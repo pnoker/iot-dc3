@@ -1,0 +1,31 @@
+server:
+  port: 8800
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+spring:
+  application:
+    name: dc3-service
+
+# 日志配置
+logging:
+  file: logs/dc3-service.log
+
+#配置Actuator监控路径 * 表示全部监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+# Eureka 服务中心
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
