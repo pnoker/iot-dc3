@@ -1,7 +1,8 @@
 # 开源分布式物联网(IOT)平台 DC_V3.0
-# DC3 Open-source IoT Platform
-
-Device management, data collection, processing and visualization for your IoT solution
+## DC3 Open-source IoT Platform
+### Device management, data collection, processing and visualization for your IoT solution
+ 
+------
  
  ## 什么是DC3 IOT平台？
  
