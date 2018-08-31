@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.pnoker</groupId>
-    <artifactId>dc3-transport</artifactId>
+    <artifactId>dc3-service</artifactId>
     <packaging>pom</packaging>
 
-    <description>DC3 数据传输处理模块，用于连接和处理物联设备。</description>
+    <description>DC3 服务提供模块集合，用于注册服务到服务中心。</description>
 
     <!-- iot-dc3 parent -->
     <parent>
@@ -19,9 +19,9 @@
 
     <!-- multiple Module -->
     <modules>
-        <module>dc3-transport-coap</module>
-        <module>dc3-transport-http</module>
-        <module>dc3-transport-mqtt</module>
+        <module>dc3-service-coap</module>
+        <module>dc3-service-http</module>
+        <module>dc3-service-mqtt</module>
     </modules>
 
     <dependencies>

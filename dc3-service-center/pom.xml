@@ -9,6 +9,7 @@
 
     <description>DC3 Eureka服务注册中心，用于提供服务注册服务。</description>
 
+    <!-- iot-dc3 parent -->
     <parent>
         <groupId>com.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>

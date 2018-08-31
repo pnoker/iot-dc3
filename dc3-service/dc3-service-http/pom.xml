@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pnoker</groupId>
-    <artifactId>dc3-dbs</artifactId>
+    <groupId>com.pnoker.service</groupId>
+    <artifactId>dc3-service-http</artifactId>
     <packaging>jar</packaging>
 
-    <description>DC3 数据库集中操作管理模块，用于提供给各类数据库操作服务。</description>
+    <description>DC3 服务提供HTTP模块，用于注册服务到服务中心。</description>
 
-    <!-- iot-dc3 parent -->
+    <!-- iot-dc3 transport parent -->
     <parent>
         <groupId>com.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-service</artifactId>
         <version>3.0</version>
     </parent>
 
