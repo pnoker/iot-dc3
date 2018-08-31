@@ -1,6 +1,8 @@
 # 开源分布式物联网(IOT)平台 DC_V3.0
-## DC3 Open-source IoT Platform
-### Device management, data collection, processing and visualization for your IoT solution
+
+DC3 Open-source IoT Platform
+
+Device management, data collection, processing and visualization for your IoT solution
  
 ------
  
@@ -26,6 +28,33 @@ DC3设计为：
 > * 4.可定制:添加新的设备协议，并注册到服务中心；
 > * 5.耐用:永远不要失去你的数据。
 > * 更多的……
+ 
+## 快速部署DC3 IOT平台
+
+### 初始化
+
+```bash
+sh init.sh
+```
+
+### 编译打包
+
+```bash
+sh build.sh
+```
+
+### 启动
+
+```bash
+sh starup.sh
+```
+
+### 停止
+
+```bash
+sh shutdown.sh
+```
+
  
 ## DC3 IOT平台架构？
 
