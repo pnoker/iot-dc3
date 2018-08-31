@@ -1,6 +1,6 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
-logs/
+dc3-logs/
 
 ### STS ###
 .apt_generated

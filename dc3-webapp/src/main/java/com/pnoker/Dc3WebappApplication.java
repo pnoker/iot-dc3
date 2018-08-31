@@ -15,9 +15,9 @@ import org.springframework.web.client.RestTemplate;
 @EnableAsync
 @EnableDiscoveryClient
 @SpringBootApplication
-public class WebappApplication {
+public class Dc3WebappApplication {
     public static void main(String[] args) {
-        SpringApplication.run(WebappApplication.class, args);
+        SpringApplication.run(Dc3WebappApplication.class, args);
     }
 
     @Bean

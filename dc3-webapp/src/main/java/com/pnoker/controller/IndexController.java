@@ -19,8 +19,8 @@ public class IndexController {
     @Autowired
     RestTemplate restTemplate;
 
-    @RequestMapping(value = "/ribbon-consumer", method = RequestMethod.GET)
-    public String helloController() {
-        return restTemplate.getForEntity("http://DC3-CLI-MODBUS/hello", String.class).getBody();
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)
+    public String hello() {
+        return restTemplate.getForEntity("http://DC3-DBS/hello", String.class).getBody();
     }
 }

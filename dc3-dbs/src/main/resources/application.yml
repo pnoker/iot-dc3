@@ -20,7 +20,7 @@ spring:
 
 # 日志配置
 logging:
-  file: logs/dc3-dbs.log
+  file: dc3-logs/dc3-dbs.log
 
 #配置Actuator监控路径 * 表示全部监控
 management:

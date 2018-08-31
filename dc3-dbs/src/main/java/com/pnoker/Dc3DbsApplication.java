@@ -10,9 +10,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  */
 @EnableEurekaClient
 @SpringBootApplication
-public class DbServiceApplication {
+public class Dc3DbsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DbServiceApplication.class, args);
+        SpringApplication.run(Dc3DbsApplication.class, args);
     }
 }
