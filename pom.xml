@@ -8,7 +8,7 @@
     <version>3.0</version>
     <packaging>pom</packaging>
 
-    <description>数据采集系统 V3.0 , 基于Spring Cloud框架搭建</description>
+    <description>开源分布式物联网(IOT)平台 , 基于Spring Cloud框架搭建</description>
 
     <!-- parent -->
     <parent>
