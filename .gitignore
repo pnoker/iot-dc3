@@ -1,6 +1,6 @@
 target/
-!.mvn/wrapper/maven-wrapper.jar
 dc3/logs/
+dc3/doc/
 
 ### STS ###
 .apt_generated
@@ -22,3 +22,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+### Maven ###
+!.mvn/wrapper/maven-wrapper.jar

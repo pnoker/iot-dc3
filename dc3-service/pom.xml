@@ -19,8 +19,6 @@
 
     <!-- multiple Module -->
     <modules>
-        <module>dc3-service-coap</module>
-        <module>dc3-service-http</module>
         <module>dc3-service-mqtt</module>
     </modules>
 

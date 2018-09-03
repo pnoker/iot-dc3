@@ -15,7 +15,7 @@ logging:
 
 #配置Actuator监控路径 * 表示全部监控
 management:
-  endpoints:
+  endpoints: 
     web:
       exposure:
         include: '*'
