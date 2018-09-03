@@ -43,7 +43,9 @@ spring-eurake、spring-zuul、spring-hystrix、spring-ribbon、spring-cloud-conf
 
 ### 架构设计
 
-![iot-dc3-architecture](/dc3/images/iot-dc3-architecture.jpg)
+![iot-dc3-architecture](/dc3/images/iot-dc3-architecture1.jpg)
+
+![iot-dc3-architecture](/dc3/images/iot-dc3-architecture2.jpg)
 
 
 

@@ -1,0 +1,20 @@
+server:
+  port: 8800
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+# 日志配置
+logging:
+  file: dc3/logs/service/center/dc3-service-center-dev.log
+
+# Eureka 服务中心
+eureka:
+  instance:
+    hostname: service1
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://service2:8800/eureka/
