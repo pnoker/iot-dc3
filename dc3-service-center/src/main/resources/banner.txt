@@ -1,9 +1,9 @@
-${AnsiColor.BRIGHT_GREEN}
+
+${AnsiColor.BRIGHT_CYAN}Spring Boot${spring-boot.formatted-version}${AnsiColor.BRIGHT_RED}
     .___     ________    .__        __            .__          __    _____
   __| _/____ \_____  \   |__| _____/  |_   ______ |  | _____ _/  |__/ ____\___________  _____
  / __ |/ ___\  _(__  <   |  |/  _ \   __\  \____ \|  | \__  \\   __\   __\/  _ \_  __ \/     \
 / /_/ \  \___ /       \  |  (  <_> )  |    |  |_> >  |__/ __ \|  |  |  | (  <_> )  | \/  Y Y  \
 \____ |\___  >______  /  |__|\____/|__|    |   __/|____(____  /__|  |__|  \____/|__|  |__|_|  /
      \/    \/       \/                     |__|             \/                              \/
-${AnsiColor.BRIGHT_RED}
-::Copyright © 2018-2020 The pnoker Authors Spring Boot${spring-boot.formatted-version}
+${AnsiColor.BRIGHT_CYAN}Copyright c 2018-2020 The ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors

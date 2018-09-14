@@ -7,11 +7,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.io.Serializable;
 
-
 /**
+ * @author: Pnoker
+ * @email: pnokers@gmail.com
+ * @project: iot-dc3
+ * @copyright: Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>
  * The class Wrapper.
- *
- * @param <T> the type parameter @author paascloud.net@gmail.com
  */
 @Data
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)

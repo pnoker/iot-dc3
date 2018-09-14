@@ -7,7 +7,7 @@ server:
 
 # 日志配置
 logging:
-  file: dc3/logs/service/center/dc3-service-center1.log
+  file: dc3/logs/service/center/dc3-service-center-product-1.log
 
 # Eureka 服务中心
 eureka:
@@ -15,4 +15,4 @@ eureka:
     hostname: service1
   client:
     serviceUrl:
-      defaultZone: http://service2:8801/eureka/,http://service3:8802/eureka/
+      defaultZone: http://service2:8801/eureka/

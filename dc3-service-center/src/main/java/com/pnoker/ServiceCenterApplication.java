@@ -10,9 +10,9 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
  */
 @EnableEurekaServer
 @SpringBootApplication
-public class Dc3ServiceCenterApplication {
+public class ServiceCenterApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Dc3ServiceCenterApplication.class, args);
+        SpringApplication.run(ServiceCenterApplication.class, args);
     }
 }
