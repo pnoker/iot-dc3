@@ -12,9 +12,9 @@ logging:
 # Eureka 服务中心
 eureka:
   instance:
-    hostname: service1
+    hostname: localhost
   client:
-    registerWithEureka: false
-    fetchRegistry: false
+    register-with-eureka: false
+    fetch-registry: false
     serviceUrl:
-      defaultZone: http://service2:8800/eureka/
+      defaultZone: http://localhost:8800/eureka/
