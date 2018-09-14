@@ -3,3 +3,13 @@ spring:
     name: dc3-webapp
   profiles:
     active: dev
+  thymeleaf:
+    cache: false
+    enabled: true
+    check-template: true
+    mode: HTML5
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+    servlet:
+      content-type: text/html
