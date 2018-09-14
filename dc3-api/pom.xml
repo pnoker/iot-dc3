@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pnoker.service</groupId>
-    <artifactId>dc3-service</artifactId>
+    <groupId>com.pnoker.api</groupId>
+    <artifactId>dc3-api</artifactId>
     <packaging>pom</packaging>
 
     <parent>
@@ -14,16 +14,24 @@
     </parent>
 
     <modules>
-        <module>dc3-service-dbs</module>
+        <module>dc3-dbs-api</module>
     </modules>
 
     <dependencies>
+        <!-- Eureka Feign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <!-- dc3 common util -->
         <dependency>
             <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common-core</artifactId>
+            <artifactId>dc3-common-util</artifactId>
             <version>3.0</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
 </project>

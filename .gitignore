@@ -25,3 +25,4 @@ nbdist/
 
 ### Maven ###
 !.mvn/wrapper/maven-wrapper.jar
+src/main/java/com/pnoker/constant/

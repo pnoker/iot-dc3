@@ -7,7 +7,7 @@
     <artifactId>dc3-webapp</artifactId>
     <packaging>jar</packaging>
 
-    <description>DC3 系统 Web 展示页面处理服务器，用于提供网页模板、页面逻辑处理、Websocket等服务。</description>
+    <description>iot-dc3 系统 Web 展示页面处理服务器，用于提供网页模板、页面逻辑处理、推送、接口等服务。</description>
 
     <parent>
         <groupId>com.pnoker</groupId>
@@ -16,15 +16,40 @@
     </parent>
 
     <dependencies>
-        <!-- Websocket 支持 -->
+        <!-- Eureka Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Web 应用 移除自带的logging和tomcat容器-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Web 容器 undertow -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-undertow</artifactId>
+        </dependency>
+
+        <!-- Thymeleaf模板引擎 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

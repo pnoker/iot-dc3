@@ -11,10 +11,10 @@ feign:
 
 # 日志配置
 logging:
-  file: dc3/logs/dc3-webapp-dev.log
+  file: dc3/logs/dc3-webapp-product.log
 
 eureka:
   client:
     register-with-eureka: false
     serviceUrl:
-      defaultZone: http://localhost:8800/eureka/
+      defaultZone: http://localhost:8800/eureka/,http://localhost:8801/eureka/
