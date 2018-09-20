@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.pnoker.common</groupId>
-    <artifactId>dc3-common-core</artifactId>
+    <artifactId>dc3-common-model</artifactId>
 
     <parent>
         <groupId>com.pnoker.common</groupId>
@@ -15,33 +15,15 @@
 
     <!-- properties -->
     <properties>
-        <mybatis.version>3.4.2</mybatis.version>
         <mapper.version>4.0.4</mapper.version>
     </properties>
 
     <dependencies>
-        <!-- dc3 common -->
-        <dependency>
-            <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common-base</artifactId>
-            <version>3.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- Mybatis -->
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>${mybatis.version}</version>
-        </dependency>
-
         <!-- tk.mybatis plugin -->
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper</artifactId>
             <version>${mapper.version}</version>
         </dependency>
-
     </dependencies>
-
 </project>

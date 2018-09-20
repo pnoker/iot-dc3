@@ -1,7 +1,11 @@
 package com.pnoker.service.dbs.dao;
 
-import com.pnoker.service.dbs.model.User;
-import tk.mybatis.mapper.common.Mapper;
+import com.pnoker.common.util.core.mybatis.MyMapper;
+import com.pnoker.common.util.model.domain.User;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
 
-public interface UserMapper extends Mapper<User> {
+@Mapper
+@Component
+public interface UserMapper extends MyMapper<User> {
 }

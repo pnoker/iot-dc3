@@ -30,8 +30,8 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
-        <javaModelGenerator targetPackage="com.pnoker.service.dbs.model"
-                            targetProject="E:/GitHubProjects/iot-dc3/dc3-service/dc3-service-dbs/src/main/java">
+        <javaModelGenerator targetPackage="com.pnoker.common.model.domain"
+                            targetProject="E:/GitHubProjects/iot-dc3/dc3-common/dc3-common-model/src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>

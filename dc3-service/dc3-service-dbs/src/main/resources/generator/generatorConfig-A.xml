@@ -8,7 +8,15 @@
 
     <context id="Mysql" targetRuntime="MyBatis3Simple"
              defaultModelType="flat">
+        <property name="autoDelimitKeywords" value="false"/>
+        <!-- 生成的Java文件的编码 -->
         <property name="javaFileEncoding" value="UTF-8"/>
+        <!-- 格式化java代码 -->
+        <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter"/>
+        <!-- 格式化XML代码 -->
+        <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
+
+        <!-- beginningDelimiter和endingDelimiter：指明数据库的用于标记数据库对象名的符号，比如ORACLE就是双引号，MYSQL默认是`反引号； -->
         <property name="beginningDelimiter" value="`"/>
         <property name="endingDelimiter" value="`"/>
 
@@ -17,7 +25,7 @@
         </plugin>
 
         <commentGenerator>
-            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressDate" value="true"/>
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
 
@@ -25,7 +33,8 @@
                         connectionURL="${jdbc.url}" userId="${jdbc.user}" password="${jdbc.password}">
         </jdbcConnection>
 
-        <javaModelGenerator targetPackage="${targetModelPackage}" targetProject="${targetJavaProject}"/>
+        <javaModelGenerator targetPackage="${targetModelPackage}"
+                            targetProject="E:/GitHubProjects/iot-dc3/dc3-common/dc3-common-model/src/main/java"/>
 
         <sqlMapGenerator targetPackage="${targetXMLPackage}" targetProject="${targetResourcesProject}"/>
 
