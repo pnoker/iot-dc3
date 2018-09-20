@@ -1,7 +1,7 @@
 package com.pnoker.service.dbs.service;
 
-import com.pnoker.common.core.support.IService;
-import com.pnoker.service.dbs.model.User;
+import com.pnoker.common.util.core.support.IService;
+import com.pnoker.common.util.model.domain.User;
 
 /**
  * @author: Pnoker

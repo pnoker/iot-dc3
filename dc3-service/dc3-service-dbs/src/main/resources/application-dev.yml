@@ -19,10 +19,6 @@ spring:
       max-lifetime: 1765000
       maximum-pool-size: 10
 
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-
 logging:
   file: dc3/logs/dc3-service-dbs-dev.log
 

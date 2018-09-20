@@ -15,6 +15,5 @@ logging:
 
 eureka:
   client:
-    register-with-eureka: false
     serviceUrl:
       defaultZone: http://localhost:8800/eureka/,http://localhost:8801/eureka/

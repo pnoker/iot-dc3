@@ -22,9 +22,8 @@
 
     <!-- multiple Module -->
     <modules>
-		<module>dc3-common</module>
-        <module>dc3-service-center</module>
-		<module>dc3-service</module>
+        <module>dc3-common</module>
+        <module>dc3-service</module>
 
         <module>dc3-webapp</module>
         <module>dc3-api</module>
@@ -36,6 +35,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <spring.tx.version>5.0.6.RELEASE</spring.tx.version>
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
         <lombok.version>1.18.2</lombok.version>
         <fastjson.version>1.2.49</fastjson.version>
@@ -62,6 +62,19 @@
     <!-- 相对于dependencyManagement，所有生命在dependencies里的依赖都会自动引入，
          并默认被所有的子项目继承 -->
     <dependencies>
+        <!-- spring transaction -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.tx.version}</version>
+        </dependency>
+
+        <!-- Feign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- Lombok 代码简化 -->
         <dependency>
             <groupId>org.projectlombok</groupId>

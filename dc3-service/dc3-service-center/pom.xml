@@ -4,44 +4,33 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.pnoker</groupId>
-    <artifactId>dc3-webapp</artifactId>
+    <artifactId>dc3-service-center</artifactId>
     <packaging>jar</packaging>
 
-    <description>iot-dc3 系统 Web 展示页面处理服务器，用于提供网页模板、页面逻辑处理、推送、接口等服务。</description>
-
+    <!-- iot-dc3 parent -->
     <parent>
-        <groupId>com.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <groupId>com.pnoker.service</groupId>
+        <artifactId>dc3-service</artifactId>
         <version>3.0</version>
     </parent>
 
     <dependencies>
-        <!-- Eureka Client -->
+        <!-- Eureka Server -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
 
-        <!-- dc3 common -->
+        <!-- Eureka Ribbon -->
         <dependency>
-            <groupId>com.pnoker.api</groupId>
-            <artifactId>dc3-api</artifactId>
-            <version>3.0</version>
-            <scope>compile</scope>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
         </dependency>
 
+        <!-- Eureka Feign -->
         <dependency>
-            <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common-core</artifactId>
-            <version>3.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common-model</artifactId>
-            <version>3.0</version>
-            <scope>compile</scope>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
         <!-- Web 应用 移除自带的logging和tomcat容器-->
@@ -62,12 +51,6 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
-        <!-- Thymeleaf模板引擎 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -79,5 +62,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

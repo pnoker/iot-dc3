@@ -1,7 +1,7 @@
 package com.pnoker.service.dbs.service.impl;
 
-import com.pnoker.common.core.support.BaseService;
-import com.pnoker.service.dbs.model.User;
+import com.pnoker.common.util.core.support.BaseService;
+import com.pnoker.common.util.model.domain.User;
 import com.pnoker.service.dbs.service.UserService;
 import org.springframework.stereotype.Service;
 

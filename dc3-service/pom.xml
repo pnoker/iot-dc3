@@ -14,13 +14,28 @@
     </parent>
 
     <modules>
+        <module>dc3-service-center</module>
         <module>dc3-service-dbs</module>
     </modules>
 
     <dependencies>
+        <!-- spring cloud hystrix -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+
+        <!-- dc3 common -->
         <dependency>
             <groupId>com.pnoker.common</groupId>
             <artifactId>dc3-common-core</artifactId>
+            <version>3.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.pnoker.common</groupId>
+            <artifactId>dc3-common-model</artifactId>
             <version>3.0</version>
             <scope>compile</scope>
         </dependency>
