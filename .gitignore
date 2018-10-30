@@ -2,27 +2,8 @@ target/
 dc3/logs/
 dc3/doc/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-
 ### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
-
-### NetBeans ###
-nbproject/private/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
-
-### Maven ###
-!.mvn/wrapper/maven-wrapper.jar
-src/main/java/com/pnoker/constant/
