@@ -13,23 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+package com.pnoker.common.exception;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: The class Config exception.
  */
-@EnableEurekaServer
-@SpringBootApplication
-public class ServiceCenterApplication {
+public class ConfigException extends RuntimeException {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ServiceCenterApplication.class, args);
+    private static final long serialVersionUID = 6480772904575978373L;
+
+    /**
+     * Instantiates a new Config exception.
+     *
+     * @param message the message
+     */
+    public ConfigException(String message) {
+        super(message);
+    }
+
+    /**
+     * Instantiates a new Config exception.
+     */
+    public ConfigException() {
+
     }
 }
