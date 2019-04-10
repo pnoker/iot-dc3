@@ -16,6 +16,8 @@
     <!-- properties -->
     <properties>
         <swagger.version>2.9.2</swagger.version>
+        <mybatis.version>3.4.2</mybatis.version>
+        <mapper.version>4.0.4</mapper.version>
     </properties>
 
     <dependencies>
@@ -23,6 +25,18 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>${swagger.version}</version>
+        </dependency>
+        <!-- Mybatis -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>${mybatis.version}</version>
+        </dependency>
+        <!-- tk.mybatis plugin -->
+        <dependency>
+            <groupId>tk.mybatis</groupId>
+            <artifactId>mapper</artifactId>
+            <version>${mapper.version}</version>
         </dependency>
     </dependencies>
 

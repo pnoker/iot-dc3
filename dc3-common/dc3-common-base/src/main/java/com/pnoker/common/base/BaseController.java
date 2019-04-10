@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker;
+package com.pnoker.common.base;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: The class Base controller.
  */
-@EnableEurekaServer
-@SpringBootApplication
-public class ServiceCenterApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(ServiceCenterApplication.class, args);
-    }
+public class BaseController {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 }

@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+package com.pnoker.common.exception;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: The class Reference model null exception.
  */
-@EnableEurekaServer
-@SpringBootApplication
-public class ServiceCenterApplication {
+public class ReferenceModelNullException extends RuntimeException {
+    private static final long serialVersionUID = -318154770875589045L;
 
-    public static void main(String[] args) {
-        SpringApplication.run(ServiceCenterApplication.class, args);
+    /**
+     * Instantiates a new Reference model null exception.
+     *
+     * @param message the message
+     */
+    public ReferenceModelNullException(String message) {
+        super(message);
     }
 }

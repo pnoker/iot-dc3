@@ -13,23 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker;
+package com.pnoker.common.mybatis;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import tk.mybatis.mapper.common.Mapper;
+import tk.mybatis.mapper.common.MySqlMapper;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: The interface My mapper.
  */
-@EnableEurekaServer
-@SpringBootApplication
-public class ServiceCenterApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(ServiceCenterApplication.class, args);
-    }
+public interface MyMapper<T> extends Mapper<T>, MySqlMapper<T> {
 }

@@ -11,13 +11,13 @@
     <name>iot-dc3</name>
     <url>https://github.com/pnoker/iot-dc3</url>
     <inceptionYear>2018</inceptionYear>
-    <description>开源分布式物联网(IOT)平台 , 基于Spring Cloud框架搭建</description>
+    <description>分布式物联网(IOT)平台 IOT-DC3, 基于开源Spring Cloud框架搭建</description>
 
     <!-- spring-boot-starter-parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.3.RELEASE</version>
+        <version>2.0.6.RELEASE</version>
     </parent>
 
     <!-- multiple Module -->
@@ -81,6 +81,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <!--只在编译和测试时使用-->
             <scope>provided</scope>
         </dependency>
 
