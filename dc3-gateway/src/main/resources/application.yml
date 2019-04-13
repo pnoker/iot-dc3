@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: dc3-gateway
+  profiles:
+    active: dev

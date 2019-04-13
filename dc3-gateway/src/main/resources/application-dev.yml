@@ -1,0 +1,27 @@
+server:
+  port: 8000
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+# 日志配置
+logging:
+  file: dc3/logs/dc3-gateway-dev.log
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8800/eureka/
+zuul:
+  routes:
+    webapp:
+      path: /webapp/**
+      serviceId: dc3-webapp
+    service:
+      path: /service/center/**
+      serviceId: dc3-service-center
+    eureka:
+      path: /eureka/**
+      serviceId: dc3-service-center
+      stripPrefix: false
