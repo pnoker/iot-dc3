@@ -15,7 +15,6 @@
 
     <modules>
         <module>dc3-common-base</module>
-		<module>dc3-common-core</module>
 		<module>dc3-common-util</module>
 		<module>dc3-common-model</module>
     </modules>

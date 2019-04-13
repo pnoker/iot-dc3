@@ -1,0 +1,20 @@
+iot-dc3-service-center {
+    dev: 8800
+    product1: 8801
+    product2: 8802
+}
+
+iot-dc3-dbs {
+    dev: 8805
+    product: 8805
+}
+
+iot-dc3-webapp {
+    dev: 8808
+    product: 8808
+}
+
+iot-dc3-gateway {
+    dev: 8000
+    product: 8000
+}
