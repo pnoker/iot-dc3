@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.service.dbs.service.impl;
+package com.pnoker;
 
-import com.pnoker.common.base.BaseService;
-import com.pnoker.common.util.model.domain.User;
-import com.pnoker.service.dbs.service.UserService;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -26,6 +26,11 @@ import org.springframework.stereotype.Service;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Service
-public class UserServiceImpl extends BaseService<User> implements UserService {
+@EnableEurekaClient
+@SpringBootApplication
+@EnableTransactionManagement
+public class DbsApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DbsApplication.class, args);
+    }
 }

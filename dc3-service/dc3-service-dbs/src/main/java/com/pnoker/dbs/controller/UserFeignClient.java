@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.service.dbs.controller;
+package com.pnoker.dbs.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.pnoker.api.dbs.UserFeignApi;
@@ -21,7 +21,7 @@ import com.pnoker.common.base.BaseController;
 import com.pnoker.common.util.model.domain.User;
 import com.pnoker.common.util.wrapper.WrapMapper;
 import com.pnoker.common.util.wrapper.Wrapper;
-import com.pnoker.service.dbs.service.UserService;
+import com.pnoker.dbs.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
