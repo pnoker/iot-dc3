@@ -1,3 +1,7 @@
 module.exports = {
-  outputDir: 'express/public'
+    outputDir: 'express/public',
+    productionSourceMap: false,
+    devServer: {
+        port: 8081,
+    }
 }
