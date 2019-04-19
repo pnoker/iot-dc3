@@ -5,12 +5,24 @@
     </div>
 </template>
 
+<style>
+    .home {
+        margin-top: 61px;
+    }
+</style>
+
 <script>
     // @ is an alias to /src
     import HelloWorld from '@/components/HelloWorld.vue'
 
     export default {
         name: 'home',
+        data() {
+            return {};
+        },
+        created() {
+            this.$store.state.activeIndex = '/'
+        },
         components: {
             HelloWorld
         }
