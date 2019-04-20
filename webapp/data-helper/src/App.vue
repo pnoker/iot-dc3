@@ -1,12 +1,19 @@
 <template>
-    <div id="app">
-        <el-menu id="nav" :default-active="$store.state.activeIndex" mode="horizontal" :router=true
+    <div class="container">
+        <el-menu class="nav"
+                 :default-active="$store.state.navIndex"
+                 mode="horizontal"
+                 :router=true
                  @select="handleSelect">
-            <el-menu-item index="/">Home</el-menu-item>
+            <el-menu-item index="/">首页</el-menu-item>
             <el-menu-item index="3" disabled>消息中心</el-menu-item>
-            <el-menu-item index="/about">About</el-menu-item>
+            <el-menu-item index="/about">关于</el-menu-item>
         </el-menu>
-        <router-view/>
+        <div class="body">
+            <el-scrollbar style="height: 100%;">
+                <router-view/>
+            </el-scrollbar>
+        </div>
     </div>
 </template>
 
@@ -15,7 +22,7 @@
         margin: 0px;
     }
 
-    #app {
+    .container {
         font-family: 'Avenir', Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -23,11 +30,21 @@
         color: #2c3e50;
     }
 
-    .el-menu {
-        box-shadow: 0 0 5px #888;
+    .nav {
         width: 100%;
         position: fixed;
         top: 0px;
+    }
+
+    .body {
+        position: absolute;
+        width: 100%;
+        top: 60px;
+        bottom: 5px;
+
+        .el-scrollbar__wrap {
+            overflow-x: hidden;
+        }
     }
 </style>
 

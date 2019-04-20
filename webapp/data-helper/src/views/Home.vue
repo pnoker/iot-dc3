@@ -5,14 +5,7 @@
     </div>
 </template>
 
-<style>
-    .home {
-        margin-top: 61px;
-    }
-</style>
-
 <script>
-    // @ is an alias to /src
     import HelloWorld from '@/components/HelloWorld.vue'
 
     export default {
@@ -21,7 +14,7 @@
             return {};
         },
         created() {
-            this.$store.state.activeIndex = '/'
+            this.$store.commit('changeNavSelect("/")');
         },
         components: {
             HelloWorld
