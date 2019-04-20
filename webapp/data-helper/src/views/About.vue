@@ -4,19 +4,13 @@
     </div>
 </template>
 
-<style>
-    .about {
-        margin-top: 61px;
-    }
-</style>
-
 <script>
     export default {
         data() {
             return {};
         },
         created() {
-            this.$store.state.activeIndex = '/about'
-        }
+            this.$store.commit('changeNavSelect("/about")');
+        },
     }
 </script>
