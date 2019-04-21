@@ -10,7 +10,7 @@
             return {};
         },
         created() {
-            this.$store.commit('changeNavSelect("/about")');
+            console.log(this.$store.state.navIndex)
         },
     }
 </script>

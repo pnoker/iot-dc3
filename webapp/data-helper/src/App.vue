@@ -54,11 +54,10 @@
             return {};
         },
         created() {
-            this.$store.state.activeIndex = '/'
         },
         methods: {
-            handleSelect(key, keyPath) {
-                console.log(key, keyPath);
+            handleSelect(key) {
+                this.$store.commit('handleSelect', key);
             }
         }
     }
