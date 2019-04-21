@@ -1,12 +1,13 @@
 <template>
     <div class="container">
         <el-menu class="nav"
-                 :default-active="$store.state.navIndex"
+                 :default-active="$store.getters.getNav"
                  mode="horizontal"
                  :router=true
                  @select="handleSelect">
             <el-menu-item index="/">首页</el-menu-item>
-            <el-menu-item index="3" disabled>消息中心</el-menu-item>
+            <el-menu-item index="/data-base">数据库</el-menu-item>
+            <el-menu-item index="/import-data">数据导入</el-menu-item>
             <el-menu-item index="/about">关于</el-menu-item>
         </el-menu>
         <div class="body">
@@ -26,7 +27,6 @@
         font-family: 'Avenir', Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        text-align: center;
         color: #2c3e50;
     }
 
@@ -56,8 +56,8 @@
         created() {
         },
         methods: {
-            handleSelect(key) {
-                this.$store.commit('handleSelect', key);
+            handleSelect(key, keyPath) {
+                console.log(key, keyPath);
             }
         }
     }

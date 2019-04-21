@@ -5,6 +5,11 @@
     </div>
 </template>
 
+<style>
+    .home {
+        text-align: center;
+    }
+</style>
 <script>
     import HelloWorld from '@/components/HelloWorld.vue'
 
@@ -14,6 +19,7 @@
             return {};
         },
         created() {
+            this.$store.commit('handleSelect', '/');
         },
         components: {
             HelloWorld

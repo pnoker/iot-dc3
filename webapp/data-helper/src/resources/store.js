@@ -5,11 +5,16 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        navIndex: '/'
+        nav: '/'
     },
     mutations: {
         handleSelect(state, index) {
-            state.navIndex = index;
+            state.nav = index;
+        }
+    },
+    getters:{
+        getNav(state){
+            return state.nav;
         }
     }
 })
