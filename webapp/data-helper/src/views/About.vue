@@ -4,13 +4,19 @@
     </div>
 </template>
 
+<style>
+    .about {
+        text-align: center;
+    }
+</style>
+
 <script>
     export default {
         data() {
             return {};
         },
         created() {
-            console.log(this.$store.state.navIndex)
-        },
+            this.$store.commit('handleSelect', '/about');
+        }
     }
 </script>
