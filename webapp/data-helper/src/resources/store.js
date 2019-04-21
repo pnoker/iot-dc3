@@ -8,7 +8,7 @@ export default new Vuex.Store({
         navIndex: '/'
     },
     mutations: {
-        changeNavSelect(state, index) {
+        handleSelect(state, index) {
             state.navIndex = index;
         }
     }

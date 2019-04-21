@@ -14,7 +14,6 @@
             return {};
         },
         created() {
-            this.$store.commit('changeNavSelect("/")');
         },
         components: {
             HelloWorld
