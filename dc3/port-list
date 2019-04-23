@@ -9,6 +9,11 @@ iot-dc3-dbs {
     product: 8805
 }
 
+dc3-service-rtsp-rtmp {
+    dev: 8806
+    product: 8806
+}
+
 iot-dc3-webapp {
     dev: 8808
     product: 8808

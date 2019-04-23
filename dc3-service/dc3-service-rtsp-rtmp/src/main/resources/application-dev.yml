@@ -1,0 +1,26 @@
+server:
+  port: 8806
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+spring:
+  redis:
+    database: 0
+    host: 114.116.9.76
+    port: 6379
+    password: pnoker
+
+feign:
+  hystrix:
+    enabled: true
+
+# 日志配置
+logging:
+  file: dc3/logs/dc3-service-rtsp-rtmp-dev.log
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8800/eureka/

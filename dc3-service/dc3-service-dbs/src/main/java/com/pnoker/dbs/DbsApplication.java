@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker;
+package com.pnoker.dbs;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -25,11 +26,11 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@EnableEurekaServer
+@EnableEurekaClient
 @SpringBootApplication
-public class ServiceCenterApplication {
-
+@EnableTransactionManagement
+public class DbsApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ServiceCenterApplication.class, args);
+        SpringApplication.run(DbsApplication.class, args);
     }
 }

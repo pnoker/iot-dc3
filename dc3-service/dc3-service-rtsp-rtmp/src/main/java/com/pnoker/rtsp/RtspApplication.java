@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.hystrix;
+package com.pnoker.rtsp;
 
-import com.pnoker.api.dbs.UserFeignApi;
-import com.pnoker.common.wrapper.WrapMapper;
-import com.pnoker.common.wrapper.Wrapper;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -26,10 +27,12 @@ import org.springframework.stereotype.Component;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Component
-public class UserFeignApiHystrix implements UserFeignApi {
-    @Override
-    public Wrapper<String> getById(Long userId) {
-        return WrapMapper.wrap(Wrapper.ERROR_CODE, Wrapper.ERROR_MESSAGE);
+@EnableAsync
+@EnableFeignClients
+@EnableEurekaClient
+@SpringBootApplication
+public class RtspApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(RtspApplication.class, args);
     }
 }
