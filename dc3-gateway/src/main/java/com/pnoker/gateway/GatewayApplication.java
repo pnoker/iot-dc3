@@ -1,4 +1,4 @@
-package com.pnoker;
+package com.pnoker.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

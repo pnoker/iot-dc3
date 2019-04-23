@@ -16,7 +16,7 @@
 package com.pnoker.api.dbs;
 
 import com.pnoker.api.dbs.hystrix.UserFeignApiHystrix;
-import com.pnoker.common.util.wrapper.Wrapper;
+import com.pnoker.common.wrapper.Wrapper;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

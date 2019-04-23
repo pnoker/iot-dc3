@@ -16,6 +16,7 @@
     <modules>
         <module>dc3-service-center</module>
         <module>dc3-service-dbs</module>
+        <module>dc3-service-rtsp-rtmp</module>
     </modules>
 
     <dependencies>
@@ -23,6 +24,11 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <!-- dc3 common -->

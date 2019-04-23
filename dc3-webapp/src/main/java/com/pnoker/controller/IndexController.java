@@ -18,7 +18,7 @@ package com.pnoker.controller;
 import com.alibaba.fastjson.JSON;
 import com.pnoker.api.dbs.UserFeignApi;
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.util.wrapper.Wrapper;
+import com.pnoker.common.wrapper.Wrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
