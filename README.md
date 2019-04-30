@@ -15,7 +15,7 @@ Device management, data collection, processing and visualization for your IoT so
 > * 分析传入的遥测和复杂事件处理触发警报；
 > * 控制设备使用远程过程调用(RPC)；
 > * 构建工作流基于设备生命周期事件,REST API,RPC请求,等等
-> * 推动设备数据到其他系统。
+> * 推送设备数据到其他系统。
 > * 更多的……
 
 DC3设计为：
@@ -50,24 +50,3 @@ spring-eurake、spring-zuul、spring-hystrix、spring-ribbon、spring-cloud-conf
 * 技术架构
 
 ![iot-dc3-architecture](/dc3/images/iot-dc3-architecture2.jpg)
-
-## 快速部署DC3 IOT平台
-
-```bash
-
-# 初始化
-sh init.sh
-
-# 编译打包
-sh build.sh
-
-# 启动
-sh starup.sh
-
-# 停止
-sh shutdown.sh
-
-```
-
-
-
