@@ -9,7 +9,6 @@ feign:
   hystrix:
     enabled: true
 
-# 日志配置
 logging:
   file: dc3/logs/dc3-webapp-product.log
 

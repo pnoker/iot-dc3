@@ -3,11 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pnoker.rtmp</groupId>
-    <artifactId>dc3-rtmp</artifactId>
+    <groupId>com.pnoker.service.socket</groupId>
+    <artifactId>dc3-socket</artifactId>
     <packaging>jar</packaging>
 
-    <description>iot-dc3 RTSP流转RTMP流 服务。</description>
+    <description>iot-dc3 Socket处理 服务。</description>
 
     <parent>
         <groupId>com.pnoker.service</groupId>
@@ -16,6 +16,13 @@
     </parent>
 
     <dependencies>
+
+        <!--Netty-->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.35.Final</version>
+        </dependency>
 
     </dependencies>
 

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.hystrix;
+package com.pnoker.register;
 
-import com.pnoker.api.dbs.UserFeignApi;
-import feign.hystrix.FallbackFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -25,11 +25,11 @@ import org.springframework.stereotype.Component;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Component
-public class UserFeignApiHystrix implements FallbackFactory<UserFeignApi> {
+@EnableEurekaServer
+@SpringBootApplication
+public class RegisterApplication {
 
-    @Override
-    public UserFeignApi create(Throwable cause) {
-        return userId -> String.format("无 %s 信息", userId);
+    public static void main(String[] args) {
+        SpringApplication.run(RegisterApplication.class, args);
     }
 }

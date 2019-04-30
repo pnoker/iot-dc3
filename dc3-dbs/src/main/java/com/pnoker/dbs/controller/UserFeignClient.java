@@ -13,35 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.controller;
+package com.pnoker.dbs.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.pnoker.api.dbs.UserFeignApi;
 import com.pnoker.common.base.BaseController;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rest接口控制器
+ * <p>Description:
  */
 @Slf4j
 @RestController
-public class IndexController extends BaseController {
-    @Autowired
-    private UserFeignApi userFeignApi;
+public class UserFeignClient extends BaseController implements UserFeignApi {
 
-    @RequestMapping(value = "/hello", method = RequestMethod.GET)
-    public String hello() {
-        log.info("hello world");
-        String wrapper = userFeignApi.getById(12L);
-        log.info(JSON.toJSONString(wrapper));
-        return JSON.toJSONString(wrapper);
+    @Override
+    public String getById(@PathVariable("userId") Long userId) {
+        log.info("search userId {}", userId);
+        return "";
     }
-
 }

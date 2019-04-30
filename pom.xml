@@ -13,7 +13,7 @@
     <inceptionYear>2018</inceptionYear>
     <description>分布式物联网(IOT)平台 IOT-DC3, 基于开源Spring Cloud框架搭建</description>
 
-    <!-- spring-boot-starter-parent -->
+    <!-- Spring-Boot-Starter-Parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -22,12 +22,15 @@
 
     <!-- multiple Module -->
     <modules>
+        <module>dc3-gateway</module>
+        <module>dc3-api</module>
         <module>dc3-common</module>
+
+        <module>dc3-register</module>
+        <module>dc3-dbs</module>
         <module>dc3-service</module>
 
         <module>dc3-webapp</module>
-        <module>dc3-api</module>
-        <module>dc3-gateway</module>
 
     </modules>
 
@@ -50,6 +53,7 @@
         然后它就会使用在这个dependencyManagement元素中指定的版本号-->
     <dependencyManagement>
         <dependencies>
+
             <!-- Spring Cloud -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -65,17 +69,11 @@
     <!-- 相对于dependencyManagement，所有生命在dependencies里的依赖都会自动引入，
          并默认被所有的子项目继承 -->
     <dependencies>
-        <!-- spring transaction -->
+        <!-- Spring Transaction -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
             <version>${spring.tx.version}</version>
-        </dependency>
-
-        <!-- Feign -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
         <!-- Lombok 代码简化 -->

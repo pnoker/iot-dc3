@@ -5,7 +5,6 @@ server:
     buffer-size: 512
     io-threads: 2
 
-# 日志配置
 logging:
   file: dc3/logs/dc3-gateway-product.log
 
@@ -19,9 +18,9 @@ zuul:
       path: /webapp/**
       serviceId: dc3-webapp
     service:
-      path: /service/center/**
-      serviceId: dc3-service-center
+      path: /register/**
+      serviceId: dc3-register
     eureka:
       path: /eureka/**
-      serviceId: dc3-service-center
+      serviceId: dc3-register
       stripPrefix: false

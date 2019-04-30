@@ -1,0 +1,28 @@
+{
+  "iot-dc3-port-list": {
+    "iot-dc3-webapp": {
+      "dev": 8000,
+      "product": 8010
+    },
+    "iot-dc3-gateway": {
+      "dev": 8001,
+      "product": 8011
+    },
+    "iot-dc3-register": {
+      "dev": 8800,
+      "product": 8810
+    },
+    "iot-dc3-dbs": {
+      "dev": 8801,
+      "product": 8811
+    },
+    "dc3-service-rtsp-rtmp": {
+      "dev": 8803,
+      "product": 8813
+    },
+    "dc3-service-socket": {
+      "dev": 8804,
+      "product": 8814
+    }
+  }
+}

@@ -3,17 +3,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pnoker</groupId>
-    <artifactId>dc3-webapp</artifactId>
+    <groupId>com.pnoker.dbs</groupId>
+    <artifactId>dc3-dbs</artifactId>
     <packaging>jar</packaging>
 
-    <description>iot-dc3 系统 Web 展示页面处理服务器，用于提供网页模板、页面逻辑处理、推送、接口等服务。</description>
-
     <parent>
-        <groupId>com.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
+        <groupId>com.pnoker</groupId>
         <version>3.0</version>
     </parent>
+
+    <!-- properties -->
+    <properties>
+        <mariadb.version>2.3.0</mariadb.version>
+        <hikaricp.version>3.2.0</hikaricp.version>
+    </properties>
 
     <dependencies>
         <!-- Eureka Client -->
@@ -40,6 +44,44 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
+        <!-- 移除 Tomcat 连接池，使用 HikariCP  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>tomcat-jdbc</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- HikariCP连接池 -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+        </dependency>
+
+        <!-- Mybatis 支持 -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Mariadb 驱动 -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb.version}</version>
+        </dependency>
+
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!-- dc3 Api -->
         <dependency>
             <groupId>com.pnoker.api</groupId>
@@ -59,7 +101,6 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
