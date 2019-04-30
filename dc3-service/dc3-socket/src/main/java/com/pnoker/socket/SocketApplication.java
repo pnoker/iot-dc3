@@ -15,11 +15,18 @@
  */
 package com.pnoker.socket;
 
+import com.pnoker.socket.server.NettyServer;
+import io.netty.channel.ChannelFuture;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableAsync;
+
+import java.net.InetSocketAddress;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -31,8 +38,30 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
-public class SocketApplication {
+public class SocketApplication implements CommandLineRunner {
+    @Value("${netty.host}")
+    private String host;
+
+    @Value("${netty.port}")
+    private int port;
+
+    @Autowired
+    private NettyServer socketServer;
+
     public static void main(String[] args) {
         SpringApplication.run(SocketApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        InetSocketAddress address = new InetSocketAddress(host, port);
+        ChannelFuture future = socketServer.run(address);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                socketServer.destroy();
+            }
+        });
+        future.channel().closeFuture().syncUninterruptibly();
     }
 }

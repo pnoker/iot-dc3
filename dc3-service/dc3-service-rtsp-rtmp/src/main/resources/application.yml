@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: dc3-service-rtsp-rtmp
-  profiles:
-    active: dev
