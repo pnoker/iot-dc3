@@ -14,37 +14,51 @@
     </parent>
 
     <modules>
-        <module>dc3-service-center</module>
-        <module>dc3-service-dbs</module>
         <module>dc3-service-rtsp-rtmp</module>
+        <module>dc3-socket</module>
     </modules>
 
     <dependencies>
-        <!-- spring cloud hystrix -->
+        <!-- Eureka Client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
+        <!-- Web 应用 移除自带的logging和tomcat容器-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <!-- dc3 common -->
+        <!-- Web 容器 undertow -->
         <dependency>
-            <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-undertow</artifactId>
+        </dependency>
+
+        <!-- dc3 Api -->
+        <dependency>
+            <groupId>com.pnoker.api</groupId>
+            <artifactId>dc3-api</artifactId>
             <version>3.0</version>
             <scope>compile</scope>
         </dependency>
 
+        <!-- dc3 Common -->
         <dependency>
             <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common-model</artifactId>
+            <artifactId>dc3-common</artifactId>
             <version>3.0</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
 </project>

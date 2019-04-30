@@ -1,5 +1,5 @@
 server:
-  port: 8808
+  port: 8800
   undertow:
     worker-threads: 20
     buffer-size: 512
@@ -10,9 +10,11 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/dc3-webapp-dev.log
+  file: dc3/logs/dc3-register-dev.log
 
 eureka:
+  instance:
+    hostname: localhost
   client:
     serviceUrl:
       defaultZone: http://localhost:8800/eureka/

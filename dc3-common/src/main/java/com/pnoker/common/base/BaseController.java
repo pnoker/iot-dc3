@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.hystrix;
+package com.pnoker.common.base;
 
-import com.pnoker.api.dbs.UserFeignApi;
-import feign.hystrix.FallbackFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: The class Base controller.
  */
-@Component
-public class UserFeignApiHystrix implements FallbackFactory<UserFeignApi> {
-
-    @Override
-    public UserFeignApi create(Throwable cause) {
-        return userId -> String.format("无 %s 信息", userId);
-    }
+public class BaseController {
 }

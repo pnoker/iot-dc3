@@ -1,5 +1,5 @@
 spring:
   application:
-    name: dc3-webapp
+    name: dc3-register
   profiles:
     active: dev
