@@ -13,6 +13,7 @@
     "element-ui": "^2.7.2",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
+    "video.js": "^7.5.4",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.4",
     "vue-router": "^3.0.3",

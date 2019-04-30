@@ -10,7 +10,7 @@
             <div class="text item">
                 <el-table
                         :data="tableData"
-                        height="250"
+                        height="500"
                         border
                         style="width: 100%">
                     <el-table-column

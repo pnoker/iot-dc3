@@ -12,12 +12,10 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8800/eureka/,http://localhost:8801/eureka/
+
 zuul:
   routes:
-    webapp:
-      path: /webapp/**
-      serviceId: dc3-webapp
-    service:
+    register:
       path: /register/**
       serviceId: dc3-register
     eureka:
