@@ -1,6 +1,6 @@
-package com.pnoker.rtsp.bean;
+package com.pnoker.rtmp.bean;
 
-import com.pnoker.rtsp.handle.OutputHandle;
+import com.pnoker.rtmp.handle.OutputHandle;
 import lombok.Data;
 
 import java.io.IOException;

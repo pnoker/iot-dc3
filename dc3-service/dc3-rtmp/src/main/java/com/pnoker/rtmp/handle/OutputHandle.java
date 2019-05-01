@@ -1,4 +1,4 @@
-package com.pnoker.rtsp.handle;
+package com.pnoker.rtmp.handle;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

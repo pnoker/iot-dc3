@@ -1,4 +1,4 @@
-package com.pnoker.rtsp.command;
+package com.pnoker.rtmp.command;
 
 
 import lombok.Data;
@@ -43,7 +43,7 @@ public class CommandBuilder {
     public static void main(String[] args) {
         CommandBuilder builder = new CommandBuilder("D:/Documents/FFmpeg/bin/");
         builder.create("ffmpeg")
-                .add("-i", "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov")
+                .add("-i", "rtmp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov")
                 .add("-vcodec", "copy")
                 .add("-acodec", "copy")
                 .add("-f", "flv")
