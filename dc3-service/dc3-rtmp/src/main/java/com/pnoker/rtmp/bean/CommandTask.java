@@ -1,4 +1,4 @@
-package com.pnoker.rtsp.bean;
+package com.pnoker.rtmp.bean;
 
 import java.util.concurrent.LinkedBlockingQueue;
 

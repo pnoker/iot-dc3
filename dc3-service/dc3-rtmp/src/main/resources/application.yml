@@ -1,5 +1,5 @@
 spring:
   application:
-    name: dc3-service-rtsp-rtmp
+    name: dc3-rtmp
   profiles:
     active: dev
