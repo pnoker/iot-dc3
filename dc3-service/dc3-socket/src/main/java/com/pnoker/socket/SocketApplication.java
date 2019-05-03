@@ -56,12 +56,7 @@ public class SocketApplication implements CommandLineRunner {
     public void run(String... args) {
         InetSocketAddress address = new InetSocketAddress(host, port);
         ChannelFuture future = socketServer.run(address);
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                socketServer.destroy();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> socketServer.destroy()));
         future.channel().closeFuture().syncUninterruptibly();
     }
 }

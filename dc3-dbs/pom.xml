@@ -15,8 +15,9 @@
 
     <!-- properties -->
     <properties>
-        <mariadb.version>2.3.0</mariadb.version>
         <hikaricp.version>3.2.0</hikaricp.version>
+        <mybatis.plus.version>3.1.1</mybatis.plus.version>
+        <mariadb.version>2.3.0</mariadb.version>
     </properties>
 
     <dependencies>
@@ -63,10 +64,11 @@
             <version>${hikaricp.version}</version>
         </dependency>
 
-        <!-- Mybatis 支持 -->
+        <!-- Mybatis Plus -->
         <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis.plus.version}</version>
         </dependency>
 
         <!-- Mariadb 驱动 -->
@@ -86,7 +88,6 @@
         <dependency>
             <groupId>com.pnoker.api</groupId>
             <artifactId>dc3-api</artifactId>
-            <version>3.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -94,13 +95,13 @@
         <dependency>
             <groupId>com.pnoker.common</groupId>
             <artifactId>dc3-common</artifactId>
-            <version>3.0</version>
             <scope>compile</scope>
         </dependency>
 
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

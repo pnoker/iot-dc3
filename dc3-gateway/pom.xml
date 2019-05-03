@@ -22,12 +22,6 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
-        <!-- Eureka Ribbon -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-        </dependency>
-
         <!-- Zuul Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -52,9 +46,24 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
+        <!-- dc3 Api -->
+        <dependency>
+            <groupId>com.pnoker.api</groupId>
+            <artifactId>dc3-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- dc3 Common -->
+        <dependency>
+            <groupId>com.pnoker.common</groupId>
+            <artifactId>dc3-common</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
