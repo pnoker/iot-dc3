@@ -21,11 +21,10 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- dc3 common -->
+        <!-- dc3 Common -->
         <dependency>
             <groupId>com.pnoker.common</groupId>
             <artifactId>dc3-common</artifactId>
-            <version>3.0</version>
             <scope>compile</scope>
         </dependency>
 

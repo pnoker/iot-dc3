@@ -44,7 +44,6 @@
         <dependency>
             <groupId>com.pnoker.api</groupId>
             <artifactId>dc3-api</artifactId>
-            <version>3.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -52,7 +51,6 @@
         <dependency>
             <groupId>com.pnoker.common</groupId>
             <artifactId>dc3-common</artifactId>
-            <version>3.0</version>
             <scope>compile</scope>
         </dependency>
 
