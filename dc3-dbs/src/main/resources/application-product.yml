@@ -23,9 +23,12 @@ feign:
   hystrix:
     enabled: true
 
-mybatis:
+mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      table-prefix: iot_
 
 # 日志配置
 logging:
