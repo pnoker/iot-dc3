@@ -23,6 +23,13 @@ feign:
   hystrix:
     enabled: true
 
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      table-prefix: iot_
+
 logging:
   file: dc3/logs/dc3-dbs-dev.log
 
@@ -30,3 +37,4 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8800/eureka/
+
