@@ -16,6 +16,9 @@
     <modules>
         <module>dc3-rtmp</module>
         <module>dc3-socket</module>
+        <module>dc3-opc</module>
+        <module>dc3-opc-ua</module>
+        <module>dc3-plc-s7</module>
     </modules>
 
     <dependencies>

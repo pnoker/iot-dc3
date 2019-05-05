@@ -1,5 +1,5 @@
 server:
-  port: 8807
+  port: 8814
   undertow:
     worker-threads: 20
     buffer-size: 512
