@@ -1,5 +1,5 @@
 server:
-  port: 8804
+  port: 8805
   undertow:
     worker-threads: 20
     buffer-size: 512
@@ -9,12 +9,8 @@ feign:
   hystrix:
     enabled: true
 
-netty:
-  host: 127.0.0.1
-  port: 7000
-
 logging:
-  file: dc3/logs/dc3-socket-dev.log
+  file: dc3/logs/dc3-opc-dev.log
 
 eureka:
   client:
