@@ -29,7 +29,7 @@ public class TestRtmp {
     public void testSelect() {
         log.info("test rtmp select");
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(Rtmp.ID, 1);
+        queryWrapper.eq("id", 1);
         List<Rtmp> rtmps = rtmpMapper.selectList(queryWrapper);
         rtmps.forEach(rtmp -> log.info(rtmp.toString()));
     }

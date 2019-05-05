@@ -10,7 +10,8 @@ import lombok.Data;
  */
 @Data
 public class Rtmp {
-    public static final String ID = "id";
-
     private long id;
+    private String rtspUrl;
+    private String rtmpUrl;
+    private short videoType;
 }
