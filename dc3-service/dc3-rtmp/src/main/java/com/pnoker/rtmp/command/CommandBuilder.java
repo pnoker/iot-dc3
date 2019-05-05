@@ -43,11 +43,12 @@ public class CommandBuilder {
     public static void main(String[] args) {
         CommandBuilder builder = new CommandBuilder("D:/Documents/FFmpeg/bin/");
         builder.create("ffmpeg")
-                .add("-i", "rtmp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov")
+                .add("-i", "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov")
                 .add("-vcodec", "copy")
                 .add("-acodec", "copy")
                 .add("-f", "flv")
-                .add("-y", "rtmp://106.14.182.20:1935/rtmp/tomcat").build();
+                .add("-y", "rtmp://106.14.182.20:1935/rtmp/bigbuckbunny_175k").build();
         System.out.println(builder.getCmd());
+        String cmd = "{exe} -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}";
     }
 }
