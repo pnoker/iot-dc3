@@ -1,4 +1,4 @@
-package com.pnoker.dbs.model;
+package com.pnoker.common.model.rtmp;
 
 import lombok.Data;
 
@@ -13,5 +13,6 @@ public class Rtmp {
     private long id;
     private String rtspUrl;
     private String rtmpUrl;
+    private String command;
     private short videoType;
 }

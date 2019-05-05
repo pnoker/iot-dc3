@@ -1,8 +1,8 @@
 package com.pnoker.dbs;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.dbs.mapper.RtmpMapper;
-import com.pnoker.dbs.model.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +16,7 @@ import java.util.List;
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: Rtmp表 测试类
  */
 @Slf4j
 @SpringBootTest
