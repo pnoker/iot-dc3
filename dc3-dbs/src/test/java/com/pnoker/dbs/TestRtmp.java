@@ -30,7 +30,7 @@ public class TestRtmp {
         log.info("test rtmp select");
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", 1);
-        List<Rtmp> rtmps = rtmpMapper.selectList(queryWrapper);
+        List<Rtmp> rtmps = rtmpMapper.selectList(null);
         rtmps.forEach(rtmp -> log.info(rtmp.toString()));
     }
 }

@@ -15,7 +15,9 @@
  */
 package com.pnoker.api.dbs;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.pnoker.api.dbs.hystrix.UserFeignApiHystrix;
+import com.pnoker.common.model.rtmp.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * <p>Description:
  */
 @FeignClient(name = "DC3-DBS", fallbackFactory = UserFeignApiHystrix.class)
-public interface UserFeignApi {
+public interface UserFeignApi extends BaseMapper<Rtmp> {
 
     @RequestMapping(value = "/api/user/getById/{userId}", method = RequestMethod.GET)
     String getById(@PathVariable("userId") Long userId);

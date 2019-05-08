@@ -16,11 +16,47 @@
 package com.pnoker.common.base;
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: The class Base controller.
  */
+@Slf4j
 public class BaseController {
+    /**
+     * 获取 HttpServletRequest
+     *
+     * @return
+     */
+    protected HttpServletRequest getRequest() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        return request;
+    }
+
+    /**
+     * 根据文件相对目录获取服务器上目录的真实位置
+     *
+     * @param resource
+     * @return
+     */
+    public String getResourcePath(String resource) {
+        String path = BaseController.class.getResource("/").getPath();
+        try {
+            path = URLDecoder.decode(path, "UTF-8") + resource;
+        } catch (UnsupportedEncodingException e) {
+            log.error("BaseController.getResourcePath.error {}", e.getMessage(), e);
+        }
+        return path;
+    }
+
+
 }
