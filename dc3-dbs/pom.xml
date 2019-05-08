@@ -16,7 +16,6 @@
     <!-- properties -->
     <properties>
         <hikaricp.version>3.2.0</hikaricp.version>
-        <mybatis.plus.version>3.1.1</mybatis.plus.version>
         <mariadb.version>2.3.0</mariadb.version>
     </properties>
 
@@ -68,7 +67,6 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis.plus.version}</version>
         </dependency>
 
         <!-- Mariadb 驱动 -->

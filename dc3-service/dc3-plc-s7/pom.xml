@@ -16,7 +16,12 @@
     </parent>
 
     <dependencies>
-
+        <!-- 西门子S7 PLC TCP -->
+        <dependency>
+            <groupId>com.github.s7connector</groupId>
+            <artifactId>s7connector</artifactId>
+            <version>2.1</version>
+        </dependency>
     </dependencies>
 
     <build>

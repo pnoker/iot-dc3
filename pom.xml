@@ -44,6 +44,7 @@
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
 
         <google.guava.version>27.1-jre</google.guava.version>
+        <mybatis.plus.version>3.1.1</mybatis.plus.version>
         <netty.version>4.1.35.Final</netty.version>
         <fastjson.version>1.2.57</fastjson.version>
         <jsoup.version>1.11.3</jsoup.version>
@@ -73,6 +74,13 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+
+            <!-- Mybatis Plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
             </dependency>
 
             <!-- dc3 Api -->
