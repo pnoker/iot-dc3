@@ -1,6 +1,8 @@
 package com.pnoker.common.utils.encryp;
 
 import com.google.common.base.Charsets;
+import com.pnoker.common.bean.encryp.Keys;
+import com.pnoker.common.utils.Tools;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -8,68 +10,67 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
 /**
- * @author: Pnoker
- * @email: pnokers@gmail.com
- * @project: eidps
- * @copyright: Copyright(c) 2018. Pnoker All Rights Reserved.
- * <p>系统激活工具类</p>
+ * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Author     : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description: AES 加密/解密 算法
  */
 public class AesTools {
 
     public static final String KEY_ALGORITHM = "AES";
 
-    public static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";
-
-    public static byte[] initkey() throws NoSuchAlgorithmException {
+    /**
+     * 生成AES密钥
+     *
+     * @return Keys.Aes
+     * @throws NoSuchAlgorithmException
+     */
+    public static Keys.Aes genKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM);
-        keyGenerator.init(192);
+        keyGenerator.init(128);
         SecretKey secretKey = keyGenerator.generateKey();
-        return secretKey.getEncoded();
+        Keys.Aes aes = new Keys().new Aes(Tools.encodeToString(secretKey.getEncoded()));
+        return aes;
     }
 
-    public static Key toKey(byte[] key) throws Exception {
-        SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
-        return secretKey;
+    /**
+     * AES 私钥加密
+     *
+     * @param str
+     * @param privateKey
+     * @return
+     * @throws Exception
+     */
+    public static String encrypt(String str, String privateKey) throws Exception {
+        //base64编码的私钥
+        byte[] keyBytes = Tools.decode(privateKey);
+        Key key = new SecretKeySpec(keyBytes, KEY_ALGORITHM);
+        //AES加密
+        Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        String outStr = Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
+        return outStr;
     }
 
-    public static String encrypt(String data, byte[] key) throws Exception {
-        Key k = toKey(key);
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, k);
-        return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes(Charsets.UTF_8)));
+    /**
+     * AES 私钥解密
+     *
+     * @param str
+     * @param privateKey
+     * @return
+     * @throws Exception
+     */
+    public static String decrypt(String str, String privateKey) throws Exception {
+        //base64编码的私钥
+        byte[] keyBytes = Tools.decode(privateKey);
+        Key key = new SecretKeySpec(keyBytes, KEY_ALGORITHM);
+        //AES解密
+        Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        //64位解码加密后的字符串
+        byte[] inputByte = Tools.decode(str.getBytes(Charsets.UTF_8));
+        return new String(cipher.doFinal(inputByte));
     }
-
-    public static String decrypt(String data, byte[] key) throws Exception {
-        Key k = toKey(key);
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, k);
-        return new String(cipher.doFinal(Base64.getDecoder().decode(data)));
-    }
-
-    public static void main(String[] args) throws Exception {
-//        String str = "20181020";
-//        System.out.println("原文：" + str);
-//        //初始化密钥
-//        byte[] key = SECRET_KEY.getBytes("UTF-8");
-//        System.out.println("密钥：" + SECRET_KEY);
-//        //加密数据
-//        byte[] data = encrypt(str.getBytes(), key);
-//        System.out.println("加密后：" + new String(data));
-//        //解密数据
-//        data = decrypt(data, key);
-//        System.out.println("解密后：" + new String(data));
-
-        byte[] key = initkey();
-        System.out.println("key : " + Base64.getEncoder().encodeToString(key));
-        String str = "张红元Pnoker张红元Pnoker张红元Pnoker张红元Pno";
-        System.out.println("string : " + str);
-        String enstr = encrypt(str, key);
-        System.out.println("encrypt str : " + enstr);
-        String destr = decrypt(enstr, key);
-        System.out.println("decrypt str : " + destr);
-    }
-
 }
