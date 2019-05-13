@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class UserFeignApiHystrix implements FallbackFactory<UserFeignApi> {
 
     @Override
-    public UserFeignApi create(Throwable cause) {
-        return userId -> String.format("无 %s 信息", userId);
+    public UserFeignApi create(Throwable throwable) {
+        return null;
     }
 }
