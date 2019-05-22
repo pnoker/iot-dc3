@@ -1,0 +1,106 @@
+{
+	"info": {
+		"_postman_id": "a9d59210-7c2f-4631-8b89-b2acd3af0b8c",
+		"name": "Iot-Dc3-Api-collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Iot-Dc3-Devices-Api",
+			"item": [
+				{
+					"name": "设备列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8020/device/list",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "添加设备",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8020/device/add",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新设备",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8020/device/update",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "删除设备",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8020/device/delete",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
