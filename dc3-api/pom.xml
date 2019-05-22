@@ -23,7 +23,7 @@
 
     <!-- properties -->
     <properties>
-        <mybatis.plus.support.version>2.3.3</mybatis.plus.support.version>
+        <mybatis.plus.version>3.1.1</mybatis.plus.version>
     </properties>
 
     <dependencies>
@@ -34,11 +34,11 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- Mybatis Plus Support -->
+        <!-- Mybatis Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-support</artifactId>
-            <version>${mybatis.plus.support.version}</version>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis.plus.version}</version>
         </dependency>
 
         <!-- dc3 Common -->
