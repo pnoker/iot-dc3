@@ -13,6 +13,19 @@
         <version>3.0</version>
     </parent>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- properties -->
+    <properties>
+        <mybatis.plus.support.version>2.3.3</mybatis.plus.support.version>
+    </properties>
+
     <dependencies>
 
         <!-- Eureka Feign -->
@@ -21,17 +34,17 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- Mybatis Plus -->
+        <!-- Mybatis Plus Support -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <artifactId>mybatis-plus-support</artifactId>
+            <version>${mybatis.plus.support.version}</version>
         </dependency>
 
         <!-- dc3 Common -->
         <dependency>
             <groupId>com.pnoker.common</groupId>
             <artifactId>dc3-common</artifactId>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
