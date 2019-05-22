@@ -15,7 +15,7 @@
  */
 package com.pnoker.api.dbs;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.pnoker.api.dbs.hystrix.UserFeignApiHystrix;
 import com.pnoker.common.model.rtmp.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;

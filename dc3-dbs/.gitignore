@@ -1,8 +1,0 @@
-target/
-dc3/logs/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr

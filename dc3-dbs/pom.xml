@@ -93,10 +93,10 @@
             <version>${mybatis.plus.version}</version>
         </dependency>
 
-        <!-- dc3 Common -->
+        <!-- dc3 Api -->
         <dependency>
-            <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common</artifactId>
+            <groupId>com.pnoker.api</groupId>
+            <artifactId>dc3-api</artifactId>
         </dependency>
 
     </dependencies>
