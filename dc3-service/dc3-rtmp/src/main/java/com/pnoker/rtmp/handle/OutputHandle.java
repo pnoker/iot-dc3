@@ -1,5 +1,7 @@
 package com.pnoker.rtmp.handle;
 
+import com.pnoker.rtmp.bean.CommandTask;
+import com.pnoker.rtmp.bean.Tasker;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,13 +19,15 @@ import java.io.InputStreamReader;
 @Slf4j
 @Data
 public class OutputHandle implements Runnable {
+    private String taskId;
     /**
      * 运行状态，false：运行失败
      */
     private volatile boolean status = true;
     private Process process;
 
-    public OutputHandle(Process process) {
+    public OutputHandle(String taskId, Process process) {
+        this.taskId = taskId;
         this.process = process;
     }
 
@@ -38,11 +42,11 @@ public class OutputHandle implements Runnable {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         try {
-            if (!status) {
-                throw new IOException();
-            }
             while (null != (line = reader.readLine())) {
                 handle(line);
+                if (!status) {
+                    throw new IOException();
+                }
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -60,6 +64,14 @@ public class OutputHandle implements Runnable {
         message = message.toLowerCase();
         if (message.contains("fail") || message.contains("miss")) {
             this.status = false;
+            Tasker tasker = CommandTask.taskMap.get(taskId);
+            tasker.setTimes(tasker.getTimes() + 1);
+            tasker.setStatus(3);
+            try {
+                CommandTask.taskQueue.put(tasker);
+            } catch (InterruptedException e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 }

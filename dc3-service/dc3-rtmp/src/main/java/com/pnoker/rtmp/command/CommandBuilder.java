@@ -47,7 +47,7 @@ public class CommandBuilder {
                 .add("-vcodec", "copy")
                 .add("-acodec", "copy")
                 .add("-f", "flv")
-                .add("-y", "rtmp://106.14.182.20:1935/rtmp/bigbuckbunny_175k").build();
+                .add("-y", "rtmp://114.116.9.76:1935/rtmp/bigbuckbunny_175k").build();
         System.out.println(builder.getCmd());
         String cmd = "{exe} -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}";
     }

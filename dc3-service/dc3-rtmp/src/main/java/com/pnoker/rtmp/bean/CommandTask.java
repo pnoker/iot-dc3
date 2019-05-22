@@ -1,5 +1,7 @@
 package com.pnoker.rtmp.bean;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -9,5 +11,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * <p>Description: 指令任务实体类，用于存放队列信息
  */
 public class CommandTask {
-    public static LinkedBlockingQueue taskQueue = new LinkedBlockingQueue(20);
+    public static Map<String, Tasker> taskMap = new HashMap<>(10);
+    public static LinkedBlockingQueue<Tasker> taskQueue = new LinkedBlockingQueue(20);
 }
