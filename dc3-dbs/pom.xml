@@ -13,13 +13,23 @@
         <version>3.0</version>
     </parent>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <!-- properties -->
     <properties>
-        <hikaricp.version>3.2.0</hikaricp.version>
         <mariadb.version>2.3.0</mariadb.version>
+        <hikaricp.version>3.3.1</hikaricp.version>
+        <mybatis.plus.version>3.1.1</mybatis.plus.version>
     </properties>
 
     <dependencies>
+
         <!-- Eureka Client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -56,19 +66,6 @@
             </exclusions>
         </dependency>
 
-        <!-- HikariCP连接池 -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
-        </dependency>
-
-        <!-- Mybatis Plus -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-        </dependency>
-
         <!-- Mariadb 驱动 -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
@@ -82,18 +79,24 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-        <!-- dc3 Api -->
+        <!-- HikariCP连接池 -->
         <dependency>
-            <groupId>com.pnoker.api</groupId>
-            <artifactId>dc3-api</artifactId>
-            <scope>compile</scope>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
+        </dependency>
+
+        <!-- Mybatis Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis.plus.version}</version>
         </dependency>
 
         <!-- dc3 Common -->
         <dependency>
             <groupId>com.pnoker.common</groupId>
             <artifactId>dc3-common</artifactId>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>

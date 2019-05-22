@@ -15,7 +15,16 @@
         <version>3.0</version>
     </parent>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <dependencies>
+
         <!-- Eureka Client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -44,14 +53,12 @@
         <dependency>
             <groupId>com.pnoker.api</groupId>
             <artifactId>dc3-api</artifactId>
-            <scope>compile</scope>
         </dependency>
 
         <!-- dc3 Common -->
         <dependency>
             <groupId>com.pnoker.common</groupId>
             <artifactId>dc3-common</artifactId>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>

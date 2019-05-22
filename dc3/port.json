@@ -8,6 +8,10 @@
       "dev": 8001,
       "product": 8011
     },
+    "dc3-devices": {
+      "dev": 8020,
+      "product": 8021
+    },
     "dc3-register": {
       "dev": 8800,
       "product": 8810

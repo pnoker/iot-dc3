@@ -11,13 +11,21 @@
     <name>iot-dc3</name>
     <url>https://github.com/pnoker/iot-dc3</url>
     <inceptionYear>2018</inceptionYear>
-    <description>分布式物联网(IOT)平台 IOT-DC3, 基于开源Spring Cloud框架搭建</description>
+    <description>可分布式的物联网(IOT)平台 IOT-DC3, 基于开源Spring Cloud框架搭建，实现设备互联、管理、代码生成和快速开发，兼容多种流行的物联网协议。</description>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <!-- Spring-Boot-Starter-Parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.9.RELEASE</version>
+        <version>2.1.5.RELEASE</version>
     </parent>
 
     <!-- multiple Module -->
@@ -36,22 +44,20 @@
 
     <!-- properties -->
     <properties>
+
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
 
-        <spring.tx.version>5.1.6.RELEASE</spring.tx.version>
-        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
-
-        <google.guava.version>27.1-jre</google.guava.version>
-        <mybatis.plus.version>3.1.1</mybatis.plus.version>
-        <netty.version>4.1.35.Final</netty.version>
-        <fastjson.version>1.2.57</fastjson.version>
-        <jsoup.version>1.11.3</jsoup.version>
-        <commons.lang3.version>3.9</commons.lang3.version>
         <commons.cli.version>1.4</commons.cli.version>
+        <commons.lang3.version>3.9</commons.lang3.version>
+        <spring.tx.version>5.1.7.RELEASE</spring.tx.version>
+        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
 
-        <lombok.version>1.18.6</lombok.version>
+        <lombok.version>1.18.8</lombok.version>
+        <fastjson.version>1.2.58</fastjson.version>
+        <google.guava.version>27.1-jre</google.guava.version>
+
     </properties>
 
     <!--通过dependencyManagement元素来管理jar包的版本，让子项目中引用一个依赖而不用显示的列出版本号。
@@ -67,20 +73,6 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!--Netty-->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-all</artifactId>
-                <version>${netty.version}</version>
-            </dependency>
-
-            <!-- Mybatis Plus -->
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis.plus.version}</version>
             </dependency>
 
             <!-- dc3 Api -->
@@ -112,31 +104,11 @@
             <version>${spring.tx.version}</version>
         </dependency>
 
+        <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <!-- Google Guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${google.guava.version}</version>
-        </dependency>
-
-        <!-- FastJson 工具包 -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
-        </dependency>
-
-        <!-- Jsoup -->
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>${jsoup.version}</version>
         </dependency>
 
         <!-- Commons 工具包 -->
@@ -152,6 +124,20 @@
             <version>${commons.cli.version}</version>
         </dependency>
 
+        <!-- FastJson 工具包 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
+        <!-- Google Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${google.guava.version}</version>
+        </dependency>
+
         <!-- Lombok 代码简化 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -162,23 +148,16 @@
 
     </dependencies>
 
-    <!--<repositories>
-        <repository>
-            <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
-            <url>https://repo.spring.io/snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>-->
+    <developers>
+        <developer>
+            <id>Pnoker</id>
+            <name>Pnoker</name>
+            <email>pnokers@gmail.com</email>
+            <roles>
+                <role>Project Manager</role>
+            </roles>
+            <organization>pnoker.github.io</organization>
+        </developer>
+    </developers>
 
 </project>

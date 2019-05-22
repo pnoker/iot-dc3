@@ -15,12 +15,26 @@
         <version>3.0</version>
     </parent>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- properties -->
+    <properties>
+        <netty.version>4.1.36.Final</netty.version>
+    </properties>
+
     <dependencies>
 
         <!--Netty-->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
         </dependency>
 
     </dependencies>
