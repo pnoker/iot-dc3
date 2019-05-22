@@ -1,0 +1,18 @@
+server:
+  port: 8021
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+feign:
+  hystrix:
+    enabled: true
+
+logging:
+  file: dc3/logs/dc3-devices-product.log
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8800/eureka/,http://localhost:8801/eureka/
