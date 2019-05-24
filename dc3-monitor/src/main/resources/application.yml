@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: dc3-monitor
+  security:
+    user:
+      name: admin
+      password: admin
+  boot:
+    admin:
+      ui:
+        title: TOT DC3 Open Source IOT Platform
+  profiles:
+    active: dev
