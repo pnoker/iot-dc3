@@ -21,6 +21,18 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <id>Pnoker</id>
+            <name>Pnoker</name>
+            <email>pnokers@gmail.com</email>
+            <roles>
+                <role>Project Manager</role>
+            </roles>
+            <organization>pnoker.github.io</organization>
+        </developer>
+    </developers>
+
     <!-- Spring-Boot-Starter-Parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -51,7 +63,6 @@
 
         <commons.cli.version>1.4</commons.cli.version>
         <commons.lang3.version>3.9</commons.lang3.version>
-        <spring.tx.version>5.1.7.RELEASE</spring.tx.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
 
         <lombok.version>1.18.8</lombok.version>
@@ -97,31 +108,12 @@
     <!-- 相对于dependencyManagement，所有生命在dependencies里的依赖都会自动引入，
          并默认被所有的子项目继承 -->
     <dependencies>
-        <!-- Spring Transaction -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.tx.version}</version>
-        </dependency>
 
         <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <!-- Commons 工具包 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons.lang3.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>${commons.cli.version}</version>
         </dependency>
 
         <!-- FastJson 工具包 -->
@@ -147,17 +139,5 @@
         </dependency>
 
     </dependencies>
-
-    <developers>
-        <developer>
-            <id>Pnoker</id>
-            <name>Pnoker</name>
-            <email>pnokers@gmail.com</email>
-            <roles>
-                <role>Project Manager</role>
-            </roles>
-            <organization>pnoker.github.io</organization>
-        </developer>
-    </developers>
 
 </project>
