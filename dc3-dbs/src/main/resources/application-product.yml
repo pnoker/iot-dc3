@@ -19,6 +19,15 @@ spring:
       max-lifetime: 1765000
       maximum-pool-size: 10
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
 feign:
   hystrix:
     enabled: true
