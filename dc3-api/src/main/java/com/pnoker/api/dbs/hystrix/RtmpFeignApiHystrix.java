@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs;
+package com.pnoker.api.dbs.hystrix;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.api.dbs.hystrix.UserFeignApiHystrix;
-import com.pnoker.common.model.rtmp.Rtmp;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import com.pnoker.api.dbs.feign.RtmpFeignApi;
+import feign.hystrix.FallbackFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -29,9 +25,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@FeignClient(name = "DC3-DBS", fallbackFactory = UserFeignApiHystrix.class)
-public interface UserFeignApi extends BaseMapper<Rtmp> {
+@Component
+public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
 
-    @RequestMapping(value = "/api/user/getById/{userId}", method = RequestMethod.GET)
-    String getById(@PathVariable("userId") Long userId);
+    @Override
+    public RtmpFeignApi create(Throwable throwable) {
+        return null;
+    }
 }

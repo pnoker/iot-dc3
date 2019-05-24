@@ -28,8 +28,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * <p>Description:
  */
 @EnableAsync
-@EnableFeignClients
 @EnableEurekaClient
+@EnableFeignClients
 @SpringBootApplication
 public class WebappApplication {
     public static void main(String[] args) {

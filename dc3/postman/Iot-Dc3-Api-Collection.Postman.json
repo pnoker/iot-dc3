@@ -9,7 +9,7 @@
 			"name": "Iot-Dc3-Devices-Api",
 			"item": [
 				{
-					"name": "设备列表",
+					"name": "device:device/list",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -32,7 +32,7 @@
 					"response": []
 				},
 				{
-					"name": "添加设备",
+					"name": "device:device/add",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -55,9 +55,9 @@
 					"response": []
 				},
 				{
-					"name": "更新设备",
+					"name": "device:device/update",
 					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -78,7 +78,7 @@
 					"response": []
 				},
 				{
-					"name": "删除设备",
+					"name": "device:device/delete",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -95,6 +95,61 @@
 							"path": [
 								"device",
 								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Iot-Dc3-Dbs-Api",
+			"item": [
+				{
+					"name": "dbs:/rtmp/api",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8801/rtmp/api",
+							"host": [
+								"localhost"
+							],
+							"port": "8801",
+							"path": [
+								"rtmp",
+								"api"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Iot-Dc3-Webapp-Api",
+			"item": [
+				{
+					"name": "webapp:/hello",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "localhost:8000/hello",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"hello"
 							]
 						}
 					},

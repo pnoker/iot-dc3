@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.hystrix;
+package com.pnoker.api.dbs.feign;
 
-import com.pnoker.api.dbs.UserFeignApi;
-import feign.hystrix.FallbackFactory;
-import org.springframework.stereotype.Component;
+import com.pnoker.api.dbs.hystrix.RtmpFeignApiHystrix;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -25,11 +26,10 @@ import org.springframework.stereotype.Component;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Component
-public class UserFeignApiHystrix implements FallbackFactory<UserFeignApi> {
+@RequestMapping("/rtmp")
+@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class)
+public interface RtmpFeignApi {
 
-    @Override
-    public UserFeignApi create(Throwable throwable) {
-        return null;
-    }
+    @GetMapping(value = "/api")
+    String api();
 }
