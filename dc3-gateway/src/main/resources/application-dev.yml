@@ -20,7 +20,7 @@ logging:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://114.116.9.76:8800/eureka/
+      defaultZone: http://localhost:8800/eureka/
 
 # 网关配置
 spring:

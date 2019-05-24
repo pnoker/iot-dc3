@@ -41,6 +41,12 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
+        <!-- Spring Cloud Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Web 应用 移除自带的logging和tomcat容器-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
