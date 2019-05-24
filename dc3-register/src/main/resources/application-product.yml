@@ -5,10 +5,6 @@ server:
     buffer-size: 512
     io-threads: 2
 
-feign:
-  hystrix:
-    enabled: true
-
 logging:
   file: dc3/logs/dc3-register-product-1.log
 
@@ -17,4 +13,4 @@ eureka:
     hostname: service
   client:
     serviceUrl:
-      defaultZone: http://localhost:8801/eureka/
+      defaultZone: http://service:8801/eureka/
