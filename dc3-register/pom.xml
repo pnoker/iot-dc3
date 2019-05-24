@@ -7,6 +7,8 @@
     <artifactId>dc3-register</artifactId>
     <packaging>jar</packaging>
 
+    <description>iot-dc3 系统 服务注册中心。</description>
+
     <!-- iot-dc3 parent -->
     <parent>
         <groupId>com.pnoker</groupId>

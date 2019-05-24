@@ -7,6 +7,8 @@
     <artifactId>dc3-service</artifactId>
     <packaging>pom</packaging>
 
+    <description>iot-dc3 系统 服务集合。</description>
+
     <parent>
         <groupId>com.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
