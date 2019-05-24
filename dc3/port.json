@@ -4,6 +4,10 @@
       "dev": 8000,
       "product": 8010
     },
+    "dc3-monitor": {
+      "dev": 8100,
+      "product": 8101
+    },
     "dc3-gateway": {
       "dev": 8001,
       "product": 8011
