@@ -5,6 +5,10 @@ server:
     buffer-size: 512
     io-threads: 2
 
+feign:
+  hystrix:
+    enabled: true
+
 logging:
   file: dc3/logs/dc3-webapp-product.log
 

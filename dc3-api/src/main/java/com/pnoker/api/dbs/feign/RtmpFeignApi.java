@@ -16,6 +16,7 @@
 package com.pnoker.api.dbs.feign;
 
 import com.pnoker.api.dbs.hystrix.RtmpFeignApiHystrix;
+import com.pnoker.common.model.rtmp.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,4 +33,7 @@ public interface RtmpFeignApi {
 
     @GetMapping(value = "/api")
     String api();
+
+    @GetMapping(value = "/list")
+    Rtmp list();
 }
