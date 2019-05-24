@@ -16,7 +16,7 @@
 package com.pnoker.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.pnoker.api.dbs.UserFeignApi;
+import com.pnoker.api.dbs.feign.RtmpFeignApi;
 import com.pnoker.common.base.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class IndexController extends BaseController {
     @Autowired
-    private UserFeignApi userFeignApi;
+    private RtmpFeignApi rtmpFeignApi;
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     public String hello() {
         log.info("hello world");
-        String wrapper = userFeignApi.getById(12L);
+        String wrapper = rtmpFeignApi.api();
         log.info(JSON.toJSONString(wrapper));
         return JSON.toJSONString(wrapper);
     }

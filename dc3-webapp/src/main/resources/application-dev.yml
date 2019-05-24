@@ -5,14 +5,10 @@ server:
     buffer-size: 512
     io-threads: 2
 
-feign:
-  hystrix:
-    enabled: true
-
 logging:
   file: dc3/logs/dc3-webapp-dev.log
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8800/eureka/
+      defaultZone: http://114.116.9.76:8800/eureka/

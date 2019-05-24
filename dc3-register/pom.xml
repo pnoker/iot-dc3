@@ -30,12 +30,6 @@
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
 
-        <!-- Eureka Ribbon -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-        </dependency>
-
         <!-- Web 应用 移除自带的logging和tomcat容器-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

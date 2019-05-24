@@ -55,12 +55,6 @@
             <artifactId>dc3-api</artifactId>
         </dependency>
 
-        <!-- dc3 Common -->
-        <dependency>
-            <groupId>com.pnoker.common</groupId>
-            <artifactId>dc3-common</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>

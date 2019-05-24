@@ -43,6 +43,7 @@ public class OutputHandle implements Runnable {
         String line;
         try {
             while (null != (line = reader.readLine())) {
+                log.info(line);
                 handle(line);
                 if (!status) {
                     throw new IOException();
