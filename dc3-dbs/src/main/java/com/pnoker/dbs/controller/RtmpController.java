@@ -2,6 +2,7 @@ package com.pnoker.dbs.controller;
 
 import com.pnoker.api.dbs.feign.RtmpFeignApi;
 import com.pnoker.common.base.BaseController;
+import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -23,5 +24,11 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
     public String api() {
 
         return environment.getProperty("server.port");
+    }
+
+    @Override
+    public Rtmp list() {
+        Rtmp rtmp = new Rtmp(1);
+        return rtmp;
     }
 }

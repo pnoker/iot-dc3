@@ -16,7 +16,9 @@
 package com.pnoker.api.dbs.hystrix;
 
 import com.pnoker.api.dbs.feign.RtmpFeignApi;
+import com.pnoker.common.model.rtmp.Rtmp;
 import feign.hystrix.FallbackFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,11 +27,24 @@ import org.springframework.stereotype.Component;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
+@Slf4j
 @Component
 public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
 
     @Override
     public RtmpFeignApi create(Throwable throwable) {
-        return null;
+        log.error("{}", throwable.getMessage(), throwable);
+        return new RtmpFeignApi() {
+            @Override
+            public String api() {
+                return "api() 故障，返回默认值：0";
+            }
+
+            @Override
+            public Rtmp list() {
+                Rtmp rtmp = new Rtmp(0);
+                return rtmp;
+            }
+        };
     }
 }

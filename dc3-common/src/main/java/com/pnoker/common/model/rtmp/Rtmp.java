@@ -1,5 +1,6 @@
 package com.pnoker.common.model.rtmp;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * <p>Description: Rtmp 信息实体类
  */
 @Data
+@AllArgsConstructor
 public class Rtmp {
     private long id;
     private String rtspUrl;
