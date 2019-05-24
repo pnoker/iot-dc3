@@ -7,6 +7,8 @@
     <artifactId>dc3-api</artifactId>
     <packaging>jar</packaging>
 
+    <description>iot-dc3 系统 远程调用API。</description>
+
     <parent>
         <groupId>com.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>

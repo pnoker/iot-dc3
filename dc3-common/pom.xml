@@ -7,6 +7,8 @@
     <groupId>com.pnoker.common</groupId>
     <artifactId>dc3-common</artifactId>
 
+    <description>iot-dc3 系统 公共基础类。</description>
+
     <parent>
         <groupId>com.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>

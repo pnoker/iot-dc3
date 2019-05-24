@@ -8,6 +8,8 @@
     <artifactId>dc3-gateway</artifactId>
     <packaging>jar</packaging>
 
+    <description>iot-dc3 系统 网关服务。</description>
+
     <parent>
         <artifactId>iot-dc3</artifactId>
         <groupId>com.pnoker</groupId>
