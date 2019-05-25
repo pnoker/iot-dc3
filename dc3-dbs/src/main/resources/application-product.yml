@@ -8,7 +8,8 @@ server:
 spring:
   redis:
     host: localhost
-    password: 123456
+    port: 6379
+    password:
   datasource:
     url: jdbc:mysql://localhost:3306/iot-dc3?useUnicode=true&characterEncoding=utf-8
     driver-class-name: org.mariadb.jdbc.Driver
