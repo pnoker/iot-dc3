@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.rtmp.runner;
+package com.pnoker.rtmp.thread;
 
-import com.pnoker.rtmp.thread.TaskMonitorThread;
+import com.pnoker.rtmp.bean.Global;
+import com.pnoker.rtmp.bean.Tasker;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -27,13 +28,21 @@ import org.springframework.stereotype.Component;
  * <p>Description:
  */
 @Slf4j
-@Component
-public class TeskRunner implements CommandLineRunner {
+public class TaskMonitorThread implements Runnable {
     @Override
-    public void run(String... args) {
-        TaskMonitorThread taskMonitorThread = new TaskMonitorThread();
-        Thread thread = new Thread(taskMonitorThread);
-        log.info("启动Rtsp->Rtmp任务队列监听线程");
-        thread.start();
+    public void run() {
+        log.info("Rtsp->Rtmp任务队列监听线程已启动");
+        try {
+            while (true) {
+                Tasker tasker = Global.taskQueue.take();
+                log.info("starting task {} , command {}", tasker.getTaskId(), tasker.getCommand());
+                tasker.start();
+                Thread.sleep(2000);
+            }
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
