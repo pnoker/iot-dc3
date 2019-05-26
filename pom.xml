@@ -48,6 +48,7 @@
 
         <module>dc3-register</module>
         <module>dc3-dbs</module>
+        <module>dc3-devices</module>
         <module>dc3-service</module>
 
 		<module>dc3-monitor</module>

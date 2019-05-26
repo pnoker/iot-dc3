@@ -1,48 +1,48 @@
 {
   "iot-dc3-port-list": {
-    "dc3-webapp": {
-      "dev": 8000,
-      "product": 8010
-    },
-    "dc3-monitor": {
-      "dev": 8100,
-      "product": 8101
-    },
     "dc3-gateway": {
-      "dev": 8001,
-      "product": 8011
-    },
-    "dc3-devices": {
-      "dev": 8020,
-      "product": 8021
+      "dev": 8000,
+      "product": 8000
     },
     "dc3-register": {
-      "dev": 8800,
-      "product": 8810
+      "dev": 8100,
+      "product": 8100
+    },
+    "dc3-monitor": {
+      "dev": 8200,
+      "product": 8200
+    },
+    "dc3-webapp": {
+      "dev": 8300,
+      "product": 8300
     },
     "dc3-dbs": {
-      "dev": 8801,
-      "product": 8811
+      "dev": 8400,
+      "product": 8400
     },
-    "dc3-rtmp": {
-      "dev": 8803,
-      "product": 8813
-    },
-    "dc3-socket": {
-      "dev": 8804,
-      "product": 8814
+    "dc3-devices": {
+      "dev": 8500,
+      "product": 8500
     },
     "dc3-opc": {
-      "dev": 8805,
-      "product": 8815
+      "dev": 8600,
+      "product": 8600
     },
     "dc3-opc-ua": {
-      "dev": 8806,
-      "product": 8816
+      "dev": 8610,
+      "product": 8610
     },
     "dc3-plc-s7": {
-      "dev": 8807,
-      "product": 8817
+      "dev": 8620,
+      "product": 8620
+    },
+    "dc3-rtmp": {
+      "dev": 8630,
+      "product": 8630
+    },
+    "dc3-socket": {
+      "dev": 8640,
+      "product": 8640
     }
   }
 }
