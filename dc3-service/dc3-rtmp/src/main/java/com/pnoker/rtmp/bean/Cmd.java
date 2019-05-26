@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.rtmp;
+package com.pnoker.rtmp.bean;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
+
+import lombok.Data;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -28,13 +24,34 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@EnableAsync
-@EnableScheduling
-@EnableFeignClients
-@EnableEurekaClient
-@SpringBootApplication
-public class RtmpApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(RtmpApplication.class, args);
+@Data
+public class Cmd {
+    private String cmd;
+    private StringBuilder stringBuilder;
+
+    public Cmd(String path) {
+        this.stringBuilder = new StringBuilder(path);
+    }
+
+    public Cmd create(String exe) {
+        if (null != stringBuilder) {
+            stringBuilder.append(exe);
+        }
+        return this;
+    }
+
+    public Cmd add(String cmd) {
+        if (null != stringBuilder) {
+            stringBuilder.append(" " + cmd);
+        }
+        return this;
+    }
+
+    public Cmd add(String key, String cmd) {
+        return add(key).add(cmd);
+    }
+
+    public void build() {
+        cmd = stringBuilder.toString();
     }
 }
