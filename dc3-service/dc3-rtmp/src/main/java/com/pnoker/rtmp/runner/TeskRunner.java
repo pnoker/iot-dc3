@@ -1,6 +1,6 @@
 package com.pnoker.rtmp.runner;
 
-import com.pnoker.rtmp.bean.CommandTask;
+import com.pnoker.rtmp.bean.Global;
 import com.pnoker.rtmp.bean.Tasker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -23,7 +23,7 @@ public class TeskRunner implements CommandLineRunner {
     public void run(String... args) {
         try {
             while (true) {
-                Tasker tasker = CommandTask.taskQueue.take();
+                Tasker tasker = Global.taskQueue.take();
                 log.info("starting task {} , command {}", tasker.getTaskId(), tasker.getCommand());
                 tasker.start();
                 Thread.sleep(5000);

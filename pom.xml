@@ -33,30 +33,31 @@
         </developer>
     </developers>
 
-    <!-- Spring-Boot-Starter-Parent -->
+    <!-- Spring Boot Starter Parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.5.RELEASE</version>
     </parent>
 
-    <!-- multiple Module -->
+    <!-- Multiple Module -->
     <modules>
+
         <module>dc3-gateway</module>
-        <module>dc3-api</module>
-        <module>dc3-common</module>
+        <module>dc3-webapp</module>
 
         <module>dc3-register</module>
-        <module>dc3-dbs</module>
+        <module>dc3-monitor</module>
         <module>dc3-devices</module>
         <module>dc3-service</module>
 
-		<module>dc3-monitor</module>
-        <module>dc3-webapp</module>
+        <module>dc3-dbs</module>
+        <module>dc3-api</module>
+        <module>dc3-common</module>
 
     </modules>
 
-    <!-- properties -->
+    <!-- Properties -->
     <properties>
 
         <java.version>1.8</java.version>

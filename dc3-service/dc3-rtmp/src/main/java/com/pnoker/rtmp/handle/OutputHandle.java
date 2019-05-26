@@ -1,6 +1,6 @@
 package com.pnoker.rtmp.handle;
 
-import com.pnoker.rtmp.bean.CommandTask;
+import com.pnoker.rtmp.bean.Global;
 import com.pnoker.rtmp.bean.Tasker;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -65,11 +65,11 @@ public class OutputHandle implements Runnable {
         message = message.toLowerCase();
         if (message.contains("fail") || message.contains("miss")) {
             this.status = false;
-            Tasker tasker = CommandTask.taskMap.get(taskId);
+            Tasker tasker = Global.taskMap.get(taskId);
             tasker.setTimes(tasker.getTimes() + 1);
             tasker.setStatus(3);
             try {
-                CommandTask.taskQueue.put(tasker);
+                Global.taskQueue.put(tasker);
             } catch (InterruptedException e) {
                 log.error(e.getMessage(), e);
             }

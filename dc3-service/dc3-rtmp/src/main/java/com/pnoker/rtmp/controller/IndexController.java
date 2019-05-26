@@ -16,7 +16,7 @@
 package com.pnoker.rtmp.controller;
 
 import com.pnoker.common.base.BaseController;
-import com.pnoker.rtmp.bean.CommandTask;
+import com.pnoker.rtmp.bean.Global;
 import com.pnoker.rtmp.bean.Tasker;
 import com.pnoker.rtmp.command.CommandBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class IndexController extends BaseController {
                 .add("-y", "rtmp://114.116.9.76:1935/rtmp/bigbuckbunny_175k").build();
         Tasker tasker = new Tasker(UUID.randomUUID().toString(), builder.getCmd());
         try {
-            CommandTask.taskQueue.put(tasker);
+            Global.taskQueue.put(tasker);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         }
