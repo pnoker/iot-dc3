@@ -1,6 +1,18 @@
-# 开源 &可分布式 IOT平台 DC3
+<p align="center">
+	<img src="./dc3/images/iot-dc3-logo.png" width="400">
+</p>
+<p align="center">
+	<strong>DC3是一个开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理拓展。</strong>
+</p>
+<p align="center">
+	<a>
+		<img src="https://api.travis-ci.org/shijun90/TTIot.svg?branch=master"></img>
+	</a>
+	<a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0.html">
+		<img src="https://img.shields.io/badge/License-Apache--2.0-brightgreen.svg" ></img>
+	</a>
+</p>
 
-DC3是一个开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理拓展。
  ## 什么是DC3 IOT平台？
  
  DC3致力于：
