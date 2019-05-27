@@ -15,7 +15,7 @@
  */
 package com.pnoker.rtmp.runner;
 
-import com.pnoker.rtmp.thread.TaskMonitorThread;
+import com.pnoker.rtmp.handle.TaskHandel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -31,8 +31,8 @@ import org.springframework.stereotype.Component;
 public class TeskRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
-        TaskMonitorThread taskMonitorThread = new TaskMonitorThread();
-        Thread thread = new Thread(taskMonitorThread);
+        TaskHandel taskHandel = new TaskHandel();
+        Thread thread = new Thread(taskHandel);
         log.info("启动Rtsp->Rtmp任务队列监听线程");
         thread.start();
     }
