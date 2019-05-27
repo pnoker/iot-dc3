@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.rtmp.thread;
+package com.pnoker.rtmp.handle;
 
 import com.pnoker.rtmp.bean.Global;
-import com.pnoker.rtmp.bean.Tasker;
+import com.pnoker.rtmp.bean.Task;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -28,15 +28,15 @@ import java.io.IOException;
  * <p>Description:
  */
 @Slf4j
-public class TaskMonitorThread implements Runnable {
+public class TaskHandel implements Runnable {
     @Override
     public void run() {
         log.info("Rtsp->Rtmp任务队列监听线程已启动");
         try {
             while (true) {
-                Tasker tasker = Global.taskQueue.take();
-                log.info("starting task {} , command {}", tasker.getTaskId(), tasker.getCommand());
-                tasker.start();
+                Task task = Global.taskQueue.take();
+                log.info("starting task {} , command {}", task.getTaskId(), task.getCommand());
+                task.start();
                 Thread.sleep(2000);
             }
         } catch (InterruptedException e) {

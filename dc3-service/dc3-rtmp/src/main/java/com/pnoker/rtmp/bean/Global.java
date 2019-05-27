@@ -26,6 +26,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * <p>Description: Global，用于存储Task队列和任务信息
  */
 public class Global {
-    public static Map<String, Tasker> taskMap = new HashMap<>(2);
-    public static LinkedBlockingQueue<Tasker> taskQueue = new LinkedBlockingQueue(20);
+    public static Map<String, Task> taskMap = new HashMap<>(2);
+    public static LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue(20);
 }

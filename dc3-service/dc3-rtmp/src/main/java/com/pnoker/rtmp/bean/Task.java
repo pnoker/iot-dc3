@@ -27,8 +27,12 @@ import java.io.IOException;
  * <p>Description: 任务描述实体类
  */
 @Data
-public class Tasker {
+public class Task {
+    /**
+     * 任务全局 GUID
+     */
     private String taskId;
+
     /**
      * 任务运行状态
      * <p>
@@ -38,18 +42,21 @@ public class Tasker {
      * 3：多次重启失败，任务已停止 <br>
      */
     private Integer status;
+
     /**
-     * 任务被启动次数
-     * <p>
-     * 启动失败，会累计次数 <br>
-     * 重启成功，会清除计数 <br>
+     * 任务累计被启动次数
      */
     private Integer times;
+
+    /**
+     * Cmd 命令内容
+     */
     private String command;
+
     private Process process;
     private OutputHandle outputHandle;
 
-    public Tasker(String taskId, String command) {
+    public Task(String taskId, String command) {
         this.taskId = taskId;
         this.command = command;
     }

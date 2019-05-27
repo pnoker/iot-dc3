@@ -17,7 +17,7 @@ package com.pnoker.rtmp.controller;
 
 import com.pnoker.common.base.BaseController;
 import com.pnoker.rtmp.bean.Global;
-import com.pnoker.rtmp.bean.Tasker;
+import com.pnoker.rtmp.bean.Task;
 import com.pnoker.rtmp.bean.Cmd;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,9 +44,9 @@ public class IndexController extends BaseController {
                 .add("-acodec", "copy")
                 .add("-f", "flv")
                 .add("-y", "rtmp://114.116.9.76:1935/rtmp/bigbuckbunny_175k").build();
-        Tasker tasker = new Tasker(UUID.randomUUID().toString(), cmd.getCmd());
+        Task task = new Task(UUID.randomUUID().toString(), cmd.getCmd());
         try {
-            Global.taskQueue.put(tasker);
+            Global.taskQueue.put(task);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         }
