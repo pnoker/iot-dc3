@@ -5,6 +5,9 @@
 	<strong>DC3是一个开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理拓展。</strong>
 </p>
 <p align="center">
+    <a>
+		<img src="https://img.shields.io/appveyor/ci/gruntjs/grunt.svg"></img>
+	</a>
 	<a>
 		<img src="https://img.shields.io/github/stars/pnoker/iot-dc3.svg"></img>
 	</a>
