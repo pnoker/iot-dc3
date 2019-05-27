@@ -15,11 +15,13 @@ management:
       show-details: ALWAYS
 
 logging:
-  file: dc3/logs/dc3-register-product-1.log
+  file: dc3/logs/dc3-register-product.log
 
 eureka:
   instance:
-    hostname: service
+    hostname: localhost
   client:
+    register-with-eureka: true
+    fetch-registry: false
     serviceUrl:
-      defaultZone: http://service:8801/eureka/
+      defaultZone: http://localhost:8100/eureka/

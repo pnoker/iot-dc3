@@ -24,8 +24,6 @@
     </licenses>
 
     <modules>
-		<module>dc3-devices</module>
-    	
         <module>dc3-rtmp</module>
         <module>dc3-socket</module>
         <module>dc3-opc</module>
@@ -47,7 +45,7 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Web 应用 移除自带的logging和tomcat容器-->
+        <!-- Web 应用 移除自带的Tomcat容器-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -59,7 +57,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Web 容器 undertow -->
+        <!-- Web 容器 使用Undertow替换Tomcat容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
