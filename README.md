@@ -6,10 +6,16 @@
 </p>
 <p align="center">
 	<a>
-		<img src="https://api.travis-ci.org/shijun90/TTIot.svg?branch=master"></img>
+		<img src="https://img.shields.io/github/stars/pnoker/iot-dc3.svg"></img>
 	</a>
-	<a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0.html">
-		<img src="https://img.shields.io/badge/License-Apache--2.0-brightgreen.svg" ></img>
+	<a>
+	    <img src="https://img.shields.io/github/forks/pnoker/iot-dc3.svg"></img>
+    </a>
+    <a>
+    	<img src="https://img.shields.io/github/issues/pnoker/iot-dc3.svg"></img>
+    </a>
+	<a target="_blank" href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE">
+		<img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg" ></img>
 	</a>
 </p>
 
