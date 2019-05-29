@@ -19,9 +19,9 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/dc3-devices-product.log
+  file: dc3/logs/dc3-devices-dev.log
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8800/eureka/,http://localhost:8801/eureka/
+      defaultZone: http://localhost:8100/eureka/
