@@ -3,11 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pnoker.devices</groupId>
-    <artifactId>dc3-devices</artifactId>
-    <packaging>jar</packaging>
+    <groupId>com.pnoker.device</groupId>
+    <artifactId>dc3-device</artifactId>
+    <packaging>pom</packaging>
 
-    <description>iot-dc3 设备端管理。</description>
+    <description>iot-dc3 设备端\数据采集管理。</description>
 
     <parent>
         <groupId>com.pnoker</groupId>
@@ -22,6 +22,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <modules>
+        <module>dc3-manager</module>
+        <module>dc3-collect</module>
+    </modules>
 
     <!-- properties -->
     <properties>
