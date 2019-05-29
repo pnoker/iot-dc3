@@ -1,5 +1,5 @@
 server:
-  port: 8600
+  port: 8500
   undertow:
     worker-threads: 20
     buffer-size: 512
@@ -19,7 +19,7 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/dc3-opc-product.log
+  file: dc3/logs/dc3-devices-product.log
 
 eureka:
   client:

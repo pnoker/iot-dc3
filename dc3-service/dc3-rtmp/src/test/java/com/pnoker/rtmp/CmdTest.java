@@ -17,7 +17,7 @@ import org.junit.Test;
 public class CmdTest {
     @Test
     public void createCmdTask() {
-        Cmd cmd = new Cmd("D:/Documents/FFmpeg/bin/");
+        Cmd cmd = new Cmd("");
         cmd.create("ffmpeg")
                 .add("-rtsp_transport", "tcp")
                 .add("-i", "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov")
@@ -30,7 +30,7 @@ public class CmdTest {
             task.start();
             log.info("Cmd任务创建成功");
             log.info(task.getCommand());
-            Thread.sleep(100000);
+            Thread.sleep(10000);
         } catch (Exception e) {
             e.printStackTrace();
         }
