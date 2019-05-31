@@ -1,5 +1,54 @@
+server:
+  port: 8000
 spring:
   application:
     name: dc3-gateway
-  profiles:
-    active: dev
+  redis:
+    host: localhost
+    port: 6379
+    password:
+  cloud:
+    gateway:
+      loadbalancer:
+        use404: true
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - name: Hystrix
+            args:
+              rate-limiter: fallbackcmd
+              key-resolver: forward:/fallback
+
+      routes:
+        #注册中心 路由配置
+        - id: register_web_route
+          uri: lb://dc3-register
+          predicates:
+            - Path=/register/**
+          filters:
+            - StripPrefix=1
+        - id: eureka_route
+          uri: lb://dc3-register
+          predicates:
+            - Path=/eureka/**
+          filters:
+            - StripPrefix=0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+logging:
+  file: dc3/logs/dc3-gateway.log
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/

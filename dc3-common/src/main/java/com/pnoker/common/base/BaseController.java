@@ -16,6 +16,8 @@
 package com.pnoker.common.base;
 
 
+import com.alibaba.fastjson.JSON;
+import com.pnoker.common.bean.base.ResponseBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -56,6 +58,48 @@ public class BaseController {
             log.error("BaseController.getResourcePath.error {}", e.getMessage(), e);
         }
         return path;
+    }
+
+    /**
+     * 返回成功
+     *
+     * @param object
+     * @return
+     */
+    public String success(Object object) {
+        ResponseBean responseBean = new ResponseBean(true, object);
+        return JSON.toJSONString(responseBean);
+    }
+
+    /**
+     * 返回成功
+     *
+     * @return
+     */
+    public String success() {
+        ResponseBean responseBean = new ResponseBean(true, "Success");
+        return JSON.toJSONString(responseBean);
+    }
+
+    /**
+     * 返回失败
+     *
+     * @param object
+     * @return
+     */
+    public String failure(Object object) {
+        ResponseBean responseBean = new ResponseBean(false, object);
+        return JSON.toJSONString(responseBean);
+    }
+
+    /**
+     * 返回失败
+     *
+     * @return
+     */
+    public String failure() {
+        ResponseBean responseBean = new ResponseBean(false, "Fail");
+        return JSON.toJSONString(responseBean);
     }
 
 
