@@ -25,4 +25,4 @@ eureka:
     health-check-url-path: /actuator/health
   client:
     serviceUrl:
-      defaultZone: http://localhost:8800/eureka/
+      defaultZone: http://localhost:8100/eureka/
