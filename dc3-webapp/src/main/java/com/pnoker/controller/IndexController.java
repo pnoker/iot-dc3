@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
@@ -41,7 +43,7 @@ public class IndexController extends BaseController {
     public String hello() {
         log.info("hello world");
         String wrapper = rtmpFeignApi.api();
-        Rtmp rtmp = rtmpFeignApi.list();
+        List<Rtmp> rtmp = rtmpFeignApi.list();
         log.info(JSON.toJSONString(wrapper));
         log.info(JSON.toJSONString(rtmp));
         return JSON.toJSONString(wrapper);
