@@ -21,6 +21,8 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
@@ -41,9 +43,24 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
             }
 
             @Override
-            public Rtmp list() {
-                Rtmp rtmp = new Rtmp(0);
-                return rtmp;
+            public String add(String json) {
+                return null;
+            }
+
+            @Override
+            public String delete(String json) {
+                return null;
+            }
+
+            @Override
+            public String update(String json) {
+                return null;
+            }
+
+            @Override
+            public List<Rtmp> list() {
+                log.info("报错");
+                return null;
             }
         };
     }
