@@ -28,7 +28,7 @@ import java.io.IOException;
  * <p>Description:
  */
 @Slf4j
-public class TaskHandel implements Runnable {
+public class TaskHandle implements Runnable {
     @Override
     public void run() {
         log.info("Rtsp->Rtmp任务队列监听线程已启动");

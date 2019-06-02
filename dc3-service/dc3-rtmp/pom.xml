@@ -7,7 +7,7 @@
     <artifactId>dc3-rtmp</artifactId>
     <packaging>jar</packaging>
 
-    <description>iot-dc3 RTSP流转RTMP流 服务。</description>
+    <description>iot-dc3 系统 Web 展示页面处理服务器，用于提供网页模板、页面逻辑处理、推送、接口等服务。</description>
 
     <parent>
         <groupId>com.pnoker.service</groupId>
@@ -22,10 +22,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <!-- properties -->
-    <properties>
-    </properties>
 
     <dependencies>
 
