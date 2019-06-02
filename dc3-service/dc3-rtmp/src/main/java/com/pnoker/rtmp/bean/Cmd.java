@@ -27,22 +27,22 @@ import lombok.Data;
 @Data
 public class Cmd {
     private String cmd;
-    private StringBuilder stringBuilder;
+    private StringBuilder builder;
 
     public Cmd(String path) {
-        this.stringBuilder = new StringBuilder(path);
+        this.builder = new StringBuilder(path);
     }
 
     public Cmd create(String exe) {
-        if (null != stringBuilder) {
-            stringBuilder.append(exe);
+        if (null != builder) {
+            builder.append(exe);
         }
         return this;
     }
 
     public Cmd add(String cmd) {
-        if (null != stringBuilder) {
-            stringBuilder.append(" " + cmd);
+        if (null != builder) {
+            builder.append(" " + cmd);
         }
         return this;
     }
@@ -52,6 +52,6 @@ public class Cmd {
     }
 
     public void build() {
-        cmd = stringBuilder.toString();
+        cmd = builder.toString();
     }
 }
