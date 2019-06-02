@@ -17,6 +17,7 @@ public class Rtmp {
     private String rtmpUrl;
     private String command;
     private short videoType;
+    private boolean autoStart;
 
     public Rtmp(long id) {
         this.id = id;
