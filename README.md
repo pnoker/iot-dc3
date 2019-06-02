@@ -87,6 +87,12 @@ DC3平台是基于Spring Cloud架构开发的，是一系列松耦合、开源�
 
 感谢：`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码
 
+### Git强制覆盖本地
+
+```bash
+git fetch --all && git reset --hard origin/master && git pull
+```
+
 ### 参与贡献
 
 1. Fork项目到自己的repo
