@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.rtmp.handle;
+package com.pnoker.rtmp.runner;
 
-import com.pnoker.rtmp.bean.Global;
-import com.pnoker.rtmp.bean.Task;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.rtmp.feign.RtmpFeignApi;
+import com.pnoker.rtmp.handle.TaskHandle;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -28,21 +32,16 @@ import java.io.IOException;
  * <p>Description:
  */
 @Slf4j
-public class TaskHandle implements Runnable {
+@Component
+public class TaskRunner implements CommandLineRunner {
+    @Autowired
+    private RtmpFeignApi rtmpFeignApi;
+
     @Override
-    public void run() {
-        log.info("Rtsp->Rtmp任务队列监听线程已启动");
-        try {
-            while (true) {
-                Task task = Global.taskQueue.take();
-                log.info("starting task {} , command {}", task.getTaskId(), task.getCommand());
-                task.start();
-                Thread.sleep(5000);
-            }
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+    public void run(String... args) {
+        List<Rtmp> list = rtmpFeignApi.list();
+        log.info("{}", list);
+        log.info("启动Rtsp->Rtmp任务队列监听线程");
+        new Thread(new TaskHandle()).start();
     }
 }

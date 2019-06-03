@@ -16,7 +16,7 @@
 package com.pnoker.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.pnoker.api.dbs.feign.RtmpFeignApi;
+import com.pnoker.rtmp.feign.RtmpFeignApi;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;

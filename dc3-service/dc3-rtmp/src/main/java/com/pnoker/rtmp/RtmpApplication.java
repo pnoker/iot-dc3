@@ -40,5 +40,4 @@ public class RtmpApplication {
     public static void main(String[] args) {
         SpringApplication.run(RtmpApplication.class, args);
     }
-
 }
