@@ -13,23 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.controller.rtmp;
+package com.pnoker.rtmp.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.pnoker.api.dbs.feign.RtmpFeignApi;
-import com.pnoker.common.base.BaseController;
-import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.rtmp.bean.Cmd;
 import com.pnoker.rtmp.bean.Global;
 import com.pnoker.rtmp.bean.Task;
+import com.pnoker.common.base.BaseController;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -41,8 +34,6 @@ import java.util.UUID;
 @Slf4j
 @RestController
 public class IndexController extends BaseController {
-    @Autowired
-    private RtmpFeignApi rtmpFeignApi;
 
     @GetMapping("/test")
     public String hello() {

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.hystrix;
+package com.pnoker.rtmp.hystrix;
 
-import com.pnoker.api.dbs.feign.RtmpFeignApi;
+import com.pnoker.rtmp.feign.RtmpFeignApi;
 import com.pnoker.common.model.rtmp.Rtmp;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;

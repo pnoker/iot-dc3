@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.feign;
+package com.pnoker.rtmp.feign;
 
-import com.pnoker.api.dbs.hystrix.RtmpFeignApiHystrix;
 import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.rtmp.hystrix.RtmpFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

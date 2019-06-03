@@ -1,10 +1,10 @@
 package com.pnoker.dbs.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.pnoker.api.dbs.feign.RtmpFeignApi;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.dbs.service.RtmpService;
+import com.pnoker.rtmp.feign.RtmpFeignApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
