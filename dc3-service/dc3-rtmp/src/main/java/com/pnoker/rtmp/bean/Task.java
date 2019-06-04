@@ -41,12 +41,12 @@ public class Task {
      * 2：任务错误，等待被重启 <br>
      * 3：多次重启失败，任务已停止 <br>
      */
-    private Integer status;
+    private int status = 0;
 
     /**
      * 任务累计被启动次数
      */
-    private Integer times;
+    private int times = 0;
 
     /**
      * Cmd 命令内容

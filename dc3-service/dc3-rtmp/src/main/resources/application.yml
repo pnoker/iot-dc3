@@ -28,3 +28,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8100/eureka/
+
+ffmpeg:
+  window: D:/Documents/FFmpeg/bin/ffmpeg.exe
+  nuix: ffmpeg

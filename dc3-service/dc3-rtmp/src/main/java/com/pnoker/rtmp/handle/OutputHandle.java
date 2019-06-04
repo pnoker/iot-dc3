@@ -35,9 +35,6 @@ import java.io.InputStreamReader;
 @Data
 public class OutputHandle implements Runnable {
     private String taskId;
-    /**
-     * 运行状态，false：运行失败
-     */
     private volatile boolean status = true;
     private Process process;
 
@@ -46,10 +43,14 @@ public class OutputHandle implements Runnable {
         this.process = process;
     }
 
-    @Override
-    public void run() {
-        if (status) {
-            read(process.getErrorStream());
+    public void handle(String message) {
+        if (message.contains("fail") || message.contains("miss") || message.contains("error")) {
+            log.info("read to restart task {}", taskId);
+            status = false;
+            Task task = Global.taskMap.get(taskId);
+            task.setTimes(task.getTimes() + 1);
+            task.setStatus(3);
+            Global.putTask(task);
         }
     }
 
@@ -57,12 +58,9 @@ public class OutputHandle implements Runnable {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         try {
-            while (null != (line = reader.readLine())) {
-                log.info(line);
-                handle(line);
-                if (!status) {
-                    throw new IOException();
-                }
+            while (null != (line = reader.readLine()) && status) {
+                //log.info(line);
+                handle(line.toLowerCase());
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -76,18 +74,8 @@ public class OutputHandle implements Runnable {
         }
     }
 
-    public void handle(String message) {
-        message = message.toLowerCase();
-        if (message.contains("fail") || message.contains("miss")) {
-            this.status = false;
-            Task task = Global.taskMap.get(taskId);
-            task.setTimes(task.getTimes() + 1);
-            task.setStatus(3);
-            try {
-                Global.taskQueue.put(task);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
+    @Override
+    public void run() {
+        read(process.getErrorStream());
     }
 }

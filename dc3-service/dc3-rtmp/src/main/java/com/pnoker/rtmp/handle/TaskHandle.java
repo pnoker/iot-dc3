@@ -19,19 +19,17 @@ import com.pnoker.rtmp.bean.Global;
 import com.pnoker.rtmp.bean.Task;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: 任务监听线程
  */
 @Slf4j
 public class TaskHandle implements Runnable {
     @Override
     public void run() {
-        log.info("Rtsp->Rtmp任务队列监听线程已启动");
+        log.info("rtsp->rtmp thread startup ok");
         try {
             while (true) {
                 Task task = Global.taskQueue.take();
@@ -39,9 +37,7 @@ public class TaskHandle implements Runnable {
                 task.start();
                 Thread.sleep(5000);
             }
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }

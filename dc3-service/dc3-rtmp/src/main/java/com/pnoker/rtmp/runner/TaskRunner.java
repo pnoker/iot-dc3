@@ -16,32 +16,74 @@
 package com.pnoker.rtmp.runner;
 
 import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.uid.UidTools;
+import com.pnoker.rtmp.bean.Global;
+import com.pnoker.rtmp.bean.Task;
 import com.pnoker.rtmp.feign.RtmpFeignApi;
 import com.pnoker.rtmp.handle.TaskHandle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.System.getProperty;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: 启动服务，自动加载自启任务
  */
 @Slf4j
 @Component
 public class TaskRunner implements CommandLineRunner {
+
+    private volatile int times = 0;
+    private int reconnect = 5000;
+
+    @Value("${ffmpeg.window}")
+    private String window;
+    @Value("${ffmpeg.nuix}")
+    private String unix;
+
     @Autowired
     private RtmpFeignApi rtmpFeignApi;
 
+    public List<Rtmp> getRtmpList() {
+        List<Rtmp> list = new ArrayList<>();
+        if (times > 10) {
+            return list;
+        }
+        times++;
+        try {
+            Thread.sleep(reconnect * times);
+        } catch (InterruptedException e) {
+            log.error("{}", e.getMessage(), e);
+        }
+        list = rtmpFeignApi.list();
+        if (list == null) {
+            return getRtmpList();
+        }
+        return list;
+    }
+
     @Override
     public void run(String... args) {
-        List<Rtmp> list = rtmpFeignApi.list();
-        log.info("{}", list);
-        log.info("启动Rtsp->Rtmp任务队列监听线程");
+        log.info("ready to start rtsp->rtmp thread");
+        String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
+        List<Rtmp> list = getRtmpList();
+        for (Rtmp rtmp : list) {
+            String cmd = rtmp.getCommand()
+                    .replace("{exe}", ffmpeg)
+                    .replace("{rtsp_url}", rtmp.getRtspUrl())
+                    .replace("{rtmp_url}", rtmp.getRtmpUrl());
+            Task task = new Task(new UidTools().guid(), cmd);
+            Global.putTask(task);
+        }
         new Thread(new TaskHandle()).start();
     }
 }
