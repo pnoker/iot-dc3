@@ -15,6 +15,8 @@
  */
 package com.pnoker.rtmp.bean;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,7 +27,17 @@ import java.util.concurrent.LinkedBlockingQueue;
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Global，用于存储Task队列和任务信息
  */
+@Slf4j
 public class Global {
-    public static Map<String, Task> taskMap = new HashMap<>(2);
+    public static Map<String, Task> taskMap = new HashMap<>(20);
     public static LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue(20);
+
+    public static void putTask(Task task) {
+        taskMap.put(task.getTaskId(), task);
+        try {
+            taskQueue.put(task);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }
