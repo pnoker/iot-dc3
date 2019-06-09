@@ -2,9 +2,7 @@
 	<img src="./dc3/images/iot-dc3-logo.png" width="400">
 </p>
 <p align="center">
-	<strong>DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理拓展。</strong>
-</p>
-<p align="center">
+	<strong>DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理拓展。</strong><br>
     <a>
 		<img src="https://img.shields.io/appveyor/ci/gruntjs/grunt.svg"></img>
 	</a>
@@ -17,17 +15,14 @@
 </p>
 <p align="center">
     <span>GitHub:</span>
-    <a href="https://github.com/pnoker/iot-dc3">https://github.com/pnoker/iot-dc3</a>
-</p>
-<p align="center">
+    <a href="https://github.com/pnoker/iot-dc3">https://github.com/pnoker/iot-dc3</a><br>
     <span>码云:</span>
     <a href="https://gitee.com/pnoker/iot-dc3">https://gitee.com/pnoker/iot-dc3</a>
 </p>
-
 ---
 
  ### 什么是DC3 IOT平台？
- 
+ ![iot-dc3-architecture](dc3/images/iot-dc3-architecture1.jpg)
  DC3致力于：
  
  * 设备端代码一键生成，快速接入设备；
@@ -70,18 +65,7 @@ DC3平台是基于Spring Cloud架构开发的，是一系列松耦合、开源�
 
 ### 架构设计
 
-* 功能模块结构图
-
-![iot-dc3-architecture](dc3/images/iot-dc3-architecture1.jpg)
-
-* 技术框架架构图
-
 ![iot-dc3-architecture](dc3/images/iot-dc3-architecture2.jpg)
-
-* 逻辑处理流程图
-
-![iot-dc3-architecture](dc3/images/iot-dc3-architecture3.jpg)
-![iot-dc3-architecture](dc3/images/iot-dc3-architecture4.jpg)
 
 ### 联系作者
 
