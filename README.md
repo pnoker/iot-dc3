@@ -8,18 +8,20 @@
     <a>
 		<img src="https://img.shields.io/appveyor/ci/gruntjs/grunt.svg"></img>
 	</a>
-	<a>
-		<img src="https://img.shields.io/github/stars/pnoker/iot-dc3.svg"></img>
-	</a>
-	<a>
-	    <img src="https://img.shields.io/github/forks/pnoker/iot-dc3.svg"></img>
-    </a>
     <a>
     	<img src="https://img.shields.io/github/issues/pnoker/iot-dc3.svg"></img>
     </a>
 	<a target="_blank" href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE">
 		<img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg" ></img>
 	</a>
+</p>
+<p align="center">
+    <span>GitHub:</span>
+    <a href="https://github.com/pnoker/iot-dc3">https://github.com/pnoker/iot-dc3</a>
+</p>
+<p align="center">
+    <span>码云:</span>
+    <a href="https://gitee.com/pnoker/iot-dc3">https://gitee.com/pnoker/iot-dc3</a>
 </p>
 
 ---
