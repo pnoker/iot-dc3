@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
+	<img src="./dc3/images/iot-dc3-logo.png" width="400" style="margin-bottom:-10px;"><br>
     <a>
 		<img src="https://img.shields.io/appveyor/ci/gruntjs/grunt.svg"></img>
 	</a>
@@ -9,7 +9,7 @@
 	<a target="_blank" href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE">
 		<img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg" ></img>
 	</a>
-	<br><br>
+	<br>
 	<strong>DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理拓展。</strong>
 </p>
 <p align="center">
