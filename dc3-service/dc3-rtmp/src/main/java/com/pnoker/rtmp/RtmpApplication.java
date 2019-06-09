@@ -15,6 +15,7 @@
  */
 package com.pnoker.rtmp;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -28,12 +29,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
+@Slf4j
 @EnableAsync
 @EnableScheduling
 @EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
 public class RtmpApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(RtmpApplication.class, args);
     }

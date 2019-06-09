@@ -34,6 +34,7 @@ public class TestEncrypt {
     public void rsaTest() throws Exception {
         Keys.Rsa rsa = RsaTools.genKey();
         log.info(" rsa key : {}", JSON.toJSONString(rsa));
+        log.info("pk:{},sk:{}",rsa.getPublicKey().length(),rsa.getPrivateKey().length());
         String str = "zhanghongyuan@ks.sia.cn,zhanghongyuan@ks.sia.cn";
         log.info("str : {}", str);
         String ens = RsaTools.encrypt(str, rsa.getPublicKey());

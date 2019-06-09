@@ -15,10 +15,10 @@
  */
 package com.pnoker.rtmp.controller;
 
-import com.pnoker.common.base.BaseController;
+import com.pnoker.rtmp.bean.Cmd;
 import com.pnoker.rtmp.bean.Global;
 import com.pnoker.rtmp.bean.Task;
-import com.pnoker.rtmp.bean.Cmd;
+import com.pnoker.common.base.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

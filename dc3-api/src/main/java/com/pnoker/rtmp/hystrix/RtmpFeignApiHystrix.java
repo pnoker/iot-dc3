@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.hystrix;
+package com.pnoker.rtmp.hystrix;
 
-import com.pnoker.api.dbs.feign.RtmpFeignApi;
+import com.pnoker.rtmp.feign.RtmpFeignApi;
 import com.pnoker.common.model.rtmp.Rtmp;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -41,9 +43,24 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
             }
 
             @Override
-            public Rtmp list() {
-                Rtmp rtmp = new Rtmp(0);
-                return rtmp;
+            public String add(String json) {
+                return null;
+            }
+
+            @Override
+            public String delete(String json) {
+                return null;
+            }
+
+            @Override
+            public String update(String json) {
+                return null;
+            }
+
+            @Override
+            public List<Rtmp> list() {
+                log.info("报错");
+                return null;
             }
         };
     }
