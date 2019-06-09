@@ -26,6 +26,7 @@
     <modules>
         <module>dc3-manager</module>
         <module>dc3-collect</module>
+        <module>dc3-client</module>
     </modules>
 
     <!-- properties -->
