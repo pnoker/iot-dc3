@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.rtmp.runner;
+package com.pnoker.device.feign;
 
-import com.pnoker.rtmp.handle.TaskHandel;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.device.hystrix.DeviceManagerFeignApiHystrix;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -26,14 +28,22 @@ import org.springframework.stereotype.Component;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Slf4j
-@Component
-public class TeskRunner implements CommandLineRunner {
-    @Override
-    public void run(String... args) {
-        TaskHandel taskHandel = new TaskHandel();
-        Thread thread = new Thread(taskHandel);
-        log.info("启动Rtsp->Rtmp任务队列监听线程");
-        thread.start();
-    }
+@RequestMapping("/device/manager")
+@FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerFeignApiHystrix.class)
+public interface DeviceManagerFeignApi {
+
+    @GetMapping(value = "/api")
+    String api();
+
+    @PostMapping(value = "/add")
+    String add(String json);
+
+    @DeleteMapping(value = "/delete")
+    String delete(String json);
+
+    @PutMapping(value = "/update")
+    String update(String json);
+
+    @GetMapping(value = "/list")
+    List<Rtmp> list();
 }

@@ -13,22 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.rtmp.timer;
+package com.pnoker.rtmp.feign;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.rtmp.hystrix.RtmpFeignApiHystrix;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: 定时任务，用于定时启动 RTSP->RTMP 任务
+ * <p>Description:
  */
-@Slf4j
-@Component
-public class TaskTimer {
-    @Scheduled(fixedRate = 5000)
-    public void runRtmpTask() {
-    }
+@RequestMapping("/rtmp")
+@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class)
+public interface RtmpFeignApi {
+
+    @GetMapping(value = "/api")
+    String api();
+
+    @PostMapping(value = "/add")
+    String add(String json);
+
+    @DeleteMapping(value = "/delete")
+    String delete(String json);
+
+    @PutMapping(value = "/update")
+    String update(String json);
+
+    @GetMapping(value = "/list")
+    List<Rtmp> list();
 }

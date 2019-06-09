@@ -1,5 +1,51 @@
+server:
+  port: 8400
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
 spring:
   application:
     name: dc3-dbs
-  profiles:
-    active: dev
+  redis:
+    host: localhost
+    port: 6379
+    password:
+  datasource:
+    url: jdbc:mysql://localhost:3306/iot-dc3?useUnicode=true&characterEncoding=utf-8
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    password:
+    sql-script-encoding: utf-8
+    hikari:
+      max-lifetime: 1765000
+      maximum-pool-size: 10
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      table-prefix: iot_
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+feign:
+  hystrix:
+    enabled: true
+
+logging:
+  file: dc3/logs/dc3-dbs-dev.log
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/

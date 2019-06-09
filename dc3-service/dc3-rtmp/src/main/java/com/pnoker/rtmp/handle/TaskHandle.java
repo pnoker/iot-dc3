@@ -13,27 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.api.dbs.feign;
+package com.pnoker.rtmp.handle;
 
-import com.pnoker.api.dbs.hystrix.RtmpFeignApiHystrix;
-import com.pnoker.common.model.rtmp.Rtmp;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.pnoker.rtmp.bean.Global;
+import com.pnoker.rtmp.bean.Task;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: 任务监听线程
  */
-@RequestMapping("/rtmp")
-@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class)
-public interface RtmpFeignApi {
-
-    @GetMapping(value = "/api")
-    String api();
-
-    @GetMapping(value = "/list")
-    Rtmp list();
+@Slf4j
+public class TaskHandle implements Runnable {
+    @Override
+    public void run() {
+        log.info("rtsp->rtmp thread startup ok");
+        try {
+            while (true) {
+                Task task = Global.taskQueue.take();
+                log.info("starting task {} , command {}", task.getTaskId(), task.getCommand());
+                task.start();
+                Thread.sleep(5000);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }

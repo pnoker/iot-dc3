@@ -16,7 +16,7 @@
 package com.pnoker.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.pnoker.api.dbs.feign.RtmpFeignApi;
+import com.pnoker.rtmp.feign.RtmpFeignApi;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -41,7 +43,7 @@ public class IndexController extends BaseController {
     public String hello() {
         log.info("hello world");
         String wrapper = rtmpFeignApi.api();
-        Rtmp rtmp = rtmpFeignApi.list();
+        List<Rtmp> rtmp = rtmpFeignApi.list();
         log.info(JSON.toJSONString(wrapper));
         log.info(JSON.toJSONString(rtmp));
         return JSON.toJSONString(wrapper);
