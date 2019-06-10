@@ -29,6 +29,11 @@
     </properties>
 
     <dependencies>
+        <!-- WebSocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
 
         <!-- 西门子S7 PLC TCP -->
         <dependency>
