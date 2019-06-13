@@ -1,15 +1,16 @@
 <p align="center">
 	<img src="./dc3/images/iot-dc3-logo.png" width="400""><br>
-    <a><img src="https://img.shields.io/appveyor/ci/gruntjs/grunt.svg"></a>
+	<a><img src="https://img.shields.io/badge/JDK-1.8-yellow.svg"></a>
     <a><img src="https://img.shields.io/github/issues/pnoker/iot-dc3.svg"></a>
 	<a target="_blank" href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE">
 		<img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg" >
 	</a><br>
-	<strong>DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。</strong>
+	<strong>DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p> 
 <p align="center">
     <span>GitHub:</span><a target="_blank" href="https://github.com/pnoker/iot-dc3">https://github.com/pnoker/iot-dc3</a><br>
-    <span>码云:</span><a target="_blank" href="https://gitee.com/pnoker/iot-dc3">https://gitee.com/pnoker/iot-dc3</a>
+    <span>码云:</span><a target="_blank" href="https://gitee.com/pnoker/iot-dc3">https://gitee.com/pnoker/iot-dc3</a><br>
+    <span>GitLab:</span><a target="_blank" href="https://gitlib.com/pnoker/iot-dc3">https://gitlib.com/pnoker/iot-dc3</a>
 </p>
 
 ---
@@ -59,7 +60,6 @@ DC3平台是基于Spring Cloud架构开发的,是一系列松耦合、开源的�
 [`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign)、
 [`Spring Cloud Config`](https://cloud.spring.io/spring-cloud-config)、
 [`Spring Cloud Bus`](https://cloud.spring.io/spring-cloud-bus) 
-
 等微服务模块。
 
 ### 联系作者
@@ -87,13 +87,10 @@ git fetch --all && git reset --hard origin/master && git pull
 mvn clean package
 
 # Yarn 操作
-# 初始化
-yarn init
-# 添加\更新、删除依赖
-yarn add\upgrade\remove [package]
 # 安装项目全部依赖
 yarn
+# 添加|更新|删除依赖
+yarn add|upgrade|remove [package]
 # 启动项目
 yarn run [script] [<args>]
-yarn run test\dev\ 
 ```
