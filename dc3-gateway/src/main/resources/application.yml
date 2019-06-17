@@ -20,7 +20,6 @@ spring:
             args:
               rate-limiter: fallbackcmd
               key-resolver: forward:/fallback
-
       routes:
         #注册中心 路由配置
         - id: register_web_route
