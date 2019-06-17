@@ -1,0 +1,35 @@
+server:
+  port: 8200
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+spring:
+  application:
+    name: dc3-monitor
+  boot:
+    admin:
+      ui:
+        favicon: images/icon/favicon.ico
+        favicon-danger: images/icon/favicon-danger.ico
+        title: IOT DC3 Monitor Platform
+        brand: <img src="images/logo/dc3-logo.png"><span>IOT DC3 Monitor Platform</span>
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+logging:
+  file: dc3/logs/center/dc3-monitor.log
+
+eureka:
+  instance:
+    health-check-url-path: /actuator/health
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/

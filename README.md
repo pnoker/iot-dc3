@@ -10,24 +10,22 @@
 <p align="center">
     <span>GitHub:</span><a target="_blank" href="https://github.com/pnoker/iot-dc3">https://github.com/pnoker/iot-dc3</a><br>
     <span>码云:</span><a target="_blank" href="https://gitee.com/pnoker/iot-dc3">https://gitee.com/pnoker/iot-dc3</a><br>
-    <span>GitLab:</span><a target="_blank" href="https://gitlib.com/pnoker/iot-dc3">https://gitlib.com/pnoker/iot-dc3</a>
 </p>
-
 ---
 
  ### 什么是DC3 IOT平台？
- 
+
  ![iot-dc3-architecture](dc3/images/iot-dc3-architecture1.jpg)
- 
+
  #### 模块
- 
+
  * 设备微服务层:用于提供标准或者私有协议连接物理设备的SDK;
  * 核心微服务层:用于提供微服务注册中心、配置管理中心、设备指令接口、设备注册与关联配对、数据管理中心,是所有微服务交互的核心部分;
  * 支持微服务层:用于提供规则引擎、任务调度、报警与消息通知、日志管理、数据清理;
  * 开放微服务层:用于提供数据开放等服务...
- 
+
   #### DC3致力于
- 
+
  * 跨平台分布式、多设备、多协议（目前支持Mqtt\Rtsp\Rtmp\Http\Plc-S7\Opc\Opc-Ua\自定义Tcp\自定义Socket\数据报文解析）;
  * 物联设备数据采集、边缘处理、数据持久化、数据缓存、全文搜索、功能性微服务调用;
  * 物联设备端代码一键生成,快速安全的接入设备和物联设备管理（目前支持Java）;
@@ -46,7 +44,7 @@
 * 跨平台:使用Java环境可异地、分布式多平台部署;
 * 完善性:设备快速接入、注册、权限校验;
 * 安全:数据加密传输。
- 
+
 ### DC3 IOT平台架构？
 
 DC3平台是基于Spring Cloud架构开发的,是一系列松耦合、开源的微服务集合。

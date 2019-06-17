@@ -6,7 +6,7 @@ server:
     io-threads: 2
 spring:
   application:
-    name: dc3-devices
+    name: dc3-client
 
 management:
   endpoints:
@@ -22,7 +22,7 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/dc3-devices-client.log
+  file: dc3/logs/device/dc3-client.log
 
 eureka:
   client:

@@ -7,25 +7,13 @@
     <artifactId>dc3-manager</artifactId>
     <packaging>jar</packaging>
 
-    <description>iot-dc3 设备端管理。</description>
+    <description>IOT DC3 平台 设备端管理。</description>
 
     <parent>
         <groupId>com.pnoker.device</groupId>
         <artifactId>dc3-device</artifactId>
         <version>3.0</version>
     </parent>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <!-- properties -->
-    <properties>
-    </properties>
 
     <dependencies>
 
