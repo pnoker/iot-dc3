@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.web;
+package com.pnoker.transfer.message;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,11 +28,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * <p>Description:
  */
 @EnableAsync
-@EnableEurekaClient
 @EnableFeignClients
+@EnableEurekaClient
 @SpringBootApplication
-public class WebSocketApplication {
+public class MessageApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(WebSocketApplication.class, args);
+        SpringApplication.run(MessageApplication.class, args);
     }
 }

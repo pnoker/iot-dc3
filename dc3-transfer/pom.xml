@@ -16,6 +16,7 @@
     </parent>
 
     <modules>
+        <module>dc3-message</module>
         <module>dc3-rtmp</module>
         <module>dc3-opc</module>
         <module>dc3-opc-ua</module>
