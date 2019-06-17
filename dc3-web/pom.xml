@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.pnoker.web</groupId>
+    <artifactId>dc3-web</artifactId>
+    <packaging>pom</packaging>
+
+    <description>IOT DC3 可视化，其中包含:WebSocket,多应用的Web界面等集合。</description>
+
+    <parent>
+        <groupId>com.pnoker</groupId>
+        <artifactId>iot-dc3</artifactId>
+        <version>3.0</version>
+    </parent>
+
+    <modules>
+        <module>webapp</module>
+        <module>dc3-websocket</module>
+    </modules>
+
+</project>

@@ -23,12 +23,8 @@
 
     <developers>
         <developer>
-            <id>Pnoker</id>
-            <name>Pnoker</name>
-            <email>pnokers@gmail.com</email>
-            <roles>
-                <role>Project Manager</role>
-            </roles>
+            <name>pnoker</name>
+            <email>pnokers@icloud.com</email>
             <organization>pnoker.github.io</organization>
         </developer>
     </developers>
@@ -44,14 +40,12 @@
     <modules>
 
         <module>dc3-gateway</module>
-        <module>dc3-webapp</module>
-
-        <module>dc3-register</module>
-        <module>dc3-monitor</module>
+        <module>dc3-center</module>
+        <module>dc3-web</module>
+        
+        <module>dc3-transfer</module>
         <module>dc3-device</module>
-        <module>dc3-service</module>
 
-        <module>dc3-dbs</module>
         <module>dc3-api</module>
         <module>dc3-common</module>
 

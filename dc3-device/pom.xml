@@ -7,7 +7,7 @@
     <artifactId>dc3-device</artifactId>
     <packaging>pom</packaging>
 
-    <description>iot-dc3 设备端\数据采集管理。</description>
+    <description>IOT DC3 平台 设备端\数据采集管理。</description>
 
     <parent>
         <groupId>com.pnoker</groupId>
@@ -15,23 +15,11 @@
         <version>3.0</version>
     </parent>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
     <modules>
         <module>dc3-manager</module>
         <module>dc3-collect</module>
         <module>dc3-client</module>
     </modules>
-
-    <!-- properties -->
-    <properties>
-    </properties>
 
     <dependencies>
 
@@ -72,15 +60,5 @@
         </dependency>
 
     </dependencies>
-
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

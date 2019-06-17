@@ -15,12 +15,9 @@
  */
 package com.pnoker.device.feign;
 
-import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.device.hystrix.DeviceManagerFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -32,18 +29,4 @@ import java.util.List;
 @FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerFeignApiHystrix.class)
 public interface DeviceManagerFeignApi {
 
-    @GetMapping(value = "/api")
-    String api();
-
-    @PostMapping(value = "/add")
-    String add(String json);
-
-    @DeleteMapping(value = "/delete")
-    String delete(String json);
-
-    @PutMapping(value = "/update")
-    String update(String json);
-
-    @GetMapping(value = "/list")
-    List<Rtmp> list();
 }
