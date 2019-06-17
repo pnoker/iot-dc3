@@ -1,0 +1,30 @@
+server:
+  port: 8100
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+spring:
+  application:
+    name: dc3-register
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+logging:
+  file: dc3/logs/center/dc3-register.log
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: true
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/

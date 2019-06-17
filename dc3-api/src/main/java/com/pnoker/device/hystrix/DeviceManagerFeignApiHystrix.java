@@ -15,13 +15,10 @@
  */
 package com.pnoker.device.hystrix;
 
-import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.rtmp.feign.RtmpFeignApi;
+import com.pnoker.device.feign.DeviceManagerFeignApi;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -31,37 +28,12 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class DeviceManagerFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
+public class DeviceManagerFeignApiHystrix implements FallbackFactory<DeviceManagerFeignApi> {
 
     @Override
-    public RtmpFeignApi create(Throwable throwable) {
+    public DeviceManagerFeignApi create(Throwable throwable) {
         log.error("{}", throwable.getMessage(), throwable);
-        return new RtmpFeignApi() {
-            @Override
-            public String api() {
-                return "api() 故障，返回默认值：0";
-            }
-
-            @Override
-            public String add(String json) {
-                return null;
-            }
-
-            @Override
-            public String delete(String json) {
-                return null;
-            }
-
-            @Override
-            public String update(String json) {
-                return null;
-            }
-
-            @Override
-            public List<Rtmp> list() {
-                log.info("报错");
-                return null;
-            }
+        return new DeviceManagerFeignApi() {
         };
     }
 }
