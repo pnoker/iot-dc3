@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.transfer.message;
+package com.pnoker.center.message;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -27,8 +25,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@EnableAsync
-@EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
 public class MessageApplication {

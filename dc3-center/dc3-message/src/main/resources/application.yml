@@ -1,0 +1,36 @@
+server:
+  port: 8400
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+spring:
+  application:
+    name: dc3-stream
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+feign:
+  hystrix:
+    enabled: true
+
+logging:
+  file: dc3/logs/transfer/dc3-stream.log
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/
