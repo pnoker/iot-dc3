@@ -7,7 +7,7 @@
     <artifactId>dc3-collect</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 设备端数据采集管理。</description>
+    <description>IOT DC3 平台 设备数据采集服务。</description>
 
     <parent>
         <groupId>com.pnoker.device</groupId>

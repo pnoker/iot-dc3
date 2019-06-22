@@ -6,7 +6,12 @@ server:
     io-threads: 2
 spring:
   application:
-    name: dc3-client
+    name: dc3-group
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite::resource:sqlite/dc3-group.sqlite
+    username:
+    password:
 
 management:
   endpoints:
