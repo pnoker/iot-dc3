@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.devices;
-
+package com.pnoker.device.manager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,9 +31,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
-public class DevicesApplication {
+public class DeviceManagerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DevicesApplication.class, args);
+        SpringApplication.run(DeviceManagerApplication.class, args);
     }
 }
