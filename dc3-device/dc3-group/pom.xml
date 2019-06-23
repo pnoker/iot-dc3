@@ -19,7 +19,7 @@
         <hikaricp.version>3.3.1</hikaricp.version>
         <mybatis.plus.version>3.1.1</mybatis.plus.version>
         <sqllite.version>3.25.2</sqllite.version>
-        <netty.version>4.1.6.Final</netty.version>
+        <netty.version>4.1.36.Final</netty.version>
     </properties>
 
     <dependencies>

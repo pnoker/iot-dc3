@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>IOT DC3 Mp4资源服务</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <script src="/js/jquery.js"></script>
+    <link rel="stylesheet" href="/js/video/video-js.css">
+    <script src="/js/video/video.js"></script>
+</head>
+<script>
+    $(window).load(function () {
+        $(".loading").fadeOut();
+    });
+</script>
+<body ondragstart="return false" onselectstart="return false">
+<div class="loading">
+    <div class="loadbox"><img src="/images/loading.gif">页面正在加载...</div>
+</div>
+<video id="video" class="video-js vjs-default-skin"
+       poster="/images/video.png"
+       preload="auto"
+       autoplay="autoplay"
+       loop
+       controls>
+    <source th:src="'/mp4/'+${name}+'.mp4'" type="video/mp4">
+</video>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use(['layer'], function () {
+        var $ = layui.$;
+        $('#video').attr('height', $(window).height()).attr('width', $(window).width());
+        var player = videojs('#video', {
+            techOrder: ["html5", "flash"],
+            controlBar: {
+                volumeMenuButton: false
+            }
+        });
+        $(window).resize(function () {
+            player.height($(window).height());
+            player.width($(window).width());
+        });
+    });
+</script>
+</body>
+</html>
