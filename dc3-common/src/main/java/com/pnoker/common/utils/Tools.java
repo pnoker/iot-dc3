@@ -2,6 +2,8 @@ package com.pnoker.common.utils;
 
 import com.google.common.base.Charsets;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Base64;
 
 /**
@@ -18,8 +20,7 @@ public class Tools {
      * @return 返回字节流
      */
     public static byte[] encode(String str) {
-        byte[] bytes = Base64.getEncoder().encode(str.getBytes(Charsets.UTF_8));
-        return bytes;
+        return Base64.getEncoder().encode(str.getBytes(Charsets.UTF_8));
     }
 
     /**
@@ -29,8 +30,7 @@ public class Tools {
      * @return 返回字符串
      */
     public static String encodeToString(byte[] bytes) {
-        String str = Base64.getEncoder().encodeToString(bytes);
-        return str;
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     /**
@@ -40,8 +40,7 @@ public class Tools {
      * @return 返回字节流
      */
     public static byte[] decode(String str) {
-        byte[] bytes = Base64.getDecoder().decode(str);
-        return bytes;
+        return Base64.getDecoder().decode(str);
     }
 
     /**
@@ -51,7 +50,11 @@ public class Tools {
      * @return 返回字节流
      */
     public static byte[] decode(byte[] input) {
-        byte[] bytes = Base64.getDecoder().decode(input);
-        return bytes;
+        return Base64.getDecoder().decode(input);
     }
+
+    public static boolean ping(String host) throws IOException {
+        return InetAddress.getByName(host).isReachable(3000);
+    }
+
 }
