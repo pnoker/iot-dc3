@@ -1,0 +1,40 @@
+server:
+  port: 8410
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+spring:
+  application:
+    name: dc3-resource
+  thymeleaf:
+    cache: false
+    enabled: true
+    check-template: true
+    mode: HTML5
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+    servlet:
+      content-type: text/html
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 1024MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+logging:
+  file: dc3/logs/transfer/dc3-resource.log
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/

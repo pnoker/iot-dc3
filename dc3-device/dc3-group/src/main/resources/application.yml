@@ -12,6 +12,17 @@ spring:
     url: jdbc:sqlite::resource:sqlite/dc3-group.sqlite
     username:
     password:
+    sql-script-encoding: utf-8
+    hikari:
+      max-lifetime: 1765000
+      maximum-pool-size: 10
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      table-prefix: dc3_group_
 
 management:
   endpoints:

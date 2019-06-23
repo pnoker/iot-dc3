@@ -18,7 +18,6 @@
     <modules>
         <module>dc3-manager</module>
         <module>dc3-group</module>
-        <module>dc3-collect</module>
     </modules>
 
     <dependencies>
