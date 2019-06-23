@@ -1,0 +1,33 @@
+body {
+    margin: 0px;
+    overflow: hidden;
+}
+
+.loading {
+    position: fixed;
+    left: 0;
+    top: 0;
+    font-size: 18px;
+    z-index: 100000000;
+    width: 100%;
+    height: 100%;
+    background: #484848;
+    text-align: center;
+}
+
+.loadbox {
+    position: absolute;
+    width: 160px;
+    height: 150px;
+    color: #aaa;
+    left: 50%;
+    top: 50%;
+    margin-top: -100px;
+    margin-left: -75px;
+}
+
+.loadbox img {
+    margin: 10px auto;
+    display: block;
+    width: 40px;
+}

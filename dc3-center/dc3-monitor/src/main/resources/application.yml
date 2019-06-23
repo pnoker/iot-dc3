@@ -12,8 +12,8 @@ spring:
       ui:
         favicon: images/icon/favicon.ico
         favicon-danger: images/icon/favicon-danger.ico
-        title: IOT DC3 Monitor Platform
-        brand: <img src="images/logo/dc3-logo.png"><span>IOT DC3 Monitor Platform</span>
+        title: IOT DC3 Monitoring Center
+        brand: <img src="images/logo/dc3-logo.png"><span>IOT DC3 Monitoring Center</span>
 
 management:
   endpoints:

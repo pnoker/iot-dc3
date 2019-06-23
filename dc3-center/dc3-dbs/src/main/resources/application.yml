@@ -1,5 +1,5 @@
 server:
-  port: 8400
+  port: 8300
   undertow:
     worker-threads: 20
     buffer-size: 512

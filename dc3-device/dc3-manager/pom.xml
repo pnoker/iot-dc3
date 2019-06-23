@@ -7,7 +7,7 @@
     <artifactId>dc3-manager</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 设备端管理。</description>
+    <description>IOT DC3 平台 全部设备集合管理服务，包括设备组注册、权限管理、设备管理等功能。</description>
 
     <parent>
         <groupId>com.pnoker.device</groupId>
