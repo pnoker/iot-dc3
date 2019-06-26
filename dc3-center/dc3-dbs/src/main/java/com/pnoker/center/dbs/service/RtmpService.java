@@ -33,4 +33,6 @@ public interface RtmpService {
      * @return
      */
     List<Rtmp> list(Wrapper<Rtmp> wrapper);
+
+    int insert(Rtmp rtmp);
 }

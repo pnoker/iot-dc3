@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.center.dbs.service.impl;
+package com.pnoker.device.group.service.wia.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.center.dbs.mapper.RtmpMapper;
-import com.pnoker.center.dbs.service.RtmpService;
+import com.pnoker.device.group.mapper.wia.WiaDataMapper;
+import com.pnoker.device.group.model.wia.WiaData;
+import com.pnoker.device.group.service.wia.WiaDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,17 +31,17 @@ import java.util.List;
  * <p>Description: Rtmp 接口实现
  */
 @Service
-public class RtmpServiceImpl implements RtmpService {
+public class WiaDataServiceImpl implements WiaDataService {
     @Autowired
-    private RtmpMapper rtmpMapper;
+    private WiaDataMapper wiaDataMapper;
 
     @Override
-    public List<Rtmp> list(Wrapper<Rtmp> wrapper) {
-        return rtmpMapper.selectList(wrapper);
+    public List<WiaData> list(Wrapper<WiaData> wrapper) {
+        return wiaDataMapper.selectList(wrapper);
     }
 
     @Override
-    public int insert(Rtmp rtmp) {
-        return rtmpMapper.insert(rtmp);
+    public int insert(WiaData wiaData) {
+        return wiaDataMapper.insert(wiaData);
     }
 }
