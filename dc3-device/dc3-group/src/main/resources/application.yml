@@ -6,10 +6,10 @@ server:
     io-threads: 2
 spring:
   application:
-    name: dc3-group
+    name: dc3-device-group
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite::resource:sqlite/dc3-group.sqlite
+    url: jdbc:sqlite::resource:sqlite/dc3-group.db
     username:
     password:
     sql-script-encoding: utf-8

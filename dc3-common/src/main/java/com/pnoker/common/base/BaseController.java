@@ -40,8 +40,7 @@ public class BaseController {
      * @return
      */
     protected HttpServletRequest getRequest() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        return request;
+        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     }
 
     /**
@@ -55,7 +54,7 @@ public class BaseController {
         try {
             path = URLDecoder.decode(path, "UTF-8") + resource;
         } catch (UnsupportedEncodingException e) {
-            log.error("BaseController.getResourcePath.error {}", e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return path;
     }

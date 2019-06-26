@@ -6,7 +6,7 @@ server:
     io-threads: 2
 spring:
   application:
-    name: dc3-manager
+    name: dc3-device-manager
 
 management:
   endpoints:

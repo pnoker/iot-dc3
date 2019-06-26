@@ -6,14 +6,12 @@ import lombok.Data;
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Wia 数采设备信息
+ * <p>Description:
  */
 @Data
-public class Device {
+public class WiaData {
     private long id;
-    private long gatewayId;
-    private String name;
-    private int status;
+    private long variableId;
+    private float value;
     private long time;
-
 }
