@@ -8,6 +8,7 @@ import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -52,5 +53,16 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
         queryWrapper.eq("auto_start", true);
         List<Rtmp> list = rtmpService.list(queryWrapper);
         return list;
+    }
+
+    @RequestMapping("/insert")
+    public void insert() {
+        for (int i = 0; i < 1000000; i++) {
+            Rtmp wiaData = new Rtmp(i);
+            rtmpService.insert(wiaData);
+            if (i % 100 == 0) {
+                log.info("完成：{},{}%", i, i / 1000000 * 10);
+            }
+        }
     }
 }
