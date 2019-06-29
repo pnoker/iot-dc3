@@ -39,7 +39,6 @@
         <module>dc3-web</module>
 
         <module>dc3-transfer</module>
-        <module>dc3-collect</module>
         <module>dc3-device</module>
 
         <module>dc3-api</module>
@@ -62,11 +61,14 @@
         <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
 
         <mariadb.version>2.3.0</mariadb.version>
+        <sqllite.version>3.25.2</sqllite.version>
         <hikaricp.version>3.3.1</hikaricp.version>
         <mybatis.plus.version>3.1.1</mybatis.plus.version>
 
+        <jna.version>5.3.1</jna.version>
         <jasypt.version>2.1.0</jasypt.version>
         <lombok.version>1.18.8</lombok.version>
+        <netty.version>4.1.36.Final</netty.version>
         <fastjson.version>1.2.58</fastjson.version>
         <commons.cli.version>1.4</commons.cli.version>
         <commons.lang3.version>3.9</commons.lang3.version>
@@ -110,9 +112,50 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!-- Java Native Access -->
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+
+            <!-- Database相关 -->
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikaricp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xerial</groupId>
+                <artifactId>sqlite-jdbc</artifactId>
+                <version>${sqllite.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${mariadb.version}</version>
+            </dependency>
+
+            <!-- Netty-->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
             <!-- dc3 Api -->
             <dependency>
-                <groupId>com.pnoker.api</groupId>
+                <groupId>com.pnoker</groupId>
                 <artifactId>dc3-api</artifactId>
                 <version>3.0</version>
                 <scope>compile</scope>
@@ -120,7 +163,7 @@
 
             <!-- dc3 Common -->
             <dependency>
-                <groupId>com.pnoker.common</groupId>
+                <groupId>com.pnoker</groupId>
                 <artifactId>dc3-common</artifactId>
                 <version>3.0</version>
                 <scope>compile</scope>

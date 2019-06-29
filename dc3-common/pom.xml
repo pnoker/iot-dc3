@@ -3,39 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.pnoker.common</groupId>
-    <artifactId>dc3-common</artifactId>
-
-    <description>iot-dc3 系统 公共基础类。</description>
-
     <parent>
         <groupId>com.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
         <version>3.0</version>
     </parent>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+    <artifactId>dc3-common</artifactId>
+    <packaging>jar</packaging>
 
-    <!-- properties -->
-    <properties>
-        <jna.version>5.3.1</jna.version>
-    </properties>
+    <description>IOT DC3 平台 公共基础类、工具类等集合。</description>
 
     <dependencies>
-
-        <!-- Spring Web -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>5.1.7.RELEASE</version>
-        </dependency>
 
         <!-- Servlet Api -->
         <dependency>
@@ -48,12 +27,10 @@
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
-            <version>${jna.version}</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>${jna.version}</version>
         </dependency>
 
         <!-- Slf4j -->

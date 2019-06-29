@@ -17,6 +17,6 @@ public class MyMQReciver {
 
     @StreamListener(MyProcessor.CALLBACKINPUT)
     public void callback(String myGirl){
-        log.info("message has recived : {} ", myGirl);
+        log.info("collect has recived : {} ", myGirl);
     }
 }
