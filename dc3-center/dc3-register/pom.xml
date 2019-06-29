@@ -2,18 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.pnoker.center.register</groupId>
-    <artifactId>dc3-register</artifactId>
-    <packaging>jar</packaging>
-
-    <description>IOT DC3 平台 服务注册中心。</description>
-
     <parent>
-        <groupId>com.pnoker.center</groupId>
+        <groupId>com.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
         <version>3.0</version>
     </parent>
+
+    <artifactId>dc3-register</artifactId>
+    <packaging>jar</packaging>
+
+    <description>IOT DC3 平台 服务注册与发现中心。</description>
 
     <dependencies>
 
@@ -25,11 +23,14 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

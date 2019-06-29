@@ -23,8 +23,10 @@ spring:
     password:
     sql-script-encoding: utf-8
     hikari:
+      pool-name: iot-dc3-dbs-hikaricp
       max-lifetime: 1765000
-      maximum-pool-size: 10
+      maximum-pool-size: 16
+      minimum-idle: 4
 
 mybatis-plus:
   configuration:

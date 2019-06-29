@@ -2,18 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.pnoker</groupId>
+        <artifactId>dc3-center</artifactId>
+        <version>3.0</version>
+    </parent>
 
-    <groupId>com.pnoker.center.dbs</groupId>
     <artifactId>dc3-dbs</artifactId>
     <packaging>jar</packaging>
 
     <description>IOT DC3 平台 数据库服务。</description>
-
-    <parent>
-        <groupId>com.pnoker.center</groupId>
-        <artifactId>dc3-center</artifactId>
-        <version>3.0</version>
-    </parent>
 
     <dependencies>
 
@@ -27,23 +25,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis.plus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>${mariadb.version}</version>
         </dependency>
 
         <dependency>
@@ -52,18 +46,21 @@
         </dependency>
 
         <dependency>
-            <groupId>com.pnoker.api</groupId>
+            <groupId>com.pnoker</groupId>
             <artifactId>dc3-api</artifactId>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

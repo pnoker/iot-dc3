@@ -2,32 +2,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.pnoker.transfer.opcua</groupId>
-    <artifactId>dc3-opc-ua</artifactId>
-    <packaging>jar</packaging>
-
-    <description>iot-dc3 OPC UA处理 服务。</description>
-
     <parent>
-        <groupId>com.pnoker.transfer</groupId>
+        <groupId>com.pnoker</groupId>
         <artifactId>dc3-transfer</artifactId>
         <version>3.0</version>
     </parent>
 
-    <properties>
-    </properties>
+    <artifactId>dc3-opc-ua</artifactId>
+    <packaging>jar</packaging>
+
+    <description>iot-dc3 OPC UA处理 服务。</description>
 
     <dependencies>
 
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

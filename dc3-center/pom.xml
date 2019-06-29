@@ -2,22 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.pnoker.center</groupId>
-    <artifactId>dc3-center</artifactId>
-    <packaging>pom</packaging>
-
-    <description>IOT DC3 平台 综合管理中心集合。</description>
-
     <parent>
         <groupId>com.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
         <version>3.0</version>
     </parent>
 
+    <artifactId>dc3-center</artifactId>
+    <packaging>pom</packaging>
+
+    <description>IOT DC3 平台 综合管理中心集合，包含：服务注册与发现中心、服务监控中心、物联数据采集中心、数据库服务中心、授权与权限管理中心、全链路监控中心。</description>
+
     <modules>
         <module>dc3-register</module>
         <module>dc3-monitor</module>
+        <module>dc3-collect</module>
         <module>dc3-dbs</module>
     </modules>
 
@@ -28,6 +27,7 @@
             <artifactId>spring-cloud-starter-security</artifactId>
         </dependency>
 
+        <!-- Undertow Web 容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -38,7 +38,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
