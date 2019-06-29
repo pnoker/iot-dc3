@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.monitor.config;
+package com.pnoker.center.monitor.security;
 
 import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import lombok.SneakyThrows;

@@ -27,7 +27,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * <p>Description:
  */
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     @SneakyThrows
     protected void configure(HttpSecurity http) {
