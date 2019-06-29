@@ -57,17 +57,15 @@
 
         <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
         <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
-        <spring-boot-admin.version>2.1.5</spring-boot-admin.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
+        <spring-boot-admin.version>2.1.5</spring-boot-admin.version>
         <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
 
         <mariadb.version>2.3.0</mariadb.version>
         <hikaricp.version>3.3.1</hikaricp.version>
         <mybatis.plus.version>3.1.1</mybatis.plus.version>
 
-        <jasypt.version>2.1.0</jasypt.version>
         <lombok.version>1.18.8</lombok.version>
-        <jackson.modules>2.9.8</jackson.modules>
         <fastjson.version>1.2.58</fastjson.version>
         <commons.cli.version>1.4</commons.cli.version>
         <commons.lang3.version>3.9</commons.lang3.version>
@@ -77,6 +75,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <!-- Spring Cloud -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -104,31 +103,10 @@
                 <artifactId>spring-security-oauth2</artifactId>
                 <version>${security.oauth.version}</version>
             </dependency>
-
-            <!-- Database -->
             <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${hikaricp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis.plus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mariadb.jdbc</groupId>
-                <artifactId>mariadb-java-client</artifactId>
-                <version>${mariadb.version}</version>
-            </dependency>
-
-            <!--Jackson模块-->
-            <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-modules-java8</artifactId>
-                <version>${jackson.modules}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-server</artifactId>
+                <version>${spring-boot-admin.version}</version>
             </dependency>
 
             <!-- dc3 Api -->
@@ -151,50 +129,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Client -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
-        <!-- Configuration -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>${jasypt.version}</version>
-        </dependency>
-
-        <!-- Actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.codecentric</groupId>
-            <artifactId>spring-boot-admin-starter-client</artifactId>
-            <version>${spring-boot-admin.version}</version>
-        </dependency>
-
-        <!-- Zipkin -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-sleuth-zipkin</artifactId>
-        </dependency>
-
-        <!-- Hystrix -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-        </dependency>
 
         <!-- Test -->
         <dependency>

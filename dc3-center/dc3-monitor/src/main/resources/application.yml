@@ -4,9 +4,14 @@ server:
     worker-threads: 20
     buffer-size: 512
     io-threads: 2
+
 spring:
   application:
     name: dc3-monitor
+  security:
+    user:
+      name: iotdc3
+      password: iotdc3
   boot:
     admin:
       ui:
@@ -29,7 +34,8 @@ logging:
 
 eureka:
   instance:
+    prefer-ip-address: true
     health-check-url-path: /actuator/health
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8100/eureka/
+    service-url:
+      defaultZone: http://iotdc3:iotdc3@localhost:8100/eureka/
