@@ -7,14 +7,11 @@ server:
 
 spring:
   application:
-    name: dc3-register
+    name: @project.artifactId@
   security:
     user:
-      name: iotdc3
-      password: iotdc3
-  cloud:
-    config:
-      enabled: false
+      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
 
 management:
   endpoints:
@@ -25,8 +22,12 @@ management:
     health:
       show-details: ALWAYS
 
+jasypt:
+  encryptor:
+    password: M82tHF1EjfWpnXzG
+
 logging:
-  file: dc3/logs/center/dc3-register.log
+  file: dc3/logs/center/${spring.application.name}.log
 
 eureka:
   instance:
@@ -36,7 +37,7 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://iotdc3:iotdc3@${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${eureka.instance.hostname}:${server.port}/eureka/
   server:
     eviction-interval-timer-in-ms: 4000
     enable-self-preservation: false

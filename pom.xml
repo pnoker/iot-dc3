@@ -65,6 +65,7 @@
         <hikaricp.version>3.3.1</hikaricp.version>
         <mybatis.plus.version>3.1.1</mybatis.plus.version>
 
+        <jasypt.version>2.1.0</jasypt.version>
         <lombok.version>1.18.8</lombok.version>
         <fastjson.version>1.2.58</fastjson.version>
         <commons.cli.version>1.4</commons.cli.version>
@@ -165,7 +166,19 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- FastJson 工具包 -->
+        <!-- 配置文件处理器 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>${jasypt.version}</version>
+        </dependency>
+
+        <!-- FastJson -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
