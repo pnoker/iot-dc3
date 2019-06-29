@@ -1,0 +1,100 @@
+version: '2'
+services:
+  iot-dc3-mysql:
+    build:
+      context: ./
+      dockerfile: ./db/Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+    container_name: iot-dc3-mysql
+    image: iot-dc3-mysql
+    ports:
+      - 3306:3306
+
+  iot-dc3-redis:
+    image: redis:5.0
+    ports:
+      - 6379:6379
+    restart: always
+    container_name: iot-dc3-redis
+    hostname: iot-dc3-redis
+
+  iot-dc3-eureka:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-eureka/Dockerfile
+    restart: always
+    ports:
+      - 8761:8761
+    container_name: iot-dc3-eureka
+    hostname: iot-dc3-eureka
+    image: iot-dc3-eureka
+
+  iot-dc3-config:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-config/Dockerfile
+    restart: always
+    container_name: iot-dc3-config
+    hostname: iot-dc3-config
+    image: iot-dc3-config
+
+  iot-dc3-gateway:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-gateway/Dockerfile
+    restart: always
+    ports:
+      - 9999:9999
+    container_name: iot-dc3-gateway
+    hostname: iot-dc3-gateway
+    image: iot-dc3-gateway
+
+  iot-dc3-auth:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-auth/Dockerfile
+    restart: always
+    container_name: iot-dc3-auth
+    hostname: iot-dc3-auth
+    image: iot-dc3-auth
+
+  iot-dc3-upms:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-upms/iot-dc3-upms-biz/Dockerfile
+    restart: always
+    container_name: iot-dc3-upms
+    hostname: iot-dc3-upms
+    image: iot-dc3-upms
+
+  iot-dc3-monitor:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-visual/iot-dc3-monitor/Dockerfile
+    restart: always
+    ports:
+      - 5001:5001
+    container_name: iot-dc3-monitor
+    hostname: iot-dc3-monitor
+    image: iot-dc3-monitor
+
+  iot-dc3-codegen:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-visual/iot-dc3-codegen/Dockerfile
+    restart: always
+    container_name: iot-dc3-codegen
+    hostname: iot-dc3-codegen
+    image: iot-dc3-codegen
+
+  iot-dc3-zipkin:
+    build:
+      context: ./
+      dockerfile: ./iot-dc3-visual/iot-dc3-zipkin/Dockerfile
+    restart: always
+    image: iot-dc3-zipkin
+    container_name: iot-dc3-zipkin
+    ports:
+      - 5002:5002

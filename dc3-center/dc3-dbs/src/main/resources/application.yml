@@ -7,11 +7,11 @@ server:
 
 spring:
   application:
-    name: dc3-dbs
+    name: @project.artifactId@
   security:
     user:
-      name: iotdc3
-      password: iotdc3
+      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
   redis:
     host: localhost
     port: 6379
@@ -42,12 +42,16 @@ management:
     health:
       show-details: ALWAYS
 
+jasypt:
+  encryptor:
+    password: M82tHF1EjfWpnXzG
+
 feign:
   hystrix:
     enabled: true
 
 logging:
-  file: dc3/logs/dc3-dbs.log
+  file: dc3/logs/center/${spring.application.name}.log
 
 eureka:
   instance:
@@ -55,4 +59,4 @@ eureka:
     health-check-url-path: /actuator/health
   client:
     service-url:
-      defaultZone: http://iotdc3:iotdc3@localhost:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@localhost:8100/eureka/
