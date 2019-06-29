@@ -29,7 +29,7 @@
     <inceptionYear>2017-2019</inceptionYear>
     <description>
         IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建，实现设备互联、管理、数据采集、代码生成、快速开发和可视化等，
-        兼容多种流行的物联网数据接入协议（Mqtt\Hart\Modbus\Wia\Rtsp\Rtmp\Siemens PLC S7...）， 是一整套完整的物联系统解决方案。
+        兼容多种流行的物联网数据接入协议（Mqtt\Hart\Modbus\Wia\Rtsp\Rtmp\Siemens PLC S7...），是一整套完整的物联系统解决方案。
     </description>
 
     <modules>
@@ -140,6 +140,22 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Zipkin -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+        </dependency>
+
+        <!-- Hystrix -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
 
         <!-- Test -->
