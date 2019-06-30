@@ -10,17 +10,18 @@ spring:
     name: @project.artifactId@
   security:
     user:
-      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
+      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==) #iotdc3
       password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
   redis:
-    host: localhost
+    host: iotdc3.redis
     port: 6379
     password:
   datasource:
-    url: jdbc:mysql://localhost:3306/iot-dc3?useUnicode=true&characterEncoding=utf-8
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     driver-class-name: org.mariadb.jdbc.Driver
-    username: root
-    password:
+    username: ENC(bO9mEK28IfbJsTZFNeGpxw==) #root
+    password: ENC(LquT8gVTYnZwwr2K0Hbmhw==)
     sql-script-encoding: utf-8
     hikari:
       pool-name: iot-dc3-dbs-hikaricp

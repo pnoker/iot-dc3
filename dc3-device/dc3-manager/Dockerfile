@@ -1,15 +1,16 @@
 FROM anapsix/alpine-java:8_server-jre_unlimited
 
-MAINTAINER pnokers.icloud.com
+MAINTAINER pnoker pnokers.icloud.com
 
+#修改时区，兼容CentOS7、RHEL7、Scientific Linux 7、Oracle Linux 7
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 RUN mkdir -p /dc3-device/dc3-manager
 
-WORKDIR /dc3-manager
+WORKDIR /dc3-device/dc3-manager
 
-EXPOSE 8300
+EXPOSE 8600
 
-ADD ./dc3-manager/target/dc3-manager.jar ./
+ADD ./dc3-device/dc3-manager/target/dc3-manager.jar ./
 
 CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-manager.jar
