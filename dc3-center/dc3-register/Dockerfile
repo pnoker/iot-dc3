@@ -1,15 +1,16 @@
 FROM anapsix/alpine-java:8_server-jre_unlimited
 
-MAINTAINER pnokers.icloud.com
+MAINTAINER pnoker pnokers.icloud.com
 
+#修改时区，兼容CentOS7、RHEL7、Scientific Linux 7、Oracle Linux 7
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-RUN mkdir -p /dc3-center/dc3-eureka
+RUN mkdir -p /dc3-center/dc3-register
 
-WORKDIR /dc3-center/dc3-eureka
+WORKDIR /dc3-center/dc3-register
 
 EXPOSE 8100
 
-ADD ./dc3-center/dc3-eureka/target/dc3-eureka.jar ./
+ADD ./dc3-center/dc3-register/target/dc3-register.jar ./
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-eureka.jar
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-register.jar

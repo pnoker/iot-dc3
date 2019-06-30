@@ -10,7 +10,7 @@ import org.jasypt.encryption.pbe.config.EnvironmentPBEConfig;
 import org.junit.Test;
 
 /**
- * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: AES\RSA 加密算法测试
@@ -50,8 +50,10 @@ public class TestEncrypt {
         config.setAlgorithm("PBEWithMD5AndDES");          // 加密的算法，这个算法是默认的
         config.setPassword("M82tHF1EjfWpnXzG");                        // 加密的密钥
         standardPBEStringEncryptor.setConfig(config);
-        String plainText = "guest";
+        String plainText = "root";
         String encryptedText = standardPBEStringEncryptor.encrypt(plainText);
         log.info("明文:{},密文:{}", plainText, encryptedText);
+        String decryptedText = standardPBEStringEncryptor.decrypt(encryptedText);
+        log.info("密文:{},明文:{}", encryptedText, decryptedText);
     }
 }

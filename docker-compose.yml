@@ -1,100 +1,125 @@
-version: '2'
+version: '3'
 services:
-  iot-dc3-mysql:
+  # 配置 docker compose
+  dc3-gateway:
     build:
       context: ./
-      dockerfile: ./db/Dockerfile
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-    restart: always
-    container_name: iot-dc3-mysql
-    image: iot-dc3-mysql
-    ports:
-      - 3306:3306
-
-  iot-dc3-redis:
-    image: redis:5.0
-    ports:
-      - 6379:6379
-    restart: always
-    container_name: iot-dc3-redis
-    hostname: iot-dc3-redis
-
-  iot-dc3-eureka:
-    build:
-      context: ./
-      dockerfile: ./iot-dc3-eureka/Dockerfile
+      dockerfile: ./dc3-gateway/Dockerfile
     restart: always
     ports:
-      - 8761:8761
-    container_name: iot-dc3-eureka
-    hostname: iot-dc3-eureka
-    image: iot-dc3-eureka
+      - 8000:8000
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-gateway
+    hostname: iotdc3.gateway
+    image: dc3-gateway:3.0
 
-  iot-dc3-config:
+  dc3-register:
     build:
       context: ./
-      dockerfile: ./iot-dc3-config/Dockerfile
-    restart: always
-    container_name: iot-dc3-config
-    hostname: iot-dc3-config
-    image: iot-dc3-config
-
-  iot-dc3-gateway:
-    build:
-      context: ./
-      dockerfile: ./iot-dc3-gateway/Dockerfile
+      dockerfile: ./dc3-center/dc3-register/Dockerfile
     restart: always
     ports:
-      - 9999:9999
-    container_name: iot-dc3-gateway
-    hostname: iot-dc3-gateway
-    image: iot-dc3-gateway
+      - 8100:8100
+    container_name: dc3-register
+    hostname: iotdc3.register
+    image: dc3-register:3.0
 
-  iot-dc3-auth:
+  dc3-monitor:
     build:
       context: ./
-      dockerfile: ./iot-dc3-auth/Dockerfile
-    restart: always
-    container_name: iot-dc3-auth
-    hostname: iot-dc3-auth
-    image: iot-dc3-auth
-
-  iot-dc3-upms:
-    build:
-      context: ./
-      dockerfile: ./iot-dc3-upms/iot-dc3-upms-biz/Dockerfile
-    restart: always
-    container_name: iot-dc3-upms
-    hostname: iot-dc3-upms
-    image: iot-dc3-upms
-
-  iot-dc3-monitor:
-    build:
-      context: ./
-      dockerfile: ./iot-dc3-visual/iot-dc3-monitor/Dockerfile
+      dockerfile: ./dc3-center/dc3-monitor/Dockerfile
     restart: always
     ports:
-      - 5001:5001
-    container_name: iot-dc3-monitor
-    hostname: iot-dc3-monitor
-    image: iot-dc3-monitor
+      - 8200:8200
+    container_name: dc3-monitor
+    hostname: iotdc3.monitor
+    image: dc3-monitor:3.0
 
-  iot-dc3-codegen:
+  dc3-dbs:
     build:
       context: ./
-      dockerfile: ./iot-dc3-visual/iot-dc3-codegen/Dockerfile
+      dockerfile: ./dc3-center/dc3-dbs/Dockerfile
     restart: always
-    container_name: iot-dc3-codegen
-    hostname: iot-dc3-codegen
-    image: iot-dc3-codegen
-
-  iot-dc3-zipkin:
-    build:
-      context: ./
-      dockerfile: ./iot-dc3-visual/iot-dc3-zipkin/Dockerfile
-    restart: always
-    image: iot-dc3-zipkin
-    container_name: iot-dc3-zipkin
     ports:
-      - 5002:5002
+      - 8300:8300
+    container_name: dc3-dbs
+    hostname: iotdc3.dbs
+    image: dc3-dbs:3.0
+
+  dc3-collect:
+    build:
+      context: ./
+      dockerfile: ./dc3-center/dc3-collect/Dockerfile
+    restart: always
+    ports:
+      - 8500:8500
+    container_name: dc3-collect
+    hostname: iotdc3.collect
+    image: dc3-collect:3.0
+
+  dc3-manager:
+    build:
+      context: ./
+      dockerfile: ./dc3-device/dc3-manager/Dockerfile
+    restart: always
+    ports:
+      - 8600:8600
+    container_name: dc3-manager
+    hostname: iotdc3.manager
+    image: dc3-manager:3.0
+
+  dc3-group:
+    build:
+      context: ./
+      dockerfile: ./dc3-device/dc3-group/Dockerfile
+    restart: always
+    ports:
+      - 8700:8700
+    container_name: dc3-group
+    hostname: iotdc3.group
+    image: dc3-group:3.0
+
+  dc3-opc:
+    build:
+      context: ./
+      dockerfile: ./dc3-transfer/dc3-opc/Dockerfile
+    restart: always
+    ports:
+      - 8810:8810
+    container_name: dc3-opc
+    hostname: iotdc3.opc
+    image: dc3-opc:3.0
+
+  dc3-opc-ua:
+    build:
+      context: ./
+      dockerfile: ./dc3-transfer/dc3-opc-ua/Dockerfile
+    restart: always
+    ports:
+      - 8820:8820
+    container_name: dc3-opc-ua
+    hostname: iotdc3.opcua
+    image: dc3-opc-ua:3.0
+
+  dc3-rtmp:
+    build:
+      context: ./
+      dockerfile: ./dc3-transfer/dc3-rtmp/Dockerfile
+    restart: always
+    ports:
+      - 8830:8830
+    container_name: dc3-rtmp
+    hostname: iotdc3.rtmp
+    image: dc3-rtmp:3.0
+
+  dc3-resource:
+    build:
+      context: ./
+      dockerfile: ./dc3-transfer/dc3-resource/Dockerfile
+    restart: always
+    ports:
+      - 8840:8840
+    container_name: dc3-resource
+    hostname: iotdc3.resource
+    image: dc3-resource:3.0
