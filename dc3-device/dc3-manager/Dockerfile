@@ -11,6 +11,6 @@ WORKDIR /dc3-device/dc3-manager
 
 EXPOSE 8600
 
-ADD ./dc3-device/dc3-manager/target/dc3-manager.jar ./
+ADD ./target/dc3-manager.jar ./
 
 CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-manager.jar

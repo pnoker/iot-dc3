@@ -11,6 +11,6 @@ WORKDIR /dc3-transfer/dc3-rtmp
 
 EXPOSE 8830
 
-ADD ./dc3-transfer/dc3-rtmp/target/dc3-rtmp.jar ./
+ADD ./target/dc3-rtmp.jar ./
 
 CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-rtmp.jar

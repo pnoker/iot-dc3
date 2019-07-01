@@ -61,6 +61,10 @@ DC3平台是基于Spring Cloud架构开发的,是一系列松耦合、开源的�
 [`Spring Cloud Bus`](https://cloud.spring.io/spring-cloud-bus) 
 等微服务模块。
 
+### DC3 IOT 镜像资源
+
+[IOT DC3 Docker Hub Repositories](https://hub.docker.com/u/pnoker)
+
 ### 联系作者
 
 邮箱:pnokers@icloud.com
@@ -76,7 +80,7 @@ DC3平台是基于Spring Cloud架构开发的,是一系列松耦合、开源的�
 5.  pull request
 6. 等待作者合并
 
-### 通用
+### 通用指令
 
 ```bash
 # Git强制覆盖本地
@@ -92,4 +96,18 @@ yarn
 yarn add|upgrade|remove [package]
 # 启动项目
 yarn run [script] [<args>]
+
+# Docker操作命令
+# list
+docker images
+# build
+docker build -t pnoker/dc3-dbs:3.0 .
+# delete
+docker rmi -f pnoker/dc3-dbs:3.0
+# run
+docker run -d -p 80:8080 --name dc3-dbs -h iotdc3.dbs --link dc3-register:iotdc3.register  pnoker/dc3-dbs:3.0
+# stop/start/restart
+docker start|start|restart pnoker/dc3-dbs:3.0
+# exec
+docker exec -i -t  pnoker/dc3-dbs:3.0 /bin/bash
 ```
