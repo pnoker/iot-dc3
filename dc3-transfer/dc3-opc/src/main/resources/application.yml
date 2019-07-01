@@ -1,30 +1,42 @@
 server:
-  port: 8410
+  port: 8810
   undertow:
     worker-threads: 20
     buffer-size: 512
     io-threads: 2
+
 spring:
   application:
-    name: dc3-opc
+    name: @project.artifactId@
+  security:
+    user:
+      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: '*'
   endpoint:
     health:
       show-details: ALWAYS
+
+jasypt:
+  encryptor:
+    password: M82tHF1EjfWpnXzG
 
 feign:
   hystrix:
     enabled: true
 
 logging:
-  file: dc3/logs/transfer/dc3-opc.log
+  file: dc3/logs/transfer/${spring.application.name}.log
 
 eureka:
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8100/eureka/
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@localhost:8100/eureka/

@@ -5,7 +5,7 @@ import com.pnoker.device.group.model.wia.WiaData;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Wia数据 数据库操作接口

@@ -5,13 +5,12 @@ import com.pnoker.common.bean.encryp.Keys;
 import com.pnoker.common.utils.encryp.AesTools;
 import com.pnoker.common.utils.encryp.RsaTools;
 import lombok.extern.slf4j.Slf4j;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+import org.jasypt.encryption.pbe.config.EnvironmentPBEConfig;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: AES\RSA 加密算法测试
@@ -34,12 +33,27 @@ public class TestEncrypt {
     public void rsaTest() throws Exception {
         Keys.Rsa rsa = RsaTools.genKey();
         log.info(" rsa key : {}", JSON.toJSONString(rsa));
-        log.info("pk:{},sk:{}",rsa.getPublicKey().length(),rsa.getPrivateKey().length());
+        log.info("pk:{},sk:{}", rsa.getPublicKey().length(), rsa.getPrivateKey().length());
         String str = "zhanghongyuan@ks.sia.cn,zhanghongyuan@ks.sia.cn";
         log.info("str : {}", str);
         String ens = RsaTools.encrypt(str, rsa.getPublicKey());
         log.info("ens : {}", ens);
         String des = RsaTools.decrypt(ens, rsa.getPrivateKey());
         log.info("des : {}", des);
+    }
+
+    @Test
+    public void jasyptTest() {
+        StandardPBEStringEncryptor standardPBEStringEncryptor = new StandardPBEStringEncryptor();
+        EnvironmentPBEConfig config = new EnvironmentPBEConfig();
+
+        config.setAlgorithm("PBEWithMD5AndDES");          // 加密的算法，这个算法是默认的
+        config.setPassword("M82tHF1EjfWpnXzG");                        // 加密的密钥
+        standardPBEStringEncryptor.setConfig(config);
+        String plainText = "root";
+        String encryptedText = standardPBEStringEncryptor.encrypt(plainText);
+        log.info("明文:{},密文:{}", plainText, encryptedText);
+        String decryptedText = standardPBEStringEncryptor.decrypt(encryptedText);
+        log.info("密文:{},明文:{}", encryptedText, decryptedText);
     }
 }
