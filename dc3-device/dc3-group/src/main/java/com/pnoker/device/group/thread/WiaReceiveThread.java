@@ -1,7 +1,7 @@
 package com.pnoker.device.group.thread;
 
 /**
- * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: wia 数据采集线程

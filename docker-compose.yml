@@ -1,0 +1,178 @@
+version: '3'
+services:
+  # 配置 docker compose
+  dc3-mariadb:
+    build:
+      context: ./dc3/dependences/mariadb/
+      dockerfile: ./Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: iotdc3
+    image: pnoker/dc3-mariadb:3.0
+    restart: always
+    ports:
+      - 3306:3306
+    container_name: dc3-mariadb
+    hostname: iotdc3.mariadb
+  
+  dc3-redis:
+    build:
+      context: ./dc3/dependences/redis/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-redis:3.0
+    restart: always
+    ports:
+      - 6379:6379
+    container_name: dc3-redis
+    hostname: iotdc3.redis
+
+  dc3-rabbitmq:
+    build:
+      context: ./dc3/dependences/rabbitmq/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-rabbitmq:3.0
+    restart: always
+    ports:
+      - 5672:5672
+    container_name: dc3-rabbitmq
+    hostname: iotdc3.rabbitmq
+
+  dc3-gateway:
+    build:
+      context: ./dc3-gateway/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-gateway:3.0
+    restart: always
+    ports:
+      - 8000:8000
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-gateway
+    hostname: iotdc3.gateway
+  
+  dc3-register:
+    build:
+      context: ./dc3-center/dc3-register/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-register:3.0
+    restart: always
+    ports:
+      - 8100:8100
+    container_name: dc3-register
+    hostname: iotdc3.register
+
+  dc3-monitor:
+    build:
+      context: ./dc3-center/dc3-monitor/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-monitor:3.0
+    restart: always
+    ports:
+      - 8200:8200
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-monitor
+    hostname: iotdc3.monitor
+
+  dc3-dbs:
+    build:
+      context: ./dc3-center/dc3-dbs/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-dbs:3.0
+    restart: always
+    ports:
+      - 8300:8300
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-dbs
+    hostname: iotdc3.dbs
+    
+  dc3-collect:
+    build:
+      context: ./dc3-center/dc3-collect/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-collect:3.0
+    restart: always
+    ports:
+      - 8500:8500
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-collect
+    hostname: iotdc3.collect
+
+  dc3-manager:
+    build:
+      context: ./dc3-device/dc3-manager/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-manager:3.0
+    restart: always
+    ports:
+      - 8600:8600
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-manager
+    hostname: iotdc3.manager
+    
+  dc3-group:
+    build:
+      context: ./dc3-device/dc3-group/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-group:3.0
+    restart: always
+    ports:
+      - 8700:8700
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-group
+    hostname: iotdc3.group
+
+  dc3-opc:
+    build:
+      context: ./dc3-transfer/dc3-opc/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-opc:3.0
+    restart: always
+    ports:
+      - 8810:8810
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-opc
+    hostname: iotdc3.opc
+    
+  dc3-opc-ua:
+    build:
+      context: ./dc3-transfer/dc3-opc-ua/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-opc-ua:3.0
+    restart: always
+    ports:
+      - 8820:8820
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-opc-ua
+    hostname: iotdc3.opcua
+
+  dc3-rtmp:
+    build:
+      context: ./dc3-transfer/dc3-rtmp/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-rtmp:3.0
+    restart: always
+    ports:
+      - 8830:8830
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-rtmp
+    hostname: iotdc3.rtmp
+
+  dc3-resource:
+    build:
+      context: ./dc3-transfer/dc3-resource/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-resource:3.0
+    restart: always
+    ports:
+      - 8840:8840
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-resource
+    hostname: iotdc3.resource

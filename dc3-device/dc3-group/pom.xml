@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2019 Pnoker. All Rights Reserved.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the Licens
+         http://www.apache.org/licenses/LICENSE
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.pnoker.device.group</groupId>
-    <artifactId>dc3-group</artifactId>
-    <packaging>jar</packaging>
-
-    <description>IOT DC3 平台 设备组服务，用于接入和管理一组设备。</description>
-
     <parent>
-        <groupId>com.pnoker.device</groupId>
+        <groupId>com.pnoker</groupId>
         <artifactId>dc3-device</artifactId>
         <version>3.0</version>
     </parent>
 
-    <properties>
-        <hikaricp.version>3.3.1</hikaricp.version>
-        <mybatis.plus.version>3.1.1</mybatis.plus.version>
-        <sqllite.version>3.25.2</sqllite.version>
-        <netty.version>4.1.36.Final</netty.version>
-    </properties>
+    <artifactId>dc3-group</artifactId>
+    <packaging>jar</packaging>
+
+    <description>IOT DC3 平台 设备组服务，用于接入和管理一组设备。</description>
 
     <dependencies>
 
@@ -38,34 +41,33 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis.plus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>${sqllite.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>${netty.version}</version>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

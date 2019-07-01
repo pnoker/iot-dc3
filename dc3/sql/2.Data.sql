@@ -1,2 +1,0 @@
-/*Data for the table `iot_rtmp` */
-insert  into `iot_rtmp`(`id`,`rtsp_url`,`rtmp_url`,`command`,`video_type`) values (1,'rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov','rtmp://106.14.182.20:1935/rtmp/bigbuckbunny_175k','{exe} -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}',0),(2,'rtsp://admin:admin@192.168.2.236:37779/cam/realmonitor?channel=1&subtype=0','rtmp://106.14.182.20:1935/rtmp/monitor',NULL,1);

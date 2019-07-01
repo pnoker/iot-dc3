@@ -1,31 +1,57 @@
 {
   "iot-dc3-port-list": {
     "dc3-gateway": {
+      "description": "网关",
       "port": 8000
     },
     "dc3-center": {
       "dc3-register": {
+        "description": "服务注册",
         "port": 8100
       },
       "dc3-monitor": {
+        "description": "服务监控",
         "port": 8200
       },
       "dc3-dbs": {
+        "description": "数据库",
         "port": 8300
+      },
+      "dc3-auth": {
+        "description": "权限",
+        "port": 8400
+      },
+      "dc3-collect": {
+        "description": "数据采集",
+        "port": 8500
       }
     },
     "dc3-transfer": {
-      "dc3-message": {
-        "port": 8400
-      },
       "dc3-opc": {
-        "port": 8410
+        "description": "OPC",
+        "port": 8810
       },
       "dc3-opc-ua": {
-        "port": 8420
+        "description": "OPC UA",
+        "port": 8820
       },
       "dc3-rtmp": {
-        "port": 8430
+        "description": "Rtsp转Rtmp",
+        "port": 8830
+      },
+      "dc3-resource": {
+        "description": "资源服务",
+        "port": 8840
+      }
+    },
+    "dc3-device": {
+      "dc3-manager": {
+        "description": "设备管理",
+        "port": 8600
+      },
+      "dc3-group": {
+        "description": "设备组",
+        "port": 8700
       }
     }
   }

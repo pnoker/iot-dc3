@@ -1,7 +1,7 @@
 package com.pnoker.device.group.thread;
 
 /**
- * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: 数据采集线程基类，数采线程请务必继承此类

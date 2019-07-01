@@ -1,0 +1,48 @@
+server:
+  port: 8500
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+spring:
+  application:
+    name: @project.artifactId@
+  security:
+    user:
+      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ENC(auWX3j36elhCLnox7Fpojw==)
+    password: ENC(VdiorXyvYl3enYnbOnznPw==)
+    virtual-host: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+jasypt:
+  encryptor:
+    password: M82tHF1EjfWpnXzG
+
+feign:
+  hystrix:
+    enabled: true
+
+logging:
+  file: dc3/logs/${spring.application.name}.log
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@localhost:8100/eureka/

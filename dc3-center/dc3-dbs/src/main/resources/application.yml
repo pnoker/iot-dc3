@@ -7,20 +7,27 @@ server:
 
 spring:
   application:
-    name: dc3-dbs
+    name: @project.artifactId@
+  security:
+    user:
+      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==) #iotdc3
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
   redis:
-    host: localhost
+    host: iotdc3.redis
     port: 6379
     password:
   datasource:
-    url: jdbc:mysql://localhost:3306/iot-dc3?useUnicode=true&characterEncoding=utf-8
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     driver-class-name: org.mariadb.jdbc.Driver
-    username: root
-    password:
+    username: ENC(bO9mEK28IfbJsTZFNeGpxw==) #root
+    password: ENC(LquT8gVTYnZwwr2K0Hbmhw==)
     sql-script-encoding: utf-8
     hikari:
+      pool-name: iot-dc3-dbs-hikaricp
       max-lifetime: 1765000
-      maximum-pool-size: 10
+      maximum-pool-size: 16
+      minimum-idle: 4
 
 mybatis-plus:
   configuration:
@@ -33,19 +40,26 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: '*'
   endpoint:
     health:
       show-details: ALWAYS
+
+jasypt:
+  encryptor:
+    password: M82tHF1EjfWpnXzG
 
 feign:
   hystrix:
     enabled: true
 
 logging:
-  file: dc3/logs/dc3-dbs.log
+  file: dc3/logs/center/${spring.application.name}.log
 
 eureka:
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8100/eureka/
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@localhost:8100/eureka/

@@ -3,7 +3,7 @@ package com.pnoker.common.bean.wia;
 import lombok.Data;
 
 /**
- * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: 设备信息数据

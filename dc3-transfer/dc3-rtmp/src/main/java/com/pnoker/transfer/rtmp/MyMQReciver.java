@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @Author: lyang
- * @Date: 2018/12/29 16:35
+ * @Date: 2019/12/29 16:35
  */
 @Component
 @Slf4j
@@ -17,6 +17,6 @@ public class MyMQReciver {
 
     @StreamListener(MyProcessor.CALLBACKINPUT)
     public void callback(String myGirl){
-        log.info("message has recived : {} ", myGirl);
+        log.info("collect has recived : {} ", myGirl);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Google LLC. All Rights Reserved.
+ * Copyright 2019 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 /**
- * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Uid工具集合，用于生成GUID（Globally Unique Identifier）
