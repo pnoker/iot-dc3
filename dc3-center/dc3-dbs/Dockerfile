@@ -11,6 +11,6 @@ WORKDIR /dc3-center/dc3-dbs
 
 EXPOSE 8300
 
-ADD ./dc3-center/dc3-dbs/target/dc3-dbs.jar ./
+ADD ./target/dc3-dbs.jar ./
 
 CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-dbs.jar

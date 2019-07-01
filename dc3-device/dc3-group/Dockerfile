@@ -11,6 +11,6 @@ WORKDIR /dc3-device/dc3-group
 
 EXPOSE 8700
 
-ADD ./dc3-device/dc3-group/target/dc3-group.jar ./
+ADD ./target/dc3-group.jar ./
 
 CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-group.jar
