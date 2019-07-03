@@ -15,7 +15,7 @@ spring:
   redis:
     host: iotdc3.redis
     port: 6379
-    password:
+    password: ENC(8/+8TEVdl0a7upOyBX8l2A==)
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
