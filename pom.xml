@@ -61,6 +61,7 @@
     <properties>
 
         <java.version>1.8</java.version>
+        <maven.jar.plugin>3.1.2</maven.jar.plugin>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
@@ -77,6 +78,7 @@
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
         <hikaricp.version>3.3.1</hikaricp.version>
+        <servlet-api.version>4.0.1</servlet-api.version>
         <mybatis.plus.version>3.1.1</mybatis.plus.version>
 
         <jna.version>5.3.1</jna.version>
@@ -85,6 +87,7 @@
         <jackson.modules>2.9.8</jackson.modules>
         <netty.version>4.1.36.Final</netty.version>
         <fastjson.version>1.2.58</fastjson.version>
+        <slf4j-api.version>1.7.26</slf4j-api.version>
         <commons.cli.version>1.4</commons.cli.version>
         <commons.lang3.version>3.9</commons.lang3.version>
         <google.guava.version>27.1-jre</google.guava.version>
@@ -200,6 +203,13 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!-- Servlet Api -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
+            </dependency>
+
             <!-- Java Native Access -->
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
@@ -248,6 +258,13 @@
                 <version>${jackson.modules}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- Slf4j -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
             </dependency>
 
             <!-- dc3 Api -->
@@ -313,14 +330,26 @@
 
     <build>
         <finalName>${project.name}</finalName>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
         </resources>
+
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin}</version>
+                    <configuration>
+                        <target>${maven.compiler.target}</target>
+                        <source>${maven.compiler.source}</source>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
@@ -338,8 +367,25 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven.dependency.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>copy-dependencies</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>copy-dependencies</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>${maven.jar.plugin}</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -351,33 +397,11 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin}</version>
-                <configuration>
-                    <target>${maven.compiler.target}</target>
-                    <source>${maven.compiler.source}</source>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven.dependency.plugin}</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

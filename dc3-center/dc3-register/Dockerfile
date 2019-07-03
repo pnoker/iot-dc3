@@ -11,6 +11,8 @@ WORKDIR /dc3-center/dc3-register
 
 EXPOSE 8100
 
-ADD ./target/dc3-register.jar ./
+ADD ./target/lib ./lib
+ADD ./target/classes ./classes
+ADD ./target/dc3-register.jar.original ./
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-register.jar
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-register.jar.original
