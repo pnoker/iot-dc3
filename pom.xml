@@ -80,6 +80,7 @@
         <jna.version>5.3.1</jna.version>
         <jasypt.version>2.1.0</jasypt.version>
         <lombok.version>1.18.8</lombok.version>
+        <jackson.modules>2.9.8</jackson.modules>
         <netty.version>4.1.36.Final</netty.version>
         <fastjson.version>1.2.58</fastjson.version>
         <commons.cli.version>1.4</commons.cli.version>
@@ -163,6 +164,15 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+
+            <!--Jackson模块-->
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-modules-java8</artifactId>
+                <version>${jackson.modules}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- dc3 Api -->
@@ -293,11 +303,6 @@
                     <source>${maven.compiler.source}</source>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <version>2.2.5</version>
             </plugin>
         </plugins>
     </build>
