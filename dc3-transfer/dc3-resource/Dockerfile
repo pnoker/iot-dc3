@@ -11,6 +11,8 @@ WORKDIR /dc3-transfer/dc3-resource
 
 EXPOSE 8840
 
-ADD ./target/dc3-resource.jar ./
+ADD ./target/lib ./lib
+ADD ./target/classes ./classes
+ADD ./target/dc3-resource.jar.original ./
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-resource.jar
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-resource.jar.original

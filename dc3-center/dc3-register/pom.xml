@@ -25,6 +25,10 @@
 
     <description>IOT DC3 平台 服务注册与发现中心。</description>
 
+    <properties>
+        <start.class>com.pnoker.center.register.RegisterApplication</start.class>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -42,11 +46,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.pnoker.center.register.RegisterApplication</mainClass>
+                            <mainClass>${start.class}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
