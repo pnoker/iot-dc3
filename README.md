@@ -95,8 +95,7 @@ iot-dc3
 |      Spring Cloud      | Greenwich.SR1 |
 | Spring Security OAuth2 |     2.3.5     |
 |      Mybatis Plus      |     3.1.0     |
-|         hutool         |    4.5.13     |
-|          Avue          |     1.6.0     |
+|          Vue           |     3.0       |
 
 ### 6 联系作者
 
