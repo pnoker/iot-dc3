@@ -11,6 +11,8 @@ WORKDIR /dc3-gateway
 
 EXPOSE 8300
 
-ADD ./target/dc3-gateway.jar ./
+ADD ./target/lib ./lib
+ADD ./target/classes ./classes
+ADD ./target/dc3-gateway.jar.original ./
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-gateway.jar
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-gateway.jar.original

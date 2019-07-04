@@ -25,6 +25,10 @@
 
     <description>IOT DC3 平台数据采集,包含Amqp,Websocket,Mqtt等通用消息中间件，通过消息订阅方式收集设备组信息。</description>
 
+    <properties>
+        <start.class>com.pnoker.center.collect.CollectApplication</start.class>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -44,6 +48,21 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${start.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>

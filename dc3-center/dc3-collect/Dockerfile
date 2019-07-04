@@ -11,6 +11,8 @@ WORKDIR /dc3-center/dc3-collect
 
 EXPOSE 8500
 
-ADD ./target/dc3-collect.jar ./
+ADD ./target/lib ./lib
+ADD ./target/classes ./classes
+ADD ./target/dc3-collect.jar.original ./
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-collect.jar
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-collect.jar.original

@@ -11,6 +11,8 @@ WORKDIR /dc3-transfer/dc3-opc
 
 EXPOSE 8810
 
-ADD ./target/dc3-opc.jar ./
+ADD ./target/lib ./lib
+ADD ./target/classes ./classes
+ADD ./target/dc3-opc.jar.original ./
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-opc.jar
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-opc.jar.original

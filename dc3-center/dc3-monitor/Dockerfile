@@ -11,6 +11,8 @@ WORKDIR /dc3-center/dc3-monitor
 
 EXPOSE 8200
 
-ADD ./target/dc3-monitor.jar ./
+ADD ./target/lib ./lib
+ADD ./target/classes ./classes
+ADD ./target/dc3-monitor.jar.original ./
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-monitor.jar
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-monitor.jar.original
