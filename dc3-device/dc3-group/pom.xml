@@ -25,6 +25,10 @@
 
     <description>IOT DC3 平台 设备组服务，用于接入和管理一组设备。</description>
 
+    <properties>
+        <start.class>com.pnoker.device.group.DeviceGroupApplication</start.class>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -64,6 +68,21 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${start.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>

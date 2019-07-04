@@ -25,6 +25,10 @@
 
     <description>IOT DC3 平台 监控服务中心。</description>
 
+    <properties>
+        <start.class>com.pnoker.center.monitor.MonitorApplication</start.class>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -39,6 +43,21 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${start.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>
