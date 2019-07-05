@@ -1,4 +1,4 @@
-FROM anapsix/alpine-java:8_server-jre_unlimited
+FROM anapsix/alpine-java:8_jdk_unlimited
 
 MAINTAINER pnoker pnokers.icloud.com
 

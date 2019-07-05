@@ -1,4 +1,4 @@
-FROM redis
+FROM redis:5.0-alpine
 
 MAINTAINER pnoker pnokers.icloud.com
 
