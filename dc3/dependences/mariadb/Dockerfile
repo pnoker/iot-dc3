@@ -1,4 +1,4 @@
-FROM mariadb
+FROM mariadb:10.4
 
 MAINTAINER pnoker pnokers.icloud.com
 

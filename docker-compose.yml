@@ -41,6 +41,9 @@ services:
     restart: always
     ports:
       - 5672:5672
+      - 1883:1883
+      - 61613:61613
+      - 15672:15672
     container_name: dc3-rabbitmq
     hostname: iotdc3.rabbitmq
 
