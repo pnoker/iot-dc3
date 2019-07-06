@@ -1,36 +1,26 @@
-FROM pnoker/dc3-base:3.0
-
+FROM pnoker/dc3-base:3.0 AS build
 MAINTAINER pnoker <pnokers.icloud.com>
 
-# Versions of Nginx and nginx-rtmp-module to use
-ENV NGINX_VERSION nginx-1.17.0
+ENV NGINX_VERSION nginx-1.17.1
 ENV NGINX_RTMP_MODULE_VERSION 1.2.1
 
-# Download and decompress Nginx
+# 下载 Nginx
 RUN mkdir -p /tmp/build/nginx \
     && cd /tmp/build/nginx \
     && wget -O ${NGINX_VERSION}.tar.gz https://nginx.org/download/${NGINX_VERSION}.tar.gz \
     && tar -zxf ${NGINX_VERSION}.tar.gz
 
-# Download and decompress RTMP module
+# 下载 Nginx Rtmp Module
 RUN mkdir -p /tmp/build/nginx-rtmp-module \
     && cd /tmp/build/nginx-rtmp-module \
     && wget -O nginx-rtmp-module-${NGINX_RTMP_MODULE_VERSION}.tar.gz https://github.com/arut/nginx-rtmp-module/archive/v${NGINX_RTMP_MODULE_VERSION}.tar.gz \
     && tar -zxf nginx-rtmp-module-${NGINX_RTMP_MODULE_VERSION}.tar.gz \
     && cd nginx-rtmp-module-${NGINX_RTMP_MODULE_VERSION}
 
-# Build and install Nginx
-# The default puts everything under /usr/local/nginx, so it's needed to change
-# it explicitly. Not just for order but to have it in the PATH
+# 安装Nginx和Rtmp Module
 RUN cd /tmp/build/nginx/${NGINX_VERSION} \
     && ./configure \
-         --sbin-path=/usr/local/sbin/nginx \
-         --conf-path=/etc/nginx/nginx.conf \
-         --error-log-path=/var/log/nginx/error.log \
-         --pid-path=/var/run/nginx/nginx.pid \
-         --lock-path=/var/lock/nginx/nginx.lock \
-         --http-log-path=/var/log/nginx/access.log \
-         --http-client-body-temp-path=/tmp/nginx-client-body \
+         --prefix=/usr/local/nginx \
          --with-http_ssl_module \
          --with-threads \
          --with-ipv6 \
@@ -40,13 +30,21 @@ RUN cd /tmp/build/nginx/${NGINX_VERSION} \
     && mkdir /var/lock/nginx \
     && rm -rf /tmp/build
 
-# Forward logs to Docker
-RUN ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log
+FROM alpine:3.8 AS release
+MAINTAINER pnoker <pnokers.icloud.com>
 
-# Set up config file
-COPY nginx.conf /etc/nginx/nginx.conf
+# 设置为国内下载源
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
+    && apk add --update-cache bash
+
+RUN mkdir -p /usr/local/nginx \
+    && apk add --no-cache --update ca-certificates openssl pcre
+
+COPY --from=build /usr/local/nginx /usr/local/nginx
+COPY nginx.conf /usr/local/nginx/conf/nginx.conf
 
 EXPOSE 80
 EXPOSE 1935
-CMD ["nginx", "-g", "daemon off;"]
+
+CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
