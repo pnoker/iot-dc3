@@ -25,10 +25,6 @@
 
     <description>iot-dc3 OPC处理 服务。</description>
 
-    <properties>
-        <start.class>com.pnoker.transfer.opc.OpcApplication</start.class>
-    </properties>
-
     <dependencies>
 
     </dependencies>
@@ -38,21 +34,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>${start.class}</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
         </plugins>
     </build>

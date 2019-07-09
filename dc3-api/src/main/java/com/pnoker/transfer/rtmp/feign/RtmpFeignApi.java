@@ -16,6 +16,7 @@
 package com.pnoker.transfer.rtmp.feign;
 
 import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.security.FeignSecurityConfigurer;
 import com.pnoker.transfer.rtmp.hystrix.RtmpFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ import java.util.List;
  * <p>Description:
  */
 @RequestMapping("/rtmp")
-@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class)
+@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class, configuration = FeignSecurityConfigurer.class)
 public interface RtmpFeignApi {
 
     @GetMapping(value = "/api")

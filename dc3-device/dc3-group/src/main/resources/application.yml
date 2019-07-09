@@ -10,13 +10,13 @@ spring:
     name: @project.artifactId@
   security:
     user:
-      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
-      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
+      name: iotdc3
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
   datasource:
     driver-class-name: org.sqlite.JDBC
     url: jdbc:sqlite::resource:sqlite/dc3-group.db
-    username:
-    password:
+    username: iotdc3
+    password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
     sql-script-encoding: utf-8
     hikari:
       pool-name: iot-dc3-group-hikaricp

@@ -12,12 +12,10 @@ FROM base AS release
 
 WORKDIR /dc3-transfer/dc3-rtmp
 
-ADD ./target/lib ./lib
-ADD ./target/classes ./classes
-ADD ./target/dc3-rtmp.jar.original ./
+ADD ./target/dc3-rtmp.jar ./
 COPY --from=build /usr/local /usr/local
 
 EXPOSE 8830
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-rtmp.jar.original
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-rtmp.jar
 

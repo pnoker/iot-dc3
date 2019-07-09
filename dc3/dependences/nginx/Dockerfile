@@ -20,11 +20,11 @@ RUN mkdir -p /tmp/build/nginx-rtmp-module \
 # 安装Nginx和Rtmp Module
 RUN cd /tmp/build/nginx/${NGINX_VERSION} \
     && ./configure \
-         --prefix=/usr/local/nginx \
-         --with-http_ssl_module \
-         --with-threads \
-         --with-ipv6 \
-         --add-module=/tmp/build/nginx-rtmp-module/nginx-rtmp-module-${NGINX_RTMP_MODULE_VERSION} \
+          --prefix=/usr/local/nginx \
+          --with-http_ssl_module \
+          --with-threads \
+          --with-ipv6 \
+          --add-module=/tmp/build/nginx-rtmp-module/nginx-rtmp-module-${NGINX_RTMP_MODULE_VERSION} \
     && make -j $(getconf _NPROCESSORS_ONLN) \
     && make install \
     && mkdir /var/lock/nginx \
@@ -44,7 +44,6 @@ RUN mkdir -p /usr/local/nginx \
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY nginx.conf /usr/local/nginx/conf/nginx.conf
 
-EXPOSE 80
 EXPOSE 1935
 
 CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
