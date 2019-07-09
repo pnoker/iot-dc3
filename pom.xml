@@ -20,6 +20,14 @@
     <version>3.0</version>
     <packaging>pom</packaging>
 
+    <name>${project.artifactId}</name>
+    <url>https://github.com/pnoker/iot-dc3</url>
+    <inceptionYear>2017-2019</inceptionYear>
+    <description>
+        IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建，实现设备互联、管理、数据采集、代码生成、快速开发和可视化等，
+        兼容多种流行的物联网数据接入协议（Mqtt\Hart\Modbus\Wia\Rtsp\Rtmp\Siemens PLC S7...），是一整套完整的物联系统解决方案。
+    </description>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -30,19 +38,12 @@
 
     <developers>
         <developer>
+            <id>pnoker</id>
             <name>pnoker</name>
             <email>pnokers@icloud.com</email>
             <organization>pnoker.github.io</organization>
         </developer>
     </developers>
-
-    <name>${project.artifactId}</name>
-    <url>https://github.com/pnoker/iot-dc3</url>
-    <inceptionYear>2017-2019</inceptionYear>
-    <description>
-        IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建，实现设备互联、管理、数据采集、代码生成、快速开发和可视化等，
-        兼容多种流行的物联网数据接入协议（Mqtt\Hart\Modbus\Wia\Rtsp\Rtmp\Siemens PLC S7...），是一整套完整的物联系统解决方案。
-    </description>
 
     <modules>
 
@@ -124,13 +125,6 @@
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
 
-        <!-- Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- 配置文件处理器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -141,6 +135,13 @@
             <groupId>com.github.ulisesbocchio</groupId>
             <artifactId>jasypt-spring-boot-starter</artifactId>
             <version>${jasypt.version}</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- FastJson -->

@@ -7,10 +7,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-center/dc3-collect
 
-ADD ./target/lib ./lib
-ADD ./target/classes ./classes
-ADD ./target/dc3-collect.jar.original ./
+ADD ./target/dc3-collect.jar ./
 
 EXPOSE 8500
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-collect.jar.original
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-collect.jar

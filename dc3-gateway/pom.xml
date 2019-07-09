@@ -26,10 +26,6 @@
 
     <description>IOT DC3 平台网关,用于限流、权限验证、服务转发、方向代理 等。</description>
 
-    <properties>
-        <start.class>com.pnoker.gateway.GatewayApplication</start.class>
-    </properties>
-
     <dependencies>
 
         <dependency>
@@ -54,21 +50,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>${start.class}</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
         </plugins>
     </build>

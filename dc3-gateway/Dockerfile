@@ -6,10 +6,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-gateway
 
-ADD ./target/lib ./lib
-ADD ./target/classes ./classes
-ADD ./target/dc3-gateway.jar.original ./
+ADD ./target/dc3-gateway.jar ./
 
 EXPOSE 8300
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-gateway.jar.original
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-gateway.jar
