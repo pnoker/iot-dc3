@@ -6,10 +6,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-center/dc3-dbs
 
-ADD ./target/lib ./lib
-ADD ./target/classes ./classes
-ADD ./target/dc3-dbs.jar.original ./
+ADD ./target/dc3-dbs.jar ./
 
 EXPOSE 8300
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-dbs.jar.original
+CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-dbs.jar
