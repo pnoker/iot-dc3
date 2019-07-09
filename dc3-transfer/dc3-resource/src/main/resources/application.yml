@@ -10,8 +10,8 @@ spring:
     name: @project.artifactId@
   security:
     user:
-      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
-      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
+      name: iotdc3
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
   thymeleaf:
     cache: false
     enabled: true

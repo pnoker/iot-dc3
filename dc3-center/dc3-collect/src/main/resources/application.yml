@@ -10,13 +10,13 @@ spring:
     name: @project.artifactId@
   security:
     user:
-      name: ENC(bmSPDpfLV5VKUJhtcec+Hw==)
-      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==)
+      name: iotdc3
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
   rabbitmq:
     host: localhost
     port: 5672
-    username: ENC(Obh/+oLG5jS+2BBgUTQPQQ==)
-    password: ENC(/Nn/8VIO1V07msqUQgJ3KQ==)
+    username: iotdc3
+    password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
     virtual-host: /
 
 management:
