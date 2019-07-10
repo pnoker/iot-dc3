@@ -49,7 +49,6 @@
 
         <module>dc3-gateway</module>
         <module>dc3-center</module>
-        <module>dc3-web</module>
 
         <module>dc3-transfer</module>
         <module>dc3-device</module>
