@@ -17,6 +17,7 @@ package com.pnoker.common.model.rtmp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -25,6 +26,7 @@ import lombok.Data;
  * <p>Description: Rtmp 信息实体类
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Rtmp {
     private long id;

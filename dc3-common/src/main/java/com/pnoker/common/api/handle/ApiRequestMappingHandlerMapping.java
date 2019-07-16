@@ -30,7 +30,7 @@ import java.lang.reflect.Method;
  * <p>Description: API 版本控制 Handler
  */
 public class ApiRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
-    private static final String VERSION_FLAG = "{version}";
+    private static final String VERSION_FLAG = "[version]";
 
     private static RequestCondition<ApiVersionCondition> createCondition(Class<?> clazz) {
         RequestMapping classRequestMapping = clazz.getAnnotation(RequestMapping.class);
