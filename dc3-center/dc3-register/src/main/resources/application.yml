@@ -25,6 +25,11 @@ management:
 jasypt:
   encryptor:
     password: M82tHF1EjfWpnXzG
+    poolSize: 1
+    algorithm: PBEWithMD5AndDES
+    stringOutputType: base64
+    keyObtentionIterations: 1000
+    saltGeneratorClassname: org.jasypt.salt.RandomSaltGenerator
 
 logging:
   file: dc3/logs/center/${spring.application.name}.log
@@ -39,6 +44,4 @@ eureka:
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${eureka.instance.hostname}:${server.port}/eureka/
   server:
-    eviction-interval-timer-in-ms: 4000
-    enable-self-preservation: false
-    renewal-percent-threshold: 0.9
+    eviction-interval-timer-in-ms: 30000

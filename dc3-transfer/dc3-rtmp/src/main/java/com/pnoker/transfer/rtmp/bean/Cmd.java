@@ -15,7 +15,6 @@
  */
 package com.pnoker.transfer.rtmp.bean;
 
-
 import lombok.Data;
 
 /**

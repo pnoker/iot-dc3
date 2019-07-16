@@ -64,7 +64,7 @@ public class TaskRunner implements CommandLineRunner {
         } catch (InterruptedException e) {
             log.error("{}", e.getMessage(), e);
         }
-        list = rtmpFeignApi.list();
+        list = rtmpFeignApi.list("");
         if (list == null) {
             return getRtmpList();
         }
