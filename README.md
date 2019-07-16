@@ -1,3 +1,6 @@
+> 说明：目前项目源码未全面开源，往后会陆陆续续进行更新，敬请理解。
+
+
 <p align="center">
 	<img src="./dc3/images/iot-dc3-logo.png" width="400""><br>
 	<a><img src="https://img.shields.io/badge/JDK-1.8-yellow.svg"></a>

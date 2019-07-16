@@ -32,6 +32,11 @@ management:
 jasypt:
   encryptor:
     password: M82tHF1EjfWpnXzG
+    poolSize: 1
+    algorithm: PBEWithMD5AndDES
+    stringOutputType: base64
+    keyObtentionIterations: 1000
+    saltGeneratorClassname: org.jasypt.salt.RandomSaltGenerator
 
 logging:
   file: dc3/logs/center/${spring.application.name}.log

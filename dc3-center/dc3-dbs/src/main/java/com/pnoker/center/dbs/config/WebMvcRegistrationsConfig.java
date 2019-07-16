@@ -13,28 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.common.model.rtmp;
+package com.pnoker.center.dbs.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.pnoker.common.api.handle.ApiRequestMappingHandlerMapping;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-/**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 信息实体类
- */
-@Data
-@AllArgsConstructor
-public class Rtmp {
-    private long id;
-    private String rtspUrl;
-    private String rtmpUrl;
-    private String command;
-    private short videoType;
-    private boolean autoStart;
-
-    public Rtmp(long id) {
-        this.id = id;
+@Configuration
+public class WebMvcRegistrationsConfig implements WebMvcRegistrations {
+    @Override
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+        return new ApiRequestMappingHandlerMapping();
     }
 }
