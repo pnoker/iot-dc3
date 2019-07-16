@@ -106,16 +106,7 @@ iot-dc3
 
 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码
 
-### 7 参与贡献
-
-1. Fork项目到自己的repo
-2. clone到本地
-3. 修改代码(dev分支)
-4. commit后push到自己的库（dev分支）
-5.  pull request
-6. 等待作者合并
-
-### 8 通用指令
+### 7 通用指令
 
 ```bash
 # Git强制覆盖本地

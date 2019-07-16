@@ -31,9 +31,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface ApiVersion {
     /**
-     * 版本号，默认为 V3.0
-     *
-     * @return
+     * @return 版本号，默认为 V3.0
      */
     int value() default 3;
 }
