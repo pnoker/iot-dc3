@@ -13,20 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.transfer.rtmp.feign;
+package com.pnoker.common.annotation;
 
-import com.pnoker.common.base.BaseFeignApi;
-import com.pnoker.security.FeignSecurityConfigurer;
-import com.pnoker.transfer.rtmp.hystrix.RtmpFeignApiHystrix;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.Mapping;
+
+import java.lang.annotation.*;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: API 版本控制注解
  */
-@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class, configuration = FeignSecurityConfigurer.class)
-public interface RtmpFeignApi extends BaseFeignApi {
+@Mapping
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface ApiVersion {
+    /**
+     * 版本号，默认为 V3.0
+     *
+     * @return
+     */
+    int value() default 3;
 }

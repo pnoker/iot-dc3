@@ -28,6 +28,12 @@
 
     <dependencies>
 
+        <!-- Spring Web MVC -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
         <!-- Servlet Api -->
         <dependency>
             <groupId>javax.servlet</groupId>

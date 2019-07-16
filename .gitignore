@@ -1,8 +1,8 @@
 *target
 *logs
-
-### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
+.vs
+.vscode

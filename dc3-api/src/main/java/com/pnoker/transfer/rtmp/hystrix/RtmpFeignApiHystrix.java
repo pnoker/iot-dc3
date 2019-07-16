@@ -37,10 +37,6 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
     public RtmpFeignApi create(Throwable throwable) {
         log.error("{}", throwable.getMessage(), throwable);
         return new RtmpFeignApi() {
-            @Override
-            public String api() {
-                return "api() 故障，返回默认值：0";
-            }
 
             @Override
             public String add(String json) {
@@ -58,7 +54,7 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
             }
 
             @Override
-            public List<Rtmp> list() {
+            public List<Rtmp> list(String json) {
                 log.info("报错");
                 return null;
             }
