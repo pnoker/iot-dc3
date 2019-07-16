@@ -15,7 +15,6 @@
  */
 package com.pnoker.common.base;
 
-
 import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.base.ResponseBean;
 import lombok.extern.slf4j.Slf4j;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.center.dbs.security;
+package com.pnoker.center.dbs.config;
 
 import lombok.SneakyThrows;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
