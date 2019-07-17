@@ -45,13 +45,13 @@ public class TaskRunner implements CommandLineRunner {
     private volatile int times = 0;
     private int reconnect = 5000;
 
+    @Autowired
+    private RtmpFeignApi rtmpFeignApi;
+
     @Value("${ffmpeg.window}")
     private String window;
     @Value("${ffmpeg.nuix}")
     private String unix;
-
-    @Autowired
-    private RtmpFeignApi rtmpFeignApi;
 
     public List<Rtmp> getRtmpList() {
         List<Rtmp> list = new ArrayList<>();
