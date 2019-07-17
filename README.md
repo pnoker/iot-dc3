@@ -1,10 +1,16 @@
-> 说明：目前项目源码未全面开源，往后会陆陆续续进行更新，敬请理解。
-
+> 说明：目前项目源码未全面开源，往后会陆陆续续进行更新，敬请关注。
 
 <p align="center">
-	<img src="./dc3/images/iot-dc3-logo.png" width="400""><br>
-	<a><img src="https://img.shields.io/badge/JDK-1.8-yellow.svg"></a>
-    <a><img src="https://img.shields.io/github/issues/pnoker/iot-dc3.svg"></a>
+	<img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
+</p> 
+<p align="center">
+    <a><img src="https://travis-ci.com/pnoker/iot-dc3.svg?branch=master"></a>
+    <a><img src="https://coveralls.io/repos/github/pnoker/iot-dc3/badge.svg?branch=master"></a>
+</p>
+<p align="center">
+	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Boot-2.1.6.RELEASE-blue.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Cloud-Greenwich.RELEASE-blue.svg"></a>
 	<a target="_blank" href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE">
 		<img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg" >
 	</a><br>
@@ -95,7 +101,7 @@ iot-dc3
 |          依赖          |     版本      |
 | :--------------------: | :-----------: |
 |      Spring Boot       | 2.1.6.RELEASE |
-|      Spring Cloud      | Greenwich.SR1 |
+|      Spring Cloud      | Greenwich.RELEASE |
 | Spring Security OAuth2 |     2.3.5     |
 |      Mybatis Plus      |     3.1.0     |
 |          Vue           |     3.0       |
