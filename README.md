@@ -4,8 +4,8 @@
 	<img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
 </p> 
 <p align="center">
-    <a><img src="https://travis-ci.com/pnoker/iot-dc3.svg?branch=master"></a>
-    <a><img src="https://coveralls.io/repos/github/pnoker/iot-dc3/badge.svg?branch=master"></a>
+    <a><img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master"></a>
+    <a><img src="https://codecov.io/gh/pnoker/iot-dc3/branch/master/graph/badge.svg"></a>
 </p>
 <p align="center">
 	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
