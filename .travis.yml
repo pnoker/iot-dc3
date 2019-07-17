@@ -4,7 +4,8 @@ jdk:
 services:
   - docker
 before_install:
-  - service mysql stop && ps -aux|grep mysql
+  - service mysql stop
+  - ps -aux|grep mysql
   - docker pull pnoker/dc3-mariadb:3.0 pnoker/dc3-redis:3.0 pnoker/dc3-rabbitmq:3.0
   - docker run -d --name dc3-mariadb -p 3306:3306 -h iotdc3.mariadb pnoker/dc3-mariadb:3.0
   - docker run -d --name dc3-redis -p 6379:6379 -h iotdc3.redis pnoker/dc3-redis:3.0
