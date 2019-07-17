@@ -19,7 +19,6 @@ import com.pnoker.common.base.BaseFeignApi;
 import com.pnoker.security.FeignSecurityConfigurer;
 import com.pnoker.transfer.rtmp.hystrix.RtmpFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
