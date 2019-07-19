@@ -1,32 +1,19 @@
-> :boom:非常欢迎广大兴趣爱好者的加入，如果有想法第一时间[联系作者](#6-联系作者)，`show me you code`，让我们共同打造一个高品质开源物联平台！
+:boom: 非常欢迎广大兴趣爱好者的加入，第一时间 [联系作者](#6-联系作者)，`show me you code`，让我们肩并肩 :alien:！
 >
-> :telescope:说明：目前项目源码未全面开源，往后会陆陆续续进行更新，敬请关注:yum:。
+:rocket: 说明：项目会陆续补全和迭代更新，敬请关注，你的 `Star` :star: [ [GitHub](https://github.com/pnoker/iot-dc3) , [Gitee](https://gitee.com/pnoker/iot-dc3) ]，是我们动力的源泉，谢谢你们 :tada:！
 
 <p align="center">
     <img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
-    <a href="https://travis-ci.org/pnoker/iot-dc3">
-        <img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master">
-    </a>
-    <a href="https://codecov.io/gh/pnoker/iot-dc3">
-        <img src="https://codecov.io/gh/pnoker/iot-dc3/branch/master/graph/badge.svg">
-    </a><br>
-	<a>
-	    <img src="https://img.shields.io/badge/JDK-1.8-green.svg">
-	</a>
-	<a>
-	    <img src="https://img.shields.io/badge/Spring Boot-2.1.6.RELEASE-blue.svg">
-	</a>
-	<a>
-	    <img src="https://img.shields.io/badge/Spring Cloud-Greenwich.RELEASE-blue.svg">
-	</a>
-	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE">
-		<img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg" >
-	</a>	
-	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong><br>
-    <span>GitHub:</span><a href="https://github.com/pnoker/iot-dc3">https://github.com/pnoker/iot-dc3</a><br>
-    <span>码云:</span><a href="https://gitee.com/pnoker/iot-dc3">https://gitee.com/pnoker/iot-dc3</a><br>
+    <a href="https://travis-ci.org/pnoker/iot-dc3"><img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master"></a>
+    <a href="https://codecov.io/gh/pnoker/iot-dc3"><img src="https://codecov.io/gh/pnoker/iot-dc3/branch/master/graph/badge.svg"></a><br>
+	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Boot-2.1.6.RELEASE-blue.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Cloud-Greenwich.RELEASE-blue.svg"></a>
+	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
+	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
----
+
+------
 
  ### 1 什么是DC3 IOT平台？
 
@@ -71,55 +58,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 [`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign)、[`Spring Cloud Config`](https://cloud.spring.io/spring-cloud-config)、[`Spring Cloud Bus`](https://cloud.spring.io/spring-cloud-bus) 等微服务模块。
 
-### 3 结构说明
-
-*(平台功能正在逐步完善中...)* 
-
-```lua
-iot-dc3 
-├── dc3-web -- 基于Vue3.0的前端工程
-├── dc3-api -- 已于Spring Cloud OpenFeign的声明式接口
-├── dc3-common -- 系统公共模块 
-├── dc3-gateway -- Spring Cloud Gateway网关[8000]
-└── dc3-center -- 平台中心模块集合
-     ├── dc3-register -- 服务注册与发现中心[8100]
-     ├── dc3-monitor -- 服务监控中心[8200]
-     ├── dc3-dbs -- 数据服务中心[8300]
-     ├── dc3-auth -- 授权管理中心[8400]
-     └── dc3-collect -- 数据采集中心[8500]
-└── dc3-device -- 设备服务集合
-     ├── dc3-manager -- 设备管理[8600]
-     └── dc3-group -- 设备组管理与数据接入[8700]
-└── dc3-transfer  -- 数据交换&协议模块集合
-     ├── dc3-opc -- Opc Server[8810]
-     ├── dc3-opc-ua -- Opc Ua Server[8820]
-     ├── dc3-rtmp -- Rtsp转Rtmp服务[8830]
-	 └── dc3-resource -- 文件资源服务器[8840]
-```
-
-### 4 DC3 IOT 镜像资源
-
-包含基础可运行环境镜像:[IOT DC3 Docker Hub Repositories](https://hub.docker.com/u/pnoker)
-
-|   资源   |          镜像          |                           链接                             |
-| :-----: | :--------------------: |:---------------------------------------------------------: |
-| Mariadb | `pnoker/dc3-mariadb:3.0` | [dc3-mariadb](https://hub.docker.com/r/pnoker/dc3-mariadb) |
-| Redis | `pnoker/dc3-redis:3.0` | [dc3-redis](https://hub.docker.com/r/pnoker/dc3-redis) |
-| RabbitMQ | `pnoker/dc3-rabbitmq:3.0` | [dc3-rabbitmq](https://hub.docker.com/r/pnoker/dc3-rabbitmq) |
-| Nginx-Rtmp | `pnoker/dc3-nginx:3.0` | [dc3-nginx](https://hub.docker.com/r/pnoker/dc3-nginx) |
-| 服务注册中心 | `pnoker/dc3-register:3.0` | [dc3-register](https://hub.docker.com/r/pnoker/dc3-register) |
-| 监控中心 | `pnoker/dc3-monitor:3.0` | [dc3-monitor](https://hub.docker.com/r/pnoker/dc3-monitor) |
-
-### 5 核心依赖
-
-|          依赖          |     版本      |
-| :--------------------: | :-----------: |
-|      Spring Boot       | 2.1.6.RELEASE |
-|      Spring Cloud      | Greenwich.RELEASE |
-|      Mybatis Plus      |     3.1.0     |
-| Spring Security OAuth2 |     2.3.5     |
-
-### 6 联系作者
+### 3 联系作者
 
 :whale2: 邮箱:pnokers@icloud.com
 
@@ -131,34 +70,14 @@ iot-dc3
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
 
-### 7 通用指令
+### 4 项目文档
 
-```bash
-# Git强制覆盖本地
-git fetch --all && git reset --hard origin/master && git pull
+详细内容请阅读 [`WiKi`](https://github.com/pnoker/iot-dc3/wiki) 文档。
 
-# Maven操作
-mvn clean package
+> 文档持续更新中...
 
-# Yarn 操作
-# 安装项目全部依赖
-yarn
-# 添加|更新|删除依赖
-yarn add|upgrade|remove [package]
-# 启动项目
-yarn run [script] [<args>]
+**其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
-# Docker操作命令
-# list
-docker images
-# build
-docker build -t pnoker/dc3-dbs:3.0 .
-# delete
-docker rmi -f pnoker/dc3-dbs:3.0
-# run
-docker run -d -p 80:8080 --name dc3-dbs -h iotdc3.dbs --link dc3-register:iotdc3.register  pnoker/dc3-dbs:3.0
-# stop/start/restart
-docker start|start|restart pnoker/dc3-dbs:3.0
-# exec
-docker exec -i -t  pnoker/dc3-dbs:3.0 /bin/bash
-```
+### 口号
+
+> **苟利国家生死以，岂因祸福避趋之。**
