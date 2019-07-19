@@ -72,7 +72,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 4 项目文档
 
-详细内容请阅读 [`WiKi` 文档](https://github.com/pnoker/iot-dc3/wiki) 。
+详细内容请阅读 [`WiKi`](https://github.com/pnoker/iot-dc3/wiki) 文档。
 
 > 文档持续更新中...
 
