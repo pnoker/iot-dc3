@@ -23,11 +23,12 @@
     <artifactId>dc3-device</artifactId>
     <packaging>pom</packaging>
 
-    <description>IOT DC3 平台 设备接入、管理、数据采集服务集合。</description>
+    <description>IOT DC3 平台 设备接入、管理、数据采集、虚拟、模拟设备服务集合。</description>
 
     <modules>
         <module>dc3-manager</module>
         <module>dc3-group</module>
+        <module>dc3-virtual</module>
     </modules>
 
     <dependencies>
