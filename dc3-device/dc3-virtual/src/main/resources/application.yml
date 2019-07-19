@@ -1,0 +1,47 @@
+server:
+  port: 8610
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+spring:
+  application:
+    name: @project.artifactId@
+  security:
+    user:
+      name: iotdc3
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+jasypt:
+  encryptor:
+    password: M82tHF1EjfWpnXzG
+    poolSize: 1
+    algorithm: PBEWithMD5AndDES
+    stringOutputType: base64
+    keyObtentionIterations: 1000
+    saltGeneratorClassname: org.jasypt.salt.RandomSaltGenerator
+
+feign:
+  hystrix:
+    enabled: true
+
+logging:
+  file: dc3/logs/device/${spring.application.name}.log
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.register:8100/eureka/
