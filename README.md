@@ -58,56 +58,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 [`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign)、[`Spring Cloud Config`](https://cloud.spring.io/spring-cloud-config)、[`Spring Cloud Bus`](https://cloud.spring.io/spring-cloud-bus) 等微服务模块。
 
-### 3 结构说明
-
-:building_construction: *(平台功能正在逐步完善中...)* :alembic:
-
-```lua
-iot-dc3 
-├── dc3-web -- 基于Vue3.0的前端工程
-├── dc3-api -- 已于Spring Cloud OpenFeign的声明式接口
-├── dc3-common -- 系统公共模块 
-├── dc3-gateway -- Spring Cloud Gateway网关[8000]
-└── dc3-center -- 平台中心模块集合
-     ├── dc3-register -- 服务注册与发现中心[8100]
-     ├── dc3-monitor -- 服务监控中心[8200]
-     ├── dc3-dbs -- 数据服务中心[8300]
-     ├── dc3-auth -- 授权管理中心[8400]
-     └── dc3-collect -- 数据采集中心[8500]
-└── dc3-device -- 设备服务集合
-     ├── dc3-manager -- 设备管理[8600]
-     ├── dc3-group -- 设备组管理与数据接入[8700]
-     └── dc3-virtual -- 虚拟设备服务[8610]
-└── dc3-transfer  -- 数据交换&协议模块集合
-     ├── dc3-opc -- Opc Server[8810]
-     ├── dc3-opc-ua -- Opc Ua Server[8820]
-     ├── dc3-rtmp -- Rtsp转Rtmp服务[8830]
-	 └── dc3-resource -- 文件资源服务器[8840]
-```
-
-### 4 DC3 IOT 镜像资源
-
-包含基础可运行环境镜像:[IOT DC3 Docker Hub Repositories](https://hub.docker.com/u/pnoker)
-
-|   资源   |          镜像          |                           链接                             |
-| :-----: | :--------------------: |:---------------------------------------------------------: |
-| Mariadb | `pnoker/dc3-mariadb:3.0` | [dc3-mariadb](https://hub.docker.com/r/pnoker/dc3-mariadb) |
-| Redis | `pnoker/dc3-redis:3.0` | [dc3-redis](https://hub.docker.com/r/pnoker/dc3-redis) |
-| RabbitMQ | `pnoker/dc3-rabbitmq:3.0` | [dc3-rabbitmq](https://hub.docker.com/r/pnoker/dc3-rabbitmq) |
-| Nginx-Rtmp | `pnoker/dc3-nginx:3.0` | [dc3-nginx](https://hub.docker.com/r/pnoker/dc3-nginx) |
-| 服务注册中心 | `pnoker/dc3-register:3.0` | [dc3-register](https://hub.docker.com/r/pnoker/dc3-register) |
-| 监控中心 | `pnoker/dc3-monitor:3.0` | [dc3-monitor](https://hub.docker.com/r/pnoker/dc3-monitor) |
-
-### 5 核心依赖
-
-|          依赖          |     版本      |
-| :--------------------: | :-----------: |
-|      Spring Boot       | 2.1.6.RELEASE |
-|      Spring Cloud      | Greenwich.RELEASE |
-|      Mybatis Plus      |     3.1.0     |
-| Spring Security OAuth2 |     2.3.5     |
-
-### 6 联系作者
+### 3 联系作者
 
 :whale2: 邮箱:pnokers@icloud.com
 
@@ -119,41 +70,12 @@ iot-dc3
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
 
-### 7 项目文档
+### 4 项目文档
 
-请阅读 [`WiKi` 文档](https://github.com/pnoker/iot-dc3/wiki) 。
+详细内容请阅读 [`WiKi` 文档](https://github.com/pnoker/iot-dc3/wiki) 。
+
+**其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
+
 > 文档持续更新中...
 >
 > 苟利国家生死以，岂因祸福避趋之。
-
-### 其他
-
-```bash
-# Git强制覆盖本地
-git fetch --all && git reset --hard origin/master && git pull
-
-# Maven操作
-mvn clean package
-
-# Yarn 操作
-# 安装项目全部依赖
-yarn
-# 添加|更新|删除依赖
-yarn add|upgrade|remove [package]
-# 启动项目
-yarn run [script] [<args>]
-
-# Docker操作命令
-# list
-docker images
-# build
-docker build -t pnoker/dc3-dbs:3.0 .
-# delete
-docker rmi -f pnoker/dc3-dbs:3.0
-# run
-docker run -d -p 80:8080 --name dc3-dbs -h iotdc3.dbs --link dc3-register:iotdc3.register  pnoker/dc3-dbs:3.0
-# stop/start/restart
-docker start|start|restart pnoker/dc3-dbs:3.0
-# exec
-docker exec -i -t  pnoker/dc3-dbs:3.0 /bin/bash
-```
