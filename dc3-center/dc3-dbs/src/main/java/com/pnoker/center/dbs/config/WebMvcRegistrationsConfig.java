@@ -22,8 +22,11 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 @Configuration
 public class WebMvcRegistrationsConfig implements WebMvcRegistrations {
+    /*
+    用于API版本控制使用，这个地方暂时不适用，使用之后feign clien直接调用会出现问题
+
     @Override
     public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
         return new ApiRequestMappingHandlerMapping();
-    }
+    }*/
 }
