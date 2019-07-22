@@ -36,7 +36,6 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/[version]/rtmp")
 public class RtmpController extends BaseController implements RtmpFeignApi {
     @Autowired
     private RtmpService rtmpService;
