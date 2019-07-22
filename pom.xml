@@ -81,6 +81,7 @@
 
         <jna.version>5.3.1</jna.version>
         <jasypt.version>2.1.0</jasypt.version>
+        <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
         <jackson.modules>2.9.8</jackson.modules>
         <netty.version>4.1.36.Final</netty.version>
@@ -355,6 +356,17 @@
                         </archive>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>${codecov.version}</version>
+                    <configuration>
+                        <formats>
+                            <format>html</format>
+                            <format>xml</format>
+                        </formats>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -366,16 +378,9 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format>
-                    </formats>
-                    <check />
-                </configuration>
             </plugin>
         </plugins>
+
     </build>
 
 </project>
