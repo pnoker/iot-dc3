@@ -1,0 +1,8 @@
+sqlite3 dc3-group.db
+.output tmp.sql
+.dump
+.quit
+
+sqlite3 new.sqlite
+.read tmp.sql
+.quit
