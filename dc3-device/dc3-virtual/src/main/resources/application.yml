@@ -1,3 +1,11 @@
+remote:
+  server:
+    address: 127.0.0.1
+    port: 8176
+virtual:
+  # unit second
+  device:
+    send-interval: 5
 server:
   port: 8610
   undertow:
@@ -36,7 +44,7 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/device/${spring.application.name}.log
+  file: dc3/logs/virtual/${spring.application.name}.log
 
 eureka:
   instance:
