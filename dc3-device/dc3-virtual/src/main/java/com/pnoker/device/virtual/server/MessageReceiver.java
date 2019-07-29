@@ -7,9 +7,18 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+/**
+ * Copyright(c) 2019. Pnoker All Rights Reserved.
+ *
+ * <p>Author : Charles
+ *
+ * <p>Email : xinguangduan@163.com
+ *
+ * <p>Description: 消息接收者
+ */
 @Component
 @Slf4j
-@Order(2)
+@Order(1)
 public class MessageReceiver implements ApplicationRunner {
 
   @Value("${remote.server.port}")
