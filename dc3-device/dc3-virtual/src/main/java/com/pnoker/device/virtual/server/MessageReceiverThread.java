@@ -11,6 +11,15 @@ import java.util.Scanner;
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_BEGIN;
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_END;
 
+/**
+ * Copyright(c) 2019. Pnoker All Rights Reserved.
+ *
+ * <p>Author : Charles
+ *
+ * <p>Email : xinguangduan@163.com
+ *
+ * <p>Description: 消息接收线程
+ */
 @Slf4j
 public class MessageReceiverThread implements Runnable {
   private Socket socket;
@@ -46,13 +55,13 @@ public class MessageReceiverThread implements Runnable {
 
   @Override
   public void run() {
-    runServer();
+    initServer();
+    receiveWithByte();
   }
 
-  public void deal() {
+  public void receiveWithLine() {
     Scanner scanner = null;
     try {
-      initServer();
       scanner = new Scanner(socket.getInputStream());
       while (scanner.hasNext()) {
         final String message = scanner.nextLine();
@@ -67,20 +76,17 @@ public class MessageReceiverThread implements Runnable {
     }
   }
 
-  public void runServer() {
+  public void receiveWithByte() {
     try {
-      initServer();
+      StringBuffer temp = new StringBuffer();
       Reader reader = new InputStreamReader(socket.getInputStream());
-      Writer writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
-      CharBuffer charbuffer = CharBuffer.allocate(8096);
+      CharBuffer charbuffer = CharBuffer.allocate(8192);
       while (reader.read(charbuffer) != -1) {
         charbuffer.flip();
-        temp += charbuffer.toString();
+        temp.append(charbuffer.toString());
         if (temp.indexOf(MSG_BEGIN) != -1 && temp.indexOf(MSG_END) != -1) {
           log.info("received :{}", temp);
-          temp = "";
-        } else if (temp.indexOf(MSG_BEGIN) != -1) {
-          temp = temp.substring(temp.indexOf(MSG_BEGIN));
+          temp.setLength(0);
         }
         if (temp.length() > 1024 * 16) {
           break;

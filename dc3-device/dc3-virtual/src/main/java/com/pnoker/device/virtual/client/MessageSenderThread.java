@@ -1,5 +1,6 @@
 package com.pnoker.device.virtual.client;
 
+import com.pnoker.device.virtual.model.ClientSocket;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -16,18 +17,18 @@ import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_END;
  *
  * <p>Author : Charles
  *
- * <p>Email : dxgvip@gmail.com
+ * <p>Email : xinguangduan@163.com
  *
  * <p>Description: 消息发送线程
  */
 @Slf4j
 public class MessageSenderThread implements Runnable {
 
-  private ClientDTO client;
-  private boolean isConnected;
+  private ClientSocket client;
+  private volatile boolean isConnected;
   private Socket socket = null;
 
-  public MessageSenderThread(ClientDTO clientDTO) {
+  public MessageSenderThread(ClientSocket clientDTO) {
     this.client = clientDTO;
   }
 
@@ -37,18 +38,17 @@ public class MessageSenderThread implements Runnable {
     isConnected = true;
   }
 
-  public void startMessageSender() {
+  public void connectToServerManagement() {
+    // Keep trying to connect to the server until it is connected
     while (isConnected == false) {
       try {
         connectToServer();
-        log.debug("virtual device client is started ...");
+        log.info("virtual device client is connected ...");
       } catch (Exception e) {
         log.error(e.getMessage(), e.getCause());
         try {
           TimeUnit.SECONDS.sleep(3);
-          connectToServer();
-        } catch (IOException | InterruptedException ex) {
-          log.error(ex.getMessage(), ex.getCause());
+        } catch (InterruptedException ex) {
         }
       }
     }
@@ -58,27 +58,30 @@ public class MessageSenderThread implements Runnable {
     PrintWriter pWriter = null;
     Scanner scanner = null;
     try {
-      startMessageSender();
-
+      connectToServerManagement();
       if (socket == null) {
-        startMessageSender();
+        connectToServerManagement();
       }
       pWriter = new PrintWriter(socket.getOutputStream());
-
       while (true) {
-        final String message = client.getMessageQueue().take();
-        // send message to  server side
-        log.info("send message to server:{}", message);
-        pWriter.write(MSG_BEGIN +message+ MSG_END);
+        final String message = buildMessage();
+        pWriter.write(message);
         pWriter.flush();
         TimeUnit.SECONDS.sleep(client.getSendInterval());
       }
-
     } catch (InterruptedException | IOException e) {
       log.error(e.getMessage(), e);
     } finally {
       scanner.close();
       pWriter.close();
     }
+  }
+
+  private String buildMessage() throws InterruptedException {
+    // take message from queue
+    final String message = client.getMessageQueue().take();
+    // send message to server side
+    log.info("send message to server:{}", message);
+    return MSG_BEGIN + message + MSG_END;
   }
 }
