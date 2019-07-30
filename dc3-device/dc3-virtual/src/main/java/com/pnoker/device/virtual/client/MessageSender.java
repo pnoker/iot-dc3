@@ -19,11 +19,8 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Copyright(c) 2019. Pnoker All Rights Reserved.
- *
  * <p>Author : Charles
- *
  * <p>Email : xinguangduan@163.com
- *
  * <p>Description: 消息发送者
  */
 @Slf4j
@@ -31,62 +28,66 @@ import java.util.concurrent.BlockingQueue;
 @Order(2)
 public class MessageSender implements ApplicationRunner {
 
-  private static final String FILE_PATH = "classpath:messages";
+    private static final String FILE_PATH = "classpath:messages";
 
-  @Value("${remote.server.address}")
-  private String serverAddress;
+    @Value("${remote.server.address}")
+    private String serverAddress;
 
-  @Value("${remote.server.port}")
-  private Integer serverPort;
+    @Value("${remote.server.port}")
+    private Integer serverPort;
 
-  @Value("${virtual.device.send-interval}")
-  private Integer sendInterval;
+    @Value("${virtual.device.send-interval}")
+    private Integer sendInterval;
 
-  private volatile boolean isConnected;
+    private volatile boolean isConnected;
 
-  private BlockingQueue<String> messageQueue = new ArrayBlockingQueue<>(100000);
+    private BlockingQueue<String> messageQueue = new ArrayBlockingQueue<>(100000);
 
-  /** 会在服务启动完成后立即执行 */
-  @Override
-  public void run(ApplicationArguments args) {
-    initializedMockMessage();
-    startMessageSender();
-  }
-
-  public void startMessageSender() {
-    ClientSocket client = new ClientSocket();
-    client.setMessageQueue(messageQueue);
-    client.setServerAddress(serverAddress);
-    client.setServerPort(serverPort);
-    client.setSendInterval(sendInterval);
-    new Thread(new MessageSenderThread(client)).start();
-  }
-
-  /** read mock data and send to queue */
-  private void initializedMockMessage() {
-    final File[] files = FileReaderUtils.getFiles(FILE_PATH);
-    if (ArrayUtils.isEmpty(files)) {
-      log.warn("mock data files is empty!");
-      return;
+    /**
+     * 会在服务启动完成后立即执行
+     */
+    @Override
+    public void run(ApplicationArguments args) {
+        initializedMockMessage();
+        startMessageSender();
     }
 
-    for (File file : files) {
-      try {
-        final List<String> lines = FileUtils.readLines(file, "UTF-8");
-        lines.forEach(
-            s -> {
-              int startStr = "报文是:".length();
-              int endStr = s.indexOf(" ");
-              final String mockData = s.substring(startStr, endStr);
-              if (log.isDebugEnabled()) {
-                log.debug("read the mock data :{}", mockData);
-              }
-              // add mock data to queue
-              messageQueue.add(mockData);
-            });
-      } catch (IOException e) {
-        log.error("read and deal line string error", e);
-      }
+    public void startMessageSender() {
+        ClientSocket client = new ClientSocket();
+        client.setMessageQueue(messageQueue);
+        client.setServerAddress(serverAddress);
+        client.setServerPort(serverPort);
+        client.setSendInterval(sendInterval);
+        new Thread(new MessageSenderThread(client)).start();
     }
-  }
+
+    /**
+     * read mock data and send to queue
+     */
+    private void initializedMockMessage() {
+        final File[] files = FileReaderUtils.getFiles(FILE_PATH);
+        if (ArrayUtils.isEmpty(files)) {
+            log.warn("mock data files is empty!");
+            return;
+        }
+
+        for (File file : files) {
+            try {
+                final List<String> lines = FileUtils.readLines(file, "UTF-8");
+                lines.forEach(
+                        s -> {
+                            int startStr = "报文是:".length();
+                            int endStr = s.indexOf(" ");
+                            final String mockData = s.substring(startStr, endStr);
+                            if (log.isDebugEnabled()) {
+                                log.debug("read the mock data :{}", mockData);
+                            }
+                            // add mock data to queue
+                            messageQueue.add(mockData);
+                        });
+            } catch (IOException e) {
+                log.error("read and deal line string error", e);
+            }
+        }
+    }
 }
