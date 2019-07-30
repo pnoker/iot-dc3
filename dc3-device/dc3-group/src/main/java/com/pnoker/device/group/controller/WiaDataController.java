@@ -30,7 +30,7 @@ public class WiaDataController extends BaseController {
     public List<WiaData> list() {
         QueryWrapper<WiaData> queryWrapper = new QueryWrapper<>();
         List<WiaData> list = wiaDataService.list(queryWrapper);
-        return list.subList(0, 100);
+        return list;
     }
 
     @Transactional
