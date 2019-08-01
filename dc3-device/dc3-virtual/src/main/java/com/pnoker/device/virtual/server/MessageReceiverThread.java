@@ -1,14 +1,12 @@
 package com.pnoker.device.virtual.server;
 
+import com.pnoker.device.virtual.constant.ProtocolConstant;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.CharBuffer;
-import java.util.Scanner;
 
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_BEGIN;
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_END;
@@ -37,9 +35,9 @@ public class MessageReceiverThread implements Runnable {
         try {
             serverSocket = new ServerSocket(port == null ? defaultPort : port);
             started = true;
-            log.info("Socket服务已启动，占用端口： {}", serverSocket.getLocalPort());
+            log.info("Mock Server service started，use port： {}", serverSocket.getLocalPort());
         } catch (IOException e) {
-            log.error("端口冲突,异常信息：{}", e);
+            log.error(e.getMessage(), e);
             System.exit(0);
         }
 
@@ -55,23 +53,17 @@ public class MessageReceiverThread implements Runnable {
     @Override
     public void run() {
         initServer();
+        sendMessageKey();
         receiveWithByte();
     }
 
-    public void receiveWithLine() {
-        Scanner scanner = null;
+    public void sendMessageKey() {
         try {
-            scanner = new Scanner(socket.getInputStream());
-            while (scanner.hasNext()) {
-                final String message = scanner.nextLine();
-                log.info(message);
-                System.out.println(message);
-            }
-
+            Writer writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+            writer.write(ProtocolConstant.MSG_KEY);
+            writer.flush();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-        } finally {
-            scanner.close();
         }
     }
 
