@@ -20,12 +20,16 @@ public class MessageReceiver implements ApplicationRunner {
 
     @Value("${remote.server.port}")
     private Integer port = null;
+    @Value("${remote.enable}")
+    private boolean enable = false;
 
     /**
      * 会在服务启动完成后立即执行
      */
     @Override
     public void run(ApplicationArguments args) {
-        new Thread(new MessageReceiverThread(port)).start();
+        if (enable) {
+            new Thread(new MessageReceiverThread(port)).start();
+        }
     }
 }

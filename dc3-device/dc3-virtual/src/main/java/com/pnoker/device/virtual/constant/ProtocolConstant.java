@@ -13,4 +13,5 @@ public final class ProtocolConstant {
 
     public static final String MSG_BEGIN = "<MSG-BEGIN>";
     public static final String MSG_END = "<MSG-END>";
+    public static final String MSG_KEY=  "0x4096";
 }
