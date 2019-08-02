@@ -1,5 +1,6 @@
 package com.pnoker.device.group.service.wia;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.pnoker.device.group.model.wia.WiaGateway;
 
 import java.util.List;
@@ -11,5 +12,5 @@ import java.util.List;
  * <p>Description: WiaGateway 服务接口
  */
 public interface WiaGatewayService {
-    List<WiaGateway> list();
+    List<WiaGateway> list(Wrapper<WiaGateway> wrapper);
 }

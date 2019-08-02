@@ -16,7 +16,7 @@
 package com.pnoker.device.group.service.wia.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.pnoker.device.group.mapper.wia.WiaDataMapper;
+import com.pnoker.device.group.dao.wia.WiaDataMapper;
 import com.pnoker.device.group.model.wia.WiaData;
 import com.pnoker.device.group.service.wia.WiaDataService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.device.group.service.wia;
+package com.pnoker.device.group.service.wia.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.pnoker.device.group.model.wia.WiaData;
+import com.pnoker.device.group.dao.wia.WiaVariableMapper;
+import com.pnoker.device.group.model.wia.WiaVariable;
+import com.pnoker.device.group.service.wia.WiaVariableService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -24,10 +28,15 @@ import java.util.List;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: WiaData 服务接口
+ * <p>Description: WiaDevice 接口实现
  */
-public interface WiaDataService {
-    List<WiaData> list(Wrapper<WiaData> wrapper);
+@Service
+public class WiaVariableServiceImpl implements WiaVariableService {
+    @Autowired
+    private WiaVariableMapper wiaVariableMapper;
 
-    int insert(WiaData wiaData);
+    @Override
+    public List<WiaVariable> list(Wrapper<WiaVariable> wrapper) {
+        return wiaVariableMapper.selectList(wrapper);
+    }
 }

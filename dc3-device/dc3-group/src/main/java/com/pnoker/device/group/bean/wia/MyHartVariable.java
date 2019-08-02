@@ -13,21 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.device.group.service.wia;
+package com.pnoker.device.group.bean.wia;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.pnoker.device.group.model.wia.WiaData;
-
-import java.util.List;
+import lombok.Data;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: WiaData 服务接口
+ * <p>Description: Wia Hart 数据信息
  */
-public interface WiaDataService {
-    List<WiaData> list(Wrapper<WiaData> wrapper);
+@Data
+public class MyHartVariable {
+    private long variableId;
+    private String variableName;
+    private float value;
+    private long time;
 
-    int insert(WiaData wiaData);
+    public MyHartVariable(String variableName) {
+        this.variableName = variableName;
+        this.time = System.currentTimeMillis();
+    }
+
+    /**
+     * 更新数据，并触发相应操作
+     *
+     * @param value
+     */
+    public void update(float value) {
+        this.value = value;
+        this.time = System.currentTimeMillis();
+        //发送消息队列
+        //入库
+    }
 }
