@@ -18,7 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: Wia协议仪表操作接口
  */
 @Slf4j
 @RestController

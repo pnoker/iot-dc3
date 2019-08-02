@@ -1,5 +1,6 @@
 package com.pnoker.device.group.service.wia.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.pnoker.device.group.dao.wia.WiaGatewayMapper;
 import com.pnoker.device.group.model.wia.WiaGateway;
 import com.pnoker.device.group.service.wia.WiaGatewayService;
@@ -20,7 +21,7 @@ public class WiaGatewayServiceImpl implements WiaGatewayService {
     private WiaGatewayMapper wiaGatewayMapper;
 
     @Override
-    public List<WiaGateway> list() {
-        return wiaGatewayMapper.list();
+    public List<WiaGateway> list(Wrapper<WiaGateway> wrapper) {
+        return wiaGatewayMapper.selectList(wrapper);
     }
 }

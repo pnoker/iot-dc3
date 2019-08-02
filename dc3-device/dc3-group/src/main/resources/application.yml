@@ -38,7 +38,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true
   global-config:
     db-config:
-      table-prefix: dc3_group_
+      table-prefix: dc3_
 
 management:
   endpoints:

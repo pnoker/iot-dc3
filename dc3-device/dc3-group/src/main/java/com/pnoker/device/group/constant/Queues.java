@@ -1,4 +1,4 @@
-package com.pnoker.device.group.global;
+package com.pnoker.device.group.constant;
 
 import com.pnoker.device.group.model.wia.WiaData;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +40,9 @@ public class Queues {
     public static LinkedBlockingQueue<WiaData> wiaDataQueue = new LinkedBlockingQueue(2000);
 
     /**
-     * 用于存放 wia 数据采集线程，为了性能，最多一次性放入32个
+     * 用于缓存 wia 数据采集线程
      */
-    public static LinkedBlockingQueue<Runnable> wiaReceiveThreadQueue = new LinkedBlockingQueue(32);
+    public static LinkedBlockingQueue<Runnable> wiaReceiveThreadQueue = new LinkedBlockingQueue(64);
 
     /**
      * 数据采集线程池，用于全部数采线程使用

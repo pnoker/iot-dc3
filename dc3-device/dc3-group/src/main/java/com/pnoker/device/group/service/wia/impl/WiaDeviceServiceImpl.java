@@ -13,36 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pnoker.common.bean.wia;
+package com.pnoker.device.group.service.wia.impl;
 
-import lombok.Data;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.pnoker.device.group.dao.wia.WiaDeviceMapper;
+import com.pnoker.device.group.model.wia.WiaDevice;
+import com.pnoker.device.group.service.wia.WiaDeviceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: WiaDevice 接口实现
  */
-@Data
-public class HartData {
-    private String valueName;
-    private float value;
-    private long time;
-
-    public HartData(String valueName) {
-        this.valueName = valueName;
-        this.time = System.currentTimeMillis();
-    }
-
-    /**
-     * 更新数据，并触发相应操作
-     *
-     * @param value
-     */
-    public void update(float value) {
-        this.value = value;
-        this.time = System.currentTimeMillis();
-        //发送消息队列
-        //入库
+@Service
+public class WiaDeviceServiceImpl implements WiaDeviceService {
+    @Autowired
+    private WiaDeviceMapper wiaDeviceMapper;
+    @Override
+    public List<WiaDevice> list(Wrapper<WiaDevice> wrapper) {
+        return wiaDeviceMapper.selectList(wrapper);
     }
 }
