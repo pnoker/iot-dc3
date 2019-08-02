@@ -1,7 +1,6 @@
 version: '3.7'
 
 services:
-  # 配置 docker compose
   dc3-base:
     build:
       context: ./dc3/dependences/base/

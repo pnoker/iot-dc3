@@ -6,13 +6,13 @@ import lombok.Data;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Wia 网关设备信息
+ * <p>Description:
  */
 @Data
-public class WiaGataway {
+public class WiaVariable {
     private long id;
-    private String ipAddress;
-    private int port;
-    private boolean ping;
-    private long time;
+    private long deviceId;
+    private long unitId;
+    private String name;
+    private float ratio;
 }

@@ -1,3 +1,12 @@
+device:
+  client:
+    encryp:
+      aes:
+        private-key: x
+      rsa:
+        public-key: x
+        private-key: x
+
 server:
   port: 8700
   undertow:
@@ -14,9 +23,9 @@ spring:
       password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite::resource:sqlite/dc3-group.db
-    username: iotdc3
-    password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+    url: jdbc:sqlite:dc3/sqlite/dc3-group.db
+    username:
+    password:
     sql-script-encoding: utf-8
     hikari:
       pool-name: iot-dc3-group-hikaricp
@@ -29,7 +38,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true
   global-config:
     db-config:
-      table-prefix: dc3_group_
+      table-prefix: dc3_
 
 management:
   endpoints:
@@ -63,12 +72,3 @@ eureka:
   client:
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.register:8100/eureka/
-
-device:
-  client:
-    encryp:
-      aes:
-        private-key: x
-      rsa:
-        public-key: x
-        private-key: x

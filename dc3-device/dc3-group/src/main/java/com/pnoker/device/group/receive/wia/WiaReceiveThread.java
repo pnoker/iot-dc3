@@ -1,11 +1,12 @@
-package com.pnoker.device.group.wia;
+package com.pnoker.device.group.receive.wia;
 
-import com.pnoker.common.bean.wia.HartDevice;
+import com.pnoker.device.group.bean.wia.MyGateway;
+import com.pnoker.device.group.bean.wia.MyHartDevice;
+import com.pnoker.device.group.util.DatagramUtils;
+import com.pnoker.device.group.util.PackageProcessor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -14,18 +15,20 @@ import java.util.Map;
  * <p>Description:
  */
 @Slf4j
-public class ReceiveThread implements Runnable {
-    private Map<String, HartDevice> hartDeviceMap = new HashMap<>(10);
+public class WiaReceiveThread implements Runnable {
+    private MyGateway myGateway;
+    private PackageProcessor p;
 
-    public ReceiveThread(List<HartDevice> hartDeviceList) {
-        hartDeviceList.forEach(hartDevice -> hartDeviceMap.put(hartDevice.getLongAddress(), hartDevice));
+    public WiaReceiveThread(String ipAddress, int localPort, int port, List<MyHartDevice> myHartDeviceList) {
+        myGateway = new MyGateway(ipAddress, localPort, port, myHartDeviceList);
     }
 
     @Override
     public void run() {
-
-        String hexDatagram = "";
-        String dataHead = "";
+        byte[] receive = myGateway.getDatagramReceive().getData();
+        p = new PackageProcessor(receive);
+        String hexDatagram = DatagramUtils.hexDatagram(receive, receive.length);
+        String dataHead = p.bytesToString(0, 1);
 
         switch (dataHead) {
             case "0101":
@@ -44,6 +47,5 @@ public class ReceiveThread implements Runnable {
                 log.info("其他报文:{}", hexDatagram);
                 break;
         }
-
     }
 }
