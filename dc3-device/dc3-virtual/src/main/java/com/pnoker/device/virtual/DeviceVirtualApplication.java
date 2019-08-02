@@ -22,9 +22,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
- * <p>Email      : pnokers@gmail.com
+ * Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>Author : Pnoker
+ * <p>Email : pnokers@gmail.com
  * <p>Description:
  */
 @EnableAsync
@@ -32,7 +32,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableEurekaClient
 @SpringBootApplication
 public class DeviceVirtualApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(DeviceVirtualApplication.class, args);
     }

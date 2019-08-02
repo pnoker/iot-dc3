@@ -13,10 +13,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "localhost:8020/device/list",
 							"host": [
@@ -36,10 +32,6 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "localhost:8020/device/add",
 							"host": [
@@ -59,10 +51,6 @@
 					"request": {
 						"method": "PUT",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "localhost:8020/device/update",
 							"host": [
@@ -82,10 +70,6 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "localhost:8020/device/delete",
 							"host": [
@@ -106,23 +90,35 @@
 			"name": "Iot-Dc3-Dbs-Api",
 			"item": [
 				{
-					"name": "dbs:/rtmp/api",
+					"name": "dbs:/rtmp/list",
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "localhost:8801/rtmp/api",
+							"raw": "localhost:8300/v3/rtmp/list",
 							"host": [
 								"localhost"
 							],
-							"port": "8801",
+							"port": "8300",
 							"path": [
+								"v3",
 								"rtmp",
-								"api"
+								"list"
 							]
 						}
 					},
@@ -138,10 +134,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "localhost:8000/hello",
 							"host": [
@@ -156,6 +148,10 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Iot-Dc3-Group",
+			"item": []
 		}
 	]
 }
