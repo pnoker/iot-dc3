@@ -19,7 +19,7 @@ import java.util.Map;
 @Slf4j
 public class MyGateway {
     /* 网关基本信息 */
-    private Map<String, MyHartDevice> hartDeviceMap = new HashMap<>(10);
+    private long id;
     private String ipAddress;
     private int localPort;
     private int port;
@@ -31,9 +31,15 @@ public class MyGateway {
     private byte[] buff = new byte[1024];
     private byte[] sendCode = {(byte) 0x01, (byte) 0x0B, (byte) 0xFF, (byte) 0xFF, (byte) 0x4A, (byte) 0x9B};
 
-    public MyGateway(String ipAddress, int localPort, int port, List<MyHartDevice> myHartDeviceList) {
+    /* 其他信息 */
+    private Map<String, MyHartDevice> hartDeviceMap = new HashMap<>(32);
+    private Map<String, String> addressMap = new HashMap<>(32);
+
+    public MyGateway(long id, String ipAddress, int localPort, int port, List<MyHartDevice> myHartDeviceList) {
+        this.id = id;
         myHartDeviceList.forEach(myHartDevice -> hartDeviceMap.put(myHartDevice.getLongAddress(), myHartDevice));
         try {
+            this.datagramReceive = new DatagramPacket(buff, 1024);
             this.datagramSocket = new DatagramSocket(localPort);
             this.datagramSocket.setSoTimeout(1000 * 60 * 3);
             this.datagramSocket.receive(datagramReceive);
@@ -45,6 +51,5 @@ public class MyGateway {
         } catch (IOException e) {
             log.error("receive datagram fail", e);
         }
-        this.datagramReceive = new DatagramPacket(buff, 1024);
     }
 }

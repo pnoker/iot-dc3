@@ -21,29 +21,19 @@ import lombok.Data;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Wia Hart 数据信息
+ * <p>Description: Wia Hart 变量数据信息
  */
 @Data
 public class MyHartVariable {
-    private long variableId;
-    private String variableName;
-    private float value;
-    private long time;
+    private long id;
+    private int start;
+    private int end;
+    private String type;
 
-    public MyHartVariable(String variableName) {
-        this.variableName = variableName;
-        this.time = System.currentTimeMillis();
-    }
-
-    /**
-     * 更新数据，并触发相应操作
-     *
-     * @param value
-     */
-    public void update(float value) {
-        this.value = value;
-        this.time = System.currentTimeMillis();
-        //发送消息队列
-        //入库
+    public MyHartVariable(long id, int start, int end, String type) {
+        this.id = id;
+        this.start = start;
+        this.end = end;
+        this.type = type;
     }
 }

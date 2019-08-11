@@ -1,12 +1,9 @@
 package com.pnoker.device.group.receive.wia;
 
 import com.pnoker.device.group.bean.wia.MyGateway;
-import com.pnoker.device.group.bean.wia.MyHartDevice;
 import com.pnoker.device.group.util.DatagramUtils;
 import com.pnoker.device.group.util.PackageProcessor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -18,10 +15,6 @@ import java.util.List;
 public class WiaReceiveThread implements Runnable {
     private MyGateway myGateway;
     private PackageProcessor p;
-
-    public WiaReceiveThread(String ipAddress, int localPort, int port, List<MyHartDevice> myHartDeviceList) {
-        myGateway = new MyGateway(ipAddress, localPort, port, myHartDeviceList);
-    }
 
     @Override
     public void run() {
