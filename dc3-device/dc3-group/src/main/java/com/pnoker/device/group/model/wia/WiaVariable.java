@@ -14,5 +14,8 @@ public class WiaVariable {
     private long deviceId;
     private long unitId;
     private String name;
+    private int start;
+    private int end;
+    private String type;
     private float ratio;
 }

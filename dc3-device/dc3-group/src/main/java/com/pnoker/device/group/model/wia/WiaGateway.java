@@ -13,6 +13,7 @@ public class WiaGateway {
     private long id;
     private String ipAddress;
     private int port;
+    private int localPort;
     private boolean ping;
     private long time;
 }

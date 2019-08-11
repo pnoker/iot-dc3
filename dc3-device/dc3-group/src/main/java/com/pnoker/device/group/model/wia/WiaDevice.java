@@ -13,6 +13,7 @@ public class WiaDevice {
     private long id;
     private long gatewayId;
     private String name;
+    private String longAddress;
     private int status;
     private long time;
 
