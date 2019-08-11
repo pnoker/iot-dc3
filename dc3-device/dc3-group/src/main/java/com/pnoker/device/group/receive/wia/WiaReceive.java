@@ -1,10 +1,10 @@
 package com.pnoker.device.group.receive.wia;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pnoker.device.group.bean.wia.MyGateway;
 import com.pnoker.device.group.bean.wia.MyHartDevice;
 import com.pnoker.device.group.bean.wia.MyHartVariable;
+import com.pnoker.device.group.constant.Queues;
 import com.pnoker.device.group.model.wia.WiaDevice;
 import com.pnoker.device.group.model.wia.WiaGateway;
 import com.pnoker.device.group.model.wia.WiaVariable;
@@ -41,7 +41,10 @@ public class WiaReceive implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         List<MyGateway> myGatewayList = wiaGatewayList();
-        log.info("gateWayList:{}", JSON.toJSONString(myGatewayList));
+        myGatewayList.forEach(myGateway -> {
+            WiaReceiveThread receiveThread = new WiaReceiveThread(myGateway);
+            Queues.receivePoolExecutor.execute(receiveThread);
+        });
     }
 
     /**

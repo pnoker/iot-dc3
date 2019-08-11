@@ -3,7 +3,6 @@ package com.pnoker.device.group.bean.wia;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
 import java.util.List;
@@ -37,19 +36,22 @@ public class MyGateway {
 
     public MyGateway(long id, String ipAddress, int localPort, int port, List<MyHartDevice> myHartDeviceList) {
         this.id = id;
+        this.ipAddress = ipAddress;
+        this.localPort = localPort;
+        this.port = port;
         myHartDeviceList.forEach(myHartDevice -> hartDeviceMap.put(myHartDevice.getLongAddress(), myHartDevice));
+    }
+
+    public void initialized() {
         try {
+            this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(ipAddress), port);
             this.datagramReceive = new DatagramPacket(buff, 1024);
             this.datagramSocket = new DatagramSocket(localPort);
             this.datagramSocket.setSoTimeout(1000 * 60 * 3);
-            this.datagramSocket.receive(datagramReceive);
-            this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(ipAddress), port);
         } catch (SocketException e) {
             log.error("init datagram socket fail", e);
         } catch (UnknownHostException e) {
             log.error("unknow gateway host", e);
-        } catch (IOException e) {
-            log.error("receive datagram fail", e);
         }
     }
 }
