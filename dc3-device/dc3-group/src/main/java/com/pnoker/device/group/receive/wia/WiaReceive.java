@@ -1,7 +1,10 @@
 package com.pnoker.device.group.receive.wia;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.pnoker.device.group.bean.wia.MyGateway;
 import com.pnoker.device.group.bean.wia.MyHartDevice;
+import com.pnoker.device.group.bean.wia.MyHartVariable;
+import com.pnoker.device.group.constant.Queues;
 import com.pnoker.device.group.model.wia.WiaDevice;
 import com.pnoker.device.group.model.wia.WiaGateway;
 import com.pnoker.device.group.model.wia.WiaVariable;
@@ -37,29 +40,62 @@ public class WiaReceive implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        List<MyGateway> myGatewayList = wiaGatewayList();
+        myGatewayList.forEach(myGateway -> {
+            WiaReceiveThread receiveThread = new WiaReceiveThread(myGateway);
+            Queues.receivePoolExecutor.execute(receiveThread);
+        });
     }
 
-    public List<WiaGateway> wiaGatewayList() {
+    /**
+     * 获取全部的WiaGateway数据
+     *
+     * @return
+     */
+    public List<MyGateway> wiaGatewayList() {
+        List<MyGateway> myGatewayList = new ArrayList<>();
+
         QueryWrapper<WiaGateway> queryWrapper = new QueryWrapper<>();
         List<WiaGateway> list = wiaGatewayService.list(queryWrapper);
-        return list;
+        list.forEach(wiaGateway -> myGatewayList.add(
+                new MyGateway(wiaGateway.getId(), wiaGateway.getIpAddress(), wiaGateway.getLocalPort(), wiaGateway.getPort(), wiaDeviceList(wiaGateway.getId()))
+        ));
+        return myGatewayList;
     }
 
-    public List<WiaDevice> wiaDeviceList(int gatewayId) {
+    /**
+     * 根据WiaGatewayId获取网关下全部的设备数据
+     *
+     * @param gatewayId
+     * @return
+     */
+    public List<MyHartDevice> wiaDeviceList(long gatewayId) {
         List<MyHartDevice> myHartDeviceList = new ArrayList<>();
+
         QueryWrapper<WiaDevice> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("gateway_id", gatewayId);
         List<WiaDevice> list = wiaDeviceService.list(queryWrapper);
-        list.forEach(wiaDevice -> {
-            //MyHartDevice myHartDevice = new MyHartDevice(wiaDevice.getId(),wiaDevice.getName());
-        });
-        return list;
+        list.forEach(wiaDevice -> myHartDeviceList.add(
+                new MyHartDevice(wiaDevice.getId(), wiaDevice.getLongAddress(), wiaVariableList(wiaDevice.getId()))
+        ));
+        return myHartDeviceList;
     }
 
-    public List<WiaVariable> wiaVariableList(int deviceId) {
+    /**
+     * 根据WiaDeviceId获取设备下全部的变量数据
+     *
+     * @param deviceId
+     * @return
+     */
+    public List<MyHartVariable> wiaVariableList(long deviceId) {
+        List<MyHartVariable> myHartVariableList = new ArrayList<>();
+
         QueryWrapper<WiaVariable> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("device_id", deviceId);
         List<WiaVariable> list = wiaVariableService.list(queryWrapper);
-        return list;
+        list.forEach(wiaVariable -> myHartVariableList.add(
+                new MyHartVariable(wiaVariable.getId(), wiaVariable.getStart(), wiaVariable.getEnd(), wiaVariable.getType())
+        ));
+        return myHartVariableList;
     }
 }
