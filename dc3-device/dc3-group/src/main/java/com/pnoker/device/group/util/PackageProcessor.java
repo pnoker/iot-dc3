@@ -4,6 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+/**
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>Author     : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description:
+ */
 public class PackageProcessor {
     private byte[] inpackage;
 
