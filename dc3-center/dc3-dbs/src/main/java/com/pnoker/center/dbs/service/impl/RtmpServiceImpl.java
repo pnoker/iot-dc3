@@ -16,6 +16,7 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.model.rtmp.Rtmp;
@@ -37,13 +38,15 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
-    @Cacheable
-    public List<Rtmp> list(Wrapper<Rtmp> wrapper) {
-        return rtmpMapper.selectList(wrapper);
+    @Cacheable(cacheNames = "rtmps" ,key = "#json")
+    public List<Rtmp> list(String json) {
+        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("auto_start", true);
+        return rtmpMapper.selectList(queryWrapper);
     }
 
     @Override
-    @Cacheable
+    @Cacheable(cacheNames = "rtmp" ,key = "#rtmp.id")
     public int insert(Rtmp rtmp) {
         return rtmpMapper.insert(rtmp);
     }

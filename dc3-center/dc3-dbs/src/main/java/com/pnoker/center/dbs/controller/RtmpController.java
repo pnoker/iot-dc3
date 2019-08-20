@@ -15,12 +15,10 @@
  */
 package com.pnoker.center.dbs.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
-import feign.Headers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,15 +55,14 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
 
     @Override
     public List<Rtmp> list(String json) {
-        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("auto_start", true);
-        List<Rtmp> list = rtmpService.list(queryWrapper);
+        json = "{}";
+        List<Rtmp> list = rtmpService.list(json);
         return list;
     }
 
     @RequestMapping("/insert")
     public void insert() {
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 5; i < 100; i++) {
             Rtmp wiaData = new Rtmp(i);
             rtmpService.insert(wiaData);
             if (i % 100 == 0) {

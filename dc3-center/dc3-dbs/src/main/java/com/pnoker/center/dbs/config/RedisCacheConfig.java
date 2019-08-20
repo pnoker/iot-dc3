@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -38,12 +38,10 @@ import java.time.Duration;
  */
 @Setter
 @Configuration
-@EnableCaching
 @ConfigurationProperties(prefix = "spring.cache.redis")
 public class RedisCacheConfig {
 
-    private Duration timeToLive = Duration.ofMinutes(10);
-    private String keyPrefix;
+    private Duration timeToLive;
 
     /**
      * 自定义 RedisCacheManager 类，主要是设置序列化，解决乱码问题
@@ -64,7 +62,7 @@ public class RedisCacheConfig {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
-                .disableCachingNullValues().entryTtl(timeToLive).prefixKeysWith(keyPrefix);
+                .disableCachingNullValues().entryTtl(timeToLive);
         RedisCacheManager cacheManager = RedisCacheManager.builder(factory).cacheDefaults(config).build();
         return cacheManager;
     }

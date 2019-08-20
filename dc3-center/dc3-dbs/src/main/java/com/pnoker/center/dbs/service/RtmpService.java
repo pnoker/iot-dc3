@@ -32,7 +32,7 @@ public interface RtmpService {
      *
      * @return
      */
-    List<Rtmp> list(Wrapper<Rtmp> wrapper);
+    List<Rtmp> list(String json);
 
     int insert(Rtmp rtmp);
 }
