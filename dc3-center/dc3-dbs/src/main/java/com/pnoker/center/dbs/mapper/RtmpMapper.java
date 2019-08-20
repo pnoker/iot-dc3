@@ -18,6 +18,7 @@ package com.pnoker.center.dbs.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.pnoker.common.model.rtmp.Rtmp;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -26,5 +27,6 @@ import org.apache.ibatis.annotations.Mapper;
  * <p>Description: Rtmp 数据库操作接口
  */
 @Mapper
+@Component
 public interface RtmpMapper extends BaseMapper<Rtmp> {
 }

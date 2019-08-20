@@ -66,18 +66,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
+        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
-        <spring-webmvc.version>5.1.8.RELEASE</spring-webmvc.version>
+        <spring-webmvc.version>5.1.9.RELEASE</spring-webmvc.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
-        <spring-boot-admin.version>2.1.5</spring-boot-admin.version>
+        <spring-boot-admin.version>2.1.6</spring-boot-admin.version>
         <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
 
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
         <hikaricp.version>3.3.1</hikaricp.version>
         <servlet-api.version>4.0.1</servlet-api.version>
-        <mybatis.plus.version>3.1.1</mybatis.plus.version>
+        <mybatis.plus.version>3.1.2</mybatis.plus.version>
 
         <jna.version>5.3.1</jna.version>
         <jasypt.version>2.1.0</jasypt.version>
@@ -89,7 +89,7 @@
         <slf4j-api.version>1.7.26</slf4j-api.version>
         <commons.cli.version>1.4</commons.cli.version>
         <commons.lang3.version>3.9</commons.lang3.version>
-        <google.guava.version>27.1-jre</google.guava.version>
+        <google.guava.version>28.0-jre</google.guava.version>
     </properties>
 
     <dependencies>

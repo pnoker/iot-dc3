@@ -16,10 +16,11 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
+import com.pnoker.common.model.rtmp.Rtmp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,11 +37,13 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
+    @Cacheable
     public List<Rtmp> list(Wrapper<Rtmp> wrapper) {
         return rtmpMapper.selectList(wrapper);
     }
 
     @Override
+    @Cacheable
     public int insert(Rtmp rtmp) {
         return rtmpMapper.insert(rtmp);
     }
