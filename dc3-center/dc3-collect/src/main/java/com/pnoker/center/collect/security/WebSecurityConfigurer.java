@@ -16,6 +16,7 @@
 package com.pnoker.center.collect.security;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -26,15 +27,20 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
+@Slf4j
 @EnableWebSecurity
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     @SneakyThrows
     protected void configure(HttpSecurity http) {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/actuator/**").permitAll()
-                .anyRequest()
-                .authenticated().and().httpBasic();
+        try {
+            http.csrf().disable()
+                    .authorizeRequests()
+                    .antMatchers("/actuator/**").permitAll()
+                    .anyRequest()
+                    .authenticated().and().httpBasic();
+        } catch (Exception e) {
+            log.error("{}", e.getMessage(), e);
+        }
     }
 }
