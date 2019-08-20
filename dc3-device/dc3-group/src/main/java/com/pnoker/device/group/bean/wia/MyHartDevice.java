@@ -27,14 +27,12 @@ import java.util.List;
  */
 @Data
 public class MyHartDevice {
-    private long deviceId;
-    private String deviceName;
+    private long id;
     private String longAddress;
     private List<MyHartVariable> myHartVariableList;
 
-    public MyHartDevice(long deviceId, String deviceName, String longAddress, List<MyHartVariable> myHartVariableList) {
-        this.deviceId = deviceId;
-        this.deviceName = deviceName;
+    public MyHartDevice(long id, String longAddress, List<MyHartVariable> myHartVariableList) {
+        this.id = id;
         this.longAddress = longAddress;
         this.myHartVariableList = myHartVariableList;
     }

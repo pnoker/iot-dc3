@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3'
 
 services:
   dc3-base:
@@ -17,6 +17,25 @@ services:
       - 3306:3306
     container_name: dc3-mariadb
     hostname: iotdc3.mariadb
+    networks:
+      network:
+        aliases:
+          - dc3-mariadb
+
+  dc3-mongo:
+    build:
+      context: ./dc3/dependences/mongo/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-mongo:3.0
+    restart: always
+    ports:
+      - 27017:27017
+    container_name: dc3-mongo
+    hostname: iotdc3.mongo
+    networks:
+      network:
+        aliases:
+          - dc3-mongo
 
   dc3-redis:
     build:
@@ -28,6 +47,10 @@ services:
       - 6379:6379
     container_name: dc3-redis
     hostname: iotdc3.redis
+    networks:
+      network:
+        aliases:
+          - dc3-redis
 
   dc3-rabbitmq:
     build:
@@ -42,6 +65,10 @@ services:
       - 15672:15672
     container_name: dc3-rabbitmq
     hostname: iotdc3.rabbitmq
+    networks:
+      network:
+        aliases:
+          - dc3-rabbitmq
 
   dc3-nginx:
     build:
@@ -54,6 +81,10 @@ services:
       - 1935:1935
     container_name: dc3-nginx
     hostname: iotdc3.nginx
+    networks:
+      network:
+        aliases:
+          - dc3-nginx
 
   dc3-gateway:
     build:
@@ -68,6 +99,10 @@ services:
       - dc3-dbs:iotdc3.dbs
     container_name: dc3-gateway
     hostname: iotdc3.gateway
+    networks:
+      network:
+        aliases:
+          - dc3-gateway
 
   dc3-register:
     build:
@@ -79,6 +114,10 @@ services:
       - 8100:8100
     container_name: dc3-register
     hostname: iotdc3.register
+    networks:
+      network:
+        aliases:
+          - dc3-register
 
   dc3-monitor:
     build:
@@ -92,6 +131,10 @@ services:
       - dc3-register:iotdc3.register
     container_name: dc3-monitor
     hostname: iotdc3.monitor
+    networks:
+      network:
+        aliases:
+          - dc3-monitor
 
   dc3-dbs:
     build:
@@ -107,6 +150,10 @@ services:
       - dc3-redis:iotdc3.redis
     container_name: dc3-dbs
     hostname: iotdc3.dbs
+    networks:
+      network:
+        aliases:
+          - dc3-dbs
 
   dc3-collect:
     build:
@@ -120,6 +167,10 @@ services:
       - dc3-register:iotdc3.register
     container_name: dc3-collect
     hostname: iotdc3.collect
+    networks:
+      network:
+        aliases:
+          - dc3-collect
 
   dc3-manager:
     build:
@@ -133,6 +184,10 @@ services:
       - dc3-register:iotdc3.register
     container_name: dc3-manager
     hostname: iotdc3.manager
+    networks:
+      network:
+        aliases:
+          - dc3-manager
 
   dc3-group:
     build:
@@ -146,6 +201,10 @@ services:
       - dc3-register:iotdc3.register
     container_name: dc3-group
     hostname: iotdc3.group
+    networks:
+      network:
+        aliases:
+          - dc3-group
 
   dc3-opc:
     build:
@@ -159,6 +218,10 @@ services:
       - dc3-register:iotdc3.register
     container_name: dc3-opc
     hostname: iotdc3.opc
+    networks:
+      network:
+        aliases:
+          - dc3-opc
 
   dc3-opc-ua:
     build:
@@ -172,6 +235,10 @@ services:
       - dc3-register:iotdc3.register
     container_name: dc3-opc-ua
     hostname: iotdc3.opcua
+    networks:
+      network:
+        aliases:
+          - dc3-opcua
 
   dc3-rtmp:
     build:
@@ -186,6 +253,10 @@ services:
       - dc3-dbs:iotdc3.dbs
     container_name: dc3-rtmp
     hostname: iotdc3.rtmp
+    networks:
+      network:
+        aliases:
+          - dc3-rtmp
 
   dc3-resource:
     build:
@@ -199,3 +270,11 @@ services:
       - dc3-register:iotdc3.register
     container_name: dc3-resource
     hostname: iotdc3.resource
+    networks:
+      network:
+        aliases:
+          - dc3-resource
+
+networks:
+  network:
+    driver: 'bridge'
