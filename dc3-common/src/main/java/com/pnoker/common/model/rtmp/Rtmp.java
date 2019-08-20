@@ -15,9 +15,11 @@
  */
 package com.pnoker.common.model.rtmp;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.AliasFor;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.

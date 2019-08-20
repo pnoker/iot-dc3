@@ -12,22 +12,6 @@ spring:
     user:
       name: iotdc3
       password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
-  redis:
-    host: iotdc3.redis
-    port: 6379
-    password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
-    database: 1
-    timeout: 60s
-    jedis:
-      pool:
-        min-idle: 4
-        max-idle: 16
-  data:
-    mongodb:
-      host: iotdc3.mongo
-      port: 27017
-      username: root
-      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
@@ -40,14 +24,30 @@ spring:
       max-lifetime: 1765000
       maximum-pool-size: 16
       minimum-idle: 4
+  data:
+    mongodb:
+      host: iotdc3.mongo
+      port: 27017
+      database: iot-dc3
+      username: root
+      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+  redis:
+    host: iotdc3.redis
+    port: 6379
+    password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+    database: 1
+    timeout: 60s
+    jedis:
+      pool:
+        max-idle: 16
+        min-idle: 4
   transaction:
     rollback-on-commit-failure: true
   cache:
     type: redis
     cache-names: iot-dc3-dbs-rediscache
     redis:
-      time-to-live: 60s
-      key-prefix: dc3cache
+      time-to-live: 10m
 
 mybatis-plus:
   configuration:

@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@RequestMapping("/{version}/rtmp")
+@RequestMapping("/rtmp")
 @FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class, configuration = FeignSecurityConfigurer.class)
 public interface RtmpFeignApi extends BaseFeignApi {
 }
