@@ -15,7 +15,6 @@
  */
 package com.pnoker.common.base;
 
-import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.base.ResponseBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -59,46 +58,78 @@ public class BaseController {
     }
 
     /**
-     * 返回成功
+     * 成功
      *
-     * @param object
      * @return
      */
-    public String success(Object object) {
-        ResponseBean responseBean = new ResponseBean(true, object);
-        return JSON.toJSONString(responseBean);
+    public ResponseBean ok() {
+        return new ResponseBean().ok();
     }
 
     /**
-     * 返回成功
+     * 成功 自定义提示信息
      *
      * @return
      */
-    public String success() {
-        ResponseBean responseBean = new ResponseBean(true, "Success");
-        return JSON.toJSONString(responseBean);
+    public ResponseBean ok(String message) {
+        return new ResponseBean().ok(message);
     }
 
     /**
-     * 返回失败
+     * 成功 返回结果
      *
-     * @param object
+     * @param object 返回结果
      * @return
      */
-    public String failure(Object object) {
-        ResponseBean responseBean = new ResponseBean(false, object);
-        return JSON.toJSONString(responseBean);
+    public ResponseBean ok(Object object) {
+        return new ResponseBean(object).ok();
     }
 
     /**
-     * 返回失败
+     * 成功 返回结果 & 自定义提示信息
+     *
+     * @param object 返回结果
+     * @return
+     */
+    public ResponseBean ok(Object object, String message) {
+        return new ResponseBean(object).ok(message);
+    }
+
+    /**
+     * 失败
      *
      * @return
      */
-    public String failure() {
-        ResponseBean responseBean = new ResponseBean(false, "Fail");
-        return JSON.toJSONString(responseBean);
+    public ResponseBean fail() {
+        return new ResponseBean().fail();
     }
 
+    /**
+     * 失败 自定义提示信息
+     *
+     * @return
+     */
+    public ResponseBean fail(String message) {
+        return new ResponseBean().fail(message);
+    }
 
+    /**
+     * 失败 返回结果
+     *
+     * @param object 返回结果
+     * @return
+     */
+    public ResponseBean fail(Object object) {
+        return new ResponseBean(object).fail();
+    }
+
+    /**
+     * 失败 返回结果 & 自定义提示信息
+     *
+     * @param object 返回结果
+     * @return
+     */
+    public ResponseBean fail(Object object, String message) {
+        return new ResponseBean(object).fail(message);
+    }
 }

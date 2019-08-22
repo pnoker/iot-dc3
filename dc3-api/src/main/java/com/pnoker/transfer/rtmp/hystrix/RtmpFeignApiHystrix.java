@@ -15,13 +15,11 @@
  */
 package com.pnoker.transfer.rtmp.hystrix;
 
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.bean.base.ResponseBean;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -35,29 +33,34 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
 
     @Override
     public RtmpFeignApi create(Throwable throwable) {
-        log.error("{}", throwable.getMessage(), throwable);
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
+        log.error("RtmpFeignApi,进入熔断:{}", message, throwable);
+
         return new RtmpFeignApi() {
 
             @Override
-            public String add(String json) {
-                return null;
+            public ResponseBean add(String json) {
+                return fail(throwable);
             }
 
             @Override
-            public String delete(String json) {
-                return null;
+            public ResponseBean delete(String json) {
+                return fail(throwable);
             }
 
             @Override
-            public String update(String json) {
-                return null;
+            public ResponseBean update(String json) {
+                return fail(throwable);
             }
 
             @Override
-            public List<Rtmp> list(String json) {
-                log.info("报错");
-                return null;
+            public ResponseBean list(String json) {
+                return fail(throwable);
             }
         };
+    }
+
+    public ResponseBean fail(Throwable throwable) {
+        return new ResponseBean().fail(throwable.getMessage());
     }
 }

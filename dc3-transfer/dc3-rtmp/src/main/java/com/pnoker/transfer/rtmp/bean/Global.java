@@ -30,14 +30,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 public class Global {
     public static Map<String, Task> taskMap = new HashMap<>(20);
+    //todo 当任务比较多的时候,考虑怎么处理呢??
     public static LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue(20);
 
     public static void putTask(Task task) {
-        taskMap.put(task.getTaskId(), task);
-        try {
-            taskQueue.put(task);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
+        // 判断是否重复提交
+        if (!taskMap.containsKey(task.getTaskId())) {
+            taskMap.put(task.getTaskId(), task);
+            try {
+                taskQueue.put(task);
+            } catch (InterruptedException e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 }

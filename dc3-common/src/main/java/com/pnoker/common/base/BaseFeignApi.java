@@ -15,13 +15,11 @@
  */
 package com.pnoker.common.base;
 
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.bean.base.ResponseBean;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-
-import java.util.List;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
@@ -38,7 +36,7 @@ public interface BaseFeignApi {
      * @return
      */
     @PostMapping(value = "/add")
-    String add(String json);
+    ResponseBean add(String json);
 
     /**
      * Delete 删除操作
@@ -47,7 +45,7 @@ public interface BaseFeignApi {
      * @return
      */
     @DeleteMapping(value = "/delete")
-    String delete(String json);
+    ResponseBean delete(String json);
 
     /**
      * Update 更新操作
@@ -56,7 +54,7 @@ public interface BaseFeignApi {
      * @return
      */
     @PutMapping(value = "/update")
-    String update(String json);
+    ResponseBean update(String json);
 
     /**
      * List 查询操作
@@ -64,5 +62,5 @@ public interface BaseFeignApi {
      * @return
      */
     @GetMapping(value = "/list")
-    List<Rtmp> list(String json);
+    ResponseBean list(String json);
 }

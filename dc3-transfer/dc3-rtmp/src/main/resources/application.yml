@@ -47,5 +47,5 @@ eureka:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.register:8100/eureka/
 
 ffmpeg:
-  window: D:/Documents/FFmpeg/bin/ffmpeg.exe
+  window: D:/Program Files/FFmpeg/bin/ffmpeg.exe
   nuix: ffmpeg

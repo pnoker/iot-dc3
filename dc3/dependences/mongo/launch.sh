@@ -5,7 +5,7 @@ set -e
 mongod --smallfiles --bind_ip_all &
 
 while true; do
-  mongo /dc3-mongo/config/init_mongo.js && break
+  mongo /dc3-mongo/config/iot-dc3.sql && break
   sleep 5
 done
 

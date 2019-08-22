@@ -6,7 +6,9 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-mongo
 
-COPY init_mongo.js ./config/
-COPY launch-dc3-mongo.sh ./config/
+COPY ./iot-dc3.sql ./config/
+COPY ./launch.sh ./config/
+
+CMD ./config/launch.sh
 
 EXPOSE 27017

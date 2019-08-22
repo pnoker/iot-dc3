@@ -16,18 +16,21 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Tools;
 import com.pnoker.common.utils.uid.UidTools;
 import com.pnoker.transfer.rtmp.bean.Global;
 import com.pnoker.transfer.rtmp.bean.Task;
-import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import com.pnoker.transfer.rtmp.handle.TaskHandle;
+import com.pnoker.transfer.rtmp.service.RtmpService;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.System.getProperty;
@@ -39,43 +42,28 @@ import static java.lang.System.getProperty;
  * <p>Description: 启动服务，自动加载自启任务
  */
 @Slf4j
+@Setter
+@Order(1)
 @Component
-public class TaskRunner implements CommandLineRunner {
+@ConfigurationProperties(prefix = "ffmpeg")
+public class TaskRunner implements ApplicationRunner {
 
-    private volatile int times = 0;
-    private int reconnect = 5000;
+    private String unix;
+    private String window;
 
     @Autowired
-    private RtmpFeignApi rtmpFeignApi;
-
-    @Value("${ffmpeg.window}")
-    private String window;
-    @Value("${ffmpeg.nuix}")
-    private String unix;
-
-    public List<Rtmp> getRtmpList() {
-        List<Rtmp> list = new ArrayList<>();
-        if (times > 10) {
-            return list;
-        }
-        times++;
-        try {
-            Thread.sleep(reconnect * times);
-        } catch (InterruptedException e) {
-            log.error("{}", e.getMessage(), e);
-        }
-        list = rtmpFeignApi.list("{}");
-        if (list == null) {
-            return getRtmpList();
-        }
-        return list;
-    }
+    private RtmpService rtmpService;
 
     @Override
-    public void run(String... args) {
-        log.info("ready to start rtsp->rtmp thread");
+    public void run(ApplicationArguments args) {
+        log.info("Prepare to start rtsp->rtmp thread");
         String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        List<Rtmp> list = getRtmpList();
+        if (!Tools.isFile(ffmpeg)) {
+            log.error("{} does not exist", ffmpeg);
+            log.error("* Failed to start rtsp->rtmp thread");
+            return;
+        }
+        List<Rtmp> list = rtmpService.getRtmpList();
         for (Rtmp rtmp : list) {
             String cmd = rtmp.getCommand()
                     .replace("{exe}", ffmpeg)
@@ -86,4 +74,5 @@ public class TaskRunner implements CommandLineRunner {
         }
         new Thread(new TaskHandle()).start();
     }
+
 }
