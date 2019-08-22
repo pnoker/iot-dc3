@@ -15,14 +15,22 @@
  */
 package com.pnoker.transfer.rtmp.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.pnoker.common.base.BaseController;
+import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.bean.Cmd;
 import com.pnoker.transfer.rtmp.bean.Global;
 import com.pnoker.transfer.rtmp.bean.Task;
-import com.pnoker.common.base.BaseController;
+import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -34,6 +42,8 @@ import java.util.UUID;
 @Slf4j
 @RestController
 public class IndexController extends BaseController {
+    @Autowired
+    private RtmpFeignApi rtmpFeignApi;
 
     @GetMapping("/test")
     public String hello() {
@@ -51,6 +61,15 @@ public class IndexController extends BaseController {
             log.error(e.getMessage(), e);
         }
         return "ok";
+    }
+
+    @GetMapping("/list")
+    public List<Rtmp> list() {
+        Map<String, Object> condition = new HashMap<>(2);
+        condition.put("auto_start", false);
+        ResponseBean responseBean = rtmpFeignApi.list("{}");
+        List<Rtmp> list = (List<Rtmp>) responseBean.getResult();
+        return list;
     }
 
 }

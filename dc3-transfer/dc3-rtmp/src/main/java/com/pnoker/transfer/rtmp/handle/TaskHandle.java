@@ -29,11 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 public class TaskHandle implements Runnable {
     @Override
     public void run() {
-        log.info("rtsp->rtmp thread startup ok");
+        log.info("Rtsp->Rtmp thread startup ok");
         try {
             while (true) {
                 Task task = Global.taskQueue.take();
-                log.info("starting task {} , command {}", task.getTaskId(), task.getCommand());
+                log.info("Starting task {} , command {}", task.getTaskId(), task.getCommand());
                 task.start();
                 Thread.sleep(5000);
             }
