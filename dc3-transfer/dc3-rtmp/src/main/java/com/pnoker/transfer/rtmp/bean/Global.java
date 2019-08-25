@@ -34,19 +34,32 @@ public class Global {
     public static int CONNECT_MAX_TIMES = 3;
 
     //记录Task信息
+    public static int MAX_TASK_SIZE = 32;
     public static Map<String, Task> taskMap = new HashMap<>(32);
     public static LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue(32);
 
-    public static void putTask(Task task) {
+    /**
+     * 创建视频转码任务
+     *
+     * @param task
+     */
+    public static boolean createTask(Task task) {
         // 判断任务是否被重复提交
         if (!taskMap.containsKey(task.getTaskId())) {
-            taskMap.put(task.getTaskId(), task);
-            try {
-                // todo 需要改成 offer
-                taskQueue.put(task);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
+            if (taskMap.size() <= MAX_TASK_SIZE) {
+                taskMap.put(task.getTaskId(), task);
+                if (!taskQueue.offer(task)) {
+                    log.error("Current tasks queue is full,please try again later.");
+                    return false;
+                }
+            } else {
+                log.error("Number of tasks is more than {}", MAX_TASK_SIZE);
+                return false;
             }
+        } else {
+            log.error("Repeat task");
+            return false;
         }
+        return true;
     }
 }
