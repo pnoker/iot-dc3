@@ -3,6 +3,9 @@ package com.pnoker.transfer.rtmp.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.base.ResponseBean;
 import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Tools;
+import com.pnoker.transfer.rtmp.bean.Global;
+import com.pnoker.transfer.rtmp.bean.Task;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +20,6 @@ import java.util.Map;
 @Slf4j
 @Service
 public class RtmpServiceImpl implements RtmpService {
-    //重连时间间隔 & 统计重连次数
-    private int interval = 1000 * 5;
     private volatile int times = 0;
 
     @Autowired
@@ -43,16 +44,31 @@ public class RtmpServiceImpl implements RtmpService {
         return list;
     }
 
+    @Override
+    public boolean createTask(Rtmp rtmp, String ffmpeg) {
+        if (!Tools.isFile(ffmpeg)) {
+            log.error("{} does not exist", ffmpeg);
+            return false;
+        }
+        String cmd = rtmp.getCommand()
+                .replace("{exe}", ffmpeg)
+                .replace("{rtsp_url}", rtmp.getRtspUrl())
+                .replace("{rtmp_url}", rtmp.getRtmpUrl());
+        Task task = new Task(Tools.uuid(), cmd);
+        Global.putTask(task);
+        return false;
+    }
+
     public void reconnect() {
         // 3 次重连机会
-        if (times > 3) {
+        if (times > Global.CONNECT_MAX_TIMES) {
             log.info("一共重连 {} 次,退出重连", times);
             return;
         }
         log.info("第 {} 次重连", times);
         times++;
         try {
-            Thread.sleep(interval * times);
+            Thread.sleep(Global.CONNECT_INTERVAL * times);
             getRtmpList();
         } catch (Exception e) {
         }

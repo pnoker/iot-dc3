@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface RtmpService {
     List<Rtmp> getRtmpList();
+
+    boolean createTask(Rtmp rtmp,String ffmpeg);
 }

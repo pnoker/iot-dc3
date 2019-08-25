@@ -29,15 +29,20 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 @Slf4j
 public class Global {
-    public static Map<String, Task> taskMap = new HashMap<>(20);
-    //todo 当任务比较多的时候,考虑怎么处理呢??
-    public static LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue(20);
+    //重连时间间隔 & 最大重连次数
+    public static int CONNECT_INTERVAL = 1000 * 5;
+    public static int CONNECT_MAX_TIMES = 3;
+
+    //记录Task信息
+    public static Map<String, Task> taskMap = new HashMap<>(32);
+    public static LinkedBlockingQueue<Task> taskQueue = new LinkedBlockingQueue(32);
 
     public static void putTask(Task task) {
-        // 判断是否重复提交
+        // 判断任务是否被重复提交
         if (!taskMap.containsKey(task.getTaskId())) {
             taskMap.put(task.getTaskId(), task);
             try {
+                // todo 需要改成 offer
                 taskQueue.put(task);
             } catch (InterruptedException e) {
                 log.error(e.getMessage(), e);
