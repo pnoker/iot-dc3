@@ -50,7 +50,7 @@ public class OutputHandle implements Runnable {
             Task task = Global.taskMap.get(taskId);
             task.setTimes(task.getTimes() + 1);
             task.setStatus(3);
-            Global.putTask(task);
+            Global.createTask(task);
         }
     }
 

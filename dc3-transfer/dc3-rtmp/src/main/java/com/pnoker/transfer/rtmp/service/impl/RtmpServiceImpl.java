@@ -54,9 +54,7 @@ public class RtmpServiceImpl implements RtmpService {
                 .replace("{exe}", ffmpeg)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
-        Task task = new Task(Tools.uuid(), cmd);
-        Global.putTask(task);
-        return false;
+        return Global.createTask(new Task(Tools.uuid(), cmd));
     }
 
     public void reconnect() {
