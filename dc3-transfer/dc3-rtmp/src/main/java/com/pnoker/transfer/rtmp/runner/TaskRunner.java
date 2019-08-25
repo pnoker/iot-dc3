@@ -16,10 +16,6 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.common.utils.Tools;
-import com.pnoker.common.utils.uid.UidTools;
-import com.pnoker.transfer.rtmp.bean.Global;
-import com.pnoker.transfer.rtmp.bean.Task;
 import com.pnoker.transfer.rtmp.handle.TaskHandle;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
@@ -56,21 +52,12 @@ public class TaskRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+
         log.info("Prepare to start rtsp->rtmp thread");
         String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        if (!Tools.isFile(ffmpeg)) {
-            log.error("{} does not exist", ffmpeg);
-            log.error("* Failed to start rtsp->rtmp thread");
-            return;
-        }
         List<Rtmp> list = rtmpService.getRtmpList();
         for (Rtmp rtmp : list) {
-            String cmd = rtmp.getCommand()
-                    .replace("{exe}", ffmpeg)
-                    .replace("{rtsp_url}", rtmp.getRtspUrl())
-                    .replace("{rtmp_url}", rtmp.getRtmpUrl());
-            Task task = new Task(new UidTools().guid(), cmd);
-            Global.putTask(task);
+            rtmpService.createTask(rtmp, ffmpeg);
         }
         new Thread(new TaskHandle()).start();
     }

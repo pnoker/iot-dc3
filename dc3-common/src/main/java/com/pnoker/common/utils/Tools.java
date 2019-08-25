@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,19 +106,6 @@ public class Tools {
     }
 
     /**
-     * 正则判断
-     *
-     * @param str
-     * @param regex
-     * @return
-     */
-    private static boolean pattern(String str, String regex) {
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(str);
-        return matcher.matches();
-    }
-
-    /**
      * 判断字符串是否为 Json格式
      *
      * @param json
@@ -175,4 +163,35 @@ public class Tools {
         return pattern(mail, regex);
     }
 
+    /**
+     * 生成 UUID
+     *
+     * @return
+     */
+    public static String uuid() {
+        UUID uuid = UUID.randomUUID();
+        long mostSigBits = uuid.getMostSignificantBits();
+        long leastSigBits = uuid.getLeastSignificantBits();
+
+        return (digits(mostSigBits >> 32, 8) + digits(mostSigBits >> 16, 4) + digits(mostSigBits, 4)
+                + digits(leastSigBits >> 48, 4) + digits(leastSigBits, 12));
+    }
+
+    /**
+     * 正则判断
+     *
+     * @param str
+     * @param regex
+     * @return
+     */
+    private static boolean pattern(String str, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+        return matcher.matches();
+    }
+
+    private static String digits(long val, int digits) {
+        long hi = 1L << (digits * 4);
+        return Long.toHexString(hi | (val & (hi - 1))).substring(1);
+    }
 }
