@@ -15,8 +15,8 @@
  */
 package com.pnoker.transfer.rtmp.handle;
 
-import com.pnoker.transfer.rtmp.bean.Global;
-import com.pnoker.transfer.rtmp.bean.Task;
+import com.pnoker.transfer.rtmp.bean.CmdTask;
+import com.pnoker.transfer.rtmp.constant.Global;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,9 +32,9 @@ public class TaskHandle implements Runnable {
         log.info("Rtsp->Rtmp thread startup ok");
         try {
             while (true) {
-                Task task = Global.taskQueue.take();
-                log.info("Starting task {} , command {}", task.getTaskId(), task.getCommand());
-                task.start();
+                CmdTask cmdTask = Global.cmdTaskQueue.take();
+                log.info("Starting task {} , command {}", cmdTask.getId(), cmdTask.getCommand());
+                cmdTask.start();
                 Thread.sleep(5000);
             }
         } catch (Exception e) {

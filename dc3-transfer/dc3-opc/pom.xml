@@ -26,6 +26,33 @@
     <description>iot-dc3 OPC处理 服务。</description>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.openscada.utgard/org.openscada.opc.lib -->
+        <dependency>
+            <groupId>org.openscada.utgard</groupId>
+            <artifactId>org.openscada.opc.lib</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.openscada.utgard/org.openscada.opc.dcom -->
+        <dependency>
+            <groupId>org.openscada.utgard</groupId>
+            <artifactId>org.openscada.opc.dcom</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.jinterop/j-interop -->
+        <dependency>
+            <groupId>org.jinterop</groupId>
+            <artifactId>j-interop</artifactId>
+            <version>2.0.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.62</version>
+        </dependency>
 
     </dependencies>
 

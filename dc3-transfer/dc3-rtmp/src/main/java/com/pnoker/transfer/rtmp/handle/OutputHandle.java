@@ -15,8 +15,8 @@
  */
 package com.pnoker.transfer.rtmp.handle;
 
-import com.pnoker.transfer.rtmp.bean.Global;
-import com.pnoker.transfer.rtmp.bean.Task;
+import com.pnoker.transfer.rtmp.bean.CmdTask;
+import com.pnoker.transfer.rtmp.constant.Global;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,10 +47,10 @@ public class OutputHandle implements Runnable {
         if (message.contains("fail") || message.contains("miss") || message.contains("error")) {
             log.info("read to restart task {}", taskId);
             status = false;
-            Task task = Global.taskMap.get(taskId);
-            task.setTimes(task.getTimes() + 1);
-            task.setStatus(3);
-            Global.createTask(task);
+            CmdTask cmdTask = Global.taskMap.get(taskId);
+            cmdTask.setStartTimes(cmdTask.getStartTimes() + 1);
+            cmdTask.setStatus(3);
+            Global.createTask(cmdTask);
         }
     }
 

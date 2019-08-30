@@ -15,13 +15,12 @@
  */
 package com.pnoker.transfer.rtmp.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.bean.base.ResponseBean;
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.transfer.rtmp.bean.Cmd;
-import com.pnoker.transfer.rtmp.bean.Global;
-import com.pnoker.transfer.rtmp.bean.Task;
+import com.pnoker.transfer.rtmp.bean.CmdBuilder;
+import com.pnoker.transfer.rtmp.bean.CmdTask;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -47,16 +45,16 @@ public class IndexController extends BaseController {
 
     @GetMapping("/test")
     public String hello() {
-        Cmd cmd = new Cmd("D:/Documents/FFmpeg/bin/");
-        cmd.create("ffmpeg")
+        CmdBuilder cmdBuilder = new CmdBuilder("D:/Documents/FFmpeg/bin/");
+        cmdBuilder.create("ffmpeg")
                 .add("-i", "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov")
                 .add("-vcodec", "copy")
                 .add("-acodec", "copy")
                 .add("-f", "flv")
                 .add("-y", "rtmp://114.116.9.76:1935/rtmp/bigbuckbunny_175k").build();
-        Task task = new Task(UUID.randomUUID().toString(), cmd.getCmd());
+        CmdTask cmdTask = new CmdTask(cmdBuilder.getCmd());
         try {
-            Global.taskQueue.put(task);
+            Global.cmdTaskQueue.put(cmdTask);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         }

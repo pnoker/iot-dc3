@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.base.ResponseBean;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Tools;
-import com.pnoker.transfer.rtmp.bean.Global;
-import com.pnoker.transfer.rtmp.bean.Task;
+import com.pnoker.transfer.rtmp.bean.CmdTask;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ public class RtmpServiceImpl implements RtmpService {
                 .replace("{exe}", ffmpeg)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
-        return Global.createTask(new Task(Tools.uuid(), cmd));
+        return Global.createTask(new CmdTask(cmd));
     }
 
     public void reconnect() {

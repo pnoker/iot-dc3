@@ -21,33 +21,58 @@ import lombok.Data;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: Command 指令构造器
  */
 @Data
-public class Cmd {
+public class CmdBuilder {
     private String cmd;
     private StringBuilder builder;
 
-    public Cmd(String path) {
+    /**
+     * 构造函数,传指令程序基地址
+     *
+     * @param path
+     */
+    public CmdBuilder(String path) {
         this.builder = new StringBuilder(path);
     }
 
-    public Cmd create(String exe) {
+    /**
+     * 可运行程序名称,填写全称
+     *
+     * @param exe
+     * @return
+     */
+    public CmdBuilder create(String exe) {
         if (null != builder) {
             builder.append(exe);
         }
         return this;
     }
 
-    public Cmd add(String cmd) {
-        if (null != builder) {
-            builder.append(" " + cmd);
-        }
-        return this;
+    /**
+     * 键值对指令模式
+     *
+     * @param key
+     * @param paramer
+     * @return
+     */
+    public CmdBuilder add(String key, String paramer) {
+        return add(key).add(paramer);
     }
 
-    public Cmd add(String key, String cmd) {
-        return add(key).add(cmd);
+    /**
+     * 单个指令模式
+     *
+     * @param paramer
+     * @return
+     */
+    public CmdBuilder add(String paramer) {
+        if (null != builder) {
+            builder.append(" ");
+            builder.append(paramer);
+        }
+        return this;
     }
 
     public void build() {
