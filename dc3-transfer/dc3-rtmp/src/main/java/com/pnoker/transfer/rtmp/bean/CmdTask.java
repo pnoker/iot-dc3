@@ -15,6 +15,7 @@
  */
 package com.pnoker.transfer.rtmp.bean;
 
+import com.pnoker.common.utils.Tools;
 import com.pnoker.transfer.rtmp.handle.OutputHandle;
 import lombok.Data;
 
@@ -24,14 +25,14 @@ import java.io.IOException;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: 任务描述实体类
+ * <p>Description: Command 指令执行任务信息类
  */
 @Data
-public class Task {
+public class CmdTask {
     /**
-     * 任务全局 GUID
+     * Command 指令任务 UUID
      */
-    private String taskId;
+    private String id;
 
     /**
      * 任务运行状态
@@ -46,7 +47,7 @@ public class Task {
     /**
      * 任务累计被启动次数
      */
-    private int times = 0;
+    private int startTimes = 0;
 
     /**
      * Cmd 命令内容
@@ -56,15 +57,15 @@ public class Task {
     private Process process;
     private OutputHandle outputHandle;
 
-    public Task(String taskId, String command) {
-        this.taskId = taskId;
+    public CmdTask(String command) {
+        this.id = Tools.uuid();
         this.command = command;
     }
 
     public void start() throws IOException {
         Runtime runtime = Runtime.getRuntime();
         process = runtime.exec(command);
-        outputHandle = new OutputHandle(taskId, process);
+        outputHandle = new OutputHandle(id, process);
         new Thread(outputHandle).start();
     }
 }
