@@ -15,7 +15,7 @@
  */
 package com.pnoker.transfer.rtmp.hystrix;
 
-import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.bean.base.Response;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -39,28 +39,28 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
         return new RtmpFeignApi() {
 
             @Override
-            public ResponseBean add(String json) {
+            public Response add(String json) {
                 return fail(throwable);
             }
 
             @Override
-            public ResponseBean delete(String json) {
+            public Response delete(String json) {
                 return fail(throwable);
             }
 
             @Override
-            public ResponseBean update(String json) {
+            public Response update(String json) {
                 return fail(throwable);
             }
 
             @Override
-            public ResponseBean list(String json) {
+            public Response list(String json) {
                 return fail(throwable);
             }
         };
     }
 
-    public ResponseBean fail(Throwable throwable) {
-        return new ResponseBean().fail(throwable.getMessage());
+    public Response fail(Throwable throwable) {
+        return new Response().fail(throwable.getMessage());
     }
 }

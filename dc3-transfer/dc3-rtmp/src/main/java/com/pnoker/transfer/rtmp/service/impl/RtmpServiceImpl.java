@@ -1,7 +1,7 @@
 package com.pnoker.transfer.rtmp.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.bean.base.Response;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Tools;
 import com.pnoker.transfer.rtmp.bean.CmdTask;
@@ -31,11 +31,11 @@ public class RtmpServiceImpl implements RtmpService {
 
         Map<String, Object> condition = new HashMap<>(2);
         condition.put("auto_start", false);
-        ResponseBean responseBean = rtmpFeignApi.list(JSON.toJSONString(condition));
-        if (responseBean.isOk()) {
-            list = (List<Rtmp>) responseBean.getResult();
+        Response response = rtmpFeignApi.list(JSON.toJSONString(condition));
+        if (response.isOk()) {
+            list = (List<Rtmp>) response.getResult();
         } else {
-            log.error(responseBean.getMessage());
+            log.error(response.getMessage());
             reconnect();
         }
         if (null == list) {

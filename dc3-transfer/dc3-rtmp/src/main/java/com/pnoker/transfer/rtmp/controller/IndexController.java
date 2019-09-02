@@ -16,7 +16,7 @@
 package com.pnoker.transfer.rtmp.controller;
 
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.bean.base.Response;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.bean.CmdBuilder;
 import com.pnoker.transfer.rtmp.bean.CmdTask;
@@ -65,8 +65,8 @@ public class IndexController extends BaseController {
     public List<Rtmp> list() {
         Map<String, Object> condition = new HashMap<>(2);
         condition.put("auto_start", false);
-        ResponseBean responseBean = rtmpFeignApi.list("{}");
-        List<Rtmp> list = (List<Rtmp>) responseBean.getResult();
+        Response response = rtmpFeignApi.list("{}");
+        List<Rtmp> list = (List<Rtmp>) response.getResult();
         return list;
     }
 

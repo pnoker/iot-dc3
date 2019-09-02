@@ -16,6 +16,7 @@
 package com.pnoker.common.bean.base;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -24,19 +25,15 @@ import lombok.Data;
  * <p>Description: 结果返回 实体类
  */
 @Data
-public class ResponseBean {
+@NoArgsConstructor
+public class Response {
     private boolean ok;
     private String message;
-    private Long time;
-    private Object result;
+    private long time = System.currentTimeMillis();
+    private Object result = null;
 
-    public ResponseBean() {
-        this.time = System.currentTimeMillis();
-    }
-
-    public ResponseBean(Object result) {
+    public Response(Object result) {
         this.result = result;
-        this.time = System.currentTimeMillis();
     }
 
     /**
@@ -44,7 +41,7 @@ public class ResponseBean {
      *
      * @return
      */
-    public ResponseBean ok() {
+    public Response ok() {
         this.ok = true;
         this.message = "Ok,Request Succeeded!";
         return this;
@@ -56,7 +53,7 @@ public class ResponseBean {
      * @param message
      * @return
      */
-    public ResponseBean ok(String message) {
+    public Response ok(String message) {
         this.ok = true;
         this.message = message;
         return this;
@@ -67,7 +64,7 @@ public class ResponseBean {
      *
      * @return
      */
-    public ResponseBean fail() {
+    public Response fail() {
         this.ok = false;
         this.message = "Sorry,Request Failed!";
         return this;
@@ -79,7 +76,7 @@ public class ResponseBean {
      * @param message
      * @return
      */
-    public ResponseBean fail(String message) {
+    public Response fail(String message) {
         this.ok = false;
         this.message = message;
         return this;
