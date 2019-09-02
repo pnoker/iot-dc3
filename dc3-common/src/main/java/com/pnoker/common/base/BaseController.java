@@ -15,7 +15,7 @@
  */
 package com.pnoker.common.base;
 
-import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.bean.base.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -62,8 +62,8 @@ public class BaseController {
      *
      * @return
      */
-    public ResponseBean ok() {
-        return new ResponseBean().ok();
+    public Response ok() {
+        return new Response().ok();
     }
 
     /**
@@ -71,8 +71,8 @@ public class BaseController {
      *
      * @return
      */
-    public ResponseBean ok(String message) {
-        return new ResponseBean().ok(message);
+    public Response ok(String message) {
+        return new Response().ok(message);
     }
 
     /**
@@ -81,8 +81,8 @@ public class BaseController {
      * @param object 返回结果
      * @return
      */
-    public ResponseBean ok(Object object) {
-        return new ResponseBean(object).ok();
+    public Response ok(Object object) {
+        return new Response(object).ok();
     }
 
     /**
@@ -91,8 +91,8 @@ public class BaseController {
      * @param object 返回结果
      * @return
      */
-    public ResponseBean ok(Object object, String message) {
-        return new ResponseBean(object).ok(message);
+    public Response ok(Object object, String message) {
+        return new Response(object).ok(message);
     }
 
     /**
@@ -100,8 +100,8 @@ public class BaseController {
      *
      * @return
      */
-    public ResponseBean fail() {
-        return new ResponseBean().fail();
+    public Response fail() {
+        return new Response().fail();
     }
 
     /**
@@ -109,8 +109,8 @@ public class BaseController {
      *
      * @return
      */
-    public ResponseBean fail(String message) {
-        return new ResponseBean().fail(message);
+    public Response fail(String message) {
+        return new Response().fail(message);
     }
 
     /**
@@ -119,8 +119,8 @@ public class BaseController {
      * @param object 返回结果
      * @return
      */
-    public ResponseBean fail(Object object) {
-        return new ResponseBean(object).fail();
+    public Response fail(Object object) {
+        return new Response(object).fail();
     }
 
     /**
@@ -129,7 +129,7 @@ public class BaseController {
      * @param object 返回结果
      * @return
      */
-    public ResponseBean fail(Object object, String message) {
-        return new ResponseBean(object).fail(message);
+    public Response fail(Object object, String message) {
+        return new Response(object).fail(message);
     }
 }

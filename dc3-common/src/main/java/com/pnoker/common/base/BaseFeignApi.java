@@ -15,7 +15,7 @@
  */
 package com.pnoker.common.base;
 
-import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.bean.base.Response;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +36,7 @@ public interface BaseFeignApi {
      * @return
      */
     @PostMapping(value = "/add")
-    ResponseBean add(String json);
+    Response add(String json);
 
     /**
      * Delete 删除操作
@@ -45,7 +45,7 @@ public interface BaseFeignApi {
      * @return
      */
     @DeleteMapping(value = "/delete")
-    ResponseBean delete(String json);
+    Response delete(String json);
 
     /**
      * Update 更新操作
@@ -54,7 +54,7 @@ public interface BaseFeignApi {
      * @return
      */
     @PutMapping(value = "/update")
-    ResponseBean update(String json);
+    Response update(String json);
 
     /**
      * List 查询操作
@@ -62,5 +62,5 @@ public interface BaseFeignApi {
      * @return
      */
     @GetMapping(value = "/list")
-    ResponseBean list(String json);
+    Response list(String json);
 }

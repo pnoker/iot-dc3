@@ -1,20 +1,18 @@
 package com.pnoker.transfer.opc.controller;
 
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.bean.base.Response;
+import com.pnoker.transfer.opc.bean.OpcInfo;
+import com.pnoker.transfer.opc.bean.OpcServer;
+import com.pnoker.transfer.opc.service.OpcService;
 import lombok.extern.slf4j.Slf4j;
-import org.jinterop.dcom.common.JIException;
-import org.openscada.opc.dcom.list.ClassDetails;
-import org.openscada.opc.lib.list.Categories;
-import org.openscada.opc.lib.list.Category;
-import org.openscada.opc.lib.list.ServerList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.UnknownHostException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -25,39 +23,47 @@ import java.util.Collection;
 @Slf4j
 @RestController
 public class OpcController extends BaseController {
+    @Autowired
+    private OpcService opcService;
 
     @RequestMapping(value = "/list/{type}", method = RequestMethod.GET)
-    public ResponseBean list(@PathVariable String type) {
-        Object object;
+    public Response list(@PathVariable String type, OpcInfo info) {
         switch (type) {
             case "server":
                 try {
-                    ServerList serverList = new ServerList(
-                            "localhost",
-                            "Administrator",
-                            "939510703",
-                            "");
-                    Collection<ClassDetails> classDetails = serverList.listServersWithDetails(new Category[]{
-                                    Categories.OPCDAServer10,
-                                    Categories.OPCDAServer20,
-                                    Categories.OPCDAServer30},
-                            new Category[]{});
-                    for (ClassDetails cds : classDetails) {
-                        System.out.println(cds.getProgId() + "=" + cds.getDescription());
-                    }
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                } catch (JIException e) {
-                    e.printStackTrace();
+                    return ok(opcService.opcServerList(info));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    return fail(e.getMessage());
                 }
-                break;
-            case "group":
-                break;
             case "item":
-                break;
+                try {
+                    List<OpcServer> opcServerList = opcService.opcServerList(info);
+                    for (OpcServer opcServer : opcServerList) {
+                        if (opcServer.getClsId().equals(info.getClsId())) {
+                            info.setProgId(opcServer.getProgId());
+                            return ok(opcService.opcItemList(info));
+                        }
+                    }
+                    return fail(String.format("No such Opc Server with this clsid (%s)", info.getClsId()));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    return fail(e.getMessage());
+                }
             default:
                 return fail("This type is not supported");
         }
-        return ok(object);
+    }
+
+    @RequestMapping(value = "/value/{type}", method = RequestMethod.GET)
+    public Response value(@PathVariable String type, List<String> nodes) {
+        switch (type) {
+            case "node":
+                return ok();
+            case "nodes":
+                return ok();
+            default:
+                return fail("This node is not existent");
+        }
     }
 }

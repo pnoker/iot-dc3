@@ -17,7 +17,7 @@ package com.pnoker.center.dbs.controller;
 
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.bean.base.ResponseBean;
+import com.pnoker.common.bean.base.Response;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Tools;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
@@ -41,22 +41,22 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
     private RtmpService rtmpService;
 
     @Override
-    public ResponseBean add(String json) {
+    public Response add(String json) {
         return ok();
     }
 
     @Override
-    public ResponseBean delete(String json) {
+    public Response delete(String json) {
         return ok();
     }
 
     @Override
-    public ResponseBean update(String json) {
+    public Response update(String json) {
         return ok();
     }
 
     @Override
-    public ResponseBean list(String json) {
+    public Response list(String json) {
         //进行数据校验
         if (null == json || "".equals(json)) {
             json = "{}";
@@ -69,7 +69,7 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
     }
 
     @RequestMapping("/insert")
-    public ResponseBean insert() {
+    public Response insert() {
         for (int i = 5; i < 100; i++) {
             Rtmp wiaData = new Rtmp(i);
             rtmpService.insert(wiaData);
