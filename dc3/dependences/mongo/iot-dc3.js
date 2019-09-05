@@ -14,17 +14,16 @@
  *  limitations under the License.
  */
 
-package com.pnoker.transfer.opc.bean;
-
-import lombok.Data;
-
-@Data
-public class OpcInfo {
-    private String host;
-    private String user;
-    private String password;
-    private String domain;
-
-    private String clsId;
-    private String progId;
-}
+db = db.getSiblingDB('iot-dc3');
+db.createUser({
+    user: "root",
+    pwd: "iotdc3",
+    roles: [{
+        role: "readWrite",
+        db: "iot-dc3"
+    }]
+});
+db.createCollection("dc3_data");
+db.createCollection("dc3_unit");
+db.createCollection("dc3_variable");
+db.createCollection("dc3_device");

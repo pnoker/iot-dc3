@@ -29,11 +29,6 @@ CREATE TABLE "dc3_unit" (
 );
 
 -- ----------------------------
--- Records of dc3_unit
--- ----------------------------
-INSERT INTO "dc3_unit" VALUES (1, '摄氏度', '℃');
-
--- ----------------------------
 -- Table structure for dc3_wia_data
 -- ----------------------------
 DROP TABLE IF EXISTS "dc3_wia_data";
@@ -45,12 +40,6 @@ CREATE TABLE "dc3_wia_data" (
   FOREIGN KEY ("variable_id") REFERENCES "dc3_wia_variable" ("") ON DELETE NO ACTION ON UPDATE NO ACTION,
   UNIQUE ("id" ASC)
 );
-
--- ----------------------------
--- Records of dc3_wia_data
--- ----------------------------
-INSERT INTO "dc3_wia_data" VALUES (1, 1, 100.0, '2019-07-31 09:44:48');
-INSERT INTO "dc3_wia_data" VALUES (2, 1, 100.0, '2019-07-31 09:01:15');
 
 -- ----------------------------
 -- Table structure for dc3_wia_device
@@ -69,11 +58,6 @@ CREATE TABLE "dc3_wia_device" (
 );
 
 -- ----------------------------
--- Records of dc3_wia_device
--- ----------------------------
-INSERT INTO "dc3_wia_device" VALUES (1, 1, NULL, 'Wia-Device-Test-01', 0, '2019-07-31 00:42:56');
-
--- ----------------------------
 -- Table structure for dc3_wia_gateway
 -- ----------------------------
 DROP TABLE IF EXISTS "dc3_wia_gateway";
@@ -89,11 +73,6 @@ CREATE TABLE "dc3_wia_gateway" (
   UNIQUE ("ip_address" ASC),
   UNIQUE ("port" ASC)
 );
-
--- ----------------------------
--- Records of dc3_wia_gateway
--- ----------------------------
-INSERT INTO "dc3_wia_gateway" VALUES (1, '127.0.0.1', NULL, 6000, 6001, 0, '2019-07-31 00:42:14');
 
 -- ----------------------------
 -- Table structure for dc3_wia_variable
@@ -114,11 +93,6 @@ CREATE TABLE "dc3_wia_variable" (
 );
 
 -- ----------------------------
--- Records of dc3_wia_variable
--- ----------------------------
-INSERT INTO "dc3_wia_variable" VALUES (1, 1, '温度', NULL, NULL, NULL, 1, 1.0);
-
--- ----------------------------
 -- Table structure for sqlite_sequence
 -- ----------------------------
 DROP TABLE IF EXISTS "sqlite_sequence";
@@ -128,45 +102,28 @@ CREATE TABLE "sqlite_sequence" (
 );
 
 -- ----------------------------
--- Records of sqlite_sequence
--- ----------------------------
-INSERT INTO "sqlite_sequence" VALUES ('dc3_unit', 1);
-INSERT INTO "sqlite_sequence" VALUES ('dc3_wia_data', 1);
-INSERT INTO "sqlite_sequence" VALUES ('dc3_wia_gateway', 1);
-INSERT INTO "sqlite_sequence" VALUES ('dc3_wia_device', 1);
-INSERT INTO "sqlite_sequence" VALUES ('dc3_wia_variable', 1);
-
--- ----------------------------
 -- Auto increment value for dc3_unit
 -- ----------------------------
-UPDATE "sqlite_sequence" SET seq = 1 WHERE name = 'dc3_unit';
+UPDATE "sqlite_sequence" SET seq = 0 WHERE name = 'dc3_unit';
 
 -- ----------------------------
 -- Auto increment value for dc3_wia_data
 -- ----------------------------
-UPDATE "sqlite_sequence" SET seq = 1 WHERE name = 'dc3_wia_data';
+UPDATE "sqlite_sequence" SET seq = 0 WHERE name = 'dc3_wia_data';
 
 -- ----------------------------
 -- Auto increment value for dc3_wia_device
 -- ----------------------------
-UPDATE "sqlite_sequence" SET seq = 1 WHERE name = 'dc3_wia_device';
+UPDATE "sqlite_sequence" SET seq = 0 WHERE name = 'dc3_wia_device';
 
 -- ----------------------------
 -- Auto increment value for dc3_wia_gateway
 -- ----------------------------
-UPDATE "sqlite_sequence" SET seq = 1 WHERE name = 'dc3_wia_gateway';
-
--- ----------------------------
--- Indexes structure for table dc3_wia_gateway
--- ----------------------------
-CREATE UNIQUE INDEX "dc3_wia_gateway_local_port_uindex"
-ON "dc3_wia_gateway" (
-  "local_port" ASC
-);
+UPDATE "sqlite_sequence" SET seq = 0 WHERE name = 'dc3_wia_gateway';
 
 -- ----------------------------
 -- Auto increment value for dc3_wia_variable
 -- ----------------------------
-UPDATE "sqlite_sequence" SET seq = 1 WHERE name = 'dc3_wia_variable';
+UPDATE "sqlite_sequence" SET seq = 0 WHERE name = 'dc3_wia_variable';
 
 PRAGMA foreign_keys = true;
