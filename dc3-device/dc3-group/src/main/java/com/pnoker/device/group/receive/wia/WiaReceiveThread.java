@@ -29,10 +29,6 @@ import java.io.IOException;
 public class WiaReceiveThread implements Runnable {
     private MyGateway myGateway;
 
-    public WiaReceiveThread(MyGateway myGateway) {
-        this.myGateway = myGateway;
-    }
-
     @Override
     public void run() {
         sendDatagram();
@@ -40,6 +36,8 @@ public class WiaReceiveThread implements Runnable {
             myGateway.getDatagramSocket().receive(myGateway.getDatagramReceive());
         } catch (IOException e) {
             log.error("receive datagram timeout", e);
+            //todo 送入待重启状态
+            return;
         }
         byte[] receive = myGateway.getDatagramReceive().getData();
         PackageProcessor processor = new PackageProcessor(receive);
@@ -65,8 +63,16 @@ public class WiaReceiveThread implements Runnable {
         }
     }
 
+    public WiaReceiveThread(MyGateway myGateway) {
+        this.myGateway = myGateway;
+    }
+
+    /**
+     * 向Wia网关设备发送数据推送指令，掉线时可以用于重连
+     */
     public void sendDatagram() {
         try {
+            myGateway.initialized();
             myGateway.getDatagramSocket().send(myGateway.getDatagramSend());
         } catch (IOException e) {
             log.error("send datagram fail", e);
