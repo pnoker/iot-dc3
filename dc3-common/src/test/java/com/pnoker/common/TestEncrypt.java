@@ -2,6 +2,7 @@ package com.pnoker.common;
 
 import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.encryp.Keys;
+import com.pnoker.common.utils.Tools;
 import com.pnoker.common.utils.encryp.AesTools;
 import com.pnoker.common.utils.encryp.RsaTools;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import org.junit.Test;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: AES\RSA 加密算法测试
  */
@@ -55,5 +56,11 @@ public class TestEncrypt {
         log.info("明文:{},密文:{}", plainText, encryptedText);
         String decryptedText = standardPBEStringEncryptor.decrypt(encryptedText);
         log.info("密文:{},明文:{}", encryptedText, decryptedText);
+    }
+
+    @Test
+    public void uuidTest(){
+        String uuid = Tools.uuid();
+        log.info(uuid);
     }
 }

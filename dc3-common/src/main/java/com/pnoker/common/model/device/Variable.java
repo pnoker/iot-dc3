@@ -14,13 +14,25 @@
  *  limitations under the License.
  */
 
-package com.pnoker.device.group.model;
+package com.pnoker.common.model.device;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>@Author    : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description: 设备变量表
+ */
 @Data
-public class Unit {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Variable {
     private long id;
+    private long deviceId;
+    private long unitId;
     private String name;
-    private String symbol;
+    private String code;
 }

@@ -27,7 +27,7 @@ spring:
   data:
     mongodb:
       host: iotdc3.mongo
-      port: 27017
+      port: 27018
       database: iot-dc3
       username: root
       password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
@@ -54,7 +54,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true
   global-config:
     db-config:
-      table-prefix: iot_
+      table-prefix: dc3_
   mapper-locations: classpath*:/mapping
 
 management:

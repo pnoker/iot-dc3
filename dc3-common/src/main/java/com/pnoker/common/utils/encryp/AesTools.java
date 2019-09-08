@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: AES 加密/解密 算法
  */

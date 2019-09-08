@@ -34,7 +34,7 @@ import static java.lang.System.getProperty;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: 启动服务，自动加载自启任务
  */

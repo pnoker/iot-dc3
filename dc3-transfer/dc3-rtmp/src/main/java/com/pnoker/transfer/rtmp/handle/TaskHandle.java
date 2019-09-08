@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: 任务监听线程
  */
