@@ -29,7 +29,7 @@ services:
     image: pnoker/dc3-mongo:3.0
     restart: always
     ports:
-      - 27017:27017
+      - 27018:27017
     container_name: dc3-mongo
     hostname: iotdc3.mongo
     networks:

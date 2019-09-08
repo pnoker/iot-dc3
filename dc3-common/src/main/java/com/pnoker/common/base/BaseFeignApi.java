@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: The class base FeignApi.
  */

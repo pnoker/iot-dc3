@@ -14,22 +14,23 @@
  *  limitations under the License.
  */
 
-package com.pnoker.device.group.model.wia;
+package com.pnoker.common.model.device;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备组 Wia设备表
+ * <p>Description: 设备标签表
  */
 @Data
-public class WiaGateway {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Tag {
     private long id;
-    private String ipAddress;
-    private int port;
-    private int localPort;
-    private boolean ping;
-    private long time;
+    private long groupId;
+    private String name;
 }
