@@ -17,6 +17,8 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Tools;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.handle.TaskHandle;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
@@ -53,14 +55,23 @@ public class TaskRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-
         log.info("Prepare to start rtsp->rtmp thread");
         String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
+        if ("".equals(ffmpeg) || null == ffmpeg) {
+            log.error("FFmpeg path is NULL !");
+            System.exit(1);
+        }
+        if (!Tools.isFile(ffmpeg)) {
+            log.error("{} does not exist", ffmpeg);
+            System.exit(1);
+        }
+
         List<Rtmp> list = rtmpService.getRtmpList();
         for (Rtmp rtmp : list) {
             rtmpService.createTask(rtmp, ffmpeg);
         }
-        new Thread(new TaskHandle()).start();
+        // 启动任务线程
+        Global.threadPoolExecutor.execute(new TaskHandle());
     }
 
 }

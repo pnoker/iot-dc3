@@ -16,7 +16,6 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.pnoker.common.model.rtmp.Rtmp;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public interface RtmpService {
      *
      * @return
      */
-    List<Rtmp> list(String json);
+    List<Rtmp> list();
 
     int insert(Rtmp rtmp);
 }

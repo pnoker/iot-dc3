@@ -19,7 +19,6 @@ package com.pnoker.transfer.rtmp.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.base.Response;
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.common.utils.Tools;
 import com.pnoker.transfer.rtmp.bean.CmdTask;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
@@ -33,6 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>@Author    : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description:
+ */
 @Slf4j
 @Service
 public class RtmpServiceImpl implements RtmpService {
@@ -47,9 +52,9 @@ public class RtmpServiceImpl implements RtmpService {
 
         Map<String, Object> condition = new HashMap<>(2);
         condition.put("auto_start", false);
-        Response response = rtmpFeignApi.list(JSON.toJSONString(condition));
+        Response response = rtmpFeignApi.list();
         if (response.isOk()) {
-            list = (List<Rtmp>) response.getResult();
+            list = JSON.parseArray(response.getResult(), Rtmp.class);
         } else {
             log.error(response.getMessage());
             reconnect();
@@ -62,10 +67,6 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public boolean createTask(Rtmp rtmp, String ffmpeg) {
-        if (!Tools.isFile(ffmpeg)) {
-            log.error("{} does not exist", ffmpeg);
-            return false;
-        }
         String cmd = rtmp.getCommand()
                 .replace("{exe}", ffmpeg)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
@@ -76,8 +77,8 @@ public class RtmpServiceImpl implements RtmpService {
     public void reconnect() {
         // 3 次重连机会
         if (times > Global.CONNECT_MAX_TIMES) {
-            log.info("一共重连 {} 次,退出重连", times);
-            return;
+            log.info("一共重连 {} 次,退出重连,服务停止！", times);
+            System.exit(1);
         }
         log.info("第 {} 次重连", times);
         times++;

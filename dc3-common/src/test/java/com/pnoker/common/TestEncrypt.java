@@ -6,8 +6,6 @@ import com.pnoker.common.utils.Tools;
 import com.pnoker.common.utils.encryp.AesTools;
 import com.pnoker.common.utils.encryp.RsaTools;
 import lombok.extern.slf4j.Slf4j;
-import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
-import org.jasypt.encryption.pbe.config.EnvironmentPBEConfig;
 import org.junit.Test;
 
 /**
@@ -41,21 +39,6 @@ public class TestEncrypt {
         log.info("ens : {}", ens);
         String des = RsaTools.decrypt(ens, rsa.getPrivateKey());
         log.info("des : {}", des);
-    }
-
-    @Test
-    public void jasyptTest() {
-        StandardPBEStringEncryptor standardPBEStringEncryptor = new StandardPBEStringEncryptor();
-        EnvironmentPBEConfig config = new EnvironmentPBEConfig();
-
-        config.setAlgorithm("PBEWithMD5AndDES");          // 加密的算法，这个算法是默认的
-        config.setPassword("M82tHF1EjfWpnXzG");                        // 加密的密钥
-        standardPBEStringEncryptor.setConfig(config);
-        String plainText = "iotdc3";
-        String encryptedText = standardPBEStringEncryptor.encrypt(plainText);
-        log.info("明文:{},密文:{}", plainText, encryptedText);
-        String decryptedText = standardPBEStringEncryptor.decrypt(encryptedText);
-        log.info("密文:{},明文:{}", encryptedText, decryptedText);
     }
 
     @Test

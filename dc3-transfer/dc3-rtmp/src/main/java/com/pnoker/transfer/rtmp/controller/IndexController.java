@@ -16,6 +16,7 @@
 
 package com.pnoker.transfer.rtmp.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.bean.base.Response;
 import com.pnoker.common.model.rtmp.Rtmp;
@@ -66,8 +67,8 @@ public class IndexController extends BaseController {
     public List<Rtmp> list() {
         Map<String, Object> condition = new HashMap<>(2);
         condition.put("auto_start", false);
-        Response response = rtmpFeignApi.list("{}");
-        List<Rtmp> list = (List<Rtmp>) response.getResult();
+        Response response = rtmpFeignApi.list();
+        List<Rtmp> list = JSON.parseArray(response.getResult(), Rtmp.class);
         return list;
     }
 

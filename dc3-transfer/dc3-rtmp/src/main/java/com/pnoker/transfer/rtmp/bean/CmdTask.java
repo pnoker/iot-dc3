@@ -17,6 +17,7 @@
 package com.pnoker.transfer.rtmp.bean;
 
 import com.pnoker.common.utils.Tools;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.handle.OutputHandle;
 import lombok.Data;
 
@@ -67,6 +68,6 @@ public class CmdTask {
         Runtime runtime = Runtime.getRuntime();
         process = runtime.exec(command);
         outputHandle = new OutputHandle(id, process);
-        new Thread(outputHandle).start();
+        Global.threadPoolExecutor.execute(outputHandle);
     }
 }
