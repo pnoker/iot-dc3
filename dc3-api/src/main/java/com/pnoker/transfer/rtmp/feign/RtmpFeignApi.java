@@ -16,11 +16,14 @@
 
 package com.pnoker.transfer.rtmp.feign;
 
-import com.pnoker.common.base.BaseFeignApi;
+import com.pnoker.common.bean.base.Response;
 import com.pnoker.security.FeignSecurityConfigurer;
 import com.pnoker.transfer.rtmp.hystrix.RtmpFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -30,5 +33,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @RequestMapping("/rtmp")
 @FeignClient(name = "DC3-DBS", fallbackFactory = RtmpFeignApiHystrix.class, configuration = FeignSecurityConfigurer.class)
-public interface RtmpFeignApi extends BaseFeignApi {
+public interface RtmpFeignApi {
+    /**
+     * List 查询全部操作
+     *
+     * @return
+     */
+    @GetMapping("/list")
+    Response list();
+
+    /**
+     * Count 数据统计操作
+     *
+     * @return
+     */
+    @GetMapping("/count")
+    Response count();
+
+    /**
+     * Delete 删除操作
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delete")
+    Response delete(@RequestParam(value = "id") String id);
 }

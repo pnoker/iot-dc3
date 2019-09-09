@@ -60,7 +60,7 @@ public class OutputHandle implements Runnable {
         String line;
         try {
             while (null != (line = reader.readLine()) && status) {
-                //log.info(line);
+                log.info(line);
                 handle(line.toLowerCase());
             }
         } catch (IOException e) {

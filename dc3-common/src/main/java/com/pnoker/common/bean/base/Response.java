@@ -16,6 +16,7 @@
 
 package com.pnoker.common.bean.base;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,10 +32,10 @@ public class Response {
     private boolean ok;
     private String message;
     private long time = System.currentTimeMillis();
-    private Object result = null;
+    private String result = null;
 
     public Response(Object result) {
-        this.result = result;
+        this.result = JSON.toJSONString(result);
     }
 
     /**

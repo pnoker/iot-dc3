@@ -14,23 +14,8 @@
  *  limitations under the License.
  */
 
-package com.pnoker.common.model.device;
+package com.pnoker.center.dbs.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public interface TagBindService {
 
-/**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备组织表
- */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Organization {
-    private long id;
-    private String name;
-    private long imageId;
 }

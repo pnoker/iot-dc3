@@ -38,24 +38,18 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
         log.error("RtmpFeignApi,进入熔断:{}", message, throwable);
 
         return new RtmpFeignApi() {
-
             @Override
-            public Response add(String json) {
+            public Response list() {
                 return fail(throwable);
             }
 
             @Override
-            public Response delete(String json) {
+            public Response count() {
                 return fail(throwable);
             }
 
             @Override
-            public Response update(String json) {
-                return fail(throwable);
-            }
-
-            @Override
-            public Response list(String json) {
+            public Response delete(String id) {
                 return fail(throwable);
             }
         };

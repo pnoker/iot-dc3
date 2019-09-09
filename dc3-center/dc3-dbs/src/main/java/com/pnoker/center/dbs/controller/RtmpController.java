@@ -20,7 +20,6 @@ import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.bean.base.Response;
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.common.utils.Tools;
 import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,30 +41,18 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
     private RtmpService rtmpService;
 
     @Override
-    public Response add(String json) {
+    public Response delete(String id) {
         return ok();
     }
 
     @Override
-    public Response delete(String json) {
+    public Response count() {
         return ok();
     }
 
     @Override
-    public Response update(String json) {
-        return ok();
-    }
-
-    @Override
-    public Response list(String json) {
-        //进行数据校验
-        if (null == json || "".equals(json)) {
-            json = "{}";
-        }
-        if (!Tools.isJson(json)) {
-            return fail("Not Json Format");
-        }
-        List<Rtmp> list = rtmpService.list(json);
+    public Response list() {
+        List<Rtmp> list = rtmpService.list();
         return ok(list);
     }
 

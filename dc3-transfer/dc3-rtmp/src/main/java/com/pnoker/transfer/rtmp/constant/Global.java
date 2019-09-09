@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Global {
     //重连时间间隔 & 最大重连次数
     public static int CONNECT_INTERVAL = 1000 * 5;
-    public static int CONNECT_MAX_TIMES = 3;
+    public static int CONNECT_MAX_TIMES = 10;
 
     //记录Task信息
     public static int MAX_TASK_SIZE = 32;
@@ -62,14 +62,14 @@ public class Global {
     public static TimeUnit unit = TimeUnit.SECONDS;
 
     /**
-     * 用于缓存 wia 数据采集线程
+     * 用于缓存 Cmd任务 线程
      */
-    public static LinkedBlockingQueue<Runnable> wiaReceiveThreadQueue = new LinkedBlockingQueue(64);
+    public static LinkedBlockingQueue<Runnable> linkedBlockingQueue = new LinkedBlockingQueue(64);
 
     /**
-     * 数据采集线程池，用于全部数采线程使用
+     * Cmd任务线程池，用于全部任务线程使用
      */
-    public static ThreadPoolExecutor receivePoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, wiaReceiveThreadQueue, new ReceiveTreadFactory(), new IgnorePolicy());
+    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, linkedBlockingQueue, new ReceiveTreadFactory(), new IgnorePolicy());
 
     static class ReceiveTreadFactory implements ThreadFactory {
         private final AtomicInteger mThreadNum = new AtomicInteger(1);

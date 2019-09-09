@@ -16,11 +16,13 @@
 
 package com.pnoker.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Charsets;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.util.Base64;
 import java.util.UUID;
@@ -179,13 +181,13 @@ public class Tools {
     }
 
     /**
-     * 正则判断
+     * 自定义正则判断
      *
      * @param str
      * @param regex
      * @return
      */
-    private static boolean pattern(String str, String regex) {
+    public static boolean pattern(String str, String regex) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         return matcher.matches();

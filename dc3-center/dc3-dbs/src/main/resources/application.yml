@@ -11,13 +11,13 @@ spring:
   security:
     user:
       name: iotdc3
-      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+      password: iotdc3
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
-    password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+    password: iotdc3
     sql-script-encoding: utf-8
     hikari:
       pool-name: iot-dc3-dbs-hikaricp
@@ -30,11 +30,11 @@ spring:
       port: 27018
       database: iot-dc3
       username: root
-      password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+      password: iotdc3
   redis:
     host: iotdc3.redis
     port: 6379
-    password: ENC(egd+8ZV2DzqcWqv6IC7YxA==) #iotdc3
+    password: iotdc3
     database: 1
     timeout: 60s
     jedis:
@@ -65,15 +65,6 @@ management:
   endpoint:
     health:
       show-details: ALWAYS
-
-jasypt:
-  encryptor:
-    password: M82tHF1EjfWpnXzG
-    poolSize: 1
-    algorithm: PBEWithMD5AndDES
-    stringOutputType: base64
-    keyObtentionIterations: 1000
-    saltGeneratorClassname: org.jasypt.salt.RandomSaltGenerator
 
 feign:
   hystrix:
