@@ -83,7 +83,6 @@
         <mybatis.plus.version>3.1.2</mybatis.plus.version>
 
         <jna.version>5.3.1</jna.version>
-        <jasypt.version>2.1.0</jasypt.version>
         <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
         <jackson.modules>2.9.8</jackson.modules>

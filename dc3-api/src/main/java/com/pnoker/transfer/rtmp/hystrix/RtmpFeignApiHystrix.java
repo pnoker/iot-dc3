@@ -56,6 +56,6 @@ public class RtmpFeignApiHystrix implements FallbackFactory<RtmpFeignApi> {
     }
 
     public Response fail(Throwable throwable) {
-        return new Response().fail(throwable.getMessage());
+        return new Response().failure(throwable.getMessage());
     }
 }
