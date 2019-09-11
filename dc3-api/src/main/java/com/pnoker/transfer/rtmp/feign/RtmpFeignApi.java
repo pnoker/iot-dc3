@@ -17,6 +17,7 @@
 package com.pnoker.transfer.rtmp.feign;
 
 import com.pnoker.common.bean.base.Response;
+import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.security.FeignSecurityConfigurer;
 import com.pnoker.transfer.rtmp.hystrix.RtmpFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -40,7 +43,7 @@ public interface RtmpFeignApi {
      * @return
      */
     @GetMapping("/list")
-    Response list();
+    Response<List<Rtmp>> list();
 
     /**
      * Count 数据统计操作

@@ -16,9 +16,11 @@
 
 package com.pnoker.common.bean.base;
 
-import com.alibaba.fastjson.JSON;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -28,14 +30,96 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class Response {
+@AllArgsConstructor
+public class Response<T> implements Serializable {
     private boolean ok;
     private String message;
     private long time = System.currentTimeMillis();
-    private String result = null;
+    private T data;
 
-    public Response(Object result) {
-        this.result = JSON.toJSONString(result);
+    /**
+     * 成功
+     *
+     * @return
+     */
+    public static <T> Response<T> ok() {
+        return new Response().success();
+    }
+
+    /**
+     * 成功 自定义提示信息
+     *
+     * @return
+     */
+    public static <T> Response<T> ok(String message) {
+        return new Response().success(message);
+    }
+
+    /**
+     * 成功 返回结果
+     *
+     * @param data 返回结果
+     * @return
+     */
+    public static <T> Response<T> ok(T data) {
+        return new Response(data).success();
+    }
+
+    /**
+     * 成功 返回结果 & 自定义提示信息
+     *
+     * @param data 返回结果
+     * @return
+     */
+    public static <T> Response<T> ok(T data, String message) {
+        return new Response(data).success(message);
+    }
+
+    /**
+     * 失败
+     *
+     * @return
+     */
+    public static <T> Response<T> fail() {
+        return new Response().failure();
+    }
+
+    /**
+     * 失败 自定义提示信息
+     *
+     * @return
+     */
+    public static <T> Response<T> fail(String message) {
+        return new Response().failure(message);
+    }
+
+    /**
+     * 失败 返回结果
+     *
+     * @param data 返回结果
+     * @return
+     */
+    public static <T> Response<T> fail(T data) {
+        return new Response(data).failure();
+    }
+
+    /**
+     * 失败 返回结果 & 自定义提示信息
+     *
+     * @param data 返回结果
+     * @return
+     */
+    public static <T> Response<T> fail(T data, String message) {
+        return new Response(data).failure(message);
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param data
+     */
+    public Response(T data) {
+        this.data = data;
     }
 
     /**
@@ -43,7 +127,7 @@ public class Response {
      *
      * @return
      */
-    public Response ok() {
+    public Response success() {
         this.ok = true;
         this.message = "Ok,Request Succeeded!";
         return this;
@@ -55,7 +139,7 @@ public class Response {
      * @param message
      * @return
      */
-    public Response ok(String message) {
+    public Response success(String message) {
         this.ok = true;
         this.message = message;
         return this;
@@ -66,7 +150,7 @@ public class Response {
      *
      * @return
      */
-    public Response fail() {
+    public Response failure() {
         this.ok = false;
         this.message = "Sorry,Request Failed!";
         return this;
@@ -78,7 +162,7 @@ public class Response {
      * @param message
      * @return
      */
-    public Response fail(String message) {
+    public Response failure(String message) {
         this.ok = false;
         this.message = message;
         return this;

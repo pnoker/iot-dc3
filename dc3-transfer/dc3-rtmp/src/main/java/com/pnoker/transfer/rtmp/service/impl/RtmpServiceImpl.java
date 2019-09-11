@@ -16,7 +16,6 @@
 
 package com.pnoker.transfer.rtmp.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.base.Response;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.bean.CmdTask;
@@ -41,28 +40,22 @@ import java.util.Map;
 @Slf4j
 @Service
 public class RtmpServiceImpl implements RtmpService {
-    private volatile int times = 0;
+    private volatile int times = 1;
 
     @Autowired
     private RtmpFeignApi rtmpFeignApi;
 
     @Override
     public List<Rtmp> getRtmpList() {
-        List<Rtmp> list = null;
-
         Map<String, Object> condition = new HashMap<>(2);
         condition.put("auto_start", false);
-        Response response = rtmpFeignApi.list();
-        if (response.isOk()) {
-            list = JSON.parseArray(response.getResult(), Rtmp.class);
-        } else {
+        Response<List<Rtmp>> response = rtmpFeignApi.list();
+        if (!response.isOk()) {
             log.error(response.getMessage());
             reconnect();
         }
-        if (null == list) {
-            list = new ArrayList<>();
-        }
-        return list;
+        List<Rtmp> list = response.getData();
+        return list != null ? list : new ArrayList<>();
     }
 
     @Override
@@ -75,7 +68,7 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     public void reconnect() {
-        // 3 次重连机会
+        // N 次重连机会
         if (times > Global.CONNECT_MAX_TIMES) {
             log.info("一共重连 {} 次,退出重连,服务停止！", times);
             System.exit(1);

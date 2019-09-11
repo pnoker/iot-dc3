@@ -42,18 +42,18 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
 
     @Override
     public Response delete(String id) {
-        return ok();
+        return Response.ok();
     }
 
     @Override
     public Response count() {
-        return ok();
+        return Response.ok();
     }
 
     @Override
-    public Response list() {
+    public Response<List<Rtmp>> list() {
         List<Rtmp> list = rtmpService.list();
-        return ok(list);
+        return Response.ok(list);
     }
 
     @RequestMapping("/insert")
@@ -65,6 +65,6 @@ public class RtmpController extends BaseController implements RtmpFeignApi {
                 log.info("完成：{},{}%", i, i / 1000000 * 10);
             }
         }
-        return ok();
+        return Response.ok();
     }
 }
