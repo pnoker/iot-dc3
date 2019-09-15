@@ -16,14 +16,13 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.model.domain.rtmp.Rtmp;
 
 import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Rtmp 服务接口
  */
@@ -33,7 +32,7 @@ public interface RtmpService {
      *
      * @return
      */
-    List<Rtmp> list(String json);
+    List<Rtmp> list();
 
     int insert(Rtmp rtmp);
 }

@@ -104,7 +104,7 @@ public class WiaReceive implements ApplicationRunner {
         queryWrapper.eq("device_id", deviceId);
         List<WiaVariable> list = wiaVariableService.list(queryWrapper);
         list.forEach(wiaVariable -> myHartVariableList.add(
-                new MyHartVariable(wiaVariable.getId(), wiaVariable.getStart(), wiaVariable.getEnd(), wiaVariable.getType())
+                new MyHartVariable(wiaVariable.getId(), wiaVariable.getStartIndex(), wiaVariable.getEndIndex(), wiaVariable.getParseType())
         ));
         return myHartVariableList;
     }

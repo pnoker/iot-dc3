@@ -16,7 +16,6 @@
 
 package com.pnoker.common.base;
 
-import com.pnoker.common.bean.base.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -27,7 +26,7 @@ import java.net.URLDecoder;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: The class Base controller.
  */
@@ -49,88 +48,12 @@ public class BaseController {
      * @return
      */
     public String getResourcePath(String resource) {
-        String path = BaseController.class.getResource("/").getPath();
+        String path = this.getClass().getResource("/").getPath();
         try {
             path = URLDecoder.decode(path, "UTF-8") + resource;
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage(), e);
         }
         return path;
-    }
-
-    /**
-     * 成功
-     *
-     * @return
-     */
-    public Response ok() {
-        return new Response().ok();
-    }
-
-    /**
-     * 成功 自定义提示信息
-     *
-     * @return
-     */
-    public Response ok(String message) {
-        return new Response().ok(message);
-    }
-
-    /**
-     * 成功 返回结果
-     *
-     * @param object 返回结果
-     * @return
-     */
-    public Response ok(Object object) {
-        return new Response(object).ok();
-    }
-
-    /**
-     * 成功 返回结果 & 自定义提示信息
-     *
-     * @param object 返回结果
-     * @return
-     */
-    public Response ok(Object object, String message) {
-        return new Response(object).ok(message);
-    }
-
-    /**
-     * 失败
-     *
-     * @return
-     */
-    public Response fail() {
-        return new Response().fail();
-    }
-
-    /**
-     * 失败 自定义提示信息
-     *
-     * @return
-     */
-    public Response fail(String message) {
-        return new Response().fail(message);
-    }
-
-    /**
-     * 失败 返回结果
-     *
-     * @param object 返回结果
-     * @return
-     */
-    public Response fail(Object object) {
-        return new Response(object).fail();
-    }
-
-    /**
-     * 失败 返回结果 & 自定义提示信息
-     *
-     * @param object 返回结果
-     * @return
-     */
-    public Response fail(Object object, String message) {
-        return new Response(object).fail(message);
     }
 }

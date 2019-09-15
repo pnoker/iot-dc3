@@ -1,17 +1,16 @@
 package com.pnoker.common;
 
 import com.alibaba.fastjson.JSON;
-import com.pnoker.common.bean.encryp.Keys;
-import com.pnoker.common.utils.encryp.AesTools;
-import com.pnoker.common.utils.encryp.RsaTools;
+import com.pnoker.common.model.dto.Keys;
+import com.pnoker.common.utils.Tools;
+import com.pnoker.common.utils.AesTools;
+import com.pnoker.common.utils.RsaTools;
 import lombok.extern.slf4j.Slf4j;
-import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
-import org.jasypt.encryption.pbe.config.EnvironmentPBEConfig;
 import org.junit.Test;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: AES\RSA 加密算法测试
  */
@@ -43,17 +42,8 @@ public class TestEncrypt {
     }
 
     @Test
-    public void jasyptTest() {
-        StandardPBEStringEncryptor standardPBEStringEncryptor = new StandardPBEStringEncryptor();
-        EnvironmentPBEConfig config = new EnvironmentPBEConfig();
-
-        config.setAlgorithm("PBEWithMD5AndDES");          // 加密的算法，这个算法是默认的
-        config.setPassword("M82tHF1EjfWpnXzG");                        // 加密的密钥
-        standardPBEStringEncryptor.setConfig(config);
-        String plainText = "iotdc3";
-        String encryptedText = standardPBEStringEncryptor.encrypt(plainText);
-        log.info("明文:{},密文:{}", plainText, encryptedText);
-        String decryptedText = standardPBEStringEncryptor.decrypt(encryptedText);
-        log.info("密文:{},明文:{}", encryptedText, decryptedText);
+    public void uuidTest(){
+        String uuid = Tools.uuid();
+        log.info(uuid);
     }
 }

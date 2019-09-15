@@ -17,7 +17,7 @@
 package com.pnoker.transfer.opc.controller;
 
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.bean.base.Response;
+import com.pnoker.common.model.dto.Response;
 import com.pnoker.transfer.opc.bean.OpcInfo;
 import com.pnoker.transfer.opc.bean.OpcServer;
 import com.pnoker.transfer.opc.service.OpcService;
@@ -42,10 +42,10 @@ public class OpcController extends BaseController {
         switch (type) {
             case "server":
                 try {
-                    return ok(opcService.opcServerList(info));
+                    return Response.ok(opcService.opcServerList(info));
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    return fail(e.getMessage());
+                    return Response.fail(e.getMessage());
                 }
             case "item":
                 try {
@@ -53,16 +53,16 @@ public class OpcController extends BaseController {
                     for (OpcServer opcServer : opcServerList) {
                         if (opcServer.getClsId().equals(info.getClsId())) {
                             info.setProgId(opcServer.getProgId());
-                            return ok(opcService.opcItemList(info));
+                            return Response.ok(opcService.opcItemList(info));
                         }
                     }
-                    return fail(String.format("No such Opc Server with this clsid (%s)", info.getClsId()));
+                    return Response.fail(String.format("No such Opc Server with this clsid (%s)", info.getClsId()));
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
-                    return fail(e.getMessage());
+                    return Response.fail(e.getMessage());
                 }
             default:
-                return fail("This type is not supported");
+                return Response.fail("This type is not supported");
         }
     }
 
@@ -73,11 +73,11 @@ public class OpcController extends BaseController {
         listA.retainAll(listB);
         switch (type) {
             case "node":
-                return ok();
+                return Response.ok();
             case "nodes":
-                return ok();
+                return Response.ok();
             default:
-                return fail("This node is not existent");
+                return Response.fail("This node is not existent");
         }
     }
 }

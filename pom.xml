@@ -83,12 +83,11 @@
         <mybatis.plus.version>3.1.2</mybatis.plus.version>
 
         <jna.version>5.3.1</jna.version>
-        <jasypt.version>2.1.0</jasypt.version>
         <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
         <jackson.modules>2.9.8</jackson.modules>
         <netty.version>4.1.36.Final</netty.version>
-        <fastjson.version>1.2.58</fastjson.version>
+        <fastjson.version>1.2.60</fastjson.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
         <commons.cli.version>1.4</commons.cli.version>
         <commons.lang3.version>3.9</commons.lang3.version>
@@ -129,11 +128,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>${jasypt.version}</version>
         </dependency>
 
         <!-- FastJson -->
