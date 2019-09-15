@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.pnoker.security.FeignSecurityConfigurer
+  com.pnoker.security.BaseAuthConfigurer

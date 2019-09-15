@@ -16,7 +16,7 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.model.domain.rtmp.Rtmp;
 
 import java.util.List;
 

@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.common.model.domain.rtmp;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 数据库操作接口
+ * <p>Description: Rtmp 信息实体类
  */
-@Mapper
-@Component
-public interface RtmpMapper extends BaseMapper<Rtmp> {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Rtmp {
+    private long id;
+    private String rtspUrl;
+    private String rtmpUrl;
+    private String command;
+    private short videoType;
+    private boolean autoStart;
+
+    public Rtmp(long id) {
+        this.id = id;
+    }
 }

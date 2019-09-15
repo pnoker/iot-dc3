@@ -16,12 +16,19 @@
 
 package com.pnoker.transfer.rtmp.service;
 
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.model.domain.rtmp.Rtmp;
 
 import java.util.List;
 
 public interface RtmpService {
+    /**
+     * 获取 Rtmp 列表
+     *
+     * @return
+     */
     List<Rtmp> getRtmpList();
 
-    boolean createTask(Rtmp rtmp,String ffmpeg);
+    boolean createCmdTask(Rtmp rtmp);
+
+    boolean stopCmdTask(String id);
 }

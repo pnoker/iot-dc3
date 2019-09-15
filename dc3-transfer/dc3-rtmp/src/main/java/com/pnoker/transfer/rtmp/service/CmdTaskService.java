@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.transfer.rtmp.service;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
+import com.pnoker.transfer.rtmp.model.constant.Global;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 数据库操作接口
+ * <p>Description: 任务监听线程服务，从队列中取Cmd任务进行执行
  */
-@Mapper
-@Component
-public interface RtmpMapper extends BaseMapper<Rtmp> {
+@Slf4j
+public class CmdTaskService implements Runnable {
+    @Override
+    public void run() {
+        log.info("启动 rtsp->rtmp 监听线程");
+        while (true) {
+            try {
+                String taskId = Global.cmdTaskIdQueue.take();
+                Global.taskMap.get(taskId).start();
+                Thread.sleep(1000 * 5);
+            } catch (InterruptedException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
+
 }
