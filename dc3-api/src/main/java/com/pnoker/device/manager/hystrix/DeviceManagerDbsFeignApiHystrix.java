@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.device.manager.hystrix;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import org.apache.ibatis.annotations.Mapper;
+import com.pnoker.device.manager.feign.DeviceManagerDbsFeignApi;
+import feign.hystrix.FallbackFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 数据库操作接口
+ * <p>Description:
  */
-@Mapper
+@Slf4j
 @Component
-public interface RtmpMapper extends BaseMapper<Rtmp> {
+public class DeviceManagerDbsFeignApiHystrix implements FallbackFactory<DeviceManagerDbsFeignApi> {
+
+    @Override
+    public DeviceManagerDbsFeignApi create(Throwable throwable) {
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
+        log.error("DeviceManagerFeignApi,进入熔断:{}", message, throwable);
+        return new DeviceManagerDbsFeignApi() {
+        };
+    }
 }

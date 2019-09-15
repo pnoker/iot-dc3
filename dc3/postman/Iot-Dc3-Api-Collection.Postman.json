@@ -110,15 +110,48 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8300/v3/rtmp/list",
+							"raw": "localhost:8300/rtmp/list",
 							"host": [
 								"localhost"
 							],
 							"port": "8300",
 							"path": [
-								"v3",
 								"rtmp",
 								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dbs:/rtmp/insert",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8300/rtmp/insert",
+							"host": [
+								"localhost"
+							],
+							"port": "8300",
+							"path": [
+								"rtmp",
+								"insert"
 							]
 						}
 					},
@@ -151,6 +184,29 @@
 		},
 		{
 			"name": "Iot-Dc3-Group",
+			"item": [
+				{
+					"name": "group:/list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8700/list",
+							"host": [
+								"localhost"
+							],
+							"port": "8700",
+							"path": [
+								"list"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Iot-Dc3-Rtmp-Api",
 			"item": []
 		}
 	]

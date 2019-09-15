@@ -17,20 +17,21 @@
 package com.pnoker.transfer.rtmp.controller;
 
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.bean.base.Response;
-import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.transfer.rtmp.bean.CmdBuilder;
-import com.pnoker.transfer.rtmp.bean.CmdTask;
-import com.pnoker.transfer.rtmp.constant.Global;
-import com.pnoker.transfer.rtmp.feign.RtmpFeignApi;
+import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.common.model.dto.Response;
+import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
+import com.pnoker.transfer.rtmp.model.constant.Global;
+import com.pnoker.transfer.rtmp.model.dto.CmdTask;
+import com.pnoker.transfer.rtmp.model.vo.RtmpVo;
+import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -40,34 +41,62 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
+@RequestMapping("/api/v3/rtmp")
 public class IndexController extends BaseController {
     @Autowired
-    private RtmpFeignApi rtmpFeignApi;
+    private RtmpDbsFeignApi rtmpDbsFeignApi;
+    @Autowired
+    private RtmpService rtmpService;
 
-    @GetMapping("/test")
-    public String hello() {
-        CmdBuilder cmdBuilder = new CmdBuilder("D:/Documents/FFmpeg/bin/");
-        cmdBuilder.create("ffmpeg")
-                .add("-i", "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov")
-                .add("-vcodec", "copy")
-                .add("-acodec", "copy")
-                .add("-f", "flv")
-                .add("-y", "rtmp://114.116.9.76:1935/rtmp/bigbuckbunny_175k").build();
-        CmdTask cmdTask = new CmdTask(cmdBuilder.getCmd());
-        try {
-            Global.cmdTaskQueue.put(cmdTask);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
+    @PostMapping("/add")
+    public Response add(@RequestBody RtmpVo rtmpVo) {
+        Rtmp rtmp = new Rtmp();
+        BeanUtils.copyProperties(rtmpVo, rtmp);
+        boolean result = rtmpService.createCmdTask(rtmp);
+
+        if (result) {
+            return Response.ok();
+        } else {
+            return Response.fail();
         }
-        return "ok";
+    }
+
+    @DeleteMapping("/delete")
+    public Response delete(String id) {
+        CmdTask cmdTask = Global.taskMap.get(id);
+        boolean result = cmdTask.stop();
+        cmdTask.clear();
+        Global.taskMap.remove(id);
+
+        if (result) {
+            return Response.ok();
+        } else {
+            return Response.fail();
+        }
     }
 
     @GetMapping("/list")
-    public List<Rtmp> list() {
-        Map<String, Object> condition = new HashMap<>(2);
-        condition.put("auto_start", false);
-        Response<List<Rtmp>> response = rtmpFeignApi.list();
-        return response.getData();
+    public Response<List<CmdTask>> list() {
+        List<CmdTask> list;
+        Collection<CmdTask> collection = Global.taskMap.values();
+        if (collection instanceof List) {
+            list = (List) collection;
+        } else {
+            list = new ArrayList(collection);
+        }
+        return Response.ok(list);
+    }
+
+    @PostMapping("/stop")
+    public Response stop(String id) {
+        CmdTask cmdTask = Global.taskMap.get(id);
+        boolean result = cmdTask.stop();
+
+        if (result) {
+            return Response.ok();
+        } else {
+            return Response.fail();
+        }
     }
 
 }

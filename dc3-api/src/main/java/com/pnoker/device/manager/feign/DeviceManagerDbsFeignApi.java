@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.device.manager.feign;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
+import com.pnoker.device.manager.hystrix.DeviceManagerDbsFeignApiHystrix;
+import com.pnoker.security.BaseAuthConfigurer;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 数据库操作接口
+ * <p>Description:
  */
-@Mapper
-@Component
-public interface RtmpMapper extends BaseMapper<Rtmp> {
+@FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
+@RequestMapping("/api/v3/device/manager")
+public interface DeviceManagerDbsFeignApi {
+
 }

@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.service.impl;
+package com.pnoker.transfer.rtmp.runner;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.pnoker.center.dbs.mapper.RtmpMapper;
-import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.transfer.rtmp.model.constant.Global;
+import com.pnoker.transfer.rtmp.service.CmdTaskService;
+import com.pnoker.transfer.rtmp.service.RtmpService;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -31,24 +34,26 @@ import java.util.List;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 接口实现
+ * <p>Description: 启动服务，自动加载自启任务
  */
 @Slf4j
-@Service
-public class RtmpServiceImpl implements RtmpService {
+@Setter
+@Order(1)
+@Component
+public class CmdTaskRunner implements ApplicationRunner {
     @Autowired
-    private RtmpMapper rtmpMapper;
+    private RtmpService rtmpService;
 
     @Override
-    //@Cacheable(cacheNames = "rtmps", key = "rtmps-all")
-    public List<Rtmp> list() {
-        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        return rtmpMapper.selectList(queryWrapper);
+    public void run(ApplicationArguments args) {
+        List<Rtmp> list = rtmpService.getRtmpList();
+        for (Rtmp rtmp : list) {
+            if (rtmp.isAutoStart()) {
+                rtmpService.createCmdTask(rtmp);
+            }
+        }
+        // 启动任务线程
+        Global.threadPoolExecutor.execute(new CmdTaskService());
     }
 
-    @Override
-    @Cacheable(cacheNames = "rtmp", key = "#rtmp.id")
-    public int insert(Rtmp rtmp) {
-        return rtmpMapper.insert(rtmp);
-    }
 }

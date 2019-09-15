@@ -17,7 +17,7 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.device.OrgBind;
+import com.pnoker.common.model.domain.device.OrgBind;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 

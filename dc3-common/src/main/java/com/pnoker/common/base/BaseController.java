@@ -16,7 +16,6 @@
 
 package com.pnoker.common.base;
 
-import com.pnoker.common.bean.base.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -49,7 +48,7 @@ public class BaseController {
      * @return
      */
     public String getResourcePath(String resource) {
-        String path = BaseController.class.getResource("/").getPath();
+        String path = this.getClass().getResource("/").getPath();
         try {
             path = URLDecoder.decode(path, "UTF-8") + resource;
         } catch (UnsupportedEncodingException e) {

@@ -17,7 +17,7 @@
 package com.pnoker.transfer.opc.controller;
 
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.bean.base.Response;
+import com.pnoker.common.model.dto.Response;
 import com.pnoker.transfer.opc.bean.OpcInfo;
 import com.pnoker.transfer.opc.bean.OpcServer;
 import com.pnoker.transfer.opc.service.OpcService;

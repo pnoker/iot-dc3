@@ -14,20 +14,23 @@
  *  limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.common.model.domain.device;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.device.Unit;
-import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Unit 单位表 数据库操作接口
+ * <p>Description: 设备标签关系表
  */
-@Mapper
-@Component
-public interface UnitMapper extends BaseMapper<Unit> {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TagBind {
+    private long id;
+    private long tagId;
+    private long deviceId;
 }
