@@ -24,6 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>@Author    : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description: Wia Gateway信息
+ */
 @Data
 @Slf4j
 public class MyGateway {
@@ -53,11 +59,12 @@ public class MyGateway {
     }
 
     public void initialized() {
+        log.info("Initializing myGateway [id:{},ipAddress:{},port:{},localPort:{}]", id, ipAddress, port, localPort);
         try {
             this.datagramSend = new DatagramPacket(sendCode, sendCode.length, InetAddress.getByName(ipAddress), port);
             this.datagramReceive = new DatagramPacket(buff, 1024);
             this.datagramSocket = new DatagramSocket(localPort);
-            this.datagramSocket.setSoTimeout(1000 * 60 * 3);
+            this.datagramSocket.setSoTimeout(1000 * 5);
         } catch (SocketException e) {
             log.error("init datagram socket fail", e);
         } catch (UnknownHostException e) {

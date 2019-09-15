@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 
 /**
  * <p>Copyright(c) 2018. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: API 版本控制注解
  */

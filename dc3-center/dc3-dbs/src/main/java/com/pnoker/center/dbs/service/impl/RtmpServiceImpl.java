@@ -16,22 +16,20 @@
 
 package com.pnoker.center.dbs.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.model.domain.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>Author     : Pnoker
+ * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Rtmp 接口实现
  */
@@ -42,13 +40,9 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
-    @Cacheable(cacheNames = "rtmps", key = "#json")
-    public List<Rtmp> list(String json) {
-        Map<String, Object> condition = JSON.parseObject(json, Map.class);
+    //@Cacheable(cacheNames = "rtmps", key = "rtmps-all")
+    public List<Rtmp> list() {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        for (Map.Entry<String, Object> entry : condition.entrySet()) {
-            queryWrapper.eq(entry.getKey(), entry.getValue());
-        }
         return rtmpMapper.selectList(queryWrapper);
     }
 

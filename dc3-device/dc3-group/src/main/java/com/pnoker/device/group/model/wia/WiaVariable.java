@@ -18,14 +18,20 @@ package com.pnoker.device.group.model.wia;
 
 import lombok.Data;
 
+/**
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>@Author    : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description: 设备组 Wia设备变量表
+ */
 @Data
 public class WiaVariable {
     private long id;
     private long deviceId;
-    private long unitId;
     private String name;
-    private int start;
-    private int end;
-    private String type;
-    private float ratio;
+    private String code;
+    private int startIndex;
+    private int endIndex;
+    private String parseType;
+    private long unitId;
 }
