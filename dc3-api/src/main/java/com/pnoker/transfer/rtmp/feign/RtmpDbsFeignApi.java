@@ -21,10 +21,7 @@ import com.pnoker.common.model.dto.Response;
 import com.pnoker.security.BaseAuthConfigurer;
 import com.pnoker.transfer.rtmp.hystrix.RtmpDbsFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,24 +31,16 @@ import java.util.List;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
 @RequestMapping(value = "/api/v3/dbs/rtmp")
+@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
 public interface RtmpDbsFeignApi {
     /**
-     * List 查询全部操作
+     * Add 新增操作
      *
      * @return
      */
-    @GetMapping("/list")
-    Response<List<Rtmp>> list();
-
-    /**
-     * Count 数据统计操作
-     *
-     * @return
-     */
-    @GetMapping("/count")
-    Response count();
+    @PostMapping("/add")
+    Response<Boolean> add(@RequestBody Rtmp rtmp);
 
     /**
      * Delete 删除操作
@@ -60,5 +49,22 @@ public interface RtmpDbsFeignApi {
      * @return
      */
     @DeleteMapping("/delete")
-    Response delete(@RequestParam(value = "id") String id);
+    Response<Boolean> delete(@RequestParam(value = "id") String id);
+
+    /**
+     * Update 新增操作
+     *
+     * @return
+     */
+    @PutMapping("/update")
+    Response<Boolean> update(@RequestBody Rtmp rtmp);
+
+    /**
+     * List 查询全部操作
+     *
+     * @return
+     */
+    @GetMapping("/list")
+    Response<List<Rtmp>> list();
+
 }

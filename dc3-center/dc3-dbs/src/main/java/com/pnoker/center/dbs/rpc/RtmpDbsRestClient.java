@@ -14,15 +14,17 @@
  *  limitations under the License.
  */
 
-package com.pnoker.center.dbs.controller.rpc;
+package com.pnoker.center.dbs.rpc;
 
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.model.dto.Response;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.common.model.dto.Response;
 import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -34,13 +36,18 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     private RtmpService rtmpService;
 
     @Override
-    public Response delete(String id) {
+    public Response<Boolean> add(@RequestBody Rtmp rtmp) {
+        return null;
+    }
+
+    @Override
+    public Response<Boolean> delete(@RequestParam(value = "id") String id) {
         return Response.ok();
     }
 
     @Override
-    public Response count() {
-        return Response.ok();
+    public Response<Boolean> update(@RequestBody Rtmp rtmp) {
+        return null;
     }
 
     @Override

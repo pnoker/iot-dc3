@@ -56,7 +56,6 @@ public class RedisCacheConfig {
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         // 解决查询缓存转换异常的问题
         ObjectMapper om = new ObjectMapper();
-        //om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
         // 配置序列化（解决乱码的问题）
