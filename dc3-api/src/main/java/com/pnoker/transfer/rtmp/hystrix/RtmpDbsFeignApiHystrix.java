@@ -16,6 +16,7 @@
 
 package com.pnoker.transfer.rtmp.hystrix;
 
+import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
 import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
 import feign.hystrix.FallbackFactory;
@@ -44,13 +45,18 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
             }
 
             @Override
-            public Response count() {
-                return fail(throwable);
+            public Response<Boolean> add(Rtmp rtmp) {
+                return null;
             }
 
             @Override
             public Response delete(String id) {
                 return fail(throwable);
+            }
+
+            @Override
+            public Response<Boolean> update(Rtmp rtmp) {
+                return null;
             }
         };
     }
