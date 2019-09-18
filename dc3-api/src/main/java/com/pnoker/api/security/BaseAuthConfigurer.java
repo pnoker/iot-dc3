@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.pnoker.device.manager;
+package com.pnoker.api.security;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.scheduling.annotation.EnableAsync;
+import feign.auth.BasicAuthRequestInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -28,13 +26,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@EnableAsync
-@EnableFeignClients
-@EnableEurekaClient
-@SpringBootApplication
-public class DeviceManagerApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(DeviceManagerApplication.class, args);
+@Configuration
+public class BaseAuthConfigurer {
+    @Bean
+    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
+        return new BasicAuthRequestInterceptor("iotdc3", "iotdc3");
     }
 }

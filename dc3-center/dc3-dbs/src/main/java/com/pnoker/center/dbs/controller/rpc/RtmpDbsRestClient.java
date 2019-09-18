@@ -20,7 +20,7 @@ import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.dto.Response;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
-import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
+import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;

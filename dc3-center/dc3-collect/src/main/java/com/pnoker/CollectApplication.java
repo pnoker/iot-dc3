@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.pnoker.security;
+package com.pnoker;
 
-import feign.auth.BasicAuthRequestInterceptor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -26,10 +26,11 @@ import org.springframework.context.annotation.Configuration;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Configuration
-public class BaseAuthConfigurer {
-    @Bean
-    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
-        return new BasicAuthRequestInterceptor("iotdc3", "iotdc3");
+@EnableEurekaClient
+@SpringBootApplication
+public class CollectApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(CollectApplication.class, args);
     }
 }

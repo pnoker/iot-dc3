@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect;
+package com.pnoker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,9 +28,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  */
 @EnableEurekaClient
 @SpringBootApplication
-public class CollectApplication {
+public class ResourceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CollectApplication.class, args);
+        SpringApplication.run(ResourceApplication.class, args);
     }
 }
