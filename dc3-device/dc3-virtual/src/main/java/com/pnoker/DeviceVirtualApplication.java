@@ -5,16 +5,16 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.pnoker.transfer.opc;
+package com.pnoker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,13 +22,18 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+/**
+ * Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>@Author : Pnoker
+ * <p>Email : pnokers@gmail.com
+ * <p>Description:
+ */
 @EnableAsync
 @EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
-public class OpcApplication {
-
+public class DeviceVirtualApplication {
     public static void main(String[] args) {
-        SpringApplication.run(OpcApplication.class, args);
+        SpringApplication.run(DeviceVirtualApplication.class, args);
     }
 }

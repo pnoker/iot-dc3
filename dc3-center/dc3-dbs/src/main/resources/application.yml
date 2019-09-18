@@ -26,8 +26,8 @@ spring:
       minimum-idle: 4
   data:
     mongodb:
-      host: iotdc3.mongo
-      port: 27018
+      host: iotdc3.mongodb
+      port: 27017
       database: iot-dc3
       username: root
       password: iotdc3

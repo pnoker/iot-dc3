@@ -19,7 +19,6 @@ package com.pnoker.transfer.rtmp.controller;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
-import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.transfer.rtmp.model.constant.Global;
 import com.pnoker.transfer.rtmp.model.dto.CmdTask;
 import com.pnoker.transfer.rtmp.model.vo.RtmpVo;
@@ -43,8 +42,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v3/rtmp")
 public class IndexController extends BaseController {
-    @Autowired
-    private RtmpDbsFeignApi rtmpDbsFeignApi;
     @Autowired
     private RtmpService rtmpService;
 

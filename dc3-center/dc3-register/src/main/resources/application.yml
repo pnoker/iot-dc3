@@ -28,7 +28,6 @@ logging:
 eureka:
   instance:
     hostname: iotdc3.register
-    prefer-ip-address: true
   client:
     register-with-eureka: false
     fetch-registry: false
