@@ -19,11 +19,12 @@ package com.pnoker.transfer.rtmp.controller;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
-import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.transfer.rtmp.model.constant.Global;
 import com.pnoker.transfer.rtmp.model.dto.CmdTask;
 import com.pnoker.transfer.rtmp.model.vo.RtmpVo;
 import com.pnoker.transfer.rtmp.service.RtmpService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +40,15 @@ import java.util.List;
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Rest接口控制器
  */
+@Api("Rtsp->Rtmp 基本操作文档")
 @Slf4j
 @RestController
 @RequestMapping("/api/v3/rtmp")
 public class IndexController extends BaseController {
     @Autowired
-    private RtmpDbsFeignApi rtmpDbsFeignApi;
-    @Autowired
     private RtmpService rtmpService;
 
+    @ApiOperation("新增 Rtmp转码任务")
     @PostMapping("/add")
     public Response add(@RequestBody RtmpVo rtmpVo) {
         Rtmp rtmp = new Rtmp();
@@ -60,7 +61,7 @@ public class IndexController extends BaseController {
             return Response.fail();
         }
     }
-
+    @ApiOperation("删除 Rtmp转码任务")
     @DeleteMapping("/delete")
     public Response delete(String id) {
         CmdTask cmdTask = Global.taskMap.get(id);
@@ -75,6 +76,7 @@ public class IndexController extends BaseController {
         }
     }
 
+    @ApiOperation("查询 Rtmp转码任务")
     @GetMapping("/list")
     public Response<List<CmdTask>> list() {
         List<CmdTask> list;
@@ -87,6 +89,7 @@ public class IndexController extends BaseController {
         return Response.ok(list);
     }
 
+    @ApiOperation("停止 Rtmp转码任务")
     @PostMapping("/stop")
     public Response stop(String id) {
         CmdTask cmdTask = Global.taskMap.get(id);
