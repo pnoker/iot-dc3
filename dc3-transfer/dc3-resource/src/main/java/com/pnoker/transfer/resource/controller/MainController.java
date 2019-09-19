@@ -32,7 +32,7 @@ public class MainController extends BaseController {
     @RequestMapping(value = "/video/{name}", method = RequestMethod.GET)
     public String videoView(ModelMap modelMap, @PathVariable String name) {
         modelMap.addAttribute("name", name);
-        return "mp4";
+        return "/mp4";
     }
 
 }

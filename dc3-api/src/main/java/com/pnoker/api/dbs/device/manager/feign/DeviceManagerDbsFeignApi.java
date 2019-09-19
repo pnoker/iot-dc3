@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.security;
+package com.pnoker.device.manager.feign;
 
-import feign.auth.BasicAuthRequestInterceptor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.pnoker.device.manager.hystrix.DeviceManagerDbsFeignApiHystrix;
+import com.pnoker.api.security.BaseAuthConfigurer;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -26,10 +27,8 @@ import org.springframework.context.annotation.Configuration;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Configuration
-public class BaseAuthConfigurer {
-    @Bean
-    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
-        return new BasicAuthRequestInterceptor("iotdc3", "iotdc3");
-    }
+@FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
+@RequestMapping("/api/v3/device/manager")
+public interface DeviceManagerDbsFeignApi {
+
 }
