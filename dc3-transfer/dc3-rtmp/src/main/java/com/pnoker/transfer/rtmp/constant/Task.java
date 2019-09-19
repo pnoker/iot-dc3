@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.model.dto;
+package com.pnoker.transfer.rtmp.constant;
 
 import com.pnoker.common.utils.Tools;
-import com.pnoker.transfer.rtmp.model.constant.Global;
-import com.pnoker.transfer.rtmp.service.CmdOutputService;
+import com.pnoker.transfer.rtmp.service.OutputService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +31,7 @@ import java.io.IOException;
  */
 @Data
 @Slf4j
-public class CmdTask {
+public class Task {
     private String id;
 
     /**
@@ -53,9 +52,9 @@ public class CmdTask {
 
     private String command;
     private Process process;
-    private CmdOutputService cmdOutputService;
+    private OutputService outputService;
 
-    public CmdTask(String command) {
+    public Task(String command) {
         this.id = Tools.uuid();
         this.status = 0;
         this.command = command;
@@ -72,8 +71,8 @@ public class CmdTask {
                 status = 1;
                 process = Runtime.getRuntime().exec(command);
                 startTimes++;
-                cmdOutputService = new CmdOutputService(id, process);
-                Global.threadPoolExecutor.execute(cmdOutputService);
+                outputService = new OutputService(id, process);
+                Global.threadPoolExecutor.execute(outputService);
             } catch (IOException e) {
                 status = 2;
                 clear();
@@ -92,9 +91,9 @@ public class CmdTask {
      */
     public boolean stop() {
         status = 4;
-        if (null != cmdOutputService) {
-            if (cmdOutputService.isStatus()) {
-                cmdOutputService.setStatus(false);
+        if (null != outputService) {
+            if (outputService.isStatus()) {
+                outputService.setStatus(false);
                 return true;
             }
         }
@@ -121,6 +120,6 @@ public class CmdTask {
             process.destroyForcibly();
             process = null;
         }
-        cmdOutputService = null;
+        outputService = null;
     }
 }

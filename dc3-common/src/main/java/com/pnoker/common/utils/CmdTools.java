@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.model.dto;
+package com.pnoker.common.utils;
 
 import lombok.Data;
 
@@ -25,7 +25,7 @@ import lombok.Data;
  * <p>Description: Command 指令构造器
  */
 @Data
-public class CmdBuilder {
+public class CmdTools {
     private String cmd;
     private StringBuilder builder;
 
@@ -34,7 +34,7 @@ public class CmdBuilder {
      *
      * @param path
      */
-    public CmdBuilder(String path) {
+    public CmdTools(String path) {
         this.builder = new StringBuilder(path);
     }
 
@@ -44,7 +44,7 @@ public class CmdBuilder {
      * @param exe
      * @return
      */
-    public CmdBuilder create(String exe) {
+    public CmdTools create(String exe) {
         if (null != builder) {
             builder.append(exe);
         }
@@ -58,7 +58,7 @@ public class CmdBuilder {
      * @param paramer
      * @return
      */
-    public CmdBuilder add(String key, String paramer) {
+    public CmdTools add(String key, String paramer) {
         return add(key).add(paramer);
     }
 
@@ -68,7 +68,7 @@ public class CmdBuilder {
      * @param paramer
      * @return
      */
-    public CmdBuilder add(String paramer) {
+    public CmdTools add(String paramer) {
         if (null != builder) {
             builder.append(" ");
             builder.append(paramer);

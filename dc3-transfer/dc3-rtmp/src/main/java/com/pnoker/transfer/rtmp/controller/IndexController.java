@@ -19,9 +19,9 @@ package com.pnoker.transfer.rtmp.controller;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
-import com.pnoker.transfer.rtmp.model.constant.Global;
-import com.pnoker.transfer.rtmp.model.dto.CmdTask;
-import com.pnoker.transfer.rtmp.model.vo.RtmpVo;
+import com.pnoker.common.model.vo.rtmp.RtmpVo;
+import com.pnoker.transfer.rtmp.constant.Task;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -64,9 +64,9 @@ public class IndexController extends BaseController {
     @ApiOperation("删除 Rtmp转码任务")
     @DeleteMapping("/delete")
     public Response delete(String id) {
-        CmdTask cmdTask = Global.taskMap.get(id);
-        boolean result = cmdTask.stop();
-        cmdTask.clear();
+        Task task = Global.taskMap.get(id);
+        boolean result = task.stop();
+        task.clear();
         Global.taskMap.remove(id);
 
         if (result) {
@@ -78,9 +78,9 @@ public class IndexController extends BaseController {
 
     @ApiOperation("查询 Rtmp转码任务")
     @GetMapping("/list")
-    public Response<List<CmdTask>> list() {
-        List<CmdTask> list;
-        Collection<CmdTask> collection = Global.taskMap.values();
+    public Response<List<Task>> list() {
+        List<Task> list;
+        Collection<Task> collection = Global.taskMap.values();
         if (collection instanceof List) {
             list = (List) collection;
         } else {
@@ -92,8 +92,8 @@ public class IndexController extends BaseController {
     @ApiOperation("停止 Rtmp转码任务")
     @PostMapping("/stop")
     public Response stop(String id) {
-        CmdTask cmdTask = Global.taskMap.get(id);
-        boolean result = cmdTask.stop();
+        Task task = Global.taskMap.get(id);
+        boolean result = task.stop();
 
         if (result) {
             return Response.ok();

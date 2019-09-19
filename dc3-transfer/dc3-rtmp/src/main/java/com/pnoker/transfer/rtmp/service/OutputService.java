@@ -16,8 +16,8 @@
 
 package com.pnoker.transfer.rtmp.service;
 
-import com.pnoker.transfer.rtmp.model.constant.Global;
-import com.pnoker.transfer.rtmp.model.dto.CmdTask;
+import com.pnoker.transfer.rtmp.constant.Task;
+import com.pnoker.transfer.rtmp.constant.Global;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,7 +34,7 @@ import java.io.InputStreamReader;
  */
 @Data
 @Slf4j
-public class CmdOutputService implements Runnable {
+public class OutputService implements Runnable {
     /**
      * 任务 ID
      */
@@ -42,7 +42,7 @@ public class CmdOutputService implements Runnable {
     private volatile boolean status = true;
     private Process process;
 
-    public CmdOutputService(String id, Process process) {
+    public OutputService(String id, Process process) {
         this.id = id;
         this.process = process;
     }
@@ -98,10 +98,10 @@ public class CmdOutputService implements Runnable {
      * 重启错误 CMD 任务
      */
     public void reStartTask() {
-        CmdTask cmdTask = Global.taskMap.get(id);
-        cmdTask.clear();
-        cmdTask.create();
-        cmdTask.setStatus(2);
+        Task task = Global.taskMap.get(id);
+        task.clear();
+        task.create();
+        task.setStatus(2);
     }
 
 }
