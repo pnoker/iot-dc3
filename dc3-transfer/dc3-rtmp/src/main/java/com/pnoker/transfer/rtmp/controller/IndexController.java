@@ -40,16 +40,16 @@ import java.util.List;
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Rest接口控制器
  */
-@Api("Rtsp->Rtmp 基本操作文档")
 @Slf4j
 @RestController
+@Api("Rtmp 视频转码服务接口说明")
 @RequestMapping("/api/v3/rtmp")
 public class IndexController extends BaseController {
     @Autowired
     private RtmpService rtmpService;
 
-    @ApiOperation("新增 Rtmp转码任务")
     @PostMapping("/add")
+    @ApiOperation("新增 Rtmp 转码任务")
     public Response add(@RequestBody RtmpVo rtmpVo) {
         Rtmp rtmp = new Rtmp();
         BeanUtils.copyProperties(rtmpVo, rtmp);
@@ -61,7 +61,8 @@ public class IndexController extends BaseController {
             return Response.fail();
         }
     }
-    @ApiOperation("删除 Rtmp转码任务")
+
+    @ApiOperation("删除 Rtmp 转码任务")
     @DeleteMapping("/delete")
     public Response delete(String id) {
         Task task = Global.taskMap.get(id);
@@ -76,7 +77,7 @@ public class IndexController extends BaseController {
         }
     }
 
-    @ApiOperation("查询 Rtmp转码任务")
+    @ApiOperation("查询 Rtmp 转码任务")
     @GetMapping("/list")
     public Response<List<Task>> list() {
         List<Task> list;
@@ -89,7 +90,7 @@ public class IndexController extends BaseController {
         return Response.ok(list);
     }
 
-    @ApiOperation("停止 Rtmp转码任务")
+    @ApiOperation("停止 Rtmp 转码任务")
     @PostMapping("/stop")
     public Response stop(String id) {
         Task task = Global.taskMap.get(id);
