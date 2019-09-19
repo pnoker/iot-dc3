@@ -18,10 +18,17 @@ package com.pnoker.device.group.constant;
 
 import com.pnoker.device.group.model.wia.WiaData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>@Author    : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description:
+ */
 @Slf4j
 public class Queues {
     /**
@@ -47,12 +54,12 @@ public class Queues {
     /**
      * 用于存放 wia 数据，支持2000并发，该队列用于优化大批量数据入库性能
      */
-    public static LinkedBlockingQueue<WiaData> wiaDataQueue = new LinkedBlockingQueue(2000);
+    public static LinkedBlockingQueue<WiaData> wiaDataQueue = new LinkedBlockingQueue<>(2000);
 
     /**
      * 用于缓存 wia 数据采集线程
      */
-    public static LinkedBlockingQueue<Runnable> wiaReceiveThreadQueue = new LinkedBlockingQueue(64);
+    public static LinkedBlockingQueue<Runnable> wiaReceiveThreadQueue = new LinkedBlockingQueue<>(64);
 
     /**
      * 数据采集线程池，用于全部数采线程使用
@@ -63,7 +70,7 @@ public class Queues {
         private final AtomicInteger mThreadNum = new AtomicInteger(1);
 
         @Override
-        public Thread newThread(Runnable runnable) {
+        public Thread newThread(@NonNull Runnable runnable) {
             Thread thread = new Thread(runnable, "dc3-group-thread-" + mThreadNum.getAndIncrement());
             log.info("{} has been created", thread.getName());
             return thread;
@@ -71,6 +78,7 @@ public class Queues {
     }
 
     static class IgnorePolicy implements RejectedExecutionHandler {
+        @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
             doLog(r, e);
         }
