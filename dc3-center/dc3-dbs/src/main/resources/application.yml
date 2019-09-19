@@ -12,6 +12,14 @@ spring:
     user:
       name: iotdc3
       password: iotdc3
+  sleuth:
+    web:
+      client:
+        enabled: true
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.zipkin:8600
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai

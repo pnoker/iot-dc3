@@ -19,7 +19,7 @@ spring:
     sampler:
       probability: 1.0
   zipkin:
-    base-url: http://iotdc3.zipkin:8600
+    base-url: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.zipkin:8600
 
 management:
   endpoints:
