@@ -21,14 +21,6 @@ spring:
     user:
       name: iotdc3
       password: iotdc3
-  sleuth:
-    web:
-      client:
-        enabled: true
-    sampler:
-      probability: 1.0
-  zipkin:
-    base-url: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.zipkin:8600
   datasource:
     driver-class-name: org.sqlite.JDBC
     url: jdbc:sqlite:dc3/sqlite/dc3-group.db
