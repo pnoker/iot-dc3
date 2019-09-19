@@ -19,45 +19,39 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-center</artifactId>
         <version>3.0</version>
     </parent>
 
-    <artifactId>dc3-center</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dc3-zipkin</artifactId>
+    <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 综合管理中心集合，包含：服务注册与发现中心、服务监控中心、物联数据采集中心、数据库服务中心、授权与权限管理中心、全链路监控中心。</description>
-
-    <modules>
-        <module>dc3-register</module>
-        <module>dc3-zipkin</module>
-        <module>dc3-monitor</module>
-        <module>dc3-dbs</module>
-    </modules>
+    <description>IOT DC3 平台 微服务链路跟踪中心。</description>
 
     <dependencies>
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-security</artifactId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
         </dependency>
 
-        <!-- Undertow Web 容器 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>io.zipkin.java</groupId>
+            <artifactId>zipkin-autoconfigure-ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
+            <groupId>io.zipkin.java</groupId>
+            <artifactId>zipkin-server</artifactId>
         </dependency>
 
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

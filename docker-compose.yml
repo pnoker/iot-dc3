@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 
 services:
   dc3-base:
@@ -22,20 +22,20 @@ services:
         aliases:
           - dc3-mariadb
 
-  dc3-mongo:
+  dc3-mongodb:
     build:
-      context: ./dc3/dependences/mongo/
+      context: ./dc3/dependences/mongodb/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-mongo:3.0
+    image: pnoker/dc3-mongodb:3.0
     restart: always
     ports:
       - 27018:27017
-    container_name: dc3-mongo
-    hostname: iotdc3.mongo
+    container_name: dc3-mongodb
+    hostname: iotdc3.mongodb
     networks:
       network:
         aliases:
-          - dc3-mongo
+          - dc3-mongodb
 
   dc3-redis:
     build:
@@ -136,6 +136,23 @@ services:
         aliases:
           - dc3-monitor
 
+  dc3-zipkin:
+    build:
+      context: ./dc3-center/dc3-zipkin/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-zipkin:3.0
+    restart: always
+    ports:
+      - 8600:8600
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-zipkin
+    hostname: iotdc3.zipkin
+    networks:
+      network:
+        aliases:
+          - dc3-zipkin
+
   dc3-dbs:
     build:
       context: ./dc3-center/dc3-dbs/
@@ -146,6 +163,7 @@ services:
       - 8300:8300
     links:
       - dc3-register:iotdc3.register
+      - dc3-mongodb:iotdc3.mongodb
       - dc3-mariadb:iotdc3.mariadb
       - dc3-redis:iotdc3.redis
     container_name: dc3-dbs

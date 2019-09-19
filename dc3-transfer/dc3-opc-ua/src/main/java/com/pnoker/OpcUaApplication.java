@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.device.manager.feign;
+package com.pnoker;
 
-import com.pnoker.device.manager.hystrix.DeviceManagerDbsFeignApiHystrix;
-import com.pnoker.security.BaseAuthConfigurer;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -27,8 +28,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
-@RequestMapping("/api/v3/device/manager")
-public interface DeviceManagerDbsFeignApi {
+@EnableAsync
+@EnableFeignClients
+@EnableEurekaClient
+@SpringBootApplication
+public class OpcUaApplication {
 
+    public static void main(String[] args) {
+        SpringApplication.run(OpcUaApplication.class, args);
+    }
 }

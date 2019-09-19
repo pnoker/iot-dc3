@@ -82,6 +82,8 @@
         <pagehelper.version>5.1.10</pagehelper.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <mybatis.plus.version>3.1.2</mybatis.plus.version>
+        <zipkin.server.version>2.12.2</zipkin.server.version>
+        <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
 
         <jna.version>5.3.1</jna.version>
         <codecov.version>2.7</codecov.version>
@@ -198,6 +200,25 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!-- ZipKin -->
+            <dependency>
+                <groupId>io.zipkin.java</groupId>
+                <artifactId>zipkin-autoconfigure-ui</artifactId>
+                <version>${zipkin.server.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.zipkin.java</groupId>
+                <artifactId>zipkin-server</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-log4j2</artifactId>
+                    </exclusion>
+                </exclusions>
+                <version>${zipkin.server.version}</version>
+            </dependency>
+
             <!-- Servlet Api -->
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -259,6 +280,11 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper</artifactId>
                 <version>${pagehelper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.boot.version}</version>
             </dependency>
 
             <!-- Netty-->

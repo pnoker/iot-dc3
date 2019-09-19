@@ -16,10 +16,10 @@
 
 package com.pnoker.transfer.rtmp.service.impl;
 
+import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
 import com.pnoker.common.utils.Tools;
-import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.transfer.rtmp.model.constant.Global;
 import com.pnoker.transfer.rtmp.model.dto.CmdTask;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -29,9 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.lang.System.getProperty;
 
@@ -56,9 +54,7 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public List<Rtmp> getRtmpList() {
         Response<List<Rtmp>> response = rtmpDbsFeignApi.list();
-        if (!response.isOk() || times == 1) {
-            times = 2;
-            response.setData(null);
+        if (!response.isOk()) {
             log.error(response.getMessage());
             return reconnect();
         }

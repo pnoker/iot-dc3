@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp;
+package com.pnoker;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -31,16 +26,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * <p>Email      : pnokers@gmail.com
  * <p>Description:
  */
-@Slf4j
-@EnableAsync
-@EnableSwagger2
-@EnableScheduling
-@EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
-public class RtmpApplication {
+public class ResourceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(RtmpApplication.class, args);
+        SpringApplication.run(ResourceApplication.class, args);
     }
 }

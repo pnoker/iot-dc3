@@ -24,6 +24,10 @@
       "dc3-collect": {
         "description": "数据采集",
         "port": 8500
+      },
+      "dc3-zipkin": {
+        "description": "微服务链路跟踪",
+        "port": 8600
       }
     },
     "dc3-transfer": {
