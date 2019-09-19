@@ -79,6 +79,7 @@
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
         <hikaricp.version>3.3.1</hikaricp.version>
+        <pagehelper.version>5.1.10</pagehelper.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <mybatis.plus.version>3.1.2</mybatis.plus.version>
         <zipkin.server.version>2.12.2</zipkin.server.version>
@@ -87,6 +88,7 @@
         <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
         <jackson.modules>2.9.8</jackson.modules>
+        <swagger2.version>2.9.2</swagger2.version>
         <netty.version>4.1.36.Final</netty.version>
         <fastjson.version>1.2.60</fastjson.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
@@ -222,6 +224,16 @@
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
 
             <!-- Spring Web MVC -->
             <dependency>
@@ -262,6 +274,11 @@
                 <groupId>org.mariadb.jdbc</groupId>
                 <artifactId>mariadb-java-client</artifactId>
                 <version>${mariadb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>${pagehelper.version}</version>
             </dependency>
 
             <!-- Netty-->
