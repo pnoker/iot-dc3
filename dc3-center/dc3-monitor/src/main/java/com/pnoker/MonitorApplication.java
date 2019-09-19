@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.monitor;
+package com.pnoker;
 
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import org.springframework.boot.SpringApplication;

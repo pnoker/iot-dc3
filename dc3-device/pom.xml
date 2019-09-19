@@ -29,12 +29,18 @@
     <description>IOT DC3 平台 设备接入、管理、数据采集、虚拟、模拟设备服务集合。</description>
 
     <modules>
-        <module>dc3-manager</module>
         <module>dc3-group</module>
+        <module>dc3-manager</module>
+        <module>dc3-collect</module>
         <module>dc3-virtual</module>
     </modules>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-security</artifactId>
+        </dependency>
 
         <!-- Undertow Web 容器 -->
         <dependency>

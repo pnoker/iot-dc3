@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs;
+package com.pnoker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
