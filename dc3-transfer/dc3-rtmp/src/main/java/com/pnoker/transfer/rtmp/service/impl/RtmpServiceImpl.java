@@ -20,8 +20,8 @@ import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
 import com.pnoker.common.utils.Tools;
-import com.pnoker.transfer.rtmp.model.constant.Global;
-import com.pnoker.transfer.rtmp.model.dto.CmdTask;
+import com.pnoker.transfer.rtmp.constant.Task;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class RtmpServiceImpl implements RtmpService {
                 .replace("{exe}", ffmpeg)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
-        return createCmdTask(new CmdTask(cmd));
+        return createCmdTask(new Task(cmd));
     }
 
     @Override
@@ -90,20 +90,20 @@ public class RtmpServiceImpl implements RtmpService {
     /**
      * 创建视频转码任务
      *
-     * @param cmdTask
+     * @param task
      */
-    public static boolean createCmdTask(CmdTask cmdTask) {
+    public static boolean createCmdTask(Task task) {
         // 判断任务是否被重复提交
-        if (!Global.taskMap.containsKey(cmdTask.getId())) {
+        if (!Global.taskMap.containsKey(task.getId())) {
             if (Global.taskMap.size() <= Global.MAX_TASK_SIZE) {
-                Global.taskMap.put(cmdTask.getId(), cmdTask);
-                return cmdTask.create();
+                Global.taskMap.put(task.getId(), task);
+                return task.create();
             } else {
                 log.error("超过最大任务数 {}", Global.MAX_TASK_SIZE);
                 return false;
             }
         } else {
-            log.error("重复任务 {}", cmdTask.getId());
+            log.error("重复任务 {}", task.getId());
             return false;
         }
     }

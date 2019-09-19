@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.model.constant;
+package com.pnoker.transfer.rtmp.constant;
 
-import com.pnoker.transfer.rtmp.model.dto.CmdTask;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class Global {
     //记录Task信息
     public static int MAX_TASK_SIZE = 32;
     public static int MAX_TASK_TIMES = 10;
-    public static Map<String, CmdTask> taskMap = new HashMap<>(32);
+    public static Map<String, Task> taskMap = new HashMap<>(32);
     public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue(32);
 
     /**
