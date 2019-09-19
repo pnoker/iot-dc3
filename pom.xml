@@ -83,6 +83,7 @@
         <servlet-api.version>4.0.1</servlet-api.version>
         <mybatis.plus.version>3.1.2</mybatis.plus.version>
         <zipkin.server.version>2.12.2</zipkin.server.version>
+        <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
 
         <jna.version>5.3.1</jna.version>
         <codecov.version>2.7</codecov.version>
@@ -279,6 +280,11 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper</artifactId>
                 <version>${pagehelper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.boot.version}</version>
             </dependency>
 
             <!-- Netty-->
