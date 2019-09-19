@@ -70,11 +70,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
-        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <spring-webmvc.version>5.1.9.RELEASE</spring-webmvc.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
         <spring-boot-admin.version>2.1.6</spring-boot-admin.version>
         <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
+        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
 
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
