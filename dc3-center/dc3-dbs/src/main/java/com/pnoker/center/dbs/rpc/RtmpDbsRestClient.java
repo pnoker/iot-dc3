@@ -16,19 +16,23 @@
 
 package com.pnoker.center.dbs.rpc;
 
+import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BaseController;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
-import com.pnoker.transfer.rtmp.feign.RtmpDbsFeignApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
+ * <p>@Author    : Pnoker
+ * <p>Email      : pnokers@gmail.com
+ * <p>Description:
+ */
 @Slf4j
 @RestController
 public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi {
@@ -36,18 +40,8 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     private RtmpService rtmpService;
 
     @Override
-    public Response<Boolean> add(@RequestBody Rtmp rtmp) {
-        return null;
-    }
-
-    @Override
-    public Response<Boolean> delete(@RequestParam(value = "id") String id) {
+    public Response delete(String id) {
         return Response.ok();
-    }
-
-    @Override
-    public Response<Boolean> update(@RequestBody Rtmp rtmp) {
-        return null;
     }
 
     @Override

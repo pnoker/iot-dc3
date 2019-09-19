@@ -16,12 +16,11 @@
 
 package com.pnoker.api.dbs.rtmp.feign;
 
+import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
+import com.pnoker.api.security.BaseAuthConfigurer;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
-import com.pnoker.api.security.BaseAuthConfigurer;
-import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,28 +37,21 @@ import java.util.List;
 @FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
 @RequestMapping(value = "/api/v3/dbs/rtmp")
 public interface RtmpDbsFeignApi {
-    /**
-     * List 查询全部操作
-     *
-     * @return
-     */
-    @GetMapping("/list")
-    Response<List<Rtmp>> list();
 
     /**
-     * Count 数据统计操作
+     * 删除 根据 ID 删除 Rtmp
      *
-     * @return
-     */
-    @GetMapping("/count")
-    Response count();
-
-    /**
-     * Delete 删除操作
-     *
-     * @param id
-     * @return
+     * @param id rtmpId
+     * @return true/false
      */
     @DeleteMapping("/delete")
     Response delete(@RequestParam(value = "id") String id);
+
+    /**
+     * 查询 查询全部 Rtmp
+     *
+     * @return rtmpList
+     */
+    @GetMapping("/list")
+    Response<List<Rtmp>> list();
 }

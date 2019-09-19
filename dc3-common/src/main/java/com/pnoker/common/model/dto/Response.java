@@ -18,7 +18,6 @@ package com.pnoker.common.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -29,19 +28,19 @@ import java.io.Serializable;
  * <p>Description: 返回信息 DTO
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Response<T> implements Serializable {
     private boolean ok;
     private String message;
-    private long time = System.currentTimeMillis();
+    private long time;
     private T data;
 
     /**
      * 成功
      *
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> ok() {
         return new Response().success();
     }
@@ -49,8 +48,9 @@ public class Response<T> implements Serializable {
     /**
      * 成功 自定义提示信息
      *
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> ok(String message) {
         return new Response().success(message);
     }
@@ -59,8 +59,9 @@ public class Response<T> implements Serializable {
      * 成功 返回结果
      *
      * @param data 返回结果
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> ok(T data) {
         return new Response(data).success();
     }
@@ -69,8 +70,9 @@ public class Response<T> implements Serializable {
      * 成功 返回结果 & 自定义提示信息
      *
      * @param data 返回结果
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> ok(T data, String message) {
         return new Response(data).success(message);
     }
@@ -78,8 +80,9 @@ public class Response<T> implements Serializable {
     /**
      * 失败
      *
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> fail() {
         return new Response().failure();
     }
@@ -87,8 +90,9 @@ public class Response<T> implements Serializable {
     /**
      * 失败 自定义提示信息
      *
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> fail(String message) {
         return new Response().failure(message);
     }
@@ -97,8 +101,9 @@ public class Response<T> implements Serializable {
      * 失败 返回结果
      *
      * @param data 返回结果
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> fail(T data) {
         return new Response(data).failure();
     }
@@ -107,27 +112,35 @@ public class Response<T> implements Serializable {
      * 失败 返回结果 & 自定义提示信息
      *
      * @param data 返回结果
-     * @return
+     * @return Response
      */
+    @SuppressWarnings("unchecked")
     public static <T> Response<T> fail(T data, String message) {
         return new Response(data).failure(message);
     }
 
     /**
+     * 无参构造函数
+     */
+    private Response() {
+        this.time = System.currentTimeMillis();
+    }
+
+    /**
      * 构造函数
      *
-     * @param data
+     * @param data 数据
      */
-    public Response(T data) {
+    private Response(T data) {
         this.data = data;
     }
 
     /**
      * 成功
      *
-     * @return
+     * @return Response
      */
-    public Response success() {
+    private Response success() {
         this.ok = true;
         this.message = "Ok,Request Succeeded!";
         return this;
@@ -136,10 +149,10 @@ public class Response<T> implements Serializable {
     /**
      * 成功 自定义提示信息
      *
-     * @param message
-     * @return
+     * @param message 成功提示信息
+     * @return Response
      */
-    public Response success(String message) {
+    private Response success(String message) {
         this.ok = true;
         this.message = message;
         return this;
@@ -148,9 +161,9 @@ public class Response<T> implements Serializable {
     /**
      * 失败
      *
-     * @return
+     * @return Response
      */
-    public Response failure() {
+    private Response failure() {
         this.ok = false;
         this.message = "Sorry,Request Failed!";
         return this;
@@ -159,10 +172,10 @@ public class Response<T> implements Serializable {
     /**
      * 失败 自定义提示信息
      *
-     * @param message
-     * @return
+     * @param message 错误提示信息
+     * @return Response
      */
-    public Response failure(String message) {
+    private Response failure(String message) {
         this.ok = false;
         this.message = message;
         return this;
