@@ -17,7 +17,7 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import com.pnoker.common.model.domain.rtmp.Rtmp;
-import com.pnoker.transfer.rtmp.model.constant.Global;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.CmdTaskService;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
@@ -40,7 +40,7 @@ import java.util.List;
 @Setter
 @Order(1)
 @Component
-public class CmdTaskRunner implements ApplicationRunner {
+public class TaskRunner implements ApplicationRunner {
     @Autowired
     private RtmpService rtmpService;
 

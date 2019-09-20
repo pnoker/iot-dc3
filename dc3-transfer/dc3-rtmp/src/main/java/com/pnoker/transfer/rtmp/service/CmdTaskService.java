@@ -16,7 +16,7 @@
 
 package com.pnoker.transfer.rtmp.service;
 
-import com.pnoker.transfer.rtmp.model.constant.Global;
+import com.pnoker.transfer.rtmp.constant.Global;
 import lombok.extern.slf4j.Slf4j;
 
 /**
