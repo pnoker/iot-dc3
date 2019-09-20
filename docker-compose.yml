@@ -29,7 +29,7 @@ services:
     image: pnoker/dc3-mongodb:3.0
     restart: always
     ports:
-      - 27018:27017
+      - 27017:27017
     container_name: dc3-mongodb
     hostname: iotdc3.mongodb
     networks:
@@ -136,23 +136,6 @@ services:
         aliases:
           - dc3-monitor
 
-  dc3-zipkin:
-    build:
-      context: ./dc3-center/dc3-zipkin/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-zipkin:3.0
-    restart: always
-    ports:
-      - 8600:8600
-    links:
-      - dc3-register:iotdc3.register
-    container_name: dc3-zipkin
-    hostname: iotdc3.zipkin
-    networks:
-      network:
-        aliases:
-          - dc3-zipkin
-
   dc3-dbs:
     build:
       context: ./dc3-center/dc3-dbs/
@@ -175,7 +158,7 @@ services:
 
   dc3-collect:
     build:
-      context: ./dc3-center/dc3-collect/
+      context: ./dc3-device/dc3-collect/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-collect:3.0
     restart: always
