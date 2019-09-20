@@ -52,7 +52,8 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-  global-config:
+  global-config.:
+    banner: false
     db-config:
       table-prefix: dc3_
   mapper-locations: classpath*:/mapping
@@ -72,6 +73,14 @@ feign:
 
 logging:
   file: dc3/logs/center/${spring.application.name}.log
+  level:
+    org.springframework.data: WARN
+    org.springframework.web: WARN
+    org.mongodb.driver: WARN
+    com.zaxxer.hikari: ERROR
+    io.lettuce.core: WARN
+    io.undertow: WARN
+    com.netflix: WARN
 
 eureka:
   instance:

@@ -39,6 +39,14 @@ management:
 
 logging:
   file: dc3/logs/transfer/${spring.application.name}.log
+  level:
+    org.springframework.data: WARN
+    org.springframework.web: WARN
+    org.mongodb.driver: WARN
+    com.zaxxer.hikari: ERROR
+    io.lettuce.core: WARN
+    io.undertow: WARN
+    com.netflix: WARN
 
 eureka:
   instance:
