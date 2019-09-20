@@ -1,4 +1,4 @@
-package com.pnoker.transfer.rtmp.model.vo;
+package com.pnoker.common.model.vo.rtmp;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,15 +17,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RtmpVo {
+    @ApiModelProperty(hidden = true)
     private long id;
-    @ApiModelProperty(value = "rtsp视频流地址", name = "rtspUrl", required = true)
+    @ApiModelProperty(value = "rtsp视频流地址", required = true)
     private String rtspUrl;
-    @ApiModelProperty(value = "rtmp推流地址", name = "rtmpUrl", required = true)
+    @ApiModelProperty(value = "rtmp推流地址", required = true)
     private String rtmpUrl;
-    @ApiModelProperty(value = "command配置", name = "command", required = true)
+    @ApiModelProperty(value = "command配置", required = true)
     private String command;
-    @ApiModelProperty(value = "rtsp视频类型", name = "videoType", required = true)
+    @ApiModelProperty(value = "rtsp视频类型", required = true)
     private short videoType;
-    @ApiModelProperty(value = "是否自动启动任务", name = "autoStart", required = true)
+    @ApiModelProperty(value = "是否自动启动任务", required = true)
     private boolean autoStart;
 }
