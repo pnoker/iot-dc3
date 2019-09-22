@@ -19,19 +19,15 @@ package com.pnoker.transfer.rtmp.service.impl;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
-import com.pnoker.common.utils.Tools;
-import com.pnoker.transfer.rtmp.constant.Task;
 import com.pnoker.transfer.rtmp.constant.Global;
+import com.pnoker.transfer.rtmp.model.Task;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.System.getProperty;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -41,10 +37,7 @@ import static java.lang.System.getProperty;
  */
 @Slf4j
 @Service
-@ConfigurationProperties(prefix = "ffmpeg")
 public class RtmpServiceImpl implements RtmpService {
-    private String unix;
-    private String window;
 
     private volatile int times = 1;
 
@@ -63,49 +56,41 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public boolean createCmdTask(Rtmp rtmp) {
-        String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        if ("".equals(ffmpeg) || null == ffmpeg) {
-            log.error("FFmpeg path is NULL !");
-            return false;
-        }
-        if (!Tools.isFile(ffmpeg)) {
-            log.error("{} does not exist", ffmpeg);
-            return false;
-        }
-
-        String cmd = rtmp.getCommand()
-                .replace("{exe}", ffmpeg)
-                .replace("{rtsp_url}", rtmp.getRtspUrl())
-                .replace("{rtmp_url}", rtmp.getRtmpUrl());
-        return createCmdTask(new Task(cmd));
+    public Response addRtmp(Rtmp rtmp) {
+        return rtmpDbsFeignApi.add(rtmp);
     }
 
     @Override
-    public boolean stopCmdTask(String id) {
-        Global.taskMap.get(id).stop();
-        return false;
-    }
-
-    /**
-     * 创建视频转码任务
-     *
-     * @param task
-     */
-    public static boolean createCmdTask(Task task) {
+    public Response startTask(Rtmp rtmp) {
+        Task task = new Task(getCommand(rtmp));
         // 判断任务是否被重复提交
         if (!Global.taskMap.containsKey(task.getId())) {
             if (Global.taskMap.size() <= Global.MAX_TASK_SIZE) {
                 Global.taskMap.put(task.getId(), task);
-                return task.create();
+                return task.create() ? Response.ok() : Response.fail();
             } else {
                 log.error("超过最大任务数 {}", Global.MAX_TASK_SIZE);
-                return false;
+                return Response.fail("超过最大任务数");
             }
         } else {
             log.error("重复任务 {}", task.getId());
-            return false;
+            return Response.fail("重复任务");
         }
+    }
+
+    @Override
+    public Response stopTask(String id) {
+        Global.taskMap.get(id).stop();
+        return Response.fail();
+    }
+
+
+    public String getCommand(Rtmp rtmp) {
+        String cmd = rtmp.getCommand()
+                .replace("{exe}", Global.FFMPEG_PATH)
+                .replace("{rtsp_url}", rtmp.getRtspUrl())
+                .replace("{rtmp_url}", rtmp.getRtmpUrl());
+        return cmd;
     }
 
     public List<Rtmp> reconnect() {
@@ -117,6 +102,7 @@ public class RtmpServiceImpl implements RtmpService {
         log.info("第 {} 次重连", times);
         times++;
         try {
+            // 设置重连之间的间隔时间
             Thread.sleep(Global.CONNECT_INTERVAL * times);
         } catch (Exception e) {
         }

@@ -17,6 +17,7 @@
 package com.pnoker.transfer.rtmp.service;
 
 import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.common.model.dto.Response;
 
 import java.util.List;
 
@@ -28,7 +29,9 @@ public interface RtmpService {
      */
     List<Rtmp> getRtmpList();
 
-    boolean createCmdTask(Rtmp rtmp);
+    Response addRtmp(Rtmp rtmp);
 
-    boolean stopCmdTask(String id);
+    Response startTask(Rtmp rtmp);
+
+    Response stopTask(String id);
 }

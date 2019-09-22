@@ -42,6 +42,11 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
 
         return new RtmpDbsFeignApi() {
             @Override
+            public Response add(Rtmp rtmp) {
+                return Response.fail(message);
+            }
+
+            @Override
             public Response delete(String id) {
                 return Response.fail(message);
             }

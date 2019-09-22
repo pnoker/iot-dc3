@@ -18,6 +18,7 @@ package com.pnoker.common.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -28,11 +29,11 @@ import java.io.Serializable;
  * <p>Description: 返回信息 DTO
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Response<T> implements Serializable {
     private boolean ok;
     private String message;
-    private long time;
     private T data;
 
     /**
@@ -117,13 +118,6 @@ public class Response<T> implements Serializable {
     @SuppressWarnings("unchecked")
     public static <T> Response<T> fail(T data, String message) {
         return new Response(data).failure(message);
-    }
-
-    /**
-     * 无参构造函数
-     */
-    private Response() {
-        this.time = System.currentTimeMillis();
     }
 
     /**

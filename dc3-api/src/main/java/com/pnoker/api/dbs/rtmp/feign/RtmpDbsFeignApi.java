@@ -21,10 +21,7 @@ import com.pnoker.api.security.BaseAuthConfigurer;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,6 +34,15 @@ import java.util.List;
 @FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
 @RequestMapping(value = "/api/v3/dbs/rtmp")
 public interface RtmpDbsFeignApi {
+
+    /**
+     * 新增 新增 Rtmp 任务记录
+     *
+     * @param rtmp Rtmp实体类
+     * @return true/false
+     */
+    @PostMapping("/add")
+    Response add(@RequestBody Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp
