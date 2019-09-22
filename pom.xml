@@ -82,14 +82,12 @@
         <pagehelper.version>5.1.10</pagehelper.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <mybatis.plus.version>3.1.2</mybatis.plus.version>
-        <zipkin.server.version>2.12.2</zipkin.server.version>
         <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
 
         <jna.version>5.3.1</jna.version>
         <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
         <jackson.modules>2.9.8</jackson.modules>
-        <swagger2.version>2.9.2</swagger2.version>
         <netty.version>4.1.36.Final</netty.version>
         <fastjson.version>1.2.60</fastjson.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
@@ -115,6 +113,13 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+
+        <!-- 配置文件处理器 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- FastJson -->
@@ -195,16 +200,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${swagger2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${swagger2.version}</version>
             </dependency>
 
             <!-- Java Native Access -->

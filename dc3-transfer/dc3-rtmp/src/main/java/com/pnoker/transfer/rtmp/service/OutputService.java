@@ -16,8 +16,8 @@
 
 package com.pnoker.transfer.rtmp.service;
 
-import com.pnoker.transfer.rtmp.constant.Task;
 import com.pnoker.transfer.rtmp.constant.Global;
+import com.pnoker.transfer.rtmp.model.Task;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,7 +62,7 @@ public class OutputService implements Runnable {
         String line;
         try {
             while (null != (line = reader.readLine()) && status) {
-                log.info(line);
+                log.debug(line);
                 handle(line.toLowerCase());
             }
             if (!status) {

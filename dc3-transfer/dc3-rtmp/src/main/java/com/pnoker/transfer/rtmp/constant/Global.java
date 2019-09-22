@@ -16,6 +16,7 @@
 
 package com.pnoker.transfer.rtmp.constant;
 
+import com.pnoker.transfer.rtmp.model.Task;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -40,6 +41,9 @@ public class Global {
     public static int MAX_TASK_TIMES = 10;
     public static Map<String, Task> taskMap = new HashMap<>(32);
     public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue(32);
+
+    //FFmpeg 位置
+    public static String FFMPEG_PATH;
 
     /**
      * 核心线程池大小

@@ -22,7 +22,6 @@ import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,14 +39,12 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
-    //@Cacheable(cacheNames = "rtmps", key = "rtmps-all")
     public List<Rtmp> list() {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         return rtmpMapper.selectList(queryWrapper);
     }
 
     @Override
-    @Cacheable(cacheNames = "rtmp", key = "#rtmp.id")
     public int insert(Rtmp rtmp) {
         return rtmpMapper.insert(rtmp);
     }

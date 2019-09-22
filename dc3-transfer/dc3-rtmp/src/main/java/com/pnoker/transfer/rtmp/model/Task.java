@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.constant;
+package com.pnoker.transfer.rtmp.model;
 
 import com.pnoker.common.utils.Tools;
+import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.OutputService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +55,11 @@ public class Task {
     private Process process;
     private OutputService outputService;
 
+    /**
+     * 构造函数
+     *
+     * @param command
+     */
     public Task(String command) {
         this.id = Tools.uuid();
         this.status = 0;

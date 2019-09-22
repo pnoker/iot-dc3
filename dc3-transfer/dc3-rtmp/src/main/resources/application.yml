@@ -36,6 +36,7 @@ logging:
     io.lettuce.core: WARN
     io.undertow: WARN
     com.netflix: WARN
+    com.pnoker: DEBUG
 
 eureka:
   instance:

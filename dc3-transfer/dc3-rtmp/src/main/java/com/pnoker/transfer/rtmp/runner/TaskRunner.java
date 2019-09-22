@@ -17,18 +17,23 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.common.utils.Tools;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.CmdTaskService;
 import com.pnoker.transfer.rtmp.service.RtmpService;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static java.lang.System.getProperty;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -40,20 +45,42 @@ import java.util.List;
 @Setter
 @Order(1)
 @Component
+@ConfigurationProperties(prefix = "ffmpeg")
 public class TaskRunner implements ApplicationRunner {
+    @Setter
+    @Getter
+    private String unix;
+    @Setter
+    @Getter
+    private String window;
+
     @Autowired
     private RtmpService rtmpService;
 
     @Override
     public void run(ApplicationArguments args) {
+        checkFFmpeg();
         List<Rtmp> list = rtmpService.getRtmpList();
         for (Rtmp rtmp : list) {
             if (rtmp.isAutoStart()) {
-                rtmpService.createCmdTask(rtmp);
+                rtmpService.startTask(rtmp);
             }
         }
         // 启动任务线程
         Global.threadPoolExecutor.execute(new CmdTaskService());
+    }
+
+    public void checkFFmpeg() {
+        String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
+        if ("".equals(ffmpeg) || null == ffmpeg) {
+            log.error("FFmpeg path is NULL !");
+            System.exit(1);
+        }
+        if (!Tools.isFile(ffmpeg)) {
+            log.error("{} does not exist", ffmpeg);
+            System.exit(1);
+        }
+        Global.FFMPEG_PATH = ffmpeg;
     }
 
 }
