@@ -36,6 +36,13 @@
             <artifactId>spring-webmvc</artifactId>
         </dependency>
 
+        <!-- Mybatis Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus</artifactId>
+            <version>${mybatis.plus.version}</version>
+        </dependency>
+
         <!-- Servlet Api -->
         <dependency>
             <groupId>javax.servlet</groupId>

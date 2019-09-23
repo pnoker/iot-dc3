@@ -32,7 +32,7 @@ public interface RtmpService {
      *
      * @return
      */
-    List<Rtmp> list();
+    List<Rtmp> list(Rtmp rtmp);
 
     int insert(Rtmp rtmp);
 }

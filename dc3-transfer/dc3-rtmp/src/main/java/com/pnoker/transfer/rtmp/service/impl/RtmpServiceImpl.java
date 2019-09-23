@@ -45,8 +45,8 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpDbsFeignApi rtmpDbsFeignApi;
 
     @Override
-    public List<Rtmp> getRtmpList() {
-        Response<List<Rtmp>> response = rtmpDbsFeignApi.list();
+    public List<Rtmp> getRtmpList(Rtmp rtmp) {
+        Response<List<Rtmp>> response = rtmpDbsFeignApi.list(rtmp);
         if (!response.isOk()) {
             log.error(response.getMessage());
             return reconnect();
@@ -106,6 +106,6 @@ public class RtmpServiceImpl implements RtmpService {
             Thread.sleep(Global.CONNECT_INTERVAL * times);
         } catch (Exception e) {
         }
-        return getRtmpList();
+        return getRtmpList(new Rtmp(true));
     }
 }

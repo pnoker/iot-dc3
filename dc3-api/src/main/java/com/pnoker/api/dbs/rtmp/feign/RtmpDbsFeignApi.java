@@ -59,5 +59,5 @@ public interface RtmpDbsFeignApi {
      * @return rtmpList
      */
     @GetMapping("/list")
-    Response<List<Rtmp>> list();
+    Response<List<Rtmp>> list(Rtmp rtmp);
 }

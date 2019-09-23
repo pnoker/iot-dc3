@@ -50,7 +50,7 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     }
 
     @Override
-    public Response<List<Rtmp>> list() {
-        return Response.ok(rtmpService.list());
+    public Response<List<Rtmp>> list(Rtmp rtmp) {
+        return Response.ok(rtmpService.list(rtmp));
     }
 }

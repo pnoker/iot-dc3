@@ -60,11 +60,9 @@ public class TaskRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         checkFFmpeg();
-        List<Rtmp> list = rtmpService.getRtmpList();
+        List<Rtmp> list = rtmpService.getRtmpList(new Rtmp(true));
         for (Rtmp rtmp : list) {
-            if (rtmp.isAutoStart()) {
-                rtmpService.startTask(rtmp);
-            }
+            rtmpService.startTask(rtmp);
         }
         // 启动任务线程
         Global.threadPoolExecutor.execute(new CmdTaskService());
