@@ -16,6 +16,8 @@
 
 package com.pnoker.common.model.domain.rtmp;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rtmp {
+    @TableId(type = IdType.AUTO)
     private long id;
     private String rtspUrl;
     private String rtmpUrl;
@@ -37,7 +40,7 @@ public class Rtmp {
     private short videoType;
     private boolean autoStart;
 
-    public Rtmp(long id) {
-        this.id = id;
+    public Rtmp(boolean autoStart) {
+        this.autoStart = autoStart;
     }
 }

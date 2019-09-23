@@ -58,6 +58,9 @@ mybatis-plus:
       table-prefix: dc3_
   mapper-locations: classpath*:/mapping
 
+pagehelper:
+  helper-dialect: mysql
+
 management:
   endpoints:
     web:

@@ -79,9 +79,8 @@
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
         <hikaricp.version>3.3.1</hikaricp.version>
-        <pagehelper.version>5.1.10</pagehelper.version>
         <servlet-api.version>4.0.1</servlet-api.version>
-        <mybatis.plus.version>3.1.2</mybatis.plus.version>
+        <mybatis.plus.version>3.2.0</mybatis.plus.version>
         <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
 
         <jna.version>5.3.1</jna.version>
@@ -222,6 +221,11 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
@@ -234,11 +238,6 @@
                 <groupId>org.mariadb.jdbc</groupId>
                 <artifactId>mariadb-java-client</artifactId>
                 <version>${mariadb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.pagehelper</groupId>
-                <artifactId>pagehelper</artifactId>
-                <version>${pagehelper.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
