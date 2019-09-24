@@ -36,7 +36,7 @@ spring:
     port: 6379
     password: iotdc3
     database: 1
-    timeout: 60s
+    timeout: 1H
     jedis:
       pool:
         max-idle: 16
@@ -45,9 +45,9 @@ spring:
     rollback-on-commit-failure: true
   cache:
     type: redis
-    cache-names: iot-dc3-dbs-rediscache
+    cache-names: dc3-dbs-rediscache
     redis:
-      time-to-live: 10m
+      time-to-live: 10M
 
 mybatis-plus:
   configuration:

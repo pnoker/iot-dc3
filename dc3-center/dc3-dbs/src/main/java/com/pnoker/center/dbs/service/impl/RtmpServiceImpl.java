@@ -22,7 +22,9 @@ import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,16 +42,36 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
+    @CachePut(value = "rtmp", key = "#rtmp.id")
+    public Rtmp add(Rtmp rtmp) {
+        rtmpMapper.insert(rtmp);
+        return rtmp;
+    }
+
+    @Override
+    @CacheEvict(value = "rtmp", key = "#rtmp.id")
+    public boolean delete(long id) {
+        return rtmpMapper.deleteById(id) > 0 ? true : false;
+    }
+
+    @Override
+    @CachePut(value = "rtmp", key = "#rtmp.id")
+    public Rtmp update(Rtmp rtmp) {
+        rtmpMapper.updateById(rtmp);
+        return rtmp;
+    }
+
+    @Override
     public List<Rtmp> list(Rtmp rtmp) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("auto_atart", rtmp.isAutoStart());
+        queryWrapper.eq("auto_start", rtmp.isAutoStart());
+        queryWrapper.like("name", rtmp.getName());
         return rtmpMapper.selectList(queryWrapper);
     }
 
     @Override
-    @CachePut(value = "rtmp_list", key = "#rtmp.id")
-    public int insert(Rtmp rtmp) {
-        rtmpMapper.insert(rtmp);
-        return 1;
+    @Cacheable(value = "rtmp", key = "#rtmp.id", unless = "#result == null")
+    public Rtmp selectById(long id) {
+        return rtmpMapper.selectById(id);
     }
 }

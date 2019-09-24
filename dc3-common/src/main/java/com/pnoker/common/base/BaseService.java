@@ -14,34 +14,54 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.domain.rtmp;
+package com.pnoker.common.base;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 信息实体类
+ * <p>Description: 基础 服务类接口
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Rtmp {
-    @TableId(type = IdType.AUTO)
-    private long id;
-    private String name;
-    private String rtspUrl;
-    private String rtmpUrl;
-    private String command;
-    private short videoType;
-    private boolean autoStart;
+public interface BaseService<T> {
+    /**
+     * 新增记录
+     *
+     * @param type
+     * @return type
+     */
+    T add(T type);
 
-    public Rtmp(boolean autoStart) {
-        this.autoStart = autoStart;
-    }
+    /**
+     * 删除记录
+     *
+     * @param id
+     * @return true/false
+     */
+    boolean delete(long id);
+
+    /**
+     * 更新记录
+     *
+     * @param type
+     * @return true/false
+     */
+    T update(T type);
+
+    /**
+     * 获取记录
+     *
+     * @param type
+     * @return typeList
+     */
+    List<T> list(T type);
+
+    /**
+     * 通过ID查询记录
+     *
+     * @param id
+     * @return type
+     */
+    T selectById(long id);
 }

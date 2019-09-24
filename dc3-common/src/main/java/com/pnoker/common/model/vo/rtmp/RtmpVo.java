@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RtmpVo {
+    private long id;
+    private String name;
     private String rtspUrl;
     private String rtmpUrl;
     private String command;
