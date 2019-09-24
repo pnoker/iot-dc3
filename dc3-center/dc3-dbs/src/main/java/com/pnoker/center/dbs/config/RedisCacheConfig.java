@@ -45,6 +45,24 @@ public class RedisCacheConfig {
     private Duration timeToLive;
 
     /**
+     * 自定义缓存 Key 生成策略
+     *
+     * @return
+     */
+    @Bean
+    public KeyGenerator wiselyKeyGenerator() {
+        return (target, method, params) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(target.getClass().getName());
+            sb.append(method.getName());
+            for (Object obj : params) {
+                sb.append(obj.toString());
+            }
+            return sb.toString();
+        };
+    }
+
+    /**
      * 自定义 RedisCacheManager 类，主要是设置序列化，解决乱码问题
      *
      * @param factory

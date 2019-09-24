@@ -16,9 +16,8 @@
 
 package com.pnoker.center.dbs.service;
 
+import com.pnoker.common.base.BaseService;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
-
-import java.util.List;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
@@ -26,13 +25,5 @@ import java.util.List;
  * <p>Email      : pnokers@gmail.com
  * <p>Description: Rtmp 服务接口
  */
-public interface RtmpService {
-    /**
-     * 获取 Rtmp任务 数据列表
-     *
-     * @return
-     */
-    List<Rtmp> list(Rtmp rtmp);
-
-    int insert(Rtmp rtmp);
+public interface RtmpService extends BaseService<Rtmp> {
 }
