@@ -16,12 +16,17 @@
 
 package com.pnoker.api.dbs.rtmp.feign;
 
+import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
 import com.pnoker.api.security.BaseAuthConfigurer;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -38,11 +43,11 @@ public interface RtmpDbsFeignApi {
     /**
      * 新增 新增 Rtmp 任务记录
      *
-     * @param rtmp Rtmp实体类
+     * @param rtmpDto
      * @return true/false
      */
     @PostMapping("/add")
-    Response add(@RequestBody Rtmp rtmp);
+    Response add(RtmpDto rtmpDto);
 
     /**
      * 删除 根据 ID 删除 Rtmp
@@ -51,13 +56,23 @@ public interface RtmpDbsFeignApi {
      * @return true/false
      */
     @DeleteMapping("/delete")
-    Response delete(@RequestParam(value = "id") String id);
+    Response delete(Long id);
 
     /**
      * 查询 查询全部 Rtmp
      *
+     * @param rtmpDto
      * @return rtmpList
      */
     @GetMapping("/list")
-    Response<List<Rtmp>> list(Rtmp rtmp);
+    Response<List<Rtmp>> list(RtmpDto rtmpDto);
+
+    /**
+     * 分页查询 按照查询 Rtmp
+     *
+     * @param rtmpDto
+     * @return rtmpList
+     */
+    @GetMapping("/listWithPage")
+    Response<PageInfo<Rtmp>> listWithPage(RtmpDto rtmpDto);
 }

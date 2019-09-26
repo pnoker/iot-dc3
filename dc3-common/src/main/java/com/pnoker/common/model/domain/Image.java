@@ -16,6 +16,7 @@
 
 package com.pnoker.common.model.domain;
 
+import com.pnoker.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,8 +24,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image {
-    private long id;
+public class Image extends BaseEntity {
     private String url;
     private String description;
 }

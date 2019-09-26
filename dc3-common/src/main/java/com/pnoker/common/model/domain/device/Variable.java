@@ -16,6 +16,7 @@
 
 package com.pnoker.common.model.domain.device;
 
+import com.pnoker.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,8 +30,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Variable {
-    private long id;
+public class Variable extends BaseEntity {
     private long deviceId;
     private long unitId;
     private String name;

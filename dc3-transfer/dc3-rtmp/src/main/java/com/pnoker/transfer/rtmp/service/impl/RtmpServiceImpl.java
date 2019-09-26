@@ -19,6 +19,7 @@ package com.pnoker.transfer.rtmp.service.impl;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.model.Task;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -46,7 +47,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public List<Rtmp> getRtmpList(Rtmp rtmp) {
-        Response<List<Rtmp>> response = rtmpDbsFeignApi.list(rtmp);
+        Response<List<Rtmp>> response = rtmpDbsFeignApi.list(new RtmpDto(rtmp));
         if (!response.isOk()) {
             log.error(response.getMessage());
             return reconnect();
@@ -57,7 +58,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public Response addRtmp(Rtmp rtmp) {
-        return rtmpDbsFeignApi.add(rtmp);
+        return rtmpDbsFeignApi.add(new RtmpDto(rtmp));
     }
 
     @Override

@@ -16,13 +16,19 @@
 
 package com.pnoker.center.dbs.rpc;
 
+import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BaseController;
+import com.pnoker.common.base.BasePage;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -40,17 +46,41 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     private RtmpService rtmpService;
 
     @Override
-    public Response add(Rtmp rtmp) {
+    public Response add(@RequestBody RtmpDto rtmpDto) {
+        Rtmp rtmp = new Rtmp();
+        if (null != rtmpDto.getQuery()) {
+            BeanUtils.copyProperties(rtmpDto.getQuery(), rtmp);
+        }
         return rtmpService.add(rtmp).getId() > 0 ? Response.ok() : Response.fail();
     }
 
     @Override
-    public Response delete(String id) {
+    public Response delete(@RequestParam Long id) {
+        if (null == id) {
+            return Response.fail("rtmp id can not be empty");
+        }
         return Response.ok();
     }
 
     @Override
-    public Response<List<Rtmp>> list(Rtmp rtmp) {
+    public Response<List<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
+        Rtmp rtmp = new Rtmp();
+        if (null != rtmpDto.getQuery()) {
+            BeanUtils.copyProperties(rtmpDto.getQuery(), rtmp);
+        }
         return Response.ok(rtmpService.list(rtmp));
+    }
+
+    @Override
+    public Response<PageInfo<Rtmp>> listWithPage(@RequestBody(required = false) RtmpDto rtmpDto) {
+        Rtmp rtmp = new Rtmp();
+        if (null != rtmpDto.getQuery()) {
+            BeanUtils.copyProperties(rtmpDto.getQuery(), rtmp);
+        }
+        BasePage page = new BasePage();
+        if (null != rtmpDto.getPage()) {
+            BeanUtils.copyProperties(rtmpDto.getPage(), page);
+        }
+        return Response.ok(rtmpService.listWithPage(rtmp, page));
     }
 }

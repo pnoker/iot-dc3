@@ -60,6 +60,8 @@ mybatis-plus:
 
 pagehelper:
   helper-dialect: mysql
+  page-size-zero: true
+  reasonable: true
 
 management:
   endpoints:

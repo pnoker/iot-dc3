@@ -32,6 +32,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Response<T> implements Serializable {
+    private static final long serialVersionUID = 6903078348107905138L;
+
     private boolean ok;
     private String message;
     private T data;

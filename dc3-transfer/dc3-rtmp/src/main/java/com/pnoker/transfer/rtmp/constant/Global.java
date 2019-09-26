@@ -40,7 +40,7 @@ public class Global {
     public static int MAX_TASK_SIZE = 32;
     public static int MAX_TASK_TIMES = 10;
     public static Map<String, Task> taskMap = new HashMap<>(32);
-    public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue(32);
+    public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue<>(32);
 
     //FFmpeg 位置
     public static String FFMPEG_PATH;
@@ -68,7 +68,7 @@ public class Global {
     /**
      * 用于缓存 Cmd任务 线程
      */
-    public static LinkedBlockingQueue<Runnable> linkedBlockingQueue = new LinkedBlockingQueue(64);
+    public static LinkedBlockingQueue<Runnable> linkedBlockingQueue = new LinkedBlockingQueue<>(64);
 
     /**
      * Cmd任务线程池，用于全部任务线程使用

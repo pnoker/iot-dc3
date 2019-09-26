@@ -16,6 +16,8 @@
 
 package com.pnoker.common.base;
 
+import com.github.pagehelper.PageInfo;
+
 import java.util.List;
 
 /**
@@ -56,6 +58,15 @@ public interface BaseService<T> {
      * @return typeList
      */
     List<T> list(T type);
+
+    /**
+     * 获取带分页、排序的记录
+     *
+     * @param type
+     * @param page pageNum,pageSize
+     * @return list
+     */
+    PageInfo<T> listWithPage(T type, BasePage page);
 
     /**
      * 通过ID查询记录

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author     : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: Rtmp Vo
  */
 @Data
 @NoArgsConstructor
@@ -20,5 +20,5 @@ public class RtmpVo {
     private String rtmpUrl;
     private String command;
     private short videoType;
-    private boolean autoStart;
+    private Boolean autoStart;
 }
