@@ -17,8 +17,11 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
+import com.pnoker.common.base.BasePage;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +67,18 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public List<Rtmp> list(Rtmp rtmp) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("auto_start", rtmp.isAutoStart());
-        queryWrapper.like("name", rtmp.getName());
+        rtmp.query(queryWrapper);
         return rtmpMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public PageInfo<Rtmp> listWithPage(Rtmp rtmp, BasePage page) {
+        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
+        rtmp.query(queryWrapper);
+        page.orderBy(queryWrapper);
+        PageHelper.startPage(page.getPageNum(), page.getPageSize());
+        List<Rtmp> rtmpList = rtmpMapper.selectList(queryWrapper);
+        return new PageInfo<>(rtmpList);
     }
 
     @Override

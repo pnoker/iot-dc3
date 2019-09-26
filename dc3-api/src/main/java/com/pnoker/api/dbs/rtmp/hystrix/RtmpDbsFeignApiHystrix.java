@@ -16,9 +16,11 @@
 
 package com.pnoker.api.dbs.rtmp.hystrix;
 
+import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,17 +44,22 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
 
         return new RtmpDbsFeignApi() {
             @Override
-            public Response add(Rtmp rtmp) {
+            public Response add(RtmpDto rtmpDto) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response delete(String id) {
+            public Response delete(Long id) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<List<Rtmp>> list() {
+            public Response<List<Rtmp>> list(RtmpDto rtmpDto) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<PageInfo<Rtmp>> listWithPage(RtmpDto rtmpDto) {
                 return Response.fail(message);
             }
         };

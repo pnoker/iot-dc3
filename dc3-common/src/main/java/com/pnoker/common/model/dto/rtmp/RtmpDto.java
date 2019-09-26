@@ -14,45 +14,33 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.domain.rtmp;
+package com.pnoker.common.model.dto.rtmp;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.pnoker.common.base.BaseEntity;
+import com.pnoker.common.base.BasePage;
+import com.pnoker.common.model.domain.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 信息实体类
+ * <p>Description: Rtmp DTO
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Rtmp extends BaseEntity {
-    private String name = null;
-    private String rtspUrl;
-    private String rtmpUrl;
-    private String command;
-    private short videoType;
-    private Boolean autoStart = null;
+public class RtmpDto implements Serializable {
+    private static final long serialVersionUID = 7313177263322392311L;
 
-    public Rtmp(boolean autoStart) {
-        this.autoStart = autoStart;
-    }
+    private Rtmp query;
 
-    public void query(QueryWrapper<Rtmp> queryWrapper) {
-        if (autoStart != null) {
-            if (autoStart) {
-                queryWrapper.eq("auto_start", true);
-            } else {
-                queryWrapper.eq("auto_start", false);
-            }
-        }
-        if (null != name && !"".equals(name)) {
-            queryWrapper.like("name", name);
-        }
+    private BasePage page;
+
+    public RtmpDto(Rtmp query) {
+        this.query = query;
     }
 }
