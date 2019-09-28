@@ -96,7 +96,7 @@ services:
       - 8000:8000
     links:
       - dc3-register:iotdc3.register
-      - dc3-dbs:iotdc3.dbs
+      - dc3-redis:iotdc3.redis
     container_name: dc3-gateway
     hostname: iotdc3.gateway
     networks:

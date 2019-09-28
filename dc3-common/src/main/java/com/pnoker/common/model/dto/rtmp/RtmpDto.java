@@ -22,8 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
@@ -33,14 +31,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RtmpDto implements Serializable {
-    private static final long serialVersionUID = 7313177263322392311L;
-
-    private Rtmp query;
+public class RtmpDto extends Rtmp {
 
     private BasePage page;
 
-    public RtmpDto(Rtmp query) {
-        this.query = query;
-    }
 }

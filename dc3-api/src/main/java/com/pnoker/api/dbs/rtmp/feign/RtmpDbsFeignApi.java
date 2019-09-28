@@ -23,10 +23,7 @@ import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
 import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,11 +40,11 @@ public interface RtmpDbsFeignApi {
     /**
      * 新增 新增 Rtmp 任务记录
      *
-     * @param rtmpDto
+     * @param rtmp
      * @return true/false
      */
     @PostMapping("/add")
-    Response add(RtmpDto rtmpDto);
+    Response<Long> add(Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp
@@ -56,16 +53,34 @@ public interface RtmpDbsFeignApi {
      * @return true/false
      */
     @DeleteMapping("/delete")
-    Response delete(Long id);
+    Response<Boolean> delete(Long id);
+
+    /**
+     * 修改 修改 Rtmp 任务记录
+     *
+     * @param rtmp
+     * @return true/false
+     */
+    @PutMapping("/update")
+    Response<Boolean> update(Rtmp rtmp);
+
+    /**
+     * 查询 根据ID查询 Rtmp
+     *
+     * @param id
+     * @return rtmp
+     */
+    @GetMapping("/selectById")
+    Response<Rtmp> selectById(Long id);
 
     /**
      * 查询 查询全部 Rtmp
      *
-     * @param rtmpDto
+     * @param rtmp
      * @return rtmpList
      */
     @GetMapping("/list")
-    Response<List<Rtmp>> list(RtmpDto rtmpDto);
+    Response<List<Rtmp>> list(Rtmp rtmp);
 
     /**
      * 分页查询 按照查询 Rtmp

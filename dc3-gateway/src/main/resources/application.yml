@@ -4,14 +4,26 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  thymeleaf:
+    cache: false
+    enabled: true
+    check-template: true
+    mode: HTML5
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+    servlet:
+      content-type: text/html
   security:
     user:
       name: iotdc3
       password: iotdc3
   redis:
-    host: localhost
+    host: iotdc3.redis
     port: 6379
-    password: iotdc3
+    password: ${spring.security.user.password}
+    database: 2
+    timeout: 1H
   cloud:
     gateway:
       loadbalancer:
@@ -20,25 +32,21 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-      default-filters:
-        - name: Hystrix
-            args:
-              rate-limiter: fallbackcmd
-              key-resolver: forward:/fallback
       routes:
-        #注册中心 路由配置
-        - id: register_web_route
-          uri: lb://dc3-register
+        - id: dbs_rest_api
+          uri: lb://dc3-dbs
           predicates:
-            - Path=/register/**
+            - Path=/api/v3/dbs/**
           filters:
-            - StripPrefix=1
-        - id: eureka_route
-          uri: lb://dc3-register
-          predicates:
-            - Path=/eureka/**
-          filters:
-            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@remoteAddrKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
 
 management:
   endpoints:

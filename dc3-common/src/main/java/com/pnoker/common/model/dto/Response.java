@@ -138,7 +138,7 @@ public class Response<T> implements Serializable {
      */
     private Response success() {
         this.ok = true;
-        this.message = "Ok,Request Succeeded!";
+        this.message = "Ok!";
         return this;
     }
 
@@ -161,7 +161,7 @@ public class Response<T> implements Serializable {
      */
     private Response failure() {
         this.ok = false;
-        this.message = "Sorry,Request Failed!";
+        this.message = "Fail!";
         return this;
     }
 

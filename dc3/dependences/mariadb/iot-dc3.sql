@@ -100,19 +100,49 @@ CREATE TABLE `dc3_org_bind`  (
 DROP TABLE IF EXISTS `dc3_rtmp`;
 CREATE TABLE `dc3_rtmp`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '名称',
   `rtsp_url` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'RTSP播放链接',
   `rtmp_url` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'RTMP播放链接',
   `command` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'cmd运行模板',
   `video_type` tinyint(1) NULL DEFAULT NULL COMMENT '摄像头类型',
   `auto_start` tinyint(1) NULL DEFAULT NULL COMMENT '自启动',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 100 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 116 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of dc3_rtmp
 -- ----------------------------
-INSERT INTO `dc3_rtmp` VALUES (1, 'rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
-INSERT INTO `dc3_rtmp` VALUES (2, 'rtsp://admin:admin@192.168.2.236:37779/cam/realmonitor?channel=1&subtype=0', 'rtmp://iotdc3.nginx:1935/rtmp/monitor', NULL, 1, 0);
+INSERT INTO `dc3_rtmp` VALUES (1, '视频1', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (100, '视频2', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k1', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (101, '视频3', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 1);
+INSERT INTO `dc3_rtmp` VALUES (102, '视频4', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (103, '视频5', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (104, '视频15', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (105, '视频14', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (106, '视频13', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (107, '视频12', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (108, '视频11', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 1);
+INSERT INTO `dc3_rtmp` VALUES (109, '视频21', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (110, '视频22', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (111, '视频23', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (112, '视频24', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (113, '视频25', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 1);
+INSERT INTO `dc3_rtmp` VALUES (114, '视频26', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+INSERT INTO `dc3_rtmp` VALUES (115, '1视频2', 'D:/FFmpeg/bin/video.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0);
+
+-- ----------------------------
+-- Table structure for dc3_schedule
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_schedule`;
+CREATE TABLE `dc3_schedule`  (
+  `id` bigint(20) NOT NULL COMMENT '主键ID',
+  `variable_id` bigint(20) NULL DEFAULT NULL COMMENT '设备数据ID，管理一个设备的一个数据采集点',
+  `job_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '任务名称',
+  `corn_expression` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '定时任务规则',
+  `status` tinyint(4) NULL DEFAULT NULL COMMENT '当前状态',
+  `time` timestamp(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '时间戳',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_tag
@@ -156,6 +186,18 @@ CREATE TABLE `dc3_unit`  (
   INDEX `group_id`(`group_id`) USING BTREE,
   CONSTRAINT `dc3_unit_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `dc3_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for dc3_user
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_user`;
+CREATE TABLE `dc3_user`  (
+  `id` bigint(20) NOT NULL COMMENT '主键ID',
+  `user_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户名，需要加密存储',
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '密码，需要加密存储',
+  `time` timestamp(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '时间戳',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_variable
