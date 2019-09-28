@@ -28,7 +28,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: Rtmp 视频转码服务启动入口
  */
 @Slf4j
 @EnableAsync

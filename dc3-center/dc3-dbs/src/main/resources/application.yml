@@ -30,11 +30,11 @@ spring:
       port: 27017
       database: iot-dc3
       username: root
-      password: iotdc3
+      password: ${spring.security.user.password}
   redis:
     host: iotdc3.redis
     port: 6379
-    password: iotdc3
+    password: ${spring.security.user.password}
     database: 1
     timeout: 1H
     jedis:

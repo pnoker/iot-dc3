@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -37,7 +36,7 @@ import java.util.List;
  * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
  * <p>@Author    : Pnoker
  * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>Description: rtmp dbs rest client
  */
 @Slf4j
 @RestController
@@ -46,27 +45,40 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     private RtmpService rtmpService;
 
     @Override
-    public Response add(@RequestBody RtmpDto rtmpDto) {
-        Rtmp rtmp = new Rtmp();
-        if (null != rtmpDto.getQuery()) {
-            BeanUtils.copyProperties(rtmpDto.getQuery(), rtmp);
+    public Response<Long> add(@RequestBody Rtmp rtmp) {
+        if (null == rtmp) {
+            return Response.fail("body is null");
         }
-        return rtmpService.add(rtmp).getId() > 0 ? Response.ok() : Response.fail();
+        rtmpService.add(rtmp);
+        return rtmp.getId() > 0 ? Response.ok(rtmp.getId()) : Response.fail();
     }
 
     @Override
-    public Response delete(@RequestParam Long id) {
+    public Response<Boolean> delete(Long id) {
         if (null == id) {
             return Response.fail("rtmp id can not be empty");
         }
-        return Response.ok();
+        return rtmpService.delete(id) ? Response.ok() : Response.fail();
     }
 
     @Override
-    public Response<List<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
-        Rtmp rtmp = new Rtmp();
-        if (null != rtmpDto.getQuery()) {
-            BeanUtils.copyProperties(rtmpDto.getQuery(), rtmp);
+    public Response<Boolean> update(@RequestBody Rtmp rtmp) {
+        return null;
+    }
+
+    @Override
+    public Response<Rtmp> selectById(Long id) {
+        if (null == id) {
+            return Response.fail("rtmp id can not be empty");
+        }
+        Rtmp rtmp = rtmpService.selectById(id);
+        return null != rtmp ? Response.ok(rtmp) : Response.fail("id does not exist");
+    }
+
+    @Override
+    public Response<List<Rtmp>> list(@RequestBody(required = false) Rtmp rtmp) {
+        if (null == rtmp) {
+            rtmp = new Rtmp();
         }
         return Response.ok(rtmpService.list(rtmp));
     }
@@ -74,8 +86,8 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     @Override
     public Response<PageInfo<Rtmp>> listWithPage(@RequestBody(required = false) RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
-        if (null != rtmpDto.getQuery()) {
-            BeanUtils.copyProperties(rtmpDto.getQuery(), rtmp);
+        if (null != rtmpDto) {
+            BeanUtils.copyProperties(rtmpDto, rtmp);
         }
         BasePage page = new BasePage();
         if (null != rtmpDto.getPage()) {

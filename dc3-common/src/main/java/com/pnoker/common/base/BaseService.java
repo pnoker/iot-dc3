@@ -31,9 +31,8 @@ public interface BaseService<T> {
      * 新增记录
      *
      * @param type
-     * @return type
      */
-    T add(T type);
+    void add(T type);
 
     /**
      * 删除记录
@@ -52,6 +51,14 @@ public interface BaseService<T> {
     T update(T type);
 
     /**
+     * 通过ID查询记录
+     *
+     * @param id
+     * @return type
+     */
+    T selectById(long id);
+
+    /**
      * 获取记录
      *
      * @param type
@@ -68,11 +75,4 @@ public interface BaseService<T> {
      */
     PageInfo<T> listWithPage(T type, BasePage page);
 
-    /**
-     * 通过ID查询记录
-     *
-     * @param id
-     * @return type
-     */
-    T selectById(long id);
 }

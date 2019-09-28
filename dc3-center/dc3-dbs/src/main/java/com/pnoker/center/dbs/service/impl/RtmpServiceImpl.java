@@ -46,15 +46,14 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @CachePut(value = "rtmp", key = "#rtmp.id")
-    public Rtmp add(Rtmp rtmp) {
+    public void add(Rtmp rtmp) {
         rtmpMapper.insert(rtmp);
-        return rtmp;
     }
 
     @Override
     @CacheEvict(value = "rtmp", key = "#rtmp.id")
     public boolean delete(long id) {
-        return rtmpMapper.deleteById(id) > 0 ? true : false;
+        return rtmpMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -62,6 +61,12 @@ public class RtmpServiceImpl implements RtmpService {
     public Rtmp update(Rtmp rtmp) {
         rtmpMapper.updateById(rtmp);
         return rtmp;
+    }
+
+    @Override
+    @Cacheable(value = "rtmp", key = "#rtmp.id", unless = "#result == null")
+    public Rtmp selectById(long id) {
+        return rtmpMapper.selectById(id);
     }
 
     @Override
@@ -81,9 +86,4 @@ public class RtmpServiceImpl implements RtmpService {
         return new PageInfo<>(rtmpList);
     }
 
-    @Override
-    @Cacheable(value = "rtmp", key = "#rtmp.id", unless = "#result == null")
-    public Rtmp selectById(long id) {
-        return rtmpMapper.selectById(id);
-    }
 }

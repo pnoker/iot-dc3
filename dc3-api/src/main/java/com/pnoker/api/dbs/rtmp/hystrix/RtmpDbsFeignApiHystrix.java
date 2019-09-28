@@ -40,11 +40,11 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
     @Override
     public RtmpDbsFeignApi create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
-        log.error("RtmpFeignApi,进入熔断:{}", message, throwable);
+        log.error("RtmpFeignApi失败:{},hystrix服务降级处理", message, throwable);
 
         return new RtmpDbsFeignApi() {
             @Override
-            public Response add(RtmpDto rtmpDto) {
+            public Response add(Rtmp rtmp) {
                 return Response.fail(message);
             }
 
@@ -54,7 +54,17 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
             }
 
             @Override
-            public Response<List<Rtmp>> list(RtmpDto rtmpDto) {
+            public Response<Boolean> update(Rtmp rtmp) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Rtmp> selectById(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<List<Rtmp>> list(Rtmp rtmp) {
                 return Response.fail(message);
             }
 
