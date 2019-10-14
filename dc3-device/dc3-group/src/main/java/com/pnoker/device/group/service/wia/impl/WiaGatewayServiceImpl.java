@@ -25,6 +25,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Service
 public class WiaGatewayServiceImpl implements WiaGatewayService {
     @Autowired

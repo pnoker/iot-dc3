@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: AES\RSA 加密算法测试
+ * <p>AES\RSA 加密算法测试
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 public class TestEncrypt {

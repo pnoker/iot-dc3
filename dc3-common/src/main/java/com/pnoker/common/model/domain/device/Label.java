@@ -22,17 +22,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备变量表
+ * <p>标签表
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Variable extends BaseEntity {
-    private long deviceId;
-    private long unitId;
+public class Label extends BaseEntity {
+    private static final long serialVersionUID = -3401186835986172381L;
+
     private String name;
-    private String code;
+    private String color;
+    private Long nodeId;
+    private Long imageId;
 }

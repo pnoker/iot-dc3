@@ -20,10 +20,10 @@ import com.pnoker.common.base.BaseService;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 服务接口
+ * <p> Rtmp 服务接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 public interface RtmpService extends BaseService<Rtmp> {
 }

@@ -14,19 +14,26 @@
  *  limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.gateway.controller;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.device.Org;
-import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
+import com.pnoker.common.base.BaseController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Orgnazation 数据库操作接口
+ * <p>Gateway MainController
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
-@Mapper
-@Component
-public interface OrgMapper extends BaseMapper<Org> {
+@Slf4j
+@Controller
+public class MainController extends BaseController {
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String index() {
+        return "index";
+    }
 }

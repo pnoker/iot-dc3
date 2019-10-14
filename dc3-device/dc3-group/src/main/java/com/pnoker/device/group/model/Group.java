@@ -19,10 +19,10 @@ package com.pnoker.device.group.model;
 import lombok.Data;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备组 信息表
+ * <p>设备组 信息表
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 public class Group {

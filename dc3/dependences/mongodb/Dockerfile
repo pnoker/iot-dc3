@@ -27,6 +27,6 @@ COPY ./launch.sh ./
 
 RUN chmod +x ./launch.sh
 
-CMD [ "/dc3-mongo/launch.sh"]
-
 EXPOSE 27017
+
+CMD [ "/dc3-mongo/launch.sh"]

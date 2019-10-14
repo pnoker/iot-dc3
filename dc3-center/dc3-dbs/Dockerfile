@@ -17,6 +17,8 @@
 FROM anapsix/alpine-java:8_server-jre_unlimited
 MAINTAINER pnoker <pnokers.icloud.com>
 
+ENV JAVA_OPS -server -Xms512m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-center/dc3-dbs
 
@@ -26,4 +28,4 @@ ADD ./target/dc3-dbs.jar ./
 
 EXPOSE 8300
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-dbs.jar
+CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-dbs.jar

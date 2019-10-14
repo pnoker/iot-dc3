@@ -29,10 +29,10 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author     : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 自定义Route配置
+ * <p>自定义Route配置
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @Configuration

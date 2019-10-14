@@ -23,6 +23,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Resource

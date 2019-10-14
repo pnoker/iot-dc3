@@ -17,17 +17,17 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.device.Group;
+import com.pnoker.common.model.domain.device.DeviceGroup;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Group 数据库操作接口
+ * <p>Group 数据库操作接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Mapper
 @Component
-public interface GroupMapper extends BaseMapper<Group> {
+public interface GroupMapper extends BaseMapper<DeviceGroup> {
 }

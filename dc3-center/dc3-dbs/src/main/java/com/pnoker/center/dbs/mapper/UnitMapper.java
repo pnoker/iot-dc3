@@ -17,15 +17,15 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.device.Unit;
+import com.pnoker.common.model.domain.Unit;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Unit 单位表 数据库操作接口
+ * <p>Unit 单位表 数据库操作接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Mapper
 @Component

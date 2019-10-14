@@ -30,6 +30,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Slf4j
 @RestController
 public class WiaDataController extends BaseController {

@@ -39,6 +39,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Service
 public class OpcServiceImpl implements OpcService {
     @Override

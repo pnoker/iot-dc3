@@ -22,18 +22,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备表
+ * <p>设备表
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Device extends BaseEntity {
-    private long groupId;
-    private String code;
+    private static final long serialVersionUID = -6242019770203721826L;
+
     private String name;
+    private String deviceCode;
     private String type;
-    private short status;
+    private Short status;
+    private Long deviceGroupId;
+    private Long nodeId;
+    private Long imageId;
 }

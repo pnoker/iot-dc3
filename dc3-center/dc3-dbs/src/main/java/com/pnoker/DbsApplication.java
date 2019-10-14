@@ -23,10 +23,10 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>数据中心服务启动入口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @EnableCaching
 @EnableEurekaClient

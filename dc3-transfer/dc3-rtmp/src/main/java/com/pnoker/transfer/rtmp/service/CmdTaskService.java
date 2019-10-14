@@ -20,10 +20,10 @@ import com.pnoker.transfer.rtmp.constant.Global;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 任务监听线程服务，从队列中取Cmd任务进行执行
+ * <p>任务监听线程服务，从队列中取Cmd任务进行执行
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 public class CmdTaskService implements Runnable {

@@ -19,6 +19,12 @@ package com.pnoker.common.model.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 public class Keys {
 
     /**
