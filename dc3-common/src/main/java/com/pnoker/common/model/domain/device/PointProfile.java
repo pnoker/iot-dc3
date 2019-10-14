@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>设备变量表
+ * <p>测点配置表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -30,13 +30,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PointProperty extends BaseEntity {
-    private static final long serialVersionUID = -8906573997172682463L;
+public class PointProfile extends BaseEntity {
+    private static final long serialVersionUID = -7739273078508717011L;
 
-    private String name;
-    private Float base;
-    private Float minimum;
-    private Float maximum;
-    private Float multiple;
-    private Float value;
+    private String config;
+    private Long driverId;
 }
