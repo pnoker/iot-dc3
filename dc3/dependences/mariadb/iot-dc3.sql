@@ -51,6 +51,26 @@ CREATE TABLE `dc3_device`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for dc3_device_driver
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_device_driver`;
+CREATE TABLE `dc3_device_driver`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT ' 协议名称',
+  `service_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '协议服务名称',
+  `connect_info` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '设备驱动连接属性',
+  `profile_info` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '设备测点配置属性',
+  `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `user_id`(`user_id`) USING BTREE,
+  CONSTRAINT `dc3_device_driver_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for dc3_device_group
 -- ----------------------------
 DROP TABLE IF EXISTS `dc3_device_group`;
@@ -68,9 +88,9 @@ CREATE TABLE `dc3_device_group`  (
   `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `org_id`(`node_id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
+  INDEX `node_id`(`node_id`) USING BTREE,
   CONSTRAINT `dc3_device_group_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_device_group_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_device_group_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -92,7 +112,7 @@ CREATE TABLE `dc3_image`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
-  INDEX `dc3_image_ibfk_1`(`node_id`) USING BTREE,
+  INDEX `node_id`(`node_id`) USING BTREE,
   CONSTRAINT `dc3_image_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_image_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '图片表' ROW_FORMAT = Dynamic;
@@ -120,7 +140,7 @@ CREATE TABLE `dc3_label`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
-  INDEX `dc3_label_ibfk_1`(`node_id`) USING BTREE,
+  INDEX `node_id`(`node_id`) USING BTREE,
   CONSTRAINT `dc3_label_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_label_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_label_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -142,9 +162,9 @@ CREATE TABLE `dc3_label_bind`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `label_id`(`label_id`) USING BTREE,
-  INDEX `device_id`(`entity_id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
-  INDEX `dc3_label_bind_ibfk_1`(`node_id`) USING BTREE,
+  INDEX `entity_id`(`entity_id`) USING BTREE,
+  INDEX `node_id`(`node_id`) USING BTREE,
   CONSTRAINT `dc3_label_bind_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_label_bind_ibfk_2` FOREIGN KEY (`label_id`) REFERENCES `dc3_label` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_label_bind_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -189,6 +209,7 @@ CREATE TABLE `dc3_point`  (
   `device_id` bigint(20) NULL DEFAULT NULL COMMENT '设备ID',
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID，节点类型为point',
   `property_id` bigint(20) NULL DEFAULT NULL COMMENT '参数属性ID',
+  `profile_id` bigint(20) NULL DEFAULT NULL COMMENT '测点配置信息ID',
   `unit_id` bigint(20) NULL DEFAULT NULL COMMENT '单位ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
@@ -200,13 +221,35 @@ CREATE TABLE `dc3_point`  (
   INDEX `unit_id`(`unit_id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `property_id`(`property_id`) USING BTREE,
-  INDEX `dc3_point_ibfk_2`(`node_id`) USING BTREE,
+  INDEX `node_id`(`node_id`) USING BTREE,
+  INDEX `profile_id`(`profile_id`) USING BTREE,
   CONSTRAINT `dc3_point_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `dc3_unit` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_point_ibfk_4` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_point_ibfk_5` FOREIGN KEY (`property_id`) REFERENCES `dc3_point_property` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_point_ibfk_1` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `dc3_point_ibfk_2` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `dc3_point_ibfk_2` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_point_ibfk_6` FOREIGN KEY (`profile_id`) REFERENCES `dc3_point_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备测点表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for dc3_point_profile
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_point_profile`;
+CREATE TABLE `dc3_point_profile`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `config` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '测点配置信息，Json字符串',
+  `driver_id` bigint(20) NULL DEFAULT NULL COMMENT '设备驱动ID',
+  `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `user_id`(`user_id`) USING BTREE,
+  INDEX `driver_id`(`driver_id`) USING BTREE,
+  CONSTRAINT `dc3_point_profile_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_point_profile_ibfk_2` FOREIGN KEY (`driver_id`) REFERENCES `dc3_device_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备测点配置表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_point_property
@@ -218,8 +261,16 @@ CREATE TABLE `dc3_point_property`  (
   `base` float NULL DEFAULT NULL COMMENT '基础值',
   `minimum` float NULL DEFAULT NULL COMMENT '最小值',
   `maximum` float NULL DEFAULT NULL COMMENT '最大值',
-  `default` float NULL DEFAULT NULL COMMENT '默认值',
-  PRIMARY KEY (`id`) USING BTREE
+  `multiple` float(255, 0) NULL DEFAULT 1 COMMENT '倍数',
+  `value` float NULL DEFAULT 0 COMMENT '默认值',
+  `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `user_id`(`user_id`) USING BTREE,
+  CONSTRAINT `dc3_point_property_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '测点属性表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -244,6 +295,7 @@ CREATE TABLE `dc3_rtmp`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
   INDEX `node_id`(`node_id`) USING BTREE,
+  INDEX `dc3_rtmp_ibfk_3`(`user_id`) USING BTREE,
   CONSTRAINT `dc3_rtmp_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_rtmp_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_rtmp_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -252,7 +304,7 @@ CREATE TABLE `dc3_rtmp`  (
 -- ----------------------------
 -- Records of dc3_rtmp
 -- ----------------------------
-INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, -1, -1,-1,  '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
@@ -261,7 +313,7 @@ INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/19031422
 DROP TABLE IF EXISTS `dc3_schedule`;
 CREATE TABLE `dc3_schedule`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `job_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '任务名称',
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '任务名称',
   `corn_expression` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '定时任务规则',
   `status` tinyint(4) NULL DEFAULT NULL COMMENT '当前状态',
   `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '链接',
@@ -272,8 +324,7 @@ CREATE TABLE `dc3_schedule`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
-  INDEX `point_id`(`url`) USING BTREE,
-  CONSTRAINT `dc3_schedule_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `dc3_schedule_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '任务调度表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -294,7 +345,7 @@ CREATE TABLE `dc3_unit`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
-  INDEX `dc3_unit_ibfk_1`(`node_id`) USING BTREE,
+  INDEX `node_id`(`node_id`) USING BTREE,
   CONSTRAINT `dc3_unit_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_unit_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '单位表' ROW_FORMAT = Dynamic;

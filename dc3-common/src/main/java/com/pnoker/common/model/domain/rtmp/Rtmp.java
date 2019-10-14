@@ -38,7 +38,7 @@ public class Rtmp extends BaseEntity {
     private String rtspUrl;
     private String rtmpUrl;
     private String command;
-    private short videoType;
+    private Short videoType;
     private Boolean autoStart;
     private Long nodeId;
     private Long imageId;
