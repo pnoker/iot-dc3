@@ -22,15 +22,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备组织关系表
+ * <p>设备组表
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrgBind extends BaseEntity {
-    private long parentOrg;
-    private long childOrg;
+public class DeviceGroup extends BaseEntity {
+    private static final long serialVersionUID = -1968327505291241092L;
+
+    private String name;
+    private String deviceGroupCode;
+    private String location;
+    private String serviceName;
+    private Long nodeId;
+    private Long imageId;
 }

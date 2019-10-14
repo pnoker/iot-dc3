@@ -21,10 +21,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Image extends BaseEntity {
+    private static final long serialVersionUID = 7504911674170775038L;
+
+    private String name;
     private String url;
-    private String description;
+    private Long nodeId;
 }

@@ -23,10 +23,10 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 返回信息 DTO
+ * <p>返回信息 DTO
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor

@@ -24,6 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Data
 @Slf4j
 public class WiaReceiveThread implements Runnable {

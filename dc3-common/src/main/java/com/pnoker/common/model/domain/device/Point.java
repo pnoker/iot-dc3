@@ -22,15 +22,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备组织表
+ * <p>设备变量表
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Org extends BaseEntity {
+public class Point extends BaseEntity {
+    private static final long serialVersionUID = -8906573997172682463L;
+
     private String name;
-    private long imageId;
+    private String pointCode;
+    private Long deviceId;
+    private Long nodeId;
+    private Long propertyId;
+    private Long unitId;
 }

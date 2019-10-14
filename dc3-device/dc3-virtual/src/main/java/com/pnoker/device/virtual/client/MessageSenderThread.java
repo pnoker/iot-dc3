@@ -32,6 +32,12 @@ import java.util.concurrent.TimeUnit;
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_BEGIN;
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_END;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Slf4j
 public class MessageSenderThread implements Runnable {
 

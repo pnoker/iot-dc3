@@ -22,19 +22,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备变量单位表
+ * <p>目录结构表
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Unit extends BaseEntity {
-    private long groupId;
-    private String code;
+public class Node extends BaseEntity {
+    private static final long serialVersionUID = -739205499172549508L;
+
     private String name;
-    private String symbol;
-    private float multiple;
-    private String format;
+    private String type;
+    private Long parentId;
+    private Long imageId;
 }

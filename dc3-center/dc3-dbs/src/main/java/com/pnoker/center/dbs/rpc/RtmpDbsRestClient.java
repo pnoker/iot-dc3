@@ -33,10 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: rtmp dbs rest client
+ * <p>rtmp dbs rest client
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @RestController

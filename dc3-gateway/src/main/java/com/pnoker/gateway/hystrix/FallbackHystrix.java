@@ -31,10 +31,10 @@ import java.util.Optional;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author     : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 服务降级处理
+ * <p>服务降级处理
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @Component

@@ -23,21 +23,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 信息实体类
+ * <p>Rtmp 信息实体类
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rtmp extends BaseEntity {
-    private String name = null;
+    private static final long serialVersionUID = 594764013253279856L;
+
+    private String name;
     private String rtspUrl;
     private String rtmpUrl;
     private String command;
     private short videoType;
-    private Boolean autoStart = null;
+    private Boolean autoStart;
+    private Long nodeId;
+    private Long imageId;
 
     public Rtmp(boolean autoStart) {
         this.autoStart = autoStart;

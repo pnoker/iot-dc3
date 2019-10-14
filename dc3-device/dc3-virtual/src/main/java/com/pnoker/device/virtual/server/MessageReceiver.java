@@ -23,6 +23,12 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Component
 @Slf4j
 @Order(1)

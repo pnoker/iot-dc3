@@ -22,10 +22,10 @@ import com.pnoker.device.group.model.wia.WiaVariable;
 import java.util.List;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: WiaDevice 服务接口
+ * <p>WiaDevice 服务接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 public interface WiaVariableService {
     List<WiaVariable> list(Wrapper<WiaVariable> wrapper);

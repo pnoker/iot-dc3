@@ -33,10 +33,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 接口实现
+ * <p>Rtmp 接口实现
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @Service

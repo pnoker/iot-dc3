@@ -52,11 +52,14 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-  global-config.:
+  mapper-locations: classpath*:/mapping
+  global-config:
     banner: false
     db-config:
       table-prefix: dc3_
-  mapper-locations: classpath*:/mapping
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
 
 pagehelper:
   helper-dialect: mysql

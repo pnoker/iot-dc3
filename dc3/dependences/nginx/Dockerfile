@@ -15,9 +15,8 @@
 #
 
 FROM pnoker/dc3-base:3.0 AS build
-MAINTAINER pnoker <pnokers.icloud.com>
 
-ENV NGINX_VERSION nginx-1.17.1
+ENV NGINX_VERSION nginx-1.17.4
 ENV NGINX_RTMP_MODULE_VERSION 1.2.1
 
 # 下载 Nginx

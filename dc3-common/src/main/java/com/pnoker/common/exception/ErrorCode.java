@@ -16,6 +16,12 @@
 
 package com.pnoker.common.exception;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 public class ErrorCode {
 
     private final int code;

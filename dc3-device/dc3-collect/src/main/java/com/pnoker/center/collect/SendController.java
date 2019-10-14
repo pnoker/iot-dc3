@@ -21,8 +21,10 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @Author: lyang
- * @Date: 2019/12/29 16:34
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @RestController
 public class SendController {

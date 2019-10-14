@@ -21,10 +21,10 @@ import com.github.pagehelper.PageInfo;
 import java.util.List;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 基础 服务类接口
+ * <p>基础 服务类接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 public interface BaseService<T> {
     /**

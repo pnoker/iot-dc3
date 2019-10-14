@@ -27,6 +27,12 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 public class AesTools {
 
     public static final String KEY_ALGORITHM = "AES";

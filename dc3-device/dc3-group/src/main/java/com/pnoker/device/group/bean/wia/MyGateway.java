@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Wia Gateway信息
+ * <p>Wia Gateway信息
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @Slf4j

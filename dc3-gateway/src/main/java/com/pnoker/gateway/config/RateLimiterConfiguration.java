@@ -22,10 +22,10 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author     : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 限流配置
+ * <p>限流配置
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Configuration
 public class RateLimiterConfiguration {

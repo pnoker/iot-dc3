@@ -22,15 +22,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备标签表
+ * <p>标签关系表
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tag extends BaseEntity {
-    private long groupId;
-    private String name;
+public class LabelBind extends BaseEntity {
+    private static final long serialVersionUID = 3258662292111482392L;
+
+    private Long nodeId;
+    private Long labelId;
+    private Long entityId;
 }

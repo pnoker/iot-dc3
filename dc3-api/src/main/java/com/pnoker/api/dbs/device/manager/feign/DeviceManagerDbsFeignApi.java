@@ -22,10 +22,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
 @RequestMapping("/api/v3/device/manager")

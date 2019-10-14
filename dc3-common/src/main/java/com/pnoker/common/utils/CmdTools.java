@@ -19,10 +19,10 @@ package com.pnoker.common.utils;
 import lombok.Data;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Command 指令构造器
+ * <p>Command 指令构造器
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 public class CmdTools {

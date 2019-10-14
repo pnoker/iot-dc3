@@ -14,23 +14,20 @@
  *  limitations under the License.
  */
 
-package com.pnoker.common.model.domain.device;
+package com.pnoker.center.dbs.mapper;
 
-import com.pnoker.common.base.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pnoker.common.model.domain.device.Node;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: 设备标签关系表
+ * <p>Orgnazation 数据库操作接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class TagBind extends BaseEntity {
-    private long tagId;
-    private long deviceId;
+@Mapper
+@Component
+public interface DirectoryMapper extends BaseMapper<Node> {
 }

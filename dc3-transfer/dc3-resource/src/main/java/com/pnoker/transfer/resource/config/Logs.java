@@ -18,6 +18,12 @@ package com.pnoker.transfer.resource.config;
 
 import java.lang.annotation.*;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Documented
 @Inherited
 @Target(ElementType.METHOD)

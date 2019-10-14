@@ -19,6 +19,12 @@ package com.pnoker.transfer.opc.bean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Data
 @AllArgsConstructor
 public class OpcServer {

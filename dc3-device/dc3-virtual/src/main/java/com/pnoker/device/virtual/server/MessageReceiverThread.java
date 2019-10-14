@@ -27,6 +27,12 @@ import java.nio.CharBuffer;
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_BEGIN;
 import static com.pnoker.device.virtual.constant.ProtocolConstant.MSG_END;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Slf4j
 public class MessageReceiverThread implements Runnable {
     private Socket socket;

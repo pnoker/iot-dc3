@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.config;
+package com.pnoker.center.register.security;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +23,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @EnableWebSecurity
-public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @SneakyThrows
     protected void configure(HttpSecurity http) {

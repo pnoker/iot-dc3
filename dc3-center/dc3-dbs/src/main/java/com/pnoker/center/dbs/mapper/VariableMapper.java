@@ -17,17 +17,17 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.device.Variable;
+import com.pnoker.common.model.domain.device.Point;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Variable 变量表 数据库操作接口
+ * <p>Variable 变量表 数据库操作接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Mapper
 @Component
-public interface VariableMapper extends BaseMapper<Variable> {
+public interface VariableMapper extends BaseMapper<Point> {
 }

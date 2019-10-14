@@ -85,6 +85,7 @@
         <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
 
         <jna.version>5.3.1</jna.version>
+        <hutool.version>4.6.8</hutool.version>
         <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
         <jackson.modules>2.9.8</jackson.modules>
@@ -93,7 +94,6 @@
         <slf4j-api.version>1.7.26</slf4j-api.version>
         <commons.cli.version>1.4</commons.cli.version>
         <commons.lang3.version>3.9</commons.lang3.version>
-        <google.guava.version>28.0-jre</google.guava.version>
     </properties>
 
     <dependencies>
@@ -136,11 +136,11 @@
             <version>${pagehelper.version}</version>
         </dependency>
 
-        <!-- Google Guava -->
+        <!-- Hutool 工具集合 -->
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${google.guava.version}</version>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
         </dependency>
 
         <!-- Lombok 代码简化 -->
@@ -309,6 +309,15 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <configuration>
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler.plugin}</version>
                     <configuration>
@@ -380,6 +389,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

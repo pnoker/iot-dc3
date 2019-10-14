@@ -18,6 +18,12 @@ package com.pnoker.transfer.opc.bean;
 
 import lombok.Data;
 
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @Data
 public class OpcItem {
     private String name;

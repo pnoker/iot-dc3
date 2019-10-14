@@ -20,8 +20,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 /**
- * @Author: lyang
- * @Date: 2019/1/1 17:55
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @JsonIgnoreProperties
