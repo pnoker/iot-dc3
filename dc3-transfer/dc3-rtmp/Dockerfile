@@ -29,7 +29,7 @@ WORKDIR /dc3-transfer/dc3-rtmp
 ADD ./target/dc3-rtmp.jar ./
 COPY --from=build /usr/local /usr/local
 
-EXPOSE 8830
+EXPOSE 8803
 
 CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-rtmp.jar
 
