@@ -14,30 +14,29 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
+package com.pnoker.common.security.exception;
 
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.pnoker.common.security.component.PigAuth2ExceptionSerializer;
+import lombok.Getter;
+import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 
 /**
  * @author lengleng
  * @date 2019/2/1
+ * 自定义OAuth2Exception
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+@JsonSerialize(using = PigAuth2ExceptionSerializer.class)
+public class PigAuth2Exception extends OAuth2Exception {
+	@Getter
+	private String errorCode;
 
-	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
-	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
+	public PigAuth2Exception(String msg) {
+		super(msg);
+	}
+
+	public PigAuth2Exception(String msg, String errorCode) {
+		super(msg);
+		this.errorCode = errorCode;
 	}
 }

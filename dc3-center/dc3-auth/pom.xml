@@ -50,6 +50,12 @@
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-common-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-common-security</artifactId>
+            <version>3.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

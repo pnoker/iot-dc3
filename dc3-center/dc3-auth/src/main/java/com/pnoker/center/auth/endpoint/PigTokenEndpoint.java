@@ -1,12 +1,12 @@
 /*
- * Copyright 2019 Pnoker. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  Copyright (c) 2019-2020, 冷冷 (wangiegie@gmail.com).
+ *  <p>
+ *  Licensed under the GNU Lesser General Public License 3.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *  <p>
+ * https://www.gnu.org/licenses/lgpl.html
+ *  <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +19,9 @@ package com.pnoker.center.auth.endpoint;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pig4cloud.pig.common.core.constant.SecurityConstants;
-import com.pnoker.common.model.domain.User;
+import com.pnoker.common.constant.SecurityConstants;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.security.service.PigUser;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.ConvertingCursor;
 import org.springframework.data.redis.core.Cursor;
@@ -138,16 +138,16 @@ public class PigTokenEndpoint {
             if (authentication instanceof UsernamePasswordAuthenticationToken) {
                 UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) authentication;
 
-                if (authenticationToken.getPrincipal() instanceof User) {
-                    User user = (User) authenticationToken.getPrincipal();
+                if (authenticationToken.getPrincipal() instanceof PigUser) {
+                    PigUser user = (PigUser) authenticationToken.getPrincipal();
                     map.put("user_id", user.getId() + "");
                     map.put("username", user.getUsername() + "");
                 }
             } else if (authentication instanceof PreAuthenticatedAuthenticationToken) {
                 //刷新token方式
                 PreAuthenticatedAuthenticationToken authenticationToken = (PreAuthenticatedAuthenticationToken) authentication;
-                if (authenticationToken.getPrincipal() instanceof User) {
-                    User user = (User) authenticationToken.getPrincipal();
+                if (authenticationToken.getPrincipal() instanceof PigUser) {
+                    PigUser user = (PigUser) authenticationToken.getPrincipal();
                     map.put("user_id", user.getId() + "");
                     map.put("username", user.getUsername() + "");
                 }

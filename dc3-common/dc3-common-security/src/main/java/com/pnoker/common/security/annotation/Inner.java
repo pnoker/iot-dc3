@@ -14,30 +14,32 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
+package com.pnoker.common.security.annotation;
 
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import java.lang.annotation.*;
 
 /**
  * @author lengleng
- * @date 2019/2/1
+ * @date 2018/11/26
+ * <p>
+ * 服务调用不鉴权注解
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Inner {
 
 	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
+	 * 是否AOP统一处理
 	 *
-	 * @param authentication 登录对象
+	 * @return false, true
 	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
-	}
+	boolean value() default true;
+
+	/**
+	 * 需要特殊判空的字段(预留)
+	 *
+	 * @return {}
+	 */
+	String[] field() default {};
 }

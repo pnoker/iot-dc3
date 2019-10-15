@@ -14,30 +14,19 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
-
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+package com.pnoker.common.exception;
 
 /**
  * @author lengleng
- * @date 2019/2/1
+ * @date 2018年06月22日16:22:15
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+public class ValidateCodeException extends Exception {
+	private static final long serialVersionUID = -7285211528095468156L;
 
-	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
-	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
+	public ValidateCodeException() {
+	}
+
+	public ValidateCodeException(String msg) {
+		super(msg);
 	}
 }

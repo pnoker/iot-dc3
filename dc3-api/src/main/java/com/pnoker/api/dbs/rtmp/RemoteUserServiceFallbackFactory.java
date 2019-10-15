@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
+package com.pnoker.api.dbs.rtmp;
 
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
+import com.pnoker.api.dbs.rtmp.feign.RemoteUserService;
+import com.pnoker.api.dbs.rtmp.hystrix.RemoteUserServiceFallbackImpl;
+import feign.hystrix.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
  * @author lengleng
  * @date 2019/2/1
  */
-@Slf4j
 @Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+public class RemoteUserServiceFallbackFactory implements FallbackFactory<RemoteUserService> {
 
-	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
-	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
-	}
+    @Override
+    public RemoteUserService create(Throwable throwable) {
+        RemoteUserServiceFallbackImpl remoteUserServiceFallback = new RemoteUserServiceFallbackImpl();
+        remoteUserServiceFallback.setCause(throwable);
+        return remoteUserServiceFallback;
+    }
 }

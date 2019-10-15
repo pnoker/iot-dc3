@@ -37,6 +37,7 @@
             <version>3.0</version>
         </dependency>
 
+        <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-security</artifactId>
@@ -44,6 +45,10 @@
         <dependency>
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-api</artifactId>
         </dependency>
 
     </dependencies>

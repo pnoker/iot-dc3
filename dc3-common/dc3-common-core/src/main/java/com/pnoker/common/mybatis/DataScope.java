@@ -14,30 +14,34 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
+package com.pnoker.common.mybatis;
 
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author lengleng
  * @date 2019/2/1
+ * 数据权限查询参数
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class DataScope extends HashMap {
+	/**
+	 * 限制范围的字段名称
+	 */
+	private String scopeName = "deptId";
 
 	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
+	 * 具体的数据范围
 	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
-	}
+	private List<Integer> deptIds;
+
+	/**
+	 * 是否只查询本部门
+	 */
+	private Boolean isOnly = false;
 }
