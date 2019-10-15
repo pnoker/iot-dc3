@@ -69,12 +69,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
-        <spring-webmvc.version>5.1.9.RELEASE</spring-webmvc.version>
+        <spring-boot.version>2.1.9.RELEASE</spring-boot.version>
+        <spring-webmvc.version>5.1.10.RELEASE</spring-webmvc.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
         <spring-boot-admin.version>2.1.6</spring-boot-admin.version>
         <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
-        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
+        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
 
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
@@ -82,6 +82,7 @@
         <pagehelper.version>5.1.10</pagehelper.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <mybatis.plus.version>3.2.0</mybatis.plus.version>
+        <redis.data.version>2.1.11.RELEASE</redis.data.version>
         <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
 
         <jna.version>5.3.1</jna.version>
@@ -191,6 +192,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!--稳定版本，替代spring security bom内置-->
             <dependency>
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
@@ -251,6 +253,11 @@
                 <groupId>org.mariadb.jdbc</groupId>
                 <artifactId>mariadb-java-client</artifactId>
                 <version>${mariadb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-redis</artifactId>
+                <version>${redis.data.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.pagehelper</groupId>

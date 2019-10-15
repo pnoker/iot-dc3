@@ -14,30 +14,40 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
+package com.pnoker.common.constant.enums;
 
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author lengleng
- * @date 2019/2/1
+ * @date 2018/8/15
+ * 社交登录类型
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+@Getter
+@AllArgsConstructor
+public enum LoginTypeEnum {
+	/**
+	 * 账号密码登录
+	 */
+	PWD("PWD", "账号密码登录"),
 
 	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
+	 * QQ登录
 	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
-	}
+	QQ("QQ", "QQ登录"),
+
+	/**
+	 * 微信登录
+	 */
+	WECHAT("WX", "微信登录");
+
+	/**
+	 * 类型
+	 */
+	private final String type;
+	/**
+	 * 描述
+	 */
+	private final String description;
 }

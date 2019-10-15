@@ -14,30 +14,35 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
+package com.pnoker.common.model.dto;
 
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * @author lengleng
  * @date 2019/2/1
+ * <p>
+ * commit('SET_ROLES', data)
+ * commit('SET_NAME', data)
+ * commit('SET_AVATAR', data)
+ * commit('SET_INTRODUCTION', data)
+ * commit('SET_PERMISSIONS', data)
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+@Data
+public class UserInfo implements Serializable {
+    /**
+     * 用户基本信息
+     */
+    private SysUser sysUser;
+    /**
+     * 权限标识集合
+     */
+    private String[] permissions;
 
-	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
-	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
-	}
+    /**
+     * 角色集合
+     */
+    private Integer[] roles;
 }

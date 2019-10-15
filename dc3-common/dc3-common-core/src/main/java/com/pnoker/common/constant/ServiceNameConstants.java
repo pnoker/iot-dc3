@@ -14,30 +14,22 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
-
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+package com.pnoker.common.constant;
 
 /**
  * @author lengleng
- * @date 2019/2/1
+ * @date 2018年06月22日16:41:01
+ * 服务名称
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+public interface ServiceNameConstants {
+	/**
+	 * 认证服务的SERVICEID
+	 */
+	String AUTH_SERVICE = "pig-auth";
 
 	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
+	 * UMPS模块
 	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
-	}
+	String UMPS_SERVICE = "pig-upms";
+
 }

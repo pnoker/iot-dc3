@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.handler;
+package com.pnoker.common.security.exception;
 
-import com.pnoker.common.security.handler.AbstractAuthenticationSuccessEventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.pnoker.common.security.component.PigAuth2ExceptionSerializer;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author lengleng
  * @date 2019/2/1
  */
-@Slf4j
-@Component
-public class PigAuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+@JsonSerialize(using = PigAuth2ExceptionSerializer.class)
+public class MethodNotAllowed extends PigAuth2Exception {
 
-	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
-	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
+	public MethodNotAllowed(String msg, Throwable t) {
+		super(msg);
 	}
+
+	@Override
+	public String getOAuth2ErrorCode() {
+		return "method_not_allowed";
+	}
+
+	@Override
+	public int getHttpErrorCode() {
+		return HttpStatus.METHOD_NOT_ALLOWED.value();
+	}
+
 }
