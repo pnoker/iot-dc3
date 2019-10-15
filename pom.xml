@@ -238,6 +238,11 @@
                 <version>${mybatis.plus.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.xerial</groupId>
                 <artifactId>sqlite-jdbc</artifactId>
                 <version>${sqllite.version}</version>
@@ -287,7 +292,7 @@
             <!-- dc3 Common -->
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-common</artifactId>
+                <artifactId>dc3-common-core</artifactId>
                 <version>3.0</version>
                 <scope>compile</scope>
             </dependency>

@@ -30,6 +30,26 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-security</artifactId>
+            <exclusions>
+                <!--旧版本 redis操作有问题-->
+                <exclusion>
+                    <artifactId>spring-security-oauth2</artifactId>
+                    <groupId>org.springframework.security.oauth</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-common-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

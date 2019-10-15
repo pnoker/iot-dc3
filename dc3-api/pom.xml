@@ -37,7 +37,7 @@
 
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common</artifactId>
+            <artifactId>dc3-common-core</artifactId>
         </dependency>
 
     </dependencies>
