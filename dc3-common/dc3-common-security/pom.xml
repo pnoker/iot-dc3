@@ -19,22 +19,32 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-common</artifactId>
         <version>3.0</version>
     </parent>
 
-    <artifactId>dc3-common</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dc3-common-security</artifactId>
+    <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Common 集合。</description>
+    <description>IOT DC3 平台 安全工具类</description>
 
-    <modules>
-        <module>dc3-common-core</module>
-        <module>dc3-common-security</module>
-    </modules>
 
     <dependencies>
 
-    </dependencies>
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-common-core</artifactId>
+            <version>3.0</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+        </dependency>
+
+    </dependencies>
 </project>
