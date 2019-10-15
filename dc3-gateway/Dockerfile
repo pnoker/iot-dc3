@@ -26,6 +26,6 @@ WORKDIR /dc3-gateway
 
 ADD ./target/dc3-gateway.jar ./
 
-EXPOSE 8300
+EXPOSE 8000
 
 CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-gateway.jar

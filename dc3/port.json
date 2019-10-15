@@ -1,50 +1,37 @@
 {
   "iot-dc3-port-list": {
+    "dc3-web": {
+      "description": "WEB",
+      "port": 80
+    },
     "dc3-gateway": {
-      "description": "网关",
+      "description": "网关服务",
       "port": 8000
     },
     "dc3-center": {
       "dc3-register": {
-        "description": "服务注册",
+        "description": "服务注册中心",
         "port": 8100
       },
       "dc3-monitor": {
-        "description": "服务监控",
+        "description": "服务监控中心",
         "port": 8200
       },
       "dc3-dbs": {
-        "description": "数据库",
+        "description": "数据服务中心",
         "port": 8300
       },
       "dc3-auth": {
-        "description": "权限",
+        "description": "权限中心",
         "port": 8400
-      },
-      "dc3-collect": {
-        "description": "数据采集",
-        "port": 8500
-      }
-    },
-    "dc3-transfer": {
-      "dc3-opc": {
-        "description": "OPC",
-        "port": 8810
-      },
-      "dc3-opc-ua": {
-        "description": "OPC UA",
-        "port": 8820
-      },
-      "dc3-rtmp": {
-        "description": "Rtsp转Rtmp",
-        "port": 8830
-      },
-      "dc3-resource": {
-        "description": "资源服务",
-        "port": 8840
       }
     },
     "dc3-device": {
+      "d": "设备相关服务，设备的数据采集和设备组管理",
+      "dc3-collect": {
+        "description": "设备数据采集",
+        "port": 8500
+      },
       "dc3-manager": {
         "description": "设备管理",
         "port": 8600
@@ -52,6 +39,40 @@
       "dc3-group": {
         "description": "设备组",
         "port": 8700
+      }
+    },
+    "dc3-driver": {
+      "d": "设备驱动，注册到设备组服务上去",
+      "dc3-driver-opc": {
+        "description": "OPC 驱动",
+        "port": 8601
+      },
+      "dc3-driver-opc-ua": {
+        "description": "OPC UA 驱动",
+        "port": 8602
+      },
+      "dc3-driver-plc-s7": {
+        "description": "西门子 S7 PLC 驱动",
+        "port": 8603
+      }
+    },
+    "dc3-transfer": {
+      "d": "文件资源服务、OPC UA Server、视频转码服务",
+      "dc3-resource": {
+        "description": "资源服务中心",
+        "port": 8800
+      },
+      "dc3-opc": {
+        "description": "OPC Server",
+        "port": 8801
+      },
+      "dc3-opc-ua": {
+        "description": "OPC UA Server",
+        "port": 8802
+      },
+      "dc3-rtmp": {
+        "description": "Rtsp转Rtmp",
+        "port": 8803
       }
     }
   }

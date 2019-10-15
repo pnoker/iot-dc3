@@ -26,7 +26,7 @@ RUN mkdir -p /dc3-transfer/dc3-opc
 
 WORKDIR /dc3-transfer/dc3-opc
 
-EXPOSE 8810
+EXPOSE 8801
 
 ADD ./target/dc3-opc.jar ./
 

@@ -26,6 +26,6 @@ WORKDIR /dc3-transfer/dc3-opc-ua
 
 ADD ./target/dc3-opc-ua.jar ./
 
-EXPOSE 8820
+EXPOSE 8802
 
 CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-opc-ua.jar

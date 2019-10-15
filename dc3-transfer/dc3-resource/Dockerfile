@@ -26,6 +26,6 @@ WORKDIR /dc3-transfer/dc3-resource
 
 ADD ./target/dc3-resource.jar ./
 
-EXPOSE 8840
+EXPOSE 8800
 
 CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-resource.jar
