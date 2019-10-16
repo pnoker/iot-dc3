@@ -25,8 +25,6 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
  * <p>
  *
@@ -64,12 +62,7 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
             }
 
             @Override
-            public Response<List<Rtmp>> list(Rtmp rtmp) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<PageInfo<Rtmp>> listWithPage(RtmpDto rtmpDto) {
+            public Response<PageInfo<Rtmp>> list(RtmpDto rtmpDto) {
                 return Response.fail(message);
             }
         };

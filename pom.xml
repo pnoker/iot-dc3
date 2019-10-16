@@ -61,40 +61,43 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <maven.jar.plugin>3.1.2</maven.jar.plugin>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
-        <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <maven.jar.plugin>3.1.2</maven.jar.plugin>
+        <maven.resource.plugin>3.1.0</maven.resource.plugin>
+        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
+        <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
+
         <spring-boot.version>2.1.9.RELEASE</spring-boot.version>
-        <spring-webmvc.version>5.1.10.RELEASE</spring-webmvc.version>
+        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
         <spring-boot-admin.version>2.1.6</spring-boot-admin.version>
-        <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
-        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
-
-        <mariadb.version>2.3.0</mariadb.version>
-        <sqllite.version>3.25.2</sqllite.version>
-        <hikaricp.version>3.3.1</hikaricp.version>
-        <pagehelper.version>5.1.10</pagehelper.version>
-        <servlet-api.version>4.0.1</servlet-api.version>
-        <mybatis.plus.version>3.2.0</mybatis.plus.version>
-        <redis.data.version>2.1.11.RELEASE</redis.data.version>
-        <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
+        <spring-webmvc.version>5.1.10.RELEASE</spring-webmvc.version>
+        <security-oauth.version>2.3.6.RELEASE</security-oauth.version>
 
         <jna.version>5.3.1</jna.version>
         <hutool.version>4.6.8</hutool.version>
         <codecov.version>2.7</codecov.version>
+        <jasypt.version>2.1.0</jasypt.version>
         <lombok.version>1.18.8</lombok.version>
         <jackson.modules>2.9.8</jackson.modules>
+        <mariadb.version>2.3.0</mariadb.version>
+        <sqllite.version>3.25.2</sqllite.version>
+        <hikaricp.version>3.3.1</hikaricp.version>
         <netty.version>4.1.36.Final</netty.version>
         <fastjson.version>1.2.60</fastjson.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
         <commons.cli.version>1.4</commons.cli.version>
+        <pagehelper.version>5.1.10</pagehelper.version>
+        <servlet-api.version>4.0.1</servlet-api.version>
+        <mybatis.plus.version>3.2.0</mybatis.plus.version>
         <commons.lang3.version>3.9</commons.lang3.version>
+        <redis.data.version>2.1.11.RELEASE</redis.data.version>
+        <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
+
     </properties>
 
     <dependencies>
@@ -116,32 +119,16 @@
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
 
-        <!-- 配置文件处理器 -->
+        <!-- Spring Configuration & 配置文件加密 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-
-        <!-- FastJson -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
-        </dependency>
-
-        <!-- PageHelper -->
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>${pagehelper.version}</version>
-        </dependency>
-
-        <!-- Hutool 工具集合 -->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>${jasypt.version}</version>
         </dependency>
 
         <!-- Lombok 代码简化 -->
@@ -163,25 +150,11 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- Spring Web MVC -->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${spring-webmvc.version}</version>
-            </dependency>
-
-            <!-- Spring Cloud -->
+            <!-- Spring Cloud 依赖 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.spring.platform</groupId>
-                <artifactId>platform-bom</artifactId>
-                <version>${spring-platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -192,35 +165,26 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!--稳定版本，替代spring security bom内置-->
+            <dependency>
+                <groupId>io.spring.platform</groupId>
+                <artifactId>platform-bom</artifactId>
+                <version>${spring-platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- 稳定版本 Spring Security Aauth2 -->
             <dependency>
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
-                <version>${security.oauth.version}</version>
+                <version>${security-oauth.version}</version>
             </dependency>
+
+            <!-- Spring Admin -->
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId>
                 <version>${spring-boot-admin.version}</version>
-            </dependency>
-
-            <!-- Servlet Api -->
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${servlet-api.version}</version>
-            </dependency>
-
-            <!-- Java Native Access -->
-            <dependency>
-                <groupId>net.java.dev.jna</groupId>
-                <artifactId>jna</artifactId>
-                <version>${jna.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.dev.jna</groupId>
-                <artifactId>jna-platform</artifactId>
-                <version>${jna.version}</version>
             </dependency>
 
             <!-- Database相关 -->
@@ -235,34 +199,9 @@
                 <version>${mybatis.plus.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis.plus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-extension</artifactId>
-                <version>${mybatis.plus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.xerial</groupId>
-                <artifactId>sqlite-jdbc</artifactId>
-                <version>${sqllite.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.mariadb.jdbc</groupId>
                 <artifactId>mariadb-java-client</artifactId>
                 <version>${mariadb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-redis</artifactId>
-                <version>${redis.data.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.pagehelper</groupId>
-                <artifactId>pagehelper-spring-boot-starter</artifactId>
-                <version>${pagehelper.boot.version}</version>
             </dependency>
 
             <!-- Netty-->
@@ -270,22 +209,6 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
-            </dependency>
-
-            <!--Jackson模块-->
-            <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-modules-java8</artifactId>
-                <version>${jackson.modules}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- Slf4j -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
             </dependency>
 
             <!-- dc3 Api -->
@@ -297,6 +220,12 @@
             </dependency>
 
             <!-- dc3 Common -->
+            <dependency>
+                <groupId>com.pnoker</groupId>
+                <artifactId>dc3-common-base</artifactId>
+                <version>3.0</version>
+                <scope>compile</scope>
+            </dependency>
             <dependency>
                 <groupId>com.pnoker</groupId>
                 <artifactId>dc3-common-core</artifactId>
@@ -317,17 +246,29 @@
             </resource>
         </resources>
 
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+
         <pluginManagement>
+
             <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <configuration>
-                        <nonFilteredFileExtensions>
-                            <nonFilteredFileExtension>ico</nonFilteredFileExtension>
-                        </nonFilteredFileExtensions>
-                    </configuration>
-                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -336,6 +277,19 @@
                         <target>${maven.compiler.target}</target>
                         <source>${maven.compiler.source}</source>
                         <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.plugin}</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <classpathPrefix>lib/</classpathPrefix>
+                            </manifest>
+                        </archive>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -353,6 +307,33 @@
                         </execution>
                     </executions>
                 </plugin>
+
+                <!-- 过滤文件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resource.plugin}</version>
+                    <configuration>
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
+                    </configuration>
+                </plugin>
+
+                <!-- 代码覆盖检测 -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>${codecov.version}</version>
+                    <configuration>
+                        <formats>
+                            <format>html</format>
+                            <format>xml</format>
+                        </formats>
+                    </configuration>
+                </plugin>
+
+                <!-- jar依赖包打包配置 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
@@ -370,47 +351,10 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven.jar.plugin}</version>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                                <classpathPrefix>lib/</classpathPrefix>
-                            </manifest>
-                        </archive>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>cobertura-maven-plugin</artifactId>
-                    <version>${codecov.version}</version>
-                    <configuration>
-                        <formats>
-                            <format>html</format>
-                            <format>xml</format>
-                        </formats>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
 
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
+            </plugins>
+
+        </pluginManagement>
 
     </build>
 
