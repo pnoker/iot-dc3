@@ -87,7 +87,7 @@
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
         <hikaricp.version>3.3.1</hikaricp.version>
-        <netty.version>4.1.36.Final</netty.version>
+        <netty.version>4.1.42.Final</netty.version>
         <fastjson.version>1.2.60</fastjson.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
         <commons.cli.version>1.4</commons.cli.version>
