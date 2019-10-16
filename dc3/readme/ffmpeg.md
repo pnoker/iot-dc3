@@ -1,4 +1,4 @@
-### 剪切&合并视频
+## 剪切&合并视频
 
 ```bash
 //截取从头开始的30s
@@ -9,7 +9,7 @@ ffmpeg -ss 00:00:30 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split
 ffmpeg -f concat -i list.txt -c copy concat.mp4
 ```
 
-### 其他常见指令
+## 其他常见指令
 
 ```bash
 // 去掉视频中的音频

@@ -27,10 +27,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Process输出处理线程服务
+ * <p>Process输出处理线程服务
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @Slf4j

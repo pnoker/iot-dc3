@@ -21,10 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @RestController

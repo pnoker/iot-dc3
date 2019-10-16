@@ -32,10 +32,10 @@ import org.springframework.data.redis.serializer.*;
 import java.time.Duration;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Setter
 @Configuration
@@ -43,6 +43,24 @@ import java.time.Duration;
 public class RedisCacheConfig {
 
     private Duration timeToLive;
+
+    /**
+     * 自定义缓存 Key 生成策略
+     *
+     * @return
+     */
+    @Bean
+    public KeyGenerator wiselyKeyGenerator() {
+        return (target, method, params) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(target.getClass().getName());
+            sb.append(method.getName());
+            for (Object obj : params) {
+                sb.append(obj.toString());
+            }
+            return sb.toString();
+        };
+    }
 
     /**
      * 自定义 RedisCacheManager 类，主要是设置序列化，解决乱码问题
@@ -67,32 +85,4 @@ public class RedisCacheConfig {
         return cacheManager;
     }
 
-    /**
-     * 实例化 RedisTemplate 对象
-     *
-     * @param redisConnectionFactory
-     * @return
-     */
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        initDomainRedisTemplate(redisTemplate, redisConnectionFactory);
-        return redisTemplate;
-    }
-
-    /**
-     * 设置数据存入 redis 的序列化方式,并开启事务
-     *
-     * @param redisTemplate
-     * @param factory
-     */
-    private void initDomainRedisTemplate(RedisTemplate<String, Object> redisTemplate, RedisConnectionFactory factory) {
-        // 如果不配置Serializer，那么存储的时候缺省使用String，如果用User类型存储，那么会提示错误User can't cast to String！
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setEnableTransactionSupport(true);
-        redisTemplate.setConnectionFactory(factory);
-    }
 }

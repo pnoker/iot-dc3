@@ -21,10 +21,10 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Wia Hart设备信息
+ * <p>Wia Hart设备信息
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 public class MyHartDevice {

@@ -25,10 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Command 指令执行任务信息类
+ * <p>Command 指令执行任务信息类
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Data
 @Slf4j

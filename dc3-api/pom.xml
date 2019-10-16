@@ -30,14 +30,16 @@
 
     <dependencies>
 
+        <!-- OpenFeign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
+        <!-- dc3 Common Base -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common</artifactId>
+            <artifactId>dc3-common-base</artifactId>
         </dependency>
 
     </dependencies>

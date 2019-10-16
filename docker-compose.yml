@@ -1,11 +1,28 @@
 version: '3.3'
 
+volumes:
+  dbs-data:
+  log-data:
+  resource-data:
+
 services:
   dc3-base:
     build:
       context: ./dc3/dependences/base/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-base:3.0
+
+  dc3-volume:
+    image: pnoker/dc3-volume:3.0
+    container_name: dc3-volume
+    networks:
+      network:
+        aliases:
+          - dc3-volume
+    volumes:
+      - dbs-data:/iotdc3/data/dbs
+      - log-data:/iotdc3/data/logs
+      - resource-data:/iotdc3/data/resources
 
   dc3-mariadb:
     build:
@@ -96,7 +113,7 @@ services:
       - 8000:8000
     links:
       - dc3-register:iotdc3.register
-      - dc3-dbs:iotdc3.dbs
+      - dc3-redis:iotdc3.redis
     container_name: dc3-gateway
     hostname: iotdc3.gateway
     networks:
@@ -214,7 +231,7 @@ services:
     image: pnoker/dc3-opc:3.0
     restart: always
     ports:
-      - 8810:8810
+      - 8801:8801
     links:
       - dc3-register:iotdc3.register
     container_name: dc3-opc
@@ -231,7 +248,7 @@ services:
     image: pnoker/dc3-opc-ua:3.0
     restart: always
     ports:
-      - 8820:8820
+      - 8802:8802
     links:
       - dc3-register:iotdc3.register
     container_name: dc3-opc-ua
@@ -248,7 +265,7 @@ services:
     image: pnoker/dc3-rtmp:3.0
     restart: always
     ports:
-      - 8830:8830
+      - 8803:8803
     links:
       - dc3-register:iotdc3.register
       - dc3-dbs:iotdc3.dbs
@@ -266,7 +283,7 @@ services:
     image: pnoker/dc3-resource:3.0
     restart: always
     ports:
-      - 8840:8840
+      - 8800:8800
     links:
       - dc3-register:iotdc3.register
     container_name: dc3-resource
@@ -279,3 +296,4 @@ services:
 networks:
   network:
     driver: 'bridge'
+...

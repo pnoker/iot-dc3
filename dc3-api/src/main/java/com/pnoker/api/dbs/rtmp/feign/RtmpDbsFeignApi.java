@@ -16,33 +16,32 @@
 
 package com.pnoker.api.dbs.rtmp.feign;
 
+import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
-import com.pnoker.api.security.BaseAuthConfigurer;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
-@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
+@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class)
 @RequestMapping(value = "/api/v3/dbs/rtmp")
 public interface RtmpDbsFeignApi {
 
     /**
      * 新增 新增 Rtmp 任务记录
      *
-     * @param rtmp Rtmp实体类
+     * @param rtmp
      * @return true/false
      */
-    @PostMapping("/add")
-    Response add(@RequestBody Rtmp rtmp);
+    @PostMapping("/")
+    Response<Long> add(Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp
@@ -50,14 +49,33 @@ public interface RtmpDbsFeignApi {
      * @param id rtmpId
      * @return true/false
      */
-    @DeleteMapping("/delete")
-    Response delete(@RequestParam(value = "id") String id);
+    @DeleteMapping("/id/{id}")
+    Response<Boolean> delete(@PathVariable Long id);
 
     /**
-     * 查询 查询全部 Rtmp
+     * 修改 修改 Rtmp 任务记录
      *
+     * @param rtmp
+     * @return true/false
+     */
+    @PutMapping("/")
+    Response<Boolean> update(Rtmp rtmp);
+
+    /**
+     * 查询 根据ID查询 Rtmp
+     *
+     * @param id
+     * @return rtmp
+     */
+    @GetMapping("/id/{id}")
+    Response<Rtmp> selectById(@PathVariable Long id);
+
+    /**
+     * 分页查询 按照查询 Rtmp
+     *
+     * @param rtmpDto
      * @return rtmpList
      */
-    @GetMapping("/list")
-    Response<List<Rtmp>> list();
+    @GetMapping("/")
+    Response<PageInfo<Rtmp>> list(RtmpDto rtmpDto);
 }

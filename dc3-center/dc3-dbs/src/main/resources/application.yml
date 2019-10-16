@@ -30,13 +30,13 @@ spring:
       port: 27017
       database: iot-dc3
       username: root
-      password: iotdc3
+      password: ${spring.security.user.password}
   redis:
     host: iotdc3.redis
     port: 6379
-    password: iotdc3
+    password: ${spring.security.user.password}
     database: 1
-    timeout: 60s
+    timeout: 1H
     jedis:
       pool:
         max-idle: 16
@@ -45,18 +45,26 @@ spring:
     rollback-on-commit-failure: true
   cache:
     type: redis
-    cache-names: iot-dc3-dbs-rediscache
+    cache-names: dc3-dbs-rediscache
     redis:
-      time-to-live: 10m
+      time-to-live: 10M
 
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-  global-config.:
+  mapper-locations: classpath*:/mapping
+  global-config:
     banner: false
     db-config:
       table-prefix: dc3_
-  mapper-locations: classpath*:/mapping
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+
+pagehelper:
+  helper-dialect: mysql
+  page-size-zero: true
+  reasonable: true
 
 management:
   endpoints:
@@ -74,13 +82,15 @@ feign:
 logging:
   file: dc3/logs/center/${spring.application.name}.log
   level:
-    org.springframework.data: WARN
-    org.springframework.web: WARN
-    org.mongodb.driver: WARN
+    org.springframework.data: ERROR
+    org.springframework.web: ERROR
+    org.mybatis.spring: ERROR
+    org.mongodb.driver: ERROR
     com.zaxxer.hikari: ERROR
-    io.lettuce.core: WARN
-    io.undertow: WARN
-    com.netflix: WARN
+    com.ulisesbocchio: ERROR
+    io.lettuce.core: ERROR
+    io.undertow: ERROR
+    com.netflix: ERROR
 
 eureka:
   instance:
