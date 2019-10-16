@@ -16,18 +16,18 @@
 
 package com.pnoker;
 
+import com.pnoker.common.security.annotation.EnableDc3FeignClients;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.client.SpringCloudApplication;
 
 /**
- * <p>权限中心服务入口
+ * <p>权限授权中心服务入口
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@EnableEurekaClient
-@SpringBootApplication
+@EnableDc3FeignClients
+@SpringCloudApplication
 public class AuthApplication {
 
     public static void main(String[] args) {

@@ -21,7 +21,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.constant.SecurityConstants;
 import com.pnoker.common.model.dto.Response;
-import com.pnoker.common.security.service.PigUser;
+import com.pnoker.common.security.service.Dc3User;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.ConvertingCursor;
 import org.springframework.data.redis.core.Cursor;
@@ -54,7 +54,7 @@ import java.util.Map;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/token")
-public class PigTokenEndpoint {
+public class AuthTokenEndpoint {
     private static final String PROJECT_OAUTH_ACCESS = SecurityConstants.PROJECT_PREFIX + SecurityConstants.OAUTH_PREFIX + "access:";
     private static final String CURRENT = "current";
     private static final String SIZE = "size";
@@ -139,16 +139,16 @@ public class PigTokenEndpoint {
             if (authentication instanceof UsernamePasswordAuthenticationToken) {
                 UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) authentication;
 
-                if (authenticationToken.getPrincipal() instanceof PigUser) {
-                    PigUser user = (PigUser) authenticationToken.getPrincipal();
+                if (authenticationToken.getPrincipal() instanceof Dc3User) {
+                    Dc3User user = (Dc3User) authenticationToken.getPrincipal();
                     map.put("user_id", user.getId() + "");
                     map.put("username", user.getUsername() + "");
                 }
             } else if (authentication instanceof PreAuthenticatedAuthenticationToken) {
                 //刷新token方式
                 PreAuthenticatedAuthenticationToken authenticationToken = (PreAuthenticatedAuthenticationToken) authentication;
-                if (authenticationToken.getPrincipal() instanceof PigUser) {
-                    PigUser user = (PigUser) authenticationToken.getPrincipal();
+                if (authenticationToken.getPrincipal() instanceof Dc3User) {
+                    Dc3User user = (Dc3User) authenticationToken.getPrincipal();
                     map.put("user_id", user.getId() + "");
                     map.put("username", user.getUsername() + "");
                 }

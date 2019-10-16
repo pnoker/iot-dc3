@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 @Component
 @AllArgsConstructor
-public class PigSecurityInnerAspect implements Ordered {
+public class SecurityInnerAspect implements Ordered {
     private final HttpServletRequest request;
 
     @SneakyThrows

@@ -28,14 +28,7 @@
 
     <description>IOT DC3 平台 安全工具类</description>
 
-
     <dependencies>
-
-        <dependency>
-            <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common-core</artifactId>
-            <version>3.0</version>
-        </dependency>
 
         <!-- Spring Security -->
         <dependency>
@@ -46,9 +39,17 @@
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
         </dependency>
+
+        <!-- dc3 Api 相关 -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-api</artifactId>
+        </dependency>
+
+        <!-- dc3 Common Core -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-common-core</artifactId>
         </dependency>
 
     </dependencies>

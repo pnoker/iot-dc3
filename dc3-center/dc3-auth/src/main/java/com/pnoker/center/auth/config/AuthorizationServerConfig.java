@@ -17,9 +17,9 @@
 package com.pnoker.center.auth.config;
 
 import com.pnoker.common.constant.SecurityConstants;
-import com.pnoker.common.security.component.PigWebResponseExceptionTranslator;
-import com.pnoker.common.security.service.PigClientDetailsService;
-import com.pnoker.common.security.service.PigUser;
+import com.pnoker.common.security.component.Dc3WebResponseExceptionTranslator;
+import com.pnoker.common.security.service.ClientDetailsService;
+import com.pnoker.common.security.service.Dc3User;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
@@ -60,7 +60,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	@SneakyThrows
 	public void configure(ClientDetailsServiceConfigurer clients) {
-		PigClientDetailsService clientDetailsService = new PigClientDetailsService(dataSource);
+		ClientDetailsService clientDetailsService = new ClientDetailsService(dataSource);
 		clientDetailsService.setSelectClientDetailsSql(SecurityConstants.DEFAULT_SELECT_STATEMENT);
 		clientDetailsService.setFindClientDetailsSql(SecurityConstants.DEFAULT_FIND_STATEMENT);
 		clients.withClientDetails(clientDetailsService);
@@ -82,9 +82,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.userDetailsService(userDetailsService)
 			.authenticationManager(authenticationManager)
 			.reuseRefreshTokens(false)
-			.exceptionTranslator(new PigWebResponseExceptionTranslator());
+			.exceptionTranslator(new Dc3WebResponseExceptionTranslator());
 	}
-
 
 	@Bean
 	public TokenStore tokenStore() {
@@ -97,11 +96,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public TokenEnhancer tokenEnhancer() {
 		return (accessToken, authentication) -> {
 			final Map<String, Object> additionalInfo = new HashMap<>(1);
-			PigUser pigUser = (PigUser) authentication.getUserAuthentication().getPrincipal();
+			Dc3User dc3User = (Dc3User) authentication.getUserAuthentication().getPrincipal();
 			additionalInfo.put(SecurityConstants.DETAILS_LICENSE, SecurityConstants.PROJECT_LICENSE);
-			additionalInfo.put(SecurityConstants.DETAILS_USER_ID, pigUser.getId());
-			additionalInfo.put(SecurityConstants.DETAILS_USERNAME, pigUser.getUsername());
-			additionalInfo.put(SecurityConstants.DETAILS_DEPT_ID, pigUser.getDeptId());
+			additionalInfo.put(SecurityConstants.DETAILS_USER_ID, dc3User.getId());
+			additionalInfo.put(SecurityConstants.DETAILS_USERNAME, dc3User.getUsername());
+			additionalInfo.put(SecurityConstants.DETAILS_DEPT_ID, dc3User.getDeptId());
 			((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
 			return accessToken;
 		};

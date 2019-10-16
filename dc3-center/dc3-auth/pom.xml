@@ -30,11 +30,11 @@
 
     <dependencies>
 
+        <!-- Spring Security-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-security</artifactId>
             <exclusions>
-                <!--旧版本 redis操作有问题-->
                 <exclusion>
                     <artifactId>spring-security-oauth2</artifactId>
                     <groupId>org.springframework.security.oauth</groupId>
@@ -46,16 +46,43 @@
             <artifactId>spring-security-oauth2</artifactId>
         </dependency>
 
+        <!-- MySQL -->
         <dependency>
-            <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common-core</artifactId>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis.plus.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>tomcat-jdbc</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- dc3 Common Security -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-common-security</artifactId>
-            <version>3.0</version>
-            <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
     <build>
