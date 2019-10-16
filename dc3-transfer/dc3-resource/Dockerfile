@@ -17,6 +17,8 @@
 FROM anapsix/alpine-java:8_server-jre_unlimited
 MAINTAINER pnoker <pnokers.icloud.com>
 
+ENV JAVA_OPS -server -Xms512m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-transfer/dc3-resource
 
@@ -24,6 +26,6 @@ WORKDIR /dc3-transfer/dc3-resource
 
 ADD ./target/dc3-resource.jar ./
 
-EXPOSE 8840
+EXPOSE 8800
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar dc3-resource.jar
+CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-resource.jar

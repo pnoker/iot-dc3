@@ -16,20 +16,20 @@
 
 package com.pnoker.api.dbs.rtmp.hystrix;
 
+import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @Component
@@ -38,7 +38,7 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
     @Override
     public RtmpDbsFeignApi create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
-        log.error("RtmpFeignApi,进入熔断:{}", message, throwable);
+        log.error("RtmpFeignApi失败:{},hystrix服务降级处理", message, throwable);
 
         return new RtmpDbsFeignApi() {
             @Override
@@ -47,12 +47,22 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
             }
 
             @Override
-            public Response delete(String id) {
+            public Response delete(Long id) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<List<Rtmp>> list() {
+            public Response<Boolean> update(Rtmp rtmp) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Rtmp> selectById(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<PageInfo<Rtmp>> list(RtmpDto rtmpDto) {
                 return Response.fail(message);
             }
         };

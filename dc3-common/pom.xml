@@ -24,40 +24,14 @@
     </parent>
 
     <artifactId>dc3-common</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-    <description>IOT DC3 平台 公共基础类、工具类等集合。</description>
+    <description>IOT DC3 平台 Common 公共模块。</description>
 
-    <dependencies>
-
-        <!-- Spring Web MVC -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-
-        <!-- Servlet Api -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-        </dependency>
-
-        <!-- Java Native Access -->
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna-platform</artifactId>
-        </dependency>
-
-        <!-- Slf4j -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-    </dependencies>
+    <modules>
+        <module>dc3-common-core</module>
+        <module>dc3-common-security</module>
+        <module>dc3-common-base</module>
+    </modules>
 
 </project>

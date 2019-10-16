@@ -5,20 +5,22 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.pnoker.transfer.rtmp.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.model.Task;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -30,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @Service
@@ -45,14 +47,14 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpDbsFeignApi rtmpDbsFeignApi;
 
     @Override
-    public List<Rtmp> getRtmpList() {
-        Response<List<Rtmp>> response = rtmpDbsFeignApi.list();
+    public List<Rtmp> getRtmpList(RtmpDto rtmpDto) {
+        Response<PageInfo<Rtmp>> response = rtmpDbsFeignApi.list(rtmpDto);
         if (!response.isOk()) {
             log.error(response.getMessage());
             return reconnect();
         }
-        List<Rtmp> list = response.getData();
-        return list != null ? list : new ArrayList<>();
+        PageInfo<Rtmp> list = response.getData();
+        return list != null ? list.getList() : new ArrayList<>();
     }
 
     @Override
@@ -106,6 +108,6 @@ public class RtmpServiceImpl implements RtmpService {
             Thread.sleep(Global.CONNECT_INTERVAL * times);
         } catch (Exception e) {
         }
-        return getRtmpList();
+        return getRtmpList(new Rtmp(true));
     }
 }

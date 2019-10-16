@@ -17,20 +17,26 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
+import com.pnoker.common.base.BasePage;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description: Rtmp 接口实现
+ * <p>Rtmp 接口实现
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @Service
@@ -39,13 +45,38 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
-    public List<Rtmp> list() {
-        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        return rtmpMapper.selectList(queryWrapper);
+    @CachePut(value = "rtmp", key = "#rtmp.id")
+    public void add(Rtmp rtmp) {
+        rtmpMapper.insert(rtmp);
     }
 
     @Override
-    public int insert(Rtmp rtmp) {
-        return rtmpMapper.insert(rtmp);
+    @CacheEvict(value = "rtmp", key = "#rtmp.id")
+    public boolean delete(Long id) {
+        return rtmpMapper.deleteById(id) > 0;
     }
+
+    @Override
+    @CachePut(value = "rtmp", key = "#rtmp.id")
+    public Rtmp update(Rtmp rtmp) {
+        rtmpMapper.updateById(rtmp);
+        return rtmp;
+    }
+
+    @Override
+    @Cacheable(value = "rtmp", key = "#rtmp.id", unless = "#result == null")
+    public Rtmp selectById(Long id) {
+        return rtmpMapper.selectById(id);
+    }
+
+    @Override
+    public PageInfo<Rtmp> listWithPage(Rtmp rtmp, BasePage page) {
+        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
+        rtmp.query(queryWrapper);
+        page.orderBy(queryWrapper);
+        PageHelper.startPage(page.getPageNum(), page.getPageSize());
+        List<Rtmp> rtmpList = rtmpMapper.selectList(queryWrapper);
+        return new PageInfo<>(rtmpList);
+    }
+
 }

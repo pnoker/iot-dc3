@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.pnoker.device.manager.feign;
+package com.pnoker.api.dbs.device.manager.feign;
 
-import com.pnoker.device.manager.hystrix.DeviceManagerDbsFeignApiHystrix;
-import com.pnoker.api.security.BaseAuthConfigurer;
+import com.pnoker.api.dbs.device.manager.hystrix.DeviceManagerDbsFeignApiHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * <p>Copyright(c) 2019. Pnoker All Rights Reserved.
- * <p>@Author    : Pnoker
- * <p>Email      : pnokers@gmail.com
- * <p>Description:
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
-@FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
+@FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerDbsFeignApiHystrix.class)
 @RequestMapping("/api/v3/device/manager")
 public interface DeviceManagerDbsFeignApi {
 
