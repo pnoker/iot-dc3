@@ -18,14 +18,11 @@ package com.pnoker.api.dbs.rtmp.feign;
 
 import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
-import com.pnoker.api.security.BaseAuthConfigurer;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import com.pnoker.common.model.dto.Response;
 import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * <p>
@@ -33,7 +30,7 @@ import java.util.List;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class, configuration = BaseAuthConfigurer.class)
+@FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class)
 @RequestMapping(value = "/api/v3/dbs/rtmp")
 public interface RtmpDbsFeignApi {
 
@@ -43,7 +40,7 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PostMapping("/add")
+    @PostMapping("/")
     Response<Long> add(Rtmp rtmp);
 
     /**
@@ -52,8 +49,8 @@ public interface RtmpDbsFeignApi {
      * @param id rtmpId
      * @return true/false
      */
-    @DeleteMapping("/delete")
-    Response<Boolean> delete(Long id);
+    @DeleteMapping("/id/{id}")
+    Response<Boolean> delete(@PathVariable Long id);
 
     /**
      * 修改 修改 Rtmp 任务记录
@@ -61,7 +58,7 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PutMapping("/update")
+    @PutMapping("/")
     Response<Boolean> update(Rtmp rtmp);
 
     /**
@@ -70,17 +67,8 @@ public interface RtmpDbsFeignApi {
      * @param id
      * @return rtmp
      */
-    @GetMapping("/selectById")
-    Response<Rtmp> selectById(Long id);
-
-    /**
-     * 查询 查询全部 Rtmp
-     *
-     * @param rtmp
-     * @return rtmpList
-     */
-    @GetMapping("/list")
-    Response<List<Rtmp>> list(Rtmp rtmp);
+    @GetMapping("/id/{id}")
+    Response<Rtmp> selectById(@PathVariable Long id);
 
     /**
      * 分页查询 按照查询 Rtmp
@@ -88,6 +76,6 @@ public interface RtmpDbsFeignApi {
      * @param rtmpDto
      * @return rtmpList
      */
-    @GetMapping("/listWithPage")
-    Response<PageInfo<Rtmp>> listWithPage(RtmpDto rtmpDto);
+    @GetMapping("/")
+    Response<PageInfo<Rtmp>> list(RtmpDto rtmpDto);
 }

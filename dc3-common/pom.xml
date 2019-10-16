@@ -26,15 +26,12 @@
     <artifactId>dc3-common</artifactId>
     <packaging>pom</packaging>
 
-    <description>IOT DC3 平台 Common 集合。</description>
+    <description>IOT DC3 平台 Common 公共模块。</description>
 
     <modules>
         <module>dc3-common-core</module>
         <module>dc3-common-security</module>
+        <module>dc3-common-base</module>
     </modules>
-
-    <dependencies>
-
-    </dependencies>
 
 </project>

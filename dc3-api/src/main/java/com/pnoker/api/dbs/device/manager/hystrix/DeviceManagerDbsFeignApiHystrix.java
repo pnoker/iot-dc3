@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.pnoker.device.manager.hystrix;
+package com.pnoker.api.dbs.device.manager.hystrix;
 
-import com.pnoker.device.manager.feign.DeviceManagerDbsFeignApi;
+import com.pnoker.api.dbs.device.manager.feign.DeviceManagerDbsFeignApi;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

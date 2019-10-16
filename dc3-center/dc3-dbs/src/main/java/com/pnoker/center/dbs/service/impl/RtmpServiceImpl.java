@@ -52,7 +52,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @CacheEvict(value = "rtmp", key = "#rtmp.id")
-    public boolean delete(long id) {
+    public boolean delete(Long id) {
         return rtmpMapper.deleteById(id) > 0;
     }
 
@@ -65,15 +65,8 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Cacheable(value = "rtmp", key = "#rtmp.id", unless = "#result == null")
-    public Rtmp selectById(long id) {
+    public Rtmp selectById(Long id) {
         return rtmpMapper.selectById(id);
-    }
-
-    @Override
-    public List<Rtmp> list(Rtmp rtmp) {
-        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        rtmp.query(queryWrapper);
-        return rtmpMapper.selectList(queryWrapper);
     }
 
     @Override
