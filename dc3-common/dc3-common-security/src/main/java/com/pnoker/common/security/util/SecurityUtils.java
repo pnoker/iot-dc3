@@ -19,7 +19,7 @@ package com.pnoker.common.security.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.pnoker.common.constant.SecurityConstants;
-import com.pnoker.common.security.service.PigUser;
+import com.pnoker.common.security.service.Dc3User;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,10 +47,10 @@ public class SecurityUtils {
 	/**
 	 * 获取用户
 	 */
-	public PigUser getUser(Authentication authentication) {
+	public Dc3User getUser(Authentication authentication) {
 		Object principal = authentication.getPrincipal();
-		if (principal instanceof PigUser) {
-			return (PigUser) principal;
+		if (principal instanceof Dc3User) {
+			return (Dc3User) principal;
 		}
 		return null;
 	}
@@ -58,7 +58,7 @@ public class SecurityUtils {
 	/**
 	 * 获取用户
 	 */
-	public PigUser getUser() {
+	public Dc3User getUser() {
 		Authentication authentication = getAuthentication();
 		if (authentication == null) {
 			return null;

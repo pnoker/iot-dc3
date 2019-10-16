@@ -65,12 +65,6 @@
             <version>${pagehelper.version}</version>
         </dependency>
 
-        <!-- Openfeign -->
-        <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-okhttp</artifactId>
-        </dependency>
-
         <!-- Java Native Access -->
         <dependency>
             <groupId>net.java.dev.jna</groupId>

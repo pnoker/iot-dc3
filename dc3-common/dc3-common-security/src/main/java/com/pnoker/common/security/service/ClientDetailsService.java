@@ -30,9 +30,9 @@ import javax.sql.DataSource;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public class PigClientDetailsService extends JdbcClientDetailsService {
+public class ClientDetailsService extends JdbcClientDetailsService {
 
-	public PigClientDetailsService(DataSource dataSource) {
+	public ClientDetailsService(DataSource dataSource) {
 		super(dataSource);
 	}
 

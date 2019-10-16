@@ -29,8 +29,8 @@ import lombok.SneakyThrows;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public class PigAuth2ExceptionSerializer extends StdSerializer<PigAuth2Exception> {
-	public PigAuth2ExceptionSerializer() {
+public class Auth2ExceptionSerializer extends StdSerializer<PigAuth2Exception> {
+	public Auth2ExceptionSerializer() {
 		super(PigAuth2Exception.class);
 	}
 

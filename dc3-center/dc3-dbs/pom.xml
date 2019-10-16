@@ -55,13 +55,6 @@
             <artifactId>HikariCP</artifactId>
         </dependency>
 
-        <!-- PageHelper -->
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>${pagehelper.version}</version>
-        </dependency>
-
         <!-- Mongo、Redis、缓存、分页 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -81,10 +74,10 @@
             <version>${pagehelper.boot.version}</version>
         </dependency>
 
-        <!-- Feign相关 -->
+        <!-- dc3 Common Security -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-api</artifactId>
+            <artifactId>dc3-common-security</artifactId>
         </dependency>
 
     </dependencies>

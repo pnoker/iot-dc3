@@ -32,13 +32,13 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * <p>1. 支持remoteTokenServices 负载均衡
- *  * 2. 支持 获取用户全部信息
+ * <p>2. 支持 获取用户全部信息
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
-public class PigResourceServerConfigurerAdapter extends ResourceServerConfigurerAdapter {
+public class Dc3ResourceServerConfigurerAdapter extends ResourceServerConfigurerAdapter {
     @Autowired
     protected ResourceAuthExceptionEntryPoint resourceAuthExceptionEntryPoint;
     @Autowired
@@ -72,7 +72,7 @@ public class PigResourceServerConfigurerAdapter extends ResourceServerConfigurer
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
-        UserAuthenticationConverter userTokenConverter = new PigUserAuthenticationConverter();
+        UserAuthenticationConverter userTokenConverter = new Dc3UserAuthenticationConverter();
         accessTokenConverter.setUserTokenConverter(userTokenConverter);
 
         remoteTokenServices.setRestTemplate(lbRestTemplate);

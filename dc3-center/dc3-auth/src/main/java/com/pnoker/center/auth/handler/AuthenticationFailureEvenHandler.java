@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class PigAuthenticationFailureEvenHandler extends AbstractAuthenticationFailureEvenHandler {
+public class AuthenticationFailureEvenHandler extends AbstractAuthenticationFailureEvenHandler {
 
 	/**
 	 * 处理登录失败方法

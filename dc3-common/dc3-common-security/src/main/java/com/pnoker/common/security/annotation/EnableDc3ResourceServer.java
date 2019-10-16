@@ -16,8 +16,8 @@
 
 package com.pnoker.common.security.annotation;
 
-import com.pnoker.common.security.component.PigResourceServerAutoConfiguration;
-import com.pnoker.common.security.component.PigSecurityBeanDefinitionRegistrar;
+import com.pnoker.common.security.component.ResourceServerAutoConfiguration;
+import com.pnoker.common.security.component.SecurityBeanDefinitionRegistrar;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -36,7 +36,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@Import({PigResourceServerAutoConfiguration.class, PigSecurityBeanDefinitionRegistrar.class})
-public @interface EnablePigResourceServer {
+@Import({ResourceServerAutoConfiguration.class, SecurityBeanDefinitionRegistrar.class})
+public @interface EnableDc3ResourceServer {
 
 }

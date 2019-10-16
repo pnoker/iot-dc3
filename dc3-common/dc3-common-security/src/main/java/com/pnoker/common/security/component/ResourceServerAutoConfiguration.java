@@ -34,7 +34,7 @@ import org.springframework.web.client.RestTemplate;
  * @email : pnokers@icloud.com
  */
 @ComponentScan("com.pig4cloud.pig.common.security")
-public class PigResourceServerAutoConfiguration {
+public class ResourceServerAutoConfiguration {
 	@Bean
 	@Primary
 	@LoadBalanced

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.pig4cloud.pig.common.security.service.PigUserDetailsServiceImpl
+  com.pnoker.common.security.service.Dc3UserDetailsServiceImpl

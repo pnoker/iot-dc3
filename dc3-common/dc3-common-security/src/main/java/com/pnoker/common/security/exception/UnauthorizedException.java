@@ -17,7 +17,7 @@
 package com.pnoker.common.security.exception;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.pnoker.common.security.component.PigAuth2ExceptionSerializer;
+import com.pnoker.common.security.component.Auth2ExceptionSerializer;
 import org.springframework.http.HttpStatus;
 /**
  * <p>
@@ -25,7 +25,7 @@ import org.springframework.http.HttpStatus;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@JsonSerialize(using = PigAuth2ExceptionSerializer.class)
+@JsonSerialize(using = Auth2ExceptionSerializer.class)
 public class UnauthorizedException extends PigAuth2Exception {
 
 	public UnauthorizedException(String msg, Throwable t) {

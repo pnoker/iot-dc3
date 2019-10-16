@@ -34,7 +34,7 @@ import java.util.Collection;
  * @email : pnokers@icloud.com
  */
 @Slf4j
-public class PigFeignClientInterceptor extends OAuth2FeignRequestInterceptor {
+public class FeignClientInterceptor extends OAuth2FeignRequestInterceptor {
 	private final OAuth2ClientContext oAuth2ClientContext;
 	private final AccessTokenContextRelay accessTokenContextRelay;
 
@@ -46,7 +46,7 @@ public class PigFeignClientInterceptor extends OAuth2FeignRequestInterceptor {
 	 * @param resource                type of resource to be accessed
 	 * @param accessTokenContextRelay
 	 */
-	public PigFeignClientInterceptor(OAuth2ClientContext oAuth2ClientContext
+	public FeignClientInterceptor(OAuth2ClientContext oAuth2ClientContext
 		, OAuth2ProtectedResourceDetails resource, AccessTokenContextRelay accessTokenContextRelay) {
 		super(oAuth2ClientContext, resource);
 		this.oAuth2ClientContext = oAuth2ClientContext;

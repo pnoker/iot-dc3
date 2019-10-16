@@ -17,7 +17,7 @@
 package com.pnoker.common.security.exception;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.pnoker.common.security.component.PigAuth2ExceptionSerializer;
+import com.pnoker.common.security.component.Auth2ExceptionSerializer;
 
 
 /**
@@ -26,7 +26,7 @@ import com.pnoker.common.security.component.PigAuth2ExceptionSerializer;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@JsonSerialize(using = PigAuth2ExceptionSerializer.class)
+@JsonSerialize(using = Auth2ExceptionSerializer.class)
 public class InvalidException extends PigAuth2Exception {
 
 	public InvalidException(String msg, Throwable t) {

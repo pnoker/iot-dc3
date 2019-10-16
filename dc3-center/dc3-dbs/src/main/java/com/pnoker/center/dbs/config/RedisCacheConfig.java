@@ -85,32 +85,4 @@ public class RedisCacheConfig {
         return cacheManager;
     }
 
-    /**
-     * 实例化 RedisTemplate 对象
-     *
-     * @param redisConnectionFactory
-     * @return
-     */
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        initDomainRedisTemplate(redisTemplate, redisConnectionFactory);
-        return redisTemplate;
-    }
-
-    /**
-     * 设置数据存入 redis 的序列化方式,并开启事务
-     *
-     * @param redisTemplate
-     * @param factory
-     */
-    private void initDomainRedisTemplate(RedisTemplate<String, Object> redisTemplate, RedisConnectionFactory factory) {
-        // 如果不配置Serializer，那么存储的时候缺省使用String，如果用User类型存储，那么会提示错误User can't cast to String！
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setEnableTransactionSupport(true);
-        redisTemplate.setConnectionFactory(factory);
-    }
 }

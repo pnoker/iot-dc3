@@ -41,7 +41,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
  * @email : pnokers@icloud.com
  */
 @Slf4j
-public class PigWebResponseExceptionTranslator implements WebResponseExceptionTranslator {
+public class Dc3WebResponseExceptionTranslator implements WebResponseExceptionTranslator {
 
     private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
 

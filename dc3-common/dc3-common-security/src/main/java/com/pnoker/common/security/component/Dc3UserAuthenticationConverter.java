@@ -17,7 +17,7 @@
 package com.pnoker.common.security.component;
 
 import com.pnoker.common.constant.SecurityConstants;
-import com.pnoker.common.security.service.PigUser;
+import com.pnoker.common.security.service.Dc3User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public class PigUserAuthenticationConverter implements UserAuthenticationConverter {
+public class Dc3UserAuthenticationConverter implements UserAuthenticationConverter {
     private static final String N_A = "N/A";
 
     /**
@@ -68,7 +68,7 @@ public class PigUserAuthenticationConverter implements UserAuthenticationConvert
             String username = (String) map.get(SecurityConstants.DETAILS_USERNAME);
             Integer id = (Integer) map.get(SecurityConstants.DETAILS_USER_ID);
             Integer deptId = (Integer) map.get(SecurityConstants.DETAILS_DEPT_ID);
-            PigUser user = new PigUser(id, deptId, username, N_A, true
+            Dc3User user = new Dc3User(id, deptId, username, N_A, true
                     , true, true, true, authorities);
             return new UsernamePasswordAuthenticationToken(user, N_A, authorities);
         }

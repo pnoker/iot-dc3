@@ -16,9 +16,11 @@
 
 package com.pnoker;
 
+import com.pnoker.common.security.annotation.EnableDc3FeignClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -29,8 +31,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @email : pnokers@icloud.com
  */
 @EnableCaching
-@EnableEurekaClient
-@SpringBootApplication
+@EnableDc3FeignClients
+@SpringCloudApplication
 @EnableTransactionManagement
 public class DbsApplication {
     public static void main(String[] args) {

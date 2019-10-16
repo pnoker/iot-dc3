@@ -42,7 +42,7 @@ import java.lang.annotation.*;
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
 @ConditionalOnWebApplication
 @ConditionalOnProperty("security.oauth2.client.client-id")
-public class PigResourceServerTokenRelayAutoConfiguration {
+public class ResourceServerTokenRelayAutoConfiguration {
 
 	@Bean
 	public AccessTokenContextRelay accessTokenContextRelay(OAuth2ClientContext context) {
