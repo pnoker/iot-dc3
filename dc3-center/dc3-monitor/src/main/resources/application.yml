@@ -14,6 +14,7 @@ spring:
       password: iotdc3
   boot:
     admin:
+      context-path: /monitor/
       ui:
         title: IOT DC3 Monitoring Center
         favicon: images/icon/favicon.ico
