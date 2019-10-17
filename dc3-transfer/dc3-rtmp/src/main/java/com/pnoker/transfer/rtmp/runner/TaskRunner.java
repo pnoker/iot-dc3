@@ -17,6 +17,7 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.common.model.dto.rtmp.RtmpDto;
 import com.pnoker.common.utils.Tools;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.CmdTaskService;
@@ -60,7 +61,7 @@ public class TaskRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         checkFFmpeg();
-        List<Rtmp> list = rtmpService.getRtmpList(new Rtmp(true));
+        List<Rtmp> list = rtmpService.getRtmpList(new RtmpDto(true));
         for (Rtmp rtmp : list) {
             rtmpService.startTask(rtmp);
         }

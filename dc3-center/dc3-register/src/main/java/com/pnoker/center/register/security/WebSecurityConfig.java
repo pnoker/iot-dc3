@@ -23,7 +23,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
- * <p>
+ * <p>注册中心安全配置
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -31,6 +31,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Slf4j
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Override
     @SneakyThrows
     protected void configure(HttpSecurity http) {
