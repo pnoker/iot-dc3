@@ -54,6 +54,7 @@ public class RtmpServiceImpl implements RtmpService {
             return reconnect();
         }
         PageInfo<Rtmp> list = response.getData();
+
         return list != null ? list.getList() : new ArrayList<>();
     }
 
@@ -108,6 +109,6 @@ public class RtmpServiceImpl implements RtmpService {
             Thread.sleep(Global.CONNECT_INTERVAL * times);
         } catch (Exception e) {
         }
-        return getRtmpList(new Rtmp(true));
+        return getRtmpList(new RtmpDto(true));
     }
 }

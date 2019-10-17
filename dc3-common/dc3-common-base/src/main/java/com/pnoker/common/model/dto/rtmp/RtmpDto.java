@@ -35,4 +35,8 @@ public class RtmpDto extends Rtmp {
 
     private BasePage page;
 
+    public RtmpDto(boolean autoStart) {
+        super(autoStart);
+    }
+
 }
