@@ -16,49 +16,25 @@
 
 package com.pnoker.center.monitor.config;
 
-import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import lombok.SneakyThrows;
-import org.springframework.context.annotation.Configuration;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 /**
- * <p>WebSecurityConfigurer
+ * <p>监控中心安全配置
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Configuration
+@Slf4j
+@EnableWebSecurity
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
-    private final String adminContextPath;
-
-    public WebSecurityConfigurer(AdminServerProperties adminServerProperties) {
-        this.adminContextPath = adminServerProperties.getContextPath();
-    }
 
     @Override
     @SneakyThrows
     protected void configure(HttpSecurity http) {
-        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
-        successHandler.setTargetUrlParameter("redirectTo");
-        successHandler.setDefaultTargetUrl(adminContextPath + "/");
 
-        http
-                .headers().frameOptions().disable()
-                .and().authorizeRequests()
-                .antMatchers(adminContextPath + "/assets/**"
-                        , adminContextPath + "/login"
-                        , adminContextPath + "/actuator/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().loginPage(adminContextPath + "/login")
-                .successHandler(successHandler).and()
-                .logout().logoutUrl(adminContextPath + "/logout")
-                .and()
-                .httpBasic().and()
-                .csrf()
-                .disable();
     }
 }
