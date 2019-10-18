@@ -16,6 +16,7 @@
 
 package com.pnoker.center.monitor.config;
 
+import de.codecentric.boot.admin.server.config.AdminServerProperties;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,11 +31,24 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Slf4j
 @EnableWebSecurity
-public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    private final String contextPath;
+
+    public WebSecurityConfig(AdminServerProperties adminServerProperties) {
+        this.contextPath = adminServerProperties.getContextPath();
+    }
 
     @Override
     @SneakyThrows
     protected void configure(HttpSecurity http) {
-
+        try {
+            http.csrf().disable()
+                    .authorizeRequests()
+                    .antMatchers(contextPath + "/assets/**", contextPath + "/login", "/actuator/**").permitAll()
+                    .anyRequest()
+                    .authenticated().and().httpBasic();
+        } catch (Exception e) {
+            log.error("{}", e.getMessage(), e);
+        }
     }
 }
