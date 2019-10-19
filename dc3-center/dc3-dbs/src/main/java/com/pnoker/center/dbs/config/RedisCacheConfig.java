@@ -32,7 +32,7 @@ import org.springframework.data.redis.serializer.*;
 import java.time.Duration;
 
 /**
- * <p>
+ * <p>Redis缓存配置
  *
  * @author : pnoker
  * @email : pnokers@icloud.com

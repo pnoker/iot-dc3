@@ -37,11 +37,6 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-security</artifactId>
-        </dependency>
-
         <!-- Undertow Web 容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

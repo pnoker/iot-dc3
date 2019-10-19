@@ -39,11 +39,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-
 /**
- * Miscellaneous utilities for web applications.
+ * <p>Miscellaneous utilities for web applications.
  *
- * @author L.cm
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
 @Slf4j
 @UtilityClass

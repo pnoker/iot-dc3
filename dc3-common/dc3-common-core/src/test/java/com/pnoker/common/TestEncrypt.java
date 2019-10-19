@@ -1,7 +1,7 @@
 package com.pnoker.common;
 
 import com.alibaba.fastjson.JSON;
-import com.pnoker.common.model.dto.Keys;
+import com.pnoker.common.dto.Keys;
 import com.pnoker.common.utils.Tools;
 import com.pnoker.common.utils.AesTools;
 import com.pnoker.common.utils.RsaTools;

@@ -16,9 +16,9 @@
 
 package com.pnoker;
 
-import com.pnoker.common.security.annotation.EnableDc3FeignClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
  * <p>权限授权中心服务入口
@@ -26,7 +26,7 @@ import org.springframework.cloud.client.SpringCloudApplication;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@EnableDc3FeignClients
+@EnableFeignClients
 @SpringCloudApplication
 public class AuthApplication {
 

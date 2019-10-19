@@ -17,9 +17,9 @@
 package com.pnoker.transfer.rtmp.controller;
 
 import com.pnoker.common.base.BaseController;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import com.pnoker.common.model.dto.Response;
-import com.pnoker.common.model.vo.rtmp.RtmpVo;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Response;
+import com.pnoker.common.vo.rtmp.RtmpVo;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.model.Task;
 import com.pnoker.transfer.rtmp.service.RtmpService;

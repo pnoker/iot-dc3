@@ -16,6 +16,7 @@
 
 package com.pnoker.common.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageInfo;
 
 /**
@@ -64,5 +65,13 @@ public interface BaseService<T> {
      * @return list
      */
     PageInfo<T> listWithPage(T type, BasePage page);
+
+    /**
+     * 模糊查询构造器
+     *
+     * @param t
+     * @param queryWrapper
+     */
+    void query(T t, QueryWrapper<T> queryWrapper);
 
 }
