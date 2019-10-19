@@ -19,7 +19,7 @@ spring:
     host: localhost
     port: 5672
     username: iotdc3
-    password: iotdc3
+    password: ${spring.security.user.password}
 
 management:
   endpoints:
