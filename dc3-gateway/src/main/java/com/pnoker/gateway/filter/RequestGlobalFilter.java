@@ -36,8 +36,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.a
  * <p>
  * 全局拦截器，作用所有的微服务
  * <p>
- * 1. 对请求头中参数进行处理 from 参数进行清洗
- * 2. 重写StripPrefix = 1,支持全局
+ * 对请求头中参数进行处理 from 参数进行清洗
  * <p>
  * 支持swagger添加X-Forwarded-Prefix header  （F SR2 已经支持，不需要自己维护）
  *
@@ -57,23 +56,15 @@ public class RequestGlobalFilter implements GlobalFilter, Ordered {
      */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 1. 清洗请求头中from 参数
+
         ServerHttpRequest request = exchange.getRequest().mutate()
                 .headers(httpHeaders -> httpHeaders.remove(SecurityConstants.FROM))
                 .build();
 
-        // 2. 重写StripPrefix
         addOriginalRequestUrl(exchange, request.getURI());
-        String rawPath = request.getURI().getRawPath();
-        String newPath = "/" + Arrays.stream(StringUtils.tokenizeToStringArray(rawPath, "/"))
-                .skip(0L).collect(Collectors.joining("/"));
-        ServerHttpRequest newRequest = request.mutate()
-                .path(newPath)
-                .build();
-        exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, newRequest.getURI());
 
         return chain.filter(exchange.mutate()
-                .request(newRequest.mutate()
+                .request(request.mutate()
                         .build()).build());
     }
 

@@ -19,7 +19,7 @@ spring:
     url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
-    password: iotdc3
+    password: ${spring.security.user.password}
     sql-script-encoding: utf-8
     hikari:
       pool-name: iot-dc3-dbs-hikaricp
