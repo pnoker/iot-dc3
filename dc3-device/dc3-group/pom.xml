@@ -44,6 +44,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
         </dependency>
 
         <dependency>
@@ -57,10 +58,13 @@
             <artifactId>sqlite-jdbc</artifactId>
         </dependency>
 
+        <!-- Netty-->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>

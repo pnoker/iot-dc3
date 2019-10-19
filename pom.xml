@@ -82,7 +82,6 @@
         <hutool.version>4.6.8</hutool.version>
         <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
-        <jackson.modules>2.9.8</jackson.modules>
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
         <hikaricp.version>3.3.1</hikaricp.version>
@@ -167,44 +166,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- 稳定版本 Spring Security Aauth2 -->
-            <dependency>
-                <groupId>org.springframework.security.oauth</groupId>
-                <artifactId>spring-security-oauth2</artifactId>
-                <version>${security-oauth.version}</version>
-            </dependency>
-
-            <!-- Spring Admin -->
-            <dependency>
-                <groupId>de.codecentric</groupId>
-                <artifactId>spring-boot-admin-starter-server</artifactId>
-                <version>${spring-boot-admin.version}</version>
-            </dependency>
-
-            <!-- Database相关 -->
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${hikaricp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus</artifactId>
-                <version>${mybatis.plus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mariadb.jdbc</groupId>
-                <artifactId>mariadb-java-client</artifactId>
-                <version>${mariadb.version}</version>
-            </dependency>
-
-            <!-- Netty-->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-all</artifactId>
-                <version>${netty.version}</version>
-            </dependency>
-
             <!-- dc3 Api -->
             <dependency>
                 <groupId>com.pnoker</groupId>
@@ -223,12 +184,6 @@
             <dependency>
                 <groupId>com.pnoker</groupId>
                 <artifactId>dc3-common-core</artifactId>
-                <version>3.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.pnoker</groupId>
-                <artifactId>dc3-common-security</artifactId>
                 <version>3.0</version>
                 <scope>compile</scope>
             </dependency>

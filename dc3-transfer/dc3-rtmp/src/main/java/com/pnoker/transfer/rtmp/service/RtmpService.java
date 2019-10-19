@@ -16,9 +16,9 @@
 
 package com.pnoker.transfer.rtmp.service;
 
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import com.pnoker.common.model.dto.Response;
-import com.pnoker.common.model.dto.rtmp.RtmpDto;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Response;
+import com.pnoker.common.dto.transfer.RtmpDto;
 
 import java.util.List;
 

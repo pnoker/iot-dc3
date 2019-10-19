@@ -17,7 +17,7 @@
 package com.pnoker.common.utils;
 
 import com.google.common.base.Charsets;
-import com.pnoker.common.model.dto.Keys;
+import com.pnoker.common.dto.Keys;
 
 import javax.crypto.Cipher;
 import java.security.*;

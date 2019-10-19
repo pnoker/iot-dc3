@@ -18,9 +18,9 @@ package com.pnoker.api.dbs.rtmp.feign;
 
 import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import com.pnoker.common.model.dto.Response;
-import com.pnoker.common.model.dto.rtmp.RtmpDto;
+import com.pnoker.common.dto.transfer.RtmpDto;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

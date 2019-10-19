@@ -16,7 +16,7 @@
 
 package com.pnoker.common.exception;
 
-import com.pnoker.common.model.dto.Response;
+import com.pnoker.common.utils.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;

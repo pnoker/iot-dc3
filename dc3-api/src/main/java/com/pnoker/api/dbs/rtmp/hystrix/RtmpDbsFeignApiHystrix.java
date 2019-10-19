@@ -18,9 +18,9 @@ package com.pnoker.api.dbs.rtmp.hystrix;
 
 import com.github.pagehelper.PageInfo;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import com.pnoker.common.model.dto.Response;
-import com.pnoker.common.model.dto.rtmp.RtmpDto;
+import com.pnoker.common.dto.transfer.RtmpDto;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Response;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

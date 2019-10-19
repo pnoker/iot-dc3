@@ -49,10 +49,12 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
         </dependency>
 
         <!-- Mongo、Redis、缓存、分页 -->
@@ -74,10 +76,10 @@
             <version>${pagehelper.boot.version}</version>
         </dependency>
 
-        <!-- dc3 Common Security -->
+        <!-- dc3 Api -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common-security</artifactId>
+            <artifactId>dc3-api</artifactId>
         </dependency>
 
     </dependencies>

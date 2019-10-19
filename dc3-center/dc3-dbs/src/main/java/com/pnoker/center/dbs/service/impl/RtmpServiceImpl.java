@@ -22,7 +22,7 @@ import com.github.pagehelper.PageInfo;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BasePage;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -72,11 +72,27 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public PageInfo<Rtmp> listWithPage(Rtmp rtmp, BasePage page) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        rtmp.query(queryWrapper);
+        query(rtmp, queryWrapper);
         page.orderBy(queryWrapper);
         PageHelper.startPage(page.getPageNum(), page.getPageSize());
         List<Rtmp> rtmpList = rtmpMapper.selectList(queryWrapper);
         return new PageInfo<>(rtmpList);
+    }
+
+    @Override
+    public void query(Rtmp rtmp, QueryWrapper<Rtmp> queryWrapper) {
+        //todo java8
+        if (rtmp.getAutoStart() != null) {
+            if (rtmp.getAutoStart()) {
+                queryWrapper.eq("auto_start", true);
+            } else {
+                queryWrapper.eq("auto_start", false);
+            }
+        }
+        //todo java8
+        if (null != rtmp.getName() && !"".equals(rtmp.getName())) {
+            queryWrapper.like("name", rtmp.getName());
+        }
     }
 
 }
