@@ -46,6 +46,7 @@ public class RouteConfiguration {
                 .route("register_route", r -> r.path("/register/**").filters(f -> f.stripPrefix(1)).uri("http://iotdc3.register:8100"))
                 .route("eureka_route", r -> r.path("/eureka/**").uri("http://iotdc3.register:8100"))
                 .route("monitor_route", r -> r.path("/monitor/**").uri("http://iotdc3.monitor:8200"))
+                .route("auth_route", r -> r.path("/auth/**").uri("lb://dc3-auth"))
                 .build();
     }
 

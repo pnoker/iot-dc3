@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * <p>
+ * <p>处理登录失败方法
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -33,15 +33,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticationFailureEvenHandler extends AbstractAuthenticationFailureEvenHandler {
 
-	/**
-	 * 处理登录失败方法
-	 * <p>
-	 *
-	 * @param authenticationException 登录的authentication 对象
-	 * @param authentication          登录的authenticationException 对象
-	 */
-	@Override
-	public void handle(AuthenticationException authenticationException, Authentication authentication) {
-		log.info("用户：{} 登录失败，异常：{}", authentication.getPrincipal(), authenticationException.getLocalizedMessage());
-	}
+    /**
+     * @param authenticationException 登录的authentication 对象
+     * @param authentication          登录的authenticationException 对象
+     */
+    @Override
+    public void handle(AuthenticationException authenticationException, Authentication authentication) {
+        log.info("用户：{} 登录失败，异常：{}", authentication.getPrincipal(), authenticationException.getLocalizedMessage());
+    }
 }

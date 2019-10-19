@@ -38,10 +38,13 @@ logging:
 eureka:
   instance:
     hostname: iotdc3.register
+    prefer-ip-address: true
   client:
     register-with-eureka: true
     fetch-registry: false
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${eureka.instance.hostname}:${server.port}/eureka/
   server:
-    eviction-interval-timer-in-ms: 30000
+    eviction-interval-timer-in-ms: 4000
+    enable-self-preservation: false
+    renewal-percent-threshold: 0.9
