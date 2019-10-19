@@ -30,20 +30,6 @@
 
     <dependencies>
 
-        <!-- Servlet Api -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
-        </dependency>
-
-        <!-- Mybatis Plus -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
-            <version>${mybatis.plus.version}</version>
-        </dependency>
-
         <!-- Spring Data Redis -->
         <dependency>
             <groupId>org.springframework.data</groupId>
