@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
   thymeleaf:
     cache: false
     enabled: true
@@ -15,6 +17,8 @@ spring:
     servlet:
       content-type: text/html
   security:
+    encode:
+      key: t8KCtK0y63kA3kUx
     user:
       name: iotdc3
       password: iotdc3

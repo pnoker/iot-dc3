@@ -122,6 +122,23 @@ services:
         aliases:
           - dc3-gateway
 
+  dc3-auth:
+    build:
+      context: ./dc3-center/dc3-auth/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-auth:3.0
+    restart: always
+    ports:
+      - 8400:8400
+    links:
+      - dc3-register:iotdc3.register
+    container_name: dc3-auth
+    hostname: iotdc3.auth
+    networks:
+      network:
+        aliases:
+          - dc3-auth
+
   dc3-register:
     build:
       context: ./dc3-center/dc3-register/

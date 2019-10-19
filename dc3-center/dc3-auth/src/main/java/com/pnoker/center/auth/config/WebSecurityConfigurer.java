@@ -34,7 +34,8 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-/**认证相关配置
+/**
+ * 认证相关配置
  * <p>
  *
  * @author : pnoker
@@ -44,51 +45,48 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @Order(90)
 @Configuration
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
-	@Autowired
-	private ObjectMapper objectMapper;
-	@Autowired
-	private ClientDetailsService clientDetailsService;
-	@Lazy
-	@Autowired
-	private AuthorizationServerTokenServices defaultAuthorizationServerTokenServices;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private ClientDetailsService clientDetailsService;
+    @Lazy
+    @Autowired
+    private AuthorizationServerTokenServices defaultAuthorizationServerTokenServices;
 
-	@Override
-	@SneakyThrows
-	protected void configure(HttpSecurity http) {
-		http
-			.authorizeRequests()
-			.antMatchers(
-				"/actuator/**",
-				"/token/**").permitAll()
-			.anyRequest().authenticated()
-			.and().csrf().disable();
-	}
+    @Override
+    @SneakyThrows
+    protected void configure(HttpSecurity http) {
+        http.csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/actuator/**", "/token/**").permitAll()
+                .anyRequest().authenticated();
+    }
 
-	@Bean
-	@Override
-	@SneakyThrows
-	public AuthenticationManager authenticationManagerBean() {
-		return super.authenticationManagerBean();
-	}
+    @Bean
+    @Override
+    @SneakyThrows
+    public AuthenticationManager authenticationManagerBean() {
+        return super.authenticationManagerBean();
+    }
 
-	@Bean
-	public AuthenticationSuccessHandler mobileLoginSuccessHandler() {
-		return MobileLoginSuccessHandler.builder()
-			.objectMapper(objectMapper)
-			.clientDetailsService(clientDetailsService)
-			.passwordEncoder(passwordEncoder())
-			.defaultAuthorizationServerTokenServices(defaultAuthorizationServerTokenServices).build();
-	}
+    @Bean
+    public AuthenticationSuccessHandler mobileLoginSuccessHandler() {
+        return MobileLoginSuccessHandler.builder()
+                .objectMapper(objectMapper)
+                .clientDetailsService(clientDetailsService)
+                .passwordEncoder(passwordEncoder())
+                .defaultAuthorizationServerTokenServices(defaultAuthorizationServerTokenServices).build();
+    }
 
-	/**
-	 * https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-updated
-	 * Encoded password does not look like BCrypt
-	 *
-	 * @return PasswordEncoder
-	 */
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-	}
+    /**
+     * https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-updated
+     * Encoded password does not look like BCrypt
+     *
+     * @return PasswordEncoder
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
 
 }

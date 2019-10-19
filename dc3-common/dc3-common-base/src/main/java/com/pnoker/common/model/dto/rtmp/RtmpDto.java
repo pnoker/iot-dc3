@@ -20,6 +20,7 @@ import com.pnoker.common.base.BasePage;
 import com.pnoker.common.model.domain.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -31,6 +32,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RtmpDto extends Rtmp {
 
     private BasePage page;

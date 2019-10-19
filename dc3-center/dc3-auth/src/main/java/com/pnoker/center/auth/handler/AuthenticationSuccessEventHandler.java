@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * <p>
+ * <p>处理登录成功方法
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -32,15 +32,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
 
-	/**
-	 * 处理登录成功方法
-	 * <p>
-	 * 获取到登录的authentication 对象
-	 *
-	 * @param authentication 登录对象
-	 */
-	@Override
-	public void handle(Authentication authentication) {
-		log.info("用户：{} 登录成功", authentication.getPrincipal());
-	}
+    /**
+     * 获取到登录的authentication 对象
+     *
+     * @param authentication 登录对象
+     */
+    @Override
+    public void handle(Authentication authentication) {
+        log.info("用户：{} 登录成功", authentication.getPrincipal());
+    }
 }
