@@ -40,7 +40,7 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PostMapping("/")
+    @PostMapping("/add")
     Response<Long> add(Rtmp rtmp);
 
     /**
@@ -49,7 +49,7 @@ public interface RtmpDbsFeignApi {
      * @param id rtmpId
      * @return true/false
      */
-    @DeleteMapping("/id/{id}")
+    @DeleteMapping("/delete/{id}")
     Response<Boolean> delete(@PathVariable Long id);
 
     /**
@@ -58,7 +58,7 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PutMapping("/")
+    @PutMapping("/update")
     Response<Boolean> update(Rtmp rtmp);
 
     /**
@@ -67,7 +67,7 @@ public interface RtmpDbsFeignApi {
      * @param id
      * @return rtmp
      */
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     Response<Rtmp> selectById(@PathVariable Long id);
 
     /**
