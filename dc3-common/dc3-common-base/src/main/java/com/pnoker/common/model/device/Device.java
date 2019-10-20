@@ -39,7 +39,6 @@ public class Device extends BaseEntity {
     private String deviceCode;
     private String type;
     private Short status;
-    private Long deviceGroupId;
     private Long nodeId;
     private Long imageId;
 }
