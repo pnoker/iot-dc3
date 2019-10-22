@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect;
+package com.pnoker.center.data;
 
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.messaging.SubscribableChannel;
 
 /**
  * @Author: lyang
- * @Date: 2019/1/1 18:46
+ * @Date: 2019/1/1 18:18
  */
-public interface MyCallback {
-    String CALLBACKINPUT = "mycallback";
+public interface MyInput {
+    String INPUT = "myinput";
 
-    @Input(MyCallback.CALLBACKINPUT)
-    SubscribableChannel callback();
+    @Input(MyInput.INPUT)
+    SubscribableChannel input();
 }

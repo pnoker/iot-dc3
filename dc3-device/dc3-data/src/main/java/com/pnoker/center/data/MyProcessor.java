@@ -14,27 +14,11 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.support.MessageBuilder;
-import org.springframework.web.bind.annotation.*;
+package com.pnoker.center.data;
 
 /**
- * <p>
- *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @Author: lyang
+ * @Date: 2019/1/1 18:17
  */
-@RestController
-public class SendController {
-
-    @Autowired
-    private MyProcessor processor;
-
-    @PostMapping("/send")
-    public String send(@RequestBody MyGirl myGirl ){
-        processor.output().send(MessageBuilder.withPayload(myGirl).build());
-        return "send a collect to my girl";
-    }
+public interface MyProcessor extends MyOutput, MyInput, MyCallback{
 }
