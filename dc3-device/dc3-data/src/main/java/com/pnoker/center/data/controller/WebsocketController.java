@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect;
+package com.pnoker.center.data.controller;
 
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.messaging.SubscribableChannel;
+import com.pnoker.common.base.BaseController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @Author: lyang
- * @Date: 2019/1/1 18:18
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
-public interface MyInput {
-    String INPUT = "myinput";
+@Slf4j
+@RestController
+public class WebsocketController extends BaseController {
 
-    @Input(MyInput.INPUT)
-    SubscribableChannel input();
 }

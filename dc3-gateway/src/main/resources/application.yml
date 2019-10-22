@@ -37,14 +37,98 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: dbs_rest_api
-          uri: lb://dc3-dbs
+        - id: auth_rest_api
+          uri: lb://dc3-auth
           predicates:
-            - Path=/api/v3/dbs/**
+            - Path=/api/v3/auth/**
           filters:
             - name: RequestRateLimiter
               args:
-                key-resolver: '#{@remoteAddrKeyResolver}'
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        - id: device_rest_api
+          uri: lb://dc3-manager
+          predicates:
+            - Path=/api/v3/device/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        - id: data_rest_api
+          uri: lb://dc3-collect
+          predicates:
+            - Path=/api/v3/data/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        - id: rtmp_rest_api
+          uri: lb://dc3-rtmp
+          predicates:
+            - Path=/api/v3/rtmp/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        - id: opc_rest_api
+          uri: lb://dc3-opc
+          predicates:
+            - Path=/api/v3/opc/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        - id: opcua_rest_api
+          uri: lb://dc3-opc-ua
+          predicates:
+            - Path=/api/v3/opcua/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        - id: resource_rest_api
+          uri: lb://dc3-resource
+          predicates:
+            - Path=/api/v3/resource/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
             - name: Hystrix

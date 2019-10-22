@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect;
+package com.pnoker.center.data.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import com.pnoker.common.base.BaseController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -25,10 +26,8 @@ import lombok.Data;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Data
-@JsonIgnoreProperties
-public class MyGirl {
-    private String name;
+@Slf4j
+@RestController
+public class MqttController extends BaseController {
 
-    private String age;
 }

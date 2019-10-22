@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect.controller;
+package com.pnoker.center.data;
 
-import com.pnoker.common.base.BaseController;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
 
 /**
- * <p>
- *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @Author: lyang
+ * @Date: 2019/1/1 18:22
  */
-@Slf4j
-@RestController
-public class AmqController extends BaseController {
+public interface MyOutput {
+    String OUTPUT = "myoutput";
 
+    @Output(MyOutput.OUTPUT)
+    MessageChannel output();
 }

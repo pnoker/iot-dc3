@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect;
+package com.pnoker.center.data;
 
-import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.messaging.MessageChannel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.web.bind.annotation.*;
 
 /**
- * @Author: lyang
- * @Date: 2019/1/1 18:22
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
  */
-public interface MyOutput {
-    String OUTPUT = "myoutput";
+@RestController
+public class SendController {
 
-    @Output(MyOutput.OUTPUT)
-    MessageChannel output();
+    @Autowired
+    private MyProcessor processor;
+
+    @PostMapping("/send")
+    public String send(@RequestBody MyGirl myGirl ){
+        processor.output().send(MessageBuilder.withPayload(myGirl).build());
+        return "send a collect to my girl";
+    }
 }

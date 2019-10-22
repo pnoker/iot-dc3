@@ -30,7 +30,7 @@
 
     <modules>
         <module>dc3-manager</module>
-        <module>dc3-collect</module>
+        <module>dc3-data</module>
         <module>dc3-virtual</module>
     </modules>
 

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.collect.controller;
+package com.pnoker.center.data;
 
-import com.pnoker.common.base.BaseController;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
@@ -26,8 +28,20 @@ import org.springframework.web.bind.annotation.RestController;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
+@Component
 @Slf4j
-@RestController
-public class WebsocketController extends BaseController {
+@EnableBinding(MyProcessor.class)
+public class MyMQReciver {
 
+    @StreamListener(MyProcessor.INPUT)
+    @SendTo(MyProcessor.CALLBACKINPUT)
+    public String process(MyGirl myGirl){
+        log.info("collect comming : {} ", myGirl.toString());
+        return myGirl.toString();
+    }
+
+    @StreamListener(MyProcessor.CALLBACKINPUT)
+    public void callback(String myGirl){
+        log.info("collect has recived : {} ", myGirl);
+    }
 }
