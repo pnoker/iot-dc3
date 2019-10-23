@@ -27,8 +27,7 @@ import com.pnoker.common.utils.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>rtmp dbs rest client
@@ -38,11 +37,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
+@RequestMapping(value = "/api/v3/dbs/rtmp")
 public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi {
     @Autowired
     private RtmpService rtmpService;
 
     @Override
+    @PostMapping("/")
     public Response<Long> add(@RequestBody Rtmp rtmp) {
         if (null == rtmp) {
             return Response.fail("body is null");
@@ -52,7 +53,8 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     }
 
     @Override
-    public Response<Boolean> delete(Long id) {
+    @DeleteMapping("/{id}")
+    public Response<Boolean> delete(@PathVariable Long id) {
         if (null == id) {
             return Response.fail("rtmp id can not be empty");
         }
@@ -60,12 +62,14 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     }
 
     @Override
+    @PutMapping("/")
     public Response<Boolean> update(@RequestBody Rtmp rtmp) {
         return null;
     }
 
     @Override
-    public Response<Rtmp> selectById(Long id) {
+    @GetMapping("/{id}")
+    public Response<Rtmp> selectById(@PathVariable Long id) {
         if (null == id) {
             return Response.fail("rtmp id can not be empty");
         }
@@ -74,7 +78,8 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     }
 
     @Override
-    public Response<PageInfo<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
+    @GetMapping("/")
+    public Response<PageInfo<Rtmp>> selectByQueryAndPage(@RequestBody(required = false) RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         if (null != rtmpDto) {
             BeanUtils.copyProperties(rtmpDto, rtmp);

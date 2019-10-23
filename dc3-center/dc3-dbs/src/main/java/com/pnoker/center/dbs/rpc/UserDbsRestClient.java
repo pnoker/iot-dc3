@@ -23,6 +23,7 @@ import com.pnoker.common.model.User;
 import com.pnoker.common.utils.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
+@RequestMapping(value = "/api/v3/dbs/user")
 public class UserDbsRestClient extends BaseController implements UserDbsFeignApi {
     @Autowired
     private UserService userService;

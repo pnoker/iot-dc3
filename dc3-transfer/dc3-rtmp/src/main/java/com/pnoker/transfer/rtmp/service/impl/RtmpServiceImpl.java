@@ -48,7 +48,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public List<Rtmp> getRtmpList(RtmpDto rtmpDto) {
-        Response<PageInfo<Rtmp>> response = rtmpDbsFeignApi.list(rtmpDto);
+        Response<PageInfo<Rtmp>> response = rtmpDbsFeignApi.selectByQueryAndPage(rtmpDto);
         if (!response.isOk()) {
             log.error(response.getMessage());
             return reconnect();

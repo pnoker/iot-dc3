@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @FeignClient(name = "DC3-DBS", fallbackFactory = UserDbsFeignApiHystrix.class)
-@RequestMapping(value = "/api/v3/dbs/user")
 public interface UserDbsFeignApi {
     /**
      * 通过用户名查询用户
