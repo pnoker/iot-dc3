@@ -22,7 +22,6 @@ import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
  * @email : pnokers@icloud.com
  */
 @FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class)
-@RequestMapping(value = "/api/v3/dbs/rtmp")
 public interface RtmpDbsFeignApi {
 
     /**
@@ -40,7 +38,6 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PostMapping("/add")
     Response<Long> add(Rtmp rtmp);
 
     /**
@@ -49,8 +46,7 @@ public interface RtmpDbsFeignApi {
      * @param id rtmpId
      * @return true/false
      */
-    @DeleteMapping("/delete/{id}")
-    Response<Boolean> delete(@PathVariable Long id);
+    Response<Boolean> delete(Long id);
 
     /**
      * 修改 修改 Rtmp 任务记录
@@ -58,7 +54,6 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PutMapping("/update")
     Response<Boolean> update(Rtmp rtmp);
 
     /**
@@ -67,8 +62,7 @@ public interface RtmpDbsFeignApi {
      * @param id
      * @return rtmp
      */
-    @GetMapping("/{id}")
-    Response<Rtmp> selectById(@PathVariable Long id);
+    Response<Rtmp> selectById(Long id);
 
     /**
      * 分页查询 按照查询 Rtmp
@@ -76,6 +70,5 @@ public interface RtmpDbsFeignApi {
      * @param rtmpDto
      * @return rtmpList
      */
-    @GetMapping("/")
-    Response<PageInfo<Rtmp>> list(RtmpDto rtmpDto);
+    Response<PageInfo<Rtmp>> selectByQueryAndPage(RtmpDto rtmpDto);
 }

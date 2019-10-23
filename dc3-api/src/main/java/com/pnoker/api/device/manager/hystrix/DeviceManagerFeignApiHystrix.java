@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.dbs.rtmp.hystrix;
+package com.pnoker.api.device.manager.hystrix;
 
 import com.github.pagehelper.PageInfo;
-import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.api.device.manager.feign.DeviceManagerDbsFeignApi;
+import com.pnoker.common.dto.device.DeviceDto;
+import com.pnoker.common.model.device.Device;
 import com.pnoker.common.utils.Response;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -33,16 +33,16 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> {
+public class DeviceManagerFeignApiHystrix implements FallbackFactory<DeviceManagerDbsFeignApi> {
 
     @Override
-    public RtmpDbsFeignApi create(Throwable throwable) {
+    public DeviceManagerDbsFeignApi create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
-        log.error("RtmpFeignApi失败:{},hystrix服务降级处理", message, throwable);
+        log.error("DeviceFeignApi失败:{},hystrix服务降级处理", message, throwable);
 
-        return new RtmpDbsFeignApi() {
+        return new DeviceManagerDbsFeignApi() {
             @Override
-            public Response add(Rtmp rtmp) {
+            public Response add(Device rtmp) {
                 return Response.fail(message);
             }
 
@@ -52,17 +52,17 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
             }
 
             @Override
-            public Response<Boolean> update(Rtmp rtmp) {
+            public Response<Boolean> update(Device rtmp) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Rtmp> selectById(Long id) {
+            public Response<Device> selectById(Long id) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<PageInfo<Rtmp>> selectByQueryAndPage(RtmpDto rtmpDto) {
+            public Response<PageInfo<Device>> list(DeviceDto rtmpDto) {
                 return Response.fail(message);
             }
         };
