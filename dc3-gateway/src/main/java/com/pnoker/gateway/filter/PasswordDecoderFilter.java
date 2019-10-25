@@ -80,7 +80,7 @@ public class PasswordDecoderFilter extends AbstractGatewayFilterFactory {
                 try {
                     password = decryptAES(password, encodeKey);
                 } catch (Exception e) {
-                    log.error("密码解密失败:{}", password);
+                    log.error("Password decryption failed:{}", password);
                     return Mono.error(e);
                 }
                 paramMap.put(PASSWORD, password.trim());
