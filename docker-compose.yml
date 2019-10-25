@@ -24,6 +24,21 @@ services:
       - log-data:/iotdc3/data/logs
       - resource-data:/iotdc3/data/resources
 
+  dc3-influxdb:
+    build:
+      context: ./dc3/dependences/influxdb/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-influxdb:3.0
+    restart: always
+    ports:
+      - 8086:8086
+    container_name: dc3-influxdb
+    hostname: iotdc3.influxdb
+    networks:
+      network:
+        aliases:
+          - dc3-influxdb
+
   dc3-mariadb:
     build:
       context: ./dc3/dependences/mariadb/
