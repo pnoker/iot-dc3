@@ -167,10 +167,10 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- dc3 Api -->
+            <!-- dc3 Api Dbs -->
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-api</artifactId>
+                <artifactId>dc3-api-dbs</artifactId>
                 <version>3.0</version>
                 <scope>compile</scope>
             </dependency>
@@ -185,6 +185,12 @@
             <dependency>
                 <groupId>com.pnoker</groupId>
                 <artifactId>dc3-common-core</artifactId>
+                <version>3.0</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.pnoker</groupId>
+                <artifactId>dc3-common-security</artifactId>
                 <version>3.0</version>
                 <scope>compile</scope>
             </dependency>
