@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service.impl;
+package com.pnoker.center.auth.handler;
 
-import com.pnoker.center.auth.service.UserService;
+import com.pnoker.commont.security.handler.AbstractAuthenticationSuccessEventHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 
 /**
- * <p>用户服务接口实现
+ * <p>处理登录成功
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
-@Service
-public class UserServiceImpl implements UserService {
+@Component
+public class Dc3AuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+
+    /**
+     * 处理登录成功方法
+     * <p>
+     * 获取到登录的authentication 对象
+     *
+     * @param authentication 登录对象
+     */
+    @Override
+    public void handle(Authentication authentication) {
+        log.info("user：{} login successfully", authentication.getPrincipal());
+    }
 }

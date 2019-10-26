@@ -1,0 +1,52 @@
+/*
+ * Copyright 2019 Pnoker. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.pnoker.commont.security.handler;
+
+import cn.hutool.core.collection.CollUtil;
+import org.springframework.context.ApplicationListener;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
+
+/**
+ * <p>认证成功事件处理器
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
+public abstract class AbstractAuthenticationSuccessEventHandler implements ApplicationListener<AuthenticationSuccessEvent> {
+    /**
+     * Handle an application event.
+     *
+     * @param event the event to respond to
+     */
+    @Override
+    public void onApplicationEvent(AuthenticationSuccessEvent event) {
+        Authentication authentication = (Authentication) event.getSource();
+        if (CollUtil.isNotEmpty(authentication.getAuthorities())) {
+            handle(authentication);
+        }
+    }
+
+    /**
+     * 处理登录成功方法
+     * <p>
+     * 获取到登录的authentication 对象
+     *
+     * @param authentication 登录对象
+     */
+    public abstract void handle(Authentication authentication);
+}

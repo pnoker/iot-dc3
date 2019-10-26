@@ -30,23 +30,11 @@
 
     <dependencies>
 
-        <!-- Spring Security-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security.oauth</groupId>
-            <artifactId>spring-security-oauth2</artifactId>
-            <version>${security-oauth.version}</version>
-        </dependency>
-
-        <!-- dc3 Api -->
+        <!-- dc3 Common Security -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-api</artifactId>
+            <artifactId>dc3-common-security</artifactId>
         </dependency>
-
 
     </dependencies>
 

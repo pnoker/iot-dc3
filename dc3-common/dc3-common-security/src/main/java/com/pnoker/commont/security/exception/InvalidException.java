@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service.impl;
+package com.pnoker.commont.security.exception;
 
-import com.pnoker.center.auth.service.UserService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.pnoker.commont.security.component.Dc3Auth2ExceptionSerializer;
 
 /**
- * <p>用户服务接口实现
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Slf4j
-@Service
-public class UserServiceImpl implements UserService {
+@JsonSerialize(using = Dc3Auth2ExceptionSerializer.class)
+public class InvalidException extends Dc3Auth2Exception {
+
+    public InvalidException(String msg, Throwable t) {
+        super(msg);
+    }
+
+    @Override
+    public String getOAuth2ErrorCode() {
+        return "invalid_exception";
+    }
+
+    @Override
+    public int getHttpErrorCode() {
+        return 426;
+    }
+
 }

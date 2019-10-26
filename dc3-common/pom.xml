@@ -29,8 +29,9 @@
     <description>IOT DC3 平台 Common 公共模块。</description>
 
     <modules>
-        <module>dc3-common-core</module>
         <module>dc3-common-base</module>
+        <module>dc3-common-core</module>
+        <module>dc3-common-security</module>
     </modules>
 
 </project>

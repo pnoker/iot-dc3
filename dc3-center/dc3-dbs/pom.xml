@@ -76,7 +76,7 @@
             <version>${pagehelper.boot.version}</version>
         </dependency>
 
-        <!-- dc3 Api -->
+        <!-- dc3 Api Dbs -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-api-dbs</artifactId>

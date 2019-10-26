@@ -14,41 +14,33 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.constant.enums;
+package com.pnoker.commont.security.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.pnoker.commont.security.component.Dc3Auth2ExceptionSerializer;
+import org.springframework.http.HttpStatus;
 
 /**
- * <p>社交登录类型
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Getter
-@AllArgsConstructor
-public enum LoginTypeEnum {
-	/**
-	 * 账号密码登录
-	 */
-	PWD("PWD", "账号密码登录"),
+@JsonSerialize(using = Dc3Auth2ExceptionSerializer.class)
+public class MethodNotAllowed extends Dc3Auth2Exception {
 
-	/**
-	 * QQ登录
-	 */
-	QQ("QQ", "QQ登录"),
+    public MethodNotAllowed(String msg, Throwable t) {
+        super(msg);
+    }
 
-	/**
-	 * 微信登录
-	 */
-	WECHAT("WX", "微信登录");
+    @Override
+    public String getOAuth2ErrorCode() {
+        return "method_not_allowed";
+    }
 
-	/**
-	 * 类型
-	 */
-	private final String type;
-	/**
-	 * 描述
-	 */
-	private final String description;
+    @Override
+    public int getHttpErrorCode() {
+        return HttpStatus.METHOD_NOT_ALLOWED.value();
+    }
+
 }

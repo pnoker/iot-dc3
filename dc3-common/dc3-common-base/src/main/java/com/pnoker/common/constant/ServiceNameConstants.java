@@ -26,11 +26,6 @@ public interface ServiceNameConstants {
 	/**
 	 * 认证服务的SERVICEID
 	 */
-	String AUTH_SERVICE = "pig-auth";
-
-	/**
-	 * UMPS模块
-	 */
-	String UMPS_SERVICE = "pig-upms";
+	String AUTH_SERVICE = "dc3-auth";
 
 }
