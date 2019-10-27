@@ -16,7 +16,10 @@
 
 package com.pnoker.transfer.rtmp.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
 import com.pnoker.common.base.BaseController;
+import com.pnoker.common.model.User;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
 import com.pnoker.common.vo.rtmp.RtmpVo;

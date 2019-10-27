@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>基础 domain 实体类
@@ -49,8 +50,8 @@ public class BaseEntity implements Serializable {
      */
     private String description;
 
-    private Long createTime;
-    private Long updateTime;
+    private Date createTime;
+    private Date updateTime;
 
     /**
      * 逻辑删除标识 1：删除，0：未删除

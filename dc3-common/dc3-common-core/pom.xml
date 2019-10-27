@@ -37,25 +37,6 @@
             <version>${redis.data.version}</version>
         </dependency>
 
-        <!-- PageHelper -->
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>${pagehelper.version}</version>
-        </dependency>
-
-        <!-- Java Native Access -->
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>${jna.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna-platform</artifactId>
-            <version>${jna.version}</version>
-        </dependency>
-
         <!-- dc3 Common Base -->
         <dependency>
             <groupId>com.pnoker</groupId>

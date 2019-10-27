@@ -16,9 +16,9 @@
 
 package com.pnoker.transfer.rtmp.runner;
 
-import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.utils.Tools;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.utils.Dc3Tools;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.CmdTaskService;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -75,7 +75,7 @@ public class TaskRunner implements ApplicationRunner {
             log.error("FFmpeg path is NULL !");
             System.exit(1);
         }
-        if (!Tools.isFile(ffmpeg)) {
+        if (!Dc3Tools.isFile(ffmpeg) && getProperty("os.name").toLowerCase().startsWith("win")) {
             log.error("{} does not exist", ffmpeg);
             System.exit(1);
         }

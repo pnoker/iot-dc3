@@ -26,5 +26,6 @@ import com.pnoker.common.model.User;
  * @email : pnokers@icloud.com
  */
 public interface UserService extends BaseService<User> {
+
     User selectByUsername(String usernama);
 }

@@ -2,7 +2,7 @@ package com.pnoker.common;
 
 import com.alibaba.fastjson.JSON;
 import com.pnoker.common.dto.Keys;
-import com.pnoker.common.utils.Tools;
+import com.pnoker.common.utils.Dc3Tools;
 import com.pnoker.common.utils.AesTools;
 import com.pnoker.common.utils.RsaTools;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class TestEncrypt {
 
     @Test
     public void uuidTest(){
-        String uuid = Tools.uuid();
+        String uuid = Dc3Tools.uuid();
         log.info(uuid);
     }
 }

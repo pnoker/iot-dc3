@@ -26,8 +26,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.*;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
@@ -50,7 +52,21 @@ public class RedisCacheConfig {
      * @return
      */
     @Bean
-    public KeyGenerator wiselyKeyGenerator() {
+    public KeyGenerator firstKeyGenerator() {
+        return (target, method, params) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(params[0].toString());
+            return sb.toString();
+        };
+    }
+
+    /**
+     * 自定义缓存 Key 生成策略
+     *
+     * @return
+     */
+    @Bean
+    public KeyGenerator commonKeyGenerator() {
         return (target, method, params) -> {
             StringBuilder sb = new StringBuilder();
             sb.append(target.getClass().getName());

@@ -28,7 +28,7 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * <p>Redis 配置类
+ * <p>RedisTemplate
  *
  * @author : pnoker
  * @email : pnokers@icloud.com

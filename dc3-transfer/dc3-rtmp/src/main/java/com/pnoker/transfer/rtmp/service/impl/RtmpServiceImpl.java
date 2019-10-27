@@ -16,7 +16,7 @@
 
 package com.pnoker.transfer.rtmp.service.impl;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
@@ -48,14 +48,14 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public List<Rtmp> getRtmpList(RtmpDto rtmpDto) {
-        Response<PageInfo<Rtmp>> response = rtmpDbsFeignApi.selectByQueryAndPage(rtmpDto);
+        Response<IPage<Rtmp>> response = rtmpDbsFeignApi.list(rtmpDto);
         if (!response.isOk()) {
             log.error(response.getMessage());
             return reconnect();
         }
-        PageInfo<Rtmp> list = response.getData();
+        IPage<Rtmp> list = response.getData();
 
-        return list != null ? list.getList() : new ArrayList<>();
+        return list != null ? list.getRecords() : new ArrayList<>();
     }
 
     @Override

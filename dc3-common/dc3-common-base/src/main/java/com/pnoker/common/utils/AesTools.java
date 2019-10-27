@@ -46,7 +46,7 @@ public class AesTools {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM);
         keyGenerator.init(128);
         SecretKey secretKey = keyGenerator.generateKey();
-        Keys.Aes aes = new Keys().new Aes(Tools.encodeToString(secretKey.getEncoded()));
+        Keys.Aes aes = new Keys().new Aes(Dc3Tools.encodeToString(secretKey.getEncoded()));
         return aes;
     }
 
@@ -60,12 +60,12 @@ public class AesTools {
      */
     public static String encrypt(String str, String privateKey) throws Exception {
         //base64编码的私钥
-        byte[] keyBytes = Tools.decode(privateKey);
+        byte[] keyBytes = Dc3Tools.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, KEY_ALGORITHM);
         //AES加密
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
-        String outStr = Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
+        String outStr = Dc3Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
         return outStr;
     }
 
@@ -79,13 +79,13 @@ public class AesTools {
      */
     public static String decrypt(String str, String privateKey) throws Exception {
         //base64编码的私钥
-        byte[] keyBytes = Tools.decode(privateKey);
+        byte[] keyBytes = Dc3Tools.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, KEY_ALGORITHM);
         //AES解密
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key);
         //64位解码加密后的字符串
-        byte[] inputByte = Tools.decode(str.getBytes(Charsets.UTF_8));
+        byte[] inputByte = Dc3Tools.decode(str.getBytes(Charsets.UTF_8));
         return new String(cipher.doFinal(inputByte));
     }
 }

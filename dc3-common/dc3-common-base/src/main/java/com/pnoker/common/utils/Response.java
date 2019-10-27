@@ -35,7 +35,6 @@ public class Response<T> implements Serializable {
     private static final long serialVersionUID = 6903078348107905138L;
 
     private boolean ok;
-    private Integer code;
     private String message;
     private T data;
 
@@ -139,7 +138,6 @@ public class Response<T> implements Serializable {
      */
     private Response success() {
         this.ok = true;
-        this.code = 200;
         this.message = "Ok!";
         return this;
     }
@@ -152,7 +150,6 @@ public class Response<T> implements Serializable {
      */
     private Response success(String message) {
         this.ok = true;
-        this.code = 200;
         this.message = message;
         return this;
     }
@@ -164,7 +161,6 @@ public class Response<T> implements Serializable {
      */
     private Response failure() {
         this.ok = false;
-        this.code = 500;
         this.message = "Fail!";
         return this;
     }
@@ -177,7 +173,6 @@ public class Response<T> implements Serializable {
      */
     private Response failure(String message) {
         this.ok = false;
-        this.code = 500;
         this.message = message;
         return this;
     }

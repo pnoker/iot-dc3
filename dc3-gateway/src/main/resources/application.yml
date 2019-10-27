@@ -37,11 +37,13 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: auth_rest_api
+        # 权限中心
+        - id: auth_rest_auth
           uri: lb://dc3-auth
           predicates:
             - Path=/api/v3/auth/**
           filters:
+            - PasswordDecoderFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@ipKeyResolver}'
@@ -51,7 +53,8 @@ spring:
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
-        - id: device_rest_api
+        # 设备管理
+        - id: device_rest_device_manager
           uri: lb://dc3-manager
           predicates:
             - Path=/api/v3/device/**
@@ -65,7 +68,8 @@ spring:
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
-        - id: data_rest_api
+        # 数据采集
+        - id: data_rest_device_collect
           uri: lb://dc3-collect
           predicates:
             - Path=/api/v3/data/**
@@ -79,7 +83,8 @@ spring:
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
-        - id: rtmp_rest_api
+        # rtmp
+        - id: rtmp_rest_rtmp
           uri: lb://dc3-rtmp
           predicates:
             - Path=/api/v3/rtmp/**
@@ -93,7 +98,8 @@ spring:
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
-        - id: opc_rest_api
+        # opc
+        - id: opc_rest_opc
           uri: lb://dc3-opc
           predicates:
             - Path=/api/v3/opc/**
@@ -107,7 +113,8 @@ spring:
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
-        - id: opcua_rest_api
+        # opc ua
+        - id: opcua_rest_opc_ua
           uri: lb://dc3-opc-ua
           predicates:
             - Path=/api/v3/opcua/**
@@ -121,7 +128,8 @@ spring:
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
-        - id: resource_rest_api
+        # resource
+        - id: resource_rest_resource
           uri: lb://dc3-resource
           predicates:
             - Path=/api/v3/resource/**

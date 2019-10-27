@@ -21,8 +21,6 @@ import com.pnoker.common.model.User;
 import com.pnoker.common.utils.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @FeignClient(name = "DC3-DBS", fallbackFactory = UserDbsFeignApiHystrix.class)
 public interface UserDbsFeignApi {
@@ -33,5 +31,5 @@ public interface UserDbsFeignApi {
      * @return R
      */
     @GetMapping("/name/{username}")
-    Response<User> user(@PathVariable("username") String username);
+    Response<User> user(String username);
 }

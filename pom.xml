@@ -73,7 +73,7 @@
         <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
 
         <spring-boot.version>2.1.9.RELEASE</spring-boot.version>
-        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
+        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
         <spring-boot-admin.version>2.1.6</spring-boot-admin.version>
         <spring-webmvc.version>5.1.10.RELEASE</spring-webmvc.version>

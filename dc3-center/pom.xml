@@ -31,8 +31,8 @@
     <modules>
         <module>dc3-register</module>
         <module>dc3-monitor</module>
+        <module>dc3-oauth</module>
         <module>dc3-dbs</module>
-        <module>dc3-auth</module>
     </modules>
 
     <dependencies>

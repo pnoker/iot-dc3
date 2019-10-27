@@ -17,8 +17,8 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.base.BasePage;
@@ -29,8 +29,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * <p>User 接口实现
@@ -64,12 +62,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "user", key = "#user.id", unless = "#result == null")
+    @Cacheable(value = "user", key = "#a0", unless = "#result == null")
     public User selectById(Long id) {
         return userMapper.selectById(id);
     }
 
-    @Cacheable(value = "user", key = "#user.username", unless = "#result == null")
+    @Cacheable(value = "user", key = "#a0", unless = "#result == null")
     public User selectByUsername(String usernama) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", usernama);
@@ -77,14 +75,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageInfo<User> listWithPage(User user, BasePage page) {
+    public IPage<User> listWithPage(User user, BasePage pageInfo) {
         //todo 使用自带的分页逻辑
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         query(user, queryWrapper);
-        page.orderBy(queryWrapper);
-        PageHelper.startPage(page.getPageNum(), page.getPageSize());
-        List<User> userList = userMapper.selectList(queryWrapper);
-        return new PageInfo<>(userList);
+        pageInfo.orderBy(queryWrapper);
+        Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
+        return userMapper.selectPage(page, queryWrapper);
     }
 
     @Override

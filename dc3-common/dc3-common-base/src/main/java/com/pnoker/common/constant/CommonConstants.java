@@ -16,57 +16,83 @@
 
 package com.pnoker.common.constant;
 
+/**
+ * <p>dc3平台常亮
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 public interface CommonConstants {
-    /**
-     * 删除
-     */
-    String STATUS_DEL = "1";
-    /**
-     * 正常
-     */
-    String STATUS_NORMAL = "0";
 
     /**
-     * 锁定
+     * 前缀
      */
-    String STATUS_LOCK = "9";
+    String PROJECT_PREFIX = "dc3_";
 
     /**
-     * 菜单
+     * oauth 相关前缀
      */
-    String MENU = "0";
+    String OAUTH_PREFIX = "oauth:";
+    /**
+     * 项目的license
+     */
+    String PROJECT_LICENSE = "made by dc3";
 
     /**
-     * 编码
+     * 标志
      */
-    String UTF8 = "UTF-8";
+    String FROM = "from";
 
     /**
-     * JSON 资源
+     * 默认登录URL
      */
-    String CONTENT_TYPE = "application/json; charset=utf-8";
+    String OAUTH_TOKEN_URL = "/oauth/token";
 
     /**
-     * 前端工程名
+     * oauth 客户端信息
      */
-    String FRONT_END_PROJECT = "pig-ui";
+    String CLIENT_DETAILS_KEY = PROJECT_PREFIX + OAUTH_PREFIX + "client:details";
 
     /**
-     * 后端工程名
+     * {bcrypt} 加密的特征码
      */
-    String BACK_END_PROJECT = "pig";
+    String BCRYPT = "{bcrypt}";
 
     /**
-     * 成功标记
+     * dc3_oauth_client_details 表的字段，不包括client_id、client_secret
      */
-    Integer SUCCESS = 0;
-    /**
-     * 失败标记
-     */
-    Integer FAIL = 1;
+    String CLIENT_FIELDS = "client_id, CONCAT('{noop}',client_secret) as client_secret, resource_ids, scope, "
+            + "authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, "
+            + "refresh_token_validity, additional_information, autoapprove";
 
     /**
-     * 验证码前缀
+     * JdbcClientDetailsService 查询语句
      */
-    String DEFAULT_CODE_KEY = "DEFAULT_CODE_KEY_";
+    String BASE_FIND_STATEMENT = "select " + CLIENT_FIELDS
+            + " from dc3_oauth_client_details";
+
+    /**
+     * 默认的查询语句
+     */
+    String DEFAULT_FIND_STATEMENT = BASE_FIND_STATEMENT + " order by client_id";
+
+    /**
+     * 按条件client_id 查询
+     */
+    String DEFAULT_SELECT_STATEMENT = BASE_FIND_STATEMENT + " where client_id = ?";
+
+    /**
+     * 用户ID字段
+     */
+    String DETAILS_USER_ID = "user_id";
+
+    /**
+     * 用户名字段
+     */
+    String DETAILS_USERNAME = "username";
+
+    /**
+     * 协议字段
+     */
+    String DETAILS_LICENSE = "license";
 }

@@ -51,13 +51,6 @@
             <version>${mybatis.plus.version}</version>
         </dependency>
 
-        <!-- PageHelper -->
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>${pagehelper.version}</version>
-        </dependency>
-
         <!-- FastJson -->
         <dependency>
             <groupId>com.alibaba</groupId>

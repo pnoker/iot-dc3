@@ -57,7 +57,7 @@
             <version>${hikaricp.version}</version>
         </dependency>
 
-        <!-- Mongo、Redis、缓存、分页 -->
+        <!-- Mongo、Redis、缓存 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -69,11 +69,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>${pagehelper.boot.version}</version>
         </dependency>
 
         <!-- dc3 Api Dbs -->
