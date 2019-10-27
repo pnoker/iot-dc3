@@ -37,7 +37,7 @@ public class BasePage implements Serializable {
 
     private Integer pageNum = 1;
     private Integer pageSize = 10;
-    private Boolean order = null;
+    private Boolean order;
 
     public <T> void orderBy(QueryWrapper<T> queryWrapper) {
         if (order != null) {

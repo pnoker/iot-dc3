@@ -17,17 +17,14 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BasePage;
+import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -43,37 +40,33 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
-    @CachePut(value = "rtmp", key = "#rtmp.id")
     public void add(Rtmp rtmp) {
         rtmpMapper.insert(rtmp);
     }
 
     @Override
-    @CacheEvict(value = "rtmp", key = "#rtmp.id")
     public boolean delete(Long id) {
         return rtmpMapper.deleteById(id) > 0;
     }
 
     @Override
-    @CachePut(value = "rtmp", key = "#rtmp.id")
     public Rtmp update(Rtmp rtmp) {
         rtmpMapper.updateById(rtmp);
         return rtmp;
     }
 
     @Override
-    @Cacheable(value = "rtmp", key = "#rtmp.id", unless = "#result == null")
-    public Rtmp selectById(Long id) {
-        return rtmpMapper.selectById(id);
-    }
-
-    @Override
-    public IPage<Rtmp> listWithPage(Rtmp rtmp, BasePage pageInfo) {
+    public Dc3Page<Rtmp> list(Rtmp rtmp, BasePage pageInfo) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         query(rtmp, queryWrapper);
         pageInfo.orderBy(queryWrapper);
         Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        return rtmpMapper.selectPage(page, queryWrapper);
+        return new Dc3Page<>(rtmpMapper.selectPage(page, queryWrapper));
+    }
+
+    @Override
+    public Rtmp selectById(Long id) {
+        return rtmpMapper.selectById(id);
     }
 
     @Override

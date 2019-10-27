@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker;
+package com.pnoker.center.dbs;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
