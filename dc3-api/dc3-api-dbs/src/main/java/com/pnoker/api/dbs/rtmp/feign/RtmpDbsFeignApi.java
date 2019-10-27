@@ -16,12 +16,13 @@
 
 package com.pnoker.api.dbs.rtmp.feign;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -29,6 +30,7 @@ import org.springframework.cloud.openfeign.FeignClient;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
+@RequestMapping("/api/v3/dbs/rtmp")
 @FeignClient(name = "DC3-DBS", fallbackFactory = RtmpDbsFeignApiHystrix.class)
 public interface RtmpDbsFeignApi {
 
@@ -38,7 +40,8 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    Response<Long> add(Rtmp rtmp);
+    @PostMapping("/add")
+    Response<Long> add( Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp
@@ -46,7 +49,8 @@ public interface RtmpDbsFeignApi {
      * @param id rtmpId
      * @return true/false
      */
-    Response<Boolean> delete(Long id);
+    @DeleteMapping("/delete/id/{id}")
+    Response<Boolean> delete( Long id);
 
     /**
      * 修改 修改 Rtmp 任务记录
@@ -54,7 +58,8 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    Response<Boolean> update(Rtmp rtmp);
+    @PutMapping("/update")
+    Response<Boolean> update( Rtmp rtmp);
 
     /**
      * 查询 根据ID查询 Rtmp
@@ -62,7 +67,8 @@ public interface RtmpDbsFeignApi {
      * @param id
      * @return rtmp
      */
-    Response<Rtmp> selectById(Long id);
+    @GetMapping("/select/id/{id}")
+    Response<Rtmp> selectById( Long id);
 
     /**
      * 分页查询 按照查询 Rtmp
@@ -70,5 +76,6 @@ public interface RtmpDbsFeignApi {
      * @param rtmpDto
      * @return rtmpList
      */
-    Response<PageInfo<Rtmp>> selectByQueryAndPage(RtmpDto rtmpDto);
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    Response<IPage<Rtmp>> list( RtmpDto rtmpDto);
 }

@@ -17,7 +17,7 @@
 package com.pnoker.common.base;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * <p>基础 服务类接口
@@ -61,10 +61,10 @@ public interface BaseService<T> {
      * 获取带分页、排序的记录
      *
      * @param type
-     * @param page pageNum,pageSize
+     * @param pageInfo pageNum,pageSize
      * @return list
      */
-    PageInfo<T> listWithPage(T type, BasePage page);
+    IPage<T> listWithPage(T type, BasePage pageInfo);
 
     /**
      * 模糊查询构造器

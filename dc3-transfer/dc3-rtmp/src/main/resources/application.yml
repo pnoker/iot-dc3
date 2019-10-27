@@ -52,4 +52,4 @@ eureka:
 
 ffmpeg:
   window: D:/FFmpeg/bin/ffmpeg.exe
-  nuix: ffmpeg
+  unix: ffmpeg

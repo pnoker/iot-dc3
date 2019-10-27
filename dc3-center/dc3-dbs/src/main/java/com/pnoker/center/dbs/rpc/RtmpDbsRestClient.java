@@ -16,10 +16,9 @@
 
 package com.pnoker.center.dbs.rpc;
 
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.BaseController;
 import com.pnoker.common.base.BasePage;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
@@ -27,7 +26,9 @@ import com.pnoker.common.utils.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>rtmp dbs rest client
@@ -37,13 +38,11 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v3/dbs/rtmp")
-public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi {
+public class RtmpDbsRestClient implements RtmpDbsFeignApi {
     @Autowired
     private RtmpService rtmpService;
 
     @Override
-    @PostMapping("/")
     public Response<Long> add(@RequestBody Rtmp rtmp) {
         if (null == rtmp) {
             return Response.fail("body is null");
@@ -53,7 +52,6 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     }
 
     @Override
-    @DeleteMapping("/{id}")
     public Response<Boolean> delete(@PathVariable Long id) {
         if (null == id) {
             return Response.fail("rtmp id can not be empty");
@@ -62,13 +60,11 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     }
 
     @Override
-    @PutMapping("/")
     public Response<Boolean> update(@RequestBody Rtmp rtmp) {
         return null;
     }
 
     @Override
-    @GetMapping("/{id}")
     public Response<Rtmp> selectById(@PathVariable Long id) {
         if (null == id) {
             return Response.fail("rtmp id can not be empty");
@@ -78,8 +74,7 @@ public class RtmpDbsRestClient extends BaseController implements RtmpDbsFeignApi
     }
 
     @Override
-    @GetMapping("/")
-    public Response<PageInfo<Rtmp>> selectByQueryAndPage(@RequestBody(required = false) RtmpDto rtmpDto) {
+    public Response<IPage<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         if (null != rtmpDto) {
             BeanUtils.copyProperties(rtmpDto, rtmp);

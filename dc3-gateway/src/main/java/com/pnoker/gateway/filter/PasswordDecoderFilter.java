@@ -23,7 +23,7 @@ import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.http.HttpUtil;
-import com.pnoker.common.constant.SecurityConstants;
+import com.pnoker.common.constant.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -67,7 +67,7 @@ public class PasswordDecoderFilter extends AbstractGatewayFilterFactory {
             ServerHttpRequest request = exchange.getRequest();
 
             // 不是登录请求，直接向下执行
-            if (!StrUtil.containsAnyIgnoreCase(request.getURI().getPath(), SecurityConstants.OAUTH_TOKEN_URL)) {
+            if (!StrUtil.containsAnyIgnoreCase(request.getURI().getPath(), CommonConstants.OAUTH_TOKEN_URL)) {
                 return chain.filter(exchange);
             }
 

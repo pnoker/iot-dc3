@@ -35,16 +35,16 @@ CREATE TABLE `dc3_device` (
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `image_id` (`image_id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
   KEY `node_id` (`node_id`) USING BTREE,
-  CONSTRAINT `dc3_device_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`),
-  CONSTRAINT `dc3_device_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`),
-  CONSTRAINT `dc3_device_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`)
+  CONSTRAINT `dc3_device_ibfk_2` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`),
+  CONSTRAINT `dc3_device_ibfk_3` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`),
+  CONSTRAINT `dc3_device_ibfk_4` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='设备表';
 
 -- ----------------------------
@@ -59,8 +59,8 @@ CREATE TABLE `dc3_device_driver` (
   `profile_info` text DEFAULT NULL COMMENT '设备测点配置属性',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
@@ -78,8 +78,8 @@ CREATE TABLE `dc3_image` (
   `node_id` bigint(20) DEFAULT -1 COMMENT '节点ID，节点类型为image',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
@@ -107,8 +107,8 @@ CREATE TABLE `dc3_label` (
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `image_id` (`image_id`) USING BTREE,
@@ -130,8 +130,8 @@ CREATE TABLE `dc3_label_bind` (
   `entity_id` bigint(20) DEFAULT NULL COMMENT '实体ID，可为设备、设备组等',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `label_id` (`label_id`) USING BTREE,
@@ -155,8 +155,8 @@ CREATE TABLE `dc3_node` (
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `image_id` (`image_id`) USING BTREE,
@@ -174,6 +174,36 @@ INSERT INTO `dc3_node` VALUES (-1, '根节点', 'NODE', -1, -1, -1, '相对根�
 COMMIT;
 
 -- ----------------------------
+-- Table structure for dc3_oauth_client_details
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_oauth_client_details`;
+CREATE TABLE `dc3_oauth_client_details` (
+  `client_id` varchar(32) NOT NULL,
+  `resource_ids` varchar(256) DEFAULT NULL,
+  `client_secret` varchar(256) DEFAULT NULL,
+  `scope` varchar(256) DEFAULT NULL,
+  `authorized_grant_types` varchar(256) DEFAULT NULL,
+  `web_server_redirect_uri` varchar(256) DEFAULT NULL,
+  `authorities` varchar(256) DEFAULT NULL,
+  `access_token_validity` int(11) DEFAULT NULL,
+  `refresh_token_validity` int(11) DEFAULT NULL,
+  `additional_information` varchar(4096) DEFAULT NULL,
+  `autoapprove` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`client_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='终端信息表';
+
+-- ----------------------------
+-- Records of dc3_oauth_client_details
+-- ----------------------------
+BEGIN;
+INSERT INTO `dc3_oauth_client_details` VALUES ('app', NULL, 'app', 'server', 'password,refresh_token', NULL, NULL, NULL, NULL, NULL, 'true');
+INSERT INTO `dc3_oauth_client_details` VALUES ('daemon', NULL, 'daemon', 'server', 'password,refresh_token', NULL, NULL, NULL, NULL, NULL, 'true');
+INSERT INTO `dc3_oauth_client_details` VALUES ('dc3', NULL, 'dc3', 'server', 'password,refresh_token,authorization_code,client_credentials', 'http://localhost:4040/sso1/login,http://localhost:4041/sso1/login', NULL, NULL, NULL, NULL, 'true');
+INSERT INTO `dc3_oauth_client_details` VALUES ('gen', NULL, 'gen', 'server', 'password,refresh_token', NULL, NULL, NULL, NULL, NULL, 'true');
+INSERT INTO `dc3_oauth_client_details` VALUES ('test', NULL, 'test', 'server', 'password,refresh_token', NULL, NULL, NULL, NULL, NULL, 'true');
+COMMIT;
+
+-- ----------------------------
 -- Table structure for dc3_point
 -- ----------------------------
 DROP TABLE IF EXISTS `dc3_point`;
@@ -188,8 +218,8 @@ CREATE TABLE `dc3_point` (
   `unit_id` bigint(20) DEFAULT NULL COMMENT '单位ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `device_id` (`device_id`) USING BTREE,
@@ -216,8 +246,8 @@ CREATE TABLE `dc3_point_profile` (
   `driver_id` bigint(20) DEFAULT NULL COMMENT '设备驱动ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
@@ -240,8 +270,8 @@ CREATE TABLE `dc3_point_property` (
   `value` float DEFAULT 0 COMMENT '默认值',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
@@ -264,8 +294,8 @@ CREATE TABLE `dc3_rtmp` (
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `image_id` (`image_id`) USING BTREE,
@@ -274,7 +304,7 @@ CREATE TABLE `dc3_rtmp` (
   CONSTRAINT `dc3_rtmp_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`),
   CONSTRAINT `dc3_rtmp_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`),
   CONSTRAINT `dc3_rtmp_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='rtmp表';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='rtmp表';
 
 -- ----------------------------
 -- Records of dc3_rtmp
@@ -282,6 +312,10 @@ CREATE TABLE `dc3_rtmp` (
 BEGIN;
 INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (1, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
+INSERT INTO `dc3_rtmp` VALUES (2, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
+INSERT INTO `dc3_rtmp` VALUES (3, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
+INSERT INTO `dc3_rtmp` VALUES (4, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
 COMMIT;
 
 -- ----------------------------
@@ -296,8 +330,8 @@ CREATE TABLE `dc3_schedule` (
   `url` varchar(255) DEFAULT NULL COMMENT '链接',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
@@ -317,8 +351,8 @@ CREATE TABLE `dc3_unit` (
   `node_id` bigint(20) DEFAULT -1 COMMENT '节点ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
@@ -349,16 +383,17 @@ COMMIT;
 DROP TABLE IF EXISTS `dc3_user`;
 CREATE TABLE `dc3_user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_name` varchar(255) DEFAULT NULL COMMENT '用户名，需要加密存储，均可用于登录',
+  `username` varchar(255) DEFAULT NULL COMMENT '用户名，需要加密存储，均可用于登录',
   `phone` varchar(255) DEFAULT NULL COMMENT '手机号，需要加密存储，均可用于登录',
   `email` varchar(255) DEFAULT NULL COMMENT '邮箱，需要加密存储，均可用于登录',
   `password` varchar(255) DEFAULT NULL COMMENT '密码，需要加密存储',
   `node_id` bigint(20) DEFAULT -1 COMMENT '节点ID，节点类型为用户',
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',
   `description` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT '修改时间',
   `deleted` tinyint(4) DEFAULT 0 COMMENT '逻辑删标识',
+  `enable` tinyint(4) DEFAULT NULL COMMENT '是否可用',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `image_id` (`image_id`) USING BTREE,
   KEY `node_id` (`node_id`) USING BTREE,
@@ -370,7 +405,7 @@ CREATE TABLE `dc3_user` (
 -- Records of dc3_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '18304071393', 'pnokers@icloud.com', 'iotdc3', -1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '18304071393', 'pnokers@icloud.com', 'iotdc3', -1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-27 11:51:06', 0, 1);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

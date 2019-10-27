@@ -17,8 +17,8 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BasePage;
@@ -29,8 +29,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * <p>Rtmp 接口实现
@@ -70,13 +68,12 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public PageInfo<Rtmp> listWithPage(Rtmp rtmp, BasePage page) {
+    public IPage<Rtmp> listWithPage(Rtmp rtmp, BasePage pageInfo) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         query(rtmp, queryWrapper);
-        page.orderBy(queryWrapper);
-        PageHelper.startPage(page.getPageNum(), page.getPageSize());
-        List<Rtmp> rtmpList = rtmpMapper.selectList(queryWrapper);
-        return new PageInfo<>(rtmpList);
+        pageInfo.orderBy(queryWrapper);
+        Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
+        return rtmpMapper.selectPage(page, queryWrapper);
     }
 
     @Override

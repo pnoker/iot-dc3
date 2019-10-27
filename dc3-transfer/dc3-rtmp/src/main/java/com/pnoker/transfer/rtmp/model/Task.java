@@ -16,7 +16,7 @@
 
 package com.pnoker.transfer.rtmp.model;
 
-import com.pnoker.common.utils.Tools;
+import com.pnoker.common.utils.Dc3Tools;
 import com.pnoker.transfer.rtmp.constant.Global;
 import com.pnoker.transfer.rtmp.service.OutputService;
 import lombok.Data;
@@ -61,7 +61,7 @@ public class Task {
      * @param command
      */
     public Task(String command) {
-        this.id = Tools.uuid();
+        this.id = Dc3Tools.uuid();
         this.status = 0;
         this.command = command;
     }

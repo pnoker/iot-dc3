@@ -206,23 +206,6 @@ services:
         aliases:
           - dc3-dbs
 
-  dc3-collect:
-    build:
-      context: ./dc3-device/dc3-collect/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-collect:3.0
-    restart: always
-    ports:
-      - 8500:8500
-    links:
-      - dc3-register:iotdc3.register
-    container_name: dc3-collect
-    hostname: iotdc3.collect
-    networks:
-      network:
-        aliases:
-          - dc3-collect
-
   dc3-manager:
     build:
       context: ./dc3-device/dc3-manager/
@@ -239,23 +222,6 @@ services:
       network:
         aliases:
           - dc3-manager
-
-  dc3-group:
-    build:
-      context: ./dc3-device/dc3-group/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-group:3.0
-    restart: always
-    ports:
-      - 8700:8700
-    links:
-      - dc3-register:iotdc3.register
-    container_name: dc3-group
-    hostname: iotdc3.group
-    networks:
-      network:
-        aliases:
-          - dc3-group
 
   dc3-opc:
     build:

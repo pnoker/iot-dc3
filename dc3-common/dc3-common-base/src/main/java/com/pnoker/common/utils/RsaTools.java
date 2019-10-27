@@ -48,8 +48,8 @@ public class RsaTools {
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        String publicKeyString = Tools.encodeToString(publicKey.getEncoded());
-        String privateKeyString = Tools.encodeToString((privateKey.getEncoded()));
+        String publicKeyString = Dc3Tools.encodeToString(publicKey.getEncoded());
+        String privateKeyString = Dc3Tools.encodeToString((privateKey.getEncoded()));
         Keys.Rsa rsa = new Keys().new Rsa(publicKeyString, privateKeyString);
         return rsa;
     }
@@ -64,13 +64,13 @@ public class RsaTools {
      */
     public static String encrypt(String str, String publicKey) throws Exception {
         //base64编码的公钥
-        byte[] keyBytes = Tools.decode(publicKey);
+        byte[] keyBytes = Dc3Tools.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(KEY_ALGORITHM).generatePublic(keySpec);
         //RSA加密
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-        String outStr = Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
+        String outStr = Dc3Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
         return outStr;
     }
 
@@ -84,14 +84,14 @@ public class RsaTools {
      */
     public static String decrypt(String str, String privateKey) throws Exception {
         //base64编码的私钥
-        byte[] keyBytes = Tools.decode(privateKey);
+        byte[] keyBytes = Dc3Tools.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(KEY_ALGORITHM).generatePrivate(keySpec);
         //RSA解密
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
         //64位解码加密后的字符串
-        byte[] inputByte = Tools.decode(str.getBytes(Charsets.UTF_8));
+        byte[] inputByte = Dc3Tools.decode(str.getBytes(Charsets.UTF_8));
         return new String(cipher.doFinal(inputByte));
     }
 }
