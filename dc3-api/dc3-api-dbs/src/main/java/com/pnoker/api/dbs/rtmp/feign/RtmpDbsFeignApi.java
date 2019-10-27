@@ -16,8 +16,8 @@
 
 package com.pnoker.api.dbs.rtmp.feign;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
+import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
@@ -40,8 +40,8 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PostMapping("/add")
-    Response<Long> add( Rtmp rtmp);
+    @PostMapping
+    Response<Long> add(Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp
@@ -49,8 +49,8 @@ public interface RtmpDbsFeignApi {
      * @param id rtmpId
      * @return true/false
      */
-    @DeleteMapping("/delete/id/{id}")
-    Response<Boolean> delete( Long id);
+    @DeleteMapping("/id/{id}")
+    Response<Boolean> delete(Long id);
 
     /**
      * 修改 修改 Rtmp 任务记录
@@ -58,8 +58,8 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PutMapping("/update")
-    Response<Boolean> update( Rtmp rtmp);
+    @PutMapping
+    Response<Boolean> update(Rtmp rtmp);
 
     /**
      * 查询 根据ID查询 Rtmp
@@ -67,8 +67,8 @@ public interface RtmpDbsFeignApi {
      * @param id
      * @return rtmp
      */
-    @GetMapping("/select/id/{id}")
-    Response<Rtmp> selectById( Long id);
+    @GetMapping("/id/{id}")
+    Response<Rtmp> selectById(Long id);
 
     /**
      * 分页查询 按照查询 Rtmp
@@ -76,6 +76,6 @@ public interface RtmpDbsFeignApi {
      * @param rtmpDto
      * @return rtmpList
      */
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    Response<IPage<Rtmp>> list( RtmpDto rtmpDto);
+    @GetMapping
+    Response<Dc3Page<Rtmp>> list(RtmpDto rtmpDto);
 }

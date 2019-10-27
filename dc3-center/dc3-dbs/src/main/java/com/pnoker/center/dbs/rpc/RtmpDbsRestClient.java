@@ -16,10 +16,10 @@
 
 package com.pnoker.center.dbs.rpc;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.BasePage;
+import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
@@ -74,7 +74,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
     }
 
     @Override
-    public Response<IPage<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
+    public Response<Dc3Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         if (null != rtmpDto) {
             BeanUtils.copyProperties(rtmpDto, rtmp);
@@ -83,6 +83,6 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
         if (null != rtmpDto.getPage()) {
             BeanUtils.copyProperties(rtmpDto.getPage(), page);
         }
-        return Response.ok(rtmpService.listWithPage(rtmp, page));
+        return Response.ok(rtmpService.list(rtmp, page));
     }
 }

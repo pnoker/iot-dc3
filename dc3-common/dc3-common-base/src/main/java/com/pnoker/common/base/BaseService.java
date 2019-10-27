@@ -17,7 +17,7 @@
 package com.pnoker.common.base;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.pnoker.common.dto.Dc3Page;
 
 /**
  * <p>基础 服务类接口
@@ -50,21 +50,21 @@ public interface BaseService<T> {
     T update(T type);
 
     /**
-     * 通过ID查询记录
-     *
-     * @param id
-     * @return type
-     */
-    T selectById(Long id);
-
-    /**
      * 获取带分页、排序的记录
      *
      * @param type
      * @param pageInfo pageNum,pageSize
      * @return list
      */
-    IPage<T> listWithPage(T type, BasePage pageInfo);
+    Dc3Page<T> list(T type, BasePage pageInfo);
+
+    /**
+     * 通过ID查询记录
+     *
+     * @param id
+     * @return type
+     */
+    T selectById(Long id);
 
     /**
      * 模糊查询构造器

@@ -17,11 +17,11 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.base.BasePage;
+import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,13 +75,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public IPage<User> listWithPage(User user, BasePage pageInfo) {
+    public Dc3Page<User> list(User user, BasePage pageInfo) {
         //todo 使用自带的分页逻辑
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         query(user, queryWrapper);
         pageInfo.orderBy(queryWrapper);
         Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        return userMapper.selectPage(page, queryWrapper);
+        return new Dc3Page<>(userMapper.selectPage(page, queryWrapper));
     }
 
     @Override
