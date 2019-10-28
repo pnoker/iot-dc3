@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker;
+package com.pnoker.center.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;

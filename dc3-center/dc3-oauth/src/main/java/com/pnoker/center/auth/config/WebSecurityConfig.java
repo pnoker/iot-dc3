@@ -17,6 +17,7 @@
 package com.pnoker.center.auth.config;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -34,6 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
+@Slf4j
 @Primary
 @Order(90)
 @Configuration
@@ -42,12 +44,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @SneakyThrows
     protected void configure(HttpSecurity http) {
-        http.csrf().disable()
-                .requestMatchers()
-                .antMatchers("/actuator/**", "/oauth/**", "/login/**", "/logout/**")
-                .and().authorizeRequests()
-                .antMatchers("/oauth/**").authenticated()
-                .and().formLogin().permitAll();
+        try {
+            http.csrf().disable()
+                    .authorizeRequests()
+                    .antMatchers("/actuator/**", "/oauth/**", "/login/**", "/logout/**").permitAll()
+                    .anyRequest()
+                    .authenticated();
+        } catch (Exception e) {
+            log.error("{}", e.getMessage(), e);
+        }
     }
 
     @Bean
