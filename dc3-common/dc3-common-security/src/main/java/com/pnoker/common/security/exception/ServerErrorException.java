@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.exception;
+package com.pnoker.common.security.exception;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.pnoker.commont.security.component.Dc3Auth2ExceptionSerializer;
+import com.pnoker.common.security.component.Dc3Auth2ExceptionSerializer;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -27,21 +27,20 @@ import org.springframework.http.HttpStatus;
  * @email : pnokers@icloud.com
  */
 @JsonSerialize(using = Dc3Auth2ExceptionSerializer.class)
-public class ForbiddenException extends Dc3Auth2Exception {
+public class ServerErrorException extends Dc3Auth2Exception {
 
-    public ForbiddenException(String msg, Throwable t) {
+    public ServerErrorException(String msg, Throwable t) {
         super(msg);
     }
 
     @Override
     public String getOAuth2ErrorCode() {
-        return "access_denied";
+        return "server_error";
     }
 
     @Override
     public int getHttpErrorCode() {
-        return HttpStatus.FORBIDDEN.value();
+        return HttpStatus.INTERNAL_SERVER_ERROR.value();
     }
 
 }
-
