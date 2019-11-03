@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.handler;
+package com.pnoker.common.security.handler;
 
 import cn.hutool.core.collection.CollUtil;
 import org.springframework.context.ApplicationListener;

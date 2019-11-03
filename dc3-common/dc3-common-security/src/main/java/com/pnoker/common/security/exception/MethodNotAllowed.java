@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.exception;
+package com.pnoker.common.security.exception;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.pnoker.commont.security.component.Dc3Auth2ExceptionSerializer;
+import com.pnoker.common.security.component.Dc3Auth2ExceptionSerializer;
+import org.springframework.http.HttpStatus;
 
 /**
  * <p>
@@ -26,20 +27,20 @@ import com.pnoker.commont.security.component.Dc3Auth2ExceptionSerializer;
  * @email : pnokers@icloud.com
  */
 @JsonSerialize(using = Dc3Auth2ExceptionSerializer.class)
-public class InvalidException extends Dc3Auth2Exception {
+public class MethodNotAllowed extends Dc3Auth2Exception {
 
-    public InvalidException(String msg, Throwable t) {
+    public MethodNotAllowed(String msg, Throwable t) {
         super(msg);
     }
 
     @Override
     public String getOAuth2ErrorCode() {
-        return "invalid_exception";
+        return "method_not_allowed";
     }
 
     @Override
     public int getHttpErrorCode() {
-        return 426;
+        return HttpStatus.METHOD_NOT_ALLOWED.value();
     }
 
 }

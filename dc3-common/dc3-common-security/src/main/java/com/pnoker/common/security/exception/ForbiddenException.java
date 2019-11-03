@@ -14,31 +14,34 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.exception;
+package com.pnoker.common.security.exception;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.pnoker.commont.security.component.Dc3Auth2ExceptionSerializer;
-import lombok.Getter;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import com.pnoker.common.security.component.Dc3Auth2ExceptionSerializer;
+import org.springframework.http.HttpStatus;
 
 /**
- * 自定义OAuth2Exception
  * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @JsonSerialize(using = Dc3Auth2ExceptionSerializer.class)
-public class Dc3Auth2Exception extends OAuth2Exception {
-    @Getter
-    private String errorCode;
+public class ForbiddenException extends Dc3Auth2Exception {
 
-    public Dc3Auth2Exception(String msg) {
+    public ForbiddenException(String msg, Throwable t) {
         super(msg);
     }
 
-    public Dc3Auth2Exception(String msg, String errorCode) {
-        super(msg);
-        this.errorCode = errorCode;
+    @Override
+    public String getOAuth2ErrorCode() {
+        return "access_denied";
     }
+
+    @Override
+    public int getHttpErrorCode() {
+        return HttpStatus.FORBIDDEN.value();
+    }
+
 }
+
