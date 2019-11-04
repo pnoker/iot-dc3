@@ -44,8 +44,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CachePut(value = "user", key = "#user.id")
-    public void add(User user) {
-        userMapper.insert(user);
+    public boolean add(User user) {
+        return userMapper.insert(user) > 0;
     }
 
     @Override
@@ -56,9 +56,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CachePut(value = "user", key = "#user.id")
-    public User update(User user) {
-        userMapper.updateById(user);
-        return user;
+    public boolean update(User user) {
+        return userMapper.updateById(user) > 0;
     }
 
     @Override

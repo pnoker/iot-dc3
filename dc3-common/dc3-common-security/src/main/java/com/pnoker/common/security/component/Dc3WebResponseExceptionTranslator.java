@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.component;
+package com.pnoker.common.security.component;
 
-import com.pnoker.commont.security.exception.*;
+import com.pnoker.common.security.exception.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

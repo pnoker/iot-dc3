@@ -40,8 +40,8 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
-    public void add(Rtmp rtmp) {
-        rtmpMapper.insert(rtmp);
+    public boolean add(Rtmp rtmp) {
+        return rtmpMapper.insert(rtmp) > 0;
     }
 
     @Override
@@ -50,9 +50,8 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public Rtmp update(Rtmp rtmp) {
-        rtmpMapper.updateById(rtmp);
-        return rtmp;
+    public boolean update(Rtmp rtmp) {
+        return rtmpMapper.updateById(rtmp) > 0;
     }
 
     @Override

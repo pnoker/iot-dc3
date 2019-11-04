@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.service;
+package com.pnoker.common.security.service;
 
 import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
-import com.pnoker.common.constant.SecurityConstants;
+import com.pnoker.common.constant.CommonConstants;
 import com.pnoker.common.model.User;
 import com.pnoker.common.utils.Response;
 import lombok.AllArgsConstructor;
@@ -85,6 +85,6 @@ public class Dc3UserDetailsServiceImpl implements UserDetailsService {
         Collection<? extends GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(dbAuthsSet.toArray(new String[0]));
 
         // 构造security用户
-        return new Dc3User(info.getId(), info.getUsername(), SecurityConstants.BCRYPT + info.getPassword(), authorities);
+        return new Dc3User(info.getId(), info.getUsername(), CommonConstants.BCRYPT + info.getPassword(), authorities);
     }
 }
