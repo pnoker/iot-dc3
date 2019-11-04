@@ -1,0 +1,22 @@
+#### 新增rtmp任务
+POST localhost:8830/api/v3/rtmp/add
+Content-Type: application/json
+Accept: application/json
+
+{
+  "rtspUrl": "D:/FFmpeg/bin/video.mp4",
+  "rtmpUrl": "rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k",
+  "command": "{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}",
+  "videoType": "0",
+  "autoStart": false
+}
+
+#### 查询rtmp任务列表
+GET localhost:8830/api/v3/rtmp/list
+Accept: application/json
+
+#### 根据Id停止rtmp任务
+POST localhost:8830/api/v3/rtmp/stop/id/c4a8023132024ad8aa9f3113e03dc240
+Accept: application/json
+
+###

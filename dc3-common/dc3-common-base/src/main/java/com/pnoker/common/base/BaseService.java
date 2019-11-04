@@ -31,7 +31,7 @@ public interface BaseService<T> {
      *
      * @param type
      */
-    void add(T type);
+    boolean add(T type);
 
     /**
      * 删除记录
@@ -47,7 +47,7 @@ public interface BaseService<T> {
      * @param type
      * @return true/false
      */
-    T update(T type);
+    boolean update(T type);
 
     /**
      * 获取带分页、排序的记录

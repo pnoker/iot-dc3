@@ -47,8 +47,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
         if (null == rtmp) {
             return Response.fail("body is null");
         }
-        rtmpService.add(rtmp);
-        return rtmp.getId() > 0 ? Response.ok(rtmp.getId()) : Response.fail();
+        return rtmpService.add(rtmp) ? Response.ok(rtmp.getId()) : Response.fail();
     }
 
     @Override
@@ -61,7 +60,8 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
 
     @Override
     public Response<Boolean> update(@RequestBody Rtmp rtmp) {
-        return null;
+        rtmpService.update(rtmp);
+        return Response.ok();
     }
 
     @Override

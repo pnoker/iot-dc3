@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.component;
+package com.pnoker.common.security.component;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.pnoker.common.constant.CommonConstants;
-import com.pnoker.commont.security.exception.Dc3Auth2Exception;
+import com.pnoker.common.security.exception.Dc3Auth2Exception;
 import lombok.SneakyThrows;
 
 /**
@@ -38,7 +37,6 @@ public class Dc3Auth2ExceptionSerializer extends StdSerializer<Dc3Auth2Exception
     @SneakyThrows
     public void serialize(Dc3Auth2Exception value, JsonGenerator gen, SerializerProvider provider) {
         gen.writeStartObject();
-        gen.writeObjectField("code", CommonConstants.FAIL);
         gen.writeStringField("msg", value.getMessage());
         gen.writeStringField("data", value.getErrorCode());
         gen.writeEndObject();

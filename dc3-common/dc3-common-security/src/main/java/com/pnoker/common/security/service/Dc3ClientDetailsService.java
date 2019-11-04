@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.pnoker.commont.security.service;
+package com.pnoker.common.security.service;
 
-import com.pnoker.common.constant.SecurityConstants;
+import com.pnoker.common.constant.CommonConstants;
 import lombok.SneakyThrows;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -45,7 +45,7 @@ public class Dc3ClientDetailsService extends JdbcClientDetailsService {
      */
     @Override
     @SneakyThrows
-    @Cacheable(value = SecurityConstants.CLIENT_DETAILS_KEY, key = "#clientId", unless = "#result == null")
+    @Cacheable(value = CommonConstants.CLIENT_DETAILS_KEY, key = "#clientId", unless = "#result == null")
     public ClientDetails loadClientByClientId(String clientId) {
         return super.loadClientByClientId(clientId);
     }
