@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class Dc3AuthenticationFailureEvenHandler extends AbstractAuthenticationFailureEvenHandler {
+public class Dc3AuthenticationFailureEvenHandler extends AuthenticationFailureEvenHandler {
 
     /**
      * 处理登录失败方法

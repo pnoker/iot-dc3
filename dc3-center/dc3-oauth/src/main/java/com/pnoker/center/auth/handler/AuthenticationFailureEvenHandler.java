@@ -27,7 +27,7 @@ import org.springframework.security.core.AuthenticationException;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public abstract class AbstractAuthenticationFailureEvenHandler implements ApplicationListener<AbstractAuthenticationFailureEvent> {
+public abstract class AuthenticationFailureEvenHandler implements ApplicationListener<AbstractAuthenticationFailureEvent> {
 
 	/**
 	 * Handle an application event.

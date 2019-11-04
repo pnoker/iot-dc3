@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class Dc3AuthenticationSuccessEventHandler extends AbstractAuthenticationSuccessEventHandler {
+public class Dc3AuthenticationSuccessEventHandler extends AuthenticationSuccessEventHandler {
 
     /**
      * 处理登录成功方法
