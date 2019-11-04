@@ -27,7 +27,7 @@ import org.springframework.security.core.Authentication;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public abstract class AbstractAuthenticationSuccessEventHandler implements ApplicationListener<AuthenticationSuccessEvent> {
+public abstract class AuthenticationSuccessEventHandler implements ApplicationListener<AuthenticationSuccessEvent> {
     /**
      * Handle an application event.
      *
