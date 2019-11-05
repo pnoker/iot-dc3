@@ -19,6 +19,8 @@ package com.pnoker.common.base;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pnoker.common.dto.Dc3Page;
 
+import java.util.List;
+
 /**
  * <p>基础 服务类接口
  *
@@ -57,6 +59,14 @@ public interface BaseService<T> {
      * @return list
      */
     Dc3Page<T> list(T type, BasePage pageInfo);
+
+    /**
+     * 获取带分页、排序的记录
+     *
+     * @param type
+     * @return list
+     */
+    List<T> all(T type);
 
     /**
      * 通过ID查询记录

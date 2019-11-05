@@ -30,6 +30,8 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>User 接口实现
  *
@@ -81,6 +83,13 @@ public class UserServiceImpl implements UserService {
         pageInfo.orderBy(queryWrapper);
         Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
         return new Dc3Page<>(userMapper.selectPage(page, queryWrapper));
+    }
+
+    @Override
+    public List<User> all(User user) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        query(user, queryWrapper);
+        return userMapper.selectList(queryWrapper);
     }
 
     @Override

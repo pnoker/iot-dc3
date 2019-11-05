@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>Rtmp 接口实现
  *
@@ -61,6 +63,13 @@ public class RtmpServiceImpl implements RtmpService {
         pageInfo.orderBy(queryWrapper);
         Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
         return new Dc3Page<>(rtmpMapper.selectPage(page, queryWrapper));
+    }
+
+    @Override
+    public List<Rtmp> all(Rtmp rtmp) {
+        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
+        query(rtmp, queryWrapper);
+        return rtmpMapper.selectList(queryWrapper);
     }
 
     @Override

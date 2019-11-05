@@ -28,7 +28,7 @@ public interface RtmpService {
      *
      * @return
      */
-    List<Rtmp> getRtmpList(RtmpDto rtmpDto);
+    List<Rtmp> getRtmpList(Rtmp rtmp);
 
     Response addRtmp(Rtmp rtmp);
 
