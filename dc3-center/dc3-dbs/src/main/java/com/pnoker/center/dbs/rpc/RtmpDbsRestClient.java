@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * <p>rtmp dbs rest client
  *
@@ -74,7 +76,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
     }
 
     @Override
-    public Response<Dc3Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
+    public Response<Dc3Page<Rtmp>> list(@RequestBody RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         if (null != rtmpDto) {
             BeanUtils.copyProperties(rtmpDto, rtmp);
@@ -84,5 +86,10 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
             BeanUtils.copyProperties(rtmpDto.getPage(), page);
         }
         return Response.ok(rtmpService.list(rtmp, page));
+    }
+
+    @Override
+    public Response<List<Rtmp>> all(@RequestBody Rtmp rtmp) {
+        return Response.ok(rtmpService.all(rtmp));
     }
 }

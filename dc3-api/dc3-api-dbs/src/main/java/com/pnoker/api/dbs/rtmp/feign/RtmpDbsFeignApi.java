@@ -24,6 +24,8 @@ import com.pnoker.common.utils.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * <p>
  *
@@ -78,4 +80,13 @@ public interface RtmpDbsFeignApi {
      */
     @GetMapping
     Response<Dc3Page<Rtmp>> list(RtmpDto rtmpDto);
+
+    /**
+     * 全量查询 Rtmp
+     *
+     * @param rtmp
+     * @return
+     */
+    @GetMapping("/all")
+    Response<List<Rtmp>> all(Rtmp rtmp);
 }
