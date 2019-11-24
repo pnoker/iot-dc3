@@ -6,13 +6,13 @@ volumes:
   resource-data:
 
 services:
-  dc3-base:
+  base:
     build:
       context: ./dc3/dependences/base/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-base:3.0
 
-  dc3-volume:
+  volume:
     image: pnoker/dc3-volume:3.0
     container_name: dc3-volume
     networks:
@@ -24,7 +24,7 @@ services:
       - log-data:/iotdc3/data/logs
       - resource-data:/iotdc3/data/resources
 
-  dc3-influxdb:
+  influxdb:
     build:
       context: ./dc3/dependences/influxdb/
       dockerfile: ./Dockerfile
@@ -39,7 +39,7 @@ services:
         aliases:
           - dc3-influxdb
 
-  dc3-mariadb:
+  mariadb:
     build:
       context: ./dc3/dependences/mariadb/
       dockerfile: ./Dockerfile
@@ -54,7 +54,7 @@ services:
         aliases:
           - dc3-mariadb
 
-  dc3-mongodb:
+  mongodb:
     build:
       context: ./dc3/dependences/mongodb/
       dockerfile: ./Dockerfile
@@ -69,7 +69,7 @@ services:
         aliases:
           - dc3-mongodb
 
-  dc3-redis:
+  redis:
     build:
       context: ./dc3/dependences/redis/
       dockerfile: ./Dockerfile
@@ -84,7 +84,7 @@ services:
         aliases:
           - dc3-redis
 
-  dc3-rabbitmq:
+  rabbitmq:
     build:
       context: ./dc3/dependences/rabbitmq/
       dockerfile: ./Dockerfile
@@ -102,7 +102,7 @@ services:
         aliases:
           - dc3-rabbitmq
 
-  dc3-nginx:
+  nginx:
     build:
       context: ./dc3/dependences/nginx/
       dockerfile: ./Dockerfile
@@ -118,7 +118,7 @@ services:
         aliases:
           - dc3-nginx
 
-  dc3-gateway:
+  gateway:
     build:
       context: ./dc3-gateway/
       dockerfile: ./Dockerfile
@@ -127,9 +127,9 @@ services:
     ports:
       - 8000:8000
     links:
-      - dc3-register:iotdc3.register
-      - dc3-monitor:iotdc3.monitor
-      - dc3-redis:iotdc3.redis
+      - register:iotdc3.register
+      - monitor:iotdc3.monitor
+      - redis:iotdc3.redis
     container_name: dc3-gateway
     hostname: iotdc3.gateway
     networks:
@@ -137,7 +137,7 @@ services:
         aliases:
           - dc3-gateway
 
-  dc3-oauth:
+  oauth:
     build:
       context: ./dc3-center/dc3-oauth/
       dockerfile: ./Dockerfile
@@ -146,7 +146,7 @@ services:
     ports:
       - 8400:8400
     links:
-      - dc3-register:iotdc3.register
+      - register:iotdc3.register
     container_name: dc3-oauth
     hostname: iotdc3.oauth
     networks:
@@ -154,7 +154,7 @@ services:
         aliases:
           - dc3-oauth
 
-  dc3-register:
+  register:
     build:
       context: ./dc3-center/dc3-register/
       dockerfile: ./Dockerfile
@@ -169,7 +169,7 @@ services:
         aliases:
           - dc3-register
 
-  dc3-monitor:
+  monitor:
     build:
       context: ./dc3-center/dc3-monitor/
       dockerfile: ./Dockerfile
@@ -178,7 +178,7 @@ services:
     ports:
       - 8200:8200
     links:
-      - dc3-register:iotdc3.register
+      - register:iotdc3.register
     container_name: dc3-monitor
     hostname: iotdc3.monitor
     networks:
@@ -186,7 +186,7 @@ services:
         aliases:
           - dc3-monitor
 
-  dc3-dbs:
+  dbs:
     build:
       context: ./dc3-center/dc3-dbs/
       dockerfile: ./Dockerfile
@@ -195,10 +195,10 @@ services:
     ports:
       - 8300:8300
     links:
-      - dc3-register:iotdc3.register
-      - dc3-mongodb:iotdc3.mongodb
-      - dc3-mariadb:iotdc3.mariadb
-      - dc3-redis:iotdc3.redis
+      - register:iotdc3.register
+      - mongodb:iotdc3.mongodb
+      - mariadb:iotdc3.mariadb
+      - redis:iotdc3.redis
     container_name: dc3-dbs
     hostname: iotdc3.dbs
     networks:
@@ -206,7 +206,7 @@ services:
         aliases:
           - dc3-dbs
 
-  dc3-manager:
+  manager:
     build:
       context: ./dc3-device/dc3-manager/
       dockerfile: ./Dockerfile
@@ -215,7 +215,7 @@ services:
     ports:
       - 8600:8600
     links:
-      - dc3-register:iotdc3.register
+      - register:iotdc3.register
     container_name: dc3-manager
     hostname: iotdc3.manager
     networks:
@@ -223,7 +223,7 @@ services:
         aliases:
           - dc3-manager
 
-  dc3-opc:
+  opc:
     build:
       context: ./dc3-transfer/dc3-opc/
       dockerfile: ./Dockerfile
@@ -232,7 +232,7 @@ services:
     ports:
       - 8801:8801
     links:
-      - dc3-register:iotdc3.register
+      - register:iotdc3.register
     container_name: dc3-opc
     hostname: iotdc3.opc
     networks:
@@ -240,7 +240,7 @@ services:
         aliases:
           - dc3-opc
 
-  dc3-opc-ua:
+  opcua:
     build:
       context: ./dc3-transfer/dc3-opc-ua/
       dockerfile: ./Dockerfile
@@ -249,7 +249,7 @@ services:
     ports:
       - 8802:8802
     links:
-      - dc3-register:iotdc3.register
+      - register:iotdc3.register
     container_name: dc3-opc-ua
     hostname: iotdc3.opcua
     networks:
@@ -257,7 +257,7 @@ services:
         aliases:
           - dc3-opcua
 
-  dc3-rtmp:
+  rtmp:
     build:
       context: ./dc3-transfer/dc3-rtmp/
       dockerfile: ./Dockerfile
@@ -266,8 +266,8 @@ services:
     ports:
       - 8803:8803
     links:
-      - dc3-register:iotdc3.register
-      - dc3-dbs:iotdc3.dbs
+      - register:iotdc3.register
+      - dbs:iotdc3.dbs
     container_name: dc3-rtmp
     hostname: iotdc3.rtmp
     networks:
@@ -275,7 +275,7 @@ services:
         aliases:
           - dc3-rtmp
 
-  dc3-resource:
+  resource:
     build:
       context: ./dc3-transfer/dc3-resource/
       dockerfile: ./Dockerfile
@@ -284,7 +284,7 @@ services:
     ports:
       - 8800:8800
     links:
-      - dc3-register:iotdc3.register
+      - register:iotdc3.register
     container_name: dc3-resource
     hostname: iotdc3.resource
     networks:

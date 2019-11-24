@@ -31,7 +31,6 @@
     <modules>
         <module>dc3-common-base</module>
         <module>dc3-common-core</module>
-        <module>dc3-common-security</module>
     </modules>
 
 </project>
