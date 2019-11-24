@@ -72,15 +72,13 @@
         <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
         <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
 
-        <spring-boot.version>2.1.9.RELEASE</spring-boot.version>
-        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
+        <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.RC1</spring-cloud.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
-        <spring-boot-admin.version>2.1.6</spring-boot-admin.version>
-        <spring-webmvc.version>5.1.10.RELEASE</spring-webmvc.version>
-        <security-oauth.version>2.3.6.RELEASE</security-oauth.version>
+        <spring-boot-admin.version>2.2.0-SNAPSHOT</spring-boot-admin.version>
 
         <jna.version>5.3.1</jna.version>
-        <hutool.version>4.6.8</hutool.version>
+        <hutool.version>5.0.3</hutool.version>
         <codecov.version>2.7</codecov.version>
         <lombok.version>1.18.8</lombok.version>
         <mariadb.version>2.3.0</mariadb.version>
@@ -96,6 +94,7 @@
         <commons.lang3.version>3.9</commons.lang3.version>
         <redis.data.version>2.1.11.RELEASE</redis.data.version>
         <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
+        <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
 
     </properties>
 
@@ -158,6 +157,11 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${security.oauth.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.spring.platform</groupId>

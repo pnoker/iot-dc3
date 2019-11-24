@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.dto;
+package com.pnoker.common.security.dto;
 
 import lombok.Getter;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;

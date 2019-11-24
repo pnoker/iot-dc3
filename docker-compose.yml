@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3'
 
 volumes:
   dbs-data:
@@ -291,6 +291,17 @@ services:
       network:
         aliases:
           - dc3-resource
+
+  portainer:
+    image:  portainer/portainer
+    container_name: portainer
+    restart: always
+    ports:
+      - "9000:9000"
+    networks:
+      network:
+        aliases:
+          - dc3-portainer
 
 networks:
   network:

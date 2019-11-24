@@ -19,6 +19,7 @@ package com.pnoker.common.security.service;
 import com.pnoker.common.constant.CommonConstants;
 import lombok.SneakyThrows;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 

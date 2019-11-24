@@ -16,6 +16,7 @@
 
 package com.pnoker.center.auth.handler;
 
+import com.pnoker.common.security.handler.AuthenticationFailureEvenHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
