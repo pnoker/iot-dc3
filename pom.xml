@@ -61,16 +61,12 @@
     </modules>
 
     <properties>
-        <java.version>1.8</java.version>
+        <maven.jar.plugin>3.1.2</maven.jar.plugin>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <maven.jar.plugin>3.1.2</maven.jar.plugin>
         <maven.resource.plugin>3.1.0</maven.resource.plugin>
-        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
         <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
         <spring-cloud.version>Hoxton.RC1</spring-cloud.version>
@@ -83,7 +79,6 @@
         <lombok.version>1.18.8</lombok.version>
         <mariadb.version>2.3.0</mariadb.version>
         <sqllite.version>3.25.2</sqllite.version>
-        <hikaricp.version>3.3.1</hikaricp.version>
         <netty.version>4.1.42.Final</netty.version>
         <fastjson.version>1.2.60</fastjson.version>
         <slf4j-api.version>1.7.26</slf4j-api.version>
@@ -128,7 +123,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -204,7 +198,6 @@
 
     <build>
         <finalName>${project.name}</finalName>
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -213,32 +206,26 @@
         </resources>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
             </plugin>
-
         </plugins>
 
         <pluginManagement>
-
             <plugins>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin}</version>
+                    <version>3.8.0</version>
                     <configuration>
                         <target>${maven.compiler.target}</target>
                         <source>${maven.compiler.source}</source>
@@ -273,7 +260,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
                 <!-- 过滤文件 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -285,7 +271,6 @@
                         </nonFilteredFileExtensions>
                     </configuration>
                 </plugin>
-
                 <!-- 代码覆盖检测 -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -298,7 +283,6 @@
                         </formats>
                     </configuration>
                 </plugin>
-
                 <!-- jar依赖包打包配置 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -317,11 +301,57 @@
                         </execution>
                     </executions>
                 </plugin>
-
             </plugins>
-
         </pluginManagement>
 
     </build>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <!--阿里云主仓库，代理了maven central和jcenter仓库-->
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <!--阿里云代理Spring 插件仓库-->
+        <pluginRepository>
+            <id>spring-plugin</id>
+            <name>spring-plugin</name>
+            <url>https://maven.aliyun.com/repository/spring-plugin</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
