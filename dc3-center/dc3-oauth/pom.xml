@@ -42,37 +42,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.security.oauth</groupId>
-            <artifactId>spring-security-oauth2</artifactId>
-            <version>${security-oauth.version}</version>
-        </dependency>
 
         <!-- MySQL、连接池 -->
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis.plus.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.tomcat</groupId>
-                    <artifactId>tomcat-jdbc</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>${mariadb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
         </dependency>
 
         <!-- Redis-->
@@ -87,10 +66,14 @@
             <artifactId>dc3-api-dbs</artifactId>
         </dependency>
 
-        <!-- dc3 Common Core -->
+        <!-- dc3 Common -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-common-security</artifactId>
         </dependency>
 
     </dependencies>

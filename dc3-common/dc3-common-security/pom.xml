@@ -38,7 +38,6 @@
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
-            <version>${security-oauth.version}</version>
         </dependency>
 
         <!-- dc3 Api Dbs -->

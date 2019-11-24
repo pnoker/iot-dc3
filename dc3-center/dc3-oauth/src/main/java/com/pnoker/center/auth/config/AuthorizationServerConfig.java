@@ -16,9 +16,10 @@
 
 package com.pnoker.center.auth.config;
 
-import com.pnoker.center.auth.dto.Dc3User;
-import com.pnoker.center.auth.service.Dc3ClientDetailsService;
 import com.pnoker.common.constant.CommonConstants;
+import com.pnoker.common.security.component.Dc3WebResponseExceptionTranslator;
+import com.pnoker.common.security.dto.Dc3User;
+import com.pnoker.common.security.service.Dc3ClientDetailsService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
@@ -80,7 +81,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .tokenEnhancer(tokenEnhancer())
                 .userDetailsService(userDetailsService)
                 .authenticationManager(authenticationManager)
-                .reuseRefreshTokens(false);
+                .reuseRefreshTokens(false)
+                .exceptionTranslator(new Dc3WebResponseExceptionTranslator());
     }
 
     @Bean

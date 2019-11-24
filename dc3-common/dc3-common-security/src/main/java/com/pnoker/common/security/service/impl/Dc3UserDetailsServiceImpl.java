@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service.impl;
+package com.pnoker.common.security.service.impl;
 
 import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
-import com.pnoker.center.auth.dto.Dc3User;
 import com.pnoker.common.constant.CommonConstants;
 import com.pnoker.common.model.User;
+import com.pnoker.common.security.dto.Dc3User;
 import com.pnoker.common.utils.Response;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -51,8 +49,6 @@ public class Dc3UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserDbsFeignApi userDbsFeignApi;
 
-    private final CacheManager cacheManager;
-
     /**
      * 用户密码登录
      *
@@ -62,14 +58,8 @@ public class Dc3UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @SneakyThrows
     public UserDetails loadUserByUsername(String username) {
-        Cache cache = cacheManager.getCache("user_details");
-        if (cache != null && cache.get(username) != null) {
-            return (Dc3User) cache.get(username).get();
-        }
-
         Response<User> result = userDbsFeignApi.user(username);
         UserDetails userDetails = getUserDetails(result);
-        cache.put(username, userDetails);
         return userDetails;
     }
 
