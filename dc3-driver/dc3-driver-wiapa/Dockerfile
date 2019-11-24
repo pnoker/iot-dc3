@@ -17,7 +17,7 @@
 FROM anapsix/alpine-java:8_server-jre_unlimited
 MAINTAINER pnoker <pnokers.icloud.com>
 
-ENV JAVA_OPS -server -Xms512m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+ENV JAVA_OPS -server -Xms512m -Xmx2g -Xmn768m -Xss256k -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256M -XX:SurvivorRatio=8 -XX:MaxTenuringThreshold=5 -XX:GCTimeRatio=19 -Xnoclassgc -XX:+DisableExplicitGC -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSFullGCsBeforeCompaction=0 -XX:-CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=70 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintHeapAtGC
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-device/dc3-group
