@@ -61,7 +61,7 @@ public class TaskRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         checkFFmpeg();
-        List<Rtmp> list = rtmpService.getRtmpList(new RtmpDto(true));
+        List<Rtmp> list = rtmpService.getRtmpList(new Rtmp(true));
         for (Rtmp rtmp : list) {
             rtmpService.startTask(rtmp);
         }
