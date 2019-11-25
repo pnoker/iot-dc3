@@ -87,6 +87,6 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return
      */
-    @GetMapping("/all")
+    @PostMapping("/all")
     Response<List<Rtmp>> all(Rtmp rtmp);
 }
