@@ -29,7 +29,6 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/transfer/${spring.application.name}.log
   level:
     org.springframework.data: ERROR
     org.springframework.web: ERROR
@@ -41,6 +40,8 @@ logging:
     io.undertow: ERROR
     com.netflix: ERROR
     com.pnoker: DEBUG
+  file:
+    name: dc3/logs/transfer/${spring.application.name}.log
 
 eureka:
   instance:

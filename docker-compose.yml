@@ -1,28 +1,11 @@
 version: '3'
 
-volumes:
-  dbs-data:
-  log-data:
-  resource-data:
-
 services:
   base:
     build:
       context: ./dc3/dependences/base/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-base:3.0
-
-  volume:
-    image: pnoker/dc3-volume:3.0
-    container_name: dc3-volume
-    networks:
-      network:
-        aliases:
-          - dc3-volume
-    volumes:
-      - dbs-data:/iotdc3/data/dbs
-      - log-data:/iotdc3/data/logs
-      - resource-data:/iotdc3/data/resources
 
   influxdb:
     build:
@@ -136,23 +119,6 @@ services:
       network:
         aliases:
           - dc3-gateway
-
-  oauth:
-    build:
-      context: ./dc3-center/dc3-oauth/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-oauth:3.0
-    restart: always
-    ports:
-      - 8400:8400
-    links:
-      - register:iotdc3.register
-    container_name: dc3-oauth
-    hostname: iotdc3.oauth
-    networks:
-      network:
-        aliases:
-          - dc3-oauth
 
   register:
     build:
