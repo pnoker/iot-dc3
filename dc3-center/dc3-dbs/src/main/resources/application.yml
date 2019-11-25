@@ -82,7 +82,6 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/center/${spring.application.name}.log
   level:
     org.springframework.data: ERROR
     org.springframework.web: ERROR
@@ -93,6 +92,8 @@ logging:
     io.lettuce.core: ERROR
     io.undertow: ERROR
     com.netflix: ERROR
+  file:
+    name: dc3/logs/center/${spring.application.name}.log
 
 eureka:
   instance:
