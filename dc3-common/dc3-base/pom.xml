@@ -23,7 +23,7 @@
         <version>3.0</version>
     </parent>
 
-    <artifactId>dc3-common-base</artifactId>
+    <artifactId>dc3-base</artifactId>
     <packaging>jar</packaging>
 
     <description>IOT DC3 平台 公共基础集合。</description>
