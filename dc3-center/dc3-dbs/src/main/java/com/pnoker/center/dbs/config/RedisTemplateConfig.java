@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.config;
+package com.pnoker.center.dbs.config;
 
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;

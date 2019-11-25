@@ -51,7 +51,7 @@
         <!-- dc3 Commont Base -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common-base</artifactId>
+            <artifactId>dc3-base</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
