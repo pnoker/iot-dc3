@@ -19,6 +19,7 @@ n latest
 或者
 n 10.16.3
 //切换nodejs
+n
 ο  node/10.16.3
 //查看版本 
 node -v
