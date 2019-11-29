@@ -16,12 +16,13 @@
 
 package com.pnoker.common.base;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * <p>基础查询类，其中包括分页以及排序
@@ -32,20 +33,11 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BasePage implements Serializable {
+public class PageInfo implements Serializable {
     private static final long serialVersionUID = 4835128943097551504L;
 
     private Integer pageNum = 1;
     private Integer pageSize = 10;
-    private Boolean order;
+    private List<OrderItem> orders;
 
-    public <T> void orderBy(QueryWrapper<T> queryWrapper) {
-        if (order != null) {
-            if (order) {
-                queryWrapper.orderByAsc("id");
-            } else {
-                queryWrapper.orderByDesc("id");
-            }
-        }
-    }
 }

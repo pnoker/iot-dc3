@@ -17,7 +17,9 @@
 package com.pnoker.common.base;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.pnoker.common.dto.Dc3Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
 
@@ -58,15 +60,7 @@ public interface BaseService<T> {
      * @param pageInfo pageNum,pageSize
      * @return list
      */
-    Dc3Page<T> list(T type, BasePage pageInfo);
-
-    /**
-     * 获取带分页、排序的记录
-     *
-     * @param type
-     * @return list
-     */
-    List<T> all(T type);
+    IPage<T> list(T type, PageInfo pageInfo);
 
     /**
      * 通过ID查询记录
@@ -83,5 +77,13 @@ public interface BaseService<T> {
      * @param queryWrapper
      */
     void query(T t, QueryWrapper<T> queryWrapper);
+
+    /**
+     * 排序构造器 & 字段校验
+     *
+     * @param orders
+     * @param page
+     */
+    void order(List<OrderItem> orders, Page<T> page);
 
 }

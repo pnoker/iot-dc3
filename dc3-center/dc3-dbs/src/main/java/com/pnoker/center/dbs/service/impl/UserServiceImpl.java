@@ -17,20 +17,25 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
-import com.pnoker.common.base.BasePage;
-import com.pnoker.common.dto.Dc3Page;
+import com.pnoker.common.base.PageInfo;
 import com.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>User 接口实现
@@ -68,6 +73,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectById(id);
     }
 
+    @Override
     @Cacheable(value = "user", key = "#a0", unless = "#result == null")
     public User selectByUsername(String usernama) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -76,34 +82,44 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Dc3Page<User> list(User user, BasePage pageInfo) {
-        //todo 使用自带的分页逻辑
+    public IPage<User> list(User user, PageInfo pageInfo) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         query(user, queryWrapper);
-        pageInfo.orderBy(queryWrapper);
         Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        return new Dc3Page<>(userMapper.selectPage(page, queryWrapper));
-    }
-
-    @Override
-    public List<User> all(User user) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        query(user, queryWrapper);
-        return userMapper.selectList(queryWrapper);
+        return userMapper.selectPage(page, queryWrapper);
     }
 
     @Override
     public void query(User user, QueryWrapper<User> queryWrapper) {
-        //todo java8
-        if (null != user.getUsername() && !"".equals(user.getUsername())) {
-            queryWrapper.like("username", user.getUsername());
-        }
-        if (null != user.getPhone() && !"".equals(user.getPhone())) {
-            queryWrapper.like("phone", user.getPhone());
-        }
-        if (null != user.getEmail() && !"".equals(user.getEmail())) {
-            queryWrapper.like("email", user.getEmail());
-        }
+        Optional.ofNullable(user).ifPresent(u -> {
+            if (StringUtils.isNotBlank(u.getUsername())) {
+                queryWrapper.like("username", u.getUsername());
+            }
+            if (StringUtils.isNotBlank(u.getPhone())) {
+                queryWrapper.like("phone", u.getPhone());
+            }
+            if (StringUtils.isNotBlank(u.getEmail())) {
+                queryWrapper.like("email", u.getEmail());
+            }
+        });
+    }
+
+    @Override
+    public void order(List<OrderItem> orders, Page<User> page) {
+        Optional.ofNullable(orders).ifPresent(orderItems -> {
+            List<OrderItem> tmps = new ArrayList<>();
+            orderItems.stream().forEach(orderItem -> {
+                if ("id".equals(orderItem.getColumn())) {
+                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                    tmps.add(orderItem);
+                }
+                if ("username".equals(orderItem.getColumn())) {
+                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                    tmps.add(orderItem);
+                }
+            });
+            page.setOrders(tmps);
+        });
     }
 
 }

@@ -16,8 +16,8 @@
 
 package com.pnoker.api.dbs.rtmp.feign;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
-import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
@@ -79,14 +79,6 @@ public interface RtmpDbsFeignApi {
      * @return rtmpList
      */
     @GetMapping
-    Response<Dc3Page<Rtmp>> list(RtmpDto rtmpDto);
+    Response<IPage<Rtmp>> list(RtmpDto rtmpDto);
 
-    /**
-     * 全量查询 Rtmp
-     *
-     * @param rtmp
-     * @return
-     */
-    @PostMapping("/all")
-    Response<List<Rtmp>> all(Rtmp rtmp);
 }

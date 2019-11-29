@@ -16,16 +16,14 @@
 
 package com.pnoker.api.dbs.rtmp.hystrix;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
-import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * <p>
@@ -64,12 +62,7 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
             }
 
             @Override
-            public Response<Dc3Page<Rtmp>> list(RtmpDto rtmpDto) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<List<Rtmp>> all(Rtmp rtmp) {
+            public Response<IPage<Rtmp>> list(RtmpDto rtmpDto) {
                 return Response.fail(message);
             }
         };
