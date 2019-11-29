@@ -16,7 +16,7 @@
 
 package com.pnoker.common.dto.transfer;
 
-import com.pnoker.common.base.BasePage;
+import com.pnoker.common.base.PageInfo;
 import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class RtmpDto extends Rtmp {
 
-    private BasePage page;
+    private PageInfo page;
 
     public RtmpDto(boolean autoStart) {
         super(autoStart);

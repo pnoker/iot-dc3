@@ -17,17 +17,22 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.BasePage;
-import com.pnoker.common.dto.Dc3Page;
+import com.pnoker.common.base.PageInfo;
 import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>Rtmp 接口实现
@@ -57,19 +62,12 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public Dc3Page<Rtmp> list(Rtmp rtmp, BasePage pageInfo) {
+    public IPage<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         query(rtmp, queryWrapper);
-        pageInfo.orderBy(queryWrapper);
         Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        return new Dc3Page<>(rtmpMapper.selectPage(page, queryWrapper));
-    }
-
-    @Override
-    public List<Rtmp> all(Rtmp rtmp) {
-        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        query(rtmp, queryWrapper);
-        return rtmpMapper.selectList(queryWrapper);
+        order(pageInfo.getOrders(), page);
+        return rtmpMapper.selectPage(page, queryWrapper);
     }
 
     @Override
@@ -79,18 +77,30 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public void query(Rtmp rtmp, QueryWrapper<Rtmp> queryWrapper) {
-        //todo java8
-        if (rtmp.getAutoStart() != null) {
-            if (rtmp.getAutoStart()) {
-                queryWrapper.eq("auto_start", true);
-            } else {
-                queryWrapper.eq("auto_start", false);
-            }
+        if (null != rtmp.getAutoStart()) {
+            queryWrapper.eq("auto_start", BooleanUtils.isTrue(rtmp.getAutoStart()));
         }
-        //todo java8
-        if (null != rtmp.getName() && !"".equals(rtmp.getName())) {
+        if (StringUtils.isNotBlank(rtmp.getName())) {
             queryWrapper.like("name", rtmp.getName());
         }
+    }
+
+    @Override
+    public void order(List<OrderItem> orders, Page<Rtmp> page) {
+        Optional.ofNullable(orders).ifPresent(orderItems -> {
+            List<OrderItem> tmps = new ArrayList<>();
+            orderItems.stream().forEach(orderItem -> {
+                if ("id".equals(orderItem.getColumn())) {
+                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                    tmps.add(orderItem);
+                }
+                if ("name".equals(orderItem.getColumn())) {
+                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                    tmps.add(orderItem);
+                }
+            });
+            page.setOrders(tmps);
+        });
     }
 
 }

@@ -16,10 +16,10 @@
 
 package com.pnoker.center.dbs.rpc;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.BasePage;
-import com.pnoker.common.dto.Dc3Page;
+import com.pnoker.common.base.PageInfo;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>rtmp dbs rest client
@@ -76,20 +76,16 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
     }
 
     @Override
-    public Response<Dc3Page<Rtmp>> list(@RequestBody RtmpDto rtmpDto) {
+    public Response<IPage<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
-        if (null != rtmpDto) {
-            BeanUtils.copyProperties(rtmpDto, rtmp);
-        }
-        BasePage page = new BasePage();
-        if (null != rtmpDto.getPage()) {
-            BeanUtils.copyProperties(rtmpDto.getPage(), page);
-        }
+        PageInfo page = new PageInfo();
+        Optional.ofNullable(rtmpDto).ifPresent(r -> {
+            BeanUtils.copyProperties(r, rtmp);
+            Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> {
+                BeanUtils.copyProperties(p, page);
+            });
+        });
         return Response.ok(rtmpService.list(rtmp, page));
     }
 
-    @Override
-    public Response<List<Rtmp>> all(@RequestBody Rtmp rtmp) {
-        return Response.ok(rtmpService.all(rtmp));
-    }
 }
