@@ -29,7 +29,6 @@
     <description>IOT DC3 平台网关,用于限流、权限验证、服务转发、方向代理 等。</description>
 
     <dependencies>
-
         <!-- Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
