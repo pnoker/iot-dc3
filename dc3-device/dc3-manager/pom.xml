@@ -29,6 +29,11 @@
     <description>IOT DC3 平台 全部设备集合管理服务，包括设备组注册、权限管理、设备管理等功能。</description>
 
     <dependencies>
+        <!-- dc3 Api Dbs -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-api-dbs</artifactId>
+        </dependency>
 
     </dependencies>
 

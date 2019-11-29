@@ -94,16 +94,17 @@
     </properties>
 
     <dependencies>
+        <!-- Spring Configuration -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Eureka Client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
-        <!-- Actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- Hystrix -->
@@ -112,11 +113,17 @@
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
 
-        <!-- Spring Configuration -->
+        <!-- Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Lombok 代码简化 -->
@@ -126,25 +133,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
-
             <!-- Spring Cloud 依赖 -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -153,9 +146,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.springframework.security.oauth</groupId>
-                <artifactId>spring-security-oauth2</artifactId>
-                <version>${security.oauth.version}</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.spring.platform</groupId>
@@ -164,12 +159,17 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${security.oauth.version}</version>
+            </dependency>
 
             <!-- dc3 Api Dbs -->
             <dependency>
                 <groupId>com.pnoker</groupId>
                 <artifactId>dc3-api-dbs</artifactId>
-                <version>3.0</version>
+                <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
 
@@ -177,19 +177,7 @@
             <dependency>
                 <groupId>com.pnoker</groupId>
                 <artifactId>dc3-base</artifactId>
-                <version>3.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.pnoker</groupId>
-                <artifactId>dc3-common-core</artifactId>
-                <version>3.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.pnoker</groupId>
-                <artifactId>dc3-common-security</artifactId>
-                <version>3.0</version>
+                <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
 
@@ -326,7 +314,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <!--阿里云主仓库，代理了maven central和jcenter仓库-->
         <repository>
             <id>aliyun</id>
             <name>aliyun</name>
@@ -340,7 +327,6 @@
         </repository>
     </repositories>
     <pluginRepositories>
-        <!--阿里云代理Spring 插件仓库-->
         <pluginRepository>
             <id>spring-plugin</id>
             <name>spring-plugin</name>
