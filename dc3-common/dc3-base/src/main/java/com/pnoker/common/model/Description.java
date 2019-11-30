@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base;
+package com.pnoker.common.model;
 
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Date;
 
 /**
- * <p>基础查询类，其中包括分页以及排序
+ * <p>基础 domain 实体类
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -33,11 +35,31 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageInfo implements Serializable {
-    private static final long serialVersionUID = 4835128943097551504L;
+public class Description implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private Integer pageNum = 1;
-    private Integer pageSize = 10;
-    private List<OrderItem> orders;
+    /**
+     * 主键，自增ID
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
+    /**
+     * 用户ID，关联操作到用户
+     */
+    private Long userId;
+
+    /**
+     * 描述信息
+     */
+    private String description;
+
+    private Date createTime;
+    private Date updateTime;
+
+    /**
+     * 逻辑删除标识 1：删除，0：未删除
+     */
+    @TableLogic
+    private Integer deleted;
 }

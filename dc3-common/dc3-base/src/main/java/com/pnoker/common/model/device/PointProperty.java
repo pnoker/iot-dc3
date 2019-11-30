@@ -16,7 +16,7 @@
 
 package com.pnoker.common.model.device;
 
-import com.pnoker.common.base.BaseEntity;
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PointProperty extends BaseEntity {
+public class PointProperty extends Description {
     private static final long serialVersionUID = -8906573997172682463L;
 
     private String name;

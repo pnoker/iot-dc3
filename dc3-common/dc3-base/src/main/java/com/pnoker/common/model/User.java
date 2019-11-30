@@ -18,9 +18,8 @@ package com.pnoker.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 /**
  * <p>
@@ -31,10 +30,9 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable {
-    private static final long serialVersionUID = 278093312954064386L;
+@EqualsAndHashCode(callSuper = true)
+public class User extends Description {
 
-    private Long id;
     private String username;
     private String phone;
     private String email;

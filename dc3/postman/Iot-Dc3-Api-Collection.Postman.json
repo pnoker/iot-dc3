@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a9d59210-7c2f-4631-8b89-b2acd3af0b8c",
+		"_postman_id": "b9dba94e-89df-4de1-895c-bbfd8e385106",
 		"name": "Iot-Dc3-Api-collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -90,72 +90,476 @@
 			"name": "Iot-Dc3-Dbs-Api",
 			"item": [
 				{
-					"name": "dbs:/rtmp/list",
-					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "iotdc3",
-									"type": "string"
+					"name": "rtmp",
+					"item": [
+						{
+							"name": "dbs:新增rtmp",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "iotdc3",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "iotdc3",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "username",
-									"value": "iotdc3",
-									"type": "string"
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"updateTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/rtmp/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"rtmp",
+										"add"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8300/rtmp/list",
-							"host": [
-								"localhost"
-							],
-							"port": "8300",
-							"path": [
-								"rtmp",
-								"list"
-							]
+						{
+							"name": "dbs:删除rtmp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/rtmp/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"rtmp",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:修改rtmp",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 32,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"updateTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+								},
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/rtmp/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"rtmp",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:查询rtmp(ID)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/rtmp/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"rtmp",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "-1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:查询rtmp(分页)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"测试\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/rtmp/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"rtmp",
+										"list"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "dbs:/rtmp/insert",
-					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "iotdc3",
-									"type": "string"
+					"name": "user",
+					"item": [
+						{
+							"name": "dbs:新增user",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "iotdc3",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "iotdc3",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "username",
-									"value": "iotdc3",
-									"type": "string"
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"updateTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"add"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8300/rtmp/insert",
-							"host": [
-								"localhost"
-							],
-							"port": "8300",
-							"path": [
-								"rtmp",
-								"insert"
-							]
+						{
+							"name": "dbs:删除user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"type": "string",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:修改user",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 32,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"updateTime\": \"2019-09-30T16:00:00.000+0000\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+								},
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:查询user(ID)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:查询user(用户名)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/username/:username",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"username",
+										":username"
+									],
+									"variable": [
+										{
+											"key": "username",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:查询user(手机号)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/phone/:phone",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"phone",
+										":phone"
+									],
+									"variable": [
+										{
+											"key": "phone",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:查询user(邮箱)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/email/:email",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"email",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dbs:查询user(分页)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"测试\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/api/v3/dbs/user/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"api",
+										"v3",
+										"dbs",
+										"user",
+										"list"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			]
 		},
@@ -163,18 +567,35 @@
 			"name": "Iot-Dc3-Webapp-Api",
 			"item": [
 				{
-					"name": "webapp:/hello",
+					"name": "获取授权信息",
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "test",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "test",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8000/hello",
+							"raw": "http://localhost:8400/oauth/token",
+							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8000",
+							"port": "8400",
 							"path": [
-								"hello"
+								"oauth",
+								"token"
 							]
 						}
 					},
@@ -207,7 +628,170 @@
 		},
 		{
 			"name": "Iot-Dc3-Rtmp-Api",
-			"item": []
+			"item": [
+				{
+					"name": "rtmp:/add",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rtspUrl\": \"D:/FFmpeg/bin/video.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": \"0\",\n    \"autoStart\": false\n}"
+						},
+						"url": {
+							"raw": "localhost:8830/api/v3/rtmp/add",
+							"host": [
+								"localhost"
+							],
+							"port": "8830",
+							"path": [
+								"api",
+								"v3",
+								"rtmp",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rtmp:/list",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8830/api/v3/rtmp/list",
+							"host": [
+								"localhost"
+							],
+							"port": "8830",
+							"path": [
+								"api",
+								"v3",
+								"rtmp",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rtmp:/stop/:id",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8830/api/v3/rtmp/stop?id=c4a8023132024ad8aa9f3113e03dc240",
+							"host": [
+								"localhost"
+							],
+							"port": "8830",
+							"path": [
+								"api",
+								"v3",
+								"rtmp",
+								"stop"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "c4a8023132024ad8aa9f3113e03dc240"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "localhost:8000/api/v3/dbs/rtmp/list",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "iotdc3",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "iotdc3",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/v3/dbs/rtmp/list",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"v3",
+						"dbs",
+						"rtmp",
+						"list"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

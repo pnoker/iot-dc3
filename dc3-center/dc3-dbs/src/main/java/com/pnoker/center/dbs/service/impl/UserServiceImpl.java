@@ -17,15 +17,14 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
-import com.pnoker.common.base.PageInfo;
+import com.pnoker.common.constant.CommonConstants;
+import com.pnoker.common.dto.PageInfo;
 import com.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -77,7 +76,21 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = "user", key = "#a0", unless = "#result == null")
     public User selectByUsername(String usernama) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", usernama);
+        queryWrapper.eq(CommonConstants.Cloumn.User.USERNAME, usernama);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public User selectByPhone(String phone) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(CommonConstants.Cloumn.User.PHONE, phone);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public User selectByEmail(String email) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(CommonConstants.Cloumn.User.EMAIL, email);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -91,13 +104,13 @@ public class UserServiceImpl implements UserService {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         Optional.ofNullable(user).ifPresent(u -> {
             if (StringUtils.isNotBlank(u.getUsername())) {
-                queryWrapper.like("username", u.getUsername());
+                queryWrapper.like(CommonConstants.Cloumn.User.USERNAME, u.getUsername());
             }
             if (StringUtils.isNotBlank(u.getPhone())) {
-                queryWrapper.like("phone", u.getPhone());
+                queryWrapper.like(CommonConstants.Cloumn.User.PHONE, u.getPhone());
             }
             if (StringUtils.isNotBlank(u.getEmail())) {
-                queryWrapper.like("email", u.getEmail());
+                queryWrapper.like(CommonConstants.Cloumn.User.EMAIL, u.getEmail());
             }
         });
         return queryWrapper;
@@ -109,12 +122,10 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.stream().forEach(orderItem -> {
-                if ("id".equals(orderItem.getColumn())) {
-                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                if (CommonConstants.Cloumn.Description.ID.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
-                if ("username".equals(orderItem.getColumn())) {
-                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                if (CommonConstants.Cloumn.User.USERNAME.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
             });

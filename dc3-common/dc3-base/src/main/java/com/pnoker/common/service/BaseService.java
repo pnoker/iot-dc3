@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base;
+package com.pnoker.common.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.dto.PageInfo;
 
 /**
  * <p>基础 服务类接口

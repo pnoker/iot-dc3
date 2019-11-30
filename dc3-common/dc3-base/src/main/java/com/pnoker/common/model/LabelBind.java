@@ -16,7 +16,6 @@
 
 package com.pnoker.common.model;
 
-import com.pnoker.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class LabelBind extends BaseEntity {
-    private static final long serialVersionUID = 3258662292111482392L;
+public class LabelBind extends Description {
 
     private Long nodeId;
     private Long labelId;

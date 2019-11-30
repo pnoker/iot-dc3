@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.model;
+package com.pnoker.transfer.rtmp.handler;
 
 import com.pnoker.common.utils.Dc3Tools;
-import com.pnoker.transfer.rtmp.constant.Global;
-import com.pnoker.transfer.rtmp.service.OutputService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * <p>Command 指令执行任务信息类
@@ -33,6 +34,9 @@ import java.io.IOException;
 @Data
 @Slf4j
 public class Task {
+    public static Map<String, Task> taskMap = new HashMap<>(Property.TASK_MAX_SIZE * 2);
+    public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue<>(Property.TASK_MAX_SIZE * 2);
+
     private String id;
 
     /**
@@ -71,14 +75,14 @@ public class Task {
      * 当任务启动次数超过最大次数，该任务不再被执行
      */
     public void start() {
-        if (startTimes < Global.MAX_TASK_TIMES) {
+        if (startTimes < Property.TASK_MAX_RESTART_TIMES) {
             try {
                 log.info("启动 task->{} , command->{}", id, command);
                 status = 1;
                 process = Runtime.getRuntime().exec(command);
                 startTimes++;
                 outputService = new OutputService(id, process);
-                Global.threadPoolExecutor.execute(outputService);
+                ThreadPool.threadPoolExecutor.execute(outputService);
             } catch (IOException e) {
                 status = 2;
                 clear();
@@ -110,7 +114,7 @@ public class Task {
      * 将任务放入队列，创建一个待启动的任务
      */
     public boolean create() {
-        if (!Global.cmdTaskIdQueue.offer(id)) {
+        if (!cmdTaskIdQueue.offer(id)) {
             log.error("Current tasks queue is full,please try again later.");
             return false;
         }

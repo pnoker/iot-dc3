@@ -16,7 +16,7 @@
 
 package com.pnoker.common.dto.transfer;
 
-import com.pnoker.common.base.PageInfo;
+import com.pnoker.common.dto.PageInfo;
 import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;

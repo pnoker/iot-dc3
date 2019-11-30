@@ -16,7 +16,6 @@
 
 package com.pnoker.common.model;
 
-import com.pnoker.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Schedule extends BaseEntity {
-    private static final long serialVersionUID = -654462867017508785L;
+public class Schedule extends Description {
 
     private String name;
     private String cornExpression;

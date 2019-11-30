@@ -17,26 +17,12 @@
 package com.pnoker.common.constant;
 
 /**
- * <p>dc3平台常亮
+ * <p>dc3平台常量
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 public interface CommonConstants {
-
-    /**
-     * 前缀
-     */
-    String PROJECT_PREFIX = "dc3_";
-
-    /**
-     * oauth 相关前缀
-     */
-    String OAUTH_PREFIX = "oauth:";
-    /**
-     * 项目的license
-     */
-    String PROJECT_LICENSE = "made by dc3";
 
     /**
      * 标志
@@ -49,50 +35,33 @@ public interface CommonConstants {
     String OAUTH_TOKEN_URL = "/oauth/token";
 
     /**
-     * oauth 客户端信息
+     * 数据字段
      */
-    String CLIENT_DETAILS_KEY = PROJECT_PREFIX + OAUTH_PREFIX + "client:details";
+    interface Cloumn {
+        String NAME = "name";
 
-    /**
-     * {bcrypt} 加密的特征码
-     */
-    String BCRYPT = "{bcrypt}";
+        /**
+         * 用户表
+         */
+        interface User {
+            String USERNAME = "username";
+            String PHONE = "phone";
+            String EMAIL = "email";
+        }
 
-    /**
-     * dc3_oauth_client_details 表的字段，不包括client_id、client_secret
-     */
-    String CLIENT_FIELDS = "client_id, CONCAT('{noop}',client_secret) as client_secret, resource_ids, scope, "
-            + "authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, "
-            + "refresh_token_validity, additional_information, autoapprove";
+        /**
+         * Rtmp表
+         */
+        interface Rtmp {
+            String AUTO_START = "auto_start";
+        }
 
-    /**
-     * JdbcClientDetailsService 查询语句
-     */
-    String BASE_FIND_STATEMENT = "select " + CLIENT_FIELDS
-            + " from dc3_oauth_client_details";
+        /**
+         * 通用描述信息
+         */
+        interface Description {
+            String ID = "id";
+        }
+    }
 
-    /**
-     * 默认的查询语句
-     */
-    String DEFAULT_FIND_STATEMENT = BASE_FIND_STATEMENT + " order by client_id";
-
-    /**
-     * 按条件client_id 查询
-     */
-    String DEFAULT_SELECT_STATEMENT = BASE_FIND_STATEMENT + " where client_id = ?";
-
-    /**
-     * 用户ID字段
-     */
-    String DETAILS_USER_ID = "user_id";
-
-    /**
-     * 用户名字段
-     */
-    String DETAILS_USERNAME = "username";
-
-    /**
-     * 协议字段
-     */
-    String DETAILS_LICENSE = "license";
 }

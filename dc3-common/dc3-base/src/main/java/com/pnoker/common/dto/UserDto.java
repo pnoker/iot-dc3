@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.exception;
+package com.pnoker.common.dto;
 
+import com.pnoker.common.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
 /**
- * <p>
+ * <p>User DTO
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
+@Data
 @NoArgsConstructor
-public class CheckedException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class UserDto extends User {
 
-	public CheckedException(String message) {
-		super(message);
-	}
-
-	public CheckedException(Throwable cause) {
-		super(cause);
-	}
-
-	public CheckedException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public CheckedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    private PageInfo page;
 
 }
