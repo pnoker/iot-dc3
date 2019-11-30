@@ -47,16 +47,10 @@
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
-        <!-- dc3 Commont Base -->
+        <!-- dc3 Commont -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-base</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-webmvc</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>

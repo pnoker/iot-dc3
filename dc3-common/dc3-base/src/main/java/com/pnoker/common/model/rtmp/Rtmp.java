@@ -16,8 +16,7 @@
 
 package com.pnoker.common.model.rtmp;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.pnoker.common.base.BaseEntity;
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,10 +32,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Rtmp extends BaseEntity {
-    private static final long serialVersionUID = 594764013253279856L;
+public class Rtmp extends Description {
 
-    private Long id;
     private String name;
     private String rtspUrl;
     private String rtmpUrl;

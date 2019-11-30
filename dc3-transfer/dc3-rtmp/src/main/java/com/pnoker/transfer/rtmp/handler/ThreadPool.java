@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.constant;
+package com.pnoker.transfer.rtmp.handler;
 
-import com.pnoker.transfer.rtmp.model.Task;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,49 +28,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @email : pnokers@icloud.com
  */
 @Slf4j
-public class Global {
-    //重连时间间隔 & 最大重连次数
-    public static int CONNECT_INTERVAL = 1000 * 5;
-    public static int CONNECT_MAX_TIMES = 10;
-
-    //记录Task信息
-    public static int MAX_TASK_SIZE = 32;
-    public static int MAX_TASK_TIMES = 10;
-    public static Map<String, Task> taskMap = new HashMap<>(32);
-    public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue<>(32);
-
-    //FFmpeg 位置
-    public static String FFMPEG_PATH;
-
-    /**
-     * 核心线程池大小
-     */
-    public static int corePoolSize = 4;
-
-    /**
-     * 最大线程池大小
-     */
-    public static int maximumPoolSize = 32;
-
-    /**
-     * 线程最大空闲时间
-     */
-    public static long keepAliveTime = 10;
-
-    /**
-     * 时间单位，秒
-     */
-    public static TimeUnit unit = TimeUnit.SECONDS;
-
-    /**
-     * 用于缓存 Cmd任务 线程
-     */
-    public static LinkedBlockingQueue<Runnable> linkedBlockingQueue = new LinkedBlockingQueue<>(64);
+public class ThreadPool {
 
     /**
      * Cmd任务线程池，用于全部任务线程使用
      */
-    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, linkedBlockingQueue, new RtmpTaskTreadFactory(), new IgnorePolicy());
+    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Property.CORE_POOL_SIZE, Property.MAX_POOL_SIZE, Property.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(Property.MAX_POOL_SIZE * 2), new RtmpTaskTreadFactory(), new IgnorePolicy());
 
     static class RtmpTaskTreadFactory implements ThreadFactory {
         private final AtomicInteger mThreadNum = new AtomicInteger(1);

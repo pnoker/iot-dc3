@@ -16,11 +16,10 @@
 
 package com.pnoker.center.dbs.rpc;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.PageInfo;
+import com.pnoker.common.dto.PageInfo;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
@@ -47,7 +46,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
 
     @Override
     public Response<Long> add(@RequestBody Rtmp rtmp) {
-        if (null == rtmp) {
+        if (!Optional.ofNullable(rtmp).isPresent()) {
             return Response.fail("body is null");
         }
         return rtmpService.add(rtmp) ? Response.ok(rtmp.getId()) : Response.fail();
@@ -56,21 +55,23 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
     @Override
     public Response<Boolean> delete(@PathVariable Long id) {
         if (null == id) {
-            return Response.fail("rtmp id can not be empty");
+            return Response.fail("id can not be empty");
         }
         return rtmpService.delete(id) ? Response.ok() : Response.fail();
     }
 
     @Override
     public Response<Boolean> update(@RequestBody Rtmp rtmp) {
-        rtmpService.update(rtmp);
-        return Response.ok();
+        if (!Optional.ofNullable(rtmp).isPresent()) {
+            return Response.fail("body is null");
+        }
+        return rtmpService.update(rtmp) ? Response.ok() : Response.fail();
     }
 
     @Override
     public Response<Rtmp> selectById(@PathVariable Long id) {
         if (null == id) {
-            return Response.fail("rtmp id can not be empty");
+            return Response.fail("id can not be empty");
         }
         Rtmp rtmp = rtmpService.selectById(id);
         return null != rtmp ? Response.ok(rtmp) : Response.fail("id does not exist");
@@ -82,9 +83,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
         PageInfo page = new PageInfo();
         Optional.ofNullable(rtmpDto).ifPresent(r -> {
             BeanUtils.copyProperties(r, rtmp);
-            Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> {
-                BeanUtils.copyProperties(p, page);
-            });
+            Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
         });
         return Response.ok(rtmpService.list(rtmp, page));
     }

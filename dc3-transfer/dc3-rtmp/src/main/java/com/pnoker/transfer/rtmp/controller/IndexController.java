@@ -16,15 +16,10 @@
 
 package com.pnoker.transfer.rtmp.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
-import com.pnoker.common.base.BaseController;
-import com.pnoker.common.model.User;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
 import com.pnoker.common.vo.rtmp.RtmpVo;
-import com.pnoker.transfer.rtmp.constant.Global;
-import com.pnoker.transfer.rtmp.model.Task;
+import com.pnoker.transfer.rtmp.handler.Task;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -44,7 +39,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/v3/rtmp")
-public class IndexController extends BaseController {
+public class IndexController {
     @Autowired
     private RtmpService rtmpService;
 
@@ -62,10 +57,10 @@ public class IndexController extends BaseController {
 
     @DeleteMapping("/delete")
     public Response delete(String id) {
-        Task task = Global.taskMap.get(id);
+        Task task = Task.taskMap.get(id);
         boolean result = task.stop();
         task.clear();
-        Global.taskMap.remove(id);
+        Task.taskMap.remove(id);
 
         if (result) {
             return Response.ok();
@@ -77,7 +72,7 @@ public class IndexController extends BaseController {
     @GetMapping("/list")
     public Response<List<Task>> list() {
         List<Task> list;
-        Collection<Task> collection = Global.taskMap.values();
+        Collection<Task> collection = Task.taskMap.values();
         if (collection instanceof List) {
             list = (List) collection;
         } else {
@@ -88,7 +83,7 @@ public class IndexController extends BaseController {
 
     @PostMapping("/stop")
     public Response stop(String id) {
-        Task task = Global.taskMap.get(id);
+        Task task = Task.taskMap.get(id);
         boolean result = task.stop();
 
         if (result) {

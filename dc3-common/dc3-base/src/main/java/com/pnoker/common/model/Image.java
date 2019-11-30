@@ -16,7 +16,6 @@
 
 package com.pnoker.common.model;
 
-import com.pnoker.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,8 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Image extends BaseEntity {
-    private static final long serialVersionUID = 7504911674170775038L;
+public class Image extends Description {
 
     private String name;
     private String url;

@@ -16,8 +16,8 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.base.BaseService;
 import com.pnoker.common.model.User;
+import com.pnoker.common.service.BaseService;
 
 /**
  * <p> User 服务接口
@@ -28,4 +28,8 @@ import com.pnoker.common.model.User;
 public interface UserService extends BaseService<User> {
 
     User selectByUsername(String usernama);
+
+    User selectByPhone(String phone);
+
+    User selectByEmail(String email);
 }

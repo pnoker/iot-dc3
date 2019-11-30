@@ -14,27 +14,39 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model;
+package com.pnoker.common.dto;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
- * <p>标签表
+ * <p>分页数据实体类
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class Label extends Description {
+@NoArgsConstructor
+public class Pages<T> implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private String name;
-    private String color;
-    private Long nodeId;
-    private Long imageId;
+    private List<T> records;
+    private Long total;
+    private Long current;
+    private Long size;
+    private Long pages;
+
+    public Pages(IPage<T> page) {
+        this.records = page.getRecords();
+        this.total = page.getTotal();
+        this.current = page.getCurrent();
+        this.size = page.getSize();
+        this.pages = page.getPages();
+    }
 }

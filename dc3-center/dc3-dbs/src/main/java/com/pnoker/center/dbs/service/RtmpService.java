@@ -16,7 +16,7 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.base.BaseService;
+import com.pnoker.common.service.BaseService;
 import com.pnoker.common.model.rtmp.Rtmp;
 
 /**

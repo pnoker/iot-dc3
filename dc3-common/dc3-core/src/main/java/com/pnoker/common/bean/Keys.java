@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.dto;
+package com.pnoker.common.bean;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Keys {
 
-/**
- * <p>
- *
- * @author : pnoker
- * @email : pnokers@icloud.com
- */
-@Data
-public class NodeDto {
-    protected int id;
-    protected int parentId;
-    protected List<NodeDto> children = new ArrayList<>();
+    /**
+     * RSA 密钥对
+     */
+    @Data
+    @AllArgsConstructor
+    public class Rsa {
+        private String publicKey;
+        private String privateKey;
+    }
 
-    public void add(NodeDto node) {
-        children.add(node);
+    /**
+     * Aes 密钥
+     */
+    @Data
+    @AllArgsConstructor
+    public class Aes {
+        private String privateKey;
     }
 }

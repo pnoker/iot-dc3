@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.constant;
+package com.pnoker.common.dto;
+
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * <p>服务名称
+ * <p>基础查询类，其中包括分页以及排序
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface ServiceNameConstants {
-	/**
-	 * 认证服务的SERVICEID
-	 */
-	String AUTH_SERVICE = "dc3-auth";
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PageInfo implements Serializable {
+    private static final long serialVersionUID = 4835128943097551504L;
+
+    private Integer pageNum = 1;
+    private Integer pageSize = 10;
+    private List<OrderItem> orders;
 
 }

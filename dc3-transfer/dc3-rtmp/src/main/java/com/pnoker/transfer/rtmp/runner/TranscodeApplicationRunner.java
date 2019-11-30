@@ -19,12 +19,13 @@ package com.pnoker.transfer.rtmp.runner;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Dc3Tools;
-import com.pnoker.transfer.rtmp.constant.Global;
-import com.pnoker.transfer.rtmp.service.CmdTaskService;
+import com.pnoker.transfer.rtmp.handler.Property;
+import com.pnoker.transfer.rtmp.handler.Task;
+import com.pnoker.transfer.rtmp.handler.ThreadPool;
 import com.pnoker.transfer.rtmp.service.RtmpService;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -47,12 +48,8 @@ import static java.lang.System.getProperty;
 @Order(1)
 @Component
 @ConfigurationProperties(prefix = "ffmpeg")
-public class TaskRunner implements ApplicationRunner {
-    @Setter
-    @Getter
+public class TranscodeApplicationRunner implements ApplicationRunner {
     private String unix;
-    @Setter
-    @Getter
     private String window;
 
     @Autowired
@@ -60,26 +57,33 @@ public class TaskRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        checkFFmpeg();
+        String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
+        if (StringUtils.isBlank(ffmpeg)) {
+            log.error("FFmpeg path is null,Please fill absolute path!");
+            System.exit(1);
+        }
+        if (!Dc3Tools.isFile(ffmpeg)) {
+            log.error("{} does not exist,Please fill absolute path!", ffmpeg);
+            System.exit(1);
+        }
+        Property.FFMPEG = ffmpeg;
         List<Rtmp> list = rtmpService.getRtmpList(new RtmpDto(true));
         for (Rtmp rtmp : list) {
             rtmpService.startTask(rtmp);
         }
         // 启动任务线程
-        Global.threadPoolExecutor.execute(new CmdTaskService());
-    }
-
-    public void checkFFmpeg() {
-        String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        if ("".equals(ffmpeg) || null == ffmpeg) {
-            log.error("FFmpeg path is NULL !");
-            System.exit(1);
-        }
-        if (!Dc3Tools.isFile(ffmpeg) && getProperty("os.name").toLowerCase().startsWith("win")) {
-            log.error("{} does not exist", ffmpeg);
-            System.exit(1);
-        }
-        Global.FFMPEG_PATH = ffmpeg;
+        //todo 逻辑错误，没有使用线程池
+        ThreadPool.threadPoolExecutor.execute(() -> {
+            log.info("listening rtsp->rtmp task");
+            while (true) {
+                try {
+                    Task.taskMap.get(Task.cmdTaskIdQueue.take()).start();
+                    Thread.sleep(1000 * 5);
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
     }
 
 }

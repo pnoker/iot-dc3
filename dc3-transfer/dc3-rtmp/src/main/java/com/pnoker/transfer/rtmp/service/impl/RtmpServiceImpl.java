@@ -21,8 +21,8 @@ import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
-import com.pnoker.transfer.rtmp.constant.Global;
-import com.pnoker.transfer.rtmp.model.Task;
+import com.pnoker.transfer.rtmp.handler.Property;
+import com.pnoker.transfer.rtmp.handler.Task;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +48,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public List<Rtmp> getRtmpList(RtmpDto rtmp) {
+        rtmp.setName("测试");
         Response<Page<Rtmp>> response = rtmpDbsFeignApi.list(rtmp);
         if (!response.isOk()) {
             log.error(response.getMessage());
@@ -67,12 +68,12 @@ public class RtmpServiceImpl implements RtmpService {
     public Response startTask(Rtmp rtmp) {
         Task task = new Task(getCommand(rtmp));
         // 判断任务是否被重复提交
-        if (!Global.taskMap.containsKey(task.getId())) {
-            if (Global.taskMap.size() <= Global.MAX_TASK_SIZE) {
-                Global.taskMap.put(task.getId(), task);
+        if (!Task.taskMap.containsKey(task.getId())) {
+            if (Task.taskMap.size() <= Property.TASK_MAX_SIZE) {
+                Task.taskMap.put(task.getId(), task);
                 return task.create() ? Response.ok() : Response.fail();
             } else {
-                log.error("超过最大任务数 {}", Global.MAX_TASK_SIZE);
+                log.error("超过最大任务数 {}", Property.TASK_MAX_SIZE);
                 return Response.fail("超过最大任务数");
             }
         } else {
@@ -83,14 +84,14 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public Response stopTask(String id) {
-        Global.taskMap.get(id).stop();
+        Task.taskMap.get(id).stop();
         return Response.fail();
     }
 
 
     public String getCommand(Rtmp rtmp) {
         String cmd = rtmp.getCommand()
-                .replace("{exe}", Global.FFMPEG_PATH)
+                .replace("{exe}", Property.FFMPEG)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
         return cmd;
@@ -98,7 +99,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     public List<Rtmp> reconnect() {
         // N 次重连机会
-        if (times > Global.CONNECT_MAX_TIMES) {
+        if (times > Property.RECONNECT_MAX_TIMES) {
             log.info("一共重连 {} 次,无法连接数据库服务,服务停止！", times);
             System.exit(1);
         }
@@ -106,7 +107,7 @@ public class RtmpServiceImpl implements RtmpService {
         times++;
         try {
             // 设置重连之间的间隔时间
-            Thread.sleep(Global.CONNECT_INTERVAL * times);
+            Thread.sleep(Property.RECONNECT_INTERVAL * times);
         } catch (Exception e) {
         }
         return getRtmpList(new RtmpDto(true));

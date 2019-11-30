@@ -16,14 +16,15 @@
 
 package com.pnoker.api.dbs.rtmp.feign;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.rtmp.hystrix.RtmpDbsFeignApiHystrix;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.common.utils.Response;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * <p>
@@ -41,7 +42,7 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PostMapping
+    @PostMapping("/add")
     Response<Long> add(Rtmp rtmp);
 
     /**
@@ -50,7 +51,7 @@ public interface RtmpDbsFeignApi {
      * @param id rtmpId
      * @return true/false
      */
-    @DeleteMapping("/id/{id}")
+    @PostMapping("/delete/{id}")
     Response<Boolean> delete(Long id);
 
     /**
@@ -59,7 +60,7 @@ public interface RtmpDbsFeignApi {
      * @param rtmp
      * @return true/false
      */
-    @PutMapping
+    @PostMapping("/update")
     Response<Boolean> update(Rtmp rtmp);
 
     /**
@@ -72,12 +73,12 @@ public interface RtmpDbsFeignApi {
     Response<Rtmp> selectById(Long id);
 
     /**
-     * 分页查询 按照查询 Rtmp
+     * 分页查询 Rtmp
      *
      * @param rtmpDto
      * @return rtmpList
      */
-    @GetMapping
+    @PostMapping("/list")
     Response<Page<Rtmp>> list(RtmpDto rtmpDto);
 
 }

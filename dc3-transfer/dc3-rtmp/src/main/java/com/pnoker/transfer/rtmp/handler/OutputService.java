@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.service;
+package com.pnoker.transfer.rtmp.handler;
 
-import com.pnoker.transfer.rtmp.constant.Global;
-import com.pnoker.transfer.rtmp.model.Task;
+import com.pnoker.transfer.rtmp.handler.Task;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +65,7 @@ public class OutputService implements Runnable {
                 handle(line.toLowerCase());
             }
             if (!status) {
-                Global.taskMap.get(id).clear();
+                Task.taskMap.get(id).clear();
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -98,7 +97,7 @@ public class OutputService implements Runnable {
      * 重启错误 CMD 任务
      */
     public void reStartTask() {
-        Task task = Global.taskMap.get(id);
+        Task task = Task.taskMap.get(id);
         task.clear();
         task.create();
         task.setStatus(2);

@@ -16,7 +16,9 @@
 
 package com.pnoker.api.dbs.user.hystrix;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
+import com.pnoker.common.dto.UserDto;
 import com.pnoker.common.model.User;
 import com.pnoker.common.utils.Response;
 import feign.hystrix.FallbackFactory;
@@ -40,7 +42,42 @@ public class UserDbsFeignApiHystrix implements FallbackFactory<UserDbsFeignApi> 
 
         return new UserDbsFeignApi() {
             @Override
-            public Response<User> user(String username) {
+            public Response<Long> add(User user) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Boolean> delete(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Boolean> update(User user) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<User> selectById(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<User> username(String username) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<User> phone(String phone) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<User> email(String email) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Page<User>> list(UserDto userDto) {
                 return Response.fail(message);
             }
         };

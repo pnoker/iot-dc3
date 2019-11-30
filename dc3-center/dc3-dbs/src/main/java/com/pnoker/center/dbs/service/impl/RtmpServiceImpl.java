@@ -17,12 +17,12 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.PageInfo;
+import com.pnoker.common.constant.CommonConstants;
+import com.pnoker.common.dto.PageInfo;
 import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
@@ -75,10 +75,10 @@ public class RtmpServiceImpl implements RtmpService {
     public QueryWrapper<Rtmp> query(Rtmp rtmp) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         if (null != rtmp.getAutoStart()) {
-            queryWrapper.eq("auto_start", BooleanUtils.isTrue(rtmp.getAutoStart()));
+            queryWrapper.eq(CommonConstants.Cloumn.Rtmp.AUTO_START, BooleanUtils.isTrue(rtmp.getAutoStart()));
         }
         if (StringUtils.isNotBlank(rtmp.getName())) {
-            queryWrapper.like("name", rtmp.getName());
+            queryWrapper.like(CommonConstants.Cloumn.NAME, rtmp.getName());
         }
         return queryWrapper;
     }
@@ -89,12 +89,10 @@ public class RtmpServiceImpl implements RtmpService {
         Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.stream().forEach(orderItem -> {
-                if ("id".equals(orderItem.getColumn())) {
-                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                if (CommonConstants.Cloumn.Description.ID.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
-                if ("name".equals(orderItem.getColumn())) {
-                    orderItem.setAsc(BooleanUtils.isTrue(orderItem.isAsc()));
+                if (CommonConstants.Cloumn.NAME.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
             });

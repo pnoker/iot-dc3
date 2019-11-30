@@ -32,7 +32,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Token implements Serializable {
-    private static final long serialVersionUID = 278093312954054386L;
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     private String token;
