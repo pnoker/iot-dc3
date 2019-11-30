@@ -62,12 +62,8 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public IPage<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
-        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        query(rtmp, queryWrapper);
-        Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        order(pageInfo.getOrders(), page);
-        return rtmpMapper.selectPage(page, queryWrapper);
+    public Page<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
+        return (Page<Rtmp>) rtmpMapper.selectPage(page(pageInfo), query(rtmp));
     }
 
     @Override
@@ -76,18 +72,21 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public void query(Rtmp rtmp, QueryWrapper<Rtmp> queryWrapper) {
+    public QueryWrapper<Rtmp> query(Rtmp rtmp) {
+        QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         if (null != rtmp.getAutoStart()) {
             queryWrapper.eq("auto_start", BooleanUtils.isTrue(rtmp.getAutoStart()));
         }
         if (StringUtils.isNotBlank(rtmp.getName())) {
             queryWrapper.like("name", rtmp.getName());
         }
+        return queryWrapper;
     }
 
     @Override
-    public void order(List<OrderItem> orders, Page<Rtmp> page) {
-        Optional.ofNullable(orders).ifPresent(orderItems -> {
+    public Page<Rtmp> page(PageInfo pageInfo) {
+        Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
+        Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.stream().forEach(orderItem -> {
                 if ("id".equals(orderItem.getColumn())) {
@@ -101,6 +100,7 @@ public class RtmpServiceImpl implements RtmpService {
             });
             page.setOrders(tmps);
         });
+        return page;
     }
 
 }

@@ -18,10 +18,7 @@ package com.pnoker.common.base;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
-import java.util.List;
 
 /**
  * <p>基础 服务类接口
@@ -60,7 +57,7 @@ public interface BaseService<T> {
      * @param pageInfo pageNum,pageSize
      * @return list
      */
-    IPage<T> list(T type, PageInfo pageInfo);
+    Page<T> list(T type, PageInfo pageInfo);
 
     /**
      * 通过ID查询记录
@@ -71,19 +68,17 @@ public interface BaseService<T> {
     T selectById(Long id);
 
     /**
-     * 模糊查询构造器
+     * 统一接口 模糊查询构造器
      *
      * @param t
-     * @param queryWrapper
      */
-    void query(T t, QueryWrapper<T> queryWrapper);
+    QueryWrapper<T> query(T t);
 
     /**
-     * 排序构造器 & 字段校验
+     * 统一接口 排序构造器 & 字段校验
      *
-     * @param orders
-     * @param page
+     * @param pageInfo
      */
-    void order(List<OrderItem> orders, Page<T> page);
+    Page<T> page(PageInfo pageInfo);
 
 }

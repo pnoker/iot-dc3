@@ -61,47 +61,36 @@
     </modules>
 
     <properties>
-        <maven.jar.plugin>3.1.2</maven.jar.plugin>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.resource.plugin>3.1.0</maven.resource.plugin>
-        <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hutool.version>5.0.6</hutool.version>
+        <lombok.version>1.18.10</lombok.version>
+        <fastjson.version>1.2.62</fastjson.version>
+        <mybatis.plus.version>3.2.0</mybatis.plus.version>
 
-        <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
         <spring-cloud.version>Hoxton.RC1</spring-cloud.version>
+        <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
+        <security.oauth.version>2.4.0.RELEASE</security.oauth.version>
         <spring-boot-admin.version>2.2.0-SNAPSHOT</spring-boot-admin.version>
 
-        <jna.version>5.3.1</jna.version>
-        <hutool.version>5.0.3</hutool.version>
         <codecov.version>2.7</codecov.version>
-        <lombok.version>1.18.8</lombok.version>
-        <mariadb.version>2.3.0</mariadb.version>
-        <sqllite.version>3.25.2</sqllite.version>
-        <netty.version>4.1.42.Final</netty.version>
-        <fastjson.version>1.2.60</fastjson.version>
-        <slf4j-api.version>1.7.26</slf4j-api.version>
-        <commons.cli.version>1.4</commons.cli.version>
-        <pagehelper.version>5.1.10</pagehelper.version>
-        <servlet-api.version>4.0.1</servlet-api.version>
-        <mybatis.plus.version>3.2.0</mybatis.plus.version>
-        <commons.lang3.version>3.9</commons.lang3.version>
-        <redis.data.version>2.1.11.RELEASE</redis.data.version>
-        <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
-        <security.oauth.version>2.3.6.RELEASE</security.oauth.version>
+        <maven.jar.plugin>3.2.0</maven.jar.plugin>
+        <maven.resource.plugin>3.1.0</maven.resource.plugin>
+        <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     </properties>
 
     <dependencies>
-        <!-- Spring Configuration -->
+        <!-- Configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- Eureka Client -->
+        <!-- Eureka -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -119,6 +108,34 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- Admin -->
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+        </dependency>
+
+        <!-- Hutool -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+
+        <!-- FastJson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -126,25 +143,11 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Lombok 代码简化 -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
             <!-- Spring Cloud 依赖 -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -160,9 +163,28 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
                 <version>${security.oauth.version}</version>
+            </dependency>
+
+            <!-- Spring Boot Admin -->
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-server</artifactId>
+                <version>${spring-boot-admin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-client</artifactId>
+                <version>${spring-boot-admin.version}</version>
             </dependency>
 
             <!-- dc3 Api Dbs -->
@@ -171,6 +193,16 @@
                 <artifactId>dc3-api-dbs</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>${mybatis.plus.version}</version>
             </dependency>
 
             <!-- dc3 Common -->

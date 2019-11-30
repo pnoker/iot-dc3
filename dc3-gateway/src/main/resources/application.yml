@@ -26,7 +26,7 @@ spring:
     host: iotdc3.redis
     port: 6379
     password: ${spring.security.user.password}
-    database: 2
+    database: 0
     timeout: 1H
   cloud:
     gateway:

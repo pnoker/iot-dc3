@@ -17,6 +17,7 @@
 package com.pnoker.center.dbs.rpc;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.PageInfo;
@@ -76,7 +77,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
     }
 
     @Override
-    public Response<IPage<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
+    public Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         PageInfo page = new PageInfo();
         Optional.ofNullable(rtmpDto).ifPresent(r -> {

@@ -189,23 +189,6 @@ services:
         aliases:
           - dc3-manager
 
-  opc:
-    build:
-      context: ./dc3-transfer/dc3-opc/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-opc:3.0
-    restart: always
-    ports:
-      - 8801:8801
-    links:
-      - register:iotdc3.register
-    container_name: dc3-opc
-    hostname: iotdc3.opc
-    networks:
-      network:
-        aliases:
-          - dc3-opc
-
   opcua:
     build:
       context: ./dc3-transfer/dc3-opc-ua/

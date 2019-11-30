@@ -82,15 +82,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public IPage<User> list(User user, PageInfo pageInfo) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        query(user, queryWrapper);
-        Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        return userMapper.selectPage(page, queryWrapper);
+    public Page<User> list(User user, PageInfo pageInfo) {
+        return (Page<User>) userMapper.selectPage(page(pageInfo), query(user));
     }
 
     @Override
-    public void query(User user, QueryWrapper<User> queryWrapper) {
+    public QueryWrapper<User> query(User user) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         Optional.ofNullable(user).ifPresent(u -> {
             if (StringUtils.isNotBlank(u.getUsername())) {
                 queryWrapper.like("username", u.getUsername());
@@ -102,11 +100,13 @@ public class UserServiceImpl implements UserService {
                 queryWrapper.like("email", u.getEmail());
             }
         });
+        return queryWrapper;
     }
 
     @Override
-    public void order(List<OrderItem> orders, Page<User> page) {
-        Optional.ofNullable(orders).ifPresent(orderItems -> {
+    public Page<User> page(PageInfo pageInfo) {
+        Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
+        Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.stream().forEach(orderItem -> {
                 if ("id".equals(orderItem.getColumn())) {
@@ -120,6 +120,7 @@ public class UserServiceImpl implements UserService {
             });
             page.setOrders(tmps);
         });
+        return page;
     }
 
 }

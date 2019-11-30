@@ -16,8 +16,8 @@
 
 package com.pnoker.api.device.manager.feign;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.device.manager.hystrix.DeviceManagerFeignApiHystrix;
-import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.dto.device.DeviceDto;
 import com.pnoker.common.model.device.Device;
 import com.pnoker.common.utils.Response;
@@ -77,5 +77,5 @@ public interface DeviceManagerDbsFeignApi {
      * @return deviceList
      */
     @GetMapping("/")
-    Response<Dc3Page<Device>> list(DeviceDto deviceDto);
+    Response<IPage<Device>> list(DeviceDto deviceDto);
 }

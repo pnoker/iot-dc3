@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 public class Rtmp extends BaseEntity {
     private static final long serialVersionUID = 594764013253279856L;
 
+    private Long id;
     private String name;
     private String rtspUrl;
     private String rtmpUrl;

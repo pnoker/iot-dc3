@@ -32,4 +32,12 @@
         <module>dc3-base</module>
     </modules>
 
+    <dependencies>
+        <!-- Slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

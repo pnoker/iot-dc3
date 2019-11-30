@@ -16,8 +16,8 @@
 
 package com.pnoker.api.device.manager.hystrix;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.device.manager.feign.DeviceManagerDbsFeignApi;
-import com.pnoker.common.dto.Dc3Page;
 import com.pnoker.common.dto.device.DeviceDto;
 import com.pnoker.common.model.device.Device;
 import com.pnoker.common.utils.Response;
@@ -62,7 +62,7 @@ public class DeviceManagerFeignApiHystrix implements FallbackFactory<DeviceManag
             }
 
             @Override
-            public Response<Dc3Page<Device>> list(DeviceDto rtmpDto) {
+            public Response<IPage<Device>> list(DeviceDto rtmpDto) {
                 return Response.fail(message);
             }
         };
