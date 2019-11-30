@@ -28,13 +28,16 @@
 
     <description>IOT DC3 平台 数据库服务。</description>
 
+    <properties>
+        <mariadb.version>2.3.0</mariadb.version>
+    </properties>
+
     <dependencies>
 
         <!-- MySQL、连接池 -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis.plus.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

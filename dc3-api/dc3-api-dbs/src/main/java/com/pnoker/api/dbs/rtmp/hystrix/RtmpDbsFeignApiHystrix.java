@@ -16,7 +16,7 @@
 
 package com.pnoker.api.dbs.rtmp.hystrix;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
@@ -62,7 +62,7 @@ public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> 
             }
 
             @Override
-            public Response<IPage<Rtmp>> list(RtmpDto rtmpDto) {
+            public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
                 return Response.fail(message);
             }
         };
