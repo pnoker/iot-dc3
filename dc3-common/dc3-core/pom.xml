@@ -18,50 +18,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>iot-dc3</artifactId>
         <groupId>com.pnoker</groupId>
+        <artifactId>dc3-common</artifactId>
         <version>3.0</version>
     </parent>
 
-    <artifactId>dc3-gateway</artifactId>
+    <artifactId>dc3-core</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台网关,用于限流、权限验证、服务转发、方向代理 等。</description>
+    <description>IOT DC3 平台 公共核心集合。</description>
 
     <dependencies>
-        <!-- Gateway -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-gateway</artifactId>
-        </dependency>
-
-        <!-- Thymeleaf -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
-        <!-- 限流 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
-        </dependency>
-
-        <!-- dc3 Commont Base -->
+        <!-- dc3 Common Base -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-base</artifactId>
         </dependency>
-
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

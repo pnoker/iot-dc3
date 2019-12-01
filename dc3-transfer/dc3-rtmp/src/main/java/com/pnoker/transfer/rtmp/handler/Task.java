@@ -16,7 +16,8 @@
 
 package com.pnoker.transfer.rtmp.handler;
 
-import com.pnoker.common.utils.Dc3Tools;
+import cn.hutool.core.util.IdUtil;
+import com.pnoker.transfer.rtmp.runner.TranscodeRunner;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,8 +35,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Data
 @Slf4j
 public class Task {
-    public static Map<String, Task> taskMap = new HashMap<>(Property.TASK_MAX_SIZE * 2);
-    public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue<>(Property.TASK_MAX_SIZE * 2);
+    public static Map<String, Task> taskMap = new HashMap<>(TranscodeRunner.taskMaxSize * 2);
+    public static LinkedBlockingQueue<String> cmdTaskIdQueue = new LinkedBlockingQueue<>(TranscodeRunner.taskMaxSize * 2);
 
     private String id;
 
@@ -65,7 +66,7 @@ public class Task {
      * @param command
      */
     public Task(String command) {
-        this.id = Dc3Tools.uuid();
+        this.id = IdUtil.simpleUUID();
         this.status = 0;
         this.command = command;
     }
@@ -75,7 +76,7 @@ public class Task {
      * 当任务启动次数超过最大次数，该任务不再被执行
      */
     public void start() {
-        if (startTimes < Property.TASK_MAX_RESTART_TIMES) {
+        if (startTimes < TranscodeRunner.taskMaxRestartTimes) {
             try {
                 log.info("启动 task->{} , command->{}", id, command);
                 status = 1;

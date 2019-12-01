@@ -19,7 +19,22 @@ package com.pnoker.common.bean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * <p> Aes/Rsa 加密密钥
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 public class Keys {
+
+    /**
+     * Aes 密钥
+     */
+    @Data
+    @AllArgsConstructor
+    public class Aes {
+        private String privateKey;
+    }
 
     /**
      * RSA 密钥对
@@ -28,15 +43,6 @@ public class Keys {
     @AllArgsConstructor
     public class Rsa {
         private String publicKey;
-        private String privateKey;
-    }
-
-    /**
-     * Aes 密钥
-     */
-    @Data
-    @AllArgsConstructor
-    public class Aes {
         private String privateKey;
     }
 }

@@ -63,7 +63,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     public Page<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
-        return (Page<Rtmp>) rtmpMapper.selectPage(page(pageInfo), query(rtmp));
+        return (Page<Rtmp>) rtmpMapper.selectPage(pagination(pageInfo), fuzzyQuery(rtmp));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public QueryWrapper<Rtmp> query(Rtmp rtmp) {
+    public QueryWrapper<Rtmp> fuzzyQuery(Rtmp rtmp) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         if (null != rtmp.getAutoStart()) {
             queryWrapper.eq(CommonConstants.Cloumn.Rtmp.AUTO_START, BooleanUtils.isTrue(rtmp.getAutoStart()));
@@ -84,12 +84,12 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public Page<Rtmp> page(PageInfo pageInfo) {
+    public Page<Rtmp> pagination(PageInfo pageInfo) {
         Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
         Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.stream().forEach(orderItem -> {
-                if (CommonConstants.Cloumn.Description.ID.equals(orderItem.getColumn())) {
+                if (CommonConstants.Cloumn.ID.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
                 if (CommonConstants.Cloumn.NAME.equals(orderItem.getColumn())) {

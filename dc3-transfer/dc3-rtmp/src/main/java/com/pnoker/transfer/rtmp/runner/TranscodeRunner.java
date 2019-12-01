@@ -16,10 +16,9 @@
 
 package com.pnoker.transfer.rtmp.runner;
 
+import cn.hutool.core.io.FileUtil;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.common.utils.Dc3Tools;
-import com.pnoker.transfer.rtmp.handler.Property;
 import com.pnoker.transfer.rtmp.handler.Task;
 import com.pnoker.transfer.rtmp.handler.ThreadPool;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -27,9 +26,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -47,10 +46,26 @@ import static java.lang.System.getProperty;
 @Setter
 @Order(1)
 @Component
-@ConfigurationProperties(prefix = "ffmpeg")
-public class TranscodeApplicationRunner implements ApplicationRunner {
-    private String unix;
-    private String window;
+public class TranscodeRunner implements ApplicationRunner {
+    public static String ffmpeg;
+    @Value("${rtmp.ffmpeg.window}")
+    public static String window;
+    @Value("${rtmp.ffmpeg.unix}")
+    public static String unix;
+    @Value("${rtmp.task.task-max-size}")
+    public static int taskMaxSize;
+    @Value("${rtmp.task.task-max-restart-times}")
+    public static int taskMaxRestartTimes;
+    @Value("${rtmp.task.reconnect-interval}")
+    public static int reconnectInterval;
+    @Value("${rtmp.task.reconnect-max-times}")
+    public static int reconnectMaxTimes;
+    @Value("${rtmp.thread.core-pool-size}")
+    public static int corePoolSize;
+    @Value("${rtmp.thread.maximum-sool-size}")
+    public static int maximumPoolSize;
+    @Value("${rtmp.thread.keep-alive-time}")
+    public static int keepAliveTime;
 
     @Autowired
     private RtmpService rtmpService;
@@ -62,11 +77,11 @@ public class TranscodeApplicationRunner implements ApplicationRunner {
             log.error("FFmpeg path is null,Please fill absolute path!");
             System.exit(1);
         }
-        if (!Dc3Tools.isFile(ffmpeg)) {
+        if (!FileUtil.isFile(ffmpeg)) {
             log.error("{} does not exist,Please fill absolute path!", ffmpeg);
             System.exit(1);
         }
-        Property.FFMPEG = ffmpeg;
+        TranscodeRunner.ffmpeg = ffmpeg;
         List<Rtmp> list = rtmpService.getRtmpList(new RtmpDto(true));
         for (Rtmp rtmp : list) {
             rtmpService.startTask(rtmp);

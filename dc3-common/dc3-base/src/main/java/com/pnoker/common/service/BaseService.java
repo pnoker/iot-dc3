@@ -31,6 +31,7 @@ public interface BaseService<T> {
      * 新增记录
      *
      * @param type
+     * @return true/false
      */
     boolean add(T type);
 
@@ -71,14 +72,16 @@ public interface BaseService<T> {
      * 统一接口 模糊查询构造器
      *
      * @param t
+     * @return type
      */
-    QueryWrapper<T> query(T t);
+    QueryWrapper<T> fuzzyQuery(T t);
 
     /**
      * 统一接口 排序构造器 & 字段校验
      *
      * @param pageInfo
+     * @return list
      */
-    Page<T> page(PageInfo pageInfo);
+    Page<T> pagination(PageInfo pageInfo);
 
 }

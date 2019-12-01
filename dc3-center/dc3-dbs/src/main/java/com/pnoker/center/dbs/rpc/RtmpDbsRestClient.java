@@ -22,7 +22,7 @@ import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.dto.PageInfo;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.common.utils.Response;
+import com.pnoker.common.bean.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

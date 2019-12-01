@@ -96,11 +96,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> list(User user, PageInfo pageInfo) {
-        return (Page<User>) userMapper.selectPage(page(pageInfo), query(user));
+        return (Page<User>) userMapper.selectPage(pagination(pageInfo), fuzzyQuery(user));
     }
 
     @Override
-    public QueryWrapper<User> query(User user) {
+    public QueryWrapper<User> fuzzyQuery(User user) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         Optional.ofNullable(user).ifPresent(u -> {
             if (StringUtils.isNotBlank(u.getUsername())) {
@@ -117,12 +117,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> page(PageInfo pageInfo) {
+    public Page<User> pagination(PageInfo pageInfo) {
         Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
         Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.stream().forEach(orderItem -> {
-                if (CommonConstants.Cloumn.Description.ID.equals(orderItem.getColumn())) {
+                if (CommonConstants.Cloumn.ID.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
                 if (CommonConstants.Cloumn.User.USERNAME.equals(orderItem.getColumn())) {

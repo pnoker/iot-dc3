@@ -16,7 +16,6 @@
 
 package com.pnoker.transfer.rtmp.handler;
 
-import com.pnoker.transfer.rtmp.handler.Task;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
