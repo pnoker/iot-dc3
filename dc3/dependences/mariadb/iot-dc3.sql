@@ -289,7 +289,8 @@ CREATE TABLE `dc3_rtmp` (
   `rtmp_url` varchar(128) DEFAULT NULL COMMENT 'rtp播放链接,填写后缀即可',
   `command` varchar(128) DEFAULT NULL COMMENT 'cmd运行模板',
   `video_type` tinyint(1) DEFAULT NULL COMMENT '摄像头类型',
-  `auto_start` tinyint(1) DEFAULT NULL COMMENT '自启动',
+  `run` tinyint(1) NULL DEFAULT NULL COMMENT '状态，0停止，1启动',
+  `auto_start` tinyint(1) NULL DEFAULT NULL COMMENT '自启动',
   `node_id` bigint(20) DEFAULT -1 COMMENT '节点ID，节点类型为rtmp',
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户ID',
@@ -304,18 +305,14 @@ CREATE TABLE `dc3_rtmp` (
   CONSTRAINT `dc3_rtmp_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`),
   CONSTRAINT `dc3_rtmp_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`),
   CONSTRAINT `dc3_rtmp_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='rtmp表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='rtmp表';
 
 -- ----------------------------
 -- Records of dc3_rtmp
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_rtmp` VALUES (1, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `dc3_rtmp` VALUES (2, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `dc3_rtmp` VALUES (3, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
-INSERT INTO `dc3_rtmp` VALUES (4, NULL, NULL, NULL, NULL, NULL, 1, -1, -1, NULL, NULL, NULL, NULL, 0);
+INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 COMMIT;
 
 -- ----------------------------

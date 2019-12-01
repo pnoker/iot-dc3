@@ -56,8 +56,6 @@ rtmp:
     window: D:/FFmpeg/bin/ffmpeg.exe
     unix: ffmpeg
   task:
-    task-max-size: 32
-    task-max-restart-times: 10
     reconnect-interval: 5000
     reconnect-max-times: 10
   thread:

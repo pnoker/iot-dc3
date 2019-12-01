@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.rpc;
+package com.pnoker.center.dbs.client;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;

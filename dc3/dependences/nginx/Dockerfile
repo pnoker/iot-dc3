@@ -16,7 +16,7 @@
 
 FROM pnoker/dc3-base:3.0 AS build
 
-ENV NGINX_VERSION nginx-1.17.4
+ENV NGINX_VERSION nginx-1.17.6
 ENV NGINX_RTMP_MODULE_VERSION 1.2.1
 
 # 下载 Nginx

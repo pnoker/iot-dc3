@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker;
+package com.pnoker.transfer.rtmp;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -35,7 +35,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableFeignClients
 @EnableEurekaClient
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.pnoker.api.dbs.rtmp")
 public class RtmpApplication {
 
     public static void main(String[] args) {

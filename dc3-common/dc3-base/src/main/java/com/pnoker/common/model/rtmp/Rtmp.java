@@ -39,9 +39,15 @@ public class Rtmp extends Description {
     private String rtmpUrl;
     private String command;
     private Short videoType;
+    private Boolean run;
     private Boolean autoStart;
     private Long nodeId;
     private Long imageId;
+
+    public Rtmp(long id, boolean run) {
+        super.setId(id);
+        this.run = run;
+    }
 
     public Rtmp(boolean autoStart) {
         this.autoStart = autoStart;

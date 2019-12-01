@@ -17,10 +17,12 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.thread.ThreadUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
+import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.transfer.rtmp.handler.Task;
-import com.pnoker.transfer.rtmp.handler.ThreadPool;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.pnoker.transfer.rtmp.runner.Environment.initial;
 import static java.lang.System.getProperty;
 
 /**
@@ -44,31 +47,30 @@ import static java.lang.System.getProperty;
  */
 @Slf4j
 @Setter
-@Order(1)
+@Order(10)
 @Component
 public class TranscodeRunner implements ApplicationRunner {
-    public static String ffmpeg;
     @Value("${rtmp.ffmpeg.window}")
-    public static String window;
+    private String window;
     @Value("${rtmp.ffmpeg.unix}")
-    public static String unix;
-    @Value("${rtmp.task.task-max-size}")
-    public static int taskMaxSize;
-    @Value("${rtmp.task.task-max-restart-times}")
-    public static int taskMaxRestartTimes;
+    private String unix;
     @Value("${rtmp.task.reconnect-interval}")
-    public static int reconnectInterval;
+    private int reconnectInterval;
     @Value("${rtmp.task.reconnect-max-times}")
-    public static int reconnectMaxTimes;
+    private int reconnectMaxTimes;
     @Value("${rtmp.thread.core-pool-size}")
-    public static int corePoolSize;
+    private int corePoolSize;
     @Value("${rtmp.thread.maximum-sool-size}")
-    public static int maximumPoolSize;
+    private int maximumPoolSize;
     @Value("${rtmp.thread.keep-alive-time}")
-    public static int keepAliveTime;
+    private int keepAliveTime;
+
+    private int times = 1;
 
     @Autowired
     private RtmpService rtmpService;
+    @Autowired
+    private RtmpDbsFeignApi rtmpDbsFeignApi;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -81,24 +83,22 @@ public class TranscodeRunner implements ApplicationRunner {
             log.error("{} does not exist,Please fill absolute path!", ffmpeg);
             System.exit(1);
         }
-        TranscodeRunner.ffmpeg = ffmpeg;
-        List<Rtmp> list = rtmpService.getRtmpList(new RtmpDto(true));
-        for (Rtmp rtmp : list) {
-            rtmpService.startTask(rtmp);
+        initial(ffmpeg, reconnectInterval, reconnectMaxTimes, corePoolSize, maximumPoolSize, keepAliveTime);
+        list().forEach(rtmp -> rtmpService.add(rtmp));
+    }
+
+    public List<Rtmp> list() {
+        Response<Page<Rtmp>> response = rtmpDbsFeignApi.list(new RtmpDto(true));
+        return response.isOk() ? response.getData().getRecords() : reconnect();
+    }
+
+    public List<Rtmp> reconnect() {
+        if (times > Environment.RECONNECT_MAX_TIMES) {
+            System.exit(1);
         }
-        // 启动任务线程
-        //todo 逻辑错误，没有使用线程池
-        ThreadPool.threadPoolExecutor.execute(() -> {
-            log.info("listening rtsp->rtmp task");
-            while (true) {
-                try {
-                    Task.taskMap.get(Task.cmdTaskIdQueue.take()).start();
-                    Thread.sleep(1000 * 5);
-                } catch (InterruptedException e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        });
+        ThreadUtil.sleep(Environment.RECONNECT_INTERVAL * times);
+        times++;
+        return list();
     }
 
 }

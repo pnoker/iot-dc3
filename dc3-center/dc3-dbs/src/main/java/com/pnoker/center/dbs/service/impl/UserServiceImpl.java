@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
         Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
         Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
-            orderItems.stream().forEach(orderItem -> {
+            orderItems.forEach(orderItem -> {
                 if (CommonConstants.Cloumn.ID.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
