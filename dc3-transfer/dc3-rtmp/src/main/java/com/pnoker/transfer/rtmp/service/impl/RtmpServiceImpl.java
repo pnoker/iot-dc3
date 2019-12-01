@@ -18,18 +18,19 @@ package com.pnoker.transfer.rtmp.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.dto.PageInfo;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.common.bean.Response;
-import com.pnoker.transfer.rtmp.handler.Task;
-import com.pnoker.transfer.rtmp.runner.TranscodeRunner;
+import com.pnoker.transfer.rtmp.handler.Transcode;
+import com.pnoker.transfer.rtmp.handler.TranscodePool;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>
@@ -41,75 +42,114 @@ import java.util.List;
 @Service
 public class RtmpServiceImpl implements RtmpService {
 
-    private volatile int times = 1;
-
     @Autowired
     private RtmpDbsFeignApi rtmpDbsFeignApi;
 
     @Override
-    public List<Rtmp> getRtmpList(RtmpDto rtmp) {
-        rtmp.setName("测试");
-        Response<Page<Rtmp>> response = rtmpDbsFeignApi.list(rtmp);
-        if (!response.isOk()) {
-            log.error(response.getMessage());
-            return reconnect();
-        }
-        List<Rtmp> list = response.getData().getRecords();
-
-        return list != null ? list : new ArrayList<>();
-    }
-
-    @Override
-    public Response addRtmp(Rtmp rtmp) {
-        return rtmpDbsFeignApi.add(rtmp);
-    }
-
-    @Override
-    public Response startTask(Rtmp rtmp) {
-        Task task = new Task(getCommand(rtmp));
-        // 判断任务是否被重复提交
-        if (!Task.taskMap.containsKey(task.getId())) {
-            if (Task.taskMap.size() <= TranscodeRunner.taskMaxSize) {
-                Task.taskMap.put(task.getId(), task);
-                return task.create() ? Response.ok() : Response.fail();
+    public Response<Boolean> add(Rtmp rtmp) {
+        //todo 如何保持事务
+        Response<Long> response = rtmpDbsFeignApi.add(rtmp);
+        if (response.isOk()) {
+            rtmp.setId(response.getData());
+            Transcode transcode = new Transcode(rtmp);
+            if (!TranscodePool.transcodeMap.containsKey(transcode.getId())) {
+                TranscodePool.transcodeMap.put(transcode.getId(), transcode);
+                return Response.ok();
             } else {
-                log.error("超过最大任务数 {}", TranscodeRunner.taskMaxSize);
-                return Response.fail("超过最大任务数");
+                return Response.fail("任务重复,表记录添加成功");
             }
-        } else {
-            log.error("重复任务 {}", task.getId());
-            return Response.fail("重复任务");
         }
+        return Response.fail(response.getMessage());
     }
 
     @Override
-    public Response stopTask(String id) {
-        Task.taskMap.get(id).stop();
-        return Response.fail();
-    }
-
-
-    public String getCommand(Rtmp rtmp) {
-        String cmd = rtmp.getCommand()
-                .replace("{exe}", TranscodeRunner.ffmpeg)
-                .replace("{rtsp_url}", rtmp.getRtspUrl())
-                .replace("{rtmp_url}", rtmp.getRtmpUrl());
-        return cmd;
-    }
-
-    public List<Rtmp> reconnect() {
-        // N 次重连机会
-        if (times > TranscodeRunner.reconnectMaxTimes) {
-            log.info("一共重连 {} 次,无法连接数据库服务,服务停止！", times);
-            System.exit(1);
+    public Response<Boolean> delete(Long id) {
+        //todo 如何保持事务
+        Transcode transcode = TranscodePool.transcodeMap.get(id);
+        if (Optional.ofNullable(transcode).isPresent()) {
+            if (!transcode.isRun()) {
+                TranscodePool.transcodeMap.remove(id);
+                Response<Boolean> response = rtmpDbsFeignApi.delete(id);
+                if (response.isOk()) {
+                    return Response.ok();
+                } else {
+                    return Response.fail("任务删除成功,表记录删除失败");
+                }
+            } else {
+                return Response.fail("任务运行中");
+            }
         }
-        log.info("第 {} 次重连", times);
-        times++;
-        try {
-            // 设置重连之间的间隔时间
-            Thread.sleep(TranscodeRunner.reconnectInterval * times);
-        } catch (Exception e) {
-        }
-        return getRtmpList(new RtmpDto(true));
+        return Response.fail("任务不存在");
     }
+
+    @Override
+    public Response<Boolean> update(Rtmp rtmp) {
+        //todo 如何保持事务
+        Transcode transcode = TranscodePool.transcodeMap.get(rtmp.getId());
+        if (Optional.ofNullable(transcode).isPresent()) {
+            if (!transcode.isRun()) {
+                TranscodePool.transcodeMap.put(transcode.getId(), new Transcode(rtmp));
+                if (rtmpDbsFeignApi.update(rtmp).isOk()) {
+                    return Response.ok();
+                } else {
+                    return Response.fail("任务更新成功,表记录更新失败");
+                }
+            } else {
+                return Response.fail("任务运行中");
+            }
+        }
+        return Response.fail("任务不存在");
+    }
+
+    @Override
+    public Response<Page<Rtmp>> list(Rtmp rtmp, PageInfo pageInfo) {
+        RtmpDto rtmpDto = new RtmpDto();
+        BeanUtils.copyProperties(rtmp, rtmpDto);
+        rtmpDto.setPage(pageInfo);
+        return rtmpDbsFeignApi.list(rtmpDto);
+    }
+
+    @Override
+    public Response<Rtmp> selectById(Long id) {
+        return rtmpDbsFeignApi.selectById(id);
+    }
+
+    @Override
+    public Response<Boolean> start(Long id) {
+        Transcode transcode = TranscodePool.transcodeMap.get(id);
+        if (Optional.ofNullable(transcode).isPresent()) {
+            if (!transcode.isRun()) {
+                transcode.start();
+                Response<Boolean> response = rtmpDbsFeignApi.update(new Rtmp(id, true));
+                if (response.isOk()) {
+                    return Response.ok();
+                } else {
+                    return Response.fail("任务启动成功,表记录修改失败");
+                }
+            } else {
+                return Response.fail("任务运行中");
+            }
+        }
+        return Response.fail("任务不存在");
+    }
+
+    @Override
+    public Response<Boolean> stop(Long id) {
+        Transcode transcode = TranscodePool.transcodeMap.get(id);
+        if (Optional.ofNullable(transcode).isPresent()) {
+            if (!transcode.isRun()) {
+                transcode.stop();
+                Response<Boolean> response = rtmpDbsFeignApi.update(new Rtmp(id, false));
+                if (response.isOk()) {
+                    return Response.ok();
+                } else {
+                    return Response.fail("任务启动成功,表记录修改失败");
+                }
+            } else {
+                return Response.fail("任务运行中");
+            }
+        }
+        return Response.fail("任务不存在");
+    }
+
 }

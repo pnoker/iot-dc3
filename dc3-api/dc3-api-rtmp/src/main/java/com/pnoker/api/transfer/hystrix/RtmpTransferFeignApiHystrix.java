@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.device.manager.hystrix;
+package com.pnoker.api.transfer.hystrix;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.pnoker.api.device.manager.feign.DeviceManagerDbsFeignApi;
-import com.pnoker.common.dto.device.DeviceDto;
-import com.pnoker.common.model.device.Device;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.api.transfer.feign.RtmpTransferFeignApi;
 import com.pnoker.common.bean.Response;
+import com.pnoker.common.dto.transfer.RtmpDto;
+import com.pnoker.common.model.rtmp.Rtmp;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,36 +33,46 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DeviceManagerFeignApiHystrix implements FallbackFactory<DeviceManagerDbsFeignApi> {
+public class RtmpTransferFeignApiHystrix implements FallbackFactory<RtmpTransferFeignApi> {
 
     @Override
-    public DeviceManagerDbsFeignApi create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
-        log.error("DeviceFeignApi失败:{},hystrix服务降级处理", message, throwable);
+    public RtmpTransferFeignApi create(Throwable throwable) {
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-RTMP" : throwable.getMessage();
+        log.error("RtmpTransferFeignApi:{},hystrix服务降级处理", message, throwable);
 
-        return new DeviceManagerDbsFeignApi() {
+        return new RtmpTransferFeignApi() {
             @Override
-            public Response add(Device rtmp) {
+            public Response<Long> add(Rtmp rtmp) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response delete(Long id) {
+            public Response<Boolean> delete(Long id) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Boolean> update(Device rtmp) {
+            public Response<Boolean> update(Rtmp rtmp) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Device> selectById(Long id) {
+            public Response<Rtmp> selectById(Long id) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<IPage<Device>> list(DeviceDto rtmpDto) {
+            public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Boolean> start(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Boolean> stop(Long id) {
                 return Response.fail(message);
             }
         };

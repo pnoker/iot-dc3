@@ -16,9 +16,11 @@
 
 package com.pnoker.transfer.rtmp.handler;
 
-import com.pnoker.transfer.rtmp.runner.TranscodeRunner;
+import com.pnoker.transfer.rtmp.runner.Environment;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -31,11 +33,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @email : pnokers@icloud.com
  */
 @Slf4j
-public class ThreadPool {
+public class TranscodePool {
 
-    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(TranscodeRunner.corePoolSize,
-            TranscodeRunner.maximumPoolSize, TranscodeRunner.keepAliveTime, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(TranscodeRunner.maximumPoolSize * 2),
+    /**
+     * 转码任务Map
+     */
+    //todo 需要保证多线程下一致性
+    public static volatile Map<Long, Transcode> transcodeMap = new HashMap<>(64);
+
+    /**
+     * 线程池
+     */
+    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Environment.CORE_POOL_SIZE,
+            Environment.MAX_POOL_SIZE, Environment.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(Environment.MAX_POOL_SIZE * 2),
             r -> {
                 Thread thread = new Thread(r, "dc3-rtmp-thread-" + new AtomicInteger(1).getAndIncrement());
                 log.info("{} has been created", thread.getName());

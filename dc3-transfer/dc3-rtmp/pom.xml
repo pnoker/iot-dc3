@@ -26,19 +26,16 @@
     <artifactId>dc3-rtmp</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Rtsp->Rtmp视频流转码服务。</description>
+    <description>IOT DC3 平台 Rtsp->Rtmp 视频流转码服务。</description>
 
     <dependencies>
 
-    </dependencies>
+        <!-- dc3 Api Rtmp -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-api-rtmp</artifactId>
+        </dependency>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    </dependencies>
 
 </project>

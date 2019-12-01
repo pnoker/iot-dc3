@@ -187,7 +187,19 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
-            <!-- dc3 Api Dbs -->
+            <!-- Mybatis Plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- dc3 Api -->
             <dependency>
                 <groupId>com.pnoker</groupId>
                 <artifactId>dc3-api-dbs</artifactId>
@@ -195,14 +207,16 @@
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis.plus.version}</version>
+                <groupId>com.pnoker</groupId>
+                <artifactId>dc3-api-device</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
-            <version>${mybatis.plus.version}</version>
+                <groupId>com.pnoker</groupId>
+                <artifactId>dc3-api-rtmp</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
             </dependency>
 
             <!-- dc3 Common -->
