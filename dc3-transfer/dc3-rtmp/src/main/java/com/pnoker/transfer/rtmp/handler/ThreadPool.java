@@ -16,13 +16,16 @@
 
 package com.pnoker.transfer.rtmp.handler;
 
+import com.pnoker.transfer.rtmp.runner.TranscodeRunner;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * <p>Global，用于存储Task队列和任务信息
+ * <p>转码任务执行线程池
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -30,31 +33,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class ThreadPool {
 
-    /**
-     * Cmd任务线程池，用于全部任务线程使用
-     */
-    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Property.CORE_POOL_SIZE, Property.MAX_POOL_SIZE, Property.KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<>(Property.MAX_POOL_SIZE * 2), new RtmpTaskTreadFactory(), new IgnorePolicy());
-
-    static class RtmpTaskTreadFactory implements ThreadFactory {
-        private final AtomicInteger mThreadNum = new AtomicInteger(1);
-
-        @Override
-        public Thread newThread(Runnable runnable) {
-            Thread thread = new Thread(runnable, "dc3-rtmp-thread-" + mThreadNum.getAndIncrement());
-            log.info("{} has been created", thread.getName());
-            return thread;
-        }
-    }
-
-    static class IgnorePolicy implements RejectedExecutionHandler {
-        @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            doLog(r, e);
-        }
-
-        private void doLog(Runnable r, ThreadPoolExecutor e) {
-            log.error("{} rejected,completedTaskCount:{}", r.toString(), e.getCompletedTaskCount());
-        }
-    }
-
+    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(TranscodeRunner.corePoolSize,
+            TranscodeRunner.maximumPoolSize, TranscodeRunner.keepAliveTime, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(TranscodeRunner.maximumPoolSize * 2),
+            r -> {
+                Thread thread = new Thread(r, "dc3-rtmp-thread-" + new AtomicInteger(1).getAndIncrement());
+                log.info("{} has been created", thread.getName());
+                return thread;
+            },
+            (r, e) -> log.error("{} rejected,completedTaskCount:{}", r.toString(), e.getCompletedTaskCount()));
 }

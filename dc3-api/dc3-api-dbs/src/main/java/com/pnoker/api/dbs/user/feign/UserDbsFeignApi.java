@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.user.hystrix.UserDbsFeignApiHystrix;
 import com.pnoker.common.dto.UserDto;
 import com.pnoker.common.model.User;
-import com.pnoker.common.utils.Response;
+import com.pnoker.common.bean.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

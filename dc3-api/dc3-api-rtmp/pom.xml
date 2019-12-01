@@ -19,35 +19,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-api</artifactId>
         <version>3.0</version>
     </parent>
 
-    <artifactId>dc3-api</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dc3-api-rtmp</artifactId>
+    <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Feign Client API 集合。</description>
-
-    <modules>
-        <module>dc3-api-dbs</module>
-        <module>dc3-api-device</module>
-        <module>dc3-api-rtmp</module>
-    </modules>
-
-    <dependencies>
-
-        <!-- OpenFeign -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
-
-        <!-- dc3 Common Core -->
-        <dependency>
-            <groupId>com.pnoker</groupId>
-            <artifactId>dc3-core</artifactId>
-        </dependency>
-
-    </dependencies>
+    <description>IOT DC3 平台 Rtmp Feign Client API。</description>
 
 </project>

@@ -17,7 +17,7 @@
 package com.pnoker.transfer.rtmp.controller;
 
 import com.pnoker.common.model.rtmp.Rtmp;
-import com.pnoker.common.utils.Response;
+import com.pnoker.common.bean.Response;
 import com.pnoker.common.vo.rtmp.RtmpVo;
 import com.pnoker.transfer.rtmp.handler.Task;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -39,7 +39,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/v3/rtmp")
-public class IndexController {
+public class MainController {
     @Autowired
     private RtmpService rtmpService;
 

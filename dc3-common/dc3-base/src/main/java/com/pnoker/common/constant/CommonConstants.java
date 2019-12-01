@@ -35,13 +35,25 @@ public interface CommonConstants {
     String OAUTH_TOKEN_URL = "/oauth/token";
 
     /**
+     * 对称加密算法
+     */
+    String KEY_ALGORITHM_AES = "AES";
+
+    /**
+     * 非对称加密算法
+     */
+    String KEY_ALGORITHM_RSA = "RSA";
+
+
+    /**
      * 数据字段
      */
     interface Cloumn {
+        String ID = "id";
         String NAME = "name";
 
         /**
-         * 用户表
+         * User表
          */
         interface User {
             String USERNAME = "username";
@@ -56,12 +68,6 @@ public interface CommonConstants {
             String AUTO_START = "auto_start";
         }
 
-        /**
-         * 通用描述信息
-         */
-        interface Description {
-            String ID = "id";
-        }
     }
 
 }

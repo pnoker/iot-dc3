@@ -17,7 +17,6 @@
 package com.pnoker.device.group.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.pnoker.common.base.BaseController;
 import com.pnoker.device.group.model.wia.WiaData;
 import com.pnoker.device.group.service.wia.WiaDataService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +37,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 @Slf4j
 @RestController
-public class WiaDataController extends BaseController {
+public class WiaDataController {
     @Autowired
     private WiaDataService wiaDataService;
 

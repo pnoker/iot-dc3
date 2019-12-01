@@ -16,7 +16,6 @@
 
 package com.pnoker.center.data.controller;
 
-import com.pnoker.common.base.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-public class AmqController extends BaseController {
+public class AmqController {
 
 }

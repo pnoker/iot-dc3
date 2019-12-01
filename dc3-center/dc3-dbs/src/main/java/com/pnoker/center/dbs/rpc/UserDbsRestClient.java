@@ -21,7 +21,7 @@ import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
 import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.dto.UserDto;
 import com.pnoker.common.model.User;
-import com.pnoker.common.utils.Response;
+import com.pnoker.common.bean.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

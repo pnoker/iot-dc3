@@ -16,7 +16,6 @@
 
 package com.pnoker.transfer.resource.controller;
 
-import com.pnoker.common.base.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -33,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Slf4j
 @Controller
 @RequestMapping("/")
-public class MainController extends BaseController {
+public class MainController {
 
     @RequestMapping(value = "/video/{name}", method = RequestMethod.GET)
     public String videoView(ModelMap modelMap, @PathVariable String name) {
