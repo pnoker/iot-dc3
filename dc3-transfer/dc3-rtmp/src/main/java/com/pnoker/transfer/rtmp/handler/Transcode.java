@@ -17,7 +17,7 @@
 package com.pnoker.transfer.rtmp.handler;
 
 import cn.hutool.core.util.RuntimeUtil;
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.base.model.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.runner.Environment;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
