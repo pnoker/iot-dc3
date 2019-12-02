@@ -5,101 +5,17 @@ services:
     build:
       context: ./dc3/dependences/base/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-base:3.0
 
-  influxdb:
-    build:
-      context: ./dc3/dependences/influxdb/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-influxdb:3.0
+  portainer:
+    image:  portainer/portainer
+    container_name: portainer
     restart: always
     ports:
-      - 8086:8086
-    container_name: dc3-influxdb
-    hostname: iotdc3.influxdb
+      - "9000:9000"
     networks:
       network:
         aliases:
-          - dc3-influxdb
-
-  mariadb:
-    build:
-      context: ./dc3/dependences/mariadb/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-mariadb:3.0
-    restart: always
-    ports:
-      - 3306:3306
-    container_name: dc3-mariadb
-    hostname: iotdc3.mariadb
-    networks:
-      network:
-        aliases:
-          - dc3-mariadb
-
-  mongodb:
-    build:
-      context: ./dc3/dependences/mongodb/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-mongodb:3.0
-    restart: always
-    ports:
-      - 27017:27017
-    container_name: dc3-mongodb
-    hostname: iotdc3.mongodb
-    networks:
-      network:
-        aliases:
-          - dc3-mongodb
-
-  redis:
-    build:
-      context: ./dc3/dependences/redis/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-redis:3.0
-    restart: always
-    ports:
-      - 6379:6379
-    container_name: dc3-redis
-    hostname: iotdc3.redis
-    networks:
-      network:
-        aliases:
-          - dc3-redis
-
-  rabbitmq:
-    build:
-      context: ./dc3/dependences/rabbitmq/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-rabbitmq:3.0
-    restart: always
-    ports:
-      - 5672:5672
-      - 1883:1883
-      - 61613:61613
-      - 15672:15672
-    container_name: dc3-rabbitmq
-    hostname: iotdc3.rabbitmq
-    networks:
-      network:
-        aliases:
-          - dc3-rabbitmq
-
-  nginx:
-    build:
-      context: ./dc3/dependences/nginx/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-nginx:3.0
-    restart: always
-    ports:
-      - 80:80
-      - 1935:1935
-    container_name: dc3-nginx
-    hostname: iotdc3.nginx
-    networks:
-      network:
-        aliases:
-          - dc3-nginx
+          - dc3-portainer
 
   gateway:
     build:
@@ -172,6 +88,51 @@ services:
         aliases:
           - dc3-dbs
 
+  mariadb:
+    build:
+      context: ./dc3/dependences/mariadb/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-mariadb:3.0
+    restart: always
+    ports:
+      - 3306:3306
+    container_name: dc3-mariadb
+    hostname: iotdc3.mariadb
+    networks:
+      network:
+        aliases:
+          - dc3-mariadb
+
+  mongodb:
+    build:
+      context: ./dc3/dependences/mongodb/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-mongodb:3.0
+    restart: always
+    ports:
+      - 27017:27017
+    container_name: dc3-mongodb
+    hostname: iotdc3.mongodb
+    networks:
+      network:
+        aliases:
+          - dc3-mongodb
+
+  redis:
+    build:
+      context: ./dc3/dependences/redis/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-redis:3.0
+    restart: always
+    ports:
+      - 6379:6379
+    container_name: dc3-redis
+    hostname: iotdc3.redis
+    networks:
+      network:
+        aliases:
+          - dc3-redis
+
   manager:
     build:
       context: ./dc3-device/dc3-manager/
@@ -188,6 +149,24 @@ services:
       network:
         aliases:
           - dc3-manager
+
+  rabbitmq:
+    build:
+      context: ./dc3/dependences/rabbitmq/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-rabbitmq:3.0
+    restart: always
+    ports:
+      - 5672:5672
+      - 1883:1883
+      - 61613:61613
+      - 15672:15672
+    container_name: dc3-rabbitmq
+    hostname: iotdc3.rabbitmq
+    networks:
+      network:
+        aliases:
+          - dc3-rabbitmq
 
   opcua:
     build:
@@ -224,6 +203,22 @@ services:
         aliases:
           - dc3-rtmp
 
+  nginx:
+    build:
+      context: ./dc3/dependences/nginx/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-nginx:3.0
+    restart: always
+    ports:
+      - 80:80
+      - 1935:1935
+    container_name: dc3-nginx
+    hostname: iotdc3.nginx
+    networks:
+      network:
+        aliases:
+          - dc3-nginx
+
   resource:
     build:
       context: ./dc3-transfer/dc3-resource/
@@ -240,17 +235,6 @@ services:
       network:
         aliases:
           - dc3-resource
-
-  portainer:
-    image:  portainer/portainer
-    container_name: portainer
-    restart: always
-    ports:
-      - "9000:9000"
-    networks:
-      network:
-        aliases:
-          - dc3-portainer
 
 networks:
   network:

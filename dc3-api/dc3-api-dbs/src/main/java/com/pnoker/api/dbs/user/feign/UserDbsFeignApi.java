@@ -18,9 +18,9 @@ package com.pnoker.api.dbs.user.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.dbs.user.hystrix.UserDbsFeignApiHystrix;
-import com.pnoker.common.bean.Response;
-import com.pnoker.common.dto.UserDto;
-import com.pnoker.common.model.User;
+import com.pnoker.common.base.bean.Response;
+import com.pnoker.common.base.dto.UserDto;
+import com.pnoker.common.base.model.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
