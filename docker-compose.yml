@@ -202,7 +202,6 @@ services:
     image: pnoker/alpine-nginx:rtmp
     restart: always
     ports:
-      - 80:80
       - 1935:1935
     container_name: dc3-nginx
     hostname: iotdc3.nginx
