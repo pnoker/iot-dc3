@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #
 #  Copyright 2019 Pnoker. All Rights Reserved.
 #
@@ -16,14 +14,11 @@
 #   limitations under the License.
 #
 
-set -e
+FROM mysql:8.0
+MAINTAINER pnoker <pnokers.icloud.com>
 
-if [ "${1:0:1}" = '-' ]; then
-    set -- influxd "$@"
-fi
+ENV MYSQL_ROOT_PASSWORD iotdc3
 
-if [ "$1" = 'influxd' ]; then
-	/init-influxdb.sh "${@:2}"
-fi
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-exec "$@"
+COPY ./iot-dc3.sql /docker-entrypoint-initdb.d

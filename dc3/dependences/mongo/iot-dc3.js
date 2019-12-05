@@ -24,9 +24,3 @@ db.createUser({
         db: "iot-dc3"
     }]
 });
-
-db.createCollection("dc3_group");
-db.createCollection("dc3_device");
-db.createCollection("dc3_unit");
-db.createCollection("dc3_variable");
-db.createCollection("dc3_data");

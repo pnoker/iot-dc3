@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-FROM anapsix/alpine-java:8_server-jre_unlimited AS base
+FROM pnoker/alpine-java:1.8.221 AS base
 MAINTAINER pnoker pnokers.icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
