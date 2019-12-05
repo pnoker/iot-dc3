@@ -17,6 +17,8 @@
 FROM pnoker/alpine-java:1.8.221 AS base
 MAINTAINER pnoker pnokers.icloud.com
 
+ENV JAVA_OPS -server -Xms512m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-transfer/dc3-rtmp
 
