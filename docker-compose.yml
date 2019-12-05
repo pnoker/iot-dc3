@@ -1,11 +1,6 @@
 version: '3'
 
 services:
-  base:
-    build:
-      context: ./dc3/dependences/base/
-      dockerfile: ./Dockerfile
-
   portainer:
     image:  portainer/portainer
     container_name: portainer
@@ -78,8 +73,8 @@ services:
       - 8300:8300
     links:
       - register:iotdc3.register
-      - mongodb:iotdc3.mongodb
-      - mariadb:iotdc3.mariadb
+      - mongo:iotdc3.mongo
+      - mysql:iotdc3.mysql
       - redis:iotdc3.redis
     container_name: dc3-dbs
     hostname: iotdc3.dbs
@@ -88,35 +83,35 @@ services:
         aliases:
           - dc3-dbs
 
-  mariadb:
+  mysql:
     build:
-      context: ./dc3/dependences/mariadb/
+      context: ./dc3/dependences/mysql/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-mariadb:3.0
+    image: pnoker/dc3-mysql:3.0
     restart: always
     ports:
       - 3306:3306
-    container_name: dc3-mariadb
-    hostname: iotdc3.mariadb
+    container_name: dc3-mysql
+    hostname: iotdc3.mysql
     networks:
       network:
         aliases:
-          - dc3-mariadb
+          - dc3-mysql
 
-  mongodb:
+  mongo:
     build:
-      context: ./dc3/dependences/mongodb/
+      context: ./dc3/dependences/mongo/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-mongodb:3.0
+    image: pnoker/dc3-mongo:3.0
     restart: always
     ports:
       - 27017:27017
-    container_name: dc3-mongodb
-    hostname: iotdc3.mongodb
+    container_name: dc3-mongo
+    hostname: iotdc3.mongo
     networks:
       network:
         aliases:
-          - dc3-mongodb
+          - dc3-mongo
 
   redis:
     build:
@@ -204,10 +199,7 @@ services:
           - dc3-rtmp
 
   nginx:
-    build:
-      context: ./dc3/dependences/nginx/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-nginx:3.0
+    image: pnoker/alpine-nginx:rtmp
     restart: always
     ports:
       - 80:80

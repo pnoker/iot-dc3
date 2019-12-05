@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-FROM anapsix/alpine-java:8_server-jre_unlimited
+FROM pnoker/alpine-java:1.8.221
 MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV JAVA_OPS -server -Xms512m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m

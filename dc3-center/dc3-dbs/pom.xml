@@ -28,10 +28,6 @@
 
     <description>IOT DC3 平台 数据库服务。</description>
 
-    <properties>
-        <mariadb.version>2.5.2</mariadb.version>
-    </properties>
-
     <dependencies>
 
         <!-- Mybatis Plus -->
@@ -46,10 +42,9 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>${mariadb.version}</version>
-        </dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
 
         <!-- Mongo-->
         <dependency>
