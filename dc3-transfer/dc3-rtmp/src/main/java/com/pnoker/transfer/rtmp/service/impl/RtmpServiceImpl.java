@@ -113,18 +113,16 @@ public class RtmpServiceImpl implements RtmpService {
         if (response.isOk()) {
             Transcode transcode = TranscodePool.transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
-                if (!transcode.isRun()) {
-                    transcode.start();
-                    response.getData().setRun(true);
-                    return rtmpDbsFeignClient.update(response.getData()).isOk() ? Response.ok() : Response.fail("任务启动成功，表记录更新失败");
+                if (transcode.isRun()) {
+                    return Response.fail("任务已是启动状态");
                 }
-                return Response.fail("任务已是启动状态");
             } else {
                 transcode = new Transcode(response.getData());
                 TranscodePool.transcodeMap.put(transcode.getId(), transcode);
-                TranscodePool.threadPoolExecutor.execute(() -> TranscodePool.transcodeMap.get(id).start());
-                return Response.ok();
             }
+            TranscodePool.threadPoolExecutor.execute(() -> TranscodePool.transcodeMap.get(id).start());
+            response.getData().setRun(true);
+            return rtmpDbsFeignClient.update(response.getData()).isOk() ? Response.ok() : Response.fail("任务启动成功，表记录更新失败");
         }
         return Response.fail("任务不存在");
     }
