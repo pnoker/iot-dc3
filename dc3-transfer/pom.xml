@@ -28,19 +28,13 @@
 
     <description>IOT DC3 平台数据交换服务集合。</description>
 
-    <modules>      
-        <module>dc3-opc</module>
+    <modules>
         <module>dc3-rtmp</module>
         <module>dc3-opc-ua</module>
         <module>dc3-resource</module>
     </modules>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-security</artifactId>
-        </dependency>
 
         <!-- Undertow Web 容器 -->
         <dependency>
@@ -58,12 +52,21 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
-        <!-- dc3 Api -->
+        <!-- dc3 Api Dbs -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-api</artifactId>
+            <artifactId>dc3-api-dbs</artifactId>
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

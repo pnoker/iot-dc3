@@ -16,23 +16,72 @@
 
 package com.pnoker.transfer.rtmp.service;
 
-import com.pnoker.common.model.domain.rtmp.Rtmp;
-import com.pnoker.common.model.dto.Response;
-import com.pnoker.common.model.dto.rtmp.RtmpDto;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.base.bean.Response;
+import com.pnoker.common.base.dto.PageInfo;
+import com.pnoker.common.base.model.rtmp.Rtmp;
 
-import java.util.List;
-
+/**
+ * <p>
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 public interface RtmpService {
     /**
-     * 获取 Rtmp 列表
+     * 新增记录
      *
-     * @return
+     * @param rtmp
+     * @return true/false
      */
-    List<Rtmp> getRtmpList(RtmpDto rtmpDto);
+    Response<Boolean> add(Rtmp rtmp);
 
-    Response addRtmp(Rtmp rtmp);
+    /**
+     * 删除记录
+     *
+     * @param id
+     * @return true/false
+     */
+    Response<Boolean> delete(Long id);
 
-    Response startTask(Rtmp rtmp);
+    /**
+     * 更新记录
+     *
+     * @param rtmp
+     * @return true/false
+     */
+    Response<Boolean> update(Rtmp rtmp);
 
-    Response stopTask(String id);
+    /**
+     * 获取带分页、排序的记录
+     *
+     * @param rtmp
+     * @param pageInfo pageNum,pageSize
+     * @return list
+     */
+    Response<Page<Rtmp>> list(Rtmp rtmp, PageInfo pageInfo);
+
+    /**
+     * 通过ID查询记录
+     *
+     * @param id
+     * @return type
+     */
+    Response<Rtmp> selectById(Long id);
+
+    /**
+     * 启动
+     *
+     * @param id
+     * @return true/false
+     */
+    Response<Boolean> start(Long id);
+
+    /**
+     * 停止
+     *
+     * @param id
+     * @return true/false
+     */
+    Response<Boolean> stop(Long id);
 }

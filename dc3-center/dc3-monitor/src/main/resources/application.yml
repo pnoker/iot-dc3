@@ -8,13 +8,14 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
   security:
     user:
       name: iotdc3
       password: iotdc3
   boot:
     admin:
-      context-path: /monitor/
       ui:
         title: IOT DC3 Monitoring Center
         favicon: images/icon/favicon.ico
@@ -31,7 +32,6 @@ management:
       show-details: ALWAYS
 
 logging:
-  file: dc3/logs/center/${spring.application.name}.log
   level:
     org.springframework.data: ERROR
     org.springframework.web: ERROR
@@ -42,6 +42,8 @@ logging:
     io.lettuce.core: ERROR
     io.undertow: ERROR
     com.netflix: ERROR
+  file:
+    name: dc3/logs/center/${spring.application.name}.log
 
 eureka:
   instance:

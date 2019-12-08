@@ -17,6 +17,8 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
   security:
     user:
       name: iotdc3
@@ -36,7 +38,6 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/virtual/${spring.application.name}.log
   level:
     org.springframework.data: ERROR
     org.springframework.web: ERROR
@@ -47,6 +48,8 @@ logging:
     io.lettuce.core: ERROR
     io.undertow: ERROR
     com.netflix: ERROR
+  file:
+    name: dc3/logs/virtual/${spring.application.name}.log
 
 eureka:
   instance:

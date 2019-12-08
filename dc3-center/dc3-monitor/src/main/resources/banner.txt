@@ -3,5 +3,5 @@
 |  |/  _ \   __\  / __ |/ ___\  _(__  <
 |  (  <_> )  |   / /_/ \  \___ /       \
 |__|\____/|__|   \____ |\___  >______  /
-                      \/    \/       \/
+ 监控中心             \/    \/       \/
 ${AnsiColor.BRIGHT_CYAN}DC3 IOT Platform V3.0 ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors

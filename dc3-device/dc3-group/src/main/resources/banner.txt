@@ -1,7 +1,0 @@
-.__        __        .___     ________
-|__| _____/  |_    __| _/____ \_____  \
-|  |/  _ \   __\  / __ |/ ___\  _(__  <
-|  (  <_> )  |   / /_/ \  \___ /       \
-|__|\____/|__|   \____ |\___  >______  /
-                      \/    \/       \/
-${AnsiColor.BRIGHT_CYAN}DC3 IOT Platform V3.0 ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors

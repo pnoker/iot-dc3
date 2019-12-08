@@ -29,13 +29,13 @@
     <description>IOT DC3 平台网关,用于限流、权限验证、服务转发、方向代理 等。</description>
 
     <dependencies>
-
         <!-- Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
+        <!-- Thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -47,15 +47,10 @@
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
+        <!-- dc3 Commont Base -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-webmvc</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>dc3-base</artifactId>
         </dependency>
 
     </dependencies>

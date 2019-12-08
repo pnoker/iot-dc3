@@ -17,7 +17,7 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.domain.Image;
+import com.pnoker.common.base.model.Image;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +28,5 @@ import org.springframework.stereotype.Component;
  * @email : pnokers@icloud.com
  */
 @Mapper
-@Component
 public interface ImageMapper extends BaseMapper<Image> {
 }
