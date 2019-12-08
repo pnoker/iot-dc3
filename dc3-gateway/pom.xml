@@ -47,6 +47,12 @@
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
+        <!-- Redis Cache-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
         <!-- dc3 Commont Base -->
         <dependency>
             <groupId>com.pnoker</groupId>

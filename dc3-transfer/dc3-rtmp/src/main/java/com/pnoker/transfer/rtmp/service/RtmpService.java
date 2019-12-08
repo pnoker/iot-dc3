@@ -53,6 +53,14 @@ public interface RtmpService {
     Response<Boolean> update(Rtmp rtmp);
 
     /**
+     * 通过ID查询记录
+     *
+     * @param id
+     * @return type
+     */
+    Response<Rtmp> selectById(Long id);
+
+    /**
      * 获取带分页、排序的记录
      *
      * @param rtmp
@@ -60,14 +68,6 @@ public interface RtmpService {
      * @return list
      */
     Response<Page<Rtmp>> list(Rtmp rtmp, PageInfo pageInfo);
-
-    /**
-     * 通过ID查询记录
-     *
-     * @param id
-     * @return type
-     */
-    Response<Rtmp> selectById(Long id);
 
     /**
      * 启动
