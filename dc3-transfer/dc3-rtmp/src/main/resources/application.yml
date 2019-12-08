@@ -8,6 +8,12 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
   security:
     user:
       name: iotdc3
@@ -27,7 +33,6 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/transfer/${spring.application.name}.log
   level:
     org.springframework.data: ERROR
     org.springframework.web: ERROR
@@ -39,6 +44,8 @@ logging:
     io.undertow: ERROR
     com.netflix: ERROR
     com.pnoker: DEBUG
+  file:
+    name: dc3/logs/transfer/${spring.application.name}.log
 
 eureka:
   instance:
@@ -48,6 +55,14 @@ eureka:
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.register:8100/eureka/
 
-ffmpeg:
-  window: D:/FFmpeg/bin/ffmpeg.exe
-  nuix: ffmpeg
+rtmp:
+  ffmpeg:
+    window: D:/FFmpeg/bin/ffmpeg.exe
+    unix: ffmpeg
+  task:
+    reconnect-interval: 5000
+    reconnect-max-times: 10
+  thread:
+    core-pool-size: 4
+    maximum-sool-size: 32
+    keep-alive-time: 10

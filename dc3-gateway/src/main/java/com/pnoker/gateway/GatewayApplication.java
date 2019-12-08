@@ -19,6 +19,12 @@ package com.pnoker.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
 
+/**
+ * <p>平台网关服务入口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 @SpringCloudApplication
 public class GatewayApplication {
 

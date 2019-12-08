@@ -54,63 +54,46 @@
 
         <module>dc3-transfer</module>
         <module>dc3-device</module>
+        <module>dc3-driver</module>
 
         <module>dc3-api</module>
         <module>dc3-common</module>
     </modules>
 
     <properties>
-        <java.version>1.8</java.version>
+        <hutool.version>5.0.7</hutool.version>
+        <lombok.version>1.18.10</lombok.version>
+        <fastjson.version>1.2.62</fastjson.version>
+        <mybatis.plus.version>3.3.0</mybatis.plus.version>
+
+        <spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring-platform.version>Cairo-SR8</spring-platform.version>
+        <security.oauth.version>2.4.0.RELEASE</security.oauth.version>
+        <spring-boot-admin.version>2.2.0-SNAPSHOT</spring-boot-admin.version>
+
+        <codecov.version>2.7</codecov.version>
+        <maven.jar.plugin>3.2.0</maven.jar.plugin>
+        <maven.resource.plugin>3.1.0</maven.resource.plugin>
+        <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <maven.jar.plugin>3.1.2</maven.jar.plugin>
-        <maven.resource.plugin>3.1.0</maven.resource.plugin>
-        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
-        <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
-
-        <spring-boot.version>2.1.9.RELEASE</spring-boot.version>
-        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
-        <spring-platform.version>Cairo-SR8</spring-platform.version>
-        <spring-boot-admin.version>2.1.6</spring-boot-admin.version>
-        <spring-webmvc.version>5.1.10.RELEASE</spring-webmvc.version>
-        <security-oauth.version>2.3.6.RELEASE</security-oauth.version>
-
-        <jna.version>5.3.1</jna.version>
-        <hutool.version>4.6.8</hutool.version>
-        <codecov.version>2.7</codecov.version>
-        <jasypt.version>2.1.0</jasypt.version>
-        <lombok.version>1.18.8</lombok.version>
-        <jackson.modules>2.9.8</jackson.modules>
-        <mariadb.version>2.3.0</mariadb.version>
-        <sqllite.version>3.25.2</sqllite.version>
-        <hikaricp.version>3.3.1</hikaricp.version>
-        <netty.version>4.1.42.Final</netty.version>
-        <fastjson.version>1.2.60</fastjson.version>
-        <slf4j-api.version>1.7.26</slf4j-api.version>
-        <commons.cli.version>1.4</commons.cli.version>
-        <pagehelper.version>5.1.10</pagehelper.version>
-        <servlet-api.version>4.0.1</servlet-api.version>
-        <mybatis.plus.version>3.2.0</mybatis.plus.version>
-        <commons.lang3.version>3.9</commons.lang3.version>
-        <redis.data.version>2.1.11.RELEASE</redis.data.version>
-        <pagehelper.boot.version>1.2.12</pagehelper.boot.version>
 
     </properties>
 
     <dependencies>
-        <!-- Eureka Client -->
+        <!-- Configuration -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Eureka -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
-        <!-- Actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- Hystrix -->
@@ -119,19 +102,33 @@
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
 
-        <!-- Spring Configuration & 配置文件加密 -->
+        <!-- Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ulisesbocchio</groupId>
-            <artifactId>jasypt-spring-boot-starter</artifactId>
-            <version>${jasypt.version}</version>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Lombok 代码简化 -->
+        <!-- Admin -->
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+        </dependency>
+
+        <!-- Hutool -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+
+        <!-- FastJson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -145,16 +142,23 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
-
             <!-- Spring Cloud 依赖 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.spring.platform</groupId>
+                <artifactId>platform-bom</artifactId>
+                <version>${spring-platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -166,76 +170,66 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.spring.platform</groupId>
-                <artifactId>platform-bom</artifactId>
-                <version>${spring-platform.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- 稳定版本 Spring Security Aauth2 -->
-            <dependency>
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
-                <version>${security-oauth.version}</version>
+                <version>${security.oauth.version}</version>
             </dependency>
 
-            <!-- Spring Admin -->
+            <!-- Spring Boot Admin -->
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId>
                 <version>${spring-boot-admin.version}</version>
             </dependency>
-
-            <!-- Database相关 -->
             <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${hikaricp.version}</version>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-client</artifactId>
+                <version>${spring-boot-admin.version}</version>
             </dependency>
+
+            <!-- Mybatis Plus -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus</artifactId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis.plus.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.mariadb.jdbc</groupId>
-                <artifactId>mariadb-java-client</artifactId>
-                <version>${mariadb.version}</version>
-            </dependency>
-
-            <!-- Netty-->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-all</artifactId>
-                <version>${netty.version}</version>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis.plus.version}</version>
             </dependency>
 
             <!-- dc3 Api -->
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-api</artifactId>
-                <version>3.0</version>
+                <artifactId>dc3-api-dbs</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.pnoker</groupId>
+                <artifactId>dc3-api-device</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.pnoker</groupId>
+                <artifactId>dc3-api-rtmp</artifactId>
+                <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
 
             <!-- dc3 Common -->
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-common-base</artifactId>
-                <version>3.0</version>
+                <artifactId>dc3-core</artifactId>
+                <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-common-core</artifactId>
-                <version>3.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.pnoker</groupId>
-                <artifactId>dc3-common-security</artifactId>
-                <version>3.0</version>
+                <artifactId>dc3-base</artifactId>
+                <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
 
@@ -244,7 +238,6 @@
 
     <build>
         <finalName>${project.name}</finalName>
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -253,32 +246,26 @@
         </resources>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
             </plugin>
-
         </plugins>
 
         <pluginManagement>
-
             <plugins>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin}</version>
+                    <version>3.8.0</version>
                     <configuration>
                         <target>${maven.compiler.target}</target>
                         <source>${maven.compiler.source}</source>
@@ -313,7 +300,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
                 <!-- 过滤文件 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -325,7 +311,6 @@
                         </nonFilteredFileExtensions>
                     </configuration>
                 </plugin>
-
                 <!-- 代码覆盖检测 -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -338,7 +323,6 @@
                         </formats>
                     </configuration>
                 </plugin>
-
                 <!-- jar依赖包打包配置 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -357,11 +341,55 @@
                         </execution>
                     </executions>
                 </plugin>
-
             </plugins>
-
         </pluginManagement>
 
     </build>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-plugin</id>
+            <name>spring-plugin</name>
+            <url>https://maven.aliyun.com/repository/spring-plugin</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

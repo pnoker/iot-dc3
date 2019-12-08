@@ -16,6 +16,12 @@
 
 package com.pnoker.center.dbs.service;
 
+/**
+ * <p> 标签 服务接口
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
 public interface TagService {
 
 }

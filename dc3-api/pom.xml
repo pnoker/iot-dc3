@@ -24,9 +24,15 @@
     </parent>
 
     <artifactId>dc3-api</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-    <description>IOT DC3 平台 Feign Client API。</description>
+    <description>IOT DC3 平台 Feign Client API 集合。</description>
+
+    <modules>
+        <module>dc3-api-dbs</module>
+        <module>dc3-api-device</module>
+        <module>dc3-api-rtmp</module>
+    </modules>
 
     <dependencies>
 
@@ -36,10 +42,10 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- dc3 Common Base -->
+        <!-- dc3 Common Core -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-common-base</artifactId>
+            <artifactId>dc3-core</artifactId>
         </dependency>
 
     </dependencies>

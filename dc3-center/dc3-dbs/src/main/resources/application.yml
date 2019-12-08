@@ -8,16 +8,22 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
   security:
     user:
       name: iotdc3
       password: iotdc3
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://iotdc3.mariadb:3306/iot-dc3?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
-    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mysql://iotdc3.mysql:3306/iot-dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: iotdc3
+    password: ${spring.security.user.password}
     sql-script-encoding: utf-8
     hikari:
       pool-name: iot-dc3-dbs-hikaricp
@@ -26,7 +32,7 @@ spring:
       minimum-idle: 4
   data:
     mongodb:
-      host: iotdc3.mongodb
+      host: iotdc3.mongo
       port: 27017
       database: iot-dc3
       username: root
@@ -35,8 +41,8 @@ spring:
     host: iotdc3.redis
     port: 6379
     password: ${spring.security.user.password}
-    database: 1
-    timeout: 1H
+    database: 0
+    timeout: 15S
     jedis:
       pool:
         max-idle: 16
@@ -45,9 +51,9 @@ spring:
     rollback-on-commit-failure: true
   cache:
     type: redis
-    cache-names: dc3-dbs-rediscache
+    cache-names: dc3-dbs-cache
     redis:
-      time-to-live: 10M
+      time-to-live: 24H
 
 mybatis-plus:
   configuration:
@@ -59,12 +65,6 @@ mybatis-plus:
       table-prefix: dc3_
       logic-delete-value: 1
       logic-not-delete-value: 0
-
-
-pagehelper:
-  helper-dialect: mysql
-  page-size-zero: true
-  reasonable: true
 
 management:
   endpoints:
@@ -80,7 +80,6 @@ feign:
     enabled: true
 
 logging:
-  file: dc3/logs/center/${spring.application.name}.log
   level:
     org.springframework.data: ERROR
     org.springframework.web: ERROR
@@ -91,6 +90,8 @@ logging:
     io.lettuce.core: ERROR
     io.undertow: ERROR
     com.netflix: ERROR
+  file:
+    name: dc3/logs/center/${spring.application.name}.log
 
 eureka:
   instance:

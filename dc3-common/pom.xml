@@ -29,9 +29,22 @@
     <description>IOT DC3 平台 Common 公共模块。</description>
 
     <modules>
-        <module>dc3-common-core</module>
-        <module>dc3-common-security</module>
-        <module>dc3-common-base</module>
+        <module>dc3-core</module>
+        <module>dc3-base</module>
     </modules>
+
+    <dependencies>
+        <!-- Mybatis Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+        </dependency>
+
+        <!-- Slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -17,20 +17,27 @@
 package com.pnoker.center.dbs.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.BasePage;
-import com.pnoker.common.model.domain.rtmp.Rtmp;
+import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.base.dto.PageInfo;
+import com.pnoker.common.base.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>Rtmp 接口实现
@@ -40,43 +47,80 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@Transactional
 public class RtmpServiceImpl implements RtmpService {
-    @Autowired
+    @Resource
     private RtmpMapper rtmpMapper;
 
     @Override
-    @CachePut(value = "rtmp", key = "#rtmp.id")
-    public void add(Rtmp rtmp) {
-        rtmpMapper.insert(rtmp);
+    @Caching(
+            put = {@CachePut(value = "rtmpCache", key = "#rtmp.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "rtmpListCache", allEntries = true)}
+    )
+    public Rtmp add(Rtmp rtmp) {
+        return rtmpMapper.insert(rtmp) > 0 ? rtmp : null;
     }
 
     @Override
-    @CacheEvict(value = "rtmp", key = "#rtmp.id")
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "rtmpCache", key = "#id"),
+                    @CacheEvict(value = "rtmpListCache", allEntries = true)
+            }
+    )
     public boolean delete(Long id) {
         return rtmpMapper.deleteById(id) > 0;
     }
 
     @Override
-    @CachePut(value = "rtmp", key = "#rtmp.id")
+    @Caching(
+            put = {@CachePut(value = "rtmpCache", key = "#rtmp.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "rtmpListCache", allEntries = true)}
+    )
     public Rtmp update(Rtmp rtmp) {
-        rtmpMapper.updateById(rtmp);
-        return rtmp;
+        return rtmpMapper.updateById(rtmp) > 0 ? rtmp : null;
     }
 
     @Override
-    @Cacheable(value = "rtmp", key = "#rtmp.id", unless = "#result == null")
+    @Cacheable(value = "rtmpCache", key = "#id", unless = "#result==null")
     public Rtmp selectById(Long id) {
         return rtmpMapper.selectById(id);
     }
 
     @Override
-    public PageInfo<Rtmp> listWithPage(Rtmp rtmp, BasePage page) {
+    @Cacheable(value = "rtmpListCache", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public Page<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
+        return rtmpMapper.selectPage(pagination(pageInfo), fuzzyQuery(rtmp));
+    }
+
+    @Override
+    public QueryWrapper<Rtmp> fuzzyQuery(Rtmp rtmp) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        rtmp.query(queryWrapper);
-        page.orderBy(queryWrapper);
-        PageHelper.startPage(page.getPageNum(), page.getPageSize());
-        List<Rtmp> rtmpList = rtmpMapper.selectList(queryWrapper);
-        return new PageInfo<>(rtmpList);
+        if (null != rtmp.getAutoStart()) {
+            queryWrapper.eq(CommonConstants.Cloumn.Rtmp.AUTO_START, BooleanUtils.isTrue(rtmp.getAutoStart()));
+        }
+        if (StringUtils.isNotBlank(rtmp.getName())) {
+            queryWrapper.like(CommonConstants.Cloumn.NAME, rtmp.getName());
+        }
+        return queryWrapper;
+    }
+
+    @Override
+    public Page<Rtmp> pagination(PageInfo pageInfo) {
+        Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
+        Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
+            List<OrderItem> tmps = new ArrayList<>();
+            orderItems.forEach(orderItem -> {
+                if (CommonConstants.Cloumn.ID.equals(orderItem.getColumn())) {
+                    tmps.add(orderItem);
+                }
+                if (CommonConstants.Cloumn.NAME.equals(orderItem.getColumn())) {
+                    tmps.add(orderItem);
+                }
+            });
+            page.setOrders(tmps);
+        });
+        return page;
     }
 
 }
