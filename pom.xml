@@ -61,13 +61,13 @@
     </modules>
 
     <properties>
-        <hutool.version>5.0.6</hutool.version>
+        <hutool.version>5.0.7</hutool.version>
         <lombok.version>1.18.10</lombok.version>
         <fastjson.version>1.2.62</fastjson.version>
-        <mybatis.plus.version>3.2.0</mybatis.plus.version>
+        <mybatis.plus.version>3.3.0</mybatis.plus.version>
 
-        <spring-cloud.version>Hoxton.RC1</spring-cloud.version>
-        <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
         <security.oauth.version>2.4.0.RELEASE</security.oauth.version>
         <spring-boot-admin.version>2.2.0-SNAPSHOT</spring-boot-admin.version>

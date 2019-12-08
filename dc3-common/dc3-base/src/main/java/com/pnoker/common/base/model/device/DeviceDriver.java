@@ -33,10 +33,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DeviceDriver extends Description {
-    private static final long serialVersionUID = 4738109804053913008L;
 
     private String name;
     private String serviceName;
     private String connectInfo;
     private String profileInfo;
+    private Long userId;
 }

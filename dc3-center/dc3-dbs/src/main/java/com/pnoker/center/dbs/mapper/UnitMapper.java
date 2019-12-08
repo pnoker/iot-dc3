@@ -28,6 +28,5 @@ import org.springframework.stereotype.Component;
  * @email : pnokers@icloud.com
  */
 @Mapper
-@Component
 public interface UnitMapper extends BaseMapper<Unit> {
 }

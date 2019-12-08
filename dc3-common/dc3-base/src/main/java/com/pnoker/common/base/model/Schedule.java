@@ -37,4 +37,5 @@ public class Schedule extends Description {
     private String cornExpression;
     private Short status;
     private String url;
+    private Long userId;
 }

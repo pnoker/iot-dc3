@@ -14,35 +14,37 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.client;
+package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
 import com.pnoker.center.dbs.service.UserService;
+import com.pnoker.common.base.bean.Response;
+import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.dto.UserDto;
 import com.pnoker.common.base.model.User;
-import com.pnoker.common.base.bean.Response;
+import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * <p>user dbs rest client
+ * <p>user dbs rest api
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v3/dbs/user")
-public class UserDbsRestClient implements UserDbsFeignApi {
-    @Autowired
+@RequestMapping("/api/v3/dbs/user")
+public class UserDbsApi implements UserDbsFeignClient {
+    @Resource
     private UserService userService;
 
     @Override
@@ -50,7 +52,7 @@ public class UserDbsRestClient implements UserDbsFeignApi {
         if (!Optional.ofNullable(user).isPresent()) {
             return Response.fail("body is null");
         }
-        return userService.add(user) ? Response.ok(user.getId()) : Response.fail();
+        return null != userService.add(user) ? Response.ok(user.getId()) : Response.fail();
     }
 
     @Override
@@ -66,7 +68,7 @@ public class UserDbsRestClient implements UserDbsFeignApi {
         if (!Optional.ofNullable(user).isPresent()) {
             return Response.fail("body is null");
         }
-        return userService.update(user) ? Response.ok() : Response.fail();
+        return null != userService.update(user) ? Response.ok() : Response.fail();
     }
 
     @Override
@@ -76,6 +78,17 @@ public class UserDbsRestClient implements UserDbsFeignApi {
         }
         User user = userService.selectById(id);
         return null != user ? Response.ok(user) : Response.fail("id does not exist");
+    }
+
+    @Override
+    public Response<Page<User>> list(@RequestBody(required = false) UserDto userDto) {
+        User user = new User();
+        PageInfo page = new PageInfo();
+        Optional.ofNullable(userDto).ifPresent(r -> {
+            BeanUtils.copyProperties(r, user);
+            Optional.ofNullable(userDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
+        });
+        return Response.ok(userService.list(user, page));
     }
 
     @Override
@@ -105,8 +118,4 @@ public class UserDbsRestClient implements UserDbsFeignApi {
         return null != user ? Response.ok(user) : Response.fail("email does not exist");
     }
 
-    @Override
-    public Response<Page<User>> list(@RequestBody(required = false) UserDto userDto) {
-        return null;
-    }
 }

@@ -27,9 +27,14 @@ import com.pnoker.common.base.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,33 +47,50 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@Transactional
 public class RtmpServiceImpl implements RtmpService {
-    @Autowired
+    @Resource
     private RtmpMapper rtmpMapper;
 
     @Override
-    public boolean add(Rtmp rtmp) {
-        return rtmpMapper.insert(rtmp) > 0;
+    @Caching(
+            put = {@CachePut(value = "rtmpCache", key = "#rtmp.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "rtmpListCache", allEntries = true)}
+    )
+    public Rtmp add(Rtmp rtmp) {
+        return rtmpMapper.insert(rtmp) > 0 ? rtmp : null;
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "rtmpCache", key = "#id"),
+                    @CacheEvict(value = "rtmpListCache", allEntries = true)
+            }
+    )
     public boolean delete(Long id) {
         return rtmpMapper.deleteById(id) > 0;
     }
 
     @Override
-    public boolean update(Rtmp rtmp) {
-        return rtmpMapper.updateById(rtmp) > 0;
+    @Caching(
+            put = {@CachePut(value = "rtmpCache", key = "#rtmp.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "rtmpListCache", allEntries = true)}
+    )
+    public Rtmp update(Rtmp rtmp) {
+        return rtmpMapper.updateById(rtmp) > 0 ? rtmp : null;
     }
 
     @Override
-    public Page<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
-        return (Page<Rtmp>) rtmpMapper.selectPage(pagination(pageInfo), fuzzyQuery(rtmp));
-    }
-
-    @Override
+    @Cacheable(value = "rtmpCache", key = "#id", unless = "#result==null")
     public Rtmp selectById(Long id) {
         return rtmpMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = "rtmpListCache", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public Page<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
+        return rtmpMapper.selectPage(pagination(pageInfo), fuzzyQuery(rtmp));
     }
 
     @Override

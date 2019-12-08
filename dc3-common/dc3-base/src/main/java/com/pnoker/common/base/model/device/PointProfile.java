@@ -33,8 +33,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PointProfile extends Description {
-    private static final long serialVersionUID = -7739273078508717011L;
 
     private String config;
     private Long driverId;
+    private Long userId;
 }

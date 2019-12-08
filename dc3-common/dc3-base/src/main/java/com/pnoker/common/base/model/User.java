@@ -16,15 +16,10 @@
 
 package com.pnoker.common.base.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>
@@ -35,14 +30,9 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+@EqualsAndHashCode(callSuper = true)
+public class User extends Description {
 
-    /**
-     * 主键，自增ID
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
     private String username;
     private String phone;
     private String email;
@@ -51,19 +41,4 @@ public class User implements Serializable {
     private Long nodeId;
     private Long imageId;
     private Long tokenId;
-
-    /**
-     * 描述信息
-     */
-    private String description;
-
-    private Date createTime;
-    private Date updateTime;
-
-    /**
-     * 逻辑删除标识 1：删除，0：未删除
-     */
-    @TableLogic
-    private Integer deleted;
-
 }

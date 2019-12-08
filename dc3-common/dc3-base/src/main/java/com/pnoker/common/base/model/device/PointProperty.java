@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PointProperty extends Description {
-    private static final long serialVersionUID = -8906573997172682463L;
 
     private String name;
     private Float base;
@@ -41,4 +40,5 @@ public class PointProperty extends Description {
     private Float maximum;
     private Float multiple;
     private Float value;
+    private Long userId;
 }

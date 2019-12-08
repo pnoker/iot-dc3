@@ -43,6 +43,7 @@ public class Rtmp extends Description {
     private Boolean autoStart;
     private Long nodeId;
     private Long imageId;
+    private Long userId;
 
     public Rtmp(long id, boolean run) {
         super.setId(id);

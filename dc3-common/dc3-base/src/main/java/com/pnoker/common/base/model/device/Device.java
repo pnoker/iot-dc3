@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Device extends Description {
-    private static final long serialVersionUID = -6242019770203721826L;
 
     private String name;
     private String deviceCode;
@@ -41,4 +40,5 @@ public class Device extends Description {
     private Short status;
     private Long nodeId;
     private Long imageId;
+    private Long userId;
 }

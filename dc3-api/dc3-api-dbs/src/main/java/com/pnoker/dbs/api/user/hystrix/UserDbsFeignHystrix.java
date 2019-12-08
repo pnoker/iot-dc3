@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.dbs.user.hystrix;
+package com.pnoker.dbs.api.user.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.dbs.user.feign.UserDbsFeignApi;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.UserDto;
 import com.pnoker.common.base.model.User;
+import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,14 +33,13 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class UserDbsFeignApiHystrix implements FallbackFactory<UserDbsFeignApi> {
+public class UserDbsFeignHystrix implements FallbackFactory<UserDbsFeignClient> {
 
     @Override
-    public UserDbsFeignApi create(Throwable throwable) {
+    public UserDbsFeignClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
         log.error("UserFeignApi失败:{},hystrix服务降级处理", message, throwable);
-
-        return new UserDbsFeignApi() {
+        return new UserDbsFeignClient() {
             @Override
             public Response<Long> add(User user) {
                 return Response.fail(message);

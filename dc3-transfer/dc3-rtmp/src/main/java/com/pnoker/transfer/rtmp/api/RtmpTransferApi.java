@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.client;
+package com.pnoker.transfer.rtmp.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
-import com.pnoker.center.dbs.service.RtmpService;
+import com.pnoker.api.transfer.rtmp.feign.RtmpTransferFeignClient;
+import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
 import com.pnoker.common.base.model.rtmp.Rtmp;
-import com.pnoker.common.base.bean.Response;
+import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * <p>rtmp dbs rest client
+ * <p>Rest接口控制器
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @RestController
-public class RtmpDbsRestClient implements RtmpDbsFeignApi {
-    @Autowired
+public class RtmpTransferApi implements RtmpTransferFeignClient {
+    @Resource
     private RtmpService rtmpService;
 
     @Override
@@ -49,7 +49,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
         if (!Optional.ofNullable(rtmp).isPresent()) {
             return Response.fail("body is null");
         }
-        return rtmpService.add(rtmp) ? Response.ok(rtmp.getId()) : Response.fail();
+        return rtmpService.add(rtmp).isOk() ? Response.ok(rtmp.getId()) : Response.fail();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
         if (null == id) {
             return Response.fail("id can not be empty");
         }
-        return rtmpService.delete(id) ? Response.ok() : Response.fail();
+        return rtmpService.delete(id);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
         if (!Optional.ofNullable(rtmp).isPresent()) {
             return Response.fail("body is null");
         }
-        return rtmpService.update(rtmp) ? Response.ok() : Response.fail();
+        return rtmpService.update(rtmp);
     }
 
     @Override
@@ -73,8 +73,7 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
         if (null == id) {
             return Response.fail("id can not be empty");
         }
-        Rtmp rtmp = rtmpService.selectById(id);
-        return null != rtmp ? Response.ok(rtmp) : Response.fail("id does not exist");
+        return rtmpService.selectById(id);
     }
 
     @Override
@@ -85,7 +84,23 @@ public class RtmpDbsRestClient implements RtmpDbsFeignApi {
             BeanUtils.copyProperties(r, rtmp);
             Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
         });
-        return Response.ok(rtmpService.list(rtmp, page));
+        return rtmpService.list(rtmp, page);
+    }
+
+    @Override
+    public Response<Boolean> start(@PathVariable Long id) {
+        if (null == id) {
+            return Response.fail("id can not be empty");
+        }
+        return rtmpService.start(id);
+    }
+
+    @Override
+    public Response<Boolean> stop(@PathVariable Long id) {
+        if (null == id) {
+            return Response.fail("id can not be empty");
+        }
+        return rtmpService.stop(id);
     }
 
 }

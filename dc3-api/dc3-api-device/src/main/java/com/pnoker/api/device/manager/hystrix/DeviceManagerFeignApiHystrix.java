@@ -17,7 +17,7 @@
 package com.pnoker.api.device.manager.hystrix;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.pnoker.api.device.manager.feign.DeviceManagerDbsFeignApi;
+import com.pnoker.api.device.manager.feign.DeviceManagerDbsFeignClient;
 import com.pnoker.common.base.dto.device.DeviceDto;
 import com.pnoker.common.base.model.device.Device;
 import com.pnoker.common.base.bean.Response;
@@ -33,14 +33,14 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DeviceManagerFeignApiHystrix implements FallbackFactory<DeviceManagerDbsFeignApi> {
+public class DeviceManagerFeignApiHystrix implements FallbackFactory<DeviceManagerDbsFeignClient> {
 
     @Override
-    public DeviceManagerDbsFeignApi create(Throwable throwable) {
+    public DeviceManagerDbsFeignClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
         log.error("DeviceFeignApi失败:{},hystrix服务降级处理", message, throwable);
 
-        return new DeviceManagerDbsFeignApi() {
+        return new DeviceManagerDbsFeignClient() {
             @Override
             public Response add(Device rtmp) {
                 return Response.fail(message);

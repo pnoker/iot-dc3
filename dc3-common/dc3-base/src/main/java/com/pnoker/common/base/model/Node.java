@@ -37,4 +37,5 @@ public class Node extends Description {
     private String type;
     private Long parentId;
     private Long imageId;
+    private Long userId;
 }

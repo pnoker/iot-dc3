@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerFeignApiHystrix.class)
 @RequestMapping(value = "/api/v3/device/manager")
-public interface DeviceManagerDbsFeignApi {
+public interface DeviceManagerDbsFeignClient {
 
     /**
      * 新增 新增 Device 任务记录

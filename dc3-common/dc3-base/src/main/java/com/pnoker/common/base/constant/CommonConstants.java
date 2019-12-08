@@ -44,6 +44,15 @@ public interface CommonConstants {
      */
     String KEY_ALGORITHM_RSA = "RSA";
 
+    /**
+     * 时间格式化
+     */
+    String DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
+    /**
+     * 时区
+     */
+    String TIMEZONE = "GMT+8";
+
 
     /**
      * 数据字段
