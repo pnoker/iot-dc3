@@ -26,8 +26,6 @@ import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +46,7 @@ public class UserDbsApi implements UserDbsFeignClient {
     private UserService userService;
 
     @Override
-    public Response<Long> add(@RequestBody User user) {
+    public Response<Long> add(User user) {
         if (!Optional.ofNullable(user).isPresent()) {
             return Response.fail("body is null");
         }
@@ -56,15 +54,12 @@ public class UserDbsApi implements UserDbsFeignClient {
     }
 
     @Override
-    public Response<Boolean> delete(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<Boolean> delete(Long id) {
         return userService.delete(id) ? Response.ok() : Response.fail();
     }
 
     @Override
-    public Response<Boolean> update(@RequestBody User user) {
+    public Response<Boolean> update(User user) {
         if (!Optional.ofNullable(user).isPresent()) {
             return Response.fail("body is null");
         }
@@ -72,16 +67,13 @@ public class UserDbsApi implements UserDbsFeignClient {
     }
 
     @Override
-    public Response<User> selectById(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<User> selectById(Long id) {
         User user = userService.selectById(id);
         return null != user ? Response.ok(user) : Response.fail("id does not exist");
     }
 
     @Override
-    public Response<Page<User>> list(@RequestBody(required = false) UserDto userDto) {
+    public Response<Page<User>> list(UserDto userDto) {
         User user = new User();
         PageInfo page = new PageInfo();
         Optional.ofNullable(userDto).ifPresent(r -> {
@@ -92,7 +84,7 @@ public class UserDbsApi implements UserDbsFeignClient {
     }
 
     @Override
-    public Response<User> username(@PathVariable String username) {
+    public Response<User> username(String username) {
         if (StringUtils.isBlank(username)) {
             return Response.fail("username can not be empty");
         }
@@ -101,7 +93,7 @@ public class UserDbsApi implements UserDbsFeignClient {
     }
 
     @Override
-    public Response<User> phone(@PathVariable String phone) {
+    public Response<User> phone(String phone) {
         if (StringUtils.isBlank(phone)) {
             return Response.fail("phone can not be empty");
         }
@@ -110,7 +102,7 @@ public class UserDbsApi implements UserDbsFeignClient {
     }
 
     @Override
-    public Response<User> email(@PathVariable String email) {
+    public Response<User> email(String email) {
         if (StringUtils.isBlank(email)) {
             return Response.fail("email can not be empty");
         }

@@ -16,11 +16,11 @@
 
 package com.pnoker.common.tool;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit;
  * @email : pnokers@icloud.com
  */
 @Slf4j
+@Component
 public class RedisTools {
-    @Getter
-    @Setter
+    @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     public RedisTools(RedisTemplate<String, Object> redisTemplate) {

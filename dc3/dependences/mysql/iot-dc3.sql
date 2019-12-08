@@ -259,7 +259,7 @@ CREATE TABLE `dc3_rtmp` (
   `rtmp_url` varchar(128) DEFAULT NULL COMMENT 'rtp播放链接,填写后缀即可',
   `command` varchar(128) DEFAULT NULL COMMENT 'cmd运行模板',
   `video_type` tinyint(4) DEFAULT NULL COMMENT '摄像头类型',
-  `run` tinyint(4) NULL DEFAULT NULL COMMENT '状态，0停止，1启动',
+  `run` tinyint(4) NULL DEFAULT 0 COMMENT '状态，0停止，1启动',
   `auto_start` tinyint(4) NULL DEFAULT NULL COMMENT '自启动',
   `node_id` bigint(20) DEFAULT -1 COMMENT '节点ID，节点类型为rtmp',
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',

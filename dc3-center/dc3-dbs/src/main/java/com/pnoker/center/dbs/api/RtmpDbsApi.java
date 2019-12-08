@@ -25,8 +25,6 @@ import com.pnoker.common.base.model.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +45,7 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
     private RtmpService rtmpService;
 
     @Override
-    public Response<Long> add(@RequestBody Rtmp rtmp) {
+    public Response<Long> add(Rtmp rtmp) {
         if (!Optional.ofNullable(rtmp).isPresent()) {
             return Response.fail("body is null");
         }
@@ -55,15 +53,12 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
     }
 
     @Override
-    public Response<Boolean> delete(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<Boolean> delete(Long id) {
         return rtmpService.delete(id) ? Response.ok() : Response.fail();
     }
 
     @Override
-    public Response<Boolean> update(@RequestBody Rtmp rtmp) {
+    public Response<Boolean> update(Rtmp rtmp) {
         if (!Optional.ofNullable(rtmp).isPresent()) {
             return Response.fail("body is null");
         }
@@ -71,16 +66,13 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
     }
 
     @Override
-    public Response<Rtmp> selectById(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<Rtmp> selectById(Long id) {
         Rtmp rtmp = rtmpService.selectById(id);
         return null != rtmp ? Response.ok(rtmp) : Response.fail("id does not exist");
     }
 
     @Override
-    public Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
+    public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         PageInfo page = new PageInfo();
         Optional.ofNullable(rtmpDto).ifPresent(r -> {

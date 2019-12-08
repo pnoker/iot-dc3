@@ -49,20 +49,18 @@ public class Transcode {
     }
 
     public void start() {
+        run = true;
         process = RuntimeUtil.exec(command);
-        InputStream inputStream = process.getErrorStream();
+        InputStream inputStream = process.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         try {
-            while (StringUtils.isNotEmpty((line = reader.readLine())) && run) {
-                log.error(line);
+            while (StringUtils.isNotEmpty((line = reader.readLine()))) {
+                log.info(line);
                 line = line.toLowerCase();
                 if (line.contains("fail") || line.contains("error")) {
                     run = false;
                 }
-            }
-            if (!run) {
-                stop();
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -73,10 +71,10 @@ public class Transcode {
                 log.error(e.getMessage(), e);
             }
         }
-        run = true;
     }
 
     public void stop() {
+        run = false;
         if (null != process) {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
             try {
@@ -88,7 +86,6 @@ public class Transcode {
             }
             process.destroyForcibly();
         }
-        run = false;
     }
 
 }

@@ -23,7 +23,9 @@ import com.pnoker.common.base.model.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.hystrix.RtmpDbsFeignHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * <p>Rtmp 数据 FeignClient
@@ -41,7 +43,7 @@ public interface RtmpDbsFeignClient {
      * @return true/false
      */
     @PostMapping("/add")
-    Response<Long> add(Rtmp rtmp);
+    Response<Long> add(@RequestBody Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp
@@ -50,7 +52,7 @@ public interface RtmpDbsFeignClient {
      * @return true/false
      */
     @PostMapping("/delete/{id}")
-    Response<Boolean> delete(Long id);
+    Response<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
      * 修改 修改 Rtmp 任务记录
@@ -59,7 +61,7 @@ public interface RtmpDbsFeignClient {
      * @return true/false
      */
     @PostMapping("/update")
-    Response<Boolean> update(Rtmp rtmp);
+    Response<Boolean> update(@RequestBody Rtmp rtmp);
 
     /**
      * 查询 根据ID查询 Rtmp
@@ -68,7 +70,7 @@ public interface RtmpDbsFeignClient {
      * @return rtmp
      */
     @GetMapping("/id/{id}")
-    Response<Rtmp> selectById(Long id);
+    Response<Rtmp> selectById(@PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Rtmp
@@ -77,6 +79,6 @@ public interface RtmpDbsFeignClient {
      * @return rtmpList
      */
     @PostMapping("/list")
-    Response<Page<Rtmp>> list(RtmpDto rtmpDto);
+    Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
 
 }
