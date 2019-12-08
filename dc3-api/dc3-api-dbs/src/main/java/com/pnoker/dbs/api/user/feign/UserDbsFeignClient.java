@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.dbs.user.feign;
+package com.pnoker.dbs.api.user.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.dbs.user.hystrix.UserDbsFeignApiHystrix;
+import com.pnoker.dbs.api.user.hystrix.UserDbsFeignHystrix;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.UserDto;
 import com.pnoker.common.base.model.User;
@@ -27,14 +27,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * <p>User 数据 UserApi
+ * <p>User 数据 UserClient
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @RequestMapping("/api/v3/dbs/user")
-@FeignClient(name = "DC3-DBS", fallbackFactory = UserDbsFeignApiHystrix.class)
-public interface UserDbsFeignApi {
+@FeignClient(name = "DC3-DBS", fallbackFactory = UserDbsFeignHystrix.class)
+public interface UserDbsFeignClient {
 
     /**
      * 新增 新增 User 记录

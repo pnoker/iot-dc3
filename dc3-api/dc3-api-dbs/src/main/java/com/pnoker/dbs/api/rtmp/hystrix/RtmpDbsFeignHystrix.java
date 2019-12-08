@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.dbs.rtmp.hystrix;
+package com.pnoker.dbs.api.rtmp.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
 import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,14 +33,13 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class RtmpDbsFeignApiHystrix implements FallbackFactory<RtmpDbsFeignApi> {
+public class RtmpDbsFeignHystrix implements FallbackFactory<RtmpDbsFeignClient> {
 
     @Override
-    public RtmpDbsFeignApi create(Throwable throwable) {
+    public RtmpDbsFeignClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
         log.error("RtmpFeignApi失败:{},hystrix服务降级处理", message, throwable);
-
-        return new RtmpDbsFeignApi() {
+        return new RtmpDbsFeignClient() {
             @Override
             public Response<Long> add(Rtmp rtmp) {
                 return Response.fail(message);

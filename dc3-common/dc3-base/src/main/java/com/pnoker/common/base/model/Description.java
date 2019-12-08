@@ -19,6 +19,8 @@ package com.pnoker.common.base.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pnoker.common.base.constant.CommonConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,16 +47,13 @@ public class Description implements Serializable {
     private Long id;
 
     /**
-     * 用户ID，关联操作到用户
-     */
-    private Long userId;
-
-    /**
      * 描述信息
      */
     private String description;
 
+    @JsonFormat(pattern = CommonConstants.DATEFORMAT, timezone = CommonConstants.TIMEZONE)
     private Date createTime;
+    @JsonFormat(pattern = CommonConstants.DATEFORMAT, timezone = CommonConstants.TIMEZONE)
     private Date updateTime;
 
     /**

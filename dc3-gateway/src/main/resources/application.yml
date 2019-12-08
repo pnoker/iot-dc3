@@ -27,7 +27,18 @@ spring:
     port: 6379
     password: ${spring.security.user.password}
     database: 0
-    timeout: 1H
+    timeout: 15S
+    jedis:
+      pool:
+        max-idle: 16
+        min-idle: 4
+  transaction:
+    rollback-on-commit-failure: true
+  cache:
+    type: redis
+    cache-names: dc3-gateway-cache
+    redis:
+      time-to-live: 24H
   cloud:
     gateway:
       loadbalancer:

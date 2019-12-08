@@ -16,13 +16,10 @@
 
 package com.pnoker.transfer.rtmp;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * <p>Rtmp 视频转码服务启动入口
@@ -30,15 +27,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Slf4j
-@EnableAsync
-@EnableScheduling
-@EnableFeignClients
-@EnableEurekaClient
-@SpringBootApplication(scanBasePackages = "com.pnoker.api.dbs.rtmp")
+@SpringCloudApplication
+@EnableFeignClients("com.pnoker.dbs.api.rtmp.*")
+@ComponentScan(basePackages = {"com.pnoker.dbs.api.rtmp", "com.pnoker.transfer.rtmp"})
 public class RtmpApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RtmpApplication.class, args);
     }
 }
+

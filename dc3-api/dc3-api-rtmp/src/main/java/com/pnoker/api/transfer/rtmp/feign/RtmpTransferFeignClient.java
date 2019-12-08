@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @RequestMapping("/api/v3/transfer/rtmp")
 @FeignClient(name = "DC3-RTMP", fallbackFactory = RtmpTransferFeignApiHystrix.class)
-public interface RtmpTransferFeignApi {
+public interface RtmpTransferFeignClient {
 
     /**
      * 新增 新增 Rtmp 任务记录

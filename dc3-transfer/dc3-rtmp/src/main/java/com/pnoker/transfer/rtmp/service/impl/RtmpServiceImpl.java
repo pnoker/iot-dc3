@@ -17,11 +17,11 @@
 package com.pnoker.transfer.rtmp.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
 import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import com.pnoker.transfer.rtmp.handler.Transcode;
 import com.pnoker.transfer.rtmp.handler.TranscodePool;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -43,12 +43,12 @@ import java.util.Optional;
 public class RtmpServiceImpl implements RtmpService {
 
     @Autowired
-    private RtmpDbsFeignApi rtmpDbsFeignApi;
+    private RtmpDbsFeignClient rtmpDbsFeignClient;
 
     @Override
     public Response<Boolean> add(Rtmp rtmp) {
         //todo 如何保持事务
-        Response<Long> response = rtmpDbsFeignApi.add(rtmp);
+        Response<Long> response = rtmpDbsFeignClient.add(rtmp);
         if (response.isOk()) {
             rtmp.setId(response.getData());
             Transcode transcode = new Transcode(rtmp);
@@ -69,7 +69,7 @@ public class RtmpServiceImpl implements RtmpService {
         if (Optional.ofNullable(transcode).isPresent()) {
             if (!transcode.isRun()) {
                 TranscodePool.transcodeMap.remove(id);
-                Response<Boolean> response = rtmpDbsFeignApi.delete(id);
+                Response<Boolean> response = rtmpDbsFeignClient.delete(id);
                 if (response.isOk()) {
                     return Response.ok();
                 } else {
@@ -89,7 +89,7 @@ public class RtmpServiceImpl implements RtmpService {
         if (Optional.ofNullable(transcode).isPresent()) {
             if (!transcode.isRun()) {
                 TranscodePool.transcodeMap.put(transcode.getId(), new Transcode(rtmp));
-                if (rtmpDbsFeignApi.update(rtmp).isOk()) {
+                if (rtmpDbsFeignClient.update(rtmp).isOk()) {
                     return Response.ok();
                 } else {
                     return Response.fail("任务更新成功,表记录更新失败");
@@ -106,12 +106,12 @@ public class RtmpServiceImpl implements RtmpService {
         RtmpDto rtmpDto = new RtmpDto();
         BeanUtils.copyProperties(rtmp, rtmpDto);
         rtmpDto.setPage(pageInfo);
-        return rtmpDbsFeignApi.list(rtmpDto);
+        return rtmpDbsFeignClient.list(rtmpDto);
     }
 
     @Override
     public Response<Rtmp> selectById(Long id) {
-        return rtmpDbsFeignApi.selectById(id);
+        return rtmpDbsFeignClient.selectById(id);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class RtmpServiceImpl implements RtmpService {
         if (Optional.ofNullable(transcode).isPresent()) {
             if (!transcode.isRun()) {
                 transcode.start();
-                Response<Boolean> response = rtmpDbsFeignApi.update(new Rtmp(id, true));
+                Response<Boolean> response = rtmpDbsFeignClient.update(new Rtmp(id, true));
                 if (response.isOk()) {
                     return Response.ok();
                 } else {
@@ -139,7 +139,7 @@ public class RtmpServiceImpl implements RtmpService {
         if (Optional.ofNullable(transcode).isPresent()) {
             if (!transcode.isRun()) {
                 transcode.stop();
-                Response<Boolean> response = rtmpDbsFeignApi.update(new Rtmp(id, false));
+                Response<Boolean> response = rtmpDbsFeignClient.update(new Rtmp(id, false));
                 if (response.isOk()) {
                     return Response.ok();
                 } else {

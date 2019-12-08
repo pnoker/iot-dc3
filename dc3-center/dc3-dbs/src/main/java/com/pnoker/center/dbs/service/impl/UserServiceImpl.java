@@ -26,12 +26,13 @@ import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,58 +46,48 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
     @Override
-    @CachePut(value = "user", key = "#user.id")
-    public boolean add(User user) {
-        return userMapper.insert(user) > 0;
+    @Caching(
+            put = {@CachePut(value = "userCache", key = "#user.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "userListCache", allEntries = true)}
+    )
+    public User add(User user) {
+        return userMapper.insert(user) > 0 ? user : null;
     }
 
     @Override
-    @CacheEvict(value = "user", key = "#user.id")
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "userCache", key = "#id"),
+                    @CacheEvict(value = "userListCache", allEntries = true)
+            }
+    )
     public boolean delete(Long id) {
         return userMapper.deleteById(id) > 0;
     }
 
     @Override
-    @CachePut(value = "user", key = "#user.id")
-    public boolean update(User user) {
-        return userMapper.updateById(user) > 0;
+    @Caching(
+            put = {@CachePut(value = "userCache", key = "#user.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "userListCache", allEntries = true)}
+    )
+    public User update(User user) {
+        return userMapper.updateById(user) > 0 ? user : null;
     }
 
     @Override
-    @Cacheable(value = "user", key = "#a0", unless = "#result == null")
+    @Cacheable(value = "userCache", key = "#id", unless = "#result==null")
     public User selectById(Long id) {
         return userMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = "user", key = "#a0", unless = "#result == null")
-    public User selectByUsername(String usernama) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.USERNAME, usernama);
-        return userMapper.selectOne(queryWrapper);
-    }
-
-    @Override
-    public User selectByPhone(String phone) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.PHONE, phone);
-        return userMapper.selectOne(queryWrapper);
-    }
-
-    @Override
-    public User selectByEmail(String email) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.EMAIL, email);
-        return userMapper.selectOne(queryWrapper);
-    }
-
-    @Override
+    @Cacheable(value = "userListCache", keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<User> list(User user, PageInfo pageInfo) {
-        return (Page<User>) userMapper.selectPage(pagination(pageInfo), fuzzyQuery(user));
+        return userMapper.selectPage(pagination(pageInfo), fuzzyQuery(user));
     }
 
     @Override
@@ -132,6 +123,30 @@ public class UserServiceImpl implements UserService {
             page.setOrders(tmps);
         });
         return page;
+    }
+
+    @Override
+    @Cacheable(value = "userCache", key = "#usernama", unless = "#result==null")
+    public User selectByUsername(String usernama) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(CommonConstants.Cloumn.User.USERNAME, usernama);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    @Cacheable(value = "userCache", key = "#phone", unless = "#result==null")
+    public User selectByPhone(String phone) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(CommonConstants.Cloumn.User.PHONE, phone);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    @Cacheable(value = "userCache", key = "#email", unless = "#result==null")
+    public User selectByEmail(String email) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(CommonConstants.Cloumn.User.EMAIL, email);
+        return userMapper.selectOne(queryWrapper);
     }
 
 }

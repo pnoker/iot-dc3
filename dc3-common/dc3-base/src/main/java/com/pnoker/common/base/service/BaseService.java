@@ -33,7 +33,7 @@ public interface BaseService<T> {
      * @param type
      * @return true/false
      */
-    boolean add(T type);
+    T add(T type);
 
     /**
      * 删除记录
@@ -49,7 +49,15 @@ public interface BaseService<T> {
      * @param type
      * @return true/false
      */
-    boolean update(T type);
+    T update(T type);
+
+    /**
+     * 通过ID查询记录
+     *
+     * @param id
+     * @return type
+     */
+    T selectById(Long id);
 
     /**
      * 获取带分页、排序的记录
@@ -59,14 +67,6 @@ public interface BaseService<T> {
      * @return list
      */
     Page<T> list(T type, PageInfo pageInfo);
-
-    /**
-     * 通过ID查询记录
-     *
-     * @param id
-     * @return type
-     */
-    T selectById(Long id);
 
     /**
      * 统一接口 模糊查询构造器

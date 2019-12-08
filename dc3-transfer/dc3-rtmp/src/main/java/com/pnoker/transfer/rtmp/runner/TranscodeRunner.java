@@ -19,7 +19,7 @@ package com.pnoker.transfer.rtmp.runner;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.dbs.rtmp.feign.RtmpDbsFeignApi;
+import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
 import com.pnoker.common.base.model.rtmp.Rtmp;
@@ -28,6 +28,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -70,7 +71,7 @@ public class TranscodeRunner implements ApplicationRunner {
     @Autowired
     private RtmpService rtmpService;
     @Autowired
-    private RtmpDbsFeignApi rtmpDbsFeignApi;
+    private RtmpDbsFeignClient rtmpDbsFeignClient;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -88,7 +89,7 @@ public class TranscodeRunner implements ApplicationRunner {
     }
 
     public List<Rtmp> list() {
-        Response<Page<Rtmp>> response = rtmpDbsFeignApi.list(new RtmpDto(true));
+        Response<Page<Rtmp>> response = rtmpDbsFeignClient.list(new RtmpDto(true));
         return response.isOk() ? response.getData().getRecords() : reconnect();
     }
 
