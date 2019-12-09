@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model;
+package com.pnoker.common.base.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

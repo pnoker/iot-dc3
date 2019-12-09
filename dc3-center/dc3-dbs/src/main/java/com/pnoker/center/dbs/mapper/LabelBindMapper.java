@@ -17,9 +17,8 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.base.model.LabelBind;
+import com.pnoker.common.base.entity.LabelBind;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>Label Bind 关联表 数据库操作接口

@@ -21,7 +21,7 @@ import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.dto.UserDto;
-import com.pnoker.common.base.model.User;
+import com.pnoker.common.base.entity.User;
 import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;

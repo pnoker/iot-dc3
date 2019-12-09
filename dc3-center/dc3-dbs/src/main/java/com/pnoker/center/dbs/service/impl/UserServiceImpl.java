@@ -23,7 +23,7 @@ import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.base.constant.CommonConstants;
 import com.pnoker.common.base.dto.PageInfo;
-import com.pnoker.common.base.model.User;
+import com.pnoker.common.base.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;

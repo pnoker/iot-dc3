@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model;
+package com.pnoker.common.base.entity.device;
 
+import com.pnoker.common.base.entity.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>设备变量单位表
+ * <p>设备变量表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -31,12 +32,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Unit extends Description {
+public class PointProperty extends Description {
 
     private String name;
-    private String unit;
-    private String symbol;
-    private String format;
-    private Long nodeId;
+    private Float base;
+    private Float minimum;
+    private Float maximum;
+    private Float multiple;
+    private Float value;
     private Long userId;
 }

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model;
+package com.pnoker.common.base.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -28,13 +29,14 @@ import lombok.NoArgsConstructor;
  * @email : pnokers@icloud.com
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class Image extends Description {
+public class NodeDto implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private String name;
-    private String url;
-    private Long nodeId;
-    private Long userId;
+    protected int id;
+    protected int parentId;
+    protected List<NodeDto> children = new ArrayList<>();
+
+    public void add(NodeDto node) {
+        children.add(node);
+    }
 }

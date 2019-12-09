@@ -23,7 +23,7 @@ import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.constant.CommonConstants;
 import com.pnoker.common.base.dto.PageInfo;
-import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.common.base.entity.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model.device;
+package com.pnoker.common.base.entity.rtmp;
 
-import com.pnoker.common.base.model.Description;
+import com.pnoker.common.base.entity.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
- * <p>设备变量表
+ * <p>Rtmp 信息实体类
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -31,14 +32,28 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class Point extends Description {
+public class Rtmp extends Description {
 
     private String name;
-    private String pointCode;
-    private Long deviceId;
+    private String rtspUrl;
+    private String rtmpUrl;
+    private String command;
+    private Short videoType;
+    private Boolean run;
+    private Boolean autoStart;
     private Long nodeId;
-    private Long propertyId;
-    private Long unitId;
+    private Long imageId;
     private Long userId;
+
+    public Rtmp(long id, boolean run) {
+        super.setId(id);
+        this.run = run;
+    }
+
+    public Rtmp(boolean autoStart) {
+        this.autoStart = autoStart;
+    }
+
 }

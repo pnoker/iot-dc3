@@ -18,7 +18,7 @@ package com.pnoker.common.base.tool;
 
 import cn.hutool.core.util.ReUtil;
 import com.google.common.base.Charsets;
-import com.pnoker.common.base.bean.NodeDto;
+import com.pnoker.common.base.dto.NodeDto;
 
 import java.util.ArrayList;
 import java.util.Base64;

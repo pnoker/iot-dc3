@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model;
+package com.pnoker.common.base.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>
+ * <p>设备变量单位表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -31,14 +31,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class User extends Description {
+public class Unit extends Description {
 
-    private String username;
-    private String phone;
-    private String email;
-    private String password;
-    private Boolean enable;
+    private String name;
+    private String unit;
+    private String symbol;
+    private String format;
     private Long nodeId;
-    private Long imageId;
-    private Long tokenId;
+    private Long userId;
 }

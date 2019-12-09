@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model;
+package com.pnoker.common.base.entity.device;
 
+import com.pnoker.common.base.entity.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>目录结构表
+ * <p>测点配置表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -31,11 +32,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Node extends Description {
+public class PointProfile extends Description {
 
-    private String name;
-    private String type;
-    private Long parentId;
-    private Long imageId;
+    private String config;
+    private Long driverId;
     private Long userId;
 }

@@ -21,19 +21,19 @@ import cn.hutool.core.thread.ThreadUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
-import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.common.base.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static com.pnoker.transfer.rtmp.runner.Environment.initial;
@@ -67,9 +67,9 @@ public class TranscodeRunner implements ApplicationRunner {
 
     private int times = 1;
 
-    @Autowired
+    @Resource
     private RtmpService rtmpService;
-    @Autowired
+    @Resource
     private RtmpDbsFeignClient rtmpDbsFeignClient;
 
     @Override

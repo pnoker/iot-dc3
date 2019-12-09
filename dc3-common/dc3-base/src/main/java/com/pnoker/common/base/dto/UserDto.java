@@ -16,7 +16,7 @@
 
 package com.pnoker.common.base.dto;
 
-import com.pnoker.common.base.model.User;
+import com.pnoker.common.base.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
