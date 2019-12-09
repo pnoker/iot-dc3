@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
-import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.common.base.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import com.pnoker.transfer.rtmp.handler.Transcode;
 import com.pnoker.transfer.rtmp.handler.TranscodePool;
@@ -28,7 +28,6 @@ import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Optional;
@@ -41,7 +40,6 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-@Transactional
 public class RtmpServiceImpl implements RtmpService {
 
     @Resource
@@ -103,8 +101,7 @@ public class RtmpServiceImpl implements RtmpService {
     public Response<Page<Rtmp>> list(Rtmp rtmp, PageInfo pageInfo) {
         RtmpDto rtmpDto = new RtmpDto();
         BeanUtils.copyProperties(rtmp, rtmpDto);
-        rtmpDto.setPage(pageInfo);
-        return rtmpDbsFeignClient.list(rtmpDto);
+        return rtmpDbsFeignClient.list(rtmpDto.setPage(pageInfo));
     }
 
     @Override
@@ -121,8 +118,7 @@ public class RtmpServiceImpl implements RtmpService {
                 TranscodePool.transcodeMap.put(transcode.getId(), transcode);
             }
             TranscodePool.threadPoolExecutor.execute(() -> TranscodePool.transcodeMap.get(id).start());
-            response.getData().setRun(true);
-            return rtmpDbsFeignClient.update(response.getData()).isOk() ? Response.ok() : Response.fail("任务启动成功，表记录更新失败");
+            return rtmpDbsFeignClient.update(response.getData().setRun(true)).isOk() ? Response.ok() : Response.fail("任务启动成功，表记录更新失败");
         }
         return Response.fail("任务不存在");
     }
@@ -135,8 +131,7 @@ public class RtmpServiceImpl implements RtmpService {
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
                     transcode.stop();
-                    response.getData().setRun(false);
-                    return rtmpDbsFeignClient.update(response.getData()).isOk() ? Response.ok() : Response.fail("任务停止成功，表记录更新失败");
+                    return rtmpDbsFeignClient.update(response.getData().setRun(false)).isOk() ? Response.ok() : Response.fail("任务停止成功，表记录更新失败");
                 }
             }
             return Response.fail("任务已是停止状态");

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model.device;
+package com.pnoker.common.base.entity;
 
-import com.pnoker.common.base.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>设备驱动表
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -32,11 +31,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DeviceDriver extends Description {
+public class Schedule extends Description {
 
     private String name;
-    private String serviceName;
-    private String connectInfo;
-    private String profileInfo;
+    private String cornExpression;
+    private Short status;
+    private String url;
     private Long userId;
 }

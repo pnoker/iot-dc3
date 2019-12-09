@@ -14,39 +14,31 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.dto;
+package com.pnoker.common.base.entity.device;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.pnoker.common.base.entity.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.List;
-
 /**
- * <p>分页数据实体类
+ * <p>设备表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Pages<T> implements Serializable {
-    private static final long serialVersionUID = 1L;
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class Device extends Description {
 
-    private List<T> records;
-    private Long total;
-    private Long current;
-    private Long size;
-    private Long pages;
-
-    public Pages(IPage<T> page) {
-        this.records = page.getRecords();
-        this.total = page.getTotal();
-        this.current = page.getCurrent();
-        this.size = page.getSize();
-        this.pages = page.getPages();
-    }
+    private String name;
+    private String deviceCode;
+    private String type;
+    private Short status;
+    private Long nodeId;
+    private Long imageId;
+    private Long userId;
 }

@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model;
+package com.pnoker.common.base.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>标签表
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -30,12 +29,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class Label extends Description {
+public class Token extends Description {
 
-    private String name;
-    private String color;
-    private Long nodeId;
-    private Long imageId;
-    private Long userId;
+    private String token;
+    private String publicKey;
+    private String privateKey;
+    private Long expireTime;
+    private Enum type;
+
 }

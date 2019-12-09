@@ -14,26 +14,31 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.bean;
+package com.pnoker.common.base.entity.device;
 
+import com.pnoker.common.base.entity.Description;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
- * <p>
+ * <p>设备变量表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Data
-public class NodeDto {
-    protected int id;
-    protected int parentId;
-    protected List<NodeDto> children = new ArrayList<>();
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class Point extends Description {
 
-    public void add(NodeDto node) {
-        children.add(node);
-    }
+    private String name;
+    private String pointCode;
+    private Long deviceId;
+    private Long nodeId;
+    private Long propertyId;
+    private Long unitId;
+    private Long userId;
 }

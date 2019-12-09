@@ -16,7 +16,7 @@
 
 package com.pnoker.common.base.dto.device;
 
-import com.pnoker.common.base.model.device.Device;
+import com.pnoker.common.base.entity.device.Device;
 import com.pnoker.common.base.dto.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;

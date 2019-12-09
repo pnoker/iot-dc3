@@ -19,7 +19,7 @@ package com.pnoker.api.device.manager.feign;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.device.manager.hystrix.DeviceManagerFeignApiHystrix;
 import com.pnoker.common.base.dto.device.DeviceDto;
-import com.pnoker.common.base.model.device.Device;
+import com.pnoker.common.base.entity.device.Device;
 import com.pnoker.common.base.bean.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;

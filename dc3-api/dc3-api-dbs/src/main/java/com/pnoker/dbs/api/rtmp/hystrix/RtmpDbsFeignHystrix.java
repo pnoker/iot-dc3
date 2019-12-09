@@ -19,7 +19,7 @@ package com.pnoker.dbs.api.rtmp.hystrix;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.base.bean.Response;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
-import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.common.base.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model;
+package com.pnoker.common.base.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
- * <p>
+ * <p>目录结构表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -31,14 +30,12 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Token implements Serializable {
-    private static final long serialVersionUID = 1L;
+@EqualsAndHashCode(callSuper = true)
+public class Node extends Description {
 
-    private Long id;
-    private String token;
-    private String publicKey;
-    private String privateKey;
-    private Long expireTime;
-    private Enum type;
-
+    private String name;
+    private String type;
+    private Long parentId;
+    private Long imageId;
+    private Long userId;
 }

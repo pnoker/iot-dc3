@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.model.device;
+package com.pnoker.common.base.entity;
 
-import com.pnoker.common.base.model.Description;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
- * <p>设备变量表
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -32,13 +28,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PointProperty extends Description {
+public class User extends Description {
 
-    private String name;
-    private Float base;
-    private Float minimum;
-    private Float maximum;
-    private Float multiple;
-    private Float value;
-    private Long userId;
+    @NonNull
+    private String username;
+    private String phone;
+    private String email;
+    @NonNull
+    private String password;
+    private Boolean enable;
+    private Long nodeId;
+    private Long imageId;
+    private Long tokenId;
 }
