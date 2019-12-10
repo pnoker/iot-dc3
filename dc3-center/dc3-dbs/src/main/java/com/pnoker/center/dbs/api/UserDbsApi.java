@@ -40,7 +40,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v3/dbs/user")
+@RequestMapping("/api/v3/center/dbs/user")
 public class UserDbsApi implements UserDbsFeignClient {
     @Resource
     private UserService userService;

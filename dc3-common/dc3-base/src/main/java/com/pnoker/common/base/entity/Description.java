@@ -20,11 +20,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.base.constant.Common;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -52,9 +51,9 @@ public class Description implements Serializable {
      */
     private String description;
 
-    @JsonFormat(pattern = CommonConstants.DATEFORMAT, timezone = CommonConstants.TIMEZONE)
+    @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     private Date createTime;
-    @JsonFormat(pattern = CommonConstants.DATEFORMAT, timezone = CommonConstants.TIMEZONE)
+    @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     private Date updateTime;
 
     /**

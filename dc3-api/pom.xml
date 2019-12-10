@@ -32,6 +32,7 @@
         <module>dc3-api-dbs</module>
         <module>dc3-api-device</module>
         <module>dc3-api-rtmp</module>
+        <module>dc3-api-auth</module>
     </modules>
 
     <dependencies>

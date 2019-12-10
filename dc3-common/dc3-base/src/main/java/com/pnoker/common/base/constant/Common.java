@@ -22,17 +22,12 @@ package com.pnoker.common.base.constant;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface CommonConstants {
+public interface Common {
 
     /**
      * 标志
      */
     String FROM = "from";
-
-    /**
-     * 默认登录URL
-     */
-    String OAUTH_TOKEN_URL = "/oauth/token";
 
     /**
      * 对称加密算法
@@ -53,6 +48,14 @@ public interface CommonConstants {
      */
     String TIMEZONE = "GMT+8";
 
+    /**
+     * 服务名称
+     */
+    interface Service {
+        String DC3_DBS = "DC3-DBS";
+        String DC3_RTMP = "DC3-RTMP";
+        String DC3_AUTH = "DC3-AUTH";
+    }
 
     /**
      * 数据字段
@@ -60,6 +63,8 @@ public interface CommonConstants {
     interface Cloumn {
         String ID = "id";
         String NAME = "name";
+        String CREATE_TIME = "create_time";
+        String UPDATE_TIME = "update_time";
 
         /**
          * User表

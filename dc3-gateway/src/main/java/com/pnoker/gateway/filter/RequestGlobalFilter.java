@@ -16,7 +16,7 @@
 
 package com.pnoker.gateway.filter;
 
-import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.base.constant.Common;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -53,7 +53,7 @@ public class RequestGlobalFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         ServerHttpRequest request = exchange.getRequest().mutate()
-                .headers(httpHeaders -> httpHeaders.remove(CommonConstants.FROM))
+                .headers(httpHeaders -> httpHeaders.remove(Common.FROM))
                 .build();
 
         addOriginalRequestUrl(exchange, request.getURI());

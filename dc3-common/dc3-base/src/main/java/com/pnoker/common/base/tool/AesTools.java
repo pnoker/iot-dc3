@@ -18,7 +18,7 @@ package com.pnoker.common.base.tool;
 
 import com.google.common.base.Charsets;
 import com.pnoker.common.base.bean.Keys;
-import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.base.constant.Common;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -42,7 +42,7 @@ public class AesTools {
      * @throws NoSuchAlgorithmException
      */
     public static Keys.Aes genKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(CommonConstants.KEY_ALGORITHM_AES);
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(Common.KEY_ALGORITHM_AES);
         keyGenerator.init(128);
         SecretKey secretKey = keyGenerator.generateKey();
         Keys.Aes aes = new Keys().new Aes(Dc3Tools.encodeToString(secretKey.getEncoded()));
@@ -60,9 +60,9 @@ public class AesTools {
     public static String encrypt(String str, String privateKey) throws Exception {
         //base64编码的私钥
         byte[] keyBytes = Dc3Tools.decode(privateKey);
-        Key key = new SecretKeySpec(keyBytes, CommonConstants.KEY_ALGORITHM_AES);
+        Key key = new SecretKeySpec(keyBytes, Common.KEY_ALGORITHM_AES);
         //AES加密
-        Cipher cipher = Cipher.getInstance(CommonConstants.KEY_ALGORITHM_AES);
+        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_AES);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         String outStr = Dc3Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
         return outStr;
@@ -79,9 +79,9 @@ public class AesTools {
     public static String decrypt(String str, String privateKey) throws Exception {
         //base64编码的私钥
         byte[] keyBytes = Dc3Tools.decode(privateKey);
-        Key key = new SecretKeySpec(keyBytes, CommonConstants.KEY_ALGORITHM_AES);
+        Key key = new SecretKeySpec(keyBytes, Common.KEY_ALGORITHM_AES);
         //AES解密
-        Cipher cipher = Cipher.getInstance(CommonConstants.KEY_ALGORITHM_AES);
+        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_AES);
         cipher.init(Cipher.DECRYPT_MODE, key);
         //64位解码加密后的字符串
         byte[] inputByte = Dc3Tools.decode(str.getBytes(Charsets.UTF_8));
