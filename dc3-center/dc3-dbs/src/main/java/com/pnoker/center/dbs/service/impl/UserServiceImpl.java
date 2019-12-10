@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
-import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.base.constant.Common;
 import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -95,13 +95,13 @@ public class UserServiceImpl implements UserService {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         Optional.ofNullable(user).ifPresent(u -> {
             if (StringUtils.isNotBlank(u.getUsername())) {
-                queryWrapper.like(CommonConstants.Cloumn.User.USERNAME, u.getUsername());
+                queryWrapper.like(Common.Cloumn.User.USERNAME, u.getUsername());
             }
             if (StringUtils.isNotBlank(u.getPhone())) {
-                queryWrapper.like(CommonConstants.Cloumn.User.PHONE, u.getPhone());
+                queryWrapper.like(Common.Cloumn.User.PHONE, u.getPhone());
             }
             if (StringUtils.isNotBlank(u.getEmail())) {
-                queryWrapper.like(CommonConstants.Cloumn.User.EMAIL, u.getEmail());
+                queryWrapper.like(Common.Cloumn.User.EMAIL, u.getEmail());
             }
         });
         return queryWrapper;
@@ -113,10 +113,10 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.forEach(orderItem -> {
-                if (CommonConstants.Cloumn.ID.equals(orderItem.getColumn())) {
+                if (Common.Cloumn.ID.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
-                if (CommonConstants.Cloumn.User.USERNAME.equals(orderItem.getColumn())) {
+                if (Common.Cloumn.User.USERNAME.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
             });
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = "userCache", key = "#usernama", unless = "#result==null")
     public User selectByUsername(String usernama) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.USERNAME, usernama);
+        queryWrapper.eq(Common.Cloumn.User.USERNAME, usernama);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = "userCache", key = "#phone", unless = "#result==null")
     public User selectByPhone(String phone) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.PHONE, phone);
+        queryWrapper.eq(Common.Cloumn.User.PHONE, phone);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = "userCache", key = "#email", unless = "#result==null")
     public User selectByEmail(String email) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.EMAIL, email);
+        queryWrapper.eq(Common.Cloumn.User.EMAIL, email);
         return userMapper.selectOne(queryWrapper);
     }
 

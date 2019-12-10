@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.base.constant.Common;
 import com.pnoker.common.base.dto.PageInfo;
 import com.pnoker.common.base.entity.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
@@ -97,10 +97,10 @@ public class RtmpServiceImpl implements RtmpService {
     public QueryWrapper<Rtmp> fuzzyQuery(Rtmp rtmp) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
         if (null != rtmp.getAutoStart()) {
-            queryWrapper.eq(CommonConstants.Cloumn.Rtmp.AUTO_START, BooleanUtils.isTrue(rtmp.getAutoStart()));
+            queryWrapper.eq(Common.Cloumn.Rtmp.AUTO_START, BooleanUtils.isTrue(rtmp.getAutoStart()));
         }
         if (StringUtils.isNotBlank(rtmp.getName())) {
-            queryWrapper.like(CommonConstants.Cloumn.NAME, rtmp.getName());
+            queryWrapper.like(Common.Cloumn.NAME, rtmp.getName());
         }
         return queryWrapper;
     }
@@ -111,10 +111,10 @@ public class RtmpServiceImpl implements RtmpService {
         Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.forEach(orderItem -> {
-                if (CommonConstants.Cloumn.ID.equals(orderItem.getColumn())) {
+                if (Common.Cloumn.ID.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
-                if (CommonConstants.Cloumn.NAME.equals(orderItem.getColumn())) {
+                if (Common.Cloumn.NAME.equals(orderItem.getColumn())) {
                     tmps.add(orderItem);
                 }
             });

@@ -18,7 +18,7 @@ package com.pnoker.common.base.tool;
 
 import com.google.common.base.Charsets;
 import com.pnoker.common.base.bean.Keys;
-import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.base.constant.Common;
 
 import javax.crypto.Cipher;
 import java.security.*;
@@ -43,7 +43,7 @@ public class RsaTools {
      * @throws NoSuchAlgorithmException
      */
     public static Keys.Rsa genKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(CommonConstants.KEY_ALGORITHM_RSA);
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(Common.KEY_ALGORITHM_RSA);
         keyPairGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
@@ -66,9 +66,9 @@ public class RsaTools {
         //base64编码的公钥
         byte[] keyBytes = Dc3Tools.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(CommonConstants.KEY_ALGORITHM_RSA).generatePublic(keySpec);
+        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(Common.KEY_ALGORITHM_RSA).generatePublic(keySpec);
         //RSA加密
-        Cipher cipher = Cipher.getInstance(CommonConstants.KEY_ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_RSA);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         String outStr = Dc3Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
         return outStr;
@@ -86,9 +86,9 @@ public class RsaTools {
         //base64编码的私钥
         byte[] keyBytes = Dc3Tools.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(CommonConstants.KEY_ALGORITHM_RSA).generatePrivate(keySpec);
+        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(Common.KEY_ALGORITHM_RSA).generatePrivate(keySpec);
         //RSA解密
-        Cipher cipher = Cipher.getInstance(CommonConstants.KEY_ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_RSA);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
         //64位解码加密后的字符串
         byte[] inputByte = Dc3Tools.decode(str.getBytes(Charsets.UTF_8));

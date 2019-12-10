@@ -18,6 +18,7 @@ package com.pnoker.dbs.api.rtmp.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.base.bean.Response;
+import com.pnoker.common.base.constant.Common;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
 import com.pnoker.common.base.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.hystrix.RtmpDbsFeignHystrix;
@@ -33,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@FeignClient(path = "/api/v3/dbs/rtmp", name = "DC3-DBS", fallbackFactory = RtmpDbsFeignHystrix.class)
+@FeignClient(path = "/api/v3/center/dbs/rtmp", name = Common.Service.DC3_DBS, fallbackFactory = RtmpDbsFeignHystrix.class)
 public interface RtmpDbsFeignClient {
 
     /**

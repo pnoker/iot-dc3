@@ -117,7 +117,7 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/rtmp/add",
+									"raw": "localhost:8300/api/v3/center/dbs/rtmp/add",
 									"host": [
 										"localhost"
 									],
@@ -125,6 +125,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"rtmp",
 										"add"
@@ -154,7 +155,7 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/rtmp/add",
+											"raw": "localhost:8300/api/v3/center/dbs/rtmp/add",
 											"host": [
 												"localhost"
 											],
@@ -162,6 +163,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"rtmp",
 												"add"
@@ -200,7 +202,7 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/rtmp/delete/:id",
+									"raw": "localhost:8300/api/v3/center/dbs/rtmp/delete/:id",
 									"host": [
 										"localhost"
 									],
@@ -208,6 +210,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"rtmp",
 										"delete",
@@ -229,7 +232,7 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/rtmp/delete/:id",
+											"raw": "localhost:8300/api/v3/center/dbs/rtmp/delete/:id",
 											"host": [
 												"localhost"
 											],
@@ -237,6 +240,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"rtmp",
 												"delete",
@@ -294,7 +298,7 @@
 									"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
 								},
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/rtmp/update",
+									"raw": "localhost:8300/api/v3/center/dbs/rtmp/update",
 									"host": [
 										"localhost"
 									],
@@ -302,6 +306,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"rtmp",
 										"update"
@@ -326,7 +331,7 @@
 											"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
 										},
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/rtmp/update",
+											"raw": "localhost:8300/api/v3/center/dbs/rtmp/update",
 											"host": [
 												"localhost"
 											],
@@ -334,6 +339,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"rtmp",
 												"update"
@@ -372,7 +378,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/rtmp/id/:id",
+									"raw": "localhost:8300/api/v3/center/dbs/rtmp/id/:id",
 									"host": [
 										"localhost"
 									],
@@ -380,6 +386,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"rtmp",
 										"id",
@@ -388,7 +395,8 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "12"
+											"type": "string",
+											"value": "18"
 										}
 									]
 								}
@@ -400,7 +408,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/rtmp/id/:id",
+											"raw": "localhost:8300/api/v3/center/dbs/rtmp/id/:id",
 											"host": [
 												"localhost"
 											],
@@ -408,6 +416,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"rtmp",
 												"id",
@@ -472,7 +481,7 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/rtmp/list",
+									"raw": "localhost:8300/api/v3/center/dbs/rtmp/list",
 									"host": [
 										"localhost"
 									],
@@ -480,6 +489,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"rtmp",
 										"list"
@@ -509,7 +519,7 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/rtmp/list",
+											"raw": "localhost:8300/api/v3/center/dbs/rtmp/list",
 											"host": [
 												"localhost"
 											],
@@ -517,6 +527,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"rtmp",
 												"list"
@@ -593,7 +604,7 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/add",
+									"raw": "localhost:8300/api/v3/center/dbs/user/add",
 									"host": [
 										"localhost"
 									],
@@ -601,6 +612,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"user",
 										"add"
@@ -630,7 +642,7 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/user/add",
+											"raw": "localhost:8300/api/v3/center/dbs/user/add",
 											"host": [
 												"localhost"
 											],
@@ -638,6 +650,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"user",
 												"add"
@@ -676,7 +689,7 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/delete/:id",
+									"raw": "localhost:8300/api/v3/center/dbs/user/delete/:id",
 									"host": [
 										"localhost"
 									],
@@ -684,6 +697,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"user",
 										"delete",
@@ -705,7 +719,7 @@
 										"method": "POST",
 										"header": [],
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/user/delete/:id",
+											"raw": "localhost:8300/api/v3/center/dbs/user/delete/:id",
 											"host": [
 												"localhost"
 											],
@@ -713,6 +727,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"user",
 												"delete",
@@ -770,7 +785,7 @@
 									"raw": "{\n    \"id\": 3,\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}"
 								},
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/update",
+									"raw": "localhost:8300/api/v3/center/dbs/user/update",
 									"host": [
 										"localhost"
 									],
@@ -778,6 +793,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"user",
 										"update"
@@ -807,7 +823,7 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/user/update",
+											"raw": "localhost:8300/api/v3/center/dbs/user/update",
 											"host": [
 												"localhost"
 											],
@@ -815,6 +831,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"user",
 												"update"
@@ -853,7 +870,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/id/:id",
+									"raw": "localhost:8300/api/v3/center/center/dbs/user/id/:id",
 									"host": [
 										"localhost"
 									],
@@ -861,6 +878,8 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
+										"center",
 										"dbs",
 										"user",
 										"id",
@@ -934,7 +953,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/username/:username",
+									"raw": "localhost:8300/api/v3/center/dbs/user/username/:username",
 									"host": [
 										"localhost"
 									],
@@ -942,6 +961,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"user",
 										"username",
@@ -962,7 +982,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/user/username/:username",
+											"raw": "localhost:8300/api/v3/center/dbs/user/username/:username",
 											"host": [
 												"localhost"
 											],
@@ -970,6 +990,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"user",
 												"username",
@@ -1015,7 +1036,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/phone/:phone",
+									"raw": "localhost:8300/api/v3/center/dbs/user/phone/:phone",
 									"host": [
 										"localhost"
 									],
@@ -1023,6 +1044,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"user",
 										"phone",
@@ -1043,7 +1065,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/user/phone/:phone",
+											"raw": "localhost:8300/api/v3/center/dbs/user/phone/:phone",
 											"host": [
 												"localhost"
 											],
@@ -1051,6 +1073,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"user",
 												"phone",
@@ -1096,7 +1119,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/email/:email",
+									"raw": "localhost:8300/api/v3/center/dbs/user/email/:email",
 									"host": [
 										"localhost"
 									],
@@ -1104,6 +1127,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"user",
 										"email",
@@ -1124,7 +1148,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/user/email/:email",
+											"raw": "localhost:8300/api/v3/center/dbs/user/email/:email",
 											"host": [
 												"localhost"
 											],
@@ -1132,6 +1156,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"user",
 												"email",
@@ -1200,7 +1225,7 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8300/api/v3/dbs/user/list",
+									"raw": "localhost:8300/api/v3/center/dbs/user/list",
 									"host": [
 										"localhost"
 									],
@@ -1208,6 +1233,7 @@
 									"path": [
 										"api",
 										"v3",
+										"center",
 										"dbs",
 										"user",
 										"list"
@@ -1237,7 +1263,7 @@
 											}
 										},
 										"url": {
-											"raw": "localhost:8300/api/v3/dbs/user/list",
+											"raw": "localhost:8300/api/v3/center/dbs/user/list",
 											"host": [
 												"localhost"
 											],
@@ -1245,6 +1271,7 @@
 											"path": [
 												"api",
 												"v3",
+												"center",
 												"dbs",
 												"user",
 												"list"
@@ -1350,7 +1377,7 @@
 			"name": "Iot-Dc3-Rtmp-Api",
 			"item": [
 				{
-					"name": "rtmp:/add",
+					"name": "rtmp:新增",
 					"request": {
 						"auth": {
 							"type": "basic",
@@ -1372,32 +1399,312 @@
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+						},
+						"url": {
+							"raw": "localhost:8803/api/v3/transfer/rtmp/add",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"api",
+								"v3",
+								"transfer",
+								"rtmp",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:新增",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+								},
+								"url": {
+									"raw": "localhost:8803/api/v3/transfer/rtmp/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"api",
+										"v3",
+										"transfer",
+										"rtmp",
+										"add"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 08 Dec 2019 10:41:31 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": 16\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:删除",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8803/api/v3/transfer/rtmp/delete/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"api",
+								"v3",
+								"transfer",
+								"rtmp",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "16"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:删除",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/api/v3/transfer/rtmp/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"api",
+										"v3",
+										"transfer",
+										"rtmp",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "16"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 08 Dec 2019 10:42:18 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:修改",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
 								"value": "application/json",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"rtspUrl\": \"D:/FFmpeg/bin/video.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": \"0\",\n    \"autoStart\": false\n}"
+							"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
-							"raw": "localhost:8830/api/v3/rtmp/add",
+							"raw": "localhost:8803/api/v3/transfer/rtmp/update",
 							"host": [
 								"localhost"
 							],
-							"port": "8830",
+							"port": "8803",
 							"path": [
 								"api",
 								"v3",
+								"transfer",
 								"rtmp",
-								"add"
+								"update"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "rtmp:修改",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8803/api/v3/transfer/rtmp/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"api",
+										"v3",
+										"transfer",
+										"rtmp",
+										"update"
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"ok\": false,\n    \"message\": \"任务运行中\",\n    \"data\": null\n}"
+						}
+					]
 				},
 				{
-					"name": "rtmp:/list",
+					"name": "rtmp:查询(ID)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8803/api/v3/transfer/rtmp/id/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"api",
+								"v3",
+								"transfer",
+								"rtmp",
+								"id",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "18"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:查询(ID)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/api/v3/transfer/rtmp/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"api",
+										"v3",
+										"transfer",
+										"rtmp",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "18"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 18,\n        \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"在线测试视频\",\n        \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n        \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": true,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"userId\": -1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:查询(分页)",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -1416,7 +1723,7 @@
 							"raw": "{\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}"
 						},
 						"url": {
-							"raw": "localhost:8803/api/v3/dbs/rtmp/list",
+							"raw": "localhost:8803/api/v3/transfer/rtmp/list",
 							"host": [
 								"localhost"
 							],
@@ -1424,16 +1731,53 @@
 							"path": [
 								"api",
 								"v3",
-								"dbs",
+								"transfer",
 								"rtmp",
 								"list"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "rtmp:查询(分页)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}"
+								},
+								"url": {
+									"raw": "localhost:8803/api/v3/transfer/rtmp/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"api",
+										"v3",
+										"transfer",
+										"rtmp",
+										"list"
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": -1,\n                \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"本地测试视频\",\n                \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 10,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 14:32:17\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 15,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": null,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 17,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 18:57:38\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 18,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": true,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            }\n        ],\n        \"total\": 6,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+						}
+					]
 				},
 				{
-					"name": "rtmp:/stop/:id",
+					"name": "rtmp:开始任务",
 					"request": {
 						"auth": {
 							"type": "basic",
@@ -1453,26 +1797,138 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "localhost:8830/api/v3/rtmp/stop?id=c4a8023132024ad8aa9f3113e03dc240",
+							"raw": "localhost:8803/api/v3/transfer/rtmp/start/:id",
 							"host": [
 								"localhost"
 							],
-							"port": "8830",
+							"port": "8803",
 							"path": [
 								"api",
 								"v3",
+								"transfer",
 								"rtmp",
-								"stop"
+								"start",
+								":id"
 							],
-							"query": [
+							"variable": [
 								{
 									"key": "id",
-									"value": "c4a8023132024ad8aa9f3113e03dc240"
+									"value": "18"
 								}
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "rtmp:开始任务",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/api/v3/transfer/rtmp/start/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"api",
+										"v3",
+										"transfer",
+										"rtmp",
+										"start",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "18"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"ok\": false,\n    \"message\": \"任务已是启动状态\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:停止任务",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8803/api/v3/transfer/rtmp/stop/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"api",
+								"v3",
+								"transfer",
+								"rtmp",
+								"stop",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "18"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:停止任务",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/api/v3/transfer/rtmp/stop/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"api",
+										"v3",
+										"transfer",
+										"rtmp",
+										"stop",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "18"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+						}
+					]
 				}
 			]
 		}

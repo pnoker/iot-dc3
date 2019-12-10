@@ -39,7 +39,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v3/dbs/rtmp")
+@RequestMapping("/api/v3/center/dbs/rtmp")
 public class RtmpDbsApi implements RtmpDbsFeignClient {
     @Resource
     private RtmpService rtmpService;

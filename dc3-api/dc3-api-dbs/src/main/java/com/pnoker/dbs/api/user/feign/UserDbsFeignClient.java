@@ -18,11 +18,15 @@ package com.pnoker.dbs.api.user.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.base.bean.Response;
+import com.pnoker.common.base.constant.Common;
 import com.pnoker.common.base.dto.UserDto;
 import com.pnoker.common.base.entity.User;
 import com.pnoker.dbs.api.user.hystrix.UserDbsFeignHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * <p>User 数据 UserClient
@@ -30,8 +34,7 @@ import org.springframework.web.bind.annotation.*;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@RequestMapping("/api/v3/dbs/user")
-@FeignClient(name = "DC3-DBS", fallbackFactory = UserDbsFeignHystrix.class)
+@FeignClient(path = "/api/v3/center/dbs/user", name = Common.Service.DC3_DBS, fallbackFactory = UserDbsFeignHystrix.class)
 public interface UserDbsFeignClient {
 
     /**
