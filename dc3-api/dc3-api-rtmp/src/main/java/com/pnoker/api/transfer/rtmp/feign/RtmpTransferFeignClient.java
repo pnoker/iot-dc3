@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@FeignClient(path = "/api/v3/transfer/rtmp", name = Common.Service.DC3_RTMP, fallbackFactory = RtmpTransferFeignApiHystrix.class)
+@FeignClient(path = Common.Service.DC3_RTMP_URL_PREFIX, name = Common.Service.DC3_RTMP, fallbackFactory = RtmpTransferFeignApiHystrix.class)
 public interface RtmpTransferFeignClient {
 
     /**

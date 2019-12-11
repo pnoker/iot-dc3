@@ -72,13 +72,41 @@ public class Dc3Tools {
     }
 
     /**
+     * @param username
+     * @return 0：无效用户名，1：用户名，2：手机号，3：邮箱
+     */
+    public static int usernameType(String username) {
+        if (isUsername(username)) {
+            return 1;
+        }
+        if (isPhone(username)) {
+            return 2;
+        }
+        if (isMail(username)) {
+            return 3;
+        }
+        return 0;
+    }
+
+    /**
+     * 判断字符串是否为 用户名格式（3-16）
+     *
+     * @param username
+     * @return
+     */
+    public static boolean isUsername(String username) {
+        String regex = "^[a-zA-Z]\\w{2,15}$";
+        return ReUtil.isMatch(regex, username);
+    }
+
+    /**
      * 判断字符串是否为 手机号码格式
      *
      * @param phone
      * @return
      */
     public static boolean isPhone(String phone) {
-        String regex = "^[1][3-9]+\\d{9}$";
+        String regex = "^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$";
         return ReUtil.isMatch(regex, phone);
     }
 
@@ -91,6 +119,58 @@ public class Dc3Tools {
     public static boolean isMail(String mail) {
         String regex = "^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$";
         return ReUtil.isMatch(regex, mail);
+    }
+
+    /**
+     * 判断密码级别
+     *
+     * @param password
+     * @return 0：无效密码，1：弱密码，2：普通密码，3：强密码
+     */
+    public static int passwordType(String password) {
+        if (isStrongPassword(password)) {
+            return 3;
+        }
+        if (isPassword(password)) {
+            return 2;
+        }
+        if (isWeakPassword(password)) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * 判断字符串是否为 弱密码格式（8-16）
+     *
+     * @param password
+     * @return
+     */
+    public static boolean isWeakPassword(String password) {
+        String regex = "^[a-zA-Z]\\w{7,15}$";
+        return ReUtil.isMatch(regex, password);
+    }
+
+    /**
+     * 判断字符串是否为 密码格式（8-16）
+     *
+     * @param password
+     * @return
+     */
+    public static boolean isPassword(String password) {
+        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,16}$";
+        return ReUtil.isMatch(regex, password);
+    }
+
+    /**
+     * 判断字符串是否为 强密码格式（8-16）
+     *
+     * @param password
+     * @return
+     */
+    public static boolean isStrongPassword(String password) {
+        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,16}$";
+        return ReUtil.isMatch(regex, password);
     }
 
     /**

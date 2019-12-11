@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.dto.transfer;
+package com.pnoker.common.base.dto.auth;
 
-import com.pnoker.common.base.bean.PageInfo;
-import com.pnoker.common.base.entity.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
- * <p>Rtmp DTO
+ * <p>Token Dto
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -33,14 +31,20 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-public class RtmpDto extends Rtmp {
+public class TokenDto implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private PageInfo page;
+    /**
+     * Token令牌
+     * <br>
+     * 第一版：使用 用户名（username） + 公钥（publicKey） + 过期时间（expireTime，毫秒） 的字符串通过'私钥对称加密'生成 Token
+     * <br>
+     * 第二版：使用 用户名（username） + 公钥（publicKey） + 过期时间（expireTime，毫秒） 的字符串通过'私钥非对称密'生成 Token
+     */
+    private String token;
 
-    public RtmpDto(boolean autoStart) {
-        super(autoStart);
-    }
-
+    /**
+     * 公钥
+     */
+    private String key;
 }

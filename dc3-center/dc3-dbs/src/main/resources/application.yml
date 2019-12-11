@@ -10,10 +10,6 @@ spring:
     name: @project.artifactId@
   main:
     allow-bean-definition-overriding: true
-  cloud:
-    loadbalancer:
-      ribbon:
-        enabled: false
   security:
     user:
       name: iotdc3
@@ -41,7 +37,7 @@ spring:
     host: iotdc3.redis
     port: 6379
     password: ${spring.security.user.password}
-    database: 0
+    database: 2
     timeout: 15S
     jedis:
       pool:

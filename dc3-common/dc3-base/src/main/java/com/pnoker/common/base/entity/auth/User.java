@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.dto;
+package com.pnoker.common.base.entity.auth;
 
-import com.pnoker.common.base.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.pnoker.common.base.entity.Description;
+import lombok.*;
 
 /**
- * <p>User DTO
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -32,8 +29,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UserDto extends User {
+public class User extends Description {
 
-    private PageInfo page;
-
+    @NonNull
+    private String username;
+    private String phone;
+    private String email;
+    @NonNull
+    private String password;
+    private Boolean enable;
+    private Long nodeId;
+    private Long imageId;
+    private Long tokenId;
 }

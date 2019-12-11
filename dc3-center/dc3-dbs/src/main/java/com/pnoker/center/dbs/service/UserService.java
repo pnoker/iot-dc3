@@ -16,7 +16,7 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.base.entity.User;
+import com.pnoker.common.base.entity.auth.User;
 import com.pnoker.common.base.service.BaseService;
 
 /**

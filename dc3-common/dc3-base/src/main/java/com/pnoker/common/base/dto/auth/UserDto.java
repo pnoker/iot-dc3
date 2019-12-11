@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.dto;
+package com.pnoker.common.base.dto.auth;
 
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.pnoker.common.base.bean.PageInfo;
+import com.pnoker.common.base.entity.auth.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.List;
-
 /**
- * <p>基础查询类，其中包括分页以及排序
+ * <p>User DTO
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -33,11 +32,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageInfo implements Serializable {
-    private static final long serialVersionUID = 1L;
+@EqualsAndHashCode(callSuper = true)
+public class UserDto extends User {
 
-    private Integer pageNum = 1;
-    private Integer pageSize = 10;
-    private List<OrderItem> orders;
+    private PageInfo page;
 
 }

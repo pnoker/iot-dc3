@@ -19,7 +19,8 @@ package com.pnoker.transfer.rtmp.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.transfer.rtmp.feign.RtmpTransferFeignClient;
 import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.dto.PageInfo;
+import com.pnoker.common.base.constant.Common;
+import com.pnoker.common.base.bean.PageInfo;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
 import com.pnoker.common.base.entity.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -39,7 +40,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v3/transfer/rtmp")
+@RequestMapping(Common.Service.DC3_RTMP_URL_PREFIX)
 public class RtmpTransferApi implements RtmpTransferFeignClient {
     @Resource
     private RtmpService rtmpService;

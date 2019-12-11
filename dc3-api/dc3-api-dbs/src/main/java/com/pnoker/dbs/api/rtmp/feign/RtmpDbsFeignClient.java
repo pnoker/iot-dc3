@@ -34,14 +34,14 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@FeignClient(path = "/api/v3/center/dbs/rtmp", name = Common.Service.DC3_DBS, fallbackFactory = RtmpDbsFeignHystrix.class)
+@FeignClient(path = Common.Service.DC3_DBS_RTMP_URL_PREFIX, name = Common.Service.DC3_DBS, fallbackFactory = RtmpDbsFeignHystrix.class)
 public interface RtmpDbsFeignClient {
 
     /**
      * 新增 新增 Rtmp 任务记录
      *
      * @param rtmp
-     * @return true/false
+     * @return rtmpId
      */
     @PostMapping("/add")
     Response<Long> add(@RequestBody Rtmp rtmp);

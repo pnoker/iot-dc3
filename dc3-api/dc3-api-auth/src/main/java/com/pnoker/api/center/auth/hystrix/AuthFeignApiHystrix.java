@@ -16,11 +16,10 @@
 
 package com.pnoker.api.center.auth.hystrix;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.auth.feign.AuthFeignClient;
 import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.dto.transfer.RtmpDto;
-import com.pnoker.common.base.entity.rtmp.Rtmp;
+import com.pnoker.common.base.dto.auth.TokenDto;
+import com.pnoker.common.base.entity.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,42 +36,23 @@ public class AuthFeignApiHystrix implements FallbackFactory<AuthFeignClient> {
 
     @Override
     public AuthFeignClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-RTMP" : throwable.getMessage();
-        log.error("RtmpTransferFeignApi:{},hystrix服务降级处理", message, throwable);
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
+        log.error("AuthTransferFeignApi:{},hystrix服务降级处理", message, throwable);
 
         return new AuthFeignClient() {
+
             @Override
-            public Response<Long> add(Rtmp rtmp) {
+            public Response<Boolean> checkExist(String username) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Boolean> delete(Long id) {
+            public Response<Boolean> checkToken(String token) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Boolean> update(Rtmp rtmp) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Rtmp> selectById(Long id) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Boolean> start(Long id) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Boolean> stop(Long id) {
+            public Response<TokenDto> token(User user) {
                 return Response.fail(message);
             }
         };
