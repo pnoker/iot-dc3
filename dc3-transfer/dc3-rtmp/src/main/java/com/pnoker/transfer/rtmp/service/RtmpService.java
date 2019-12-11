@@ -18,7 +18,7 @@ package com.pnoker.transfer.rtmp.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.dto.PageInfo;
+import com.pnoker.common.base.bean.PageInfo;
 import com.pnoker.common.base.entity.rtmp.Rtmp;
 
 /**

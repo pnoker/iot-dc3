@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.constant.Common;
-import com.pnoker.common.base.dto.PageInfo;
+import com.pnoker.common.base.bean.PageInfo;
 import com.pnoker.common.base.entity.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
@@ -54,8 +54,8 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "rtmpCache", key = "#rtmp.id", unless = "#result==null")},
-            evict = {@CacheEvict(value = "rtmpListCache", allEntries = true)}
+            put = {@CachePut(value = "dbs_rtmp", key = "#rtmp.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "dbs_rtmp_list", allEntries = true)}
     )
     public Rtmp add(Rtmp rtmp) {
         return rtmpMapper.insert(rtmp) > 0 ? rtmp : null;
@@ -64,8 +64,8 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "rtmpCache", key = "#id"),
-                    @CacheEvict(value = "rtmpListCache", allEntries = true)
+                    @CacheEvict(value = "dbs_rtmp", key = "#id"),
+                    @CacheEvict(value = "dbs_rtmp_list", allEntries = true)
             }
     )
     public boolean delete(Long id) {
@@ -74,21 +74,21 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "rtmpCache", key = "#rtmp.id", unless = "#result==null")},
-            evict = {@CacheEvict(value = "rtmpListCache", allEntries = true)}
+            put = {@CachePut(value = "dbs_rtmp", key = "#rtmp.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "dbs_rtmp_list", allEntries = true)}
     )
     public Rtmp update(Rtmp rtmp) {
         return rtmpMapper.updateById(rtmp) > 0 ? rtmp : null;
     }
 
     @Override
-    @Cacheable(value = "rtmpCache", key = "#id", unless = "#result==null")
+    @Cacheable(value = "dbs_rtmp", key = "#id", unless = "#result==null")
     public Rtmp selectById(Long id) {
         return rtmpMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = "rtmpListCache", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = "dbs_rtmp_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
         return rtmpMapper.selectPage(pagination(pageInfo), fuzzyQuery(rtmp));
     }

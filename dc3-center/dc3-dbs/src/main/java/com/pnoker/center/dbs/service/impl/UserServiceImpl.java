@@ -22,8 +22,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.base.constant.Common;
-import com.pnoker.common.base.dto.PageInfo;
-import com.pnoker.common.base.entity.User;
+import com.pnoker.common.base.bean.PageInfo;
+import com.pnoker.common.base.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -51,8 +51,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "userCache", key = "#user.id", unless = "#result==null")},
-            evict = {@CacheEvict(value = "userListCache", allEntries = true)}
+            put = {@CachePut(value = "dbs_user", key = "#user.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "dbs_user_list", allEntries = true)}
     )
     public User add(User user) {
         return userMapper.insert(user) > 0 ? user : null;
@@ -61,8 +61,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "userCache", key = "#id"),
-                    @CacheEvict(value = "userListCache", allEntries = true)
+                    @CacheEvict(value = "dbs_user", key = "#id"),
+                    @CacheEvict(value = "dbs_user_list", allEntries = true)
             }
     )
     public boolean delete(Long id) {
@@ -71,21 +71,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "userCache", key = "#user.id", unless = "#result==null")},
-            evict = {@CacheEvict(value = "userListCache", allEntries = true)}
+            put = {@CachePut(value = "dbs_user", key = "#user.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "dbs_user_list", allEntries = true)}
     )
     public User update(User user) {
         return userMapper.updateById(user) > 0 ? user : null;
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#id", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#id", unless = "#result==null")
     public User selectById(Long id) {
         return userMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = "userListCache", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = "dbs_user_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<User> list(User user, PageInfo pageInfo) {
         return userMapper.selectPage(pagination(pageInfo), fuzzyQuery(user));
     }
@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#usernama", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#usernama", unless = "#result==null")
     public User selectByUsername(String usernama) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(Common.Cloumn.User.USERNAME, usernama);
@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#phone", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#phone", unless = "#result==null")
     public User selectByPhone(String phone) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(Common.Cloumn.User.PHONE, phone);
@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#email", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#email", unless = "#result==null")
     public User selectByEmail(String email) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(Common.Cloumn.User.EMAIL, email);

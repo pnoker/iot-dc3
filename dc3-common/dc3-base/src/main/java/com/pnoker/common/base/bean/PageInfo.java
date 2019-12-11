@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.base.entity;
+package com.pnoker.common.base.bean;
 
-import lombok.*;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * <p>
+ * <p>基础查询类，其中包括分页以及排序
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -27,17 +33,11 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class User extends Description {
+public class PageInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    @NonNull
-    private String username;
-    private String phone;
-    private String email;
-    @NonNull
-    private String password;
-    private Boolean enable;
-    private Long nodeId;
-    private Long imageId;
-    private Long tokenId;
+    private Integer pageNum = 1;
+    private Integer pageSize = 10;
+    private List<OrderItem> orders;
+
 }

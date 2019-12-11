@@ -18,7 +18,7 @@ package com.pnoker.common.base.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.base.dto.PageInfo;
+import com.pnoker.common.base.bean.PageInfo;
 
 /**
  * <p>基础 服务类接口

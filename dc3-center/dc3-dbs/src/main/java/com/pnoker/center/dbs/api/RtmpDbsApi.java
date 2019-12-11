@@ -19,7 +19,8 @@ package com.pnoker.center.dbs.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.dto.PageInfo;
+import com.pnoker.common.base.constant.Common;
+import com.pnoker.common.base.bean.PageInfo;
 import com.pnoker.common.base.dto.transfer.RtmpDto;
 import com.pnoker.common.base.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
@@ -39,7 +40,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v3/center/dbs/rtmp")
+@RequestMapping(Common.Service.DC3_DBS_RTMP_URL_PREFIX)
 public class RtmpDbsApi implements RtmpDbsFeignClient {
     @Resource
     private RtmpService rtmpService;

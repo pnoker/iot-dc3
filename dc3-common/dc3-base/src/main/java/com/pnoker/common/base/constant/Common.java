@@ -49,12 +49,18 @@ public interface Common {
     String TIMEZONE = "GMT+8";
 
     /**
-     * 服务名称
+     * 服务名称 & 服务基地址
      */
     interface Service {
         String DC3_DBS = "DC3-DBS";
+        String DC3_DBS_RTMP_URL_PREFIX = "/api/v3/center/dbs/rtmp";
+        String DC3_DBS_USER_URL_PREFIX = "/api/v3/center/dbs/user";
+
         String DC3_RTMP = "DC3-RTMP";
+        String DC3_RTMP_URL_PREFIX = "/api/v3/transfer/rtmp";
+
         String DC3_AUTH = "DC3-AUTH";
+        String DC3_AUTH_URL_PREFIX = "/api/v3/center/auth";
     }
 
     /**

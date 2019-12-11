@@ -1,3 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.pnoker.common.config.RedisTemplateConfig,\
-  com.pnoker.common.tool.RedisTools
+  com.pnoker.common.config.RedisTemplateConfig
