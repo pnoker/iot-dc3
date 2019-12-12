@@ -16,10 +16,12 @@
 
 package com.pnoker.center.auth.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.auth.feign.AuthFeignClient;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +37,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(Common.Service.DC3_AUTH_URL_PREFIX)
 public class AuthApi implements AuthFeignClient {
+
+    @Override
+    public Response<Long> add(User user) {
+        return null;
+    }
+
+    @Override
+    public Response<Boolean> delete(Long id) {
+        return null;
+    }
+
+    @Override
+    public Response<Boolean> update(User user) {
+        return null;
+    }
+
+    @Override
+    public Response<User> selectById(Long id) {
+        return null;
+    }
+
+    @Override
+    public Response<Page<User>> list(UserDto userDto) {
+        return null;
+    }
 
     @Override
     public Response<Boolean> checkUserExist(String username) {

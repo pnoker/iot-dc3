@@ -25,7 +25,6 @@ import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -76,10 +75,12 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
     public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         PageInfo page = new PageInfo();
-        Optional.ofNullable(rtmpDto).ifPresent(dto -> {
-            dto.convertToDo(rtmp);
-            Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
-        });
+        Optional.ofNullable(rtmpDto)
+                .ifPresent(dto -> {
+                    dto.convertToDo(rtmp);
+                    Optional.ofNullable(rtmpDto.getPage())
+                            .ifPresent(p -> p.convert(page));
+                });
         return Response.ok(rtmpService.list(rtmp, page));
     }
 

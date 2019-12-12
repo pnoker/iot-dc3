@@ -124,7 +124,7 @@ spring:
                 fallbackUri: 'forward:/fallback'
         # opc ua
         - id: opcua_rest_opc_ua
-          uri: lb://dc3-opc-ua
+          uri: lb://dc3-opcua
           predicates:
             - Path=/api/v3/opcua/**
           filters:

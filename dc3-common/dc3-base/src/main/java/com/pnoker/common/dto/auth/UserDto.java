@@ -35,7 +35,7 @@ import org.springframework.beans.BeanUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UserDto extends User implements Converter<UserDto, User> {
+public class UserDto extends User implements Converter<User> {
 
     private PageInfo page;
 

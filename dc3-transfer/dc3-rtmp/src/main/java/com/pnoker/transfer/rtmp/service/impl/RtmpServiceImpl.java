@@ -17,8 +17,8 @@
 package com.pnoker.transfer.rtmp.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.bean.Response;
 import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
@@ -26,7 +26,6 @@ import com.pnoker.transfer.rtmp.handler.Transcode;
 import com.pnoker.transfer.rtmp.handler.TranscodePool;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -100,7 +99,7 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public Response<Page<Rtmp>> list(Rtmp rtmp, PageInfo pageInfo) {
         RtmpDto rtmpDto = new RtmpDto();
-        BeanUtils.copyProperties(rtmp, rtmpDto);
+        rtmpDto.convertToDto(rtmp);
         return rtmpDbsFeignClient.list(rtmpDto.setPage(pageInfo));
     }
 

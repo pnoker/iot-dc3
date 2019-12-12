@@ -34,7 +34,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenDto implements Serializable, Converter<TokenDto, Token> {
+public class TokenDto implements Serializable, Converter<Token> {
     private static final long serialVersionUID = 1L;
 
     /**
