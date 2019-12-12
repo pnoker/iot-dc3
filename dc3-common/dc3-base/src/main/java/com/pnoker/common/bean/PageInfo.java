@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -39,5 +40,9 @@ public class PageInfo implements Serializable {
     private Integer pageNum = 1;
     private Integer pageSize = 10;
     private List<OrderItem> orders;
+
+    public void convert(PageInfo page) {
+        BeanUtils.copyProperties(this, page);
+    }
 
 }

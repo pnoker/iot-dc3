@@ -18,15 +18,14 @@ package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.service.UserService;
+import com.pnoker.common.bean.PageInfo;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.bean.PageInfo;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.User;
 import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,10 +76,12 @@ public class UserDbsApi implements UserDbsFeignClient {
     public Response<Page<User>> list(UserDto userDto) {
         User user = new User();
         PageInfo page = new PageInfo();
-        Optional.ofNullable(userDto).ifPresent(r -> {
-            BeanUtils.copyProperties(r, user);
-            Optional.ofNullable(userDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
-        });
+        Optional.ofNullable(userDto)
+                .ifPresent(dto -> {
+                    dto.convertToDo(user);
+                    Optional.ofNullable(userDto.getPage())
+                            .ifPresent(p -> p.convert(page));
+                });
         return Response.ok(userService.list(user, page));
     }
 

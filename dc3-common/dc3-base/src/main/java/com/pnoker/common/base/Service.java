@@ -26,7 +26,7 @@ import com.pnoker.common.bean.PageInfo;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface BaseService<T> {
+public interface Service<T> {
     /**
      * 新增记录
      *

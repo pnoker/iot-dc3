@@ -17,7 +17,7 @@
 package com.pnoker.center.dbs.service;
 
 import com.pnoker.common.entity.auth.User;
-import com.pnoker.common.base.BaseService;
+import com.pnoker.common.base.Service;
 
 /**
  * <p> User 服务接口
@@ -25,7 +25,7 @@ import com.pnoker.common.base.BaseService;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface UserService extends BaseService<User> {
+public interface UserService extends Service<User> {
 
     User selectByUsername(String usernama);
 

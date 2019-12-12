@@ -37,7 +37,7 @@ import org.springframework.beans.BeanUtils;
 @AllArgsConstructor
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class RtmpDto extends Rtmp implements Converter<RtmpDto, Rtmp> {
+public class RtmpDto extends Rtmp implements Converter<Rtmp> {
 
     private PageInfo page;
 

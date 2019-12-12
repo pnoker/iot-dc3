@@ -16,9 +16,11 @@
 
 package com.pnoker.api.center.auth.hystrix;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.auth.feign.AuthFeignClient;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,31 @@ public class AuthFeignApiHystrix implements FallbackFactory<AuthFeignClient> {
         log.error("AuthTransferFeignApi:{},hystrix服务降级处理", message, throwable);
 
         return new AuthFeignClient() {
+
+            @Override
+            public Response<Long> add(User user) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Boolean> delete(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Boolean> update(User user) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<User> selectById(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Page<User>> list(UserDto userDto) {
+                return Response.fail(message);
+            }
 
             @Override
             public Response<Boolean> checkUserExist(String username) {

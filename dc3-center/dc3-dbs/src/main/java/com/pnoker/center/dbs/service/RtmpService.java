@@ -16,7 +16,7 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.base.BaseService;
+import com.pnoker.common.base.Service;
 import com.pnoker.common.entity.rtmp.Rtmp;
 
 /**
@@ -25,5 +25,5 @@ import com.pnoker.common.entity.rtmp.Rtmp;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface RtmpService extends BaseService<Rtmp> {
+public interface RtmpService extends Service<Rtmp> {
 }

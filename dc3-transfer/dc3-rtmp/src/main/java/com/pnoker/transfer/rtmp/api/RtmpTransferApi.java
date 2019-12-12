@@ -18,14 +18,13 @@ package com.pnoker.transfer.rtmp.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.transfer.rtmp.feign.RtmpTransferFeignClient;
+import com.pnoker.common.bean.PageInfo;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.bean.PageInfo;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -75,10 +74,12 @@ public class RtmpTransferApi implements RtmpTransferFeignClient {
     public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         PageInfo page = new PageInfo();
-        Optional.ofNullable(rtmpDto).ifPresent(r -> {
-            BeanUtils.copyProperties(r, rtmp);
-            Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
-        });
+        Optional.ofNullable(rtmpDto)
+                .ifPresent(dto -> {
+                    dto.convertToDo(rtmp);
+                    Optional.ofNullable(rtmpDto.getPage())
+                            .ifPresent(p -> p.convert(page));
+                });
         return rtmpService.list(rtmp, page);
     }
 

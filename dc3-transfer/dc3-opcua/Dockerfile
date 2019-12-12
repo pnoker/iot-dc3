@@ -20,12 +20,12 @@ MAINTAINER pnoker <pnokers.icloud.com>
 ENV JAVA_OPS -server -Xms512m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-transfer/dc3-opc-ua
+    && mkdir -p /dc3-transfer/dc3-opcua
 
-WORKDIR /dc3-transfer/dc3-opc-ua
+WORKDIR /dc3-transfer/dc3-opcua
 
-ADD ./target/dc3-opc-ua.jar ./
+ADD ./target/dc3-opcua.jar ./
 
 EXPOSE 8802
 
-CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-opc-ua.jar
+CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-opcua.jar

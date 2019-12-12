@@ -22,7 +22,7 @@ package com.pnoker.common.base;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface Converter<T, D> {
+public interface Converter<D> {
     /**
      * DTO 转 DO
      *
