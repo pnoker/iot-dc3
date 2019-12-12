@@ -18,10 +18,10 @@ package com.pnoker.api.transfer.rtmp.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.transfer.rtmp.hystrix.RtmpTransferFeignApiHystrix;
-import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.constant.Common;
-import com.pnoker.common.base.dto.transfer.RtmpDto;
-import com.pnoker.common.base.entity.rtmp.Rtmp;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.transfer.RtmpDto;
+import com.pnoker.common.entity.rtmp.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

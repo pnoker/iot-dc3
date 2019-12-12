@@ -17,10 +17,10 @@
 package com.pnoker.api.center.auth.feign;
 
 import com.pnoker.api.center.auth.hystrix.AuthFeignApiHystrix;
-import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.constant.Common;
-import com.pnoker.common.base.dto.auth.TokenDto;
-import com.pnoker.common.base.entity.auth.User;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.entity.auth.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,17 +42,17 @@ public interface AuthFeignClient {
      * @param username
      * @return true/false
      */
-    @GetMapping("/check/exist/{username}")
-    Response<Boolean> checkExist(@PathVariable(value = "username") String username);
+    @GetMapping("/check/{username}")
+    Response<Boolean> checkUserExist(@PathVariable(value = "username") String username);
 
     /**
-     * 检测用Token是否有效
+     * 检测Token是否有效
      *
      * @param token
      * @return true/false
      */
-    @GetMapping("/check/token/{token}")
-    Response<Boolean> checkToken(@PathVariable(value = "token") String token);
+    @GetMapping("/token/{token}")
+    Response<Boolean> checkTokenValid(@PathVariable(value = "token") String token);
 
     /**
      * 获取Token
@@ -61,6 +61,6 @@ public interface AuthFeignClient {
      * @return true/false
      */
     @PostMapping("/token")
-    Response<TokenDto> token(@RequestBody User user);
+    Response<TokenDto> generateToken(@RequestBody User user);
 
 }

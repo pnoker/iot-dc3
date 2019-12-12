@@ -17,7 +17,7 @@
 FROM mysql:8.0
 MAINTAINER pnoker <pnokers.icloud.com>
 
-ENV MYSQL_ROOT_PASSWORD iotdc3
+ENV MYSQL_ROOT_PASSWORD dc3
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 

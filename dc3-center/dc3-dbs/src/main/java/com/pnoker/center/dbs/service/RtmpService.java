@@ -16,8 +16,8 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.base.service.BaseService;
-import com.pnoker.common.base.entity.rtmp.Rtmp;
+import com.pnoker.common.base.BaseService;
+import com.pnoker.common.entity.rtmp.Rtmp;
 
 /**
  * <p> Rtmp 服务接口

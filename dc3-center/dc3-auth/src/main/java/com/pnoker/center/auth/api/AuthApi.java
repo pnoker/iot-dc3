@@ -17,10 +17,10 @@
 package com.pnoker.center.auth.api;
 
 import com.pnoker.api.center.auth.feign.AuthFeignClient;
-import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.constant.Common;
-import com.pnoker.common.base.dto.auth.TokenDto;
-import com.pnoker.common.base.entity.auth.User;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,17 +37,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthApi implements AuthFeignClient {
 
     @Override
-    public Response<Boolean> checkExist(String username) {
+    public Response<Boolean> checkUserExist(String username) {
         return null;
     }
 
     @Override
-    public Response<Boolean> checkToken(String token) {
+    public Response<Boolean> checkTokenValid(String token) {
         return null;
     }
 
     @Override
-    public Response<TokenDto> token(User user) {
+    public Response<TokenDto> generateToken(User user) {
         return null;
     }
 }

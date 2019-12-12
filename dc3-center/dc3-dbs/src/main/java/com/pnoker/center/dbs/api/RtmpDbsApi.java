@@ -18,11 +18,11 @@ package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.constant.Common;
-import com.pnoker.common.base.bean.PageInfo;
-import com.pnoker.common.base.dto.transfer.RtmpDto;
-import com.pnoker.common.base.entity.rtmp.Rtmp;
+import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.transfer.RtmpDto;
+import com.pnoker.common.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -76,8 +76,8 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
     public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
         PageInfo page = new PageInfo();
-        Optional.ofNullable(rtmpDto).ifPresent(r -> {
-            BeanUtils.copyProperties(r, rtmp);
+        Optional.ofNullable(rtmpDto).ifPresent(dto -> {
+            dto.convertToDo(rtmp);
             Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
         });
         return Response.ok(rtmpService.list(rtmp, page));
