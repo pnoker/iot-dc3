@@ -12,8 +12,8 @@ spring:
     allow-bean-definition-overriding: true
   security:
     user:
-      name: iotdc3
-      password: iotdc3
+      name: dc3
+      password: dc3
 
   thymeleaf:
     cache: false
@@ -59,4 +59,4 @@ eureka:
     health-check-url-path: /actuator/health
   client:
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.register:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3.register:8100/eureka/

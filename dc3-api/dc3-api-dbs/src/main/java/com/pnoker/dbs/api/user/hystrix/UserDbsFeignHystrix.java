@@ -17,9 +17,9 @@
 package com.pnoker.dbs.api.user.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.dto.auth.UserDto;
-import com.pnoker.common.base.entity.auth.User;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.User;
 import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;

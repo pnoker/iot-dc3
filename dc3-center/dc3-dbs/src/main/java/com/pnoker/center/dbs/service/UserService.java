@@ -16,8 +16,8 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.base.entity.auth.User;
-import com.pnoker.common.base.service.BaseService;
+import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.base.BaseService;
 
 /**
  * <p> User 服务接口

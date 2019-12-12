@@ -1,16 +1,17 @@
-version: '3'
+version: '3.7'
 
 services:
   portainer:
     image:  portainer/portainer
-    container_name: portainer
     restart: always
+    container_name: portainer
+    hostname: dc3.portainer
     ports:
       - "9000:9000"
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-portainer
+          - dc3.portainer
 
   gateway:
     build:
@@ -20,16 +21,12 @@ services:
     restart: always
     ports:
       - 8000:8000
-    links:
-      - register:iotdc3.register
-      - monitor:iotdc3.monitor
-      - redis:iotdc3.redis
-    container_name: dc3-gateway
-    hostname: iotdc3.gateway
+    container_name: dc3.gateway
+    hostname: dc3.gateway
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-gateway
+          - dc3.gateway
 
   register:
     build:
@@ -39,12 +36,12 @@ services:
     restart: always
     ports:
       - 8100:8100
-    container_name: dc3-register
-    hostname: iotdc3.register
+    container_name: dc3.register
+    hostname: dc3.register
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-register
+          - dc3.register
 
   monitor:
     build:
@@ -54,14 +51,12 @@ services:
     restart: always
     ports:
       - 8200:8200
-    links:
-      - register:iotdc3.register
-    container_name: dc3-monitor
-    hostname: iotdc3.monitor
+    container_name: dc3.monitor
+    hostname: dc3.monitor
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-monitor
+          - dc3.monitor
 
   dbs:
     build:
@@ -71,17 +66,12 @@ services:
     restart: always
     ports:
       - 8300:8300
-    links:
-      - register:iotdc3.register
-      - mongo:iotdc3.mongo
-      - mysql:iotdc3.mysql
-      - redis:iotdc3.redis
-    container_name: dc3-dbs
-    hostname: iotdc3.dbs
+    container_name: dc3.dbs
+    hostname: dc3.dbs
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-dbs
+          - dc3.dbs
 
   mysql:
     build:
@@ -91,12 +81,12 @@ services:
     restart: always
     ports:
       - 3306:3306
-    container_name: dc3-mysql
-    hostname: iotdc3.mysql
+    container_name: dc3.mysql
+    hostname: dc3.mysql
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-mysql
+          - dc3.mysql
 
   mongo:
     build:
@@ -106,12 +96,12 @@ services:
     restart: always
     ports:
       - 27017:27017
-    container_name: dc3-mongo
-    hostname: iotdc3.mongo
+    container_name: dc3.mongo
+    hostname: dc3.mongo
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-mongo
+          - dc3.mongo
 
   redis:
     build:
@@ -121,12 +111,12 @@ services:
     restart: always
     ports:
       - 6379:6379
-    container_name: dc3-redis
-    hostname: iotdc3.redis
+    container_name: dc3.redis
+    hostname: dc3.redis
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-redis
+          - dc3.redis
 
   manager:
     build:
@@ -136,14 +126,12 @@ services:
     restart: always
     ports:
       - 8600:8600
-    links:
-      - register:iotdc3.register
-    container_name: dc3-manager
-    hostname: iotdc3.manager
+    container_name: dc3.manager
+    hostname: dc3.manager
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-manager
+          - dc3.manager
 
   rabbitmq:
     build:
@@ -156,29 +144,27 @@ services:
       - 1883:1883
       - 61613:61613
       - 15672:15672
-    container_name: dc3-rabbitmq
-    hostname: iotdc3.rabbitmq
+    container_name: dc3.rabbitmq
+    hostname: dc3.rabbitmq
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-rabbitmq
+          - dc3.rabbitmq
 
   opcua:
     build:
-      context: ./dc3-transfer/dc3-opc-ua/
+      context: ./dc3-transfer/dc3-opcua/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-opc-ua:3.0
+    image: pnoker/dc3-opcua:3.0
     restart: always
     ports:
       - 8802:8802
-    links:
-      - register:iotdc3.register
-    container_name: dc3-opc-ua
-    hostname: iotdc3.opcua
+    container_name: dc3.opcua
+    hostname: dc3.opcua
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-opcua
+          - dc3.opcua
 
   rtmp:
     build:
@@ -188,27 +174,24 @@ services:
     restart: always
     ports:
       - 8803:8803
-    links:
-      - register:iotdc3.register
-      - dbs:iotdc3.dbs
-    container_name: dc3-rtmp
-    hostname: iotdc3.rtmp
+    container_name: dc3.rtmp
+    hostname: dc3.rtmp
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-rtmp
+          - dc3.rtmp
 
   nginx:
     image: pnoker/alpine-nginx:rtmp
     restart: always
     ports:
       - 1935:1935
-    container_name: dc3-nginx
-    hostname: iotdc3.nginx
+    container_name: dc3.nginx
+    hostname: dc3.nginx
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-nginx
+          - dc3.nginx
 
   resource:
     build:
@@ -218,16 +201,14 @@ services:
     restart: always
     ports:
       - 8800:8800
-    links:
-      - register:iotdc3.register
-    container_name: dc3-resource
-    hostname: iotdc3.resource
+    container_name: dc3.resource
+    hostname: dc3.resource
     networks:
-      network:
+      dc3net:
         aliases:
-          - dc3-resource
+          - dc3.resource
 
 networks:
-  network:
-    driver: 'bridge'
+  dc3net:
+    driver: 'overlay'
 ...

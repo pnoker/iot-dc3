@@ -16,8 +16,8 @@
 
 package com.pnoker.center.auth.service;
 
-import com.pnoker.common.base.dto.auth.TokenDto;
-import com.pnoker.common.base.entity.auth.User;
+import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.entity.auth.User;
 
 /**
  * <p>Auth 服务接口

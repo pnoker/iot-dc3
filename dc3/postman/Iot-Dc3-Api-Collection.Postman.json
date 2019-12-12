@@ -109,7 +109,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -147,7 +147,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+											"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -295,7 +295,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+									"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
 								},
 								"url": {
 									"raw": "localhost:8300/api/v3/center/dbs/rtmp/update",
@@ -328,7 +328,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+											"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
 										},
 										"url": {
 											"raw": "localhost:8300/api/v3/center/dbs/rtmp/update",
@@ -452,7 +452,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 1,\n        \"userId\": -1,\n        \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"本地测试视频\",\n        \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n        \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": false,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1\n    }\n}"
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 1,\n        \"userId\": -1,\n        \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"本地测试视频\",\n        \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n        \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_local\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": false,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1\n    }\n}"
 								}
 							]
 						},
@@ -556,7 +556,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"userId\": -1,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"userId\": -1,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
 								}
 							]
 						}
@@ -575,12 +575,12 @@
 									"basic": [
 										{
 											"key": "password",
-											"value": "iotdc3",
+											"value": "dc3",
 											"type": "string"
 										},
 										{
 											"key": "username",
-											"value": "iotdc3",
+											"value": "dc3",
 											"type": "string"
 										}
 									]
@@ -596,7 +596,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
+									"raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"dc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -634,7 +634,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
+											"raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"dc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -782,7 +782,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": 3,\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}"
+									"raw": "{\n    \"id\": 3,\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"dc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}"
 								},
 								"url": {
 									"raw": "localhost:8300/api/v3/center/dbs/user/update",
@@ -815,7 +815,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": -1,\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
+											"raw": "{\n    \"id\": -1,\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"password\": \"dc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -943,7 +943,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"dc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
 								}
 							]
 						},
@@ -1026,7 +1026,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"dc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
 								}
 							]
 						},
@@ -1109,7 +1109,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"dc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
 								}
 							]
 						},
@@ -1196,7 +1196,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"dc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
 								}
 							]
 						},
@@ -1300,7 +1300,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -1,\n                \"description\": \"平台开发者账号\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-27 11:51:06\",\n                \"deleted\": 0,\n                \"username\": \"pnoker\",\n                \"phone\": \"18304071393\",\n                \"email\": \"pnokers@icloud.com\",\n                \"password\": \"iotdc3\",\n                \"enable\": true,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"tokenId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -1,\n                \"description\": \"平台开发者账号\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-27 11:51:06\",\n                \"deleted\": 0,\n                \"username\": \"pnoker\",\n                \"phone\": \"18304071393\",\n                \"email\": \"pnokers@icloud.com\",\n                \"password\": \"dc3\",\n                \"enable\": true,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"tokenId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
 								}
 							]
 						}
@@ -1384,12 +1384,12 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "iotdc3",
+									"value": "dc3",
 									"type": "string"
 								},
 								{
 									"key": "username",
-									"value": "iotdc3",
+									"value": "dc3",
 									"type": "string"
 								}
 							]
@@ -1405,7 +1405,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+							"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
 						},
 						"url": {
 							"raw": "localhost:8803/api/v3/transfer/rtmp/add",
@@ -1437,7 +1437,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
 								},
 								"url": {
 									"raw": "localhost:8803/api/v3/transfer/rtmp/add",
@@ -1575,7 +1575,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+							"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1612,7 +1612,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+									"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1699,7 +1699,7 @@
 							"_postman_previewlanguage": "json",
 							"header": null,
 							"cookie": [],
-							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 18,\n        \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"在线测试视频\",\n        \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n        \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": true,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"userId\": -1\n    }\n}"
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 18,\n        \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"在线测试视频\",\n        \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n        \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": true,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"userId\": -1\n    }\n}"
 						}
 					]
 				},
@@ -1772,7 +1772,7 @@
 							"_postman_previewlanguage": "json",
 							"header": null,
 							"cookie": [],
-							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": -1,\n                \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"本地测试视频\",\n                \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 10,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 14:32:17\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 15,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": null,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 17,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 18:57:38\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 18,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": true,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            }\n        ],\n        \"total\": 6,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": -1,\n                \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"本地测试视频\",\n                \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n                \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_local\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 10,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 14:32:17\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 15,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": null,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 17,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 18:57:38\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 18,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://dc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": true,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            }\n        ],\n        \"total\": 6,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
 						}
 					]
 				},
@@ -1784,12 +1784,12 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "iotdc3",
+									"value": "dc3",
 									"type": "string"
 								},
 								{
 									"key": "username",
-									"value": "iotdc3",
+									"value": "dc3",
 									"type": "string"
 								}
 							]
@@ -1861,12 +1861,12 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "iotdc3",
+									"value": "dc3",
 									"type": "string"
 								},
 								{
 									"key": "username",
-									"value": "iotdc3",
+									"value": "dc3",
 									"type": "string"
 								}
 							]

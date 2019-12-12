@@ -17,8 +17,8 @@
 package com.pnoker.center.auth.service.impl;
 
 import com.pnoker.center.auth.service.AuthService;
-import com.pnoker.common.base.dto.auth.TokenDto;
-import com.pnoker.common.base.entity.auth.User;
+import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.entity.auth.User;
 import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

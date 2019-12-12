@@ -8,7 +8,7 @@
     <base href="<@spring.url basePath/>">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>IOT DC3 Register Center</title>
+    <title>DC3 Register Center</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
 

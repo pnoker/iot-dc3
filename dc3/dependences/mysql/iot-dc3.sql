@@ -92,7 +92,7 @@ CREATE TABLE `dc3_image` (
 -- Records of dc3_image
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_image` VALUES (-1, 'iotdc3-logo', '/images/logo/dc3-logo.png', -1, -1, 'iotdc3平台logo，默认创建', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_image` VALUES (-1, 'dc3-logo', '/images/logo/dc3-logo.png', -1, -1, 'dc3平台logo，默认创建', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 COMMIT;
 
 -- ----------------------------
@@ -281,8 +281,8 @@ CREATE TABLE `dc3_rtmp` (
 -- Records of dc3_rtmp
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://dc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://dc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 COMMIT;
 
 -- ----------------------------
@@ -398,7 +398,7 @@ CREATE TABLE `dc3_user` (
 -- Records of dc3_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '18304071393', 'pnokers@icloud.com', 'iotdc3', -1,-1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-27 11:51:06', 0, 1);
+INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '18304071393', 'pnokers@icloud.com', 'dc3', -1,-1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-27 11:51:06', 0, 1);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

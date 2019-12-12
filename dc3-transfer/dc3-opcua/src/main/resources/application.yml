@@ -1,0 +1,51 @@
+server:
+  port: 8802
+  undertow:
+    worker-threads: 20
+    buffer-size: 512
+    io-threads: 2
+
+spring:
+  application:
+    name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    user:
+      name: dc3
+      password: dc3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+feign:
+  hystrix:
+    enabled: true
+
+logging:
+  level:
+    org.springframework.data: ERROR
+    org.springframework.web: ERROR
+    org.mybatis.spring: ERROR
+    org.mongodb.driver: ERROR
+    com.zaxxer.hikari: ERROR
+    com.ulisesbocchio: ERROR
+    io.lettuce.core: ERROR
+    io.undertow: ERROR
+    com.netflix: ERROR
+  file:
+    name: dc3/logs/transfer/${spring.application.name}.log
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3.register:8100/eureka/

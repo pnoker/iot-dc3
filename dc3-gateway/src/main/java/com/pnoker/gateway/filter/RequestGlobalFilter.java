@@ -16,7 +16,7 @@
 
 package com.pnoker.gateway.filter;
 
-import com.pnoker.common.base.constant.Common;
+import com.pnoker.common.constant.Common;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;

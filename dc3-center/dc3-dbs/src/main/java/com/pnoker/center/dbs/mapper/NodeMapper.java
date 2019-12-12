@@ -17,7 +17,7 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.base.entity.Node;
+import com.pnoker.common.entity.Node;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

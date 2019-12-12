@@ -10,8 +10,8 @@ spring:
     name: @project.artifactId@
   security:
     user:
-      name: iotdc3
-      password: iotdc3
+      name: dc3
+      password: dc3
 
 management:
   endpoints:
@@ -38,7 +38,7 @@ logging:
 
 eureka:
   instance:
-    hostname: iotdc3.register
+    hostname: dc3.register
     prefer-ip-address: true
   client:
     register-with-eureka: false
