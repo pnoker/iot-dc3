@@ -83,6 +83,7 @@
     </properties>
 
     <dependencies>
+
         <!-- Configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -147,6 +148,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <!-- Spring Cloud 依赖 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
+
 /**
  * <p>Rtmp 数据 FeignClient
  *
@@ -80,6 +82,6 @@ public interface RtmpDbsFeignClient {
      * @return rtmpList
      */
     @PostMapping("/list")
-    Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
+    Response<Page<Rtmp>> list(@Valid @RequestBody(required = false) RtmpDto rtmpDto);
 
 }

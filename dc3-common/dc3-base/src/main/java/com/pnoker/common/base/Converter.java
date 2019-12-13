@@ -17,7 +17,7 @@
 package com.pnoker.common.base;
 
 /**
- * <p>定义类转换抽象接口
+ * <p>Converter
  *
  * @author : pnoker
  * @email : pnokers@icloud.com

@@ -34,14 +34,14 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageInfo implements Serializable {
+public class Pages implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer pageNum = 1;
     private Integer pageSize = 10;
     private List<OrderItem> orders;
 
-    public void convert(PageInfo page) {
+    public void convert(Pages page) {
         BeanUtils.copyProperties(this, page);
     }
 

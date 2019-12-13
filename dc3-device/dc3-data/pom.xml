@@ -29,6 +29,7 @@
     <description>IOT DC3 平台数据采集,包含Amqp,Websocket,Mqtt等通用消息中间件，通过消息订阅方式收集设备组信息。</description>
 
     <dependencies>
+
         <!-- Spring RabbiitMq -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

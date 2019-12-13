@@ -36,7 +36,7 @@ spring:
     type: redis
     cache-names: dc3-gateway-cache
     redis:
-      time-to-live: 24H
+      time-to-live: 12H
   cloud:
     gateway:
       loadbalancer:

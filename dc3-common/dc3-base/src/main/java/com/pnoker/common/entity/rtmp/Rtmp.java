@@ -23,6 +23,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>Rtmp 信息实体类
  *
@@ -36,6 +38,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 public class Rtmp extends Description {
 
+    @NotNull(message = "nn")
     private String name;
     private String rtspUrl;
     private String rtmpUrl;

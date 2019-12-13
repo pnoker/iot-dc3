@@ -18,17 +18,17 @@ package com.pnoker.common.base;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 
 /**
- * <p>基础 服务类接口
+ * <p>Service接口
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 public interface Service<T> {
     /**
-     * 新增记录
+     * 新增
      *
      * @param type
      * @return true/false
@@ -36,7 +36,7 @@ public interface Service<T> {
     T add(T type);
 
     /**
-     * 删除记录
+     * 删除
      *
      * @param id
      * @return true/false
@@ -44,7 +44,7 @@ public interface Service<T> {
     boolean delete(Long id);
 
     /**
-     * 更新记录
+     * 更新
      *
      * @param type
      * @return true/false
@@ -52,7 +52,7 @@ public interface Service<T> {
     T update(T type);
 
     /**
-     * 通过ID查询记录
+     * 通过ID查询
      *
      * @param id
      * @return type
@@ -60,13 +60,13 @@ public interface Service<T> {
     T selectById(Long id);
 
     /**
-     * 获取带分页、排序的记录
+     * 获取带分页、排序
      *
      * @param type
-     * @param pageInfo pageNum,pageSize
+     * @param pages pageNum,pageSize
      * @return list
      */
-    Page<T> list(T type, PageInfo pageInfo);
+    Page<T> list(T type, Pages pages);
 
     /**
      * 统一接口 模糊查询构造器
@@ -79,9 +79,9 @@ public interface Service<T> {
     /**
      * 统一接口 排序构造器 & 字段校验
      *
-     * @param pageInfo
+     * @param pages
      * @return list
      */
-    Page<T> pagination(PageInfo pageInfo);
+    Page<T> pagination(Pages pages);
 
 }

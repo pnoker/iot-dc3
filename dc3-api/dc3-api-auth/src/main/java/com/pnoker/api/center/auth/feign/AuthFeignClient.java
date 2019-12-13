@@ -45,7 +45,7 @@ public interface AuthFeignClient {
      * @return true/false
      */
     @PostMapping("/user/add")
-    Response<Long> add(@RequestBody User user);
+    Response<Long> add( @RequestBody User user);
 
     /**
      * 删除 根据 ID 删除 User

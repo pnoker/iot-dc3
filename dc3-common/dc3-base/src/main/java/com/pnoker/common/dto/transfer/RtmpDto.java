@@ -17,7 +17,7 @@
 package com.pnoker.common.dto.transfer;
 
 import com.pnoker.common.base.Converter;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,7 +39,7 @@ import org.springframework.beans.BeanUtils;
 @EqualsAndHashCode(callSuper = true)
 public class RtmpDto extends Rtmp implements Converter<Rtmp> {
 
-    private PageInfo page;
+    private Pages page;
 
     public RtmpDto(boolean autoStart) {
         super(autoStart);

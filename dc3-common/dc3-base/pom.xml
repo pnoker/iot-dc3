@@ -28,4 +28,13 @@
 
     <description>IOT DC3 平台 公共基础集合。</description>
 
+    <dependencies>
+
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+
+    </dependencies>
+
 </project>
