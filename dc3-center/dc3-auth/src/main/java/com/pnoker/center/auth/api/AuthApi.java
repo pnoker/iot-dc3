@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 /**
  * <p>auth rest api
  *
@@ -39,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthApi implements AuthFeignClient {
 
     @Override
-    public Response<Long> add(User user) {
+    public Response<Long> add(@Valid User user) {
         return null;
     }
 

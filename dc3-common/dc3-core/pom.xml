@@ -29,17 +29,17 @@
     <description>IOT DC3 平台 公共核心集合。</description>
 
     <dependencies>
+
         <!-- Redis -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
-
-        <!-- dc3 Common Base -->
         <dependency>
-            <groupId>com.pnoker</groupId>
-            <artifactId>dc3-base</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

@@ -18,7 +18,7 @@ package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
@@ -74,7 +74,7 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
     @Override
     public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
         Rtmp rtmp = new Rtmp();
-        PageInfo page = new PageInfo();
+        Pages page = new Pages();
         Optional.ofNullable(rtmpDto)
                 .ifPresent(dto -> {
                     dto.convertToDo(rtmp);

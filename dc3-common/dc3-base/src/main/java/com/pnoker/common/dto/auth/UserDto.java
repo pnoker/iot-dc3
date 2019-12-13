@@ -17,7 +17,7 @@
 package com.pnoker.common.dto.auth;
 
 import com.pnoker.common.base.Converter;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.entity.auth.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +37,7 @@ import org.springframework.beans.BeanUtils;
 @EqualsAndHashCode(callSuper = true)
 public class UserDto extends User implements Converter<User> {
 
-    private PageInfo page;
+    private Pages page;
 
     @Override
     public void convertToDo(User user) {

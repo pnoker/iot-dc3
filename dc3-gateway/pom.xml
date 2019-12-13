@@ -29,6 +29,7 @@
     <description>IOT DC3 平台网关,用于限流、权限验证、服务转发、方向代理 等。</description>
 
     <dependencies>
+
         <!-- Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -47,13 +48,11 @@
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
-        <!-- Redis Cache-->
+        <!-- dc3 Commont -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-core</artifactId>
         </dependency>
-
-        <!-- dc3 Commont Base -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-base</artifactId>

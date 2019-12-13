@@ -17,7 +17,7 @@
 package com.pnoker.transfer.rtmp.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
@@ -97,10 +97,10 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public Response<Page<Rtmp>> list(Rtmp rtmp, PageInfo pageInfo) {
+    public Response<Page<Rtmp>> list(Rtmp rtmp, Pages pages) {
         RtmpDto rtmpDto = new RtmpDto();
         rtmpDto.convertToDto(rtmp);
-        return rtmpDbsFeignClient.list(rtmpDto.setPage(pageInfo));
+        return rtmpDbsFeignClient.list(rtmpDto.setPage(pages));
     }
 
     @Override

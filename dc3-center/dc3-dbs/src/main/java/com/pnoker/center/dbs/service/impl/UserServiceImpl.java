@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -86,8 +86,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = "dbs_user_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Page<User> list(User user, PageInfo pageInfo) {
-        return userMapper.selectPage(pagination(pageInfo), fuzzyQuery(user));
+    public Page<User> list(User user, Pages pages) {
+        return userMapper.selectPage(pagination(pages), fuzzyQuery(user));
     }
 
     @Override
@@ -108,9 +108,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> pagination(PageInfo pageInfo) {
-        Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
+    public Page<User> pagination(Pages pages) {
+        Page<User> page = new Page<>(pages.getPageNum(), pages.getPageSize());
+        Optional.ofNullable(pages.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.forEach(orderItem -> {
                 if (Common.Cloumn.ID.equals(orderItem.getColumn())) {

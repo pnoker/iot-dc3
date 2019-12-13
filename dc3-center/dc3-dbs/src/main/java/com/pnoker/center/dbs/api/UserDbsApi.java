@@ -18,7 +18,7 @@ package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.service.UserService;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
@@ -75,7 +75,7 @@ public class UserDbsApi implements UserDbsFeignClient {
     @Override
     public Response<Page<User>> list(UserDto userDto) {
         User user = new User();
-        PageInfo page = new PageInfo();
+        Pages page = new Pages();
         Optional.ofNullable(userDto)
                 .ifPresent(dto -> {
                     dto.convertToDo(user);

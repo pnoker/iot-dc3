@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * <p>返回信息 DTO
+ * <p>Response
  *
  * @author : pnoker
  * @email : pnokers@icloud.com

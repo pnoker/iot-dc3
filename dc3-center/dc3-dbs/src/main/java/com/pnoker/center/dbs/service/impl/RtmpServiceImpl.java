@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
@@ -89,8 +89,8 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Cacheable(value = "dbs_rtmp_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Page<Rtmp> list(Rtmp rtmp, PageInfo pageInfo) {
-        return rtmpMapper.selectPage(pagination(pageInfo), fuzzyQuery(rtmp));
+    public Page<Rtmp> list(Rtmp rtmp, Pages pages) {
+        return rtmpMapper.selectPage(pagination(pages), fuzzyQuery(rtmp));
     }
 
     @Override
@@ -106,9 +106,9 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public Page<Rtmp> pagination(PageInfo pageInfo) {
-        Page<Rtmp> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
+    public Page<Rtmp> pagination(Pages pages) {
+        Page<Rtmp> page = new Page<>(pages.getPageNum(), pages.getPageSize());
+        Optional.ofNullable(pages.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
             orderItems.forEach(orderItem -> {
                 if (Common.Cloumn.ID.equals(orderItem.getColumn())) {

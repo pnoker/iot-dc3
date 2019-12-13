@@ -17,7 +17,7 @@
 package com.pnoker.common.dto.device;
 
 import com.pnoker.common.entity.device.Device;
-import com.pnoker.common.bean.PageInfo;
+import com.pnoker.common.bean.Pages;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,5 +35,5 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class DeviceDto extends Device {
 
-    private PageInfo page;
+    private Pages page;
 }

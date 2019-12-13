@@ -49,7 +49,7 @@ spring:
     type: redis
     cache-names: dc3-dbs-cache
     redis:
-      time-to-live: 24H
+      time-to-live: 12H
 
 mybatis-plus:
   configuration:

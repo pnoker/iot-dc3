@@ -43,10 +43,14 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- dc3 Common Core -->
+        <!-- dc3 Common -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-base</artifactId>
         </dependency>
 
     </dependencies>

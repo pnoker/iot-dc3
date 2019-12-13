@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.config;
+package com.pnoker.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Setter;
