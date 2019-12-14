@@ -17,7 +17,7 @@
 package com.pnoker.transfer.rtmp.handler;
 
 import cn.hutool.core.util.RuntimeUtil;
-import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.common.entity.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.runner.Environment;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -49,20 +49,18 @@ public class Transcode {
     }
 
     public void start() {
+        run = true;
         process = RuntimeUtil.exec(command);
         InputStream inputStream = process.getErrorStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         try {
-            while (StringUtils.isNotEmpty((line = reader.readLine())) && run) {
+            while (StringUtils.isNotEmpty((line = reader.readLine()))&&run) {
                 log.error(line);
                 line = line.toLowerCase();
                 if (line.contains("fail") || line.contains("error")) {
-                    run = false;
+                    stop();
                 }
-            }
-            if (!run) {
-                stop();
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -73,10 +71,10 @@ public class Transcode {
                 log.error(e.getMessage(), e);
             }
         }
-        run = true;
     }
 
     public void stop() {
+        run = false;
         if (null != process) {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
             try {
@@ -88,7 +86,6 @@ public class Transcode {
             }
             process.destroyForcibly();
         }
-        run = false;
     }
 
 }

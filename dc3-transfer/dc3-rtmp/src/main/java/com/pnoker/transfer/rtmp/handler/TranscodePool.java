@@ -38,7 +38,6 @@ public class TranscodePool {
     /**
      * 转码任务Map
      */
-    //todo 需要保证多线程下一致性
     public static volatile Map<Long, Transcode> transcodeMap = new HashMap<>(64);
 
     /**

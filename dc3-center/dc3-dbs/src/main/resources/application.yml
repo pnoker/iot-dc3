@@ -10,17 +10,17 @@ spring:
     name: @project.artifactId@
   main:
     allow-bean-definition-overriding: true
-  cloud:
-    loadbalancer:
-      ribbon:
-        enabled: false
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
   security:
     user:
-      name: iotdc3
-      password: iotdc3
+      name: dc3
+      password: dc3
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://iotdc3.mysql:3306/iot-dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://dc3.mysql:3306/iot-dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ${spring.security.user.password}
@@ -32,16 +32,16 @@ spring:
       minimum-idle: 4
   data:
     mongodb:
-      host: iotdc3.mongo
+      host: dc3.mongo
       port: 27017
       database: iot-dc3
       username: root
       password: ${spring.security.user.password}
   redis:
-    host: iotdc3.redis
+    host: dc3.redis
     port: 6379
     password: ${spring.security.user.password}
-    database: 0
+    database: 2
     timeout: 15S
     jedis:
       pool:
@@ -53,7 +53,7 @@ spring:
     type: redis
     cache-names: dc3-dbs-cache
     redis:
-      time-to-live: 24H
+      time-to-live: 12H
 
 mybatis-plus:
   configuration:
@@ -99,4 +99,4 @@ eureka:
     health-check-url-path: /actuator/health
   client:
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.register:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3.register:8100/eureka/

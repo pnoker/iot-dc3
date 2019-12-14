@@ -17,9 +17,8 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.base.model.Unit;
+import com.pnoker.common.entity.Unit;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>Unit 单位表 数据库操作接口

@@ -16,10 +16,9 @@
 
 package com.pnoker.gateway.filter;
 
-import com.pnoker.common.base.constant.CommonConstants;
+import com.pnoker.common.constant.Common;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.core.Ordered;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -39,7 +38,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.a
  * @email : pnokers@icloud.com
  */
 @Component
-public class RequestGlobalFilter implements GlobalFilter, Ordered {
+public class RequestGlobalFilter implements GlobalFilter {
 
     /**
      * Process the Web request and (optionally) delegate to the next
@@ -53,7 +52,7 @@ public class RequestGlobalFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         ServerHttpRequest request = exchange.getRequest().mutate()
-                .headers(httpHeaders -> httpHeaders.remove(CommonConstants.FROM))
+                .headers(httpHeaders -> httpHeaders.remove(Common.FROM))
                 .build();
 
         addOriginalRequestUrl(exchange, request.getURI());
@@ -61,10 +60,5 @@ public class RequestGlobalFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange.mutate()
                 .request(request.mutate()
                         .build()).build());
-    }
-
-    @Override
-    public int getOrder() {
-        return -1000;
     }
 }

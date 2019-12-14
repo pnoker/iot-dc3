@@ -17,9 +17,8 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.base.model.device.Device;
+import com.pnoker.common.entity.device.Device;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>Device 数据库操作接口

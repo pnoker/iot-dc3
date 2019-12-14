@@ -10,17 +10,21 @@ spring:
     name: @project.artifactId@
   main:
     allow-bean-definition-overriding: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
   security:
     user:
-      name: iotdc3
-      password: iotdc3
+      name: dc3
+      password: dc3
   boot:
     admin:
       ui:
-        title: IOT DC3 Monitoring Center
+        title: DC3 Monitor Center
         favicon: images/icon/favicon.ico
         favicon-danger: images/icon/favicon-danger.ico
-        brand: <img src="images/logo/dc3-logo.png"><span>IOT DC3 Monitoring Center</span>
+        brand: <img src="images/logo/dc3-logo.png"><span>DC3 Monitor Center</span>
 
 management:
   endpoints:
@@ -51,4 +55,4 @@ eureka:
     health-check-url-path: /actuator/health
   client:
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@iotdc3.register:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3.register:8100/eureka/

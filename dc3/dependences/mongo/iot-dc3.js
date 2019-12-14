@@ -18,7 +18,7 @@
 db = db.getSiblingDB('iot-dc3');
 db.createUser({
     user: "root",
-    pwd: "iotdc3",
+    pwd: "dc3",
     roles: [{
         role: "readWrite",
         db: "iot-dc3"

@@ -19,11 +19,14 @@ package com.pnoker.center.dbs.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.center.dbs.mapper.TokenMapper;
 import com.pnoker.center.dbs.mapper.UserMapper;
 import com.pnoker.center.dbs.service.UserService;
-import com.pnoker.common.base.constant.CommonConstants;
-import com.pnoker.common.base.dto.PageInfo;
-import com.pnoker.common.base.model.User;
+import com.pnoker.common.bean.Pages;
+import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -48,11 +51,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private TokenMapper tokenMapper;
 
     @Override
     @Caching(
-            put = {@CachePut(value = "userCache", key = "#user.id", unless = "#result==null")},
-            evict = {@CacheEvict(value = "userListCache", allEntries = true)}
+            put = {@CachePut(value = "dbs_user", key = "#user.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "dbs_user_list", allEntries = true)}
     )
     public User add(User user) {
         return userMapper.insert(user) > 0 ? user : null;
@@ -61,8 +66,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "userCache", key = "#id"),
-                    @CacheEvict(value = "userListCache", allEntries = true)
+                    @CacheEvict(value = "dbs_user", key = "#id"),
+                    @CacheEvict(value = "dbs_user_token_id", allEntries = true),
+                    @CacheEvict(value = "dbs_user_token_app_id", allEntries = true),
+                    @CacheEvict(value = "dbs_user_list", allEntries = true)
             }
     )
     public boolean delete(Long id) {
@@ -71,53 +78,57 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "userCache", key = "#user.id", unless = "#result==null")},
-            evict = {@CacheEvict(value = "userListCache", allEntries = true)}
+            put = {@CachePut(value = "dbs_user", key = "#user.id", unless = "#result==null")},
+            evict = {
+                    @CacheEvict(value = "dbs_user_token_id", allEntries = true),
+                    @CacheEvict(value = "dbs_user_token_app_id", allEntries = true),
+                    @CacheEvict(value = "dbs_user_list", allEntries = true)
+            }
     )
     public User update(User user) {
         return userMapper.updateById(user) > 0 ? user : null;
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#id", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#id", unless = "#result==null")
     public User selectById(Long id) {
         return userMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = "userListCache", keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Page<User> list(User user, PageInfo pageInfo) {
-        return userMapper.selectPage(pagination(pageInfo), fuzzyQuery(user));
+    @Cacheable(value = "dbs_user_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public Page<User> list(UserDto userDto) {
+        return userMapper.selectPage(pagination(userDto.getPage()), fuzzyQuery(userDto));
     }
 
     @Override
-    public QueryWrapper<User> fuzzyQuery(User user) {
+    public QueryWrapper<User> fuzzyQuery(UserDto userDto) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        Optional.ofNullable(user).ifPresent(u -> {
-            if (StringUtils.isNotBlank(u.getUsername())) {
-                queryWrapper.like(CommonConstants.Cloumn.User.USERNAME, u.getUsername());
+        Optional.ofNullable(userDto).ifPresent(dto -> {
+            if (StringUtils.isNotBlank(dto.getUsername())) {
+                queryWrapper.like(Common.Cloumn.User.USERNAME, dto.getUsername());
             }
-            if (StringUtils.isNotBlank(u.getPhone())) {
-                queryWrapper.like(CommonConstants.Cloumn.User.PHONE, u.getPhone());
+            if (StringUtils.isNotBlank(dto.getPhone())) {
+                queryWrapper.like(Common.Cloumn.User.PHONE, dto.getPhone());
             }
-            if (StringUtils.isNotBlank(u.getEmail())) {
-                queryWrapper.like(CommonConstants.Cloumn.User.EMAIL, u.getEmail());
+            if (StringUtils.isNotBlank(dto.getEmail())) {
+                queryWrapper.like(Common.Cloumn.User.EMAIL, dto.getEmail());
             }
         });
         return queryWrapper;
     }
 
     @Override
-    public Page<User> pagination(PageInfo pageInfo) {
-        Page<User> page = new Page<>(pageInfo.getPageNum(), pageInfo.getPageSize());
-        Optional.ofNullable(pageInfo.getOrders()).ifPresent(orderItems -> {
+    public Page<User> pagination(Pages pages) {
+        Page<User> page = new Page<>(pages.getPageNum(), pages.getPageSize());
+        Optional.ofNullable(pages.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
-            orderItems.forEach(orderItem -> {
-                if (CommonConstants.Cloumn.ID.equals(orderItem.getColumn())) {
-                    tmps.add(orderItem);
+            orderItems.forEach(item -> {
+                if (Common.Cloumn.ID.equals(item.getColumn())) {
+                    tmps.add(item);
                 }
-                if (CommonConstants.Cloumn.User.USERNAME.equals(orderItem.getColumn())) {
-                    tmps.add(orderItem);
+                if (Common.Cloumn.User.USERNAME.equals(item.getColumn())) {
+                    tmps.add(item);
                 }
             });
             page.setOrders(tmps);
@@ -126,27 +137,52 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#usernama", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#usernama", unless = "#result==null")
     public User selectByUsername(String usernama) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.USERNAME, usernama);
+        queryWrapper.eq(Common.Cloumn.User.USERNAME, usernama);
         return userMapper.selectOne(queryWrapper);
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#phone", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#phone", unless = "#result==null")
     public User selectByPhone(String phone) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.PHONE, phone);
+        queryWrapper.eq(Common.Cloumn.User.PHONE, phone);
         return userMapper.selectOne(queryWrapper);
     }
 
     @Override
-    @Cacheable(value = "userCache", key = "#email", unless = "#result==null")
+    @Cacheable(value = "dbs_user", key = "#email", unless = "#result==null")
     public User selectByEmail(String email) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(CommonConstants.Cloumn.User.EMAIL, email);
+        queryWrapper.eq(Common.Cloumn.User.EMAIL, email);
         return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    @Caching(
+            put = {
+                    @CachePut(value = "dbs_user_token_id", key = "#token.id", unless = "#result==null"),
+                    @CachePut(value = "dbs_user_token_app_id", key = "#token.appId", unless = "#result==null")
+            }
+    )
+    public Token updateToken(Token token) {
+        return tokenMapper.updateById(token) > 0 ? token : null;
+    }
+
+    @Override
+    @Cacheable(value = "dbs_user_token_id", key = "#id", unless = "#result==null")
+    public Token selectTokenById(Long id) {
+        return tokenMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = "dbs_user_token_app_id", key = "#appId", unless = "#result==null")
+    public Token selectTokenByAppId(String appId) {
+        QueryWrapper<Token> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Common.Cloumn.Token.APP_ID, appId);
+        return tokenMapper.selectOne(queryWrapper);
     }
 
 }

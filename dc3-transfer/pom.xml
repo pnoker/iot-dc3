@@ -30,7 +30,7 @@
 
     <modules>
         <module>dc3-rtmp</module>
-        <module>dc3-opc-ua</module>
+        <module>dc3-opcua</module>
         <module>dc3-resource</module>
     </modules>
 

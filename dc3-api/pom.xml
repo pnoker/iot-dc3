@@ -32,6 +32,7 @@
         <module>dc3-api-dbs</module>
         <module>dc3-api-device</module>
         <module>dc3-api-rtmp</module>
+        <module>dc3-api-auth</module>
     </modules>
 
     <dependencies>
@@ -42,10 +43,10 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- dc3 Common Core -->
+        <!-- dc3 Common Base -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-core</artifactId>
+            <artifactId>dc3-base</artifactId>
         </dependency>
 
     </dependencies>

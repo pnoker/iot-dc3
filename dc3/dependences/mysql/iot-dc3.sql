@@ -92,7 +92,7 @@ CREATE TABLE `dc3_image` (
 -- Records of dc3_image
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_image` VALUES (-1, 'iotdc3-logo', '/images/logo/dc3-logo.png', -1, -1, 'iotdc3平台logo，默认创建', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_image` VALUES (-1, 'dc3-logo', '/images/logo/dc3-logo.png', -1, -1, 'dc3平台logo，默认创建', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 COMMIT;
 
 -- ----------------------------
@@ -259,7 +259,7 @@ CREATE TABLE `dc3_rtmp` (
   `rtmp_url` varchar(128) DEFAULT NULL COMMENT 'rtp播放链接,填写后缀即可',
   `command` varchar(128) DEFAULT NULL COMMENT 'cmd运行模板',
   `video_type` tinyint(4) DEFAULT NULL COMMENT '摄像头类型',
-  `run` tinyint(4) NULL DEFAULT NULL COMMENT '状态，0停止，1启动',
+  `run` tinyint(4) NULL DEFAULT 0 COMMENT '状态，0停止，1启动',
   `auto_start` tinyint(4) NULL DEFAULT NULL COMMENT '自启动',
   `node_id` bigint(20) DEFAULT -1 COMMENT '节点ID，节点类型为rtmp',
   `image_id` bigint(20) DEFAULT -1 COMMENT '图片ID',
@@ -281,8 +281,8 @@ CREATE TABLE `dc3_rtmp` (
 -- Records of dc3_rtmp
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://dc3.nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://dc3.nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, -1, -1, -1, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 COMMIT;
 
 -- ----------------------------
@@ -311,7 +311,7 @@ CREATE TABLE `dc3_schedule` (
 DROP TABLE IF EXISTS `dc3_token`;
 CREATE TABLE `dc3_token`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `token` varchar(32) DEFAULT NULL COMMENT 'Token,用于接口验证',
+  `token` varchar(255) DEFAULT NULL COMMENT 'Token,用于接口验证',
   `app_id` varchar(32) DEFAULT NULL COMMENT '应用ID,由平台生成',
   `private_key` varchar(255) DEFAULT NULL COMMENT '密钥,由平台生成',
   `expire_time` datetime(0) NULL DEFAULT NULL COMMENT '过期时间',
@@ -398,7 +398,7 @@ CREATE TABLE `dc3_user` (
 -- Records of dc3_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '18304071393', 'pnokers@icloud.com', 'iotdc3', -1,-1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-27 11:51:06', 0, 1);
+INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '18304071393', 'pnokers@icloud.com', 'dc3', -1,-1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-27 11:51:06', 0, 1);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

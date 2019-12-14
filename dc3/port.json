@@ -66,7 +66,7 @@
         "description": "OPC Server",
         "port": 8801
       },
-      "dc3-opc-ua": {
+      "dc3-opcua": {
         "description": "OPC UA Server",
         "port": 8802
       },
