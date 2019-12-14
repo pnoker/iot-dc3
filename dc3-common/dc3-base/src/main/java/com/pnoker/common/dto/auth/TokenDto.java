@@ -16,14 +16,18 @@
 
 package com.pnoker.common.dto.auth;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pnoker.common.base.Converter;
+import com.pnoker.common.constant.Common;
 import com.pnoker.common.entity.auth.Token;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>Token Dto
@@ -34,6 +38,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class TokenDto implements Serializable, Converter<Token> {
     private static final long serialVersionUID = 1L;
 
@@ -43,14 +48,15 @@ public class TokenDto implements Serializable, Converter<Token> {
     private String token;
 
     /**
-     * 公钥
+     * App Id
      */
-    private String publicKey;
+    private String appId;
 
     /**
      * 过期时间
      */
-    private Long expireTime;
+    @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
+    private Date expireTime;
 
     @Override
     public void convertToDo(Token token) {

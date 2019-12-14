@@ -16,7 +16,10 @@
 
 package com.pnoker.center.auth.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 
 /**
@@ -28,10 +31,66 @@ import com.pnoker.common.entity.auth.User;
 public interface AuthService {
 
     /**
+     * 新增记录
+     *
+     * @param user
+     * @return true/false
+     */
+    User add(User user);
+
+    /**
+     * 删除记录
+     *
+     * @param id
+     * @return true/false
+     */
+    boolean delete(Long id);
+
+    /**
+     * 更新记录
+     *
+     * @param user
+     * @return true/false
+     */
+    boolean update(User user);
+
+    /**
+     * 通过ID查询记录
+     *
+     * @param id
+     * @return type
+     */
+    User selectById(Long id);
+
+    /**
+     * 获取带分页、排序的记录
+     *
+     * @param userDto
+     * @return list
+     */
+    Page<User> list(UserDto userDto);
+
+    /**
+     * 判断是用户否存在
+     *
+     * @param username
+     * @return true/false
+     */
+    boolean checkUserExist(String username);
+
+    /**
+     * 判断Token令牌是否有效
+     *
+     * @param token
+     * @return true/false
+     */
+    boolean checkTokenValid(Token token);
+
+    /**
      * 生成Token令牌
      *
      * @param user
-     * @return
+     * @return tokenDto
      */
     TokenDto generateToken(User user);
 

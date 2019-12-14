@@ -23,6 +23,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,7 +45,7 @@ public interface RtmpTransferFeignClient {
      * @return true/false
      */
     @PostMapping("/add")
-    Response<Long> add(@RequestBody Rtmp rtmp);
+    Response<Long> add(@Validated  @RequestBody Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp

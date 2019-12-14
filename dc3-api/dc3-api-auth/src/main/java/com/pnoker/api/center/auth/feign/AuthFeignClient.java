@@ -22,8 +22,10 @@ import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +47,7 @@ public interface AuthFeignClient {
      * @return true/false
      */
     @PostMapping("/user/add")
-    Response<Long> add( @RequestBody User user);
+    Response<Long> add(@Validated @RequestBody User user);
 
     /**
      * 删除 根据 ID 删除 User
@@ -93,21 +95,21 @@ public interface AuthFeignClient {
     Response<Boolean> checkUserExist(@PathVariable(value = "username") String username);
 
     /**
-     * 检测Token是否有效
-     *
-     * @param token
-     * @return true/false
-     */
-    @GetMapping("/token/{token}")
-    Response<Boolean> checkTokenValid(@PathVariable(value = "token") String token);
-
-    /**
      * 获取Token
      *
      * @param user
      * @return true/false
      */
     @PostMapping("/token")
-    Response<TokenDto> generateToken(@RequestBody User user);
+    Response<TokenDto> generateToken(@Validated @RequestBody User user);
+
+    /**
+     * 检测Token是否有效
+     *
+     * @param token
+     * @return true/false
+     */
+    @PostMapping("/check/token")
+    Response<Boolean> checkTokenValid(@Validated @RequestBody Token token);
 
 }

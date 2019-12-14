@@ -18,7 +18,6 @@ package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.bean.Pages;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
@@ -46,9 +45,6 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
 
     @Override
     public Response<Long> add(Rtmp rtmp) {
-        if (!Optional.ofNullable(rtmp).isPresent()) {
-            return Response.fail("body is null");
-        }
         return null != rtmpService.add(rtmp) ? Response.ok(rtmp.getId()) : Response.fail();
     }
 
@@ -59,8 +55,8 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
 
     @Override
     public Response<Boolean> update(Rtmp rtmp) {
-        if (!Optional.ofNullable(rtmp).isPresent()) {
-            return Response.fail("body is null");
+        if (null == rtmp.getId()) {
+            return Response.fail("id is null");
         }
         return null != rtmpService.update(rtmp) ? Response.ok() : Response.fail();
     }
@@ -73,15 +69,10 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
 
     @Override
     public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
-        Rtmp rtmp = new Rtmp();
-        Pages page = new Pages();
-        Optional.ofNullable(rtmpDto)
-                .ifPresent(dto -> {
-                    dto.convertToDo(rtmp);
-                    Optional.ofNullable(rtmpDto.getPage())
-                            .ifPresent(p -> p.convert(page));
-                });
-        return Response.ok(rtmpService.list(rtmp, page));
+        if (!Optional.ofNullable(rtmpDto).isPresent()) {
+            rtmpDto = new RtmpDto();
+        }
+        return Response.ok(rtmpService.list(rtmpDto));
     }
 
 }

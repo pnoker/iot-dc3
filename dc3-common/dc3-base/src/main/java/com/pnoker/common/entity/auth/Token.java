@@ -16,13 +16,22 @@
 
 package com.pnoker.common.entity.auth;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pnoker.common.constant.Common;
 import com.pnoker.common.entity.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
- * <p>
+ * <p>Token
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -30,12 +39,30 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
 public class Token extends Description {
 
+    @NotNull(message = "token can't be empty")
     private String token;
-    private String publicKey;
+
+    @NotNull(message = "app id can't be empty")
+    private String appId;
+
     private String privateKey;
-    private Long expireTime;
-    private Enum type;
+
+    @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
+    @Future(message = "expire time must be greater than the current time")
+    private Date expireTime;
+
+    private Short type;
+
+    public void expireTime(int hour) {
+        hour = hour < 1 ? 6 : hour;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.HOUR, hour);
+        expireTime = calendar.getTime();
+    }
 
 }

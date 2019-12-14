@@ -16,8 +16,10 @@
 
 package com.pnoker.center.dbs.service;
 
-import com.pnoker.common.entity.auth.User;
 import com.pnoker.common.base.Service;
+import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 
 /**
  * <p> User 服务接口
@@ -25,11 +27,17 @@ import com.pnoker.common.base.Service;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface UserService extends Service<User> {
+public interface UserService extends Service<User, UserDto> {
 
     User selectByUsername(String usernama);
 
     User selectByPhone(String phone);
 
     User selectByEmail(String email);
+
+    Token updateToken(Token token);
+
+    Token selectTokenById(Long id);
+
+    Token selectTokenByAppId(String appId);
 }

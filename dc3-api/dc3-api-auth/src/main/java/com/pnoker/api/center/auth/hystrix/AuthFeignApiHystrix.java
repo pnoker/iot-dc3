@@ -21,6 +21,7 @@ import com.pnoker.api.center.auth.feign.AuthFeignClient;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -74,12 +75,12 @@ public class AuthFeignApiHystrix implements FallbackFactory<AuthFeignClient> {
             }
 
             @Override
-            public Response<Boolean> checkTokenValid(String token) {
+            public Response<TokenDto> generateToken(User user) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<TokenDto> generateToken(User user) {
+            public Response<Boolean> checkTokenValid(Token token) {
                 return Response.fail(message);
             }
         };

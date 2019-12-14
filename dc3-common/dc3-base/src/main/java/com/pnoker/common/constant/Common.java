@@ -82,6 +82,13 @@ public interface Common {
         }
 
         /**
+         * Token表
+         */
+        interface Token {
+            String APP_ID = "app_id";
+        }
+
+        /**
          * Rtmp表
          */
         interface Rtmp {

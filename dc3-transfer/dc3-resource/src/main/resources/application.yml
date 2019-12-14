@@ -10,6 +10,10 @@ spring:
     name: @project.artifactId@
   main:
     allow-bean-definition-overriding: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
   security:
     user:
       name: dc3

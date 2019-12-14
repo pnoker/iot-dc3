@@ -21,8 +21,9 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.RtmpMapper;
 import com.pnoker.center.dbs.service.RtmpService;
-import com.pnoker.common.constant.Common;
 import com.pnoker.common.bean.Pages;
+import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
@@ -89,19 +90,21 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Cacheable(value = "dbs_rtmp_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Page<Rtmp> list(Rtmp rtmp, Pages pages) {
-        return rtmpMapper.selectPage(pagination(pages), fuzzyQuery(rtmp));
+    public Page<Rtmp> list(RtmpDto rtmpDto) {
+        return rtmpMapper.selectPage(pagination(rtmpDto.getPage()), fuzzyQuery(rtmpDto));
     }
 
     @Override
-    public QueryWrapper<Rtmp> fuzzyQuery(Rtmp rtmp) {
+    public QueryWrapper<Rtmp> fuzzyQuery(RtmpDto rtmpDto) {
         QueryWrapper<Rtmp> queryWrapper = new QueryWrapper<>();
-        if (null != rtmp.getAutoStart()) {
-            queryWrapper.eq(Common.Cloumn.Rtmp.AUTO_START, BooleanUtils.isTrue(rtmp.getAutoStart()));
-        }
-        if (StringUtils.isNotBlank(rtmp.getName())) {
-            queryWrapper.like(Common.Cloumn.NAME, rtmp.getName());
-        }
+        Optional.ofNullable(rtmpDto).ifPresent(dto -> {
+            if (null != dto.getAutoStart()) {
+                queryWrapper.eq(Common.Cloumn.Rtmp.AUTO_START, BooleanUtils.isTrue(dto.getAutoStart()));
+            }
+            if (StringUtils.isNotBlank(dto.getName())) {
+                queryWrapper.like(Common.Cloumn.NAME, dto.getName());
+            }
+        });
         return queryWrapper;
     }
 
@@ -110,12 +113,12 @@ public class RtmpServiceImpl implements RtmpService {
         Page<Rtmp> page = new Page<>(pages.getPageNum(), pages.getPageSize());
         Optional.ofNullable(pages.getOrders()).ifPresent(orderItems -> {
             List<OrderItem> tmps = new ArrayList<>();
-            orderItems.forEach(orderItem -> {
-                if (Common.Cloumn.ID.equals(orderItem.getColumn())) {
-                    tmps.add(orderItem);
+            orderItems.forEach(item -> {
+                if (Common.Cloumn.ID.equals(item.getColumn())) {
+                    tmps.add(item);
                 }
-                if (Common.Cloumn.NAME.equals(orderItem.getColumn())) {
-                    tmps.add(orderItem);
+                if (Common.Cloumn.NAME.equals(item.getColumn())) {
+                    tmps.add(item);
                 }
             });
             page.setOrders(tmps);

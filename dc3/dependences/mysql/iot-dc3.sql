@@ -311,7 +311,7 @@ CREATE TABLE `dc3_schedule` (
 DROP TABLE IF EXISTS `dc3_token`;
 CREATE TABLE `dc3_token`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `token` varchar(32) DEFAULT NULL COMMENT 'Token,用于接口验证',
+  `token` varchar(255) DEFAULT NULL COMMENT 'Token,用于接口验证',
   `app_id` varchar(32) DEFAULT NULL COMMENT '应用ID,由平台生成',
   `private_key` varchar(255) DEFAULT NULL COMMENT '密钥,由平台生成',
   `expire_time` datetime(0) NULL DEFAULT NULL COMMENT '过期时间',

@@ -21,10 +21,11 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
+
+import java.io.Serializable;
 
 /**
  * <p>Rtmp DTO
@@ -36,13 +37,20 @@ import org.springframework.beans.BeanUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-public class RtmpDto extends Rtmp implements Converter<Rtmp> {
+public class RtmpDto implements Serializable, Converter<Rtmp> {
+    private static final long serialVersionUID = 1L;
+
+    private String name;
+    private Short videoType;
+    private Boolean run;
+    private Boolean autoStart;
+    private Long nodeId;
+    private Long userId;
 
     private Pages page;
 
     public RtmpDto(boolean autoStart) {
-        super(autoStart);
+        this.autoStart = autoStart;
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 /**
- * <p>Redis缓存配置
+ * <p>Redis Cache
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -91,7 +91,6 @@ public class RedisCacheConfig {
         ObjectMapper om = new ObjectMapper();
         om.activateDefaultTyping(om.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
-
         // 配置序列化（解决乱码的问题）
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
