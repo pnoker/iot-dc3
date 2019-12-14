@@ -83,6 +83,7 @@
     </properties>
 
     <dependencies>
+
         <!-- Configuration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -147,6 +148,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <!-- Spring Cloud 依赖 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -208,6 +210,12 @@
             </dependency>
             <dependency>
                 <groupId>com.pnoker</groupId>
+                <artifactId>dc3-api-auth</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.pnoker</groupId>
                 <artifactId>dc3-api-device</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
@@ -222,13 +230,13 @@
             <!-- dc3 Common -->
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-core</artifactId>
+                <artifactId>dc3-base</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-base</artifactId>
+                <artifactId>dc3-core</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
@@ -343,7 +351,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
     </build>
 
     <repositories>
@@ -378,6 +385,7 @@
             </snapshots>
         </repository>
     </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>spring-plugin</id>

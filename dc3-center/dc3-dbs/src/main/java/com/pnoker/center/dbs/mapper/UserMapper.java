@@ -17,9 +17,8 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.base.model.User;
+import com.pnoker.common.entity.auth.User;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>User 数据库操作接口

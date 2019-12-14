@@ -29,6 +29,7 @@
     <description>IOT DC3 平台 虚拟设备服务，用于数据测试专用。</description>
 
     <dependencies>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

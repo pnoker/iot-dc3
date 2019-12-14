@@ -48,14 +48,10 @@ public class RedisTemplateConfig {
         ObjectMapper om = new ObjectMapper();
         om.activateDefaultTyping(om.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
-
+        // 配置序列化（解决乱码的问题）
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        //key&value
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
-        //hash key&value
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
         redisTemplate.setConnectionFactory(factory);
         return redisTemplate;
     }

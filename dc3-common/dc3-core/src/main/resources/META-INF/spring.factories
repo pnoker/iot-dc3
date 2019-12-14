@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.pnoker.common.exception.GlobalExceptionAdvice,\
+  com.pnoker.common.config.RedisTemplateConfig,\
+  com.pnoker.common.config.RedisCacheConfig

@@ -18,15 +18,13 @@ package com.pnoker.transfer.rtmp.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.transfer.rtmp.feign.RtmpTransferFeignClient;
-import com.pnoker.common.base.bean.Response;
-import com.pnoker.common.base.dto.PageInfo;
-import com.pnoker.common.base.dto.transfer.RtmpDto;
-import com.pnoker.common.base.model.rtmp.Rtmp;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.transfer.RtmpDto;
+import com.pnoker.common.entity.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -40,66 +38,49 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
+@RequestMapping(Common.Service.DC3_RTMP_URL_PREFIX)
 public class RtmpTransferApi implements RtmpTransferFeignClient {
     @Resource
     private RtmpService rtmpService;
 
     @Override
-    public Response<Long> add(@RequestBody Rtmp rtmp) {
-        if (!Optional.ofNullable(rtmp).isPresent()) {
-            return Response.fail("body is null");
-        }
+    public Response<Long> add(Rtmp rtmp) {
         return rtmpService.add(rtmp).isOk() ? Response.ok(rtmp.getId()) : Response.fail();
     }
 
     @Override
-    public Response<Boolean> delete(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<Boolean> delete(Long id) {
         return rtmpService.delete(id);
     }
 
     @Override
-    public Response<Boolean> update(@RequestBody Rtmp rtmp) {
-        if (!Optional.ofNullable(rtmp).isPresent()) {
-            return Response.fail("body is null");
+    public Response<Boolean> update(Rtmp rtmp) {
+        if (null == rtmp.getId()) {
+            return Response.fail("id is null");
         }
         return rtmpService.update(rtmp);
     }
 
     @Override
-    public Response<Rtmp> selectById(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<Rtmp> selectById(Long id) {
         return rtmpService.selectById(id);
     }
 
     @Override
-    public Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto) {
-        Rtmp rtmp = new Rtmp();
-        PageInfo page = new PageInfo();
-        Optional.ofNullable(rtmpDto).ifPresent(r -> {
-            BeanUtils.copyProperties(r, rtmp);
-            Optional.ofNullable(rtmpDto.getPage()).ifPresent(p -> BeanUtils.copyProperties(p, page));
-        });
-        return rtmpService.list(rtmp, page);
+    public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
+        if (!Optional.ofNullable(rtmpDto).isPresent()) {
+            rtmpDto = new RtmpDto();
+        }
+        return rtmpService.list(rtmpDto);
     }
 
     @Override
-    public Response<Boolean> start(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<Boolean> start(Long id) {
         return rtmpService.start(id);
     }
 
     @Override
-    public Response<Boolean> stop(@PathVariable Long id) {
-        if (null == id) {
-            return Response.fail("id can not be empty");
-        }
+    public Response<Boolean> stop(Long id) {
         return rtmpService.stop(id);
     }
 

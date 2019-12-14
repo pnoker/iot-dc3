@@ -5,7 +5,7 @@ Accept: application/json
 
 {
   "rtspUrl": "D:/FFmpeg/bin/video.mp4",
-  "rtmpUrl": "rtmp://iotdc3.nginx:1935/rtmp/bigbuckbunny_175k",
+  "rtmpUrl": "rtmp://dc3.nginx:1935/rtmp/bigbuckbunny_175k",
   "command": "{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}",
   "videoType": "0",
   "autoStart": false

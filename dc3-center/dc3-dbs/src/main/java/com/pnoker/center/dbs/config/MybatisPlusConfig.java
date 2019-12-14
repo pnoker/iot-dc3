@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * <p>Mybatis配置
+ * <p>MybatisPlus配置
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
