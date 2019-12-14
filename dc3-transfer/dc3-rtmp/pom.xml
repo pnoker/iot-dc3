@@ -26,7 +26,7 @@
     <artifactId>dc3-rtmp</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Rtsp->Rtmp 视频流转码服务。</description>
+    <description>IOT DC3 平台 Rtsp转Rtmp 视频流转码服务。</description>
 
     <dependencies>
 
@@ -34,6 +34,12 @@
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-api-rtmp</artifactId>
+        </dependency>
+
+        <!-- dc3 Common Core -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-core</artifactId>
         </dependency>
 
     </dependencies>

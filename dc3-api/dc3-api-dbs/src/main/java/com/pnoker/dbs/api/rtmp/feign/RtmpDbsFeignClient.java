@@ -23,12 +23,11 @@ import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import com.pnoker.dbs.api.rtmp.hystrix.RtmpDbsFeignHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import javax.validation.Valid;
 
 /**
  * <p>Rtmp 数据 FeignClient
@@ -46,7 +45,7 @@ public interface RtmpDbsFeignClient {
      * @return rtmpId
      */
     @PostMapping("/add")
-    Response<Long> add(@RequestBody Rtmp rtmp);
+    Response<Long> add(@Validated @RequestBody Rtmp rtmp);
 
     /**
      * 删除 根据 ID 删除 Rtmp
@@ -82,6 +81,6 @@ public interface RtmpDbsFeignClient {
      * @return rtmpList
      */
     @PostMapping("/list")
-    Response<Page<Rtmp>> list(@Valid @RequestBody(required = false) RtmpDto rtmpDto);
+    Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
 
 }

@@ -19,6 +19,7 @@ package com.pnoker.dbs.api.user.hystrix;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import feign.hystrix.FallbackFactory;
@@ -61,6 +62,11 @@ public class UserDbsFeignHystrix implements FallbackFactory<UserDbsFeignClient> 
             }
 
             @Override
+            public Response<Page<User>> list(UserDto userDto) {
+                return Response.fail(message);
+            }
+
+            @Override
             public Response<User> username(String username) {
                 return Response.fail(message);
             }
@@ -76,7 +82,17 @@ public class UserDbsFeignHystrix implements FallbackFactory<UserDbsFeignClient> 
             }
 
             @Override
-            public Response<Page<User>> list(UserDto userDto) {
+            public Response<Boolean> updateToken(Token token) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Token> selectTokenById(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Token> selectTokenByAppId(String appId) {
                 return Response.fail(message);
             }
         };

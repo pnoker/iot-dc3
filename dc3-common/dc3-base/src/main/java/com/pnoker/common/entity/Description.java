@@ -53,6 +53,7 @@ public class Description implements Serializable {
 
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     private Date createTime;
+
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     private Date updateTime;
 

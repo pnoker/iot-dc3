@@ -26,7 +26,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotNull;
 
 /**
- * <p>Rtmp 信息实体类
+ * <p>Rtmp
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -38,11 +38,18 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class Rtmp extends Description {
 
-    @NotNull(message = "nn")
+    @NotNull(message = "name can't be empty")
     private String name;
+
+    @NotNull(message = "rtsp url can't be empty")
     private String rtspUrl;
+
+    @NotNull(message = "rtmp url can't be empty")
     private String rtmpUrl;
+
+    @NotNull(message = "command can't be empty")
     private String command;
+
     private Short videoType;
     private Boolean run;
     private Boolean autoStart;

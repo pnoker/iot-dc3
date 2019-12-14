@@ -19,7 +19,8 @@ package com.pnoker.center.auth;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * <p>授权中心服务启动入口
@@ -29,7 +30,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @EnableCaching
 @SpringCloudApplication
-@EnableTransactionManagement
+@EnableFeignClients("com.pnoker.dbs.api.user.*")
+@ComponentScan(basePackages = {"com.pnoker.dbs.api.user", "com.pnoker.center.auth"})
 public class AuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);

@@ -19,6 +19,7 @@ package com.pnoker.transfer.rtmp.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.bean.Pages;
+import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 
 /**
@@ -63,11 +64,10 @@ public interface RtmpService {
     /**
      * 获取带分页、排序的记录
      *
-     * @param rtmp
-     * @param pages pageNum,pageSize
+     * @param rtmpDto
      * @return list
      */
-    Response<Page<Rtmp>> list(Rtmp rtmp, Pages pages);
+    Response<Page<Rtmp>> list(RtmpDto rtmpDto);
 
     /**
      * 启动

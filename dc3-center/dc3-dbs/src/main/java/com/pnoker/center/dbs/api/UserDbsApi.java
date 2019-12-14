@@ -18,10 +18,10 @@ package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.service.UserService;
-import com.pnoker.common.bean.Pages;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
@@ -47,9 +47,6 @@ public class UserDbsApi implements UserDbsFeignClient {
 
     @Override
     public Response<Long> add(User user) {
-        if (!Optional.ofNullable(user).isPresent()) {
-            return Response.fail("body is null");
-        }
         return null != userService.add(user) ? Response.ok(user.getId()) : Response.fail();
     }
 
@@ -60,8 +57,8 @@ public class UserDbsApi implements UserDbsFeignClient {
 
     @Override
     public Response<Boolean> update(User user) {
-        if (!Optional.ofNullable(user).isPresent()) {
-            return Response.fail("body is null");
+        if (null == user.getId()) {
+            return Response.fail("id is null");
         }
         return null != userService.update(user) ? Response.ok() : Response.fail();
     }
@@ -74,15 +71,10 @@ public class UserDbsApi implements UserDbsFeignClient {
 
     @Override
     public Response<Page<User>> list(UserDto userDto) {
-        User user = new User();
-        Pages page = new Pages();
-        Optional.ofNullable(userDto)
-                .ifPresent(dto -> {
-                    dto.convertToDo(user);
-                    Optional.ofNullable(userDto.getPage())
-                            .ifPresent(p -> p.convert(page));
-                });
-        return Response.ok(userService.list(user, page));
+        if (!Optional.ofNullable(userDto).isPresent()) {
+            userDto = new UserDto();
+        }
+        return Response.ok(userService.list(userDto));
     }
 
     @Override
@@ -110,6 +102,26 @@ public class UserDbsApi implements UserDbsFeignClient {
         }
         User user = userService.selectByEmail(email);
         return null != user ? Response.ok(user) : Response.fail("email does not exist");
+    }
+
+    @Override
+    public Response<Boolean> updateToken(Token token) {
+        if (null == token.getId()) {
+            return Response.fail("id is null");
+        }
+        return null != userService.updateToken(token) ? Response.ok() : Response.fail();
+    }
+
+    @Override
+    public Response<Token> selectTokenById(Long id) {
+        Token token = userService.selectTokenById(id);
+        return null != token ? Response.ok(token) : Response.fail("id does not exist");
+    }
+
+    @Override
+    public Response<Token> selectTokenByAppId(String appId) {
+        Token token = userService.selectTokenByAppId(appId);
+        return null != token ? Response.ok(token) : Response.fail("id does not exist");
     }
 
 }

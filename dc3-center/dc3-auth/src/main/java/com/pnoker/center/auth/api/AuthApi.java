@@ -18,16 +18,19 @@ package com.pnoker.center.auth.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.auth.feign.AuthFeignClient;
+import com.pnoker.center.auth.service.AuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * <p>auth rest api
@@ -39,44 +42,54 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(Common.Service.DC3_AUTH_URL_PREFIX)
 public class AuthApi implements AuthFeignClient {
+    @Resource
+    private AuthService authService;
 
     @Override
-    public Response<Long> add(@Valid User user) {
-        return null;
+    public Response<Long> add(User user) {
+        return null != authService.add(user) ? Response.ok(user.getId()) : Response.fail();
     }
 
     @Override
     public Response<Boolean> delete(Long id) {
-        return null;
+        return authService.delete(id) ? Response.ok() : Response.fail();
     }
 
     @Override
     public Response<Boolean> update(User user) {
-        return null;
+        if (null == user.getId()) {
+            return Response.fail("id is null");
+        }
+        return authService.update(user) ? Response.ok() : Response.fail();
     }
 
     @Override
     public Response<User> selectById(Long id) {
-        return null;
+        User user = authService.selectById(id);
+        return null != user ? Response.ok(user) : Response.fail("id does not exist");
     }
 
     @Override
     public Response<Page<User>> list(UserDto userDto) {
-        return null;
+        if (!Optional.ofNullable(userDto).isPresent()) {
+            userDto = new UserDto();
+        }
+        return Response.ok(authService.list(userDto));
     }
 
     @Override
     public Response<Boolean> checkUserExist(String username) {
-        return null;
-    }
-
-    @Override
-    public Response<Boolean> checkTokenValid(String token) {
-        return null;
+        return authService.checkUserExist(username) ? Response.ok() : Response.fail();
     }
 
     @Override
     public Response<TokenDto> generateToken(User user) {
-        return null;
+        TokenDto tokenDto = authService.generateToken(user);
+        return null != tokenDto ? Response.ok(tokenDto) : Response.fail();
+    }
+
+    @Override
+    public Response<Boolean> checkTokenValid(Token token) {
+        return authService.checkTokenValid(token) ? Response.ok() : Response.fail();
     }
 }

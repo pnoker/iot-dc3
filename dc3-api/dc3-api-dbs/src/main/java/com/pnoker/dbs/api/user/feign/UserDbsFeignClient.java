@@ -20,9 +20,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import com.pnoker.dbs.api.user.hystrix.UserDbsFeignHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,12 +46,12 @@ public interface UserDbsFeignClient {
      * @return userId
      */
     @PostMapping("/add")
-    Response<Long> add(@RequestBody User user);
+    Response<Long> add(@Validated @RequestBody User user);
 
     /**
      * 删除 根据 ID 删除 User
      *
-     * @param id userId
+     * @param id
      * @return true/false
      */
     @PostMapping("/delete/{id}")
@@ -85,7 +87,7 @@ public interface UserDbsFeignClient {
     /**
      * 通过用户名查询用户
      *
-     * @param username 用户名
+     * @param username
      * @return user
      */
     @GetMapping("/username/{username}")
@@ -94,7 +96,7 @@ public interface UserDbsFeignClient {
     /**
      * 通过手机号查询用户
      *
-     * @param phone 用户名
+     * @param phone
      * @return user
      */
     @GetMapping("/phone/{phone}")
@@ -103,10 +105,37 @@ public interface UserDbsFeignClient {
     /**
      * 通过邮箱查询用户
      *
-     * @param email 用户名
+     * @param email
      * @return user
      */
     @GetMapping("/email/{email}")
     Response<User> email(@PathVariable(value = "email") String email);
+
+    /**
+     * 修改 修改 Token 记录
+     *
+     * @param token
+     * @return true/false
+     */
+    @PostMapping("/token/update")
+    Response<Boolean> updateToken(@RequestBody Token token);
+
+    /**
+     * 通过TokenId查询用户Token信息
+     *
+     * @param id
+     * @return token
+     */
+    @GetMapping("/token/{id}")
+    Response<Token> selectTokenById(@PathVariable(value = "id") Long id);
+
+    /**
+     * 通过TokenId查询用户Token信息
+     *
+     * @param appId
+     * @return token
+     */
+    @GetMapping("/token/app/{app_id}")
+    Response<Token> selectTokenByAppId(@PathVariable(value = "app_id") String appId);
 
 }

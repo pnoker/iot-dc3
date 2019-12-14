@@ -26,7 +26,7 @@ import com.pnoker.common.bean.Pages;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface Service<T> {
+public interface Service<T, D> {
     /**
      * 新增
      *
@@ -62,19 +62,18 @@ public interface Service<T> {
     /**
      * 获取带分页、排序
      *
-     * @param type
-     * @param pages pageNum,pageSize
+     * @param dto
      * @return list
      */
-    Page<T> list(T type, Pages pages);
+    Page<T> list(D dto);
 
     /**
      * 统一接口 模糊查询构造器
      *
-     * @param t
+     * @param dto
      * @return type
      */
-    QueryWrapper<T> fuzzyQuery(T t);
+    QueryWrapper<T> fuzzyQuery(D dto);
 
     /**
      * 统一接口 排序构造器 & 字段校验

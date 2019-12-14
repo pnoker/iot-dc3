@@ -16,6 +16,7 @@
 
 package com.pnoker.common.bean;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class Response<T> implements Serializable {
 
     private boolean ok;
     private String message;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
     /**
@@ -138,7 +140,7 @@ public class Response<T> implements Serializable {
      */
     private Response success() {
         this.ok = true;
-        this.message = "Ok!";
+        this.message = "ok";
         return this;
     }
 
@@ -161,7 +163,7 @@ public class Response<T> implements Serializable {
      */
     private Response failure() {
         this.ok = false;
-        this.message = "Fail!";
+        this.message = "fail";
         return this;
     }
 

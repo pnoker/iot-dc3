@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.service;
+package com.pnoker.center.dbs.mapper;
 
-import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pnoker.common.entity.auth.Token;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * <p> Rtmp 服务接口
+ * <p>Token 数据库操作接口
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface RtmpService extends Service<Rtmp, RtmpDto> {
+@Mapper
+public interface TokenMapper extends BaseMapper<Token> {
 }

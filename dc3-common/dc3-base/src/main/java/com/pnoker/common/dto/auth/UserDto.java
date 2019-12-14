@@ -21,9 +21,11 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.entity.auth.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
+
+import java.io.Serializable;
 
 /**
  * <p>User DTO
@@ -34,8 +36,14 @@ import org.springframework.beans.BeanUtils;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class UserDto extends User implements Converter<User> {
+@Accessors(chain = true)
+public class UserDto implements Serializable, Converter<User> {
+
+    private String username;
+    private String phone;
+    private String email;
+    private Boolean enable;
+    private Long nodeId;
 
     private Pages page;
 
