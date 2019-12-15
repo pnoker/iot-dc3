@@ -19,7 +19,6 @@ package com.pnoker.center.auth.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 
 /**
@@ -79,19 +78,19 @@ public interface AuthService {
     boolean checkUserExist(String username);
 
     /**
-     * 判断Token令牌是否有效
-     *
-     * @param token
-     * @return true/false
-     */
-    boolean checkTokenValid(Token token);
-
-    /**
      * 生成Token令牌
      *
      * @param user
      * @return tokenDto
      */
     TokenDto generateToken(User user);
+
+    /**
+     * 判断Token令牌是否有效
+     *
+     * @param tokenDto
+     * @return true/false
+     */
+    boolean checkTokenValid(TokenDto tokenDto);
 
 }

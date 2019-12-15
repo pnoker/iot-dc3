@@ -18,7 +18,9 @@ package com.pnoker.center.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -33,7 +35,7 @@ public class SendController {
     private MyProcessor processor;
 
     @PostMapping("/send")
-    public String send(@RequestBody MyGirl myGirl ){
+    public String send(@RequestBody MyGirl myGirl) {
         processor.output().send(MessageBuilder.withPayload(myGirl).build());
         return "send a collect to my girl";
     }

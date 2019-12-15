@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp;
+package com.pnoker.gateway.service.impl;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
+import com.pnoker.api.center.auth.feign.AuthFeignClient;
+import com.pnoker.common.bean.Response;
+import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.gateway.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
- * <p>Rtmp 视频转码服务启动入口
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@SpringCloudApplication
-@EnableFeignClients("com.pnoker.api.center.dbs.rtmp.*")
-@ComponentScan(basePackages = {"com.pnoker.api.center.dbs.rtmp", "com.pnoker.transfer.rtmp"})
-public class RtmpApplication {
+@Service
+public class AuthServiceImpl implements AuthService {
+    @Autowired
+    private AuthFeignClient authFeignClient;
 
-    public static void main(String[] args) {
-        SpringApplication.run(RtmpApplication.class, args);
+    @Override
+    public boolean isPermitted(TokenDto tokenDto) {
+        Response<Boolean> response = authFeignClient.checkTokenValid(tokenDto);
+        return response.isOk();
     }
 }
-

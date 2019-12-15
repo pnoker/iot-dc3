@@ -18,6 +18,8 @@ package com.pnoker.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * <p>平台网关服务入口
@@ -26,6 +28,8 @@ import org.springframework.cloud.client.SpringCloudApplication;
  * @email : pnokers@icloud.com
  */
 @SpringCloudApplication
+@EnableFeignClients("com.pnoker.api.center.auth.*")
+@ComponentScan(basePackages = {"com.pnoker.api.center.auth", "com.pnoker.gateway"})
 public class GatewayApplication {
 
     public static void main(String[] args) {

@@ -29,13 +29,13 @@ import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,9 +49,9 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-    @Resource
+    @Autowired
     private UserMapper userMapper;
-    @Resource
+    @Autowired
     private TokenMapper tokenMapper;
 
     @Override
@@ -108,12 +108,6 @@ public class UserServiceImpl implements UserService {
             if (StringUtils.isNotBlank(dto.getUsername())) {
                 queryWrapper.like(Common.Cloumn.User.USERNAME, dto.getUsername());
             }
-            if (StringUtils.isNotBlank(dto.getPhone())) {
-                queryWrapper.like(Common.Cloumn.User.PHONE, dto.getPhone());
-            }
-            if (StringUtils.isNotBlank(dto.getEmail())) {
-                queryWrapper.like(Common.Cloumn.User.EMAIL, dto.getEmail());
-            }
         });
         return queryWrapper;
     }
@@ -141,22 +135,6 @@ public class UserServiceImpl implements UserService {
     public User selectByUsername(String usernama) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(Common.Cloumn.User.USERNAME, usernama);
-        return userMapper.selectOne(queryWrapper);
-    }
-
-    @Override
-    @Cacheable(value = "dbs_user", key = "#phone", unless = "#result==null")
-    public User selectByPhone(String phone) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(Common.Cloumn.User.PHONE, phone);
-        return userMapper.selectOne(queryWrapper);
-    }
-
-    @Override
-    @Cacheable(value = "dbs_user", key = "#email", unless = "#result==null")
-    public User selectByEmail(String email) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(Common.Cloumn.User.EMAIL, email);
         return userMapper.selectOne(queryWrapper);
     }
 

@@ -17,17 +17,17 @@
 package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.api.center.dbs.rtmp.feign.RtmpDbsFeignClient;
 import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
-import com.pnoker.dbs.api.rtmp.feign.RtmpDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
@@ -40,7 +40,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(Common.Service.DC3_DBS_RTMP_URL_PREFIX)
 public class RtmpDbsApi implements RtmpDbsFeignClient {
-    @Resource
+    @Autowired
     private RtmpService rtmpService;
 
     @Override

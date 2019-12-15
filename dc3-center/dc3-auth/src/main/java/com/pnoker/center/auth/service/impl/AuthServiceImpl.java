@@ -18,6 +18,7 @@ package com.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
 import com.pnoker.center.auth.service.AuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
@@ -25,17 +26,15 @@ import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import com.pnoker.common.tool.AesTools;
-import com.pnoker.common.tool.Dc3Tools;
-import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Date;
 
 /**
@@ -47,7 +46,7 @@ import java.util.Date;
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
-    @Resource
+    @Autowired
     private UserDbsFeignClient userDbsFeignClient;
 
     @Override
@@ -61,6 +60,8 @@ public class AuthServiceImpl implements AuthService {
             user.setId(response.getData());
             return user;
         }
+        // 防止cache提示key为空
+        user.setId(0L);
         return null;
     }
 
@@ -68,8 +69,8 @@ public class AuthServiceImpl implements AuthService {
     @Caching(
             evict = {
                     @CacheEvict(value = "auth_user", key = "#id"),
-                    @CacheEvict(value = "auth_check", allEntries = true),
-                    @CacheEvict(value = "auth_check_token", allEntries = true),
+                    @CacheEvict(value = "auth_check_user", allEntries = true),
+                    @CacheEvict(value = "auth_token", allEntries = true),
                     @CacheEvict(value = "auth_user_list", allEntries = true)
             }
     )
@@ -81,8 +82,8 @@ public class AuthServiceImpl implements AuthService {
     @Caching(
             evict = {
                     @CacheEvict(value = "auth_user", key = "#user.id"),
-                    @CacheEvict(value = "auth_check", key = "#user.username"),
-                    @CacheEvict(value = "auth_check_token", allEntries = true),
+                    @CacheEvict(value = "auth_check_user", allEntries = true),
+                    @CacheEvict(value = "auth_token", allEntries = true),
                     @CacheEvict(value = "auth_user_list", allEntries = true)
             }
     )
@@ -105,35 +106,28 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @CachePut(value = "auth_check", key = "#username")
+    @CachePut(value = "auth_check_user", key = "#username")
     public boolean checkUserExist(String username) {
-        if (Dc3Tools.isMail(username)) {
-            return userDbsFeignClient.email(username).isOk();
-        }
-        if (Dc3Tools.isPhone(username)) {
-            return userDbsFeignClient.phone(username).isOk();
-        }
-        if (Dc3Tools.isUsername(username)) {
-            return userDbsFeignClient.username(username).isOk();
-        }
-        return false;
+        return userDbsFeignClient.username(username).isOk();
     }
 
     @Override
     @SneakyThrows
-    @CacheEvict(value = "auth_check_token", allEntries = true)
+    @CacheEvict(value = "auth_token", allEntries = true)
     public TokenDto generateToken(User user) {
         Response<User> userResponse = userDbsFeignClient.username(user.getUsername());
         if (userResponse.isOk()) {
             user = userResponse.getData();
             Response<Token> tokenResponse = userDbsFeignClient.selectTokenById(user.getTokenId());
             if (tokenResponse.isOk()) {
+                // 生成Token
                 Token token = tokenResponse.getData();
                 token.expireTime(0);
                 token.setToken(AesTools.encrypt(IdUtil.simpleUUID(), token.getPrivateKey()));
+                userDbsFeignClient.updateToken(token);
+
                 TokenDto tokenDto = new TokenDto();
                 tokenDto.convertToDto(tokenResponse.getData());
-                userDbsFeignClient.updateToken(token);
                 return tokenDto;
             }
         }
@@ -142,12 +136,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @SneakyThrows
-    @CachePut(value = "auth_check_token", key = "#token.token")
-    public boolean checkTokenValid(Token token) {
-        Response<Token> tokenResponse = userDbsFeignClient.selectTokenByAppId(token.getAppId());
+    @CachePut(value = "auth_token", key = "#tokenDto.appId")
+    public boolean checkTokenValid(TokenDto tokenDto) {
+        Response<Token> tokenResponse = userDbsFeignClient.selectTokenByAppId(tokenDto.getAppId());
         if (tokenResponse.isOk()) {
             Token temp = tokenResponse.getData();
-            if (token.getToken().equals(temp.getToken()) && temp.getExpireTime().getTime() > (new Date()).getTime()) {
+            if (tokenDto.getToken().equals(temp.getToken()) && temp.getExpireTime().getTime() > (new Date()).getTime()) {
                 return true;
             }
         }

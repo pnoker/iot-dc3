@@ -34,7 +34,7 @@ spring:
     type: redis
     cache-names: dc3-auth-cache
     redis:
-      time-to-live: 12H
+      time-to-live: 60S
 
 management:
   endpoints:

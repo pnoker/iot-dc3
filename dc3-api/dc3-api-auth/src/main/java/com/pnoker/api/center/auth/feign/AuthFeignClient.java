@@ -22,7 +22,6 @@ import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
@@ -106,10 +105,10 @@ public interface AuthFeignClient {
     /**
      * 检测Token是否有效
      *
-     * @param token
+     * @param tokenDto
      * @return true/false
      */
     @PostMapping("/check/token")
-    Response<Boolean> checkTokenValid(@Validated @RequestBody Token token);
+    Response<Boolean> checkTokenValid(@Validated @RequestBody TokenDto tokenDto);
 
 }
