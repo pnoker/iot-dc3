@@ -31,10 +31,6 @@ public interface UserService extends Service<User, UserDto> {
 
     User selectByUsername(String usernama);
 
-    User selectByPhone(String phone);
-
-    User selectByEmail(String email);
-
     Token updateToken(Token token);
 
     Token selectTokenById(Long id);

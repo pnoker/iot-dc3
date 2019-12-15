@@ -36,7 +36,7 @@ spring:
     type: redis
     cache-names: dc3-gateway-cache
     redis:
-      time-to-live: 12H
+      time-to-live: 60S
   cloud:
     gateway:
       loadbalancer:
@@ -52,6 +52,7 @@ spring:
           predicates:
             - Path=/api/v3/auth/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@ipKeyResolver}'
@@ -67,6 +68,7 @@ spring:
           predicates:
             - Path=/api/v3/device/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@ipKeyResolver}'
@@ -82,6 +84,7 @@ spring:
           predicates:
             - Path=/api/v3/data/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@ipKeyResolver}'
@@ -97,6 +100,7 @@ spring:
           predicates:
             - Path=/api/v3/rtmp/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@ipKeyResolver}'
@@ -112,6 +116,7 @@ spring:
           predicates:
             - Path=/api/v3/opc/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@ipKeyResolver}'
@@ -125,6 +130,7 @@ spring:
         - id: opcua_rest_opc_ua
           uri: lb://dc3-opcua
           predicates:
+            - AuthenticFilter
             - Path=/api/v3/opcua/**
           filters:
             - name: RequestRateLimiter
@@ -142,6 +148,7 @@ spring:
           predicates:
             - Path=/api/v3/resource/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@ipKeyResolver}'
@@ -161,8 +168,13 @@ management:
     health:
       show-details: ALWAYS
 
+feign:
+  hystrix:
+    enabled: true
+
 logging:
   level:
+    org.springframework.cloud.gateway.route: ERROR
     org.springframework.data: ERROR
     org.springframework.web: ERROR
     org.mybatis.spring: ERROR

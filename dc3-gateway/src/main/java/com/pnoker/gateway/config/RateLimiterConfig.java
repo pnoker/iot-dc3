@@ -16,22 +16,25 @@
 
 package com.pnoker.gateway.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>限流配置
+ * <p>全局过滤器配置
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
+@Slf4j
 @Configuration
 public class RateLimiterConfig {
 
-    @Bean(value = "ipKeyResolver")
+    @Bean
     public KeyResolver ipKeyResolver() {
         return exchange -> Mono.just(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
     }
+
 }

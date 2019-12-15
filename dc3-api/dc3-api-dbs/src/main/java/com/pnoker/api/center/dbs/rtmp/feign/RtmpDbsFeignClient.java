@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.pnoker.dbs.api.rtmp.feign;
+package com.pnoker.api.center.dbs.rtmp.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
-import com.pnoker.dbs.api.rtmp.hystrix.RtmpDbsFeignHystrix;
+import com.pnoker.api.center.dbs.rtmp.hystrix.RtmpDbsFeignHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

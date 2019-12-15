@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.dbs.api.user.feign;
+package com.pnoker.api.center.dbs.user.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
@@ -22,7 +22,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
-import com.pnoker.dbs.api.user.hystrix.UserDbsFeignHystrix;
+import com.pnoker.api.center.dbs.user.hystrix.UserDbsFeignHystrix;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -92,24 +92,6 @@ public interface UserDbsFeignClient {
      */
     @GetMapping("/username/{username}")
     Response<User> username(@PathVariable(value = "username") String username);
-
-    /**
-     * 通过手机号查询用户
-     *
-     * @param phone
-     * @return user
-     */
-    @GetMapping("/phone/{phone}")
-    Response<User> phone(@PathVariable(value = "phone") String phone);
-
-    /**
-     * 通过邮箱查询用户
-     *
-     * @param email
-     * @return user
-     */
-    @GetMapping("/email/{email}")
-    Response<User> email(@PathVariable(value = "email") String email);
 
     /**
      * 修改 修改 Token 记录

@@ -23,13 +23,12 @@ import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
@@ -42,17 +41,21 @@ import java.util.Optional;
 @RestController
 @RequestMapping(Common.Service.DC3_AUTH_URL_PREFIX)
 public class AuthApi implements AuthFeignClient {
-    @Resource
+    @Autowired
     private AuthService authService;
 
     @Override
     public Response<Long> add(User user) {
+        boolean exist = authService.checkUserExist(user.getUsername());
+        if (exist) {
+            return Response.fail("user already exists");
+        }
         return null != authService.add(user) ? Response.ok(user.getId()) : Response.fail();
     }
 
     @Override
     public Response<Boolean> delete(Long id) {
-        return authService.delete(id) ? Response.ok() : Response.fail();
+        return authService.delete(id) ? Response.ok() : Response.fail("id does not exist");
     }
 
     @Override
@@ -60,7 +63,7 @@ public class AuthApi implements AuthFeignClient {
         if (null == user.getId()) {
             return Response.fail("id is null");
         }
-        return authService.update(user) ? Response.ok() : Response.fail();
+        return authService.update(user.setUsername(null)) ? Response.ok() : Response.fail("id does not exist");
     }
 
     @Override
@@ -89,7 +92,7 @@ public class AuthApi implements AuthFeignClient {
     }
 
     @Override
-    public Response<Boolean> checkTokenValid(Token token) {
-        return authService.checkTokenValid(token) ? Response.ok() : Response.fail();
+    public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
+        return authService.checkTokenValid(tokenDto) ? Response.ok() : Response.fail();
     }
 }

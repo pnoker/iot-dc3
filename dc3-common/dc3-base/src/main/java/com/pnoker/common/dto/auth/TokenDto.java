@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -45,11 +46,13 @@ public class TokenDto implements Serializable, Converter<Token> {
     /**
      * Token令牌
      */
+    @NotNull(message = "token can't be empty")
     private String token;
 
     /**
      * App Id
      */
+    @NotNull(message = "appId can't be empty")
     private String appId;
 
     /**

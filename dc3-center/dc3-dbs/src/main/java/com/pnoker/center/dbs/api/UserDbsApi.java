@@ -17,19 +17,19 @@
 package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
 import com.pnoker.center.dbs.service.UserService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
-import com.pnoker.dbs.api.user.feign.UserDbsFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
@@ -42,7 +42,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(Common.Service.DC3_DBS_USER_URL_PREFIX)
 public class UserDbsApi implements UserDbsFeignClient {
-    @Resource
+    @Autowired
     private UserService userService;
 
     @Override
@@ -84,24 +84,6 @@ public class UserDbsApi implements UserDbsFeignClient {
         }
         User user = userService.selectByUsername(username);
         return null != user ? Response.ok(user) : Response.fail("username does not exist");
-    }
-
-    @Override
-    public Response<User> phone(String phone) {
-        if (StringUtils.isBlank(phone)) {
-            return Response.fail("phone can not be empty");
-        }
-        User user = userService.selectByPhone(phone);
-        return null != user ? Response.ok(user) : Response.fail("phone does not exist");
-    }
-
-    @Override
-    public Response<User> email(String email) {
-        if (StringUtils.isBlank(email)) {
-            return Response.fail("email can not be empty");
-        }
-        User user = userService.selectByEmail(email);
-        return null != user ? Response.ok(user) : Response.fail("email does not exist");
     }
 
     @Override

@@ -45,7 +45,9 @@ public class FallbackHystrix implements HandlerFunction<ServerResponse> {
 
         originalUris.ifPresent(originalUri -> log.error("Request:{} fail", originalUri));
 
-        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .contentType(MediaType.TEXT_PLAIN).body(BodyInserters.fromObject("Service unavailable"));
+        return ServerResponse
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(BodyInserters.fromValue("Service unavailable"));
     }
 }
