@@ -19,40 +19,36 @@ package com.pnoker.center.dbs.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.center.dbs.mapper.TokenMapper;
 import com.pnoker.center.dbs.mapper.UserMapper;
-import com.pnoker.center.dbs.service.UserService;
+import com.pnoker.center.dbs.service.UserDbsService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>User 接口实现
+ * <p>UserDbsServiceImpl
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
-    @Autowired
+public class UserDbsServiceImpl implements UserDbsService {
+    @Resource
     private UserMapper userMapper;
-    @Autowired
-    private TokenMapper tokenMapper;
 
     @Override
     @Caching(
@@ -60,15 +56,16 @@ public class UserServiceImpl implements UserService {
             evict = {@CacheEvict(value = "dbs_user_list", allEntries = true)}
     )
     public User add(User user) {
-        return userMapper.insert(user) > 0 ? user : null;
+        if (userMapper.insert(user) > 0) {
+            return userMapper.selectById(user.getId());
+        }
+        return null;
     }
 
     @Override
     @Caching(
             evict = {
                     @CacheEvict(value = "dbs_user", key = "#id"),
-                    @CacheEvict(value = "dbs_user_token_id", allEntries = true),
-                    @CacheEvict(value = "dbs_user_token_app_id", allEntries = true),
                     @CacheEvict(value = "dbs_user_list", allEntries = true)
             }
     )
@@ -79,20 +76,27 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             put = {@CachePut(value = "dbs_user", key = "#user.id", unless = "#result==null")},
-            evict = {
-                    @CacheEvict(value = "dbs_user_token_id", allEntries = true),
-                    @CacheEvict(value = "dbs_user_token_app_id", allEntries = true),
-                    @CacheEvict(value = "dbs_user_list", allEntries = true)
-            }
+            evict = {@CacheEvict(value = "dbs_user_list", allEntries = true)}
     )
     public User update(User user) {
-        return userMapper.updateById(user) > 0 ? user : null;
+        if (userMapper.updateById(user) > 0) {
+            return userMapper.selectById(user.getId());
+        }
+        return null;
     }
 
     @Override
     @Cacheable(value = "dbs_user", key = "#id", unless = "#result==null")
     public User selectById(Long id) {
         return userMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = "dbs_user", key = "#usernama", unless = "#result==null")
+    public User selectByUsername(String usernama) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Common.Cloumn.User.USERNAME, usernama);
+        return userMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -128,39 +132,6 @@ public class UserServiceImpl implements UserService {
             page.setOrders(tmps);
         });
         return page;
-    }
-
-    @Override
-    @Cacheable(value = "dbs_user", key = "#usernama", unless = "#result==null")
-    public User selectByUsername(String usernama) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(Common.Cloumn.User.USERNAME, usernama);
-        return userMapper.selectOne(queryWrapper);
-    }
-
-    @Override
-    @Caching(
-            put = {
-                    @CachePut(value = "dbs_user_token_id", key = "#token.id", unless = "#result==null"),
-                    @CachePut(value = "dbs_user_token_app_id", key = "#token.appId", unless = "#result==null")
-            }
-    )
-    public Token updateToken(Token token) {
-        return tokenMapper.updateById(token) > 0 ? token : null;
-    }
-
-    @Override
-    @Cacheable(value = "dbs_user_token_id", key = "#id", unless = "#result==null")
-    public Token selectTokenById(Long id) {
-        return tokenMapper.selectById(id);
-    }
-
-    @Override
-    @Cacheable(value = "dbs_user_token_app_id", key = "#appId", unless = "#result==null")
-    public Token selectTokenByAppId(String appId) {
-        QueryWrapper<Token> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(Common.Cloumn.Token.APP_ID, appId);
-        return tokenMapper.selectOne(queryWrapper);
     }
 
 }

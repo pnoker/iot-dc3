@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.center.dbs.user.feign;
+package com.pnoker.api.center.dbs.token.feign;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.dbs.user.hystrix.UserDbsFeignClientHystrix;
+import com.pnoker.api.center.dbs.token.hystrix.TokenDbsFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.entity.auth.Token;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,25 +28,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>UserDbsFeignClient
+ * <p>TokenDbsFeignClient
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@FeignClient(path = Common.Service.DC3_DBS_USER_URL_PREFIX, name = Common.Service.DC3_DBS, fallbackFactory = UserDbsFeignClientHystrix.class)
-public interface UserDbsFeignClient {
+@FeignClient(path = Common.Service.DC3_DBS_TOKEN_URL_PREFIX, name = Common.Service.DC3_DBS, fallbackFactory = TokenDbsFeignClientHystrix.class)
+public interface TokenDbsFeignClient {
 
     /**
-     * 新增 User 记录
+     * 新增 Token 记录
      *
-     * @param user
-     * @return User
+     * @param token
+     * @return Token
      */
     @PostMapping("/add")
-    Response<User> add(@Validated @RequestBody User user);
+    Response<Token> add(@Validated @RequestBody Token token);
 
     /**
-     * 根据 ID 删除 User
+     * 根据 ID 删除 Token
      *
      * @param id
      * @return Boolean
@@ -57,39 +55,21 @@ public interface UserDbsFeignClient {
     Response<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 User 记录
+     * 修改 Token 记录
      *
-     * @param user
-     * @return User
+     * @param token
+     * @return Token
      */
     @PostMapping("/update")
-    Response<User> update(@RequestBody User user);
+    Response<Token> update(@RequestBody Token token);
 
     /**
-     * 根据ID查询 User
+     * 根据 ID 查询 Token
      *
      * @param id
-     * @return User
+     * @return Token
      */
     @GetMapping("/id/{id}")
-    Response<User> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 通过用户名查询用户
-     *
-     * @param username
-     * @return User
-     */
-    @GetMapping("/username/{username}")
-    Response<User> selectByUsername(@PathVariable(value = "username") String username);
-
-    /**
-     * 分页查询 User
-     *
-     * @param userDto
-     * @return Page<User>
-     */
-    @PostMapping("/list")
-    Response<Page<User>> list(@RequestBody(required = false) UserDto userDto);
+    Response<Token> selectById(@PathVariable(value = "id") Long id);
 
 }

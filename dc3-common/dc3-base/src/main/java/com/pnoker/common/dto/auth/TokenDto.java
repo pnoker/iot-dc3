@@ -50,10 +50,10 @@ public class TokenDto implements Serializable, Converter<Token> {
     private String token;
 
     /**
-     * App Id
+     * User编号
      */
-    @NotNull(message = "appId can't be empty")
-    private String appId;
+    @NotNull(message = "user id can't be empty")
+    private Long userId;
 
     /**
      * 过期时间

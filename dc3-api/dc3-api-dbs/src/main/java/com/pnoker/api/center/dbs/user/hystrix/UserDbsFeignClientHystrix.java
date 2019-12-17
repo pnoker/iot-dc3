@@ -14,35 +14,34 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.transfer.rtmp.hystrix;
+package com.pnoker.api.center.dbs.user.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.transfer.rtmp.feign.RtmpTransferFeignClient;
+import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
 import com.pnoker.common.bean.Response;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>
+ * <p>UserDbsFeignClientHystrix
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @Component
-public class RtmpTransferFeignApiHystrix implements FallbackFactory<RtmpTransferFeignClient> {
+public class UserDbsFeignClientHystrix implements FallbackFactory<UserDbsFeignClient> {
 
     @Override
-    public RtmpTransferFeignClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-RTMP" : throwable.getMessage();
-        log.error("RtmpTransferFeignApi:{},hystrix服务降级处理", message, throwable);
-
-        return new RtmpTransferFeignClient() {
+    public UserDbsFeignClient create(Throwable throwable) {
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
+        log.error("UserDbsFeignClient:{},hystrix服务降级处理", message, throwable);
+        return new UserDbsFeignClient() {
             @Override
-            public Response<Long> add(Rtmp rtmp) {
+            public Response<User> add(User user) {
                 return Response.fail(message);
             }
 
@@ -52,27 +51,22 @@ public class RtmpTransferFeignApiHystrix implements FallbackFactory<RtmpTransfer
             }
 
             @Override
-            public Response<Boolean> update(Rtmp rtmp) {
+            public Response<User> update(User user) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Rtmp> selectById(Long id) {
+            public Response<User> selectById(Long id) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
+            public Response<User> selectByUsername(String username) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Boolean> start(Long id) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Boolean> stop(Long id) {
+            public Response<Page<User>> list(UserDto userDto) {
                 return Response.fail(message);
             }
         };

@@ -17,9 +17,9 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
-CREATE DATABASE `iot-dc3`;
+CREATE DATABASE `dc3`;
 
-USE `iot-dc3`;
+USE `dc3`;
 
 -- ----------------------------
 -- Table structure for dc3_device
@@ -34,14 +34,15 @@ CREATE TABLE `dc3_device`  (
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID，节点类型为device',
   `image_id` bigint(20) NULL DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `node_id`(`node_id`) USING BTREE,
+  UNIQUE INDEX `name`(`name`) USING BTREE,
   CONSTRAINT `dc3_device_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_device_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_device_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -58,9 +59,9 @@ CREATE TABLE `dc3_device_driver`  (
   `connect_info` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '设备驱动连接属性',
   `profile_info` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '设备测点配置属性',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
@@ -78,13 +79,14 @@ CREATE TABLE `dc3_image`  (
   `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '图片或者图标链接',
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID，节点类型为image',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `node_id`(`node_id`) USING BTREE,
+  UNIQUE INDEX `name`(`name`) USING BTREE,
   CONSTRAINT `dc3_image_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_image_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '图片表' ROW_FORMAT = Dynamic;
@@ -105,14 +107,15 @@ CREATE TABLE `dc3_label`  (
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID，节点类型为label',
   `image_id` bigint(20) NULL DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `node_id`(`node_id`) USING BTREE,
+  UNIQUE INDEX `name`(`name`) USING BTREE,
   CONSTRAINT `dc3_label_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_label_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_label_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -128,9 +131,9 @@ CREATE TABLE `dc3_label_bind`  (
   `label_id` bigint(20) NULL DEFAULT NULL COMMENT '标签ID',
   `entity_id` bigint(20) NULL DEFAULT NULL COMMENT '实体ID，可为设备、设备组等',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `label_id`(`label_id`) USING BTREE,
@@ -153,9 +156,9 @@ CREATE TABLE `dc3_node`  (
   `parent_id` bigint(20) NULL DEFAULT -1 COMMENT '父级ID,默认为根节点，ID=-1',
   `image_id` bigint(20) NULL DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
@@ -184,9 +187,9 @@ CREATE TABLE `dc3_point`  (
   `profile_id` bigint(20) NULL DEFAULT NULL COMMENT '测点配置信息ID',
   `unit_id` bigint(20) NULL DEFAULT NULL COMMENT '单位ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `device_id`(`device_id`) USING BTREE,
@@ -212,9 +215,9 @@ CREATE TABLE `dc3_point_profile`  (
   `config` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '测点配置信息，Json字符串',
   `driver_id` bigint(20) NULL DEFAULT NULL COMMENT '设备驱动ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
@@ -236,12 +239,13 @@ CREATE TABLE `dc3_point_property`  (
   `multiple` float(255, 0) NULL DEFAULT 1 COMMENT '倍数',
   `value` float NULL DEFAULT 0 COMMENT '默认值',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
+  UNIQUE INDEX `name`(`name`) USING BTREE,
   CONSTRAINT `dc3_point_property_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '测点属性表' ROW_FORMAT = Dynamic;
 
@@ -261,9 +265,9 @@ CREATE TABLE `dc3_rtmp`  (
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID，节点类型为rtmp',
   `image_id` bigint(20) NULL DEFAULT -1 COMMENT '图片ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
@@ -292,9 +296,9 @@ CREATE TABLE `dc3_schedule`  (
   `status` tinyint(4) NULL DEFAULT NULL COMMENT '当前状态',
   `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '链接',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
@@ -309,23 +313,19 @@ DROP TABLE IF EXISTS `dc3_token`;
 CREATE TABLE `dc3_token`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `token` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Token,用于接口验证',
-  `app_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '应用ID,由平台生成',
   `private_key` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '密钥,由平台生成',
   `expire_time` datetime(0) NULL DEFAULT NULL COMMENT '过期时间',
-  `type` tinyint(4) NULL DEFAULT 0 COMMENT '密钥类型',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `app_id`(`app_id`) USING BTREE,
-  UNIQUE INDEX `private_key`(`private_key`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'Token表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of dc3_token
 -- ----------------------------
-INSERT INTO `dc3_token` VALUES (-1, '2i5zdIB8iQz+t4GiPn+NfcF37tVHwCTAOkbOZbzwcMliPS2IRRpKPAwx+9+7Unyg', 'Tp6vIA0hjv5dxrqi', 'Q5IkfORRoP5EQa8ED4EeR73WKXont2X6', '2019-12-15 06:02:01', 0, '测试专用Token', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_token` VALUES (-1, '2i5zdIB8iQz+t4GiPn+NfcF37tVHwCTAOkbOZbzwcMliPS2IRRpKPAwx+9+7Unyg', 'Q5IkfORRoP5EQa8ED4EeR73WKXont2X6', '2019-12-15 06:02:01', '测试专用Token', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_unit
@@ -339,9 +339,9 @@ CREATE TABLE `dc3_unit`  (
   `format` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '%.3f' COMMENT '保留小数格式，采用string.format格式化',
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID',
   `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
@@ -376,9 +376,9 @@ CREATE TABLE `dc3_user`  (
   `token_id` bigint(20) NULL DEFAULT -1 COMMENT 'Token ID',
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID，节点类型为用户',
   `image_id` bigint(20) NULL DEFAULT -1 COMMENT '图片ID',
-  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   `enable` tinyint(4) NULL DEFAULT NULL COMMENT '是否可用',
   PRIMARY KEY (`id`) USING BTREE,

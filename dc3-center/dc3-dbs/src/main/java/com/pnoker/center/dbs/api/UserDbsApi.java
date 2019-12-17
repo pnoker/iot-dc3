@@ -18,22 +18,20 @@ package com.pnoker.center.dbs.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
-import com.pnoker.center.dbs.service.UserService;
+import com.pnoker.center.dbs.service.UserDbsService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * <p>user dbs rest api
+ * <p>UserDbsApi
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -42,31 +40,59 @@ import java.util.Optional;
 @RestController
 @RequestMapping(Common.Service.DC3_DBS_USER_URL_PREFIX)
 public class UserDbsApi implements UserDbsFeignClient {
-    @Autowired
-    private UserService userService;
+    @Resource
+    private UserDbsService userDbsService;
 
     @Override
-    public Response<Long> add(User user) {
-        return null != userService.add(user) ? Response.ok(user.getId()) : Response.fail();
+    public Response<User> add(User user) {
+        try {
+            user = userDbsService.add(user);
+            return null != user ? Response.ok(user) : Response.fail("user record add failed");
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
     public Response<Boolean> delete(Long id) {
-        return userService.delete(id) ? Response.ok() : Response.fail();
+        try {
+            return userDbsService.delete(id) ? Response.ok() : Response.fail("user record delete failed");
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
-    public Response<Boolean> update(User user) {
+    public Response<User> update(User user) {
         if (null == user.getId()) {
-            return Response.fail("id is null");
+            return Response.fail("user id is null");
         }
-        return null != userService.update(user) ? Response.ok() : Response.fail();
+        try {
+            user = userDbsService.update(user);
+            return null != user ? Response.ok(user) : Response.fail("user record update failed");
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
     public Response<User> selectById(Long id) {
-        User user = userService.selectById(id);
-        return null != user ? Response.ok(user) : Response.fail("id does not exist");
+        try {
+            User user = userDbsService.selectById(id);
+            return null != user ? Response.ok(user) : Response.fail(String.format("user record does not exist for id(%s)", id));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public Response<User> selectByUsername(String username) {
+        try {
+            User user = userDbsService.selectByUsername(username);
+            return null != user ? Response.ok(user) : Response.fail(String.format("user record does not exist for username(%s)", username));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
@@ -74,36 +100,11 @@ public class UserDbsApi implements UserDbsFeignClient {
         if (!Optional.ofNullable(userDto).isPresent()) {
             userDto = new UserDto();
         }
-        return Response.ok(userService.list(userDto));
-    }
-
-    @Override
-    public Response<User> username(String username) {
-        if (StringUtils.isBlank(username)) {
-            return Response.fail("username can not be empty");
+        try {
+            return Response.ok(userDbsService.list(userDto));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
         }
-        User user = userService.selectByUsername(username);
-        return null != user ? Response.ok(user) : Response.fail("username does not exist");
-    }
-
-    @Override
-    public Response<Boolean> updateToken(Token token) {
-        if (null == token.getId()) {
-            return Response.fail("id is null");
-        }
-        return null != userService.updateToken(token) ? Response.ok() : Response.fail();
-    }
-
-    @Override
-    public Response<Token> selectTokenById(Long id) {
-        Token token = userService.selectTokenById(id);
-        return null != token ? Response.ok(token) : Response.fail("id does not exist");
-    }
-
-    @Override
-    public Response<Token> selectTokenByAppId(String appId) {
-        Token token = userService.selectTokenByAppId(appId);
-        return null != token ? Response.ok(token) : Response.fail("id does not exist");
     }
 
 }

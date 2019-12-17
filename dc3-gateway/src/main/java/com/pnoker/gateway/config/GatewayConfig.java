@@ -17,24 +17,51 @@
 package com.pnoker.gateway.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>全局过滤器配置
+ * <p>自定义过滤器配置
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @Configuration
-public class RateLimiterConfig {
+public class GatewayConfig {
 
+    /**
+     * 根据 HostAddress 进行限流
+     *
+     * @return
+     */
     @Bean
-    public KeyResolver ipKeyResolver() {
+    @Order(-10)
+    public KeyResolver hostKeyResolver() {
         return exchange -> Mono.just(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
+    }
+
+    /**
+     * 统计请求时间
+     *
+     * @return
+     */
+    @Bean
+    @Order(-5)
+    public GlobalFilter elapsedGlobalFilter() {
+        return (exchange, chain) -> {
+            //调用请求之前统计时间
+            Long startTime = System.currentTimeMillis();
+            return chain.filter(exchange).then().then(Mono.fromRunnable(() -> {
+                //调用请求之后统计时间
+                Long endTime = System.currentTimeMillis();
+                log.debug("{}, cost time : {}ms", exchange.getRequest().getURI().getRawPath(), (endTime - startTime));
+            }));
+        };
     }
 
 }

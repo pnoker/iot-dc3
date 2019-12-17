@@ -30,8 +30,15 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @EnableCaching
 @SpringCloudApplication
-@EnableFeignClients("com.pnoker.api.center.dbs.user.*")
-@ComponentScan(basePackages = {"com.pnoker.api.center.dbs.user", "com.pnoker.center.auth"})
+@EnableFeignClients(basePackages = {
+        "com.pnoker.api.center.dbs.user.*",
+        "com.pnoker.api.center.dbs.token.*"
+})
+@ComponentScan(basePackages = {
+        "com.pnoker.api.center.dbs.user",
+        "com.pnoker.api.center.dbs.token",
+        "com.pnoker.center.auth"
+})
 public class AuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);

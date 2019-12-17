@@ -1,5 +1,5 @@
 {
-  "iot-dc3-port-list": {
+  "dc3-port-list": {
     "dc3-web": {
       "description": "WEB",
       "port": 80

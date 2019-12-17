@@ -16,17 +16,15 @@
 
 package com.pnoker.common.entity.auth;
 
+import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.entity.Description;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.pnoker.common.tool.AesTools;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,26 +41,28 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 public class Token extends Description {
 
-    @NotNull(message = "token can't be empty")
     private String token;
-
-    @NotNull(message = "app id can't be empty")
-    private String appId;
-
     private String privateKey;
 
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     @Future(message = "expire time must be greater than the current time")
     private Date expireTime;
 
-    private Short type;
+    @SneakyThrows
+    public Token(int hour) {
+        this.token = IdUtil.simpleUUID();
+        this.privateKey = AesTools.genKey().getPrivateKey();
+        expireTime(hour);
+        super.setCreateTime(new Date());
+    }
 
-    public void expireTime(int hour) {
+    public Token expireTime(int hour) {
         hour = hour < 1 ? 6 : hour;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.HOUR, hour);
         expireTime = calendar.getTime();
+        return this;
     }
 
 }

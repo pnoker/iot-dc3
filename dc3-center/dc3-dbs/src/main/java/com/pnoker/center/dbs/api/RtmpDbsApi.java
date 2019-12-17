@@ -24,14 +24,13 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.entity.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
 /**
- * <p>rtmp dbs rest api
+ * <p>RtmpDbsApi
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -40,31 +39,52 @@ import java.util.Optional;
 @RestController
 @RequestMapping(Common.Service.DC3_DBS_RTMP_URL_PREFIX)
 public class RtmpDbsApi implements RtmpDbsFeignClient {
-    @Autowired
-    private RtmpService rtmpService;
+    private final RtmpService rtmpService;
+
+    public RtmpDbsApi(RtmpService rtmpService) {
+        this.rtmpService = rtmpService;
+    }
 
     @Override
-    public Response<Long> add(Rtmp rtmp) {
-        return null != rtmpService.add(rtmp) ? Response.ok(rtmp.getId()) : Response.fail();
+    public Response<Rtmp> add(Rtmp rtmp) {
+        try {
+            rtmp = rtmpService.add(rtmp);
+            return null != rtmp ? Response.ok(rtmp) : Response.fail("rtmp record add failed");
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
     public Response<Boolean> delete(Long id) {
-        return rtmpService.delete(id) ? Response.ok() : Response.fail();
+        try {
+            return rtmpService.delete(id) ? Response.ok() : Response.fail("rtmp record delete failed");
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
-    public Response<Boolean> update(Rtmp rtmp) {
+    public Response<Rtmp> update(Rtmp rtmp) {
         if (null == rtmp.getId()) {
             return Response.fail("id is null");
         }
-        return null != rtmpService.update(rtmp) ? Response.ok() : Response.fail();
+        try {
+            rtmp = rtmpService.update(rtmp);
+            return null != rtmp ? Response.ok(rtmp) : Response.fail("rtmp record update failed");
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
     public Response<Rtmp> selectById(Long id) {
-        Rtmp rtmp = rtmpService.selectById(id);
-        return null != rtmp ? Response.ok(rtmp) : Response.fail("id does not exist");
+        try {
+            Rtmp rtmp = rtmpService.selectById(id);
+            return null != rtmp ? Response.ok(rtmp) : Response.fail(String.format("rtmp record does not exist for id(%s)", id));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
     @Override
@@ -72,7 +92,11 @@ public class RtmpDbsApi implements RtmpDbsFeignClient {
         if (!Optional.ofNullable(rtmpDto).isPresent()) {
             rtmpDto = new RtmpDto();
         }
-        return Response.ok(rtmpService.list(rtmpDto));
+        try {
+            return Response.ok(rtmpService.list(rtmpDto));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
     }
 
 }

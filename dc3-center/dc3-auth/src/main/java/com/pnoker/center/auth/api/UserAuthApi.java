@@ -14,68 +14,61 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.api;
+package com.pnoker.center.auth.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.transfer.rtmp.feign.RtmpTransferFeignClient;
+import com.pnoker.api.center.auth.user.feign.UserAuthFeignClient;
+import com.pnoker.center.auth.service.UserAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.entity.rtmp.Rtmp;
-import com.pnoker.transfer.rtmp.service.RtmpService;
+import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 /**
- * <p>Rest接口控制器
+ * <p>UserAuthApi
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_RTMP_URL_PREFIX)
-public class RtmpTransferApi implements RtmpTransferFeignClient {
+@RequestMapping(Common.Service.DC3_USER_URL_PREFIX)
+public class UserAuthApi implements UserAuthFeignClient {
     @Autowired
-    private RtmpService rtmpService;
+    private UserAuthService userAuthService;
 
     @Override
-    public Response<Rtmp> add(Rtmp rtmp) {
-        return rtmpService.add(rtmp);
+    public Response<User> add(User user) {
+        return userAuthService.add(user);
     }
 
     @Override
     public Response<Boolean> delete(Long id) {
-        return rtmpService.delete(id);
+        return userAuthService.delete(id);
     }
 
     @Override
-    public Response<Rtmp> update(Rtmp rtmp) {
-        return rtmpService.update(rtmp);
+    public Response<User> update(User user) {
+        return userAuthService.update(user);
     }
 
     @Override
-    public Response<Rtmp> selectById(Long id) {
-        return rtmpService.selectById(id);
+    public Response<User> selectById(Long id) {
+        return userAuthService.selectById(id);
     }
 
     @Override
-    public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
-        return rtmpService.list(rtmpDto);
+    public Response<Page<User>> list(UserDto userDto) {
+        return userAuthService.list(userDto);
     }
 
     @Override
-    public Response<Boolean> start(Long id) {
-        return rtmpService.start(id);
-    }
-
-    @Override
-    public Response<Boolean> stop(Long id) {
-        return rtmpService.stop(id);
+    public Response<Boolean> checkUserExist(String username) {
+        return userAuthService.checkUserExist(username);
     }
 
 }

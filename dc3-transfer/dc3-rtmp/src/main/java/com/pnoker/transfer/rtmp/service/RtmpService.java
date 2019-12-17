@@ -35,7 +35,7 @@ public interface RtmpService {
      * @param rtmp
      * @return true/false
      */
-    Response<Boolean> add(Rtmp rtmp);
+    Response<Rtmp> add(Rtmp rtmp);
 
     /**
      * 删除记录
@@ -51,7 +51,7 @@ public interface RtmpService {
      * @param rtmp
      * @return true/false
      */
-    Response<Boolean> update(Rtmp rtmp);
+    Response<Rtmp> update(Rtmp rtmp);
 
     /**
      * 通过ID查询记录

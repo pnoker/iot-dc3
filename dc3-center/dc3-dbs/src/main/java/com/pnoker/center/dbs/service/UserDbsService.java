@@ -18,22 +18,22 @@ package com.pnoker.center.dbs.service;
 
 import com.pnoker.common.base.Service;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 
 /**
- * <p> User 服务接口
+ * <p>UserDbsService
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface UserService extends Service<User, UserDto> {
+public interface UserDbsService extends Service<User, UserDto> {
 
+    /**
+     * 根据用户名查询用户
+     *
+     * @param usernama
+     * @return
+     */
     User selectByUsername(String usernama);
 
-    Token updateToken(Token token);
-
-    Token selectTokenById(Long id);
-
-    Token selectTokenByAppId(String appId);
 }
