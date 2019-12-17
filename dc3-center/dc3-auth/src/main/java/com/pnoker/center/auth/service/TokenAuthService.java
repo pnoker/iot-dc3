@@ -14,22 +14,43 @@
  * limitations under the License.
  */
 
-package com.pnoker.gateway.service;
+package com.pnoker.center.auth.service;
 
+import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 
 /**
- * <p>权限服务接口
+ * <p>TokenAuthService
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface AuthService {
+public interface TokenAuthService {
+
     /**
-     * Token权限校验
+     * 更新 Token 记录
+     *
+     * @param user
+     * @return TokenDto
+     */
+    Response<TokenDto> update(User user);
+
+    /**
+     * 通过 ID 查询 Token 记录
+     *
+     * @param id
+     * @return Token
+     */
+    Response<Token> selectById(Long id);
+
+    /**
+     * 判断 Token 令牌是否有效
      *
      * @param tokenDto
-     * @return
+     * @return Boolean
      */
-    boolean isPermitted(TokenDto tokenDto);
+    Response<Boolean> checkTokenValid(TokenDto tokenDto);
+
 }

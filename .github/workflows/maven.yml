@@ -1,4 +1,4 @@
-name: IOT DC3 Maven CI
+name: IOT DC3 CI
 on:
   push:
     branches:

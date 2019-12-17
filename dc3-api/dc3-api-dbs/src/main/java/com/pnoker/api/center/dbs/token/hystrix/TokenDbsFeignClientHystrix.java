@@ -14,34 +14,32 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.center.dbs.rtmp.hystrix;
+package com.pnoker.api.center.dbs.token.hystrix;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.dbs.rtmp.feign.RtmpDbsFeignClient;
+import com.pnoker.api.center.dbs.token.feign.TokenDbsFeignClient;
 import com.pnoker.common.bean.Response;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.pnoker.common.entity.auth.Token;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>熔断
+ * <p>TokenDbsFeignClientHystrix
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @Component
-public class RtmpDbsFeignHystrix implements FallbackFactory<RtmpDbsFeignClient> {
+public class TokenDbsFeignClientHystrix implements FallbackFactory<TokenDbsFeignClient> {
 
     @Override
-    public RtmpDbsFeignClient create(Throwable throwable) {
+    public TokenDbsFeignClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DBS" : throwable.getMessage();
-        log.error("RtmpFeignApi失败:{},hystrix服务降级处理", message, throwable);
-        return new RtmpDbsFeignClient() {
+        log.error("TokenDbsFeignClient:{},hystrix服务降级处理", message, throwable);
+        return new TokenDbsFeignClient() {
             @Override
-            public Response<Long> add(Rtmp rtmp) {
+            public Response<Token> add(Token token) {
                 return Response.fail(message);
             }
 
@@ -51,17 +49,12 @@ public class RtmpDbsFeignHystrix implements FallbackFactory<RtmpDbsFeignClient> 
             }
 
             @Override
-            public Response<Boolean> update(Rtmp rtmp) {
+            public Response<Token> update(Token token) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Rtmp> selectById(Long id) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
+            public Response<Token> selectById(Long id) {
                 return Response.fail(message);
             }
         };

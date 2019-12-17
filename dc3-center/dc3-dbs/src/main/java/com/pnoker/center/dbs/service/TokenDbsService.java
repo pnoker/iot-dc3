@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-// create dc3 database and user
-db = db.getSiblingDB('dc3');
-db.createUser({
-    user: "root",
-    pwd: "dc3",
-    roles: [{
-        role: "readWrite",
-        db: "dc3"
-    }]
-});
+package com.pnoker.center.dbs.service;
+
+import com.pnoker.common.base.Service;
+import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.entity.auth.Token;
+
+/**
+ * <p>TokenDbsService
+ *
+ * @author : pnoker
+ * @email : pnokers@icloud.com
+ */
+public interface TokenDbsService extends Service<Token, TokenDto> {
+}

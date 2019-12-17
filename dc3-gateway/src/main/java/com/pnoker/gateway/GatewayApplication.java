@@ -17,9 +17,8 @@
 package com.pnoker.gateway;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * <p>平台网关服务入口
@@ -27,9 +26,8 @@ import org.springframework.context.annotation.ComponentScan;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
+@EnableCaching
 @SpringCloudApplication
-@EnableFeignClients("com.pnoker.api.center.auth.*")
-@ComponentScan(basePackages = {"com.pnoker.api.center.auth", "com.pnoker.gateway"})
 public class GatewayApplication {
 
     public static void main(String[] args) {

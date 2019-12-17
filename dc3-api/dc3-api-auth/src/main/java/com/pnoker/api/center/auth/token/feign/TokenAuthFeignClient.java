@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.center.dbs.rtmp.feign;
+package com.pnoker.api.center.auth.token.feign;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.dbs.rtmp.hystrix.RtmpDbsFeignClientHystrix;
+import com.pnoker.api.center.auth.token.hystrix.TokenAuthFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,57 +30,39 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>RtmpDbsFeignClient
+ * <p>TokenAuthFeignClient
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@FeignClient(path = Common.Service.DC3_DBS_RTMP_URL_PREFIX, name = Common.Service.DC3_DBS, fallbackFactory = RtmpDbsFeignClientHystrix.class)
-public interface RtmpDbsFeignClient {
+@FeignClient(path = Common.Service.DC3_TOKEN_URL_PREFIX, name = Common.Service.DC3_AUTH, fallbackFactory = TokenAuthFeignClientHystrix.class)
+public interface TokenAuthFeignClient {
 
     /**
-     * 新增 Rtmp 记录
+     * 修改 Token 记录
      *
-     * @param rtmp
-     * @return Long
-     */
-    @PostMapping("/add")
-    Response<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
-
-    /**
-     * 根据 ID 删除 Rtmp
-     *
-     * @param id
-     * @return Boolean
-     */
-    @PostMapping("/delete/{id}")
-    Response<Boolean> delete(@PathVariable(value = "id") Long id);
-
-    /**
-     * 修改 Rtmp 记录
-     *
-     * @param rtmp
-     * @return Boolean
+     * @param user
+     * @return TokenDto
      */
     @PostMapping("/update")
-    Response<Rtmp> update(@RequestBody Rtmp rtmp);
+    Response<TokenDto> update(@Validated @RequestBody User user);
 
     /**
-     * 根据 ID 查询 Rtmp
+     * 根据 ID 查询 Token
      *
      * @param id
-     * @return Rtmp
+     * @return Token
      */
     @GetMapping("/id/{id}")
-    Response<Rtmp> selectById(@PathVariable(value = "id") Long id);
+    Response<Token> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 分页查询 Rtmp
+     * 检测 Token 是否有效
      *
-     * @param rtmpDto
-     * @return Page<Rtmp>
+     * @param tokenDto
+     * @return Boolean
      */
-    @PostMapping("/list")
-    Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
+    @PostMapping("/check")
+    Response<Boolean> checkTokenValid(@Validated @RequestBody TokenDto tokenDto);
 
 }

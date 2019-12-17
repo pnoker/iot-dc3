@@ -17,80 +17,63 @@
 package com.pnoker.center.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.dto.auth.TokenDto;
+import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.User;
 
 /**
- * <p>Auth 服务接口
+ * <p>UserAuthService
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public interface AuthService {
+public interface UserAuthService {
 
     /**
-     * 新增记录
+     * 新增 User 记录
      *
      * @param user
-     * @return true/false
+     * @return User
      */
-    User add(User user);
+    Response<User> add(User user);
 
     /**
-     * 删除记录
+     * 删除 User 记录
      *
      * @param id
-     * @return true/false
+     * @return
      */
-    boolean delete(Long id);
+    Response<Boolean> delete(Long id);
 
     /**
-     * 更新记录
+     * 更新 User 记录
      *
      * @param user
-     * @return true/false
+     * @return User
      */
-    boolean update(User user);
+    Response<User> update(User user);
 
     /**
-     * 通过ID查询记录
+     * 通过 ID 查询 User 记录
      *
      * @param id
-     * @return type
+     * @return
      */
-    User selectById(Long id);
+    Response<User> selectById(Long id);
 
     /**
-     * 获取带分页、排序的记录
+     * 获取带分页、排序的 User 记录
      *
      * @param userDto
-     * @return list
+     * @return Page<User>
      */
-    Page<User> list(UserDto userDto);
+    Response<Page<User>> list(UserDto userDto);
 
     /**
-     * 判断是用户否存在
+     * 根据 username 判断 User 是否存在
      *
      * @param username
-     * @return true/false
+     * @return Boolean
      */
-    boolean checkUserExist(String username);
-
-    /**
-     * 生成Token令牌
-     *
-     * @param user
-     * @return tokenDto
-     */
-    TokenDto generateToken(User user);
-
-    /**
-     * 判断Token令牌是否有效
-     *
-     * @param tokenDto
-     * @return true/false
-     */
-    boolean checkTokenValid(TokenDto tokenDto);
-
+    Response<Boolean> checkUserExist(String username);
 }

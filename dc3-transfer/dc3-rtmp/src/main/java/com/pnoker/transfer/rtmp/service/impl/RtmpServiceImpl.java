@@ -44,10 +44,10 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpDbsFeignClient rtmpDbsFeignClient;
 
     @Override
-    public Response<Boolean> add(Rtmp rtmp) {
-        Response<Long> response = rtmpDbsFeignClient.add(rtmp);
+    public Response<Rtmp> add(Rtmp rtmp) {
+        Response<Rtmp> response = rtmpDbsFeignClient.add(rtmp);
         if (response.isOk()) {
-            rtmp.setId(response.getData());
+            rtmp = response.getData();
             Transcode transcode = new Transcode(rtmp);
             if (!TranscodePool.transcodeMap.containsKey(transcode.getId())) {
                 TranscodePool.transcodeMap.put(transcode.getId(), transcode);
@@ -75,7 +75,7 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public Response<Boolean> update(Rtmp rtmp) {
+    public Response<Rtmp> update(Rtmp rtmp) {
         Response<Rtmp> response = rtmpDbsFeignClient.selectById(rtmp.getId());
         if (response.isOk()) {
             Transcode transcode = TranscodePool.transcodeMap.get(rtmp.getId());
@@ -85,7 +85,11 @@ public class RtmpServiceImpl implements RtmpService {
                 }
                 TranscodePool.transcodeMap.put(transcode.getId(), new Transcode(rtmp));
             }
-            return rtmpDbsFeignClient.update(rtmp).isOk() ? Response.ok() : Response.fail("任务更新成功,表记录更新失败");
+            Response<Rtmp> rtmpResponse = rtmpDbsFeignClient.update(rtmp);
+            if (rtmpResponse.isOk()) {
+                return rtmpResponse;
+            }
+            return Response.fail("任务更新成功,表记录更新失败");
         }
         return Response.fail("任务不存在");
     }
@@ -114,7 +118,11 @@ public class RtmpServiceImpl implements RtmpService {
                 TranscodePool.transcodeMap.put(transcode.getId(), transcode);
             }
             TranscodePool.threadPoolExecutor.execute(() -> TranscodePool.transcodeMap.get(id).start());
-            return rtmpDbsFeignClient.update(response.getData().setRun(true)).isOk() ? Response.ok() : Response.fail("任务启动成功，表记录更新失败");
+            Response<Rtmp> rtmpResponse = rtmpDbsFeignClient.update(response.getData().setRun(true));
+            if (rtmpResponse.isOk()) {
+                return Response.ok();
+            }
+            return Response.fail("任务启动成功，表记录更新失败");
         }
         return Response.fail("任务不存在");
     }
@@ -127,7 +135,11 @@ public class RtmpServiceImpl implements RtmpService {
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
                     transcode.stop();
-                    return rtmpDbsFeignClient.update(response.getData().setRun(false)).isOk() ? Response.ok() : Response.fail("任务停止成功，表记录更新失败");
+                    Response<Rtmp> rtmpResponse = rtmpDbsFeignClient.update(response.getData().setRun(false));
+                    if (rtmpResponse.isOk()) {
+                        return Response.ok();
+                    }
+                    return Response.fail("任务停止成功，表记录更新失败");
                 }
             }
             return Response.fail("任务已是停止状态");

@@ -14,67 +14,41 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.center.auth.hystrix;
+package com.pnoker.api.center.auth.token.hystrix;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.auth.feign.AuthFeignClient;
+import com.pnoker.api.center.auth.token.feign.TokenAuthFeignClient;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>
+ * <p>TokenAuthFeignClientHystrix
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @Component
-public class AuthFeignApiHystrix implements FallbackFactory<AuthFeignClient> {
+public class TokenAuthFeignClientHystrix implements FallbackFactory<TokenAuthFeignClient> {
 
     @Override
-    public AuthFeignClient create(Throwable throwable) {
+    public TokenAuthFeignClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
-        log.error("AuthTransferFeignApi:{},hystrix服务降级处理", message, throwable);
+        log.error("TokenAuthFeignClient:{},hystrix服务降级处理", message, throwable);
 
-        return new AuthFeignClient() {
+        return new TokenAuthFeignClient() {
 
             @Override
-            public Response<Long> add(User user) {
+            public Response<TokenDto> update(User user) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Boolean> delete(Long id) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Boolean> update(User user) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<User> selectById(Long id) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Page<User>> list(UserDto userDto) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Boolean> checkUserExist(String username) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<TokenDto> generateToken(User user) {
+            public Response<Token> selectById(Long id) {
                 return Response.fail(message);
             }
 

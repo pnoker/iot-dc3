@@ -16,27 +16,28 @@
 
 package com.pnoker.gateway.service.impl;
 
-import com.pnoker.api.center.auth.feign.AuthFeignClient;
-import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.gateway.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 /**
- * <p>
+ * <p>权限服务接口
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Service
 public class AuthServiceImpl implements AuthService {
-    @Autowired
-    private AuthFeignClient authFeignClient;
+    private final RedisTemplate redisTemplate;
+
+    public AuthServiceImpl(RedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     public boolean isPermitted(TokenDto tokenDto) {
-        Response<Boolean> response = authFeignClient.checkTokenValid(tokenDto);
-        return response.isOk();
+        return true;
     }
 }
