@@ -18,12 +18,16 @@ package com.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.pnoker.api.center.dbs.token.feign.TokenDbsFeignClient;
-import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
 import com.pnoker.center.auth.service.TokenAuthService;
+import com.pnoker.center.auth.service.UserAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -38,33 +42,45 @@ import java.util.Date;
 @Service
 public class TokenAuthServiceImpl implements TokenAuthService {
     @Resource
-    private UserDbsFeignClient userDbsFeignClient;
-    @Resource
     private TokenDbsFeignClient tokenDbsFeignClient;
 
+    @Resource
+    private UserAuthService userAuthService;
+
     @Override
-    public Response<TokenDto> update(User user) {
-        Response<User> userResponse = userDbsFeignClient.selectById(user.getId());
-        if (userResponse.isOk()) {
-            user = userResponse.getData();
-            Response<Token> tokenResponse = tokenDbsFeignClient.selectById(user.getTokenId());
-            if (tokenResponse.isOk()) {
-                // 生成Token
-                Token token = tokenResponse.getData().expireTime(6).setToken(IdUtil.simpleUUID());
-                Response<Token> response = tokenDbsFeignClient.update(token);
-                if (response.isOk()) {
-                    TokenDto tokenDto = new TokenDto();
-                    tokenDto.convertToDto(tokenResponse.getData());
-                    return Response.ok(tokenDto);
-                }
-                return Response.fail(response.getMessage());
+    @Caching(
+            put = {
+                    @CachePut(value = "token", key = "#token.userId", unless = "#result==null"),
+                    @CachePut(value = "auth_token", key = "#token.id", unless = "#result==null")
             }
-            return Response.fail(tokenResponse.getMessage());
-        }
-        return Response.fail(userResponse.getMessage());
+    )
+    public Response<Token> add(Token token) {
+        return tokenDbsFeignClient.add(token);
     }
 
     @Override
+    @CacheEvict(value = "auth_user", key = "#id")
+    public Response<Boolean> delete(Long id) {
+        return tokenDbsFeignClient.delete(id);
+    }
+
+    @Override
+    @Caching(
+            put = {
+                    @CachePut(value = "token", key = "#token.userId", unless = "#result==null"),
+                    @CachePut(value = "auth_token", key = "#token.id", unless = "#result==null")
+            }
+    )
+    public Response<Token> update(Token token) {
+        Response<Token> response = tokenDbsFeignClient.update(token.expireTime(6).setToken(IdUtil.simpleUUID()));
+        if (response.isOk()) {
+            return Response.ok(token);
+        }
+        return Response.fail(response.getMessage());
+    }
+
+    @Override
+    @Cacheable(value = "auth_token", key = "#id", unless = "#result==null")
     public Response<Token> selectById(Long id) {
         Response<Token> response = tokenDbsFeignClient.selectById(id);
         return response;
@@ -72,14 +88,14 @@ public class TokenAuthServiceImpl implements TokenAuthService {
 
     @Override
     public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
-        Response<User> userResponse = userDbsFeignClient.selectById(tokenDto.getUserId());
+        Response<User> userResponse = userAuthService.selectById(tokenDto.getUserId());
         if (userResponse.isOk()) {
             User user = userResponse.getData();
             Response<Token> tokenResponse = tokenDbsFeignClient.selectById(user.getTokenId());
             if (tokenResponse.isOk()) {
                 Token token = tokenResponse.getData();
                 if (tokenDto.getToken().equals(token.getToken()) && token.getExpireTime().getTime() > (new Date()).getTime()) {
-                    return Response.ok(true);
+                    return Response.ok();
                 }
                 return Response.fail("token invalid");
             }
