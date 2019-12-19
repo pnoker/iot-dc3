@@ -28,7 +28,6 @@ import com.pnoker.common.entity.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,6 +35,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +50,7 @@ import java.util.Optional;
 @Service
 @Transactional
 public class RtmpServiceImpl implements RtmpService {
-    @Autowired
+    @Resource
     private RtmpMapper rtmpMapper;
 
     @Override

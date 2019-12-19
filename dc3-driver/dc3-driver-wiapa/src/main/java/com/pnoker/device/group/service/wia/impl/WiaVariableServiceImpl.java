@@ -20,9 +20,9 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.pnoker.device.group.dao.wia.WiaVariableMapper;
 import com.pnoker.device.group.model.wia.WiaVariable;
 import com.pnoker.device.group.service.wia.WiaVariableService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -33,7 +33,7 @@ import java.util.List;
  */
 @Service
 public class WiaVariableServiceImpl implements WiaVariableService {
-    @Autowired
+    @Resource
     private WiaVariableMapper wiaVariableMapper;
 
     @Override

@@ -16,11 +16,12 @@
 
 package com.pnoker.center.data;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -31,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SendController {
 
-    @Autowired
+    @Resource
     private MyProcessor processor;
 
     @PostMapping("/send")
