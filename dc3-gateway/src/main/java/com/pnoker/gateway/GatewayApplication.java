@@ -17,6 +17,7 @@
 package com.pnoker.gateway;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
 
 /**
@@ -25,6 +26,7 @@ import org.springframework.cloud.client.SpringCloudApplication;
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
+@EnableCaching
 @SpringCloudApplication
 public class GatewayApplication {
 

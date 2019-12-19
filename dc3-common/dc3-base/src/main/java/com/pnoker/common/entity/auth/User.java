@@ -43,12 +43,6 @@ public class User extends Description {
     @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "invalid username")
     private String username;
 
-    @Pattern(regexp = "^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$", message = "invalid phone")
-    private String phone;
-
-    @Pattern(regexp = "^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$", message = "invalid email")
-    private String email;
-
     @NotNull(message = "password can't be empty")
     @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "invalid password")
     private String password;
@@ -56,5 +50,4 @@ public class User extends Description {
     private Boolean enable;
     private Long nodeId;
     private Long imageId;
-    private Long tokenId;
 }

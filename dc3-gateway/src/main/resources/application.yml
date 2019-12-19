@@ -36,7 +36,7 @@ spring:
     type: redis
     cache-names: dc3-gateway-cache
     redis:
-      time-to-live: 12H
+      time-to-live: 60S
   cloud:
     gateway:
       loadbalancer:
@@ -46,45 +46,33 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # 权限中心
-        - id: auth_rest_auth
+        # auth
+        - id: token_route
+          uri: lb://dc3-auth/center/auth/token
+          predicates:
+            - Path=/api/v3/token
+          filters:
+            - StripPrefix=3
+            - PrefixPath=/center/auth/token
+            - AuthenticFilter
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        - id: auth_route
           uri: lb://dc3-auth
           predicates:
-            - Path=/api/v3/auth/**
+            - Path=/api/v3/user/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
-                key-resolver: '#{@ipKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
-        # 设备管理
-        - id: device_rest_device_manager
-          uri: lb://dc3-manager
-          predicates:
-            - Path=/api/v3/device/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@ipKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
-        # 数据采集
-        - id: data_rest_device_collect
-          uri: lb://dc3-collect
-          predicates:
-            - Path=/api/v3/data/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@ipKeyResolver}'
+                key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
             - name: Hystrix
@@ -92,59 +80,15 @@ spring:
                 name: default
                 fallbackUri: 'forward:/fallback'
         # rtmp
-        - id: rtmp_rest_rtmp
+        - id: rtmp_route
           uri: lb://dc3-rtmp
           predicates:
             - Path=/api/v3/rtmp/**
           filters:
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
-                key-resolver: '#{@ipKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
-        # opc
-        - id: opc_rest_opc
-          uri: lb://dc3-opc
-          predicates:
-            - Path=/api/v3/opc/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@ipKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
-        # opc ua
-        - id: opcua_rest_opc_ua
-          uri: lb://dc3-opcua
-          predicates:
-            - Path=/api/v3/opcua/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@ipKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
-        # resource
-        - id: resource_rest_resource
-          uri: lb://dc3-resource
-          predicates:
-            - Path=/api/v3/resource/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@ipKeyResolver}'
+                key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
             - name: Hystrix
@@ -161,8 +105,13 @@ management:
     health:
       show-details: ALWAYS
 
+feign:
+  hystrix:
+    enabled: true
+
 logging:
   level:
+    org.springframework.cloud.gateway.route: ERROR
     org.springframework.data: ERROR
     org.springframework.web: ERROR
     org.mybatis.spring: ERROR

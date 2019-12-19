@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * <p>Rest接口控制器
@@ -44,8 +43,8 @@ public class RtmpTransferApi implements RtmpTransferFeignClient {
     private RtmpService rtmpService;
 
     @Override
-    public Response<Long> add(Rtmp rtmp) {
-        return rtmpService.add(rtmp).isOk() ? Response.ok(rtmp.getId()) : Response.fail();
+    public Response<Rtmp> add(Rtmp rtmp) {
+        return rtmpService.add(rtmp);
     }
 
     @Override
@@ -54,10 +53,7 @@ public class RtmpTransferApi implements RtmpTransferFeignClient {
     }
 
     @Override
-    public Response<Boolean> update(Rtmp rtmp) {
-        if (null == rtmp.getId()) {
-            return Response.fail("id is null");
-        }
+    public Response<Rtmp> update(Rtmp rtmp) {
         return rtmpService.update(rtmp);
     }
 
@@ -68,9 +64,6 @@ public class RtmpTransferApi implements RtmpTransferFeignClient {
 
     @Override
     public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
-        if (!Optional.ofNullable(rtmpDto).isPresent()) {
-            rtmpDto = new RtmpDto();
-        }
         return rtmpService.list(rtmpDto);
     }
 

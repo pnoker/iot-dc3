@@ -9,13 +9,13 @@
 
     <!-- Server side setup -->
     <servers>
-        <server host="iot-dc3" port="8085" type="tcp"/>
+        <server host="dc3" port="8085" type="tcp"/>
     </servers>
 
     <!-- to start os monitoring (cpu, network, memory). Use an erlang
     agent on the remote machine or SNMP. erlang is the default -->
     <monitoring>
-        <monitor host="iot-dc3" type="snmp"/>
+        <monitor host="dc3" type="snmp"/>
     </monitoring>
 
     <load>

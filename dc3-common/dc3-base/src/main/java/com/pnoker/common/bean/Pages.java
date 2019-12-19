@@ -17,9 +17,11 @@
 package com.pnoker.common.bean;
 
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -34,11 +36,14 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Pages implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer pageNum = 1;
     private Integer pageSize = 10;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private List<OrderItem> orders;
 
     public void convert(Pages page) {

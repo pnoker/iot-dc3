@@ -16,7 +16,10 @@
 #   limitations under the License.
 #
 
-app_path=$(cd $(dirname $0);pwd);
+app_path=$(
+  cd $(dirname $0)
+  pwd
+)
 project_name=iot-dc3
 git_url=https://github.com/pnoker/iot-dc3.git
 

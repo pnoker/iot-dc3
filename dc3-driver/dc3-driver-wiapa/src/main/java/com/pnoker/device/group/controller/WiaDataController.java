@@ -20,12 +20,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pnoker.device.group.model.wia.WiaData;
 import com.pnoker.device.group.service.wia.WiaDataService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -38,7 +38,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 @RestController
 public class WiaDataController {
-    @Autowired
+    @Resource
     private WiaDataService wiaDataService;
 
     @RequestMapping("/list")
@@ -52,8 +52,8 @@ public class WiaDataController {
     @RequestMapping("/insert/{num}")
     public String insert(@PathVariable int num) {
         LinkedBlockingQueue blockingQueue = new LinkedBlockingQueue(5000);
-        if(blockingQueue.size()>1000){
-            
+        if (blockingQueue.size() > 1000) {
+
         }
         long start = System.currentTimeMillis();
         for (int i = 0; i < num; i++) {

@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.constant.Common;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -61,5 +62,6 @@ public class Description implements Serializable {
      * 逻辑删除标识 1：删除，0：未删除
      */
     @TableLogic
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Integer deleted;
 }

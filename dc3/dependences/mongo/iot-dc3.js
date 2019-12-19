@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-// create iot-dc3 database and user
-db = db.getSiblingDB('iot-dc3');
+// create dc3 database and user
+db = db.getSiblingDB('dc3');
 db.createUser({
     user: "root",
     pwd: "dc3",
     roles: [{
         role: "readWrite",
-        db: "iot-dc3"
+        db: "dc3"
     }]
 });
