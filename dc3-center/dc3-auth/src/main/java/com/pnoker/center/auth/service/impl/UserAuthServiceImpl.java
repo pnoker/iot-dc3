@@ -17,14 +17,18 @@
 package com.pnoker.center.auth.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.dbs.token.feign.TokenDbsFeignClient;
 import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
+import com.pnoker.center.auth.service.TokenAuthService;
 import com.pnoker.center.auth.service.UserAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.Token;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -40,15 +44,20 @@ import javax.annotation.Resource;
 public class UserAuthServiceImpl implements UserAuthService {
     @Resource
     private UserDbsFeignClient userDbsFeignClient;
+
     @Resource
-    private TokenDbsFeignClient tokenDbsFeignClient;
+    private TokenAuthService tokenAuthService;
 
     @Override
+    @Caching(
+            put = {@CachePut(value = "auth_user", key = "#user.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "auth_user_list", allEntries = true)}
+    )
     public Response<User> add(User user) {
-        Response<Boolean> exist = checkUserExist(user.getUsername());
+        Response<Boolean> exist = checkUserValid(user.getUsername());
         if (!exist.isOk()) {
             Token token = new Token(6);
-            Response<Token> tokenResponse = tokenDbsFeignClient.add(token);
+            Response<Token> tokenResponse = tokenAuthService.add(token);
             if (tokenResponse.isOk()) {
                 token = tokenResponse.getData();
                 Response<User> userResponse = userDbsFeignClient.add(user.setTokenId(token.getId()));
@@ -60,13 +69,20 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "auth_user", key = "#id"),
+                    @CacheEvict(value = "token", key = "#id"),
+                    @CacheEvict(value = "auth_user_list", allEntries = true)
+            }
+    )
     public Response<Boolean> delete(Long id) {
         Response<User> userResponse = userDbsFeignClient.selectById(id);
         if (userResponse.isOk()) {
             User user = userResponse.getData();
             Response<Boolean> userDelete = userDbsFeignClient.delete(user.getId());
             if (userDelete.isOk()) {
-                Response<Boolean> tokenDelete = tokenDbsFeignClient.delete(user.getTokenId());
+                Response<Boolean> tokenDelete = tokenAuthService.delete(user.getTokenId());
                 return tokenDelete;
             }
             return Response.fail(userDelete.getMessage());
@@ -75,6 +91,13 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    @Caching(
+            put = {@CachePut(value = "auth_user", key = "#user.id", unless = "#result==null")},
+            evict = {
+                    @CacheEvict(value = "token", key = "#id"),
+                    @CacheEvict(value = "auth_user_list", allEntries = true)
+            }
+    )
     public Response<User> update(User user) {
         Response<User> userResponse = userDbsFeignClient.selectById(user.getId());
         if (userResponse.isOk()) {
@@ -85,21 +108,23 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    @Cacheable(value = "auth_user", key = "#id", unless = "#result==null")
     public Response<User> selectById(Long id) {
         Response<User> response = userDbsFeignClient.selectById(id);
         return response;
     }
 
     @Override
+    @Cacheable(value = "auth_user_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Response<Page<User>> list(UserDto userDto) {
         Response<Page<User>> response = userDbsFeignClient.list(userDto);
         return response;
     }
 
     @Override
-    public Response<Boolean> checkUserExist(String username) {
+    public Response<Boolean> checkUserValid(String username) {
         Response<User> response = userDbsFeignClient.selectByUsername(username);
-        return Response.ok(response.isOk());
+        return response.isOk() ? Response.ok() : Response.fail(response.getMessage());
     }
 
 }

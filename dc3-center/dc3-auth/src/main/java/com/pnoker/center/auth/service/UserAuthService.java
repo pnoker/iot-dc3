@@ -75,5 +75,5 @@ public interface UserAuthService {
      * @param username
      * @return Boolean
      */
-    Response<Boolean> checkUserExist(String username);
+    Response<Boolean> checkUserValid(String username);
 }

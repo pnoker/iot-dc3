@@ -30,12 +30,28 @@ import com.pnoker.common.entity.auth.User;
 public interface TokenAuthService {
 
     /**
+     * 新增 Token 记录
+     *
+     * @param token
+     * @return Token
+     */
+    Response<Token> add(Token token);
+
+    /**
+     * 删除 Token 记录
+     *
+     * @param id
+     * @return
+     */
+    Response<Boolean> delete(Long id);
+
+    /**
      * 更新 Token 记录
      *
-     * @param user
-     * @return TokenDto
+     * @param token
+     * @return Token
      */
-    Response<TokenDto> update(User user);
+    Response<Token> update(Token token);
 
     /**
      * 通过 ID 查询 Token 记录
