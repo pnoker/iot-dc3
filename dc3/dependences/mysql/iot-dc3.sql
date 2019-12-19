@@ -315,17 +315,20 @@ CREATE TABLE `dc3_token`  (
   `token` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'Token,用于接口验证',
   `private_key` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '密钥,由平台生成',
   `expire_time` datetime(0) NULL DEFAULT NULL COMMENT '过期时间',
+  `user_id` bigint(20) NULL DEFAULT NULL COMMENT '用户ID',
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `user_id`(`user_id`) USING BTREE,
+  CONSTRAINT `dc3_token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'Token表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of dc3_token
 -- ----------------------------
-INSERT INTO `dc3_token` VALUES (-1, '2i5zdIB8iQz+t4GiPn+NfcF37tVHwCTAOkbOZbzwcMliPS2IRRpKPAwx+9+7Unyg', 'Q5IkfORRoP5EQa8ED4EeR73WKXont2X6', '2019-12-15 06:02:01', '测试专用Token', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_token` VALUES (-1, '2i5zdIB8iQz+t4GiPn+NfcF37tVHwCTAOkbOZbzwcMliPS2IRRpKPAwx+9+7Unyg', 'Q5IkfORRoP5EQa8ED4EeR73WKXont2X6', '2019-12-15 06:02:01', -1, '测试专用Token', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_unit
@@ -373,7 +376,6 @@ CREATE TABLE `dc3_user`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名，需要加密存储，均可用于登录',
   `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '密码，需要加密存储',
-  `token_id` bigint(20) NULL DEFAULT -1 COMMENT 'Token ID',
   `node_id` bigint(20) NULL DEFAULT -1 COMMENT '节点ID，节点类型为用户',
   `image_id` bigint(20) NULL DEFAULT -1 COMMENT '图片ID',
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
@@ -384,16 +386,14 @@ CREATE TABLE `dc3_user`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `image_id`(`image_id`) USING BTREE,
   INDEX `node_id`(`node_id`) USING BTREE,
-  INDEX `token_id`(`token_id`) USING BTREE,
   UNIQUE INDEX `username`(`username`) USING BTREE,
   CONSTRAINT `dc3_user_ibfk_1` FOREIGN KEY (`node_id`) REFERENCES `dc3_node` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `dc3_user_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `dc3_user_ibfk_3` FOREIGN KEY (`token_id`) REFERENCES `dc3_token` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `dc3_user_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `dc3_image` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of dc3_user
 -- ----------------------------
-INSERT INTO `dc3_user` VALUES (-1, 'pnoker', 'dc3dc3dc3', -1, -1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-12-14 22:47:01', 0, 1);
+INSERT INTO `dc3_user` VALUES (-1, 'pnoker', 'dc3dc3dc3', -1, -1, '平台开发者账号', '2019-10-01 00:00:00', '2019-12-14 22:47:01', 0, 1);
 
 SET FOREIGN_KEY_CHECKS = 1;
