@@ -27,4 +27,11 @@ import com.pnoker.common.entity.auth.Token;
  * @email : pnokers@icloud.com
  */
 public interface TokenDbsService extends Service<Token, TokenDto> {
+    /**
+     * 通过 User ID 查询
+     *
+     * @param id
+     * @return
+     */
+    Token selectByUserId(Long id);
 }

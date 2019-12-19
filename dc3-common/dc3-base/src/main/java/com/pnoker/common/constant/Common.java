@@ -53,8 +53,8 @@ public interface Common {
      */
     interface Service {
         String DC3_AUTH = "DC3-AUTH";
-        String DC3_USER_URL_PREFIX = "/center/auth/user";
-        String DC3_TOKEN_URL_PREFIX = "/center/auth/token";
+        String DC3_USER_URL_PREFIX = "/auth/user";
+        String DC3_TOKEN_URL_PREFIX = "/auth/token";
 
         String DC3_DBS = "DC3-DBS";
         String DC3_DBS_RTMP_URL_PREFIX = "/center/dbs/rtmp";
@@ -79,15 +79,13 @@ public interface Common {
          */
         interface User {
             String USERNAME = "username";
-            String PHONE = "phone";
-            String EMAIL = "email";
         }
 
         /**
          * Token表
          */
         interface Token {
-            String APP_ID = "app_id";
+            String USER_ID = "user_id";
         }
 
         /**

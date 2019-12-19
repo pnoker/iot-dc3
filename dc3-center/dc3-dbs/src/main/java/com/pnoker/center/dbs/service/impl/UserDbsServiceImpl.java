@@ -79,6 +79,7 @@ public class UserDbsServiceImpl implements UserDbsService {
             evict = {@CacheEvict(value = "dbs_user_list", allEntries = true)}
     )
     public User update(User user) {
+        user.setUpdateTime(null);
         if (userMapper.updateById(user) > 0) {
             return userMapper.selectById(user.getId());
         }

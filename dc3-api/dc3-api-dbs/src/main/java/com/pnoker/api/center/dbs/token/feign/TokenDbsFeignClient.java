@@ -63,7 +63,7 @@ public interface TokenDbsFeignClient {
      * @return Token
      */
     @PostMapping("/update")
-    Response<Token> update(@RequestBody Token token);
+    Response<Token> update(@Validated @RequestBody Token token);
 
     /**
      * 根据 ID 查询 Token
@@ -73,6 +73,15 @@ public interface TokenDbsFeignClient {
      */
     @GetMapping("/id/{id}")
     Response<Token> selectById(@PathVariable(value = "id") Long id);
+
+    /**
+     * 根据 User ID 查询 Token
+     *
+     * @param id
+     * @return Token
+     */
+    @GetMapping("/user/{id}")
+    Response<Token> selectByUserId(@PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Token

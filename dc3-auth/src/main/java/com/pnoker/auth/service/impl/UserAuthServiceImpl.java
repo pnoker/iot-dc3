@@ -51,22 +51,25 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = "auth_user", key = "#user.id", unless = "#result==null"),
-                    @CachePut(value = "auth_user_username", key = "#user.username", unless = "#result==null")
+                    @CachePut(value = "auth_user", key = "#user.id", condition = "#result.ok==true"),
+                    @CachePut(value = "auth_user_username", key = "#user.username", condition = "#result.ok==true")
             },
             evict = {@CacheEvict(value = "auth_user_list", allEntries = true)}
     )
     public Response<User> add(User user) {
         Response<Boolean> exist = checkUserValid(user.getUsername());
         if (!exist.isOk()) {
-            Token token = new Token(6);
-            Response<Token> tokenResponse = tokenAuthService.add(token);
-            if (tokenResponse.isOk()) {
-                token = tokenResponse.getData();
-                Response<User> userResponse = userDbsFeignClient.add(user.setTokenId(token.getId()));
-                return userResponse;
+            Response<User> userResponse = userDbsFeignClient.add(user);
+            if (userResponse.isOk()) {
+                user.setId(userResponse.getData().getId());
+                Token token = new Token().setUserId(user.getId());
+                Response<Token> tokenResponse = tokenAuthService.add(token);
+                if (tokenResponse.isOk()) {
+                    return userResponse;
+                }
+                return Response.fail(tokenResponse.getMessage());
             }
-            return Response.fail(tokenResponse.getMessage());
+            return Response.fail(userResponse.getMessage());
         }
         return Response.fail("user already exists");
     }
@@ -81,33 +84,33 @@ public class UserAuthServiceImpl implements UserAuthService {
             }
     )
     public Response<Boolean> delete(Long id) {
-        Response<User> userResponse = userDbsFeignClient.selectById(id);
-        if (userResponse.isOk()) {
-            User user = userResponse.getData();
-            Response<Boolean> userDelete = userDbsFeignClient.delete(user.getId());
-            if (userDelete.isOk()) {
-                Response<Boolean> tokenDelete = tokenAuthService.delete(user.getTokenId());
+        Response<Boolean> userDelete = userDbsFeignClient.delete(id);
+        if (userDelete.isOk()) {
+            Response<Token> tokenResponse = tokenAuthService.selectByUserId(id);
+            if (tokenResponse.isOk()) {
+                Response<Boolean> tokenDelete = tokenAuthService.delete(tokenResponse.getData().getId());
                 return tokenDelete;
             }
-            return Response.fail(userDelete.getMessage());
+            return Response.fail(tokenResponse.getMessage());
         }
-        return Response.fail(userResponse.getMessage());
+        return Response.fail(userDelete.getMessage());
     }
 
     @Override
     @Caching(
             put = {
-                    @CachePut(value = "auth_user", key = "#user.id", unless = "#result==null"),
-                    @CachePut(value = "auth_user_username", key = "#user.username", unless = "#result==null")
+                    @CachePut(value = "auth_user", key = "#user.id", condition = "#result.ok==true"),
+                    @CachePut(value = "auth_user_username", key = "#user.username", condition = "#result.ok==true")
             },
             evict = {
-                    @CacheEvict(value = "token", key = "#id"),
+                    @CacheEvict(value = "token", key = "#user.id"),
                     @CacheEvict(value = "auth_user_list", allEntries = true)
             }
     )
     public Response<User> update(User user) {
         Response<User> userResponse = userDbsFeignClient.selectById(user.getId());
         if (userResponse.isOk()) {
+            user.setUsername(userResponse.getData().getUsername());
             Response<User> response = userDbsFeignClient.update(user);
             return response;
         }
@@ -115,21 +118,21 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    @Cacheable(value = "auth_user", key = "#id", unless = "#result==null")
+    @Cacheable(value = "auth_user", key = "#id", unless = "#result.ok==false")
     public Response<User> selectById(Long id) {
         Response<User> response = userDbsFeignClient.selectById(id);
         return response;
     }
 
     @Override
-    @Cacheable(value = "auth_user_username", key = "#username", unless = "#result==null")
+    @Cacheable(value = "auth_user_username", key = "#username", unless = "#result.ok==false")
     public Response<User> selectByUsername(String username) {
         Response<User> response = userDbsFeignClient.selectByUsername(username);
         return response;
     }
 
     @Override
-    @Cacheable(value = "auth_user_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = "auth_user_list", keyGenerator = "commonKeyGenerator", unless = "#result.ok==false")
     public Response<Page<User>> list(UserDto userDto) {
         Response<Page<User>> response = userDbsFeignClient.list(userDto);
         return response;

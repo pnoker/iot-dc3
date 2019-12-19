@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.api;
+package com.pnoker.auth.api;
 
-import com.pnoker.api.center.auth.token.feign.TokenAuthFeignClient;
-import com.pnoker.center.auth.service.TokenAuthService;
+import com.pnoker.api.auth.token.feign.TokenAuthFeignClient;
+import com.pnoker.auth.service.TokenAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>TokenAuthApi
@@ -38,12 +38,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(Common.Service.DC3_TOKEN_URL_PREFIX)
 public class TokenAuthApi implements TokenAuthFeignClient {
-    @Autowired
+    @Resource
     private TokenAuthService tokenAuthService;
 
     @Override
-    public Response<TokenDto> update(User user) {
-        return tokenAuthService.update(user);
+    public Response<Token> update(Token token) {
+        return tokenAuthService.update(token);
     }
 
     @Override

@@ -50,5 +50,4 @@ public class User extends Description {
     private Boolean enable;
     private Long nodeId;
     private Long imageId;
-    private Long tokenId;
 }

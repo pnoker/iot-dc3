@@ -17,6 +17,7 @@
 package com.pnoker.common.bean;
 
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,6 +42,8 @@ public class Pages implements Serializable {
 
     private Integer pageNum = 1;
     private Integer pageSize = 10;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private List<OrderItem> orders;
 
     public void convert(Pages page) {

@@ -1,2529 +1,2568 @@
 {
-  "info": {
-    "_postman_id": "41f5a584-6d08-42d2-8b46-d68be272c73c",
-    "name": "Dc3-Api(测试集合)",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "Dc3-Dbs-Api(内部)",
-      "item": [
-        {
-          "name": "rtmp",
-          "item": [
-            {
-              "name": "dbs:Add rtmp",
-              "request": {
-                "auth": {
-                  "type": "noauth"
-                },
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8300/center/dbs/rtmp/add",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "rtmp",
-                    "add"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:Add rtmp",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "name": "Content-Type",
-                        "value": "application/json",
-                        "type": "text"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
-                      "options": {
-                        "raw": {
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/rtmp/add",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "rtmp",
-                        "add"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 07:38:31 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": 8\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:Delete rtmp",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8300/center/dbs/rtmp/delete/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "rtmp",
-                    "delete",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "14"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:Delete rtmp",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [],
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/rtmp/delete/:id",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "rtmp",
-                        "delete",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "8"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 07:38:42 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:Update rtmp",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
-                },
-                "url": {
-                  "raw": "localhost:8300/center/dbs/rtmp/update",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "rtmp",
-                    "update"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:Update rtmp",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "name": "Content-Type",
-                        "value": "application/json",
-                        "type": "text"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
-                    },
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/rtmp/update",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "rtmp",
-                        "update"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 08:18:11 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:查询rtmp(ID)",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8300/center/dbs/rtmp/id/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "rtmp",
-                    "id",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "-1"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:查询rtmp(ID)",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/rtmp/id/:id",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "rtmp",
-                        "id",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "1"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 07:40:01 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 1,\n        \"userId\": -1,\n        \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"本地测试视频\",\n        \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n        \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": false,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1\n    }\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:查询rtmp(分页)",
-              "request": {
-                "auth": {
-                  "type": "noauth"
-                },
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n\n    \"autoStart\": false,\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8300/center/dbs/rtmp/list",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "rtmp",
-                    "list"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:查询rtmp(分页)",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "name": "Content-Type",
-                        "value": "application/json",
-                        "type": "text"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n    \"name\": \"在线测试视频\",\n    \"autoStart\": false,\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}",
-                      "options": {
-                        "raw": {
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/rtmp/list",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "rtmp",
-                        "list"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 07:41:41 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"userId\": -1,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
-                }
-              ]
-            }
-          ],
-          "protocolProfileBehavior": {},
-          "_postman_isSubFolder": true
-        },
-        {
-          "name": "user",
-          "item": [
-            {
-              "name": "dbs:Add user",
-              "request": {
-                "auth": {
-                  "type": "basic",
-                  "basic": [
-                    {
-                      "key": "password",
-                      "value": "iotdc3",
-                      "type": "string"
-                    },
-                    {
-                      "key": "username",
-                      "value": "iotdc3",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "type": "text",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/add",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "add"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:Add user",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "name": "Content-Type",
-                        "type": "text",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
-                      "options": {
-                        "raw": {
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/user/add",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "user",
-                        "add"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 15:43:16 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": 2\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:Delete user",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/delete/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "delete",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "1"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:Delete user",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [],
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/user/delete/:id",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "user",
-                        "delete",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "1"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 15:43:25 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:Update user",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "type": "text",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"id\": 3,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}"
-                },
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/update",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "update"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:Update user",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "name": "Content-Type",
-                        "value": "application/json",
-                        "type": "text"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n    \"id\": -1,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
-                      "options": {
-                        "raw": {
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/user/update",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "user",
-                        "update"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 15:45:20 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:查询user(ID)",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/id/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "id",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "-1"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:查询user(ID)",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "localhost:8300/dbs/user/id/:id",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "dbs",
-                        "user",
-                        "id",
-                        ":id"
-                      ],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "-1"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 15:45:49 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:查询user(用户名)",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/username/:username",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "username",
-                    ":username"
-                  ],
-                  "variable": [
-                    {
-                      "key": "username",
-                      "value": "pnoker"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:查询user(用户名)",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/user/username/:username",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "user",
-                        "username",
-                        ":username"
-                      ],
-                      "variable": [
-                        {
-                          "key": "username",
-                          "value": "pnoker"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 15:46:09 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:查询user(手机号)",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/phone/:phone",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "phone",
-                    ":phone"
-                  ],
-                  "variable": [
-                    {
-                      "key": "phone",
-                      "value": "18304071393"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:查询user(手机号)",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/user/phone/:phone",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "user",
-                        "phone",
-                        ":phone"
-                      ],
-                      "variable": [
-                        {
-                          "key": "phone",
-                          "value": "18304071393"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 15:50:08 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:查询user(邮箱)",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/email/:email",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "email",
-                    ":email"
-                  ],
-                  "variable": [
-                    {
-                      "key": "email",
-                      "value": "pnokers@icloud.com"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:查询user(邮箱)",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/user/email/:email",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "user",
-                        "email",
-                        ":email"
-                      ],
-                      "variable": [
-                        {
-                          "key": "email",
-                          "value": "pnokers@icloud.com"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Content-Disposition",
-                      "value": "inline;filename=f.txt"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sat, 07 Dec 2019 15:50:43 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
-                }
-              ]
-            },
-            {
-              "name": "dbs:查询user(分页)",
-              "request": {
-                "auth": {
-                  "type": "noauth"
-                },
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "type": "text",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8300/center/dbs/user/list",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8300",
-                  "path": [
-                    "center",
-                    "dbs",
-                    "user",
-                    "list"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "dbs:查询user(分页)",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "name": "Content-Type",
-                        "type": "text",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
-                      "options": {
-                        "raw": {
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "localhost:8300/center/dbs/user/list",
-                      "host": [
-                        "localhost"
-                      ],
-                      "port": "8300",
-                      "path": [
-                        "center",
-                        "dbs",
-                        "user",
-                        "list"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Connection",
-                      "value": "keep-alive"
-                    },
-                    {
-                      "key": "Transfer-Encoding",
-                      "value": "chunked"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    },
-                    {
-                      "key": "Date",
-                      "value": "Sun, 08 Dec 2019 02:01:45 GMT"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -1,\n                \"description\": \"平台开发者账号\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-27 11:51:06\",\n                \"deleted\": 0,\n                \"username\": \"pnoker\",\n                \"phone\": \"18304071393\",\n                \"email\": \"pnokers@icloud.com\",\n                \"password\": \"iotdc3\",\n                \"enable\": true,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"tokenId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
-                }
-              ]
-            }
-          ],
-          "protocolProfileBehavior": {},
-          "_postman_isSubFolder": true
-        }
-      ],
-      "protocolProfileBehavior": {}
-    },
-    {
-      "name": "Dc3-Auth-Api(对外)",
-      "item": [
-        {
-          "name": "auth:Add user",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"qwqw\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "localhost:8400/center/auth/user/add",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "user",
-                "add"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "auth:Add user",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8400/center/auth/user/add",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8400",
-                  "path": [
-                    "center",
-                    "auth",
-                    "user",
-                    "add"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 15 Dec 2019 03:43:24 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"ok\",\n    \"data\": 1\n}"
-            }
-          ]
-        },
-        {
-          "name": "auth:Delete user",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "localhost:8400/center/auth/user/delete/:id",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "user",
-                "delete",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "9"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "auth:Delete user",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8400/center/auth/user/delete/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8400",
-                  "path": [
-                    "center",
-                    "auth",
-                    "user",
-                    "delete",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "1"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 15 Dec 2019 03:44:25 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "auth:Update user",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"id\": 2,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "localhost:8400/center/auth/user/update",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "user",
-                "update"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "auth:Update user",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"id\": 1,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8400/center/auth/user/update",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8400",
-                  "path": [
-                    "center",
-                    "auth",
-                    "user",
-                    "update"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 15 Dec 2019 03:44:06 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "auth:查询user(id)",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "localhost:8400/center/auth/user/id/:id",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "user",
-                "id",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "4"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "auth:查询user(分页)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "localhost:8400/center/auth/user/list",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "user",
-                "list"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "auth:查询user(分页)",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8400/center/auth/user/list",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8400",
-                  "path": [
-                    "center",
-                    "auth",
-                    "user",
-                    "list"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 15 Dec 2019 03:35:00 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\r\n    \"ok\": true,\r\n    \"message\": \"ok\",\r\n    \"data\": {\r\n        \"records\": [\r\n            {\r\n                \"id\": -1,\r\n                \"description\": \"平台开发者账号\",\r\n                \"createTime\": \"2019-10-01 00:00:00\",\r\n                \"updateTime\": \"2019-12-14 22:47:01\",\r\n                \"deleted\": 0,\r\n                \"username\": \"pnoker\",\r\n                \"phone\": \"18304071393\",\r\n                \"email\": \"pnokers@icloud.com\",\r\n                \"password\": \"dc3dc3dc3\",\r\n                \"enable\": true,\r\n                \"nodeId\": -1,\r\n                \"imageId\": -1,\r\n                \"tokenId\": -1\r\n            }\r\n        ],\r\n        \"total\": 1,\r\n        \"size\": 10,\r\n        \"current\": 1,\r\n        \"orders\": [\r\n            {\r\n                \"column\": \"id\",\r\n                \"asc\": false\r\n            }\r\n        ],\r\n        \"searchCount\": true,\r\n        \"pages\": 1\r\n    }\r\n}"
-            }
-          ]
-        },
-        {
-          "name": "auth:检测user是否存在",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "localhost:8400/center/auth/check/:username",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "check",
-                ":username"
-              ],
-              "variable": [
-                {
-                  "key": "username",
-                  "value": "pnoker"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "auth:检测user是否存在",
-              "originalRequest": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8400/center/auth/check/:username",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8400",
-                  "path": [
-                    "center",
-                    "auth",
-                    "check",
-                    ":username"
-                  ],
-                  "variable": [
-                    {
-                      "key": "username",
-                      "value": "pnoker"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 15 Dec 2019 03:31:22 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "auth:生成Token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"pnoker\",\n    \"password\": \"dc3dc3dc3\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "localhost:8400/center/auth/token",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "token"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "auth:生成Token",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"username\": \"pnoker\",\n    \"password\": \"dc3dc3dc3\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8400/center/auth/token",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8400",
-                  "path": [
-                    "center",
-                    "auth",
-                    "token"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 15 Dec 2019 03:31:44 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"ok\",\n    \"data\": {\n        \"token\": \"Y8C/d0XoNchao77sTx9e1W/PUGzK967UpsabPCLAcbNiPS2IRRpKPAwx+9+7Unyg\",\n        \"appId\": \"Tp6vIA0hjv5dxrqi\",\n        \"expireTime\": \"2019-12-15 17:31:44\"\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "auth:检测token是否有效",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"token\": \"2i5zdIB8iQz+t4GiPn+NfcF37tVHwCTAOkbOZbzwcMliPS2IRRpKPAwx+9+7Unyg\",\n    \"appId\": \"Tp6vIA0hjv5dxrqi\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "localhost:8400/center/auth/check/token",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "center",
-                "auth",
-                "check",
-                "token"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "auth:检测token是否有效",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"token\": \"Y8C/d0XoNchao77sTx9e1W/PUGzK967UpsabPCLAcbNiPS2IRRpKPAwx+9+7Unyg\",\n    \"appId\": \"Tp6vIA0hjv5dxrqi\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8400/center/auth/check/token",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8400",
-                  "path": [
-                    "center",
-                    "auth",
-                    "check",
-                    "token"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 15 Dec 2019 03:32:30 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
-            }
-          ]
-        }
-      ],
-      "protocolProfileBehavior": {}
-    },
-    {
-      "name": "Dc3-Devices-Api(对外)",
-      "item": [
-        {
-          "name": "device:device/list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "localhost:8020/device/list",
-              "host": [
-                "localhost"
-              ],
-              "port": "8020",
-              "path": [
-                "device",
-                "list"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "device:device/add",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "localhost:8020/device/add",
-              "host": [
-                "localhost"
-              ],
-              "port": "8020",
-              "path": [
-                "device",
-                "add"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "device:device/update",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "localhost:8020/device/update",
-              "host": [
-                "localhost"
-              ],
-              "port": "8020",
-              "path": [
-                "device",
-                "update"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "device:device/delete",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "localhost:8020/device/delete",
-              "host": [
-                "localhost"
-              ],
-              "port": "8020",
-              "path": [
-                "device",
-                "delete"
-              ]
-            }
-          },
-          "response": []
-        }
-      ],
-      "protocolProfileBehavior": {}
-    },
-    {
-      "name": "Dc3-Webapp-Api(对外)",
-      "item": [
-        {
-          "name": "获取授权信息",
-          "request": {
-            "auth": {
-              "type": "basic",
-              "basic": [
-                {
-                  "key": "password",
-                  "value": "dc3",
-                  "type": "string"
-                },
-                {
-                  "key": "username",
-                  "value": "dc3",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8400/oauth/token",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8400",
-              "path": [
-                "oauth",
-                "token"
-              ]
-            }
-          },
-          "response": []
-        }
-      ],
-      "protocolProfileBehavior": {}
-    },
-    {
-      "name": "Dc3-Group(内部)",
-      "item": [
-        {
-          "name": "group:/list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "localhost:8700/list",
-              "host": [
-                "localhost"
-              ],
-              "port": "8700",
-              "path": [
-                "list"
-              ]
-            }
-          },
-          "response": []
-        }
-      ],
-      "protocolProfileBehavior": {}
-    },
-    {
-      "name": "Dc3-Rtmp-Api(对外)",
-      "item": [
-        {
-          "name": "rtmp:Add",
-          "request": {
-            "auth": {
-              "type": "basic",
-              "basic": [
-                {
-                  "key": "password",
-                  "value": "iotdc3",
-                  "type": "string"
-                },
-                {
-                  "key": "username",
-                  "value": "iotdc3",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "type": "text",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
-            },
-            "url": {
-              "raw": "localhost:8803/transfer/rtmp/add",
-              "host": [
-                "localhost"
-              ],
-              "port": "8803",
-              "path": [
-                "transfer",
-                "rtmp",
-                "add"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "rtmp:Add",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "type": "text",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
-                },
-                "url": {
-                  "raw": "localhost:8803/transfer/rtmp/add",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8803",
-                  "path": [
-                    "transfer",
-                    "rtmp",
-                    "add"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 08 Dec 2019 10:41:31 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": 16\n}"
-            }
-          ]
-        },
-        {
-          "name": "rtmp:Delete",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "localhost:8803/transfer/rtmp/delete/:id",
-              "host": [
-                "localhost"
-              ],
-              "port": "8803",
-              "path": [
-                "transfer",
-                "rtmp",
-                "delete",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "16"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "rtmp:Delete",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8803/transfer/rtmp/delete/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8803",
-                  "path": [
-                    "transfer",
-                    "rtmp",
-                    "delete",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "16"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Connection",
-                  "value": "keep-alive"
-                },
-                {
-                  "key": "Transfer-Encoding",
-                  "value": "chunked"
-                },
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                },
-                {
-                  "key": "Date",
-                  "value": "Sun, 08 Dec 2019 10:42:18 GMT"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
-            }
-          ]
-        },
-        {
-          "name": "rtmp:Update",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "localhost:8803/transfer/rtmp/update",
-              "host": [
-                "localhost"
-              ],
-              "port": "8803",
-              "path": [
-                "transfer",
-                "rtmp",
-                "update"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "rtmp:Update",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "localhost:8803/transfer/rtmp/update",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8803",
-                  "path": [
-                    "transfer",
-                    "rtmp",
-                    "update"
-                  ]
-                }
-              },
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "cookie": [],
-              "body": "{\n    \"ok\": false,\n    \"message\": \"任务运行中\",\n    \"data\": null\n}"
-            }
-          ]
-        },
-        {
-          "name": "rtmp:查询(ID)",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "localhost:8803/transfer/rtmp/id/:id",
-              "host": [
-                "localhost"
-              ],
-              "port": "8803",
-              "path": [
-                "transfer",
-                "rtmp",
-                "id",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "18"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "rtmp:查询(ID)",
-              "originalRequest": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8803/transfer/rtmp/id/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8803",
-                  "path": [
-                    "transfer",
-                    "rtmp",
-                    "id",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "18"
-                    }
-                  ]
-                }
-              },
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 18,\n        \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"在线测试视频\",\n        \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n        \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": true,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"userId\": -1\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "rtmp:查询(分页)",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "name": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}"
-            },
-            "url": {
-              "raw": "localhost:8803/transfer/rtmp/list",
-              "host": [
-                "localhost"
-              ],
-              "port": "8803",
-              "path": [
-                "transfer",
-                "rtmp",
-                "list"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "rtmp:查询(分页)",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "name": "Content-Type",
-                    "value": "application/json",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}"
-                },
-                "url": {
-                  "raw": "localhost:8803/transfer/rtmp/list",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8803",
-                  "path": [
-                    "transfer",
-                    "rtmp",
-                    "list"
-                  ]
-                }
-              },
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": -1,\n                \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"本地测试视频\",\n                \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 10,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 14:32:17\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 15,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": null,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 17,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 18:57:38\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 18,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": true,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            }\n        ],\n        \"total\": 6,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
-            }
-          ]
-        },
-        {
-          "name": "rtmp:开始任务",
-          "request": {
-            "auth": {
-              "type": "basic",
-              "basic": [
-                {
-                  "key": "password",
-                  "value": "iotdc3",
-                  "type": "string"
-                },
-                {
-                  "key": "username",
-                  "value": "iotdc3",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "localhost:8803/transfer/rtmp/start/:id",
-              "host": [
-                "localhost"
-              ],
-              "port": "8803",
-              "path": [
-                "transfer",
-                "rtmp",
-                "start",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "18"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "rtmp:开始任务",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8803/transfer/rtmp/start/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8803",
-                  "path": [
-                    "transfer",
-                    "rtmp",
-                    "start",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "18"
-                    }
-                  ]
-                }
-              },
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "cookie": [],
-              "body": "{\n    \"ok\": false,\n    \"message\": \"任务已是启动状态\",\n    \"data\": null\n}"
-            }
-          ]
-        },
-        {
-          "name": "rtmp:停止任务",
-          "request": {
-            "auth": {
-              "type": "basic",
-              "basic": [
-                {
-                  "key": "password",
-                  "value": "iotdc3",
-                  "type": "string"
-                },
-                {
-                  "key": "username",
-                  "value": "iotdc3",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "localhost:8803/transfer/rtmp/stop/:id",
-              "host": [
-                "localhost"
-              ],
-              "port": "8803",
-              "path": [
-                "transfer",
-                "rtmp",
-                "stop",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "18"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "rtmp:停止任务",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "localhost:8803/transfer/rtmp/stop/:id",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "8803",
-                  "path": [
-                    "transfer",
-                    "rtmp",
-                    "stop",
-                    ":id"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "18"
-                    }
-                  ]
-                }
-              },
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "cookie": [],
-              "body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
-            }
-          ]
-        }
-      ],
-      "protocolProfileBehavior": {}
-    }
-  ],
-  "protocolProfileBehavior": {}
+	"info": {
+		"_postman_id": "183c1f95-bf25-42ff-baa3-d3dee25d56ac",
+		"name": "Dc3-Api(测试集合)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Dc3-Dbs-Api(内部)",
+			"item": [
+				{
+					"name": "rtmp",
+					"item": [
+						{
+							"name": "dbs:Add rtmp",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/center/dbs/rtmp/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"rtmp",
+										"add"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:Add rtmp",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8300/center/dbs/rtmp/add",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"rtmp",
+												"add"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 07:38:31 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": 8\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:Delete rtmp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/center/dbs/rtmp/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"rtmp",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "14"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:Delete rtmp",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "localhost:8300/center/dbs/rtmp/delete/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"rtmp",
+												"delete",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "8"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 07:38:42 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:Update rtmp",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+								},
+								"url": {
+									"raw": "localhost:8300/center/dbs/rtmp/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"rtmp",
+										"update"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:Update rtmp",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": 10,\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+										},
+										"url": {
+											"raw": "localhost:8300/center/dbs/rtmp/update",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"rtmp",
+												"update"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 08:18:11 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:查询rtmp(ID)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/center/dbs/rtmp/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"rtmp",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "-1"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:查询rtmp(ID)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8300/center/dbs/rtmp/id/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"rtmp",
+												"id",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 07:40:01 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 1,\n        \"userId\": -1,\n        \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"本地测试视频\",\n        \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n        \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": false,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:查询rtmp(分页)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n    \"autoStart\": false,\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/center/dbs/rtmp/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"rtmp",
+										"list"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:查询rtmp(分页)",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"在线测试视频\",\n    \"autoStart\": false,\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8300/center/dbs/rtmp/list",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"rtmp",
+												"list"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 07:41:41 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"userId\": -1,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+								}
+							]
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "dbs:Add user",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "iotdc3",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "iotdc3",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"add"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:Add user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8300/center/dbs/user/add",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"user",
+												"add"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 15:43:16 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": 2\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:Delete user",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:Delete user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "localhost:8300/center/dbs/user/delete/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"user",
+												"delete",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 15:43:25 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:Update user",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 3,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}"
+								},
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"update"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:Update user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": -1,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\",\n    \"deleted\": 0\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8300/center/dbs/user/update",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"user",
+												"update"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 15:45:20 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:查询user(ID)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "-1"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:查询user(ID)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8300/dbs/user/id/:id",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"dbs",
+												"user",
+												"id",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "-1"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 15:45:49 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:查询user(用户名)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/username/:username",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"username",
+										":username"
+									],
+									"variable": [
+										{
+											"key": "username",
+											"value": "pnoker"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:查询user(用户名)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8300/center/dbs/user/username/:username",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"user",
+												"username",
+												":username"
+											],
+											"variable": [
+												{
+													"key": "username",
+													"value": "pnoker"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 15:46:09 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:查询user(手机号)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/phone/:phone",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"phone",
+										":phone"
+									],
+									"variable": [
+										{
+											"key": "phone",
+											"value": "18304071393"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:查询user(手机号)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8300/center/dbs/user/phone/:phone",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"user",
+												"phone",
+												":phone"
+											],
+											"variable": [
+												{
+													"key": "phone",
+													"value": "18304071393"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 15:50:08 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:查询user(邮箱)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/email/:email",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"email",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "pnokers@icloud.com"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:查询user(邮箱)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "localhost:8300/center/dbs/user/email/:email",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"user",
+												"email",
+												":email"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "pnokers@icloud.com"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Disposition",
+											"value": "inline;filename=f.txt"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 07 Dec 2019 15:50:43 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": -1,\n        \"username\": \"pnoker\",\n        \"phone\": \"18304071393\",\n        \"email\": \"pnokers@icloud.com\",\n        \"password\": \"iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"tokenId\": -1,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"deleted\": 0\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "dbs:查询user(分页)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8300/center/dbs/user/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8300",
+									"path": [
+										"center",
+										"dbs",
+										"user",
+										"list"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "dbs:查询user(分页)",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"name": "Content-Type",
+												"type": "text",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"pnoker\",\n    \"phone\": \"18304071393\",\n    \"email\": \"pnokers@icloud.com\",\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "localhost:8300/center/dbs/user/list",
+											"host": [
+												"localhost"
+											],
+											"port": "8300",
+											"path": [
+												"center",
+												"dbs",
+												"user",
+												"list"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Sun, 08 Dec 2019 02:01:45 GMT"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -1,\n                \"description\": \"平台开发者账号\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-27 11:51:06\",\n                \"deleted\": 0,\n                \"username\": \"pnoker\",\n                \"phone\": \"18304071393\",\n                \"email\": \"pnokers@icloud.com\",\n                \"password\": \"iotdc3\",\n                \"enable\": true,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"tokenId\": -1\n            }\n        ],\n        \"total\": 1,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+								}
+							]
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "*Dc3-Auth-Api(对外)",
+			"item": [
+				{
+					"name": "auth:Add user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"dc3\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"description\": \"平台开发者账号\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8400/auth/user/add",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"user",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:Add user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"dc3\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"description\": \"平台开发者账号\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8400/auth/user/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"user",
+										"add"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 09:53:15 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\",\n    \"data\": {\n        \"id\": 2,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-12-19 17:53:14\",\n        \"updateTime\": \"2019-12-19 17:53:14\",\n        \"username\": \"dc3\",\n        \"password\": \"iotdc3iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "auth:Delete user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8400/auth/user/delete/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"user",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:Delete user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8400/auth/user/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"user",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 13:59:05 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
+						}
+					]
+				},
+				{
+					"name": "auth:Update user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 2,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8400/auth/user/update",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"user",
+								"update"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:Update user",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 2,\n    \"username\": \"pnoker\",\n    \"password\": \"iotdc3iotdc3\",\n    \"enable\": true,\n    \"nodeId\": -1,\n    \"imageId\": -1,\n    \"tokenId\": -1,\n    \"description\": \"平台开发者账号\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-27 11:51:06\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8400/auth/user/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"user",
+										"update"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 13:11:24 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\",\n    \"data\": {\n        \"id\": 2,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"username\": \"dc3\",\n        \"password\": \"iotdc3iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "auth:查询user(id)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8400/auth/user/id/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"user",
+								"id",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:查询user(id)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8400/auth/user/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"user",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 13:23:03 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\",\n    \"data\": {\n        \"id\": 2,\n        \"description\": \"平台开发者账号\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-27 11:51:06\",\n        \"username\": \"dc3\",\n        \"password\": \"iotdc3iotdc3\",\n        \"enable\": true,\n        \"nodeId\": -1,\n        \"imageId\": -1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "auth:查询user(分页)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"\",\n    \"page\": {\n        \"pageNum\": 1,\n        \"pageSize\": 10,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8400/auth/user/list",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"user",
+								"list"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:查询user(分页)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"\",\n    \"page\": {\n        \"pageNum\": 1,\n        \"pageSize\": 10,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8400/auth/user/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"user",
+										"list"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 13:27:54 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": 2,\n                \"description\": \"平台开发者账号\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-27 11:51:06\",\n                \"username\": \"dc3\",\n                \"password\": \"iotdc3iotdc3\",\n                \"enable\": true,\n                \"nodeId\": -1,\n                \"imageId\": -1\n            },\n            {\n                \"id\": 1,\n                \"description\": \"平台开发者账号\",\n                \"createTime\": \"2019-12-19 17:52:15\",\n                \"updateTime\": \"2019-12-19 17:52:15\",\n                \"username\": \"trfgds\",\n                \"password\": \"iotdc3iotdc3\",\n                \"enable\": true,\n                \"nodeId\": -1,\n                \"imageId\": -1\n            },\n            {\n                \"id\": -1,\n                \"description\": \"平台开发者账号\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-14 22:47:01\",\n                \"username\": \"pnoker\",\n                \"password\": \"dc3dc3dc3\",\n                \"enable\": true,\n                \"nodeId\": -1,\n                \"imageId\": -1\n            }\n        ],\n        \"total\": 3,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "auth:检测user是否存在",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8400/auth/user/check/:username",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"user",
+								"check",
+								":username"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "pnoker"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:检测user是否存在",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8400/auth/user/check/:username",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"user",
+										"check",
+										":username"
+									],
+									"variable": [
+										{
+											"key": "username",
+											"value": "pnoker"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 13:29:30 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
+						}
+					]
+				},
+				{
+					"name": "auth:生成Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": 2,\n    \"newKey\": true,\n    \"duration\": 6\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8400/auth/token/update",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"token",
+								"update"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:生成Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": 2,\n    \"newKey\": true,\n    \"duration\": 6\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8400/auth/token/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"token",
+										"update"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 15:27:46 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\",\n    \"data\": {\n        \"id\": 2,\n        \"description\": \"\",\n        \"createTime\": \"2019-12-19 17:53:14\",\n        \"updateTime\": \"2019-12-19 23:27:46\",\n        \"token\": \"HJnRHSxTzeJ67r9Nha7+jwnuDM8nitL4JnuoMD+Lxn09HDiB5/hMZMYbsxjM/K8R\",\n        \"privateKey\": \"Lz3VjQL/KW6K8u4Xc9SP9g==\",\n        \"expireTime\": \"2019-12-20 05:27:46\",\n        \"userId\": 2,\n        \"newKey\": false,\n        \"duration\": 0\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "auth:检测token是否有效",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"rYjSHrSsjEceA78e5O+ETqlExKovs+kKLXv7x8oY6in23l94+Ypj5OXFoo1vUFl4\",\n    \"userId\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8400/auth/token/check",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"token",
+								"check"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:检测token是否有效",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"rYjSHrSsjEceA78e5O+ETqlExKovs+kKLXv7x8oY6in23l94+Ypj5OXFoo1vUFl4\",\n    \"userId\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8400/auth/token/check",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"token",
+										"check"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 15:29:55 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
+						}
+					]
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Dc3-Devices-Api(对外)",
+			"item": [
+				{
+					"name": "device:device/list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8020/device/list",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "device:device/add",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8020/device/add",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "device:device/update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:8020/device/update",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "device:device/delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8020/device/delete",
+							"host": [
+								"localhost"
+							],
+							"port": "8020",
+							"path": [
+								"device",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Dc3-Webapp-Api(对外)",
+			"item": [
+				{
+					"name": "获取授权信息",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "dc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "dc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8400/oauth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Dc3-Group(内部)",
+			"item": [
+				{
+					"name": "group:/list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8700/list",
+							"host": [
+								"localhost"
+							],
+							"port": "8700",
+							"path": [
+								"list"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Dc3-Rtmp-Api(对外)",
+			"item": [
+				{
+					"name": "rtmp:Add",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+						},
+						"url": {
+							"raw": "localhost:8803/transfer/rtmp/add",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"transfer",
+								"rtmp",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:Add",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}"
+								},
+								"url": {
+									"raw": "localhost:8803/transfer/rtmp/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"transfer",
+										"rtmp",
+										"add"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 08 Dec 2019 10:41:31 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": 16\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:Delete",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8803/transfer/rtmp/delete/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"transfer",
+								"rtmp",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "16"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:Delete",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/transfer/rtmp/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"transfer",
+										"rtmp",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "16"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 08 Dec 2019 10:42:18 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:Update",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8803/transfer/rtmp/update",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"transfer",
+								"rtmp",
+								"update"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:Update",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"18\",\n    \"userId\": -1,\n    \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n    \"createTime\": \"2019-10-01 00:00:00\",\n    \"updateTime\": \"2019-10-01 00:00:00\",\n    \"deleted\": 0,\n    \"name\": \"在线测试视频\",\n    \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n    \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n    \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n    \"videoType\": 0,\n    \"autoStart\": false,\n    \"nodeId\": -1,\n    \"imageId\": -1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8803/transfer/rtmp/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"transfer",
+										"rtmp",
+										"update"
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"ok\": false,\n    \"message\": \"任务运行中\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:查询(ID)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8803/transfer/rtmp/id/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"transfer",
+								"rtmp",
+								"id",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "18"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:查询(ID)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/transfer/rtmp/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"transfer",
+										"rtmp",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "18"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"id\": 18,\n        \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n        \"createTime\": \"2019-10-01 00:00:00\",\n        \"updateTime\": \"2019-10-01 00:00:00\",\n        \"deleted\": 0,\n        \"name\": \"在线测试视频\",\n        \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n        \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n        \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n        \"videoType\": 0,\n        \"run\": true,\n        \"autoStart\": false,\n        \"nodeId\": -1,\n        \"imageId\": -1,\n        \"userId\": -1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:查询(分页)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "localhost:8803/transfer/rtmp/list",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"transfer",
+								"rtmp",
+								"list"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:查询(分页)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"page\": {\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ]\n    }\n}"
+								},
+								"url": {
+									"raw": "localhost:8803/transfer/rtmp/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"transfer",
+										"rtmp",
+										"list"
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": {\n        \"records\": [\n            {\n                \"id\": -2,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": -1,\n                \"description\": \"本地MP4视频文件（复仇者联盟预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"本地测试视频\",\n                \"rtspUrl\": \"D:/FFmpeg/bin/190314223540373995.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_local\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 10,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 14:32:17\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 15,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": null,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 17,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-12-08 18:57:38\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": false,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            },\n            {\n                \"id\": 18,\n                \"description\": \"在线视频流（无限动力预告），用于测试使用\",\n                \"createTime\": \"2019-10-01 00:00:00\",\n                \"updateTime\": \"2019-10-01 00:00:00\",\n                \"deleted\": 0,\n                \"name\": \"在线测试视频\",\n                \"rtspUrl\": \"http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4\",\n                \"rtmpUrl\": \"rtmp://iotdc3.nginx:1935/rtmp/190314223540373995_online\",\n                \"command\": \"{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}\",\n                \"videoType\": 0,\n                \"run\": true,\n                \"autoStart\": false,\n                \"nodeId\": -1,\n                \"imageId\": -1,\n                \"userId\": -1\n            }\n        ],\n        \"total\": 6,\n        \"size\": 10,\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": true\n            }\n        ],\n        \"searchCount\": true,\n        \"pages\": 1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:开始任务",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8803/transfer/rtmp/start/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"transfer",
+								"rtmp",
+								"start",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "18"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:开始任务",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/transfer/rtmp/start/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"transfer",
+										"rtmp",
+										"start",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "18"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"ok\": false,\n    \"message\": \"任务已是启动状态\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "rtmp:停止任务",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "iotdc3",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "iotdc3",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8803/transfer/rtmp/stop/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8803",
+							"path": [
+								"transfer",
+								"rtmp",
+								"stop",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "18"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "rtmp:停止任务",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8803/transfer/rtmp/stop/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8803",
+									"path": [
+										"transfer",
+										"rtmp",
+										"stop",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "18"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"Ok!\",\n    \"data\": null\n}"
+						}
+					]
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
 }
