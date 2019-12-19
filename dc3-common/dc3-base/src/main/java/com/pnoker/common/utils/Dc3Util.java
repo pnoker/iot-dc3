@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.tool;
+package com.pnoker.common.utils;
 
 import cn.hutool.core.util.ReUtil;
 import com.google.common.base.Charsets;
@@ -25,12 +25,12 @@ import java.util.Base64;
 import java.util.List;
 
 /**
- * <p>自定义工具类集合
+ * <p>Dc3 平台自定义工具类集合
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public class Dc3Tools {
+public class Dc3Util {
     /**
      * 将字符串进行Base64编码
      *
@@ -47,7 +47,7 @@ public class Dc3Tools {
      * @param bytes
      * @return 返回字符串
      */
-    public static String encodeToString(byte[] bytes) {
+    public static String encode(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
@@ -69,23 +69,6 @@ public class Dc3Tools {
      */
     public static byte[] decode(byte[] input) {
         return Base64.getDecoder().decode(input);
-    }
-
-    /**
-     * @param username
-     * @return 0：无效用户名，1：用户名，2：手机号，3：邮箱
-     */
-    public static int usernameType(String username) {
-        if (isUsername(username)) {
-            return 1;
-        }
-        if (isPhone(username)) {
-            return 2;
-        }
-        if (isMail(username)) {
-            return 3;
-        }
-        return 0;
     }
 
     /**
@@ -119,25 +102,6 @@ public class Dc3Tools {
     public static boolean isMail(String mail) {
         String regex = "^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$";
         return ReUtil.isMatch(regex, mail);
-    }
-
-    /**
-     * 判断密码级别
-     *
-     * @param password
-     * @return 0：无效密码，1：弱密码，2：普通密码，3：强密码
-     */
-    public static int passwordType(String password) {
-        if (isStrongPassword(password)) {
-            return 3;
-        }
-        if (isPassword(password)) {
-            return 2;
-        }
-        if (isWeakPassword(password)) {
-            return 1;
-        }
-        return 0;
     }
 
     /**

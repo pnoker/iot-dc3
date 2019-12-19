@@ -20,7 +20,7 @@ import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.entity.Description;
-import com.pnoker.common.tool.AesTools;
+import com.pnoker.common.utils.KeyUtil;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -47,11 +47,13 @@ public class Token extends Description {
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     @Future(message = "expire time must be greater than the current time")
     private Date expireTime;
+    private Long userId;
+
 
     @SneakyThrows
     public Token(int hour) {
+        this.privateKey = KeyUtil.genAesKey().getPrivateKey();
         this.token = IdUtil.simpleUUID();
-        this.privateKey = AesTools.genKey().getPrivateKey();
         expireTime(hour);
         super.setCreateTime(new Date());
     }
