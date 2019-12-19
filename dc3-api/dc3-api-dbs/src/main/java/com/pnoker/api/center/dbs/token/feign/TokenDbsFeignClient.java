@@ -16,9 +16,11 @@
 
 package com.pnoker.api.center.dbs.token.feign;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.token.hystrix.TokenDbsFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
@@ -72,4 +74,12 @@ public interface TokenDbsFeignClient {
     @GetMapping("/id/{id}")
     Response<Token> selectById(@PathVariable(value = "id") Long id);
 
+    /**
+     * 分页查询 Token
+     *
+     * @param tokenDto
+     * @return Page<Token>
+     */
+    @PostMapping("/list")
+    Response<Page<Token>> list(@RequestBody(required = false) TokenDto tokenDto);
 }
