@@ -16,14 +16,18 @@
 
 package com.pnoker.center.dbs.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.token.feign.TokenDbsFeignClient;
 import com.pnoker.center.dbs.service.TokenDbsService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 /**
  * <p>TokenDbsApi
@@ -78,6 +82,18 @@ public class TokenDbsApi implements TokenDbsFeignClient {
         try {
             Token token = tokenDbsService.selectById(id);
             return null != token ? Response.ok(token) : Response.fail(String.format("token record does not exist for id(%s)", id));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public Response<Page<Token>> list(TokenDto tokenDto) {
+        if (!Optional.ofNullable(tokenDto).isPresent()) {
+            tokenDto = new TokenDto();
+        }
+        try {
+            return Response.ok(tokenDbsService.list(tokenDto));
         } catch (Exception e) {
             return Response.fail(e.getMessage());
         }
