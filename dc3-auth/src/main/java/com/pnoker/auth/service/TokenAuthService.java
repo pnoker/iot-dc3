@@ -62,6 +62,14 @@ public interface TokenAuthService {
     Response<Token> selectById(Long id);
 
     /**
+     * 通过 User ID 查询 Token 记录
+     *
+     * @param id
+     * @return Token
+     */
+    Response<Token> selectByUserId(Long id);
+
+    /**
      * 获取带分页、排序的 Token 记录
      *
      * @param tokenDto

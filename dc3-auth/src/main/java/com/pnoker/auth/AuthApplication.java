@@ -39,7 +39,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan(basePackages = {
         "com.pnoker.api.center.dbs.user",
         "com.pnoker.api.center.dbs.token",
-        "com.pnoker.center.auth"
+        "com.pnoker.auth"
 })
 public class AuthApplication {
     public static void main(String[] args) {

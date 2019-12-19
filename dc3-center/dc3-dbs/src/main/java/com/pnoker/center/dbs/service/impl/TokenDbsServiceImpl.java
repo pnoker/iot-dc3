@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.dbs.mapper.TokenMapper;
 import com.pnoker.center.dbs.service.TokenDbsService;
 import com.pnoker.common.bean.Pages;
+import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
 import lombok.extern.slf4j.Slf4j;
@@ -46,13 +47,15 @@ public class TokenDbsServiceImpl implements TokenDbsService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null")},
+            put = {
+                    @CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null"),
+                    @CachePut(value = "dbs_token_user_id", key = "#token.userId", unless = "#result==null")
+            },
             evict = {@CacheEvict(value = "dbs_token_list", allEntries = true)}
     )
     public Token add(Token token) {
         if (tokenMapper.insert(token) > 0) {
-            token = tokenMapper.selectById(token.getId());
-            return token;
+            return tokenMapper.selectById(token.getId());
         }
         return null;
     }
@@ -61,6 +64,7 @@ public class TokenDbsServiceImpl implements TokenDbsService {
     @Caching(
             evict = {
                     @CacheEvict(value = "dbs_token", key = "#id"),
+                    @CacheEvict(value = "dbs_token_user_id", allEntries = true),
                     @CacheEvict(value = "dbs_token_list", allEntries = true)
             }
     )
@@ -70,13 +74,18 @@ public class TokenDbsServiceImpl implements TokenDbsService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null")},
+            put = {
+                    @CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null"),
+                    @CachePut(value = "dbs_token_user_id", key = "#token.userId", unless = "#result==null")
+            },
             evict = {@CacheEvict(value = "dbs_token_list", allEntries = true)}
     )
     public Token update(Token token) {
+        token.setUpdateTime(null);
         if (tokenMapper.updateById(token) > 0) {
-            token = tokenMapper.selectById(token.getId());
-            return token;
+            Token result = tokenMapper.selectById(token.getId());
+            token.setId(result.getId());
+            return result;
         }
         return null;
     }
@@ -85,6 +94,14 @@ public class TokenDbsServiceImpl implements TokenDbsService {
     @Cacheable(value = "dbs_token", key = "#id", unless = "#result==null")
     public Token selectById(Long id) {
         return tokenMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = "dbs_token_user_id", key = "#id", unless = "#result==null")
+    public Token selectByUserId(Long id) {
+        QueryWrapper<Token> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(Common.Cloumn.Token.USER_ID, id);
+        return tokenMapper.selectOne(queryWrapper);
     }
 
     @Override

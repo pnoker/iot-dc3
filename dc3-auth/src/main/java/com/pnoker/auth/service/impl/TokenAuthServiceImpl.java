@@ -16,7 +16,6 @@
 
 package com.pnoker.auth.service.impl;
 
-import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.token.feign.TokenDbsFeignClient;
 import com.pnoker.auth.service.TokenAuthService;
@@ -51,19 +50,26 @@ public class TokenAuthServiceImpl implements TokenAuthService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = "token", key = "#token.userId", unless = "#result==null"),
-                    @CachePut(value = "auth_token", key = "#token.id", unless = "#result==null")
+                    @CachePut(value = "token", key = "#token.userId", condition = "#result.ok==true"),
+                    @CachePut(value = "auth_token", key = "#token.id", condition = "#result.ok==true"),
+                    @CachePut(value = "auth_token_user_id", key = "#token.userId", condition = "#result.ok==true")
             },
             evict = {@CacheEvict(value = "auth_token_list", allEntries = true)}
     )
     public Response<Token> add(Token token) {
-        return tokenDbsFeignClient.add(token);
+        Response<Token> response = tokenDbsFeignClient.add(token);
+        if (response.isOk()) {
+            token.setId(response.getData().getId());
+            return response;
+        }
+        return Response.fail(response.getMessage());
     }
 
     @Override
     @Caching(
             evict = {
                     @CacheEvict(value = "auth_token", key = "#id"),
+                    @CacheEvict(value = "auth_token_user_id", allEntries = true),
                     @CacheEvict(value = "auth_token_list", allEntries = true)
             }
     )
@@ -74,28 +80,42 @@ public class TokenAuthServiceImpl implements TokenAuthService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = "token", key = "#token.userId", unless = "#result==null"),
-                    @CachePut(value = "auth_token", key = "#token.id", unless = "#result==null")
+                    @CachePut(value = "token", key = "#token.userId", condition = "#result.ok==true"),
+                    @CachePut(value = "auth_token", key = "#token.id", condition = "#result.ok==true"),
+                    @CachePut(value = "auth_token_user_id", key = "#token.userId", condition = "#result.ok==true")
             },
             evict = {@CacheEvict(value = "auth_token_list", allEntries = true)}
     )
     public Response<Token> update(Token token) {
-        Response<Token> response = tokenDbsFeignClient.update(token.expireTime(6).setToken(IdUtil.simpleUUID()));
-        if (response.isOk()) {
-            return Response.ok(token);
+        Response<Token> tokenResponse = tokenDbsFeignClient.selectByUserId(token.getUserId());
+        if (tokenResponse.isOk()) {
+            Token result = tokenResponse.getData();
+            token.setId(result.getId());
+            Response<Token> response = tokenDbsFeignClient.update(result.generate(token.isNewKey(), token.getDuration()));
+            if (response.isOk()) {
+                return Response.ok(response.getData());
+            }
+            return response;
         }
-        return Response.fail(response.getMessage());
+        return tokenResponse;
     }
 
     @Override
-    @Cacheable(value = "auth_token", key = "#id", unless = "#result==null")
+    @Cacheable(value = "auth_token", key = "#id", unless = "#result.ok==false")
     public Response<Token> selectById(Long id) {
         Response<Token> response = tokenDbsFeignClient.selectById(id);
         return response;
     }
 
     @Override
-    @Cacheable(value = "auth_token_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = "auth_token_user_id", key = "#id", unless = "#result.ok==false")
+    public Response<Token> selectByUserId(Long id) {
+        Response<Token> response = tokenDbsFeignClient.selectByUserId(id);
+        return response;
+    }
+
+    @Override
+    @Cacheable(value = "auth_token_list", keyGenerator = "commonKeyGenerator", unless = "#result.ok==false")
     public Response<Page<Token>> list(TokenDto tokenDto) {
         Response<Page<Token>> response = tokenDbsFeignClient.list(tokenDto);
         return response;
@@ -105,8 +125,7 @@ public class TokenAuthServiceImpl implements TokenAuthService {
     public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
         Response<User> userResponse = userAuthService.selectById(tokenDto.getUserId());
         if (userResponse.isOk()) {
-            User user = userResponse.getData();
-            Response<Token> tokenResponse = selectById(user.getTokenId());
+            Response<Token> tokenResponse = selectByUserId(tokenDto.getUserId());
             if (tokenResponse.isOk()) {
                 Token token = tokenResponse.getData();
                 if (tokenDto.getToken().equals(token.getToken()) && token.getExpireTime().getTime() > (new Date()).getTime()) {

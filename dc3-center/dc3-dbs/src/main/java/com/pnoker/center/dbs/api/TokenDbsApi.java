@@ -88,6 +88,16 @@ public class TokenDbsApi implements TokenDbsFeignClient {
     }
 
     @Override
+    public Response<Token> selectByUserId(Long id) {
+        try {
+            Token token = tokenDbsService.selectByUserId(id);
+            return null != token ? Response.ok(token) : Response.fail(String.format("token record does not exist for user id(%s)", id));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
+    }
+
+    @Override
     public Response<Page<Token>> list(TokenDto tokenDto) {
         if (!Optional.ofNullable(tokenDto).isPresent()) {
             tokenDto = new TokenDto();

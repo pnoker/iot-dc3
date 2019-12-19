@@ -16,15 +16,19 @@
 
 package com.pnoker.common.entity.auth;
 
-import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.entity.Description;
 import com.pnoker.common.utils.KeyUtil;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -35,7 +39,6 @@ import java.util.Date;
  * @email : pnokers@icloud.com
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
@@ -47,15 +50,37 @@ public class Token extends Description {
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     @Future(message = "expire time must be greater than the current time")
     private Date expireTime;
+
+    @NotNull(message = "user id can't be empty")
     private Long userId;
 
+    /**
+     * 是否重新生成 Key
+     */
+    @TableField(exist = false)
+    private boolean newKey = false;
+
+    /**
+     * Token 持续时间，单位：小时
+     */
+    @TableField(exist = false)
+    private int duration = 0;
+
+    public Token() {
+        generate(true, 6);
+        super.setCreateTime(new Date());
+    }
 
     @SneakyThrows
-    public Token(int hour) {
-        this.privateKey = KeyUtil.genAesKey().getPrivateKey();
-        this.token = IdUtil.simpleUUID();
-        expireTime(hour);
-        super.setCreateTime(new Date());
+    public Token generate(boolean isNewKey, int duration) {
+        expireTime(duration);
+        if (isNewKey) {
+            this.privateKey = KeyUtil.genAesKey().getPrivateKey();
+        }
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(this.expireTime.getTime()).append("|").append(this.userId).append("|").append(this.privateKey);
+        this.token = KeyUtil.encryptAes(buffer.toString(), this.privateKey);
+        return this;
     }
 
     public Token expireTime(int hour) {

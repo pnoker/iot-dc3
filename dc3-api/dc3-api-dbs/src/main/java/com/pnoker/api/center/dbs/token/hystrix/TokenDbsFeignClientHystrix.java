@@ -61,6 +61,11 @@ public class TokenDbsFeignClientHystrix implements FallbackFactory<TokenDbsFeign
             }
 
             @Override
+            public Response<Token> selectByUserId(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
             public Response<Page<Token>> list(TokenDto tokenDto) {
                 return Response.fail(message);
             }
