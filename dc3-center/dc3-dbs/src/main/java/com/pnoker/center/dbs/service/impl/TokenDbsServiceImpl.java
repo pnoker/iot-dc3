@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,7 +45,10 @@ public class TokenDbsServiceImpl implements TokenDbsService {
     private TokenMapper tokenMapper;
 
     @Override
-    @CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null")
+    @Caching(
+            put = {@CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "dbs_token_list", allEntries = true)}
+    )
     public Token add(Token token) {
         if (tokenMapper.insert(token) > 0) {
             token = tokenMapper.selectById(token.getId());
@@ -54,13 +58,21 @@ public class TokenDbsServiceImpl implements TokenDbsService {
     }
 
     @Override
-    @CacheEvict(value = "dbs_token", key = "#id")
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "dbs_token", key = "#id"),
+                    @CacheEvict(value = "dbs_token_list", allEntries = true)
+            }
+    )
     public boolean delete(Long id) {
         return tokenMapper.deleteById(id) > 0;
     }
 
     @Override
-    @CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null")
+    @Caching(
+            put = {@CachePut(value = "dbs_token", key = "#token.id", unless = "#result==null")},
+            evict = {@CacheEvict(value = "dbs_token_list", allEntries = true)}
+    )
     public Token update(Token token) {
         if (tokenMapper.updateById(token) > 0) {
             token = tokenMapper.selectById(token.getId());
@@ -75,22 +87,22 @@ public class TokenDbsServiceImpl implements TokenDbsService {
         return tokenMapper.selectById(id);
     }
 
-    /**
-     * Token不提供List查询
-     */
     @Override
+    @Cacheable(value = "dbs_token_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Token> list(TokenDto tokenDto) {
-        return null;
+        return tokenMapper.selectPage(pagination(tokenDto.getPage()), fuzzyQuery(tokenDto));
     }
 
     @Override
     public QueryWrapper<Token> fuzzyQuery(TokenDto tokenDto) {
-        return null;
+        QueryWrapper<Token> queryWrapper = new QueryWrapper<>();
+        return queryWrapper;
     }
 
     @Override
     public Page<Token> pagination(Pages pages) {
-        return null;
+        Page<Token> page = new Page<>(pages.getPageNum(), pages.getPageSize());
+        return page;
     }
 
 }
