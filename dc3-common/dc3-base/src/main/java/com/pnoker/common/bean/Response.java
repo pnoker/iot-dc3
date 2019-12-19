@@ -35,8 +35,8 @@ import java.io.Serializable;
 public class Response<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private boolean ok;
-    private String message;
+    private boolean ok = false;
+    private String message = "fail";
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 

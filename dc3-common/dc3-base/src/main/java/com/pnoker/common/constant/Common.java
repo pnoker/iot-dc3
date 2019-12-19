@@ -52,15 +52,17 @@ public interface Common {
      * 服务名称 & 服务基地址
      */
     interface Service {
+        String DC3_AUTH = "DC3-AUTH";
+        String DC3_USER_URL_PREFIX = "/auth/user";
+        String DC3_TOKEN_URL_PREFIX = "/auth/token";
+
         String DC3_DBS = "DC3-DBS";
-        String DC3_DBS_RTMP_URL_PREFIX = "/api/v3/center/dbs/rtmp";
-        String DC3_DBS_USER_URL_PREFIX = "/api/v3/center/dbs/user";
+        String DC3_DBS_RTMP_URL_PREFIX = "/center/dbs/rtmp";
+        String DC3_DBS_USER_URL_PREFIX = "/center/dbs/user";
+        String DC3_DBS_TOKEN_URL_PREFIX = "/center/dbs/token";
 
         String DC3_RTMP = "DC3-RTMP";
-        String DC3_RTMP_URL_PREFIX = "/api/v3/transfer/rtmp";
-
-        String DC3_AUTH = "DC3-AUTH";
-        String DC3_AUTH_URL_PREFIX = "/api/v3/center/auth";
+        String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
     }
 
     /**
@@ -77,15 +79,13 @@ public interface Common {
          */
         interface User {
             String USERNAME = "username";
-            String PHONE = "phone";
-            String EMAIL = "email";
         }
 
         /**
          * Token表
          */
         interface Token {
-            String APP_ID = "app_id";
+            String USER_ID = "user_id";
         }
 
         /**

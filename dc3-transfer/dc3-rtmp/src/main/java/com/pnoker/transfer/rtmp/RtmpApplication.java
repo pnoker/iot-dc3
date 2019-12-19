@@ -28,8 +28,13 @@ import org.springframework.context.annotation.ComponentScan;
  * @email : pnokers@icloud.com
  */
 @SpringCloudApplication
-@EnableFeignClients("com.pnoker.dbs.api.rtmp.*")
-@ComponentScan(basePackages = {"com.pnoker.dbs.api.rtmp", "com.pnoker.transfer.rtmp"})
+@EnableFeignClients(basePackages = {
+        "com.pnoker.api.center.dbs.rtmp.*"
+})
+@ComponentScan(basePackages = {
+        "com.pnoker.api.center.dbs.rtmp",
+        "com.pnoker.transfer.rtmp"
+})
 public class RtmpApplication {
 
     public static void main(String[] args) {

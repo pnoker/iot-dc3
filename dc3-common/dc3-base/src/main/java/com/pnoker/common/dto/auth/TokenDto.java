@@ -16,9 +16,8 @@
 
 package com.pnoker.common.dto.auth;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pnoker.common.base.Converter;
-import com.pnoker.common.constant.Common;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.entity.auth.Token;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,8 +25,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>Token Dto
@@ -45,18 +44,16 @@ public class TokenDto implements Serializable, Converter<Token> {
     /**
      * Token令牌
      */
+    @NotNull(message = "token can't be empty")
     private String token;
 
     /**
-     * App Id
+     * User编号
      */
-    private String appId;
+    @NotNull(message = "user id can't be empty")
+    private Long userId;
 
-    /**
-     * 过期时间
-     */
-    @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
-    private Date expireTime;
+    private Pages page;
 
     @Override
     public void convertToDo(Token token) {

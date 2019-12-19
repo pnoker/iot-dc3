@@ -40,8 +40,6 @@ import java.io.Serializable;
 public class UserDto implements Serializable, Converter<User> {
 
     private String username;
-    private String phone;
-    private String email;
     private Boolean enable;
     private Long nodeId;
 

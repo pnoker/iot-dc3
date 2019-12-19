@@ -42,10 +42,10 @@ public class FallbackHystrix implements HandlerFunction<ServerResponse> {
     @Override
     public Mono<ServerResponse> handle(ServerRequest serverRequest) {
         Optional<Object> originalUris = serverRequest.attribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
-
-        originalUris.ifPresent(originalUri -> log.error("Request:{} fail", originalUri));
-
-        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .contentType(MediaType.TEXT_PLAIN).body(BodyInserters.fromObject("Service unavailable"));
+        originalUris.ifPresent(originalUri -> log.error("Request:{},hystrix服务降级处理", originalUri));
+        return ServerResponse
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(BodyInserters.fromValue("No available server for this request."));
     }
 }

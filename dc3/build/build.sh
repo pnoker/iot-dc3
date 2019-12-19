@@ -16,10 +16,13 @@
 #   limitations under the License.
 #
 
-app_path=$(cd $(dirname $0);pwd);
+app_path=$(
+  cd $(dirname $0)
+  pwd
+)
 project_name=iot-dc3
 git_url=https://github.com/pnoker/iot-dc3.git
-version=v`date -d "today" +"%Y-%m-%d-%H%M%S"`
+version=v$(date -d "today" +"%Y-%m-%d-%H%M%S")
 build_dir=build/versions/$version
 
 echo "[*] app path $app_path"
@@ -38,7 +41,7 @@ mvn -U clean package
 cd webpage
 npm run build
 
-find .|egrep "/target/dc3-*\.jar$"|xargs -i cp {} $build_dir;
+find . | egrep "/target/dc3-*\.jar$" | xargs -i cp {} $build_dir
 
 echo "[*] success"
 echo "[*] build path is $build_dir"

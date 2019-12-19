@@ -31,7 +31,7 @@ public interface Service<T, D> {
      * 新增
      *
      * @param type
-     * @return true/false
+     * @return
      */
     T add(T type);
 
@@ -39,7 +39,7 @@ public interface Service<T, D> {
      * 删除
      *
      * @param id
-     * @return true/false
+     * @return
      */
     boolean delete(Long id);
 
@@ -52,10 +52,10 @@ public interface Service<T, D> {
     T update(T type);
 
     /**
-     * 通过ID查询
+     * 通过 ID 查询
      *
      * @param id
-     * @return type
+     * @return
      */
     T selectById(Long id);
 
@@ -63,7 +63,7 @@ public interface Service<T, D> {
      * 获取带分页、排序
      *
      * @param dto
-     * @return list
+     * @return
      */
     Page<T> list(D dto);
 
@@ -71,7 +71,7 @@ public interface Service<T, D> {
      * 统一接口 模糊查询构造器
      *
      * @param dto
-     * @return type
+     * @return
      */
     QueryWrapper<T> fuzzyQuery(D dto);
 
@@ -79,7 +79,7 @@ public interface Service<T, D> {
      * 统一接口 排序构造器 & 字段校验
      *
      * @param pages
-     * @return list
+     * @return
      */
     Page<T> pagination(Pages pages);
 
