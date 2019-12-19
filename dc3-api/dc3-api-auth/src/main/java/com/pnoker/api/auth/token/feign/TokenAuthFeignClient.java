@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.center.auth.token.feign;
+package com.pnoker.api.auth.token.feign;
 
-import com.pnoker.api.center.auth.token.hystrix.TokenAuthFeignClientHystrix;
+import com.pnoker.api.auth.token.hystrix.TokenAuthFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,11 +40,11 @@ public interface TokenAuthFeignClient {
     /**
      * 修改 Token 记录
      *
-     * @param user
+     * @param token
      * @return TokenDto
      */
     @PostMapping("/update")
-    Response<TokenDto> update(@Validated @RequestBody User user);
+    Response<Token> update(@Validated @RequestBody Token token);
 
     /**
      * 根据 ID 查询 Token

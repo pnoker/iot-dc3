@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.api;
+package com.pnoker.auth.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.auth.user.feign.UserAuthFeignClient;
-import com.pnoker.center.auth.service.UserAuthService;
+import com.pnoker.api.auth.user.feign.UserAuthFeignClient;
+import com.pnoker.auth.service.UserAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>UserAuthApi
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(Common.Service.DC3_USER_URL_PREFIX)
 public class UserAuthApi implements UserAuthFeignClient {
-    @Autowired
+    @Resource
     private UserAuthService userAuthService;
 
     @Override
@@ -67,8 +68,8 @@ public class UserAuthApi implements UserAuthFeignClient {
     }
 
     @Override
-    public Response<Boolean> checkUserExist(String username) {
-        return userAuthService.checkUserExist(username);
+    public Response<Boolean> checkUserValid(String username) {
+        return userAuthService.checkUserValid(username);
     }
 
 }

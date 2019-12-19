@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service;
+package com.pnoker.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
@@ -60,6 +60,14 @@ public interface UserAuthService {
      * @return
      */
     Response<User> selectById(Long id);
+
+    /**
+     * 通过 Username 查询 User 记录
+     *
+     * @param username
+     * @return
+     */
+    Response<User> selectByUsername(String username);
 
     /**
      * 获取带分页、排序的 User 记录

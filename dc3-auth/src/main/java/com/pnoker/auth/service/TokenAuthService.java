@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service;
+package com.pnoker.auth.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
 
 /**
  * <p>TokenAuthService
@@ -60,6 +60,14 @@ public interface TokenAuthService {
      * @return Token
      */
     Response<Token> selectById(Long id);
+
+    /**
+     * 获取带分页、排序的 Token 记录
+     *
+     * @param tokenDto
+     * @return Page<Token>
+     */
+    Response<Page<Token>> list(TokenDto tokenDto);
 
     /**
      * 判断 Token 令牌是否有效

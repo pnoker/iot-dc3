@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service.impl;
+package com.pnoker.auth.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.token.feign.TokenDbsFeignClient;
-import com.pnoker.center.auth.service.TokenAuthService;
-import com.pnoker.center.auth.service.UserAuthService;
+import com.pnoker.auth.service.TokenAuthService;
+import com.pnoker.auth.service.UserAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
@@ -52,14 +53,20 @@ public class TokenAuthServiceImpl implements TokenAuthService {
             put = {
                     @CachePut(value = "token", key = "#token.userId", unless = "#result==null"),
                     @CachePut(value = "auth_token", key = "#token.id", unless = "#result==null")
-            }
+            },
+            evict = {@CacheEvict(value = "auth_token_list", allEntries = true)}
     )
     public Response<Token> add(Token token) {
         return tokenDbsFeignClient.add(token);
     }
 
     @Override
-    @CacheEvict(value = "auth_user", key = "#id")
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "auth_token", key = "#id"),
+                    @CacheEvict(value = "auth_token_list", allEntries = true)
+            }
+    )
     public Response<Boolean> delete(Long id) {
         return tokenDbsFeignClient.delete(id);
     }
@@ -69,7 +76,8 @@ public class TokenAuthServiceImpl implements TokenAuthService {
             put = {
                     @CachePut(value = "token", key = "#token.userId", unless = "#result==null"),
                     @CachePut(value = "auth_token", key = "#token.id", unless = "#result==null")
-            }
+            },
+            evict = {@CacheEvict(value = "auth_token_list", allEntries = true)}
     )
     public Response<Token> update(Token token) {
         Response<Token> response = tokenDbsFeignClient.update(token.expireTime(6).setToken(IdUtil.simpleUUID()));
@@ -87,11 +95,18 @@ public class TokenAuthServiceImpl implements TokenAuthService {
     }
 
     @Override
+    @Cacheable(value = "auth_token_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public Response<Page<Token>> list(TokenDto tokenDto) {
+        Response<Page<Token>> response = tokenDbsFeignClient.list(tokenDto);
+        return response;
+    }
+
+    @Override
     public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
         Response<User> userResponse = userAuthService.selectById(tokenDto.getUserId());
         if (userResponse.isOk()) {
             User user = userResponse.getData();
-            Response<Token> tokenResponse = tokenDbsFeignClient.selectById(user.getTokenId());
+            Response<Token> tokenResponse = selectById(user.getTokenId());
             if (tokenResponse.isOk()) {
                 Token token = tokenResponse.getData();
                 if (tokenDto.getToken().equals(token.getToken()) && token.getExpireTime().getTime() > (new Date()).getTime()) {

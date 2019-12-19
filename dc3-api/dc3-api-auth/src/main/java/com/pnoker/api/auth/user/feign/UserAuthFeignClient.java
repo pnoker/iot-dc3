@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.center.auth.user.feign;
+package com.pnoker.api.auth.user.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.auth.user.hystrix.UserAuthFeignClientiHystrix;
+import com.pnoker.api.auth.user.hystrix.UserAuthFeignClientiHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
@@ -90,6 +90,6 @@ public interface UserAuthFeignClient {
      * @return Boolean
      */
     @GetMapping("/check/{username}")
-    Response<Boolean> checkUserExist(@PathVariable(value = "username") String username);
+    Response<Boolean> checkUserValid(@PathVariable(value = "username") String username);
 
 }

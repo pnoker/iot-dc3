@@ -22,7 +22,7 @@ spring:
     host: dc3.redis
     port: 6379
     password: ${spring.security.user.password}
-    database: 0
+    database: 1
     timeout: 15S
     jedis:
       pool:
