@@ -51,6 +51,7 @@
     <modules>
         <module>dc3-gateway</module>
         <module>dc3-center</module>
+        <module>dc3-auth</module>
 
         <module>dc3-transfer</module>
         <module>dc3-device</module>

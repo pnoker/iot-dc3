@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth;
+package com.pnoker.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;

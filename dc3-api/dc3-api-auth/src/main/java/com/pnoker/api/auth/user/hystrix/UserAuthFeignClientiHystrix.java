@@ -14,46 +14,61 @@
  * limitations under the License.
  */
 
-package com.pnoker.api.center.auth.token.hystrix;
+package com.pnoker.api.auth.user.hystrix;
 
-import com.pnoker.api.center.auth.token.feign.TokenAuthFeignClient;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.api.auth.user.feign.UserAuthFeignClient;
 import com.pnoker.common.bean.Response;
-import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>TokenAuthFeignClientHystrix
+ * <p>UserAuthFeignClientiHystrix
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @Component
-public class TokenAuthFeignClientHystrix implements FallbackFactory<TokenAuthFeignClient> {
+public class UserAuthFeignClientiHystrix implements FallbackFactory<UserAuthFeignClient> {
 
     @Override
-    public TokenAuthFeignClient create(Throwable throwable) {
+    public UserAuthFeignClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
-        log.error("TokenAuthFeignClient:{},hystrix服务降级处理", message, throwable);
+        log.error("UserAuthFeignClient:{},hystrix服务降级处理", message, throwable);
 
-        return new TokenAuthFeignClient() {
+        return new UserAuthFeignClient() {
 
             @Override
-            public Response<TokenDto> update(User user) {
+            public Response<User> add(User user) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Token> selectById(Long id) {
+            public Response<Boolean> delete(Long id) {
                 return Response.fail(message);
             }
 
             @Override
-            public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
+            public Response<User> update(User user) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<User> selectById(Long id) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Page<User>> list(UserDto userDto) {
+                return Response.fail(message);
+            }
+
+            @Override
+            public Response<Boolean> checkUserValid(String username) {
                 return Response.fail(message);
             }
         };

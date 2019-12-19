@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service.impl;
+package com.pnoker.auth.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
-import com.pnoker.center.auth.service.TokenAuthService;
-import com.pnoker.center.auth.service.UserAuthService;
+import com.pnoker.auth.service.TokenAuthService;
+import com.pnoker.auth.service.UserAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.entity.auth.Token;
@@ -50,7 +50,10 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "auth_user", key = "#user.id", unless = "#result==null")},
+            put = {
+                    @CachePut(value = "auth_user", key = "#user.id", unless = "#result==null"),
+                    @CachePut(value = "auth_user_username", key = "#user.username", unless = "#result==null")
+            },
             evict = {@CacheEvict(value = "auth_user_list", allEntries = true)}
     )
     public Response<User> add(User user) {
@@ -72,6 +75,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Caching(
             evict = {
                     @CacheEvict(value = "auth_user", key = "#id"),
+                    @CacheEvict(value = "auth_user_username", allEntries = true),
                     @CacheEvict(value = "token", key = "#id"),
                     @CacheEvict(value = "auth_user_list", allEntries = true)
             }
@@ -92,7 +96,10 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "auth_user", key = "#user.id", unless = "#result==null")},
+            put = {
+                    @CachePut(value = "auth_user", key = "#user.id", unless = "#result==null"),
+                    @CachePut(value = "auth_user_username", key = "#user.username", unless = "#result==null")
+            },
             evict = {
                     @CacheEvict(value = "token", key = "#id"),
                     @CacheEvict(value = "auth_user_list", allEntries = true)
@@ -115,6 +122,13 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    @Cacheable(value = "auth_user_username", key = "#username", unless = "#result==null")
+    public Response<User> selectByUsername(String username) {
+        Response<User> response = userDbsFeignClient.selectByUsername(username);
+        return response;
+    }
+
+    @Override
     @Cacheable(value = "auth_user_list", keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Response<Page<User>> list(UserDto userDto) {
         Response<Page<User>> response = userDbsFeignClient.list(userDto);
@@ -123,7 +137,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public Response<Boolean> checkUserValid(String username) {
-        Response<User> response = userDbsFeignClient.selectByUsername(username);
+        Response<User> response = selectByUsername(username);
         return response.isOk() ? Response.ok() : Response.fail(response.getMessage());
     }
 
