@@ -28,12 +28,12 @@ import com.pnoker.device.group.service.wia.WiaDeviceService;
 import com.pnoker.device.group.service.wia.WiaGatewayService;
 import com.pnoker.device.group.service.wia.WiaVariableService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,11 +47,11 @@ import java.util.List;
 @Order(1)
 @Component
 public class WiaReceive implements ApplicationRunner {
-    @Autowired
+    @Resource
     private WiaGatewayService wiaGatewayService;
-    @Autowired
+    @Resource
     private WiaDeviceService wiaDeviceService;
-    @Autowired
+    @Resource
     private WiaVariableService wiaVariableService;
 
     @Override

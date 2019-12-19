@@ -27,13 +27,13 @@ import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static com.pnoker.transfer.rtmp.runner.Environment.initial;
@@ -65,12 +65,12 @@ public class TranscodeRunner implements ApplicationRunner {
     @Value("${rtmp.thread.keep-alive-time}")
     private int keepAliveTime;
 
-    private int times = 1;
-
-    @Autowired
+    @Resource
     private RtmpService rtmpService;
-    @Autowired
+    @Resource
     private RtmpDbsFeignClient rtmpDbsFeignClient;
+
+    private int times = 1;
 
     @Override
     public void run(ApplicationArguments args) {

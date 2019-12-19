@@ -21,6 +21,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * <p>授权中心服务启动入口
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @email : pnokers@icloud.com
  */
 @EnableCaching
+@EnableScheduling
 @SpringCloudApplication
 @EnableFeignClients(basePackages = {
         "com.pnoker.api.center.dbs.user.*",

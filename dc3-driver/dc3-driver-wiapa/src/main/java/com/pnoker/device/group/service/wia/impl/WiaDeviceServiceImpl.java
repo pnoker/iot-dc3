@@ -20,9 +20,9 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.pnoker.device.group.dao.wia.WiaDeviceMapper;
 import com.pnoker.device.group.model.wia.WiaDevice;
 import com.pnoker.device.group.service.wia.WiaDeviceService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -33,8 +33,9 @@ import java.util.List;
  */
 @Service
 public class WiaDeviceServiceImpl implements WiaDeviceService {
-    @Autowired
+    @Resource
     private WiaDeviceMapper wiaDeviceMapper;
+
     @Override
     public List<WiaDevice> list(Wrapper<WiaDevice> wrapper) {
         return wiaDeviceMapper.selectList(wrapper);
