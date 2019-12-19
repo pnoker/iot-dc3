@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.tool;
+package com.pnoker.common.utils;
 
 import com.google.common.base.Charsets;
 import com.pnoker.common.bean.Keys;
 import com.pnoker.common.constant.Common;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -29,12 +32,65 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * <p>
+ * <p>Dc3 平台密钥工具类
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-public class RsaTools {
+public class KeyUtil {
+
+    /**
+     * 生成AES密钥
+     *
+     * @return Keys.Aes
+     * @throws NoSuchAlgorithmException
+     */
+    public static Keys.Aes genAesKey() throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(Common.KEY_ALGORITHM_AES);
+        keyGenerator.init(128);
+        SecretKey secretKey = keyGenerator.generateKey();
+        Keys.Aes aes = new Keys().new Aes(Dc3Util.encode(secretKey.getEncoded()));
+        return aes;
+    }
+
+    /**
+     * AES 私钥加密
+     *
+     * @param str
+     * @param privateKey
+     * @return
+     * @throws Exception
+     */
+    public static String encryptAes(String str, String privateKey) throws Exception {
+        //base64编码的私钥
+        byte[] keyBytes = Dc3Util.decode(privateKey);
+        Key key = new SecretKeySpec(keyBytes, Common.KEY_ALGORITHM_AES);
+        //AES加密
+        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_AES);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        String outStr = Dc3Util.encode(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
+        return outStr;
+    }
+
+    /**
+     * AES 私钥解密
+     *
+     * @param str
+     * @param privateKey
+     * @return
+     * @throws Exception
+     */
+    public static String decryptAes(String str, String privateKey) throws Exception {
+        //base64编码的私钥
+        byte[] keyBytes = Dc3Util.decode(privateKey);
+        Key key = new SecretKeySpec(keyBytes, Common.KEY_ALGORITHM_AES);
+        //AES解密
+        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_AES);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        //64位解码加密后的字符串
+        byte[] inputByte = Dc3Util.decode(str.getBytes(Charsets.UTF_8));
+        return new String(cipher.doFinal(inputByte));
+    }
 
     /**
      * 生成RSA密钥对
@@ -42,14 +98,14 @@ public class RsaTools {
      * @return Keys.Rsa
      * @throws NoSuchAlgorithmException
      */
-    public static Keys.Rsa genKey() throws NoSuchAlgorithmException {
+    public static Keys.Rsa genRsaKey() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(Common.KEY_ALGORITHM_RSA);
         keyPairGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        String publicKeyString = Dc3Tools.encodeToString(publicKey.getEncoded());
-        String privateKeyString = Dc3Tools.encodeToString((privateKey.getEncoded()));
+        String publicKeyString = Dc3Util.encode(publicKey.getEncoded());
+        String privateKeyString = Dc3Util.encode((privateKey.getEncoded()));
         Keys.Rsa rsa = new Keys().new Rsa(publicKeyString, privateKeyString);
         return rsa;
     }
@@ -62,15 +118,15 @@ public class RsaTools {
      * @return
      * @throws Exception
      */
-    public static String encrypt(String str, String publicKey) throws Exception {
+    public static String encryptRsa(String str, String publicKey) throws Exception {
         //base64编码的公钥
-        byte[] keyBytes = Dc3Tools.decode(publicKey);
+        byte[] keyBytes = Dc3Util.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(Common.KEY_ALGORITHM_RSA).generatePublic(keySpec);
         //RSA加密
         Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_RSA);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-        String outStr = Dc3Tools.encodeToString(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
+        String outStr = Dc3Util.encode(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
         return outStr;
     }
 
@@ -82,16 +138,16 @@ public class RsaTools {
      * @return
      * @throws Exception
      */
-    public static String decrypt(String str, String privateKey) throws Exception {
+    public static String decryptRsa(String str, String privateKey) throws Exception {
         //base64编码的私钥
-        byte[] keyBytes = Dc3Tools.decode(privateKey);
+        byte[] keyBytes = Dc3Util.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(Common.KEY_ALGORITHM_RSA).generatePrivate(keySpec);
         //RSA解密
         Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_RSA);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
         //64位解码加密后的字符串
-        byte[] inputByte = Dc3Tools.decode(str.getBytes(Charsets.UTF_8));
+        byte[] inputByte = Dc3Util.decode(str.getBytes(Charsets.UTF_8));
         return new String(cipher.doFinal(inputByte));
     }
 }
