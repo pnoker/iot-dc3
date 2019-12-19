@@ -18,6 +18,7 @@ package com.pnoker.common.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pnoker.common.base.Converter;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.entity.auth.Token;
 import lombok.AllArgsConstructor;
@@ -60,6 +61,8 @@ public class TokenDto implements Serializable, Converter<Token> {
      */
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
     private Date expireTime;
+
+    private Pages page;
 
     @Override
     public void convertToDo(Token token) {
