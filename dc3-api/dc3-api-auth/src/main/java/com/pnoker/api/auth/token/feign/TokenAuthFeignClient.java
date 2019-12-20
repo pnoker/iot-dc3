@@ -21,6 +21,7 @@ import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,15 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @FeignClient(path = Common.Service.DC3_TOKEN_URL_PREFIX, name = Common.Service.DC3_AUTH, fallbackFactory = TokenAuthFeignClientHystrix.class)
 public interface TokenAuthFeignClient {
+
+    /**
+     * 生成用户 Token 令牌
+     *
+     * @param user
+     * @return TokenDto
+     */
+    @PostMapping
+    Response<TokenDto> generateToken(@Validated @RequestBody User user);
 
     /**
      * 修改 Token 记录

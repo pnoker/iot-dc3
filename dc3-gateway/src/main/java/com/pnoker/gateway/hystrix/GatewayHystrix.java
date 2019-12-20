@@ -31,18 +31,18 @@ import java.util.Optional;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR;
 
 /**
- * <p>服务降级处理
+ * <p>网关服务降级处理
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
 @Slf4j
 @Component
-public class FallbackHystrix implements HandlerFunction<ServerResponse> {
+public class GatewayHystrix implements HandlerFunction<ServerResponse> {
     @Override
     public Mono<ServerResponse> handle(ServerRequest serverRequest) {
         Optional<Object> originalUris = serverRequest.attribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
-        originalUris.ifPresent(originalUri -> log.error("Request:{},hystrix服务降级处理", originalUri));
+        originalUris.ifPresent(originalUri -> log.error("Request:{},GatewayHystrix服务降级处理", originalUri));
         return ServerResponse
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .contentType(MediaType.TEXT_PLAIN)

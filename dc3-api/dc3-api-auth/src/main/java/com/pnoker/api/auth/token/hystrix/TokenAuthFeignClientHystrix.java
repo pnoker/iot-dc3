@@ -20,6 +20,7 @@ import com.pnoker.api.auth.token.feign.TokenAuthFeignClient;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,11 @@ public class TokenAuthFeignClientHystrix implements FallbackFactory<TokenAuthFei
         log.error("TokenAuthFeignClient:{},hystrix服务降级处理", message, throwable);
 
         return new TokenAuthFeignClient() {
+
+            @Override
+            public Response<TokenDto> generateToken(User user) {
+                return Response.fail(message);
+            }
 
             @Override
             public Response<Token> update(Token token) {

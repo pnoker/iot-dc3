@@ -37,7 +37,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class RtmpDto implements Serializable, Converter<Rtmp> {
+public class RtmpDto implements Serializable, Converter<Rtmp, RtmpDto> {
     private static final long serialVersionUID = 1L;
 
     private String name;
@@ -59,7 +59,8 @@ public class RtmpDto implements Serializable, Converter<Rtmp> {
     }
 
     @Override
-    public void convertToDto(Rtmp rtmp) {
+    public RtmpDto convert(Rtmp rtmp) {
         BeanUtils.copyProperties(rtmp, this);
+        return this;
     }
 }

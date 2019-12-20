@@ -16,8 +16,11 @@
 
 package com.pnoker.common.dto.auth;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
+import com.pnoker.common.constant.Common;
 import com.pnoker.common.entity.auth.Token;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>Token Dto
@@ -38,14 +42,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class TokenDto implements Serializable, Converter<Token> {
+public class TokenDto implements Serializable, Converter<Token, TokenDto> {
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Token令牌
-     */
-    @NotNull(message = "token can't be empty")
-    private String token;
 
     /**
      * User编号
@@ -53,6 +51,16 @@ public class TokenDto implements Serializable, Converter<Token> {
     @NotNull(message = "user id can't be empty")
     private Long userId;
 
+    /**
+     * Token令牌
+     */
+    @NotNull(message = "token can't be empty")
+    private String token;
+
+    @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
+    private Date expireTime;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     @Override
@@ -61,7 +69,8 @@ public class TokenDto implements Serializable, Converter<Token> {
     }
 
     @Override
-    public void convertToDto(Token token) {
+    public TokenDto convert(Token token) {
         BeanUtils.copyProperties(token, this);
+        return this;
     }
 }

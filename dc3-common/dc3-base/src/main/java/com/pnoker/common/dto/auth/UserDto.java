@@ -37,7 +37,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class UserDto implements Serializable, Converter<User> {
+public class UserDto implements Serializable, Converter<User, UserDto> {
 
     private String username;
     private Boolean enable;
@@ -51,7 +51,8 @@ public class UserDto implements Serializable, Converter<User> {
     }
 
     @Override
-    public void convertToDto(User user) {
+    public UserDto convert(User user) {
         BeanUtils.copyProperties(user, this);
+        return this;
     }
 }

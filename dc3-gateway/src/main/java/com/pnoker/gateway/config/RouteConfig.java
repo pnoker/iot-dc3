@@ -16,17 +16,21 @@
 
 package com.pnoker.gateway.config;
 
-import com.pnoker.gateway.hystrix.FallbackHystrix;
+import com.pnoker.gateway.hystrix.GatewayHystrix;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
+import reactor.core.publisher.Mono;
 
 /**
  * <p>自定义Route配置
@@ -38,17 +42,53 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 @Configuration
 @AllArgsConstructor
 public class RouteConfig {
-    private final FallbackHystrix fallbackHystrix;
+    private final GatewayHystrix gatewayHystrix;
 
     @Bean
     public RouteLocator myRouteLocator(RouteLocatorBuilder builder) {
-        return builder.routes().build();
+        return builder.routes()
+                .route("generate_token",
+                        r -> r.path("/api/v3/token")
+                                .filters(
+                                        f -> f.stripPrefix(3).prefixPath("/auth/token")
+                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
+                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                ).uri("lb://dc3-auth")
+                )
+                .route("register_user",
+                        r -> r.path("/api/v3/register")
+                                .filters(
+                                        f -> f.stripPrefix(3).prefixPath("/auth/user/add")
+                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
+                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                ).uri("lb://dc3-auth")
+                )
+                .build();
+    }
+
+    /**
+     * 根据 HostAddress 进行限流
+     *
+     * @return
+     */
+    @Bean
+    @Order(-10)
+    public KeyResolver hostKeyResolver() {
+        return exchange -> Mono.just(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
+    }
+
+    /**
+     * 限流
+     *
+     * @return
+     */
+    @Bean
+    RedisRateLimiter redisRateLimiter() {
+        return new RedisRateLimiter(100, 2000);
     }
 
     @Bean
     public RouterFunction routerFunction() {
-        return RouterFunctions.route(
-                RequestPredicates.path("/fallback")
-                        .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), fallbackHystrix);
+        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), gatewayHystrix);
     }
 }
