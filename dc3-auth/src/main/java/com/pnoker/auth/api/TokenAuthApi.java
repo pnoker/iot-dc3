@@ -22,6 +22,7 @@ import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +41,11 @@ import javax.annotation.Resource;
 public class TokenAuthApi implements TokenAuthFeignClient {
     @Resource
     private TokenAuthService tokenAuthService;
+
+    @Override
+    public Response<TokenDto> generateToken(User user) {
+        return tokenAuthService.generateToken(user);
+    }
 
     @Override
     public Response<Token> update(Token token) {

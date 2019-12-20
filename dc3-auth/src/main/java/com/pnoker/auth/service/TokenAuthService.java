@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.entity.auth.User;
 
 /**
  * <p>TokenAuthService
@@ -84,5 +85,13 @@ public interface TokenAuthService {
      * @return Boolean
      */
     Response<Boolean> checkTokenValid(TokenDto tokenDto);
+
+    /**
+     * 生成 Token 令牌
+     *
+     * @param user
+     * @return
+     */
+    Response<TokenDto> generateToken(User user);
 
 }

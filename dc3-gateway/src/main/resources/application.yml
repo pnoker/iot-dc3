@@ -46,39 +46,6 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # auth
-        - id: token_route
-          uri: lb://dc3-auth/center/auth/token
-          predicates:
-            - Path=/api/v3/token
-          filters:
-            - StripPrefix=3
-            - PrefixPath=/center/auth/token
-            - AuthenticFilter
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
-        - id: auth_route
-          uri: lb://dc3-auth
-          predicates:
-            - Path=/api/v3/user/**
-          filters:
-            - AuthenticFilter
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # rtmp
         - id: rtmp_route
           uri: lb://dc3-rtmp

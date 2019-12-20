@@ -35,17 +35,6 @@ import reactor.core.publisher.Mono;
 public class GatewayConfig {
 
     /**
-     * 根据 HostAddress 进行限流
-     *
-     * @return
-     */
-    @Bean
-    @Order(-10)
-    public KeyResolver hostKeyResolver() {
-        return exchange -> Mono.just(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
-    }
-
-    /**
      * 统计请求时间
      *
      * @return

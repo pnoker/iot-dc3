@@ -137,4 +137,22 @@ public class TokenAuthServiceImpl implements TokenAuthService {
         }
         return Response.fail(userResponse.getMessage());
     }
+
+    @Override
+    public Response<TokenDto> generateToken(User user) {
+        Response<User> userResponse = userAuthService.selectByUsername(user.getUsername());
+        if (userResponse.isOk()) {
+            if (user.getPassword().equals(userResponse.getData().getPassword())) {
+                Token token = new Token().setUserId(userResponse.getData().getId()).setNewKey(true).setDuration(6);
+                Response<Token> tokenResponse = update(token);
+                if (tokenResponse.isOk()) {
+                    TokenDto tokenDto = new TokenDto().convert(tokenResponse.getData());
+                    return Response.ok(tokenDto);
+                }
+                return Response.fail(tokenResponse.getMessage());
+            }
+            return Response.fail("invalid username or password");
+        }
+        return Response.fail(userResponse.getMessage());
+    }
 }
