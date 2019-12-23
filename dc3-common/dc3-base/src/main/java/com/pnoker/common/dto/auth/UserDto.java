@@ -41,7 +41,6 @@ public class UserDto implements Serializable, Converter<User, UserDto> {
 
     private String username;
     private Boolean enable;
-    private Long nodeId;
 
     private Pages page;
 

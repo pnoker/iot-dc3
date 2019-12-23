@@ -48,6 +48,5 @@ public class User extends Description {
     private String password;
 
     private Boolean enable;
-    private Long nodeId;
     private Long imageId;
 }

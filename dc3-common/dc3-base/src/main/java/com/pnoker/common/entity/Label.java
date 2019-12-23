@@ -35,7 +35,6 @@ public class Label extends Description {
 
     private String name;
     private String color;
-    private Long nodeId;
     private Long imageId;
     private Long userId;
 }
