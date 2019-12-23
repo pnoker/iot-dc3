@@ -15,7 +15,7 @@ services:
 
   gateway:
     build:
-      context: ./dc3-gateway/
+      context: ../dc3-gateway/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-gateway:3.0
     restart: always
@@ -30,7 +30,7 @@ services:
 
   register:
     build:
-      context: ./dc3-center/dc3-register/
+      context: ../dc3-center/dc3-register/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-register:3.0
     restart: always
@@ -45,7 +45,7 @@ services:
 
   monitor:
     build:
-      context: ./dc3-center/dc3-monitor/
+      context: ../dc3-center/dc3-monitor/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-monitor:3.0
     restart: always
@@ -60,7 +60,7 @@ services:
 
   auth:
     build:
-      context: ./dc3-auth/
+      context: ../dc3-auth/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-auth:3.0
     restart: always
@@ -75,7 +75,7 @@ services:
 
   dbs:
     build:
-      context: ./dc3-center/dc3-dbs/
+      context: ../dc3-center/dc3-dbs/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-dbs:3.0
     restart: always
@@ -90,7 +90,7 @@ services:
 
   mysql:
     build:
-      context: ./dc3/dependences/mysql/
+      context: ./dependences/mysql/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-mysql:3.0
     restart: always
@@ -105,7 +105,7 @@ services:
 
   mongo:
     build:
-      context: ./dc3/dependences/mongo/
+      context: ./dependences/mongo/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-mongo:3.0
     restart: always
@@ -120,7 +120,7 @@ services:
 
   redis:
     build:
-      context: ./dc3/dependences/redis/
+      context: ./dependences/redis/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-redis:3.0
     restart: always
@@ -135,7 +135,7 @@ services:
 
   manager:
     build:
-      context: ./dc3-device/dc3-manager/
+      context: ../dc3-device/dc3-manager/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-manager:3.0
     restart: always
@@ -150,7 +150,7 @@ services:
 
   rabbitmq:
     build:
-      context: ./dc3/dependences/rabbitmq/
+      context: ./dependences/rabbitmq/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-rabbitmq:3.0
     restart: always
@@ -168,7 +168,7 @@ services:
 
   opcua:
     build:
-      context: ./dc3-transfer/dc3-opcua/
+      context: ../dc3-transfer/dc3-opcua/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-opcua:3.0
     restart: always
@@ -183,7 +183,7 @@ services:
 
   rtmp:
     build:
-      context: ./dc3-transfer/dc3-rtmp/
+      context: ../dc3-transfer/dc3-rtmp/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-rtmp:3.0
     restart: always
@@ -210,7 +210,7 @@ services:
 
   resource:
     build:
-      context: ./dc3-transfer/dc3-resource/
+      context: ../dc3-transfer/dc3-resource/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-resource:3.0
     restart: always
