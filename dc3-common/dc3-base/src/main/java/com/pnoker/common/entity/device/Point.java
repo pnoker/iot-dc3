@@ -37,7 +37,6 @@ public class Point extends Description {
     private String name;
     private String pointCode;
     private Long deviceId;
-    private Long nodeId;
     private Long propertyId;
     private Long unitId;
     private Long userId;

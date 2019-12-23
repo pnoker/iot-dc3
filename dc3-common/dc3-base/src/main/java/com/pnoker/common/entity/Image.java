@@ -35,6 +35,5 @@ public class Image extends Description {
 
     private String name;
     private String url;
-    private Long nodeId;
     private Long userId;
 }

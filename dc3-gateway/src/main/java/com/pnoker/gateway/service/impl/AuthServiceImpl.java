@@ -16,11 +16,12 @@
 
 package com.pnoker.gateway.service.impl;
 
+import com.pnoker.api.auth.user.feign.UserAuthFeignClient;
 import com.pnoker.common.dto.auth.TokenDto;
 import com.pnoker.gateway.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * <p>权限服务接口
@@ -30,14 +31,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AuthServiceImpl implements AuthService {
-    private final RedisTemplate redisTemplate;
 
-    public AuthServiceImpl(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
+    @Resource
+    private UserAuthFeignClient userAuthFeignClient;
 
     @Override
     public boolean isPermitted(TokenDto tokenDto) {
+        userAuthFeignClient.selectById(-1L);
         return true;
     }
 }

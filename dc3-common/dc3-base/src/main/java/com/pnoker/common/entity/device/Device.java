@@ -38,7 +38,6 @@ public class Device extends Description {
     private String deviceCode;
     private String type;
     private Short status;
-    private Long nodeId;
     private Long imageId;
     private Long userId;
 }

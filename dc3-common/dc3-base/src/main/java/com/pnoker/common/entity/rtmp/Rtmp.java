@@ -53,7 +53,6 @@ public class Rtmp extends Description {
     private Short videoType;
     private Boolean run;
     private Boolean autoStart;
-    private Long nodeId;
     private Long imageId;
     private Long userId;
 

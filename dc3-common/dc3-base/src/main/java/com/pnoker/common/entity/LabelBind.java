@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class LabelBind extends Description {
 
-    private Long nodeId;
     private Long labelId;
     private Long entityId;
     private Long userId;

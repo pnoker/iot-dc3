@@ -37,6 +37,5 @@ public class Unit extends Description {
     private String unit;
     private String symbol;
     private String format;
-    private Long nodeId;
     private Long userId;
 }

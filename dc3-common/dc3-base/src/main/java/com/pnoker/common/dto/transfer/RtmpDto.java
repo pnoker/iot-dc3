@@ -44,7 +44,6 @@ public class RtmpDto implements Serializable, Converter<Rtmp, RtmpDto> {
     private Short videoType;
     private Boolean run;
     private Boolean autoStart;
-    private Long nodeId;
     private Long userId;
 
     private Pages page;

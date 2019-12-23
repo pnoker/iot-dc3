@@ -18,7 +18,6 @@ package com.pnoker.auth.schedule;
 
 import com.pnoker.auth.service.TokenAuthService;
 import com.pnoker.auth.service.UserAuthService;
-import com.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -38,9 +37,6 @@ public class TokenSchedule {
     private TokenAuthService tokenAuthService;
     @Resource
     private UserAuthService userAuthService;
-
-    @Resource
-    private RedisUtil redisUtil;
 
     @Scheduled(cron = "0/10 * * * * *")
     public void refreshToken() {
