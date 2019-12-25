@@ -17,7 +17,7 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.entity.device.PointProfile;
+import com.pnoker.common.model.device.PointProfile;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

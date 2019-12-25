@@ -21,7 +21,7 @@ import com.pnoker.api.auth.user.hystrix.UserAuthFeignClientiHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

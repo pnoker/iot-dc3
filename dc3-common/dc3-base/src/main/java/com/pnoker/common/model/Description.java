@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity;
+package com.pnoker.common.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -22,10 +22,12 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.valid.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -45,6 +47,7 @@ public class Description implements Serializable {
      * 主键，自增ID
      */
     @TableId(type = IdType.AUTO)
+    @NotNull(message = "id can't be empty", groups = {Update.class})
     private Long id;
 
     /**

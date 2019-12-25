@@ -21,7 +21,9 @@ import com.pnoker.api.center.dbs.token.hystrix.TokenDbsFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.model.auth.Token;
+import com.pnoker.common.valid.Insert;
+import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +47,7 @@ public interface TokenDbsFeignClient {
      * @return Token
      */
     @PostMapping("/add")
-    Response<Token> add(@Validated @RequestBody Token token);
+    Response<Token> add(@Validated(Insert.class) @RequestBody Token token);
 
     /**
      * 根据 ID 删除 Token
@@ -63,7 +65,7 @@ public interface TokenDbsFeignClient {
      * @return Token
      */
     @PostMapping("/update")
-    Response<Token> update(@Validated @RequestBody Token token);
+    Response<Token> update(@Validated(Update.class) @RequestBody Token token);
 
     /**
      * 根据 ID 查询 Token

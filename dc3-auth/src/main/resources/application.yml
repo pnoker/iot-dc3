@@ -48,6 +48,16 @@ management:
 feign:
   hystrix:
     enabled: true
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+      useGzipDecoder: true
 
 logging:
   level:

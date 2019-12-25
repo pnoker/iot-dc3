@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity.device;
+package com.pnoker.common.model.device;
 
-import com.pnoker.common.entity.Description;
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>设备表
+ * <p>设备变量表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -32,12 +32,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Device extends Description {
+public class PointProperty extends Description {
 
     private String name;
-    private String deviceCode;
-    private String type;
-    private Short status;
-    private Long imageId;
-    private Long userId;
+    private Float base;
+    private Float minimum;
+    private Float maximum;
+    private Float multiple;
+    private Float value;
 }

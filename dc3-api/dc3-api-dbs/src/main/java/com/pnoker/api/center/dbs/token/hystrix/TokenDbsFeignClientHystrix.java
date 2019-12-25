@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.token.feign.TokenDbsFeignClient;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.model.auth.Token;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

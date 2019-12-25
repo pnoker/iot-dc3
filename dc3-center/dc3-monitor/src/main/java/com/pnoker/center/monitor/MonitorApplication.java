@@ -18,12 +18,10 @@ package com.pnoker.center.monitor;
 
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
- * <p>
+ * <p>服务监控中心
  *
  * @author : pnoker
  * @email : pnokers@icloud.com

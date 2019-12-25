@@ -43,6 +43,12 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
+        <!-- Feign OkHttp -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+        </dependency>
+
         <!-- dc3 Common Base -->
         <dependency>
             <groupId>com.pnoker</groupId>

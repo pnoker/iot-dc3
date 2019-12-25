@@ -14,29 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity.device;
-
-import com.pnoker.common.entity.Description;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+package com.pnoker.common.valid;
 
 /**
- * <p>设备驱动表
+ * <p>Validated 分组
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class DeviceDriver extends Description {
-
-    private String name;
-    private String serviceName;
-    private String connectInfo;
-    private String profileInfo;
-    private Long userId;
+public interface Update {
 }

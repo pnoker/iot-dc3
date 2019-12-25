@@ -22,7 +22,7 @@ import com.pnoker.center.dbs.service.TokenDbsService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.model.auth.Token;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,9 +66,6 @@ public class TokenDbsApi implements TokenDbsFeignClient {
 
     @Override
     public Response<Token> update(Token token) {
-        if (null == token.getId()) {
-            return Response.fail("token id is null");
-        }
         try {
             token = tokenDbsService.update(token);
             return null != token ? Response.ok(token) : Response.fail("token record update failed");

@@ -21,8 +21,8 @@ import com.pnoker.auth.service.TokenAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.Token;
+import com.pnoker.common.model.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,18 +48,8 @@ public class TokenAuthApi implements TokenAuthFeignClient {
     }
 
     @Override
-    public Response<Token> update(Token token) {
-        return tokenAuthService.update(token);
-    }
-
-    @Override
-    public Response<Token> selectById(Long id) {
-        return tokenAuthService.selectById(id);
-    }
-
-    @Override
-    public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
-        return tokenAuthService.checkTokenValid(tokenDto);
+    public Response<Boolean> checkTokenValid(Token token) {
+        return tokenAuthService.checkTokenValid(token);
     }
 
 }

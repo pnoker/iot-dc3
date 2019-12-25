@@ -16,9 +16,10 @@
 
 package com.pnoker.common.dto.auth;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,7 @@ public class UserDto implements Serializable, Converter<User, UserDto> {
     private String username;
     private Boolean enable;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     @Override

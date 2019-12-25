@@ -21,7 +21,9 @@ import com.pnoker.api.center.dbs.rtmp.hystrix.RtmpDbsFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.valid.Insert;
+import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +47,7 @@ public interface RtmpDbsFeignClient {
      * @return Long
      */
     @PostMapping("/add")
-    Response<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
+    Response<Rtmp> add(@Validated(Insert.class) @RequestBody Rtmp rtmp);
 
     /**
      * 根据 ID 删除 Rtmp
@@ -63,7 +65,7 @@ public interface RtmpDbsFeignClient {
      * @return Boolean
      */
     @PostMapping("/update")
-    Response<Rtmp> update(@RequestBody Rtmp rtmp);
+    Response<Rtmp> update(@Validated(Update.class) @RequestBody Rtmp rtmp);
 
     /**
      * 根据 ID 查询 Rtmp

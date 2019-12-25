@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity.rtmp;
+package com.pnoker.common.model.rtmp;
 
-import com.pnoker.common.entity.Description;
+import com.pnoker.common.model.Description;
+import com.pnoker.common.valid.Insert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -38,23 +40,22 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class Rtmp extends Description {
 
-    @NotNull(message = "name can't be empty")
+    @NotBlank(message = "name can't be empty", groups = {Insert.class})
     private String name;
 
-    @NotNull(message = "rtsp url can't be empty")
+    @NotBlank(message = "rtsp url can't be empty", groups = {Insert.class})
     private String rtspUrl;
 
-    @NotNull(message = "rtmp url can't be empty")
+    @NotBlank(message = "rtmp url can't be empty", groups = {Insert.class})
     private String rtmpUrl;
 
-    @NotNull(message = "command can't be empty")
+    @NotBlank(message = "command can't be empty", groups = {Insert.class})
     private String command;
 
     private Short videoType;
     private Boolean run;
     private Boolean autoStart;
     private Long imageId;
-    private Long userId;
 
     public Rtmp(long id, boolean run) {
         super.setId(id);

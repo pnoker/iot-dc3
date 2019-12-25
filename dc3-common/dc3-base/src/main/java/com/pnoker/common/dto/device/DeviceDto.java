@@ -16,7 +16,8 @@
 
 package com.pnoker.common.dto.device;
 
-import com.pnoker.common.entity.device.Device;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pnoker.common.model.device.Device;
 import com.pnoker.common.bean.Pages;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,5 +36,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class DeviceDto extends Device {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 }

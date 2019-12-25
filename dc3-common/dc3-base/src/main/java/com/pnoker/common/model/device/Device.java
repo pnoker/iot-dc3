@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.common.model.device;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.entity.Unit;
-import org.apache.ibatis.annotations.Mapper;
+import com.pnoker.common.model.Description;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
- * <p>Unit 单位表 数据库操作接口
+ * <p>设备表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Mapper
-public interface UnitMapper extends BaseMapper<Unit> {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class Device extends Description {
+
+    private String name;
+    private String code;
+    private Short status;
+    private Long profileId;
+    private Long imageId;
 }

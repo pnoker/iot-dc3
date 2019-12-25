@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity.device;
+package com.pnoker.common.model.device;
 
-import com.pnoker.common.entity.Description;
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,13 +32,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PointProperty extends Description {
+public class Point extends Description {
 
     private String name;
-    private Float base;
-    private Float minimum;
-    private Float maximum;
-    private Float multiple;
-    private Float value;
-    private Long userId;
+    private String pointCode;
+    private Long deviceId;
+    private Long propertyId;
+    private Long unitId;
 }

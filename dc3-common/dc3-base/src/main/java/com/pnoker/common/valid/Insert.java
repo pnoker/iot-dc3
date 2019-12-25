@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+package com.pnoker.common.valid;
 
 /**
- * <p>标签关系表
+ * <p>Validated 分组
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class LabelBind extends Description {
-
-    private Long labelId;
-    private Long entityId;
-    private Long userId;
+public interface Insert {
 }

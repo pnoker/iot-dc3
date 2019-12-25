@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity;
+package com.pnoker.common.model.device;
 
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>标签表
+ * <p>测点配置表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -31,10 +32,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Label extends Description {
+public class PointProfile extends Description {
 
-    private String name;
-    private String color;
-    private Long imageId;
-    private Long userId;
+    private String config;
+    private Long driverId;
 }

@@ -20,8 +20,10 @@ import com.pnoker.api.auth.token.hystrix.TokenAuthFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.Token;
+import com.pnoker.common.model.auth.User;
+import com.pnoker.common.valid.Auth;
+import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,33 +47,15 @@ public interface TokenAuthFeignClient {
      * @return TokenDto
      */
     @PostMapping
-    Response<TokenDto> generateToken(@Validated @RequestBody User user);
-
-    /**
-     * 修改 Token 记录
-     *
-     * @param token
-     * @return TokenDto
-     */
-    @PostMapping("/update")
-    Response<Token> update(@Validated @RequestBody Token token);
-
-    /**
-     * 根据 ID 查询 Token
-     *
-     * @param id
-     * @return Token
-     */
-    @GetMapping("/id/{id}")
-    Response<Token> selectById(@PathVariable(value = "id") Long id);
+    Response<TokenDto> generateToken(@Validated(Auth.class) @RequestBody User user);
 
     /**
      * 检测 Token 是否有效
      *
-     * @param tokenDto
+     * @param token
      * @return Boolean
      */
     @PostMapping("/check")
-    Response<Boolean> checkTokenValid(@Validated @RequestBody TokenDto tokenDto);
+    Response<Boolean> checkTokenValid(@Validated(Auth.class) @RequestBody Token token);
 
 }

@@ -22,7 +22,7 @@ import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * <p>数据中心服务启动入口
+ * <p>数据服务中心
  *
  * @author : pnoker
  * @email : pnokers@icloud.com

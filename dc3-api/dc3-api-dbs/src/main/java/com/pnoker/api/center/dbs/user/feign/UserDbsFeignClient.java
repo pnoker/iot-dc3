@@ -21,7 +21,9 @@ import com.pnoker.api.center.dbs.user.hystrix.UserDbsFeignClientHystrix;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.User;
+import com.pnoker.common.valid.Insert;
+import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +47,7 @@ public interface UserDbsFeignClient {
      * @return User
      */
     @PostMapping("/add")
-    Response<User> add(@Validated @RequestBody User user);
+    Response<User> add(@Validated(Insert.class) @RequestBody User user);
 
     /**
      * 根据 ID 删除 User
@@ -63,7 +65,7 @@ public interface UserDbsFeignClient {
      * @return User
      */
     @PostMapping("/update")
-    Response<User> update(@RequestBody User user);
+    Response<User> update(@Validated(Update.class) @RequestBody User user);
 
     /**
      * 根据ID查询 User

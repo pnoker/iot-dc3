@@ -31,6 +31,18 @@ management:
 feign:
   hystrix:
     enabled: true
+  httpclient:
+    enabled: false
+    max-connections: 200
+    max-connections-per-route: 50
+  okhttp:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+      useGzipDecoder: true
 
 logging:
   level:

@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+package com.pnoker.common.valid;
 
 /**
- * <p>
+ * <p>Validated 分组
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class Schedule extends Description {
-
-    private String name;
-    private String cornExpression;
-    private Short status;
-    private String url;
-    private Long userId;
+public interface Auth {
 }

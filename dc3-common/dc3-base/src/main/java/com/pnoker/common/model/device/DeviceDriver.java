@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity.auth;
+package com.pnoker.common.model.device;
 
-import com.pnoker.common.entity.Description;
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 /**
- * <p>User
+ * <p>设备驱动表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -35,18 +31,11 @@ import javax.validation.constraints.Pattern;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class User extends Description {
+public class DeviceDriver extends Description {
 
-    @NotNull(message = "username can't be empty")
-    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "invalid username")
-    private String username;
-
-    @NotNull(message = "password can't be empty")
-    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "invalid password")
-    private String password;
-
-    private Boolean enable;
-    private Long imageId;
+    private String name;
+    private String serviceName;
+    private String connectInfo;
+    private String profileInfo;
 }

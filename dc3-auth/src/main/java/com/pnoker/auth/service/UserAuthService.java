@@ -19,7 +19,7 @@ package com.pnoker.auth.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.User;
 
 /**
  * <p>UserAuthService

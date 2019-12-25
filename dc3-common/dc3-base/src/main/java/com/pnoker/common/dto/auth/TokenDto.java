@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.entity.auth.Token;
+import com.pnoker.common.model.auth.Token;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,13 +48,11 @@ public class TokenDto implements Serializable, Converter<Token, TokenDto> {
     /**
      * User编号
      */
-    @NotNull(message = "user id can't be empty")
     private Long userId;
 
     /**
      * Token令牌
      */
-    @NotNull(message = "token can't be empty")
     private String token;
 
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
