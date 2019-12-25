@@ -22,8 +22,8 @@ import com.pnoker.auth.service.TokenAuthService;
 import com.pnoker.auth.service.UserAuthService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.Token;
+import com.pnoker.common.model.auth.User;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -122,13 +122,13 @@ public class TokenAuthServiceImpl implements TokenAuthService {
     }
 
     @Override
-    public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
-        Response<User> userResponse = userAuthService.selectById(tokenDto.getUserId());
+    public Response<Boolean> checkTokenValid(Token token) {
+        Response<User> userResponse = userAuthService.selectById(token.getUserId());
         if (userResponse.isOk()) {
-            Response<Token> tokenResponse = selectByUserId(tokenDto.getUserId());
+            Response<Token> tokenResponse = selectByUserId(token.getUserId());
             if (tokenResponse.isOk()) {
-                Token token = tokenResponse.getData();
-                if (tokenDto.getToken().equals(token.getToken()) && token.getExpireTime().getTime() > (new Date()).getTime()) {
+                Token data = tokenResponse.getData();
+                if (token.getToken().equals(data.getToken()) && data.getExpireTime().getTime() > (new Date()).getTime()) {
                     return Response.ok();
                 }
                 return Response.fail("token invalid");

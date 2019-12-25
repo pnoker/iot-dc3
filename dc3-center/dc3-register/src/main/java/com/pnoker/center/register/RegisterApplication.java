@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 /**
- * <p>
+ * <p>服务注册中心
  *
  * @author : pnoker
  * @email : pnokers@icloud.com

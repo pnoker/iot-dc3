@@ -19,8 +19,8 @@ package com.pnoker.auth.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.Token;
+import com.pnoker.common.model.auth.User;
 
 /**
  * <p>TokenAuthService
@@ -81,10 +81,10 @@ public interface TokenAuthService {
     /**
      * 判断 Token 令牌是否有效
      *
-     * @param tokenDto
+     * @param token
      * @return Boolean
      */
-    Response<Boolean> checkTokenValid(TokenDto tokenDto);
+    Response<Boolean> checkTokenValid(Token token);
 
     /**
      * 生成 Token 令牌

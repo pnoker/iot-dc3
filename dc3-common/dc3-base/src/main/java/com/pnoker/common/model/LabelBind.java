@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.common.model;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.entity.Node;
-import org.apache.ibatis.annotations.Mapper;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
- * <p>Node 数据库操作接口
+ * <p>标签关系表
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Mapper
-public interface NodeMapper extends BaseMapper<Node> {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class LabelBind extends Description {
+
+    private Long labelId;
+    private Long entityId;
 }

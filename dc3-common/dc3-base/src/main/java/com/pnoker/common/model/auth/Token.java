@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity.auth;
+package com.pnoker.common.model.auth;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.entity.Description;
+import com.pnoker.common.model.Description;
 import com.pnoker.common.utils.KeyUtil;
+import com.pnoker.common.valid.Auth;
+import com.pnoker.common.valid.Insert;
+import com.pnoker.common.valid.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,15 +47,16 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 public class Token extends Description {
 
+    @NotNull(message = "user id can't be empty", groups = {Insert.class, Update.class, Auth.class})
+    private Long userId;
+
+    @NotBlank(message = "token can't be empty", groups = {Auth.class})
     private String token;
     private String privateKey;
 
     @JsonFormat(pattern = Common.DATEFORMAT, timezone = Common.TIMEZONE)
-    @Future(message = "expire time must be greater than the current time")
     private Date expireTime;
 
-    @NotNull(message = "user id can't be empty")
-    private Long userId;
 
     /**
      * 是否重新生成 Key

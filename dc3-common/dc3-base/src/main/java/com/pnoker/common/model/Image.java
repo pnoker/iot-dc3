@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity;
+package com.pnoker.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,5 +35,4 @@ public class Image extends Description {
 
     private String name;
     private String url;
-    private Long userId;
 }

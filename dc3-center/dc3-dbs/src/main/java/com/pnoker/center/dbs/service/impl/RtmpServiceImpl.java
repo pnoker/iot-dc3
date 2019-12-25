@@ -24,7 +24,7 @@ import com.pnoker.center.dbs.service.RtmpService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -59,7 +59,10 @@ public class RtmpServiceImpl implements RtmpService {
             evict = {@CacheEvict(value = "dbs_rtmp_list", allEntries = true)}
     )
     public Rtmp add(Rtmp rtmp) {
-        return rtmpMapper.insert(rtmp) > 0 ? rtmp : null;
+        if (rtmpMapper.insert(rtmp) > 0) {
+            return rtmpMapper.selectById(rtmp.getId());
+        }
+        return null;
     }
 
     @Override
@@ -79,7 +82,11 @@ public class RtmpServiceImpl implements RtmpService {
             evict = {@CacheEvict(value = "dbs_rtmp_list", allEntries = true)}
     )
     public Rtmp update(Rtmp rtmp) {
-        return rtmpMapper.updateById(rtmp) > 0 ? rtmp : null;
+        rtmp.setUpdateTime(null);
+        if (rtmpMapper.updateById(rtmp) > 0) {
+            return rtmpMapper.selectById(rtmp.getId());
+        }
+        return null;
     }
 
     @Override

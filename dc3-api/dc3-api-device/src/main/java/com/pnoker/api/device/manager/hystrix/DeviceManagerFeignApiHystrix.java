@@ -19,7 +19,7 @@ package com.pnoker.api.device.manager.hystrix;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.device.manager.feign.DeviceManagerDbsFeignClient;
 import com.pnoker.common.dto.device.DeviceDto;
-import com.pnoker.common.entity.device.Device;
+import com.pnoker.common.model.device.Device;
 import com.pnoker.common.bean.Response;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;

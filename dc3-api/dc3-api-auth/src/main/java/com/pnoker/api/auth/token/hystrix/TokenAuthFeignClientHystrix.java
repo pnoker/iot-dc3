@@ -19,8 +19,8 @@ package com.pnoker.api.auth.token.hystrix;
 import com.pnoker.api.auth.token.feign.TokenAuthFeignClient;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.entity.auth.Token;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.Token;
+import com.pnoker.common.model.auth.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -48,17 +48,7 @@ public class TokenAuthFeignClientHystrix implements FallbackFactory<TokenAuthFei
             }
 
             @Override
-            public Response<Token> update(Token token) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Token> selectById(Long id) {
-                return Response.fail(message);
-            }
-
-            @Override
-            public Response<Boolean> checkTokenValid(TokenDto tokenDto) {
+            public Response<Boolean> checkTokenValid(Token token) {
                 return Response.fail(message);
             }
         };

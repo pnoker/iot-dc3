@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.entity.device;
+package com.pnoker.common.model;
 
-import com.pnoker.common.entity.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>测点配置表
+ * <p>
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
@@ -32,9 +31,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PointProfile extends Description {
+public class Schedule extends Description {
 
-    private String config;
-    private Long driverId;
-    private Long userId;
+    private String name;
+    private String cornExpression;
+    private Short status;
+    private String url;
 }

@@ -75,10 +75,6 @@ management:
     health:
       show-details: ALWAYS
 
-feign:
-  hystrix:
-    enabled: true
-
 logging:
   level:
     org.springframework.data: ERROR

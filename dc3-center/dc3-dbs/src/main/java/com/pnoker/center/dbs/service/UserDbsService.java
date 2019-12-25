@@ -18,7 +18,7 @@ package com.pnoker.center.dbs.service;
 
 import com.pnoker.common.base.Service;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.User;
 
 /**
  * <p>UserDbsService

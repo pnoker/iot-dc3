@@ -17,7 +17,7 @@
 package com.pnoker.center.dbs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.pnoker.common.model.rtmp.Rtmp;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

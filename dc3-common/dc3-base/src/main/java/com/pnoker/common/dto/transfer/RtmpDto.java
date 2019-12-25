@@ -16,9 +16,10 @@
 
 package com.pnoker.common.dto.transfer;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
-import com.pnoker.common.entity.rtmp.Rtmp;
+import com.pnoker.common.model.rtmp.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,7 @@ public class RtmpDto implements Serializable, Converter<Rtmp, RtmpDto> {
     private Boolean autoStart;
     private Long userId;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     public RtmpDto(boolean autoStart) {

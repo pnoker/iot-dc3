@@ -22,7 +22,7 @@ import com.pnoker.center.dbs.service.UserDbsService;
 import com.pnoker.common.bean.Response;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.entity.auth.User;
+import com.pnoker.common.model.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,9 +64,6 @@ public class UserDbsApi implements UserDbsFeignClient {
 
     @Override
     public Response<User> update(User user) {
-        if (null == user.getId()) {
-            return Response.fail("user id is null");
-        }
         try {
             user = userDbsService.update(user);
             return null != user ? Response.ok(user) : Response.fail("user record update failed");
