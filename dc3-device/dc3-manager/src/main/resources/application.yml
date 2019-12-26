@@ -1,9 +1,9 @@
 server:
   port: 8600
   undertow:
+    io-threads: 2
     worker-threads: 20
     buffer-size: 512
-    io-threads: 2
 
 spring:
   application:
@@ -43,6 +43,11 @@ feign:
     response:
       enabled: true
       useGzipDecoder: true
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 20
 
 logging:
   level:

@@ -1,9 +1,9 @@
 server:
   port: 8200
   undertow:
+    io-threads: 2
     worker-threads: 20
     buffer-size: 512
-    io-threads: 2
 
 spring:
   application:

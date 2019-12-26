@@ -16,7 +16,6 @@
 
 package com.pnoker.auth.api;
 
-import cn.hutool.core.thread.ThreadUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.auth.user.feign.UserAuthFeignClient;
 import com.pnoker.auth.service.UserAuthService;

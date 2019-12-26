@@ -67,7 +67,7 @@
         <fastjson.version>1.2.62</fastjson.version>
         <mybatis.plus.version>3.3.0</mybatis.plus.version>
 
-        <spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
+        <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
         <spring-boot-admin.version>2.2.0-SNAPSHOT</spring-boot-admin.version>
