@@ -255,7 +255,7 @@ CREATE TABLE `dc3_token`  (
 -- ----------------------------
 -- Records of dc3_token
 -- ----------------------------
-INSERT INTO `dc3_token` VALUES (-1, '2i5zdIB8iQz+t4GiPn+NfcF37tVHwCTAOkbOZbzwcMliPS2IRRpKPAwx+9+7Unyg', 'Q5IkfORRoP5EQa8ED4EeR73WKXont2X6', '2019-10-01 00:00:00', -1, '测试专用Token', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_token` VALUES (-1, -1, '2i5zdIB8iQz+t4GiPn+NfcF37tVHwCTAOkbOZbzwcMliPS2IRRpKPAwx+9+7Unyg', 'Q5IkfORRoP5EQa8ED4EeR73WKXont2X6', '2019-10-01 00:00:00', '测试专用Token', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_user

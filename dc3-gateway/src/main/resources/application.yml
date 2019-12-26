@@ -88,6 +88,11 @@ feign:
       enabled: true
       useGzipDecoder: true
 
+hystrix:
+  threadpool:
+    default:
+      coreSize: 20
+
 logging:
   level:
     org.springframework.cloud.gateway.route: ERROR

@@ -16,6 +16,7 @@
 
 package com.pnoker.center.dbs.api;
 
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.dbs.user.feign.UserDbsFeignClient;
 import com.pnoker.center.dbs.service.UserDbsService;
@@ -46,6 +47,7 @@ public class UserDbsApi implements UserDbsFeignClient {
     @Override
     public Response<User> add(User user) {
         try {
+            user.setUsername(IdUtil.simpleUUID().substring(0,11));
             user = userDbsService.add(user);
             return null != user ? Response.ok(user) : Response.fail("user record add failed");
         } catch (Exception e) {
