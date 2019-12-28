@@ -16,135 +16,168 @@
 
 package com.pnoker.transfer.rtmp.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.dbs.rtmp.feign.RtmpDbsFeignClient;
-import com.pnoker.common.bean.Response;
+import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
+import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.handler.Transcode;
 import com.pnoker.transfer.rtmp.handler.TranscodePool;
+import com.pnoker.transfer.rtmp.mapper.RtmpMapper;
 import com.pnoker.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * <p>
- *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @Service
 public class RtmpServiceImpl implements RtmpService {
 
     @Resource
-    private RtmpDbsFeignClient rtmpDbsFeignClient;
+    private RtmpMapper rtmpMapper;
 
     @Override
-    public Response<Rtmp> add(Rtmp rtmp) {
-        Response<Rtmp> response = rtmpDbsFeignClient.add(rtmp);
-        if (response.isOk()) {
-            rtmp = response.getData();
+    @Caching(
+            put = {@CachePut(value = Common.Cache.USER_ID, key = "#rtmp.id", condition = "#result!=null")},
+            evict = {@CacheEvict(value = Common.Cache.USER_LIST, allEntries = true, condition = "#result!=null")}
+    )
+    public Rtmp add(Rtmp rtmp) {
+        if (rtmpMapper.insert(rtmp) > 0) {
             Transcode transcode = new Transcode(rtmp);
             if (!TranscodePool.transcodeMap.containsKey(transcode.getId())) {
                 TranscodePool.transcodeMap.put(transcode.getId(), transcode);
-                return Response.ok();
+                return selectById(rtmp.getId());
             }
-            return Response.fail("任务重复,表记录添加成功");
+            throw new ServiceException("任务重复,表记录添加成功");
         }
-        return Response.fail(response.getMessage());
+        return null;
     }
 
     @Override
-    public Response<Boolean> delete(Long id) {
-        Response<Rtmp> response = rtmpDbsFeignClient.selectById(id);
-        if (response.isOk()) {
+    @Caching(
+            evict = {
+                    @CacheEvict(value = Common.Cache.RTMP_ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result==true")
+            }
+    )
+    public boolean delete(Long id) {
+        Rtmp select = selectById(id);
+        if (null != select) {
             Transcode transcode = TranscodePool.transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
-                    return Response.fail("任务运行中");
+                    throw new ServiceException("任务运行中");
                 }
                 TranscodePool.transcodeMap.remove(id);
             }
-            return rtmpDbsFeignClient.delete(id).isOk() ? Response.ok() : Response.fail("任务删除成功,表记录删除失败");
+            if (rtmpMapper.deleteById(id) > 0) {
+                return true;
+            }
+            throw new ServiceException("任务删除成功,表记录删除失败");
         }
-        return Response.fail("任务不存在");
+        throw new ServiceException("任务不存在");
     }
 
     @Override
-    public Response<Rtmp> update(Rtmp rtmp) {
-        Response<Rtmp> response = rtmpDbsFeignClient.selectById(rtmp.getId());
-        if (response.isOk()) {
+    @Caching(
+            put = {@CachePut(value = Common.Cache.RTMP_ID, key = "#rtmp.id", condition = "#result!=null")},
+            evict = {@CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result!=null")}
+    )
+    public Rtmp update(Rtmp rtmp) {
+        Rtmp select = selectById(rtmp.getId());
+        if (null != select) {
             Transcode transcode = TranscodePool.transcodeMap.get(rtmp.getId());
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
-                    return Response.fail("任务运行中");
+                    throw new ServiceException("任务运行中");
                 }
                 TranscodePool.transcodeMap.put(transcode.getId(), new Transcode(rtmp));
             }
-            Response<Rtmp> rtmpResponse = rtmpDbsFeignClient.update(rtmp);
-            if (rtmpResponse.isOk()) {
-                return rtmpResponse;
+            if (rtmpMapper.updateById(rtmp) > 0) {
+                return select;
             }
-            return Response.fail("任务更新成功,表记录更新失败");
+            throw new ServiceException("任务更新成功,表记录更新失败");
         }
-        return Response.fail("任务不存在");
+        throw new ServiceException("任务不存在");
     }
 
     @Override
-    public Response<Rtmp> selectById(Long id) {
-        return rtmpDbsFeignClient.selectById(id);
+    @Cacheable(value = Common.Cache.RTMP_ID, key = "#id", unless = "#result==null")
+    public Rtmp selectById(Long id) {
+        return rtmpMapper.selectById(id);
     }
 
     @Override
-    public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
-        return rtmpDbsFeignClient.list(rtmpDto);
+    @Cacheable(value = Common.Cache.RTMP_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public Page<Rtmp> list(RtmpDto rtmpDto) {
+        return rtmpMapper.selectPage(rtmpDto.getPage().convert(), fuzzyQuery(rtmpDto));
     }
 
     @Override
-    public Response<Boolean> start(Long id) {
-        Response<Rtmp> response = rtmpDbsFeignClient.selectById(id);
-        if (response.isOk()) {
+    public boolean start(Long id) {
+        Rtmp select = rtmpMapper.selectById(id);
+        if (null != select) {
             Transcode transcode = TranscodePool.transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
-                    return Response.fail("任务已是启动状态");
+                    throw new ServiceException("任务已是启动状态");
                 }
             } else {
-                transcode = new Transcode(response.getData());
+                transcode = new Transcode(select);
                 TranscodePool.transcodeMap.put(transcode.getId(), transcode);
             }
             TranscodePool.threadPoolExecutor.execute(() -> TranscodePool.transcodeMap.get(id).start());
-            Response<Rtmp> rtmpResponse = rtmpDbsFeignClient.update(response.getData().setRun(true));
-            if (rtmpResponse.isOk()) {
-                return Response.ok();
+            if (rtmpMapper.updateById(select.setRun(true)) > 0) {
+                return true;
             }
-            return Response.fail("任务启动成功，表记录更新失败");
+            throw new ServiceException("任务启动成功，表记录更新失败");
         }
-        return Response.fail("任务不存在");
+        throw new ServiceException("任务不存在");
     }
 
     @Override
-    public Response<Boolean> stop(Long id) {
-        Response<Rtmp> response = rtmpDbsFeignClient.selectById(id);
-        if (response.isOk()) {
+    public boolean stop(Long id) {
+        Rtmp select = rtmpMapper.selectById(id);
+        if (null != select) {
             Transcode transcode = TranscodePool.transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
                     transcode.stop();
-                    Response<Rtmp> rtmpResponse = rtmpDbsFeignClient.update(response.getData().setRun(false));
-                    if (rtmpResponse.isOk()) {
-                        return Response.ok();
+                    if (rtmpMapper.updateById(select.setRun(false)) > 0) {
+                        return true;
                     }
-                    return Response.fail("任务停止成功，表记录更新失败");
+                    throw new ServiceException("任务停止成功，表记录更新失败");
                 }
             }
-            return Response.fail("任务已是停止状态");
+            throw new ServiceException("任务已是停止状态");
         }
-        return Response.fail("任务不存在");
+        throw new ServiceException("任务不存在");
+    }
+
+    @Override
+    public LambdaQueryWrapper<Rtmp> fuzzyQuery(RtmpDto rtmpDto) {
+        LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
+        Optional.ofNullable(rtmpDto).ifPresent(dto -> {
+            if (StringUtils.isNotBlank(dto.getName())) {
+                queryWrapper.like(Rtmp::getName, dto.getName());
+            }
+            if(null!=rtmpDto.getAutoStart()){
+                queryWrapper.eq(Rtmp::getAutoStart, dto.getAutoStart());
+            }
+        });
+        return queryWrapper;
     }
 
 }

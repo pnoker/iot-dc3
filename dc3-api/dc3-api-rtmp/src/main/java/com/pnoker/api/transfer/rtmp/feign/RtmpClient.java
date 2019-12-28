@@ -17,8 +17,8 @@
 package com.pnoker.api.transfer.rtmp.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.transfer.rtmp.hystrix.RtmpTransferFeignClientHystrix;
-import com.pnoker.common.bean.Response;
+import com.pnoker.api.transfer.rtmp.hystrix.RtmpClientHystrix;
+import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
@@ -30,13 +30,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>RtmpTransferFeignClient
+ * Rtmp转码任务 FeignClient
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_RTMP_URL_PREFIX, name = Common.Service.DC3_RTMP, fallbackFactory = RtmpTransferFeignClientHystrix.class)
-public interface RtmpTransferFeignClient {
+@FeignClient(path = Common.Service.DC3_RTMP_URL_PREFIX, name = Common.Service.DC3_RTMP, fallbackFactory = RtmpClientHystrix.class)
+public interface RtmpClient {
 
     /**
      * 新增 Rtmp 任务记录
@@ -45,7 +44,7 @@ public interface RtmpTransferFeignClient {
      * @return Rtmp
      */
     @PostMapping("/add")
-    Response<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
+    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
 
     /**
      * 根据 ID 删除 Rtmp
@@ -54,7 +53,7 @@ public interface RtmpTransferFeignClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    Response<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
      * 修改 Rtmp 任务记录
@@ -63,7 +62,7 @@ public interface RtmpTransferFeignClient {
      * @return Rtmp
      */
     @PostMapping("/update")
-    Response<Rtmp> update(@RequestBody Rtmp rtmp);
+    R<Rtmp> update(@RequestBody Rtmp rtmp);
 
     /**
      * 根据 ID 查询 Rtmp
@@ -72,7 +71,7 @@ public interface RtmpTransferFeignClient {
      * @return Rtmp
      */
     @GetMapping("/id/{id}")
-    Response<Rtmp> selectById(@PathVariable(value = "id") Long id);
+    R<Rtmp> selectById(@PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Rtmp
@@ -81,7 +80,7 @@ public interface RtmpTransferFeignClient {
      * @return Page<Rtmp>
      */
     @PostMapping("/list")
-    Response<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
+    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
 
     /**
      * 启动 Rtmp 转码任务
@@ -90,7 +89,7 @@ public interface RtmpTransferFeignClient {
      * @return Boolean
      */
     @PostMapping("/start/{id}")
-    Response<Boolean> start(@PathVariable(value = "id") Long id);
+    R<Boolean> start(@PathVariable(value = "id") Long id);
 
     /**
      * 停止 Rtmp 转码任务
@@ -99,6 +98,6 @@ public interface RtmpTransferFeignClient {
      * @return Boolean
      */
     @PostMapping("/stop/{id}")
-    Response<Boolean> stop(@PathVariable(value = "id") Long id);
+    R<Boolean> stop(@PathVariable(value = "id") Long id);
 
 }

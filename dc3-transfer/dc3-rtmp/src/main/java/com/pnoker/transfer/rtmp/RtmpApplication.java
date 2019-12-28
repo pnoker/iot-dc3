@@ -17,24 +17,16 @@
 package com.pnoker.transfer.rtmp;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
- * <p>Rtmp 视频转码服务启动入口
+ * Rtmp 视频转码服务启动入口
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
+@EnableCaching
 @SpringCloudApplication
-@EnableFeignClients(basePackages = {
-        "com.pnoker.api.center.dbs.rtmp.*"
-})
-@ComponentScan(basePackages = {
-        "com.pnoker.api.center.dbs.rtmp",
-        "com.pnoker.transfer.rtmp"
-})
 public class RtmpApplication {
 
     public static void main(String[] args) {
