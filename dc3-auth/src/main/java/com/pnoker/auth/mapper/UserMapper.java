@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.auth;
+package com.pnoker.auth.mapper;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.SpringCloudApplication;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pnoker.common.model.auth.User;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 授权中心服务启动入口
+ * Mapper
  *
  * @author pnoker
  */
-@EnableCaching
-@SpringCloudApplication
-public class AuthApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(AuthApplication.class, args);
-    }
+@Mapper
+public interface UserMapper extends BaseMapper<User> {
 }
-

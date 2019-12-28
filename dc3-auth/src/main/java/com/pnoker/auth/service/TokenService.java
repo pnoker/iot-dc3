@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.mapper;
+package com.pnoker.auth.service;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.Image;
-import org.apache.ibatis.annotations.Mapper;
+import com.pnoker.common.model.auth.User;
 
 /**
- * <p>Image 数据库操作接口
+ * Token 服务接口
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
-@Mapper
-public interface ImageMapper extends BaseMapper<Image> {
+public interface TokenService {
+    /**
+     * 生成用户的Token令牌
+     *
+     * @param user
+     * @return
+     */
+    String generateToken(User user);
+
+    /**
+     * 校验用户的Token令牌是否有效
+     *
+     * @param token
+     * @return
+     */
+    boolean checkTokenValid(String token);
 }

@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * UserAuthFeignClient
+ * 用户 FeignClient
  *
  * @author pnoker
  */
