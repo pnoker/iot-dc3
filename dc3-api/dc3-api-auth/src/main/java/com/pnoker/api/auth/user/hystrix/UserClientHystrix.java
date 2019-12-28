@@ -17,8 +17,8 @@
 package com.pnoker.api.auth.user.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.auth.user.feign.UserAuthFeignClient;
-import com.pnoker.common.bean.Response;
+import com.pnoker.api.auth.user.feign.UserClient;
+import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.auth.UserDto;
 import com.pnoker.common.model.auth.User;
 import feign.hystrix.FallbackFactory;
@@ -26,50 +26,59 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>UserAuthFeignClientiHystrix
+ * UserAuthFeignClientiHystrix
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @Component
-public class UserAuthFeignClientiHystrix implements FallbackFactory<UserAuthFeignClient> {
+public class UserClientHystrix implements FallbackFactory<UserClient> {
 
     @Override
-    public UserAuthFeignClient create(Throwable throwable) {
+    public UserClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
         log.error("UserAuthFeignClient:{},hystrix服务降级处理", message, throwable);
 
-        return new UserAuthFeignClient() {
+        return new UserClient() {
 
             @Override
-            public Response<User> add(User user) {
-                return Response.fail(message);
+            public R<User> add(User user) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Boolean> delete(Long id) {
-                return Response.fail(message);
+            public R<Boolean> delete(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<User> update(User user) {
-                return Response.fail(message);
+            public R<User> update(User user) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<User> selectById(Long id) {
-                return Response.fail(message);
+            public R<Boolean> restPassword(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Page<User>> list(UserDto userDto) {
-                return Response.fail(message);
+            public R<User> selectById(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Boolean> checkUserValid(String username) {
-                return Response.fail(message);
+            public R<User> selectByName(String name) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Page<User>> list(UserDto userDto) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Boolean> checkUserValid(String username) {
+                return R.fail(message);
             }
         };
     }
