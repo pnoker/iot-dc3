@@ -16,12 +16,10 @@
 
 package com.pnoker.auth.api;
 
-import com.pnoker.api.auth.token.feign.TokenAuthFeignClient;
-import com.pnoker.auth.service.TokenAuthService;
-import com.pnoker.common.bean.Response;
+import com.pnoker.api.auth.token.feign.TokenClient;
+import com.pnoker.auth.service.TokenService;
+import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.auth.TokenDto;
-import com.pnoker.common.model.auth.Token;
 import com.pnoker.common.model.auth.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,26 +28,29 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * <p>TokenAuthApi
+ * 用户 Client 接口实现
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @RestController
 @RequestMapping(Common.Service.DC3_TOKEN_URL_PREFIX)
-public class TokenAuthApi implements TokenAuthFeignClient {
+public class TokenApi implements TokenClient {
     @Resource
-    private TokenAuthService tokenAuthService;
+    private TokenService tokenService;
 
     @Override
-    public Response<TokenDto> generateToken(User user) {
-        return tokenAuthService.generateToken(user);
+    public R<String> generateToken(User user) {
+        try {
+            String token = tokenService.generateToken(user);
+            return null != token ? R.ok(token) : R.fail("用户名密码不匹配");
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
     }
 
     @Override
-    public Response<Boolean> checkTokenValid(Token token) {
-        return tokenAuthService.checkTokenValid(token);
+    public R<Boolean> checkTokenValid(String token) {
+        return tokenService.checkTokenValid(token) ? R.ok() : R.fail("无效令牌");
     }
-
 }
