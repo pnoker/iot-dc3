@@ -26,10 +26,9 @@ import org.apache.commons.lang.StringUtils;
 import java.io.*;
 
 /**
- * <p>Command 指令执行任务信息类
+ * Command 指令执行任务信息类
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @Slf4j

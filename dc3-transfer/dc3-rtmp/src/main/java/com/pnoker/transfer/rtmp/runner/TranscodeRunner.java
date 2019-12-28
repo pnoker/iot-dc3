@@ -17,10 +17,8 @@
 package com.pnoker.transfer.rtmp.runner;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.thread.ThreadUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.dbs.rtmp.feign.RtmpDbsFeignClient;
-import com.pnoker.common.bean.Response;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import com.pnoker.transfer.rtmp.service.RtmpService;
@@ -34,16 +32,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.pnoker.transfer.rtmp.runner.Environment.initial;
 import static java.lang.System.getProperty;
 
 /**
- * <p>启动服务，自动加载自启任务
+ * 启动服务，自动加载自启任务
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @Setter
@@ -67,10 +65,6 @@ public class TranscodeRunner implements ApplicationRunner {
 
     @Resource
     private RtmpService rtmpService;
-    @Resource
-    private RtmpDbsFeignClient rtmpDbsFeignClient;
-
-    private int times = 1;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -88,17 +82,8 @@ public class TranscodeRunner implements ApplicationRunner {
     }
 
     public List<Rtmp> list() {
-        Response<Page<Rtmp>> response = rtmpDbsFeignClient.list(new RtmpDto(true));
-        return response.isOk() ? response.getData().getRecords() : reconnect();
-    }
-
-    public List<Rtmp> reconnect() {
-        if (times > Environment.RECONNECT_MAX_TIMES) {
-            System.exit(1);
-        }
-        ThreadUtil.sleep(Environment.RECONNECT_INTERVAL * times);
-        times++;
-        return list();
+        Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages()));
+        return null != page.getRecords() ? page.getRecords() : new ArrayList<>();
     }
 
 }

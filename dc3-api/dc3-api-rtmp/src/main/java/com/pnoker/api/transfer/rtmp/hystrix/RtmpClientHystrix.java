@@ -17,8 +17,8 @@
 package com.pnoker.api.transfer.rtmp.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.transfer.rtmp.feign.RtmpTransferFeignClient;
-import com.pnoker.common.bean.Response;
+import com.pnoker.api.transfer.rtmp.feign.RtmpClient;
+import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 import feign.hystrix.FallbackFactory;
@@ -26,54 +26,53 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>RtmpTransferFeignClientHystrix
+ * Rtmp转码任务 FeignHystrix
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @Component
-public class RtmpTransferFeignClientHystrix implements FallbackFactory<RtmpTransferFeignClient> {
+public class RtmpClientHystrix implements FallbackFactory<RtmpClient> {
 
     @Override
-    public RtmpTransferFeignClient create(Throwable throwable) {
+    public RtmpClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-RTMP" : throwable.getMessage();
         log.error("RtmpTransferFeignClient:{},hystrix服务降级处理", message, throwable);
 
-        return new RtmpTransferFeignClient() {
+        return new RtmpClient() {
             @Override
-            public Response<Rtmp> add(Rtmp rtmp) {
-                return Response.fail(message);
+            public R<Rtmp> add(Rtmp rtmp) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Boolean> delete(Long id) {
-                return Response.fail(message);
+            public R<Boolean> delete(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Rtmp> update(Rtmp rtmp) {
-                return Response.fail(message);
+            public R<Rtmp> update(Rtmp rtmp) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Rtmp> selectById(Long id) {
-                return Response.fail(message);
+            public R<Rtmp> selectById(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Page<Rtmp>> list(RtmpDto rtmpDto) {
-                return Response.fail(message);
+            public R<Page<Rtmp>> list(RtmpDto rtmpDto) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Boolean> start(Long id) {
-                return Response.fail(message);
+            public R<Boolean> start(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Boolean> stop(Long id) {
-                return Response.fail(message);
+            public R<Boolean> stop(Long id) {
+                return R.fail(message);
             }
         };
     }

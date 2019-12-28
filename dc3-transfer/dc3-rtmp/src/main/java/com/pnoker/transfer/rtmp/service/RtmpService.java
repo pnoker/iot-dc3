@@ -16,57 +16,15 @@
 
 package com.pnoker.transfer.rtmp.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.bean.Response;
+import com.pnoker.common.base.Service;
+import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.transfer.RtmpDto;
 import com.pnoker.common.model.rtmp.Rtmp;
 
 /**
- * <p>
- *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
-public interface RtmpService {
-    /**
-     * 新增记录
-     *
-     * @param rtmp
-     * @return true/false
-     */
-    Response<Rtmp> add(Rtmp rtmp);
-
-    /**
-     * 删除记录
-     *
-     * @param id
-     * @return true/false
-     */
-    Response<Boolean> delete(Long id);
-
-    /**
-     * 更新记录
-     *
-     * @param rtmp
-     * @return true/false
-     */
-    Response<Rtmp> update(Rtmp rtmp);
-
-    /**
-     * 通过ID查询记录
-     *
-     * @param id
-     * @return type
-     */
-    Response<Rtmp> selectById(Long id);
-
-    /**
-     * 获取带分页、排序的记录
-     *
-     * @param rtmpDto
-     * @return list
-     */
-    Response<Page<Rtmp>> list(RtmpDto rtmpDto);
+public interface RtmpService extends Service<Rtmp, RtmpDto> {
 
     /**
      * 启动
@@ -74,7 +32,7 @@ public interface RtmpService {
      * @param id
      * @return true/false
      */
-    Response<Boolean> start(Long id);
+    boolean start(Long id);
 
     /**
      * 停止
@@ -82,5 +40,5 @@ public interface RtmpService {
      * @param id
      * @return true/false
      */
-    Response<Boolean> stop(Long id);
+    boolean stop(Long id);
 }

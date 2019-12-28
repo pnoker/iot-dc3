@@ -17,10 +17,9 @@
 package com.pnoker.transfer.rtmp.runner;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 public class Environment {
     public static String FFMPEG;
