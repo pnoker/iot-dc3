@@ -16,18 +16,17 @@
 
 package com.pnoker.gateway.filter;
 
-import com.pnoker.gateway.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.pnoker.common.utils.KeyUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>自定义权限过滤器
+ * 自定义权限过滤器
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Component
 public class AuthenticFilter extends AbstractGatewayFilterFactory {
@@ -37,12 +36,14 @@ public class AuthenticFilter extends AbstractGatewayFilterFactory {
         return (exchange, chain) -> {
             // 获取Header信息
             String token = exchange.getRequest().getHeaders().getFirst("Token");
-            String appId = exchange.getRequest().getHeaders().getFirst("AppId");
-            /*if (!StringUtils.isBlank(token) && !StringUtils.isBlank(appId)) {
-                if (authService.isPermitted(new TokenDto().setToken(token).setAppId(appId))) {
+            if (!StringUtils.isBlank(token)) {
+                try {
+                    // 校验Token
+                    KeyUtil.parserToken(token);
                     return chain.filter(exchange);
+                } catch (Exception e) {
                 }
-            }*/
+            }
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         };

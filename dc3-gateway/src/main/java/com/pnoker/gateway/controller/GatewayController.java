@@ -23,10 +23,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import javax.annotation.Resource;
 
 /**
- * <p>Gateway Controller
+ * Gateway Controller
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Controller
 public class GatewayController {

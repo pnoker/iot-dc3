@@ -23,10 +23,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * <p>平台网关服务入口
+ * 平台网关服务入口
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @EnableCaching
 @SpringCloudApplication

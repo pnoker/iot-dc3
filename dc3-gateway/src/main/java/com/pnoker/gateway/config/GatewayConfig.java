@@ -25,10 +25,9 @@ import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>自定义过滤器配置
+ * 自定义过滤器配置
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @Configuration

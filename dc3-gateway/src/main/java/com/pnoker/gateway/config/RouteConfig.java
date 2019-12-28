@@ -33,10 +33,9 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import reactor.core.publisher.Mono;
 
 /**
- * <p>自定义Route配置
+ * 自定义Route配置
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @Configuration
