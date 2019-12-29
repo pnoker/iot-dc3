@@ -18,7 +18,7 @@ package com.pnoker.api.auth.token.hystrix;
 
 import com.pnoker.api.auth.token.feign.TokenClient;
 import com.pnoker.common.bean.R;
-import com.pnoker.common.model.auth.User;
+import com.pnoker.common.model.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

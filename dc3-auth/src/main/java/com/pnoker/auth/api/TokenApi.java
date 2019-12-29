@@ -20,7 +20,7 @@ import com.pnoker.api.auth.token.feign.TokenClient;
 import com.pnoker.auth.service.TokenService;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.model.auth.User;
+import com.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

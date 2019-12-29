@@ -17,9 +17,8 @@
 package com.pnoker.transfer.rtmp.service;
 
 import com.pnoker.common.base.Service;
-import com.pnoker.common.bean.R;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.dto.RtmpDto;
+import com.pnoker.common.model.Rtmp;
 
 /**
  * @author pnoker

@@ -19,7 +19,7 @@ package com.pnoker.api.auth.token.feign;
 import com.pnoker.api.auth.token.hystrix.TokenClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.model.auth.User;
+import com.pnoker.common.model.User;
 import com.pnoker.common.valid.Auth;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;

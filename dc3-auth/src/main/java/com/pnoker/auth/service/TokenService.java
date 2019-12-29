@@ -16,7 +16,7 @@
 
 package com.pnoker.auth.service;
 
-import com.pnoker.common.model.auth.User;
+import com.pnoker.common.model.User;
 
 /**
  * Token 服务接口

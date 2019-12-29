@@ -19,8 +19,8 @@ package com.pnoker.api.transfer.rtmp.hystrix;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.transfer.rtmp.feign.RtmpClient;
 import com.pnoker.common.bean.R;
-import com.pnoker.common.dto.transfer.RtmpDto;
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.dto.RtmpDto;
+import com.pnoker.common.model.Rtmp;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ public class RtmpClientHystrix implements FallbackFactory<RtmpClient> {
     @Override
     public RtmpClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-RTMP" : throwable.getMessage();
-        log.error("RtmpTransferFeignClient:{},hystrix服务降级处理", message, throwable);
+        log.error("RtmpClientHystrix:{},hystrix服务降级处理", message, throwable);
 
         return new RtmpClient() {
             @Override
