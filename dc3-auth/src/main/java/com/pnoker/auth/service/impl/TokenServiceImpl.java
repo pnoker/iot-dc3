@@ -18,7 +18,7 @@ package com.pnoker.auth.service.impl;
 
 import com.pnoker.auth.service.TokenService;
 import com.pnoker.auth.service.UserService;
-import com.pnoker.common.model.auth.User;
+import com.pnoker.common.model.User;
 import com.pnoker.common.utils.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

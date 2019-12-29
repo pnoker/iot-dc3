@@ -17,8 +17,8 @@
 package com.pnoker.auth.service;
 
 import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.auth.UserDto;
-import com.pnoker.common.model.auth.User;
+import com.pnoker.common.dto.UserDto;
+import com.pnoker.common.model.User;
 
 /**
  * User服务接口

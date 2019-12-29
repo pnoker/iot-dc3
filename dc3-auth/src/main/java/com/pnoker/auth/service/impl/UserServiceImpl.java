@@ -22,9 +22,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.auth.mapper.UserMapper;
 import com.pnoker.auth.service.UserService;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.auth.UserDto;
+import com.pnoker.common.dto.UserDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.auth.User;
+import com.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -108,7 +108,8 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = Common.Cache.USER_NAME, key = "#name", unless = "#result==null")
     public User selectByName(String name) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda()
-                .eq(User::getName, name);
+                .eq(User::getName, name)
+                .eq(User::getEnable, true);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -120,7 +121,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkUserValid(String name) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda().eq(User::getName, name);
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda()
+                .eq(User::getName, name)
+                .eq(User::getEnable, true);
         Integer count = userMapper.selectCount(queryWrapper);
         return count > 0;
     }
