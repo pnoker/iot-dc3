@@ -21,10 +21,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 public class PackageProcessor {
     private byte[] inpackage;

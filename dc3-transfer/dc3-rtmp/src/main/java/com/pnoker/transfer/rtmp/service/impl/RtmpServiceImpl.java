@@ -126,6 +126,12 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = Common.Cache.RTMP_ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result==true")
+            }
+    )
     public boolean start(Long id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null != select) {
@@ -148,6 +154,12 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = Common.Cache.RTMP_ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result==true")
+            }
+    )
     public boolean stop(Long id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null != select) {
@@ -173,7 +185,7 @@ public class RtmpServiceImpl implements RtmpService {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Rtmp::getName, dto.getName());
             }
-            if(null!=rtmpDto.getAutoStart()){
+            if (null != rtmpDto.getAutoStart()) {
                 queryWrapper.eq(Rtmp::getAutoStart, dto.getAutoStart());
             }
         });

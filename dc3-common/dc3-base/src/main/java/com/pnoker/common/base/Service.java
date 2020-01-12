@@ -16,15 +16,13 @@
 
 package com.pnoker.common.base;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.common.bean.Pages;
 
 /**
- * <p>Service接口
+ * 基础服务类接口
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public interface Service<T, D> {
     /**
@@ -71,16 +69,8 @@ public interface Service<T, D> {
      * 统一接口 模糊查询构造器
      *
      * @param dto
-     * @return
+     * @return QueryWrapper
      */
-    QueryWrapper<T> fuzzyQuery(D dto);
-
-    /**
-     * 统一接口 排序构造器 & 字段校验
-     *
-     * @param pages
-     * @return
-     */
-    Page<T> pagination(Pages pages);
+    LambdaQueryWrapper<T> fuzzyQuery(D dto);
 
 }

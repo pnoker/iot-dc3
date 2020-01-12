@@ -21,10 +21,9 @@ import lombok.Data;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Data
 public class ClientSocket {

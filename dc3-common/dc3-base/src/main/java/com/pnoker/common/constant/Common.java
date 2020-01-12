@@ -17,17 +17,16 @@
 package com.pnoker.common.constant;
 
 /**
- * <p>dc3平台常量
+ * dc3平台常量
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public interface Common {
 
     /**
-     * 标志
+     * 默认密钥
      */
-    String FROM = "from";
+    String KEY = "pnoker/dc3";
 
     /**
      * 对称加密算法
@@ -42,11 +41,17 @@ public interface Common {
     /**
      * 时间格式化
      */
-    String DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
+    String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     /**
      * 时区
      */
     String TIMEZONE = "GMT+8";
+
+    /**
+     * 默认密码
+     */
+    String DEFAULT_PASSWORD = "dc3dc3";
 
     /**
      * 服务名称 & 服务基地址
@@ -56,45 +61,20 @@ public interface Common {
         String DC3_USER_URL_PREFIX = "/auth/user";
         String DC3_TOKEN_URL_PREFIX = "/auth/token";
 
-        String DC3_DBS = "DC3-DBS";
-        String DC3_DBS_RTMP_URL_PREFIX = "/center/dbs/rtmp";
-        String DC3_DBS_USER_URL_PREFIX = "/center/dbs/user";
-        String DC3_DBS_TOKEN_URL_PREFIX = "/center/dbs/token";
-
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
     }
 
     /**
-     * 数据字段
+     * 缓存Key
      */
-    interface Cloumn {
-        String ID = "id";
-        String NAME = "name";
-        String CREATE_TIME = "create_time";
-        String UPDATE_TIME = "update_time";
+    interface Cache {
+        String USER_ID = "auth_user_id";
+        String USER_NAME = "auth_user_name";
+        String USER_LIST = "auth_user_list";
 
-        /**
-         * User表
-         */
-        interface User {
-            String USERNAME = "username";
-        }
-
-        /**
-         * Token表
-         */
-        interface Token {
-            String USER_ID = "user_id";
-        }
-
-        /**
-         * Rtmp表
-         */
-        interface Rtmp {
-            String AUTO_START = "auto_start";
-        }
-
+        String RTMP_ID = "transfer_rtmp_id";
+        String RTMP_LIST = "transfer_rtmp_list";
     }
 
 }

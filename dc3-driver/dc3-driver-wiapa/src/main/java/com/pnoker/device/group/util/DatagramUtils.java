@@ -17,10 +17,9 @@
 package com.pnoker.device.group.util;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 public class DatagramUtils {
 

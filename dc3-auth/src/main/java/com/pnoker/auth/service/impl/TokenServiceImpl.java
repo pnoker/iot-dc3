@@ -18,6 +18,7 @@ package com.pnoker.auth.service.impl;
 
 import com.pnoker.auth.service.TokenService;
 import com.pnoker.auth.service.UserService;
+import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.User;
 import com.pnoker.common.utils.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +41,11 @@ public class TokenServiceImpl implements TokenService {
     public String generateToken(User user) {
         User select = userService.selectByName(user.getName());
         if (null != select) {
-            if (select.getName().equals(user.getName())) {
+            if (select.getPassword().equals(user.getPassword())) {
                 return KeyUtil.generateToken(user.getName());
             }
         }
-        return null;
+        throw new ServiceException("用户不存在或者密码不匹配");
     }
 
     @Override

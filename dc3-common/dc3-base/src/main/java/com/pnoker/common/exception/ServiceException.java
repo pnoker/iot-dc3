@@ -14,30 +14,15 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.device;
-
-import com.pnoker.common.model.Description;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+package com.pnoker.common.exception;
 
 /**
- * <p>设备变量表
+ * 服务接口异常
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class PointProperty extends Description {
-
-    private String name;
-    private Float base;
-    private Float minimum;
-    private Float maximum;
-    private Float multiple;
-    private Float value;
+public class ServiceException extends RuntimeException {
+    public ServiceException(String message) {
+        super(message);
+    }
 }

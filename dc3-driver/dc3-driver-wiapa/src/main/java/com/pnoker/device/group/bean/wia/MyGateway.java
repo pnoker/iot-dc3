@@ -25,10 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>Wia Gateway信息
+ * Wia Gateway信息
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @Slf4j

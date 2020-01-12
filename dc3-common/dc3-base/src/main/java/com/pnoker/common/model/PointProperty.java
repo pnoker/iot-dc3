@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.device;
+package com.pnoker.common.model;
 
 import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
@@ -23,19 +23,20 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>设备驱动表
+ * 设备变量表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DeviceDriver extends Description {
+public class PointProperty extends Description {
 
     private String name;
-    private String serviceName;
-    private String connectInfo;
-    private String profileInfo;
+    private Float base;
+    private Float minimum;
+    private Float maximum;
+    private Float multiple;
+    private Float value;
 }

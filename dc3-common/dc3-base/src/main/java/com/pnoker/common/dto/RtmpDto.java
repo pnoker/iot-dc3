@@ -14,56 +14,53 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.rtmp;
+package com.pnoker.common.dto;
 
-import com.pnoker.common.model.Description;
-import com.pnoker.common.valid.Insert;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pnoker.common.base.Converter;
+import com.pnoker.common.bean.Pages;
+import com.pnoker.common.model.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.beans.BeanUtils;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
- * <p>Rtmp
+ * Rtmp DTO
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-public class Rtmp extends Description {
+public class RtmpDto implements Serializable, Converter<Rtmp, RtmpDto> {
+    private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "name can't be empty", groups = {Insert.class})
     private String name;
-
-    @NotBlank(message = "rtsp url can't be empty", groups = {Insert.class})
-    private String rtspUrl;
-
-    @NotBlank(message = "rtmp url can't be empty", groups = {Insert.class})
-    private String rtmpUrl;
-
-    @NotBlank(message = "command can't be empty", groups = {Insert.class})
-    private String command;
-
     private Short videoType;
     private Boolean run;
     private Boolean autoStart;
-    private Long imageId;
+    private Long userId;
 
-    public Rtmp(long id, boolean run) {
-        super.setId(id);
-        this.run = run;
-    }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
 
-    public Rtmp(boolean autoStart) {
+    public RtmpDto(boolean autoStart) {
         this.autoStart = autoStart;
     }
 
+    @Override
+    public void convertToDo(Rtmp rtmp) {
+        BeanUtils.copyProperties(this, rtmp);
+    }
+
+    @Override
+    public RtmpDto convert(Rtmp rtmp) {
+        BeanUtils.copyProperties(rtmp, this);
+        return this;
+    }
 }

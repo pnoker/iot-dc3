@@ -22,10 +22,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>标签表
+ * 标签表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
@@ -35,5 +34,4 @@ public class Label extends Description {
 
     private String name;
     private String color;
-    private Long imageId;
 }

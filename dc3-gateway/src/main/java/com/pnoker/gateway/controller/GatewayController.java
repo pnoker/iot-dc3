@@ -16,11 +16,8 @@
 
 package com.pnoker.gateway.controller;
 
-import com.pnoker.gateway.service.AuthService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import javax.annotation.Resource;
 
 /**
  * Gateway Controller
@@ -29,17 +26,9 @@ import javax.annotation.Resource;
  */
 @Controller
 public class GatewayController {
-    @Resource
-    private AuthService authService;
 
     @GetMapping(value = "/")
     public String index() {
-        return "index";
-    }
-
-    @GetMapping(value = "/t")
-    public String t() {
-        authService.isPermitted(null);
         return "index";
     }
 

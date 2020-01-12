@@ -16,23 +16,25 @@
 
 package com.pnoker.common.model;
 
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>
+ * 设备驱动表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Image extends Description {
+public class DeviceDriver extends Description {
 
     private String name;
-    private String url;
+    private String serviceName;
+    private String connectInfo;
+    private String profileInfo;
 }

@@ -14,54 +14,36 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.dto.transfer;
+package com.pnoker.common.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
-import com.pnoker.common.model.rtmp.Rtmp;
+import com.pnoker.common.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
-import java.io.Serializable;
-
 /**
- * <p>Rtmp DTO
+ * User DTO
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
-public class RtmpDto implements Serializable, Converter<Rtmp, RtmpDto> {
-    private static final long serialVersionUID = 1L;
+public class UserDto extends User implements Converter<User, UserDto> {
 
-    private String name;
-    private Short videoType;
-    private Boolean run;
-    private Boolean autoStart;
-    private Long userId;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    public RtmpDto(boolean autoStart) {
-        this.autoStart = autoStart;
+    @Override
+    public void convertToDo(User user) {
+        BeanUtils.copyProperties(this, user);
     }
 
     @Override
-    public void convertToDo(Rtmp rtmp) {
-        BeanUtils.copyProperties(this, rtmp);
-    }
-
-    @Override
-    public RtmpDto convert(Rtmp rtmp) {
-        BeanUtils.copyProperties(rtmp, this);
+    public UserDto convert(User user) {
+        BeanUtils.copyProperties(user, this);
         return this;
     }
 }

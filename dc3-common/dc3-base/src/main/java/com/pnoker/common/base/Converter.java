@@ -17,10 +17,9 @@
 package com.pnoker.common.base;
 
 /**
- * <p>Converter
+ * Converter
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public interface Converter<D,T> {
     /**

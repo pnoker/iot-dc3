@@ -16,8 +16,7 @@
 
 package com.pnoker.common.bean;
 
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,13 +24,11 @@ import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * <p>基础查询类，其中包括分页以及排序
+ * 基础查询类，其中包括分页以及排序
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
@@ -40,14 +37,13 @@ import java.util.List;
 public class Pages implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Integer pageNum = 1;
-    private Integer pageSize = 10;
+    private long current = 1;
+    private long size = 20;
 
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private List<OrderItem> orders;
-
-    public void convert(Pages page) {
+    public <T> Page<T> convert() {
+        Page<T> page = new Page<>();
         BeanUtils.copyProperties(this, page);
+        return page;
     }
 
 }

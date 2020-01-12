@@ -29,10 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Slf4j
 @Component

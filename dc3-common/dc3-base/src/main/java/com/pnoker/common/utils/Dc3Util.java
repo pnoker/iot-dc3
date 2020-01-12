@@ -20,15 +20,12 @@ import cn.hutool.core.util.ReUtil;
 import com.google.common.base.Charsets;
 import com.pnoker.common.dto.NodeDto;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 /**
- * <p>Dc3 平台自定义工具类集合
+ * Dc3 平台自定义工具类集合
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public class Dc3Util {
     /**
@@ -72,12 +69,25 @@ public class Dc3Util {
     }
 
     /**
+     * 按小时推迟时间
+     *
+     * @param hour
+     * @return
+     */
+    public static Date expireTime(int hour) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.HOUR, hour);
+        return calendar.getTime();
+    }
+
+    /**
      * 判断字符串是否为 用户名格式（3-16）
      *
      * @param username
      * @return
      */
-    public static boolean isUsername(String username) {
+    public static boolean isName(String username) {
         String regex = "^[a-zA-Z]\\w{2,15}$";
         return ReUtil.isMatch(regex, username);
     }
@@ -105,35 +115,13 @@ public class Dc3Util {
     }
 
     /**
-     * 判断字符串是否为 弱密码格式（8-16）
-     *
-     * @param password
-     * @return
-     */
-    public static boolean isWeakPassword(String password) {
-        String regex = "^[a-zA-Z]\\w{7,15}$";
-        return ReUtil.isMatch(regex, password);
-    }
-
-    /**
      * 判断字符串是否为 密码格式（8-16）
      *
      * @param password
      * @return
      */
     public static boolean isPassword(String password) {
-        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,16}$";
-        return ReUtil.isMatch(regex, password);
-    }
-
-    /**
-     * 判断字符串是否为 强密码格式（8-16）
-     *
-     * @param password
-     * @return
-     */
-    public static boolean isStrongPassword(String password) {
-        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,16}$";
+        String regex = "^[a-zA-Z]\\w{7,15}$";
         return ReUtil.isMatch(regex, password);
     }
 

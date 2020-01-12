@@ -19,6 +19,10 @@ package com.pnoker.common.utils;
 import com.google.common.base.Charsets;
 import com.pnoker.common.bean.Keys;
 import com.pnoker.common.constant.Common;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -30,12 +34,12 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Date;
 
 /**
- * <p>Dc3 平台密钥工具类
+ * Dc3 平台密钥工具类
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public class KeyUtil {
 
@@ -149,5 +153,33 @@ public class KeyUtil {
         //64位解码加密后的字符串
         byte[] inputByte = Dc3Util.decode(str.getBytes(Charsets.UTF_8));
         return new String(cipher.doFinal(inputByte));
+    }
+
+    /**
+     * 生成Token令牌
+     *
+     * @param name
+     * @return
+     */
+    public static String generateToken(String name) {
+        JwtBuilder builder = Jwts.builder()
+                .setId(name)
+                .setIssuedAt(new Date())
+                .setExpiration(Dc3Util.expireTime(6))
+                .signWith(SignatureAlgorithm.HS256, Common.KEY);
+        return builder.compact();
+    }
+
+    /**
+     * 解析Token令牌
+     *
+     * @param token
+     * @return
+     */
+    public static Claims parserToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(Common.KEY)
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

@@ -43,7 +43,7 @@ public class TokenApi implements TokenClient {
     public R<String> generateToken(User user) {
         try {
             String token = tokenService.generateToken(user);
-            return null != token ? R.ok(token) : R.fail("用户名密码不匹配");
+            return null != token ? R.ok(token) : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -51,6 +51,6 @@ public class TokenApi implements TokenClient {
 
     @Override
     public R<Boolean> checkTokenValid(String token) {
-        return tokenService.checkTokenValid(token) ? R.ok() : R.fail("无效令牌");
+        return tokenService.checkTokenValid(token) ? R.ok() : R.fail();
     }
 }

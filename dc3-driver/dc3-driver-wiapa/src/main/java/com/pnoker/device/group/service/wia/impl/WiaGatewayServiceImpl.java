@@ -26,10 +26,9 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Service
 public class WiaGatewayServiceImpl implements WiaGatewayService {
