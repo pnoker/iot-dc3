@@ -26,10 +26,9 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * <p>WiaDevice 接口实现
+ * WiaDevice 接口实现
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Service
 public class WiaVariableServiceImpl implements WiaVariableService {

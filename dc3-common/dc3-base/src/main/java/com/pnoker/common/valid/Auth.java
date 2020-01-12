@@ -17,10 +17,9 @@
 package com.pnoker.common.valid;
 
 /**
- * <p>Validated 分组
+ * Validated Auth分组
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public interface Auth {
 }

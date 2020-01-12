@@ -18,18 +18,17 @@ package com.pnoker.api.device.manager.hystrix;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.device.manager.feign.DeviceManagerDbsFeignClient;
-import com.pnoker.common.dto.device.DeviceDto;
-import com.pnoker.common.model.device.Device;
-import com.pnoker.common.bean.Response;
+import com.pnoker.common.dto.DeviceDto;
+import com.pnoker.common.model.Device;
+import com.pnoker.common.bean.R;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Slf4j
 @Component
@@ -42,28 +41,28 @@ public class DeviceManagerFeignApiHystrix implements FallbackFactory<DeviceManag
 
         return new DeviceManagerDbsFeignClient() {
             @Override
-            public Response add(Device rtmp) {
-                return Response.fail(message);
+            public R add(Device rtmp) {
+                return R.fail(message);
             }
 
             @Override
-            public Response delete(Long id) {
-                return Response.fail(message);
+            public R delete(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Boolean> update(Device rtmp) {
-                return Response.fail(message);
+            public R<Boolean> update(Device rtmp) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<Device> selectById(Long id) {
-                return Response.fail(message);
+            public R<Device> selectById(Long id) {
+                return R.fail(message);
             }
 
             @Override
-            public Response<IPage<Device>> list(DeviceDto rtmpDto) {
-                return Response.fail(message);
+            public R<IPage<Device>> list(DeviceDto rtmpDto) {
+                return R.fail(message);
             }
         };
     }

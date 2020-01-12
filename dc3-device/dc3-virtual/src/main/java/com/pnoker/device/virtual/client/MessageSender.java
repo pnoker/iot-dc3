@@ -34,10 +34,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Slf4j
 @Component

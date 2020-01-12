@@ -19,10 +19,9 @@ package com.pnoker.device.group.bean.wia;
 import lombok.Data;
 
 /**
- * <p>Wia Hart 变量数据信息
+ * Wia Hart 变量数据信息
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 public class MyHartVariable {

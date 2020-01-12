@@ -30,10 +30,9 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Slf4j
 @RestController

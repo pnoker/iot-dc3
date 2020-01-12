@@ -21,10 +21,9 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * <p>Wia Hart设备信息
+ * Wia Hart设备信息
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 public class MyHartDevice {

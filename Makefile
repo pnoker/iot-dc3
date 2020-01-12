@@ -14,11 +14,15 @@
 #   limitations under the License.
 #
 
-FROM rabbitmq:3.8-alpine
-MAINTAINER pnoker <pnokers.icloud.com>
+Default:
+    @echo "make build: mvn package & docker-compose build"
+    @echo "make clean: mvn clean"
 
-ENV RABBITMQ_DEFAULT_USER dc3
-ENV RABBITMQ_DEFAULT_PASS dc3
+.PHONY: build clean
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && rabbitmq-plugins enable rabbitmq_management rabbitmq_mqtt rabbitmq_stomp
+build:
+	mvn package
+	cd ./dc3
+	docker-compose build
+clean:
+	mvn clean

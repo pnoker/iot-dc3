@@ -28,6 +28,10 @@
 
     <description>IOT DC3 平台 公共基础集合。</description>
 
+    <properties>
+        <jwt.version>0.9.1</jwt.version>
+    </properties>
+
     <dependencies>
 
         <!-- Mybatis Plus -->
@@ -40,6 +44,13 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+        </dependency>
+
+        <!-- jwt -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jwt.version}</version>
         </dependency>
 
         <!-- Slf4j -->

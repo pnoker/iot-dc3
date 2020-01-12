@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.device;
+package com.pnoker.common.config;
 
-import com.pnoker.common.model.Description;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * <p>测点配置表
+ * <p>MybatisPlus配置
  *
  * @author : pnoker
  * @email : pnokers@icloud.com
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class PointProfile extends Description {
+@Configuration
+public class MybatisPlusConfig {
+    /**
+     * 分页插件
+     *
+     * @return PaginationInterceptor
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+    }
 
-    private String config;
-    private Long driverId;
 }

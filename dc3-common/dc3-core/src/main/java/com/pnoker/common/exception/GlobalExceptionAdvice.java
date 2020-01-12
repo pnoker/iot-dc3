@@ -16,7 +16,7 @@
 
 package com.pnoker.common.exception;
 
-import com.pnoker.common.bean.Response;
+import com.pnoker.common.bean.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -30,10 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * <p>全局异常处理
+ * 全局异常处理
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Slf4j
 @RestControllerAdvice
@@ -47,9 +46,9 @@ public class GlobalExceptionAdvice {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Response exception(Exception exception) {
+    public R exception(Exception exception) {
         log.error("Global Exception:{}", exception.getMessage());
-        return Response.fail(exception.getMessage());
+        return R.fail(exception.getMessage());
     }
 
     /**
@@ -63,14 +62,14 @@ public class GlobalExceptionAdvice {
             MethodArgumentNotValidException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Response bodyValidExceptionHandler(MethodArgumentNotValidException exception) {
+    public R bodyValidExceptionHandler(MethodArgumentNotValidException exception) {
         HashMap<String, String> map = new HashMap<>(16);
         List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
         errorList.forEach(error -> {
             log.warn("Method Argument Not Valid Exception:{}({})", error.getField(), error.getDefaultMessage());
             map.put(error.getField(), error.getDefaultMessage());
         });
-        return Response.fail(map);
+        return R.fail(map);
     }
 
 }

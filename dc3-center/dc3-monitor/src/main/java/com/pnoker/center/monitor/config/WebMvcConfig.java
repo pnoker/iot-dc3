@@ -22,10 +22,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {

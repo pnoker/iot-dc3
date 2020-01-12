@@ -19,10 +19,9 @@ package com.pnoker.device.group.model.wia;
 import lombok.Data;
 
 /**
- * <p>设备组 Wia设备表
+ * 设备组 Wia设备表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 public class WiaDevice {

@@ -73,21 +73,6 @@ services:
         aliases:
           - dc3.auth
 
-  dbs:
-    build:
-      context: ../dc3-center/dc3-dbs/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-dbs:3.0
-    restart: always
-    ports:
-      - 8300:8300
-    container_name: dc3.dbs
-    hostname: dc3.dbs
-    networks:
-      dc3net:
-        aliases:
-          - dc3.dbs
-
   mysql:
     build:
       context: ./dependences/mysql/
@@ -225,5 +210,5 @@ services:
 
 networks:
   dc3net:
-    driver: 'overlay'
+    driver: 'bridge'
 ...

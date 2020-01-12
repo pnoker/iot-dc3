@@ -54,6 +54,7 @@ logging:
     io.lettuce.core: ERROR
     io.undertow: ERROR
     com.netflix: ERROR
+    com.pnoker: DEBUG
   file:
     name: dc3/logs/transfer/${spring.application.name}.log
 

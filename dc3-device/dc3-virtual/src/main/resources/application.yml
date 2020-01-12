@@ -42,8 +42,6 @@ feign:
     enabled: true
   httpclient:
     enabled: false
-    max-connections: 200
-    max-connections-per-route: 50
   okhttp:
     enabled: true
   compression:
@@ -69,6 +67,7 @@ logging:
     io.lettuce.core: ERROR
     io.undertow: ERROR
     com.netflix: ERROR
+    com.pnoker: DEBUG
   file:
     name: dc3/logs/virtual/${spring.application.name}.log
 

@@ -24,15 +24,14 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * <p>Response
+ * Response
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Response<T> implements Serializable {
+public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private boolean ok = false;
@@ -46,8 +45,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> ok() {
-        return new Response().success();
+    public static <T> R<T> ok() {
+        return new R().success();
     }
 
     /**
@@ -56,8 +55,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> ok(String message) {
-        return new Response().success(message);
+    public static <T> R<T> ok(String message) {
+        return new R().success(message);
     }
 
     /**
@@ -67,8 +66,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> ok(T data) {
-        return new Response(data).success();
+    public static <T> R<T> ok(T data) {
+        return new R(data).success();
     }
 
     /**
@@ -78,8 +77,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> ok(T data, String message) {
-        return new Response(data).success(message);
+    public static <T> R<T> ok(T data, String message) {
+        return new R(data).success(message);
     }
 
     /**
@@ -88,8 +87,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> fail() {
-        return new Response().failure();
+    public static <T> R<T> fail() {
+        return new R().failure();
     }
 
     /**
@@ -98,8 +97,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> fail(String message) {
-        return new Response().failure(message);
+    public static <T> R<T> fail(String message) {
+        return new R().failure(message);
     }
 
     /**
@@ -109,8 +108,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> fail(T data) {
-        return new Response(data).failure();
+    public static <T> R<T> fail(T data) {
+        return new R(data).failure();
     }
 
     /**
@@ -120,8 +119,8 @@ public class Response<T> implements Serializable {
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public static <T> Response<T> fail(T data, String message) {
-        return new Response(data).failure(message);
+    public static <T> R<T> fail(T data, String message) {
+        return new R(data).failure(message);
     }
 
     /**
@@ -129,7 +128,7 @@ public class Response<T> implements Serializable {
      *
      * @param data 数据
      */
-    private Response(T data) {
+    private R(T data) {
         this.data = data;
     }
 
@@ -138,7 +137,7 @@ public class Response<T> implements Serializable {
      *
      * @return Response
      */
-    private Response success() {
+    private R success() {
         this.ok = true;
         this.message = "ok";
         return this;
@@ -150,7 +149,7 @@ public class Response<T> implements Serializable {
      * @param message 成功提示信息
      * @return Response
      */
-    private Response success(String message) {
+    private R success(String message) {
         this.ok = true;
         this.message = message;
         return this;
@@ -161,7 +160,7 @@ public class Response<T> implements Serializable {
      *
      * @return Response
      */
-    private Response failure() {
+    private R failure() {
         this.ok = false;
         this.message = "fail";
         return this;
@@ -173,7 +172,7 @@ public class Response<T> implements Serializable {
      * @param message 错误提示信息
      * @return Response
      */
-    private Response failure(String message) {
+    private R failure(String message) {
         this.ok = false;
         this.message = message;
         return this;

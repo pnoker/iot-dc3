@@ -18,17 +18,16 @@ package com.pnoker.api.device.manager.feign;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pnoker.api.device.manager.hystrix.DeviceManagerFeignApiHystrix;
-import com.pnoker.common.dto.device.DeviceDto;
-import com.pnoker.common.model.device.Device;
-import com.pnoker.common.bean.Response;
+import com.pnoker.common.dto.DeviceDto;
+import com.pnoker.common.model.Device;
+import com.pnoker.common.bean.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * <p>设备管理FeignCLient
+ * 设备管理FeignCLient
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @FeignClient(name = "DC3-DEVICE-MANAGER", fallbackFactory = DeviceManagerFeignApiHystrix.class)
 @RequestMapping(value = "/api/v3/device/manager")
@@ -41,7 +40,7 @@ public interface DeviceManagerDbsFeignClient {
      * @return true/false
      */
     @PostMapping("/add")
-    Response<Long> add(Device device);
+    R<Long> add(Device device);
 
     /**
      * 删除 根据 ID 删除 Device
@@ -50,7 +49,7 @@ public interface DeviceManagerDbsFeignClient {
      * @return true/false
      */
     @DeleteMapping("/delete/{id}")
-    Response<Boolean> delete(@PathVariable Long id);
+    R<Boolean> delete(@PathVariable Long id);
 
     /**
      * 修改 修改 Device 任务记录
@@ -59,7 +58,7 @@ public interface DeviceManagerDbsFeignClient {
      * @return true/false
      */
     @PutMapping("/update")
-    Response<Boolean> update(Device device);
+    R<Boolean> update(Device device);
 
     /**
      * 查询 根据ID查询 Device
@@ -68,7 +67,7 @@ public interface DeviceManagerDbsFeignClient {
      * @return device
      */
     @GetMapping("/{id}")
-    Response<Device> selectById(@PathVariable Long id);
+    R<Device> selectById(@PathVariable Long id);
 
     /**
      * 分页查询 按照查询 Device
@@ -77,5 +76,5 @@ public interface DeviceManagerDbsFeignClient {
      * @return deviceList
      */
     @GetMapping("/")
-    Response<IPage<Device>> list(DeviceDto deviceDto);
+    R<IPage<Device>> list(DeviceDto deviceDto);
 }

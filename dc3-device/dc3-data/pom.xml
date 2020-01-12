@@ -36,12 +36,6 @@
             <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
         </dependency>
 
-        <!-- dc3 Api Dbs -->
-        <dependency>
-            <groupId>com.pnoker</groupId>
-            <artifactId>dc3-api-dbs</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

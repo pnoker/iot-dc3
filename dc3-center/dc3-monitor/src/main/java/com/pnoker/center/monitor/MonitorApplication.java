@@ -21,10 +21,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
 
 /**
- * <p>服务监控中心
+ * 服务监控中心
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @EnableAdminServer
 @SpringCloudApplication

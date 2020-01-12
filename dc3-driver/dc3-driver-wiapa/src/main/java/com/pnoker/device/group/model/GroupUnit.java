@@ -19,10 +19,9 @@ package com.pnoker.device.group.model;
 import lombok.Data;
 
 /**
- * <p>设备组 综合单位表
+ * 设备组 综合单位表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 public class GroupUnit {

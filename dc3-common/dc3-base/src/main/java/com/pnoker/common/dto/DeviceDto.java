@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.device;
+package com.pnoker.common.dto;
 
-import com.pnoker.common.model.Description;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pnoker.common.model.Device;
+import com.pnoker.common.bean.Pages;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>设备表
+ * Device DTO
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Device extends Description {
+public class DeviceDto extends Device {
 
-    private String name;
-    private String code;
-    private Short status;
-    private Long profileId;
-    private Long imageId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
 }

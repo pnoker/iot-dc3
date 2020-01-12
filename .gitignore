@@ -6,3 +6,5 @@
 *.ipr
 .vs
 .vscode
+.settings
+.project

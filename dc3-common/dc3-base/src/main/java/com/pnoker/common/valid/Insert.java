@@ -17,10 +17,9 @@
 package com.pnoker.common.valid;
 
 /**
- * <p>Validated 分组
+ * Validated Insert分组
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public interface Insert {
 }

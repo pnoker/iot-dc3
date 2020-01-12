@@ -14,42 +14,28 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model.auth;
+package com.pnoker.common.model;
 
 import com.pnoker.common.model.Description;
-import com.pnoker.common.valid.Auth;
-import com.pnoker.common.valid.Insert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 /**
- * <p>User
+ * 设备变量表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class User extends Description {
+public class Point extends Description {
 
-    @NotBlank(message = "username can't be empty", groups = {Insert.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "invalid username")
-    private String username;
-
-    @NotBlank(message = "password can't be empty", groups = {Insert.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "invalid password")
-    private String password;
-
-    private Boolean enable;
-    private Long imageId;
+    private String name;
+    private String pointCode;
+    private Long deviceId;
+    private Long propertyId;
+    private Long unitId;
 }

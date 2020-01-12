@@ -24,10 +24,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Component
 @Slf4j

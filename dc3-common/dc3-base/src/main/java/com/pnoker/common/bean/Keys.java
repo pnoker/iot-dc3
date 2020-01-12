@@ -20,10 +20,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * <p> Aes/Rsa 加密密钥
+ *  Aes/Rsa 加密密钥
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public class Keys {
 

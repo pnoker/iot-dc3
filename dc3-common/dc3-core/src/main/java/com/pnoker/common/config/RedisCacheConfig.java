@@ -33,10 +33,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 /**
- * <p>Redis Cache
+ * Redis Cache
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Configuration
 @ConfigurationProperties(prefix = "spring.cache.redis")

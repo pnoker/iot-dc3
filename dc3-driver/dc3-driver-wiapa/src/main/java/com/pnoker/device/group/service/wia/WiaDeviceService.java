@@ -22,10 +22,9 @@ import com.pnoker.device.group.model.wia.WiaDevice;
 import java.util.List;
 
 /**
- * <p>WiaDevice 服务接口
+ * WiaDevice 服务接口
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 public interface WiaDeviceService {
     List<WiaDevice> list(Wrapper<WiaDevice> wrapper);

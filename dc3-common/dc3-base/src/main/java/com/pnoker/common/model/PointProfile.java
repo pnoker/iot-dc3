@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.dto.device;
+package com.pnoker.common.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.pnoker.common.model.device.Device;
-import com.pnoker.common.bean.Pages;
+import com.pnoker.common.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <p>Device DTO
+ * 测点配置表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DeviceDto extends Device {
+public class PointProfile extends Description {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
+    private String config;
+    private Long driverId;
 }

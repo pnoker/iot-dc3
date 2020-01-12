@@ -14,14 +14,27 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.dbs.service;
+package com.pnoker.common.model;
+
+import com.pnoker.common.model.Description;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
- * <p> 设备 服务接口
+ * 设备表
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ * @author pnoker
  */
-public interface DeviceService {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class Device extends Description {
 
+    private String name;
+    private String code;
+    private Short status;
+    private Long profileId;
 }

@@ -25,10 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 /**
- * <p>
  *
- * @author : pnoker
- * @email : pnokers@icloud.com
+ *
+ * @author pnoker
  */
 @Data
 @Slf4j
