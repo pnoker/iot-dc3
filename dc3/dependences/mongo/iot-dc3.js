@@ -17,7 +17,7 @@
 // create dc3 database and user
 db = db.getSiblingDB('dc3');
 db.createUser({
-    user: "root",
+    user: "dc3",
     pwd: "dc3",
     roles: [{
         role: "readWrite",

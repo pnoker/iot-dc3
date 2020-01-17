@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: dc3-rabbitmq
+  name: dc3-rabbitmq
+spec:
+  ports:
+  - name: "5672"
+    port: 5672
+    targetPort: 5672
+  - name: "1883"
+    port: 1883
+    targetPort: 1883
+  - name: "61613"
+    port: 61613
+    targetPort: 61613
+  - name: "15672"
+    port: 15672
+    targetPort: 15672
+  selector:
+    io.kompose.service: dc3-rabbitmq
+status:
+  loadBalancer: {}

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: dc3-register
+  name: dc3-register
+spec:
+  type: NodePort
+  ports:
+  - name: "8100"
+    port: 8100
+    nodePort: 30081
+    targetPort: 8100
+  selector:
+    io.kompose.service: dc3-register
+status:
+  loadBalancer: {}

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: dc3-portainer
+  name: dc3-portainer
+spec:
+  ports:
+  - name: "9000"
+    port: 9000
+    targetPort: 9000
+  selector:
+    io.kompose.service: dc3-portainer
+status:
+  loadBalancer: {}

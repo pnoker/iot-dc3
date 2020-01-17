@@ -39,7 +39,7 @@ logging:
 
 eureka:
   instance:
-    hostname: dc3.register
+    hostname: dc3-register
     prefer-ip-address: true
   client:
     register-with-eureka: false
