@@ -20,7 +20,7 @@ spring:
       password: dc3
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://dc3.mysql:3306/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://dc3-mysql:3306/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ${spring.security.user.password}
@@ -31,7 +31,7 @@ spring:
       maximum-pool-size: 16
       minimum-idle: 4
   redis:
-    host: dc3.redis
+    host: dc3-redis
     port: 6379
     password: ${spring.security.user.password}
     database: 1
@@ -108,4 +108,4 @@ eureka:
     health-check-url-path: /actuator/health
   client:
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3.register:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/

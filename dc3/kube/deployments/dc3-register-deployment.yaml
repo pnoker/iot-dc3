@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: dc3-register
+  name: dc3-register
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Program Files\Docker\Docker\Resources\bin\kompose.exe -f docker-compose.yml
+          convert
+        kompose.version: 1.20.0 (f3d54d784)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/dc3net: "true"
+        io.kompose.service: dc3-register
+    spec:
+      containers:
+      - image: pnoker/dc3-register:3.0
+        name: dc3-register
+        ports:
+        - containerPort: 8100
+          hostPort: 8100
+        resources: {}
+      hostname: dc3-register
+      restartPolicy: Always
+status: {}

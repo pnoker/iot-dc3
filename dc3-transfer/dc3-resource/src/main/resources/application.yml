@@ -64,4 +64,4 @@ eureka:
     health-check-url-path: /actuator/health
   client:
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3.register:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/

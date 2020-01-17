@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: dc3-manager
+  name: dc3-manager
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Program Files\Docker\Docker\Resources\bin\kompose.exe -f docker-compose.yml
+          convert
+        kompose.version: 1.20.0 (f3d54d784)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/dc3net: "true"
+        io.kompose.service: dc3-manager
+    spec:
+      containers:
+      - image: pnoker/dc3-manager:3.0
+        name: dc3-manager
+        ports:
+        - containerPort: 8600
+        resources: {}
+      hostname: dc3-manager
+      restartPolicy: Always
+status: {}

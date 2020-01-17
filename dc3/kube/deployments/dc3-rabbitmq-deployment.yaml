@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: dc3-rabbitmq
+  name: dc3-rabbitmq
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Program Files\Docker\Docker\Resources\bin\kompose.exe -f docker-compose.yml
+          convert
+        kompose.version: 1.20.0 (f3d54d784)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/dc3net: "true"
+        io.kompose.service: dc3-rabbitmq
+    spec:
+      containers:
+      - image: pnoker/dc3-rabbitmq:3.0
+        name: dc3-rabbitmq
+        ports:
+        - containerPort: 5672
+        - containerPort: 1883
+        - containerPort: 61613
+        - containerPort: 15672
+        resources: {}
+      hostname: dc3-rabbitmq
+      restartPolicy: Always
+status: {}

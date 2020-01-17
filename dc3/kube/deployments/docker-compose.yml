@@ -1,10 +1,10 @@
 version: '3.7'
 
 services:
-  portainer:
+  dc3-portainer:
     image:  portainer/portainer
     restart: always
-    container_name: portainer
+    container_name: dc3-portainer
     hostname: dc3-portainer
     ports:
       - "9000:9000"
@@ -13,7 +13,7 @@ services:
         aliases:
           - dc3-portainer
 
-  gateway:
+  dc3-gateway:
     build:
       context: ../dc3-gateway/
       dockerfile: ./Dockerfile
@@ -28,7 +28,7 @@ services:
         aliases:
           - dc3-gateway
 
-  register:
+  dc3-register:
     build:
       context: ../dc3-center/dc3-register/
       dockerfile: ./Dockerfile
@@ -43,7 +43,7 @@ services:
         aliases:
           - dc3-register
 
-  monitor:
+  dc3-monitor:
     build:
       context: ../dc3-center/dc3-monitor/
       dockerfile: ./Dockerfile
@@ -58,7 +58,7 @@ services:
         aliases:
           - dc3-monitor
 
-  auth:
+  dc3-auth:
     build:
       context: ../dc3-auth/
       dockerfile: ./Dockerfile
@@ -73,7 +73,7 @@ services:
         aliases:
           - dc3-auth
 
-  mysql:
+  dc3-mysql:
     build:
       context: ./dependences/mysql/
       dockerfile: ./Dockerfile
@@ -88,7 +88,7 @@ services:
         aliases:
           - dc3-mysql
 
-  mongo:
+  dc3-mongo:
     build:
       context: ./dependences/mongo/
       dockerfile: ./Dockerfile
@@ -103,7 +103,7 @@ services:
         aliases:
           - dc3-mongo
 
-  redis:
+  dc3-redis:
     build:
       context: ./dependences/redis/
       dockerfile: ./Dockerfile
@@ -118,7 +118,7 @@ services:
         aliases:
           - dc3-redis
 
-  manager:
+  dc3-manager:
     build:
       context: ../dc3-device/dc3-manager/
       dockerfile: ./Dockerfile
@@ -133,7 +133,7 @@ services:
         aliases:
           - dc3-manager
 
-  rabbitmq:
+  dc3-rabbitmq:
     build:
       context: ./dependences/rabbitmq/
       dockerfile: ./Dockerfile
@@ -151,7 +151,7 @@ services:
         aliases:
           - dc3-rabbitmq
 
-  opcua:
+  dc3-opcua:
     build:
       context: ../dc3-transfer/dc3-opcua/
       dockerfile: ./Dockerfile
@@ -166,7 +166,7 @@ services:
         aliases:
           - dc3-opcua
 
-  rtmp:
+  dc3-rtmp:
     build:
       context: ../dc3-transfer/dc3-rtmp/
       dockerfile: ./Dockerfile
@@ -181,7 +181,7 @@ services:
         aliases:
           - dc3-rtmp
 
-  nginx:
+  dc3-nginx:
     image: pnoker/alpine-nginx:rtmp
     restart: always
     ports:
@@ -193,7 +193,7 @@ services:
         aliases:
           - dc3-nginx
 
-  resource:
+  dc3-resource:
     build:
       context: ../dc3-transfer/dc3-resource/
       dockerfile: ./Dockerfile

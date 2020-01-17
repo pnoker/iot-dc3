@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: dc3-redis
+  name: dc3-redis
+spec:
+  ports:
+  - name: "6379"
+    port: 6379
+    targetPort: 6379
+  selector:
+    io.kompose.service: dc3-redis
+status:
+  loadBalancer: {}

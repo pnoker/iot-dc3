@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: dc3-rtmp
+  name: dc3-rtmp
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Program Files\Docker\Docker\Resources\bin\kompose.exe -f docker-compose.yml
+          convert
+        kompose.version: 1.20.0 (f3d54d784)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/dc3net: "true"
+        io.kompose.service: dc3-rtmp
+    spec:
+      containers:
+      - image: pnoker/dc3-rtmp:3.0
+        name: dc3-rtmp
+        ports:
+        - containerPort: 8803
+        resources: {}
+      hostname: dc3-rtmp
+      restartPolicy: Always
+status: {}
