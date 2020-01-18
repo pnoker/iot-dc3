@@ -4,6 +4,18 @@
 
 DC3_ROOT=$(dirname "${BASH_SOURCE}")/
 
+function delete_namespace {
+
+  kubectl delete -f "${DC3_ROOT}/namespace/dc3-namespace.yaml"
+
+}
+
+function delete_network {
+
+  kubectl delete -f "${DC3_ROOT}/network/dc3-networkpolicy.yaml"
+
+}
+
 function delete_services {
 
   kubectl delete -f "${DC3_ROOT}/services/dc3-register-service.yaml"
@@ -20,6 +32,7 @@ function delete_services {
   #kubectl delete -f "${DC3_ROOT}/services/dc3-redis-service.yaml"
   #kubectl delete -f "${DC3_ROOT}/services/dc3-resource-service.yaml"
   #kubectl delete -f "${DC3_ROOT}/services/dc3-rtmp-service.yaml"
+
 }
 
 function delete_deployments {
@@ -62,3 +75,10 @@ echo "Deleting DC3 services now!"
 delete_services
 echo "DC3 services deleted successfully !"
 
+echo "Deleting DC3 network now!"
+delete_network
+echo "DC3 network deleted successfully !"
+
+echo "Deleting DC3 namespace now!"
+delete_namespace
+echo "DC3 namespace deleted successfully !"

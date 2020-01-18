@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     io.kompose.service: dc3-manager
+  namespace: dc3
   name: dc3-manager
 spec:
   ports:
