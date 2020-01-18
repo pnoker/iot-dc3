@@ -1,25 +1,28 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.kompose.service: dc3-nginx
+    dc3.service: dc3-nginx
   namespace: dc3
   name: dc3-nginx
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-nginx
   template:
     metadata:
       labels:
-        io.kompose.network/dc3net: "true"
-        io.kompose.service: dc3-nginx
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-nginx
     spec:
       containers:
-      - image: pnoker/alpine-nginx:rtmp
-        name: dc3-nginx
-        ports:
-        - containerPort: 1935
-        resources: {}
+        - image: pnoker/alpine-nginx:rtmp
+          name: dc3-nginx
+          ports:
+            - containerPort: 1935
       hostname: dc3-nginx
       restartPolicy: Always
-status: {}

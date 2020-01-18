@@ -2,15 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: dc3-gateway
+    dc3.service: dc3-gateway
   namespace: dc3
   name: dc3-gateway
 spec:
   ports:
-  - name: "8000"
-    port: 8000
-    targetPort: 8000
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
   selector:
-    io.kompose.service: dc3-gateway
-status:
-  loadBalancer: {}
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-gateway

@@ -4,66 +4,57 @@ set -e
 
 DC3_ROOT=$(dirname "${BASH_SOURCE}")/
 
-function create_namespace {
+function create_namespace() {
 
-  kubectl create -f "${DC3_ROOT}/namespace/dc3-namespace.yaml"
-
-}
-
-function create_network {
-
-  kubectl create -f "${DC3_ROOT}/network/dc3-networkpolicy.yaml"
+  kubectl apply -f "${DC3_ROOT}/namespace/dc3-namespace.yaml"
 
 }
 
-function create_services {
+function create_ingress() {
 
-  kubectl create -f "${DC3_ROOT}/services/dc3-register-service.yaml"
-  kubectl create -f "${DC3_ROOT}/services/dc3-monitor-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-auth-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-gateway-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-manager-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-mongo-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-mysql-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-nginx-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-opcua-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-portainer-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-rabbitmq-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-redis-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-resource-service.yaml"
-  #kubectl create -f "${DC3_ROOT}/services/dc3-rtmp-service.yaml"
+  kubectl apply -f "${DC3_ROOT}/ingress/dc3-ingress.yaml"
 
 }
 
-function create_deployments {
+function create_network() {
 
-  kubectl create -f "${DC3_ROOT}/deployments/dc3-register-deployment.yaml"
-  sleep 10
-  kubectl create -f "${DC3_ROOT}/deployments/dc3-monitor-deployment.yaml"
-  sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-auth-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-gateway-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-manager-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-mongo-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-mysql-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-nginx-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-opcua-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-portainer-client-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-rabbitmq-distro-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-redis-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-resource-deployment.yaml"
-  #sleep 10
-  #kubectl create -f "${DC3_ROOT}/deployments/dc3-rtmp-deployment.yaml"
+  kubectl apply -f "${DC3_ROOT}/network/dc3-networkpolicy.yaml"
+
+}
+
+function create_services() {
+
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-mysql-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-redis-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-mongo-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-rabbitmq-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-nginx-service.yaml"
+  kubectl apply -f "${DC3_ROOT}/services/dc3-register-service.yaml"
+  kubectl apply -f "${DC3_ROOT}/services/dc3-monitor-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-auth-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-gateway-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-manager-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-resource-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-rtmp-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-opcua-service.yaml"
+
+}
+
+function create_deployments() {
+
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-mysql-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-redis-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-mongo-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-rabbitmq-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-nginx-deployment.yaml"
+  kubectl apply -f "${DC3_ROOT}/deployments/dc3-register-deployment.yaml"
+  kubectl apply -f "${DC3_ROOT}/deployments/dc3-monitor-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-auth-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-gateway-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-manager-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-resource-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-rtmp-deployment.yaml"
+  #kubectl apply -f "${DC3_ROOT}/deployments/dc3-opcua-deployment.yaml"
 
 }
 
@@ -82,3 +73,7 @@ echo "DC3 services created successfully !"
 echo "Creating DC3 deployments now!"
 create_deployments
 echo "DC3 deployments created successfully!"
+
+echo "Creating DC3 ingress now!"
+create_ingress
+echo "DC3 ingress created successfully!"

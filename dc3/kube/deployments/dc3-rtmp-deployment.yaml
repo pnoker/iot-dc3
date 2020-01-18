@@ -1,25 +1,28 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.kompose.service: dc3-rtmp
+    dc3.service: dc3-rtmp
   namespace: dc3
   name: dc3-rtmp
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-rtmp
   template:
     metadata:
       labels:
-        io.kompose.network/dc3net: "true"
-        io.kompose.service: dc3-rtmp
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-rtmp
     spec:
       containers:
-      - image: pnoker/dc3-rtmp:3.0
-        name: dc3-rtmp
-        ports:
-        - containerPort: 8803
-        resources: {}
+        - image: pnoker/dc3-rtmp:3.0
+          name: dc3-rtmp
+          ports:
+            - containerPort: 8803
       hostname: dc3-rtmp
       restartPolicy: Always
-status: {}
