@@ -2,15 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: dc3-auth
+    dc3.service: dc3-auth
   namespace: dc3
   name: dc3-auth
 spec:
   ports:
-  - name: "8400"
-    port: 8400
-    targetPort: 8400
+    - name: "8400"
+      port: 8400
+      targetPort: 8400
   selector:
-    io.kompose.service: dc3-auth
-status:
-  loadBalancer: {}
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-auth

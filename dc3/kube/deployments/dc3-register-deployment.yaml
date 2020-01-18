@@ -1,26 +1,28 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.kompose.service: dc3-register
+    dc3.service: dc3-register
   namespace: dc3
   name: dc3-register
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-register
   template:
     metadata:
       labels:
-        io.kompose.network/dc3net: "true"
-        io.kompose.service: dc3-register
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-register
     spec:
       containers:
-      - image: pnoker/dc3-register:3.0
-        name: dc3-register
-        ports:
-        - containerPort: 8100
-          hostPort: 8100
-        resources: {}
+        - image: pnoker/dc3-register:3.0
+          name: dc3-register
+          ports:
+            - containerPort: 8100
       hostname: dc3-register
       restartPolicy: Always
-status: {}

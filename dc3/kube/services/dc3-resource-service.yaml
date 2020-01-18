@@ -2,15 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: dc3-resource
+    dc3.service: dc3-resource
   namespace: dc3
   name: dc3-resource
 spec:
   ports:
-  - name: "8800"
-    port: 8800
-    targetPort: 8800
+    - name: "8800"
+      port: 8800
+      targetPort: 8800
   selector:
-    io.kompose.service: dc3-resource
-status:
-  loadBalancer: {}
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-resource

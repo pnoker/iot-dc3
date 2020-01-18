@@ -2,17 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: dc3-monitor
+    dc3.service: dc3-monitor
   namespace: dc3
   name: dc3-monitor
 spec:
-  type: NodePort
   ports:
-  - name: "8200"
-    port: 8200
-    nodePort: 30082
-    targetPort: 8200
+    - name: "8200"
+      port: 8200
+      targetPort: 8200
   selector:
-    io.kompose.service: dc3-monitor
-status:
-  loadBalancer: {}
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-monitor

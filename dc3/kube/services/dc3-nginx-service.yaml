@@ -2,15 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: dc3-nginx
+    dc3.service: dc3-nginx
   namespace: dc3
   name: dc3-nginx
 spec:
   ports:
-  - name: "1935"
-    port: 1935
-    targetPort: 1935
+    - name: "1935"
+      port: 1935
+      targetPort: 1935
   selector:
-    io.kompose.service: dc3-nginx
-status:
-  loadBalancer: {}
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-nginx

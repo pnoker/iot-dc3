@@ -1,14 +1,15 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   namespace: dc3
   name: dc3net
 spec:
   ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          io.kompose.network/dc3net: "true"
+    - from:
+        - podSelector:
+            matchLabels:
+              dc3.network/dc3net: "true"
   podSelector:
     matchLabels:
-      io.kompose.network/dc3net: "true"
+      dc3.version: develop
+      dc3.network/dc3net: "true"

@@ -1,28 +1,31 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.kompose.service: dc3-rabbitmq
+    dc3.service: dc3-rabbitmq
   namespace: dc3
   name: dc3-rabbitmq
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-rabbitmq
   template:
     metadata:
       labels:
-        io.kompose.network/dc3net: "true"
-        io.kompose.service: dc3-rabbitmq
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-rabbitmq
     spec:
       containers:
-      - image: pnoker/dc3-rabbitmq:3.0
-        name: dc3-rabbitmq
-        ports:
-        - containerPort: 5672
-        - containerPort: 1883
-        - containerPort: 61613
-        - containerPort: 15672
-        resources: {}
+        - image: pnoker/dc3-rabbitmq:3.0
+          name: dc3-rabbitmq
+          ports:
+            - containerPort: 5672
+            - containerPort: 1883
+            - containerPort: 61613
+            - containerPort: 15672
       hostname: dc3-rabbitmq
       restartPolicy: Always
-status: {}

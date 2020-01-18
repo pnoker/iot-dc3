@@ -2,17 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: dc3-register
+    dc3.service: dc3-register
   namespace: dc3
   name: dc3-register
 spec:
-  type: NodePort
   ports:
-  - name: "8100"
-    port: 8100
-    nodePort: 30081
-    targetPort: 8100
+    - name: "8100"
+      port: 8100
+      targetPort: 8100
   selector:
-    io.kompose.service: dc3-register
-status:
-  loadBalancer: {}
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-register

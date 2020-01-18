@@ -1,25 +1,28 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.kompose.service: dc3-gateway
+    dc3.service: dc3-gateway
   namespace: dc3
   name: dc3-gateway
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-gateway
   template:
     metadata:
       labels:
-        io.kompose.network/dc3net: "true"
-        io.kompose.service: dc3-gateway
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-gateway
     spec:
       containers:
-      - image: pnoker/dc3-gateway:3.0
-        name: dc3-gateway
-        ports:
-        - containerPort: 8000
-        resources: {}
+        - image: pnoker/dc3-gateway:3.0
+          name: dc3-gateway
+          ports:
+            - containerPort: 8000
       hostname: dc3-gateway
       restartPolicy: Always
-status: {}
