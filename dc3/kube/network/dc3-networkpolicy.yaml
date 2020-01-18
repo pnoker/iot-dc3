@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: NetworkPolicy
+metadata:
+  namespace: dc3
+  name: dc3net
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          io.kompose.network/dc3net: "true"
+  podSelector:
+    matchLabels:
+      io.kompose.network/dc3net: "true"

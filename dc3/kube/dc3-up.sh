@@ -4,6 +4,18 @@ set -e
 
 DC3_ROOT=$(dirname "${BASH_SOURCE}")/
 
+function create_namespace {
+
+  kubectl create -f "${DC3_ROOT}/namespace/dc3-namespace.yaml"
+
+}
+
+function create_network {
+
+  kubectl create -f "${DC3_ROOT}/network/dc3-networkpolicy.yaml"
+
+}
+
 function create_services {
 
   kubectl create -f "${DC3_ROOT}/services/dc3-register-service.yaml"
@@ -55,6 +67,14 @@ function create_deployments {
 
 }
 
+echo "Creating DC3 namespace now!"
+create_namespace
+echo "DC3 namespace created successfully!"
+
+echo "Creating DC3 network now!"
+create_network
+echo "DC3 network created successfully!"
+
 echo "Creating DC3 services now!"
 create_services
 echo "DC3 services created successfully !"
@@ -62,4 +82,3 @@ echo "DC3 services created successfully !"
 echo "Creating DC3 deployments now!"
 create_deployments
 echo "DC3 deployments created successfully!"
-
