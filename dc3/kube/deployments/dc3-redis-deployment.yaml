@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   labels:
     dc3.service: dc3-redis
-  namespace: dc3
   name: dc3-redis
+  namespace: dc3
 spec:
   replicas: 1
   selector:
