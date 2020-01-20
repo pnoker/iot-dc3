@@ -8,8 +8,8 @@ metadata:
 
 ---
 
-kind: ConfigMap
 apiVersion: v1
+kind: ConfigMap
 metadata:
   name: nginx-configuration
   namespace: ingress-nginx
@@ -18,8 +18,8 @@ metadata:
     app.kubernetes.io/part-of: ingress-nginx
 
 ---
-kind: ConfigMap
 apiVersion: v1
+kind: ConfigMap
 metadata:
   name: tcp-services
   namespace: ingress-nginx
@@ -28,8 +28,8 @@ metadata:
     app.kubernetes.io/part-of: ingress-nginx
 
 ---
-kind: ConfigMap
 apiVersion: v1
+kind: ConfigMap
 metadata:
   name: udp-services
   namespace: ingress-nginx
@@ -288,6 +288,8 @@ metadata:
 spec:
   limits:
     - default:
+        cpu: 300m
+        memory: 200Mi
       min:
         memory: 90Mi
         cpu: 100m

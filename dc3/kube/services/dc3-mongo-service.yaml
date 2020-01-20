@@ -3,8 +3,8 @@ kind: Service
 metadata:
   labels:
     dc3.service: dc3-mongo
-  namespace: dc3
   name: dc3-mongo
+  namespace: dc3
 spec:
   ports:
     - name: "27017"

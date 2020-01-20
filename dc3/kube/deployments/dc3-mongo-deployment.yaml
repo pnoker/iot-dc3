@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   labels:
     dc3.service: dc3-mongo
-  namespace: dc3
   name: dc3-mongo
+  namespace: dc3
 spec:
   replicas: 1
   selector:

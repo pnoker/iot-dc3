@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  namespace: dc3
   name: dc3net
+  namespace: dc3
 spec:
   ingress:
     - from:
