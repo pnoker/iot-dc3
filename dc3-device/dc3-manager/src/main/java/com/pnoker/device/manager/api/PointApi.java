@@ -17,12 +17,12 @@
 package com.pnoker.device.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.device.manager.feign.GroupClient;
+import com.pnoker.api.device.manager.feign.PointClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.GroupDto;
-import com.pnoker.common.model.Group;
-import com.pnoker.device.manager.service.GroupService;
+import com.pnoker.common.dto.PointDto;
+import com.pnoker.common.model.Point;
+import com.pnoker.device.manager.service.PointService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,22 +30,22 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 设备 Client 接口实现
+ * 位号 Client 接口实现
  *
  * @author pnoker
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_GROUP_URL_PREFIX)
-public class GroupApi implements GroupClient {
+@RequestMapping(Common.Service.DC3_MANAGER_POINT_URL_PREFIX)
+public class PointApi implements PointClient {
 
     @Resource
-    private GroupService groupService;
+    private PointService pointService;
 
     @Override
-    public R<Group> add(Group group) {
+    public R<Point> add(Point point) {
         try {
-            Group add = groupService.add(group);
+            Point add = pointService.add(point);
             if (null != add) {
                 return R.ok(add);
             }
@@ -58,16 +58,16 @@ public class GroupApi implements GroupClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return groupService.delete(id) ? R.ok() : R.fail();
+            return pointService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<Group> update(Group group) {
+    public R<Point> update(Point point) {
         try {
-            Group update = groupService.update(group);
+            Point update = pointService.update(point);
             if (null != update) {
                 return R.ok(update);
             }
@@ -78,9 +78,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> selectById(Long id) {
+    public R<Point> selectById(Long id) {
         try {
-            Group select = groupService.selectById(id);
+            Point select = pointService.selectById(id);
             if (null != select) {
                 return R.ok(select);
             }
@@ -91,9 +91,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> selectByName(String name) {
+    public R<Point> selectByName(String name) {
         try {
-            Group select = groupService.selectByName(name);
+            Point select = pointService.selectByName(name);
             if (null != select) {
                 return R.ok(select);
             }
@@ -104,9 +104,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Page<Group>> list(GroupDto groupDto) {
+    public R<Page<Point>> list(PointDto pointDto) {
         try {
-            Page<Group> page = groupService.list(groupDto);
+            Page<Point> page = pointService.list(pointDto);
             if (null != page) {
                 return R.ok(page);
             }

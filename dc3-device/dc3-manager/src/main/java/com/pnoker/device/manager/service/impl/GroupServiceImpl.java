@@ -37,7 +37,7 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * 设备服务接口实现类
+ * 设备分组服务接口实现类
  *
  * @author pnoker
  */
@@ -104,7 +104,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Cacheable(value = Common.Cache.GROUP_NAME, key = "#name", unless = "#result==null")
     public Group selectByName(String name) {
-        return null;
+        LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
+        queryWrapper.like(Group::getName, name);
+        return groupMapper.selectOne(queryWrapper);
     }
 
     @Override
