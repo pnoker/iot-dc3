@@ -18,6 +18,46 @@ spring:
     user:
       name: dc3
       password: dc3
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://dc3-mysql:3306/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: ${spring.security.user.password}
+    sql-script-encoding: utf-8
+    hikari:
+      pool-name: dc3-manager-hikaricp
+      max-lifetime: 1765000
+      maximum-pool-size: 16
+      minimum-idle: 4
+  redis:
+    host: dc3-redis
+    port: 6379
+    password: ${spring.security.user.password}
+    database: 2
+    timeout: 15S
+    jedis:
+      pool:
+        max-idle: 16
+        min-idle: 4
+  transaction:
+    rollback-on-commit-failure: true
+  cache:
+    type: redis
+    cache-names: dc3-manager-cache
+    redis:
+      time-to-live: 60S
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapping
+  global-config:
+    banner: false
+    db-config:
+      table-prefix: dc3_
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
 management:
   endpoints:

@@ -60,7 +60,7 @@ services:
 
   auth:
     build:
-      context: ../dc3-auth/
+      context: ../dc3-center/dc3-auth/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-auth:3.0
     restart: always

@@ -18,10 +18,7 @@ package com.pnoker.common.model;
 
 import com.pnoker.common.model.Description;
 import com.pnoker.common.valid.Insert;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
@@ -36,6 +33,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Rtmp extends Description {
 

@@ -23,6 +23,7 @@ import com.pnoker.common.model.Rtmp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
@@ -37,6 +38,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
+@ToString(callSuper = true)
 public class RtmpDto implements Serializable, Converter<Rtmp, RtmpDto> {
     private static final long serialVersionUID = 1L;
 

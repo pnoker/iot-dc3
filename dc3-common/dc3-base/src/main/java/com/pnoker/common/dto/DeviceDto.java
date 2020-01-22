@@ -17,12 +17,11 @@
 package com.pnoker.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.pnoker.common.model.Device;
+import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.pnoker.common.model.Device;
+import lombok.*;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Device DTO
@@ -32,9 +31,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DeviceDto extends Device {
+public class DeviceDto extends Device implements Converter<Device, DeviceDto> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    @Override
+    public void convertToDo(Device device) {
+        BeanUtils.copyProperties(this, device);
+    }
+
+    @Override
+    public DeviceDto convert(Device device) {
+        BeanUtils.copyProperties(device, this);
+        return this;
+    }
 }

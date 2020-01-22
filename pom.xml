@@ -51,7 +51,6 @@
     <modules>
         <module>dc3-gateway</module>
         <module>dc3-center</module>
-        <module>dc3-auth</module>
 
         <module>dc3-transfer</module>
         <module>dc3-device</module>
@@ -197,7 +196,7 @@
             </dependency>
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-api-device</artifactId>
+                <artifactId>dc3-api-manager</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
