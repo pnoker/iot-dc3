@@ -54,6 +54,15 @@ public interface Common {
     String DEFAULT_PASSWORD = "dc3dc3";
 
     /**
+     * 属性常量
+     */
+    interface Property {
+        short READ_ONLY = 0;
+        short WRITE_ONLY = 1;
+        short READ_WRITE = 2;
+    }
+
+    /**
      * 服务名称 & 服务基地址
      */
     interface Service {
@@ -81,6 +90,10 @@ public interface Common {
         String GROUP_ID = "manager_group_id";
         String GROUP_NAME = "manager_group_name";
         String GROUP_LIST = "manager_group_list";
+
+        String DRIVER_ID = "manager_driver_id";
+        String DRIVER_NAME = "manager_driver_name";
+        String DRIVER_LIST = "manager_driver_list";
 
         String PROFILE_ID = "manager_profile_id";
         String PROFILE_NAME = "manager_profile_name";

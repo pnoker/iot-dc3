@@ -41,6 +41,7 @@ public class Point extends Description {
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
     private String name;
+
     private String type;
     private short rw;
     private String value;
@@ -51,6 +52,7 @@ public class Point extends Description {
     private boolean accrue;
     private String format;
     private String unit;
-    @NotNull(message = "profile id can't be empty", groups = {Insert.class})
+
+    @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
     private Long profileId;
 }

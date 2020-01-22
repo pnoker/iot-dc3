@@ -20,10 +20,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.DeviceDto;
+import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.dto.ProfileDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Device;
+import com.pnoker.common.model.Driver;
+import com.pnoker.common.model.Point;
 import com.pnoker.common.model.Profile;
 import com.pnoker.device.manager.mapper.ProfileMapper;
+import com.pnoker.device.manager.service.DeviceService;
+import com.pnoker.device.manager.service.DriverService;
+import com.pnoker.device.manager.service.PointService;
 import com.pnoker.device.manager.service.ProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +53,15 @@ import java.util.Optional;
 @Service
 public class ProfileServiceImpl implements ProfileService {
     @Resource
+    private DriverService driverService;
+
+    @Resource
+    private DeviceService deviceService;
+
+    @Resource
+    private PointService pointService;
+
+    @Resource
     private ProfileMapper profileMapper;
 
     @Override
@@ -56,9 +73,13 @@ public class ProfileServiceImpl implements ProfileService {
             evict = {@CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Profile add(Profile profile) {
+        Driver driver = driverService.selectById(profile.getDriverId());
+        if (null == driver) {
+            throw new ServiceException("driver does not exist");
+        }
         Profile select = selectByName(profile.getName());
         if (null != select) {
-            throw new ServiceException("位号已存在");
+            throw new ServiceException("profile already exists");
         }
         if (profileMapper.insert(profile) > 0) {
             return profileMapper.selectById(profile.getId());
@@ -75,6 +96,20 @@ public class ProfileServiceImpl implements ProfileService {
             }
     )
     public boolean delete(Long id) {
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setProfileId(id);
+        Page<Device> devicePage = deviceService.list(deviceDto);
+        if (devicePage.getTotal() > 0) {
+            throw new ServiceException("profile already bound by the device");
+        }
+
+        PointDto pointDto = new PointDto();
+        pointDto.setProfileId(id);
+        Page<Point> pointPage = pointService.list(pointDto);
+        if (pointPage.getTotal() > 0) {
+            throw new ServiceException("profile already bound by the point");
+        }
+
         return profileMapper.deleteById(id) > 0;
     }
 

@@ -41,8 +41,10 @@ public class Profile extends Description {
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
     private String name;
+
     private boolean share;
     private String config;
-    @NotNull(message = "driver id can't be empty", groups = {Insert.class})
+
+    @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
     private Long driverId;
 }

@@ -51,14 +51,14 @@ public class PointServiceImpl implements PointService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_ID, key = "#point.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_NAME, key = "#point.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_NAME, key = "#point.name+'.'+#point.name", condition = "#result!=null")
             },
             evict = {@CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Point add(Point point) {
-        Point select = selectByName(point.getName());
+        Point select = selectByProfileAndName(point.getProfileId(), point.getName());
         if (null != select) {
-            throw new ServiceException("位号已存在");
+            throw new ServiceException("point already exists");
         }
         if (pointMapper.insert(point) > 0) {
             return pointMapper.selectById(point.getId());
@@ -82,11 +82,18 @@ public class PointServiceImpl implements PointService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_ID, key = "#point.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_NAME, key = "#point.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_NAME, key = "#point.profileId+'.'+#point.name", condition = "#result!=null")
             },
             evict = {@CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result==true")}
     )
     public Point update(Point point) {
+        Point selectById = pointMapper.selectById(point.getId());
+        if (!selectById.getProfileId().equals(point.getProfileId()) || !selectById.getName().equals(point.getName())) {
+            Point select = selectByProfileAndName(point.getProfileId(), point.getName());
+            if (null != select) {
+                throw new ServiceException("point already exists");
+            }
+        }
         if (pointMapper.updateById(point) > 0) {
             Point select = selectById(point.getId());
             point.setName(select.getName());
@@ -102,10 +109,11 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_NAME, key = "#name", unless = "#result==null")
-    public Point selectByName(String name) {
+    @Cacheable(value = Common.Cache.POINT_NAME, key = "#profileId+'.'+#name", unless = "#result==null")
+    public Point selectByProfileAndName(Long profileId, String name) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        queryWrapper.like(Point::getName, name);
+        queryWrapper.eq(Point::getProfileId, profileId);
+        queryWrapper.eq(Point::getName, name);
         return pointMapper.selectOne(queryWrapper);
     }
 

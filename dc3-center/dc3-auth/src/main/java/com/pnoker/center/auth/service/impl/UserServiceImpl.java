@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     public User add(User user) {
         User select = selectByName(user.getName());
         if (null != select) {
-            throw new ServiceException("用户已存在");
+            throw new ServiceException("user already exists");
         }
         if (userMapper.insert(user) > 0) {
             return userMapper.selectById(user.getId());
