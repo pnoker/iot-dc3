@@ -16,11 +16,14 @@
 
 package com.pnoker.common.model;
 
-import com.pnoker.common.model.Description;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.pnoker.common.valid.Insert;
+import com.pnoker.common.valid.Update;
+import lombok.*;
+import lombok.experimental.Accessors;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
  * 设备表
@@ -30,11 +33,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Device extends Description {
 
+    @NotBlank(message = "name can't be empty", groups = {Insert.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
     private String name;
+
     private String code;
     private Short status;
+
+    @NotNull(message = "profile id can't be empty", groups = {Insert.class})
     private Long profileId;
+
+    @NotNull(message = "group id can't be empty", groups = {Insert.class})
+    private Long groupId;
 }

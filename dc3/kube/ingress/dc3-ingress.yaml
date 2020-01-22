@@ -4,6 +4,8 @@ metadata:
   name: dc3-ingress
   namespace: dc3
   annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
@@ -12,8 +14,8 @@ spec:
           - path: /register
             backend:
               serviceName: dc3-register
-              servicePort: 48081
+              servicePort: 8100
           - path: /monitor
             backend:
               serviceName: dc3-monitor
-              servicePort: 48082
+              servicePort: 8200

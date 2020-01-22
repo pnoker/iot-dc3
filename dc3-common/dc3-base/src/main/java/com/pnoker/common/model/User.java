@@ -17,14 +17,10 @@
 package com.pnoker.common.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.pnoker.common.model.Description;
 import com.pnoker.common.valid.Auth;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
@@ -39,6 +35,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class User extends Description {
 

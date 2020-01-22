@@ -19,9 +19,7 @@ package com.pnoker.common.dto;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -32,6 +30,8 @@ import org.springframework.beans.BeanUtils;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class UserDto extends User implements Converter<User, UserDto> {
 
     private Pages page;

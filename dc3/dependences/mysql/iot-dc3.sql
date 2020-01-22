@@ -117,7 +117,7 @@ CREATE TABLE `dc3_device`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE,
   UNIQUE INDEX `code`(`code`) USING BTREE,
   INDEX `profile_id`(`profile_id`) USING BTREE,
   INDEX `group_id`(`group_id`) USING BTREE,

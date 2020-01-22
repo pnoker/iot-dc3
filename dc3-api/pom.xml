@@ -29,7 +29,7 @@
     <description>IOT DC3 平台 Feign Client API 集合。</description>
 
     <modules>
-        <module>dc3-api-device</module>
+        <module>dc3-api-manager</module>
         <module>dc3-api-rtmp</module>
         <module>dc3-api-auth</module>
     </modules>
