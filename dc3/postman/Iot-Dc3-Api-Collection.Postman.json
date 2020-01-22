@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "183c1f95-bf25-42ff-baa3-d3dee25d56ac",
+		"_postman_id": "3deca44c-5547-4887-b8f2-ed74babf4519",
 		"name": "Dc3-Api(测试集合)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -696,7 +696,134 @@
 					"response": []
 				},
 				{
-					"name": "根据id查询用户",
+					"name": "生成用户Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"dc3\",\n    \"password\": \"dc3dc3\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8400/auth/token",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "校验用户Token是否有效",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8400/auth/token/:token",
+							"host": [
+								"localhost"
+							],
+							"port": "8400",
+							"path": [
+								"auth",
+								"token",
+								":token"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkYzMiLCJzdWIiOiJkYzMiLCJpYXQiOjE1Nzc1MjAzOTAsImV4cCI6MTU3NzU0MTk5MCwidHlwZSI6IndlYiJ9.Xov3yNSmbx9g_oGk_gLQM8QZR49zXjGaPXmaKa14yyQ"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "auth:检测token是否有效",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"rYjSHrSsjEceA78e5O+ETqlExKovs+kKLXv7x8oY6in23l94+Ypj5OXFoo1vUFl4\",\n    \"userId\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8400/auth/token/check",
+									"host": [
+										"localhost"
+									],
+									"port": "8400",
+									"path": [
+										"auth",
+										"token",
+										"check"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 19 Dec 2019 15:29:55 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
+						}
+					]
+				},
+				{
+					"name": "根据ID查询用户",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -723,7 +850,7 @@
 					"response": []
 				},
 				{
-					"name": "根据name查询用户",
+					"name": "根据用户NAME查询用户",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -921,77 +1048,19 @@
 							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
 						}
 					]
-				},
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Dc3-Devices-Api(对外)",
+			"item": [
 				{
-					"name": "auth:生成token",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"dc3\",\n    \"password\": \"dc3dc3\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8400/auth/token",
-							"host": [
-								"localhost"
-							],
-							"port": "8400",
-							"path": [
-								"auth",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "auth:检测token是否有效",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/x-www-form-urlencoded",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "localhost:8400/auth/token/:token",
-							"host": [
-								"localhost"
-							],
-							"port": "8400",
-							"path": [
-								"auth",
-								"token",
-								":token"
-							],
-							"variable": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJkYzMiLCJzdWIiOiJkYzMiLCJpYXQiOjE1Nzc1MjAzOTAsImV4cCI6MTU3NzU0MTk5MCwidHlwZSI6IndlYiJ9.Xov3yNSmbx9g_oGk_gLQM8QZR49zXjGaPXmaKa14yyQ"
-								}
-							]
-						}
-					},
-					"response": [
+					"name": "device",
+					"item": [
 						{
-							"name": "auth:检测token是否有效",
-							"originalRequest": {
+							"name": "新增设备",
+							"request": {
 								"method": "POST",
 								"header": [
 									{
@@ -1003,7 +1072,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"token\": \"rYjSHrSsjEceA78e5O+ETqlExKovs+kKLXv7x8oY6in23l94+Ypj5OXFoo1vUFl4\",\n    \"userId\": 2\n}",
+									"raw": "{\n    \"name\": \"erer\",\n    \"description\": \"测试设备\",\n    \"profileId\": -1,\n    \"groupId\": -1\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1011,125 +1080,351 @@
 									}
 								},
 								"url": {
-									"raw": "localhost:8400/auth/token/check",
+									"raw": "localhost:8600/manager/device/add",
 									"host": [
 										"localhost"
 									],
-									"port": "8400",
+									"port": "8600",
 									"path": [
-										"auth",
-										"token",
-										"check"
+										"manager",
+										"device",
+										"add"
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Transfer-Encoding",
-									"value": "chunked"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 19 Dec 2019 15:29:55 GMT"
+							"response": []
+						},
+						{
+							"name": "删除设备",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/device/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"device",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
 								}
-							],
-							"cookie": [],
-							"body": "{\n    \"ok\": true,\n    \"message\": \"ok\"\n}"
+							},
+							"response": []
+						},
+						{
+							"name": "更新设备",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"id\":3,\n    \"name\": \"erer56\",\n    \"description\": \"测试设备\",\n    \"profileId\": -1,\n    \"groupId\": -1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8600/manager/device/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"device",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "根据ID查询设备",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/device/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"device",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "根据CODE查询设备",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/device/code/:code",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"device",
+										"code",
+										":code"
+									],
+									"variable": [
+										{
+											"key": "code",
+											"value": "d5c9ccdc46c1415a82ae149636248f47"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "根据分组ID和设备NAME查询设备",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/device/group/:groupId/name/:name",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"device",
+										"group",
+										":groupId",
+										"name",
+										":name"
+									],
+									"variable": [
+										{
+											"key": "groupId",
+											"value": "-1"
+										},
+										{
+											"key": "name",
+											"value": "erer"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "设备分页&模糊查询",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"6\",\n    \"groupId\":-1,\n    \"page\": {\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8600/manager/device/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"device",
+										"list"
+									]
+								}
+							},
+							"response": []
 						}
-					]
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "Dc3-Devices-Api(对外)",
-			"item": [
-				{
-					"name": "device:device/list",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8020/device/list",
-							"host": [
-								"localhost"
-							],
-							"port": "8020",
-							"path": [
-								"device",
-								"list"
-							]
-						}
-					},
-					"response": []
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "device:device/add",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "localhost:8020/device/add",
-							"host": [
-								"localhost"
-							],
-							"port": "8020",
-							"path": [
-								"device",
-								"add"
-							]
+					"name": "group",
+					"item": [
+						{
+							"name": "新增设备分组",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"erer\",\n    \"description\": \"测试设备\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8600/manager/group/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"group",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "删除设备分组",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/group/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"group",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "更新设备分组",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"id\":1,\n    \"name\": \"erer56\",\n    \"description\": \"测试设备1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8600/manager/group/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"group",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "设备分组分页&模糊查询",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"\",\n    \"page\": {\n        \"current\": 1,\n        \"orders\": [\n            {\n                \"column\": \"id\",\n                \"asc\": false\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8600/manager/group/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"group",
+										"list"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
-				},
-				{
-					"name": "device:device/update",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "localhost:8020/device/update",
-							"host": [
-								"localhost"
-							],
-							"port": "8020",
-							"path": [
-								"device",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "device:device/delete",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "localhost:8020/device/delete",
-							"host": [
-								"localhost"
-							],
-							"port": "8020",
-							"path": [
-								"device",
-								"delete"
-							]
-						}
-					},
-					"response": []
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"protocolProfileBehavior": {}

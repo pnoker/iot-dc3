@@ -14,40 +14,34 @@
  * limitations under the License.
  */
 
-package com.pnoker.auth.service;
+package com.pnoker.device.manager.service;
 
 import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.UserDto;
-import com.pnoker.common.model.User;
+import com.pnoker.common.dto.DeviceDto;
+import com.pnoker.common.model.Device;
 
 /**
- * User服务接口
+ * Device服务接口
  *
  * @author pnoker
  */
-public interface UserService extends Service<User, UserDto> {
+public interface DeviceService extends Service<Device, DeviceDto> {
 
     /**
-     * 根据用户名查询用户
+     * 根据设备CODE查询设备
      *
-     * @param nama
-     * @return User
+     * @param code
+     * @return
      */
-    User selectByName(String nama);
+    Device selectByCode(String code);
 
     /**
-     * 根据用户名判断用户是否存在
+     * 根据设备名称和分组ID查询设备
      *
+     * @param groupId
      * @param name
-     * @return boolean
+     * @return
      */
-    boolean checkUserValid(String name);
+    Device selectDeviceByNameAndGroup(long groupId, String name);
 
-    /**
-     * 重置密码
-     *
-     * @param id
-     * @return boolean
-     */
-    boolean restPassword(Long id);
 }

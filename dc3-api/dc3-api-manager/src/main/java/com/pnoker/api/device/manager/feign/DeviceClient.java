@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DeviceClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_DEVICE_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DeviceClientHystrix.class)
 public interface DeviceClient {
 
     /**

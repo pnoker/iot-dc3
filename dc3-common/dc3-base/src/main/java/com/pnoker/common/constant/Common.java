@@ -62,7 +62,8 @@ public interface Common {
         String DC3_TOKEN_URL_PREFIX = "/auth/token";
 
         String DC3_MANAGER = "DC3_MANAGER";
-        String DC3_MANAGER_URL_PREFIX = "/device/manager";
+        String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
+        String DC3_MANAGER_GROUP_URL_PREFIX = "/manager/group";
 
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
@@ -76,10 +77,14 @@ public interface Common {
         String USER_NAME = "auth_user_name";
         String USER_LIST = "auth_user_list";
 
-        String DEVICE_ID = "device_id";
-        String DEVICE_CODE = "device_code";
-        String DEVICE_GROUP_NAME = "device_group_name";
-        String DEVICE_LIST = "device_list";
+        String DEVICE_ID = "manager_device_id";
+        String DEVICE_CODE = "manager_device_code";
+        String DEVICE_GROUP_NAME = "manager_device_group_name";
+        String DEVICE_LIST = "manager_device_list";
+
+        String GROUP_ID = "manager_group_id";
+        String GROUP_NAME = "manager_group_name";
+        String GROUP_LIST = "manager_group_list";
 
         String RTMP_ID = "transfer_rtmp_id";
         String RTMP_LIST = "transfer_rtmp_list";
