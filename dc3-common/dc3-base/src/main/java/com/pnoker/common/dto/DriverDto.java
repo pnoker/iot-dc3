@@ -14,25 +14,38 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model;
+package com.pnoker.common.dto;
 
-import com.pnoker.common.model.Description;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pnoker.common.base.Converter;
+import com.pnoker.common.bean.Pages;
+import com.pnoker.common.model.Driver;
 import lombok.*;
-import lombok.experimental.Accessors;
+import org.springframework.beans.BeanUtils;
 
 /**
- * 测点配置表
+ * Driver DTO
  *
  * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class PointProfile extends Description {
+public class DriverDto extends Driver implements Converter<Driver, DriverDto> {
 
-    private String config;
-    private Long driverId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
+
+    @Override
+    public void convertToDo(Driver driver) {
+        BeanUtils.copyProperties(this, driver);
+    }
+
+    @Override
+    public DriverDto convert(Driver driver) {
+        BeanUtils.copyProperties(driver, this);
+        return this;
+    }
 }

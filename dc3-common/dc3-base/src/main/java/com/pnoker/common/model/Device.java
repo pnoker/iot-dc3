@@ -45,9 +45,9 @@ public class Device extends Description {
     private String code;
     private Short status;
 
-    @NotNull(message = "profile id can't be empty", groups = {Insert.class})
+    @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
     private Long profileId;
 
-    @NotNull(message = "group id can't be empty", groups = {Insert.class})
+    @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
 }

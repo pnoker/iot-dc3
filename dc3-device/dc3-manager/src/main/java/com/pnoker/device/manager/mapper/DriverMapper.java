@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.device.manager.service;
+package com.pnoker.device.manager.mapper;
 
-import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.PointDto;
-import com.pnoker.common.model.Point;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pnoker.common.model.Driver;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * Point服务接口
+ * Mapper
  *
  * @author pnoker
  */
-public interface PointService extends Service<Point, PointDto> {
-
-    /**
-     * 根据位号NAME & 模板ID 查询位号
-     *
-     * @param profileId
-     * @param name
-     * @return
-     */
-    Point selectByProfileAndName(Long profileId, String name);
+@Mapper
+public interface DriverMapper extends BaseMapper<Driver> {
 }

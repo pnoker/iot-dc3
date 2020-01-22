@@ -60,7 +60,7 @@ public class DeviceServiceImpl implements DeviceService {
     public Device add(Device device) {
         Device select = selectDeviceByNameAndGroup(device.getGroupId(), device.getName());
         if (null != select) {
-            throw new ServiceException("设备已存在");
+            throw new ServiceException("device already exists");
         }
         if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
             return deviceMapper.selectById(device.getId());

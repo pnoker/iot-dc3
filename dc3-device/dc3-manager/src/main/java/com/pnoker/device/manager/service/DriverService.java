@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model;
+package com.pnoker.device.manager.service;
 
-import com.pnoker.common.model.Description;
-import lombok.*;
-import lombok.experimental.Accessors;
+import com.pnoker.common.base.Service;
+import com.pnoker.common.dto.DriverDto;
+import com.pnoker.common.model.Driver;
 
 /**
- * 设备变量表
+ * Driver服务接口
  *
  * @author pnoker
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Accessors(chain = true)
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class PointProperty extends Description {
-
-    private String name;
-    private Float base;
-    private Float minimum;
-    private Float maximum;
-    private Float multiple;
-    private Float value;
+public interface DriverService extends Service<Driver, DriverDto> {
+    /**
+     * 根据设备分组NAME查询分组
+     *
+     * @param name
+     * @return
+     */
+    Driver selectByName(String name);
 }

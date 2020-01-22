@@ -20,10 +20,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.dto.GroupDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Group;
 import com.pnoker.device.manager.mapper.GroupMapper;
+import com.pnoker.device.manager.service.DeviceService;
 import com.pnoker.device.manager.service.GroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +48,9 @@ import java.util.Optional;
 @Service
 public class GroupServiceImpl implements GroupService {
     @Resource
+    private DeviceService deviceService;
+
+    @Resource
     private GroupMapper groupMapper;
 
     @Override
@@ -58,7 +64,7 @@ public class GroupServiceImpl implements GroupService {
     public Group add(Group group) {
         Group select = selectByName(group.getName());
         if (null != select) {
-            throw new ServiceException("设备分组已存在");
+            throw new ServiceException("device group already exists");
         }
         if (groupMapper.insert(group) > 0) {
             return groupMapper.selectById(group.getId());
@@ -75,6 +81,12 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public boolean delete(Long id) {
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setGroupId(id);
+        Page<Device> devicePage = deviceService.list(deviceDto);
+        if (devicePage.getTotal() > 0) {
+            throw new ServiceException("group already bound by the device");
+        }
         return groupMapper.deleteById(id) > 0;
     }
 

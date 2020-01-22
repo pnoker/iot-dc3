@@ -1387,6 +1387,33 @@
 							"response": []
 						},
 						{
+							"name": "根据ID查询设备分组",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/group/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"group",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "设备分组分页&模糊查询",
 							"request": {
 								"method": "POST",
@@ -1416,6 +1443,127 @@
 									"path": [
 										"manager",
 										"group",
+										"list"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "point",
+					"item": [
+						{
+							"name": "新增位号",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/point/add",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"point",
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "删除位号",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/point/delete/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"point",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "更新位号",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/point/update",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"point",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "根据ID查询位号",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/point/id/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"point",
+										"id",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "位号分页&模糊查询",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8600/manager/point/list",
+									"host": [
+										"localhost"
+									],
+									"port": "8600",
+									"path": [
+										"manager",
+										"point",
 										"list"
 									]
 								}

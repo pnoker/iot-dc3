@@ -16,9 +16,13 @@
 
 package com.pnoker.common.model;
 
-import com.pnoker.common.model.Description;
+import com.pnoker.common.valid.Insert;
+import com.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 /**
  * 设备驱动表
@@ -31,10 +35,16 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DeviceDriver extends Description {
+public class Driver extends Description {
 
+    @NotBlank(message = "name can't be empty", groups = {Insert.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
     private String name;
+
+    @NotBlank(message = "service name can't be empty", groups = {Insert.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid service name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
     private String serviceName;
+
     private String connectInfo;
     private String profileInfo;
 }
