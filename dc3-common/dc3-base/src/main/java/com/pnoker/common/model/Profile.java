@@ -36,21 +36,13 @@ import javax.validation.constraints.Pattern;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Point extends Description {
+public class Profile extends Description {
 
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
     private String name;
-    private String type;
-    private short rw;
-    private String value;
-    private float base;
-    private float minimum;
-    private float maximum;
-    private float multiple;
-    private boolean accrue;
-    private String format;
-    private String unit;
-    @NotNull(message = "profile id can't be empty", groups = {Insert.class})
-    private Long profileId;
+    private boolean share;
+    private String config;
+    @NotNull(message = "driver id can't be empty", groups = {Insert.class})
+    private Long driverId;
 }

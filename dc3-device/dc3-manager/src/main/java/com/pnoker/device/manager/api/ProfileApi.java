@@ -17,12 +17,12 @@
 package com.pnoker.device.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.device.manager.feign.GroupClient;
+import com.pnoker.api.device.manager.feign.ProfileClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.GroupDto;
-import com.pnoker.common.model.Group;
-import com.pnoker.device.manager.service.GroupService;
+import com.pnoker.common.dto.ProfileDto;
+import com.pnoker.common.model.Profile;
+import com.pnoker.device.manager.service.ProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,22 +30,22 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 设备 Client 接口实现
+ * 模板Client 接口实现
  *
  * @author pnoker
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_GROUP_URL_PREFIX)
-public class GroupApi implements GroupClient {
+@RequestMapping(Common.Service.DC3_MANAGER_POINT_URL_PREFIX)
+public class ProfileApi implements ProfileClient {
 
     @Resource
-    private GroupService groupService;
+    private ProfileService profileService;
 
     @Override
-    public R<Group> add(Group group) {
+    public R<Profile> add(Profile profile) {
         try {
-            Group add = groupService.add(group);
+            Profile add = profileService.add(profile);
             if (null != add) {
                 return R.ok(add);
             }
@@ -58,16 +58,16 @@ public class GroupApi implements GroupClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return groupService.delete(id) ? R.ok() : R.fail();
+            return profileService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<Group> update(Group group) {
+    public R<Profile> update(Profile profile) {
         try {
-            Group update = groupService.update(group);
+            Profile update = profileService.update(profile);
             if (null != update) {
                 return R.ok(update);
             }
@@ -78,9 +78,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> selectById(Long id) {
+    public R<Profile> selectById(Long id) {
         try {
-            Group select = groupService.selectById(id);
+            Profile select = profileService.selectById(id);
             if (null != select) {
                 return R.ok(select);
             }
@@ -91,9 +91,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> selectByName(String name) {
+    public R<Profile> selectByName(String name) {
         try {
-            Group select = groupService.selectByName(name);
+            Profile select = profileService.selectByName(name);
             if (null != select) {
                 return R.ok(select);
             }
@@ -104,9 +104,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Page<Group>> list(GroupDto groupDto) {
+    public R<Page<Profile>> list(ProfileDto profileDto) {
         try {
-            Page<Group> page = groupService.list(groupDto);
+            Page<Profile> page = profileService.list(profileDto);
             if (null != page) {
                 return R.ok(page);
             }

@@ -17,32 +17,32 @@
 package com.pnoker.api.device.manager.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.device.manager.feign.GroupClient;
+import com.pnoker.api.device.manager.feign.PointClient;
 import com.pnoker.common.bean.R;
-import com.pnoker.common.dto.GroupDto;
-import com.pnoker.common.model.Group;
+import com.pnoker.common.dto.PointDto;
+import com.pnoker.common.model.Point;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>设备 FeignHystrix
+ * <p>位号 FeignHystrix
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class GroupClientHystrix implements FallbackFactory<GroupClient> {
+public class PointClientHystrix implements FallbackFactory<PointClient> {
 
     @Override
-    public GroupClient create(Throwable throwable) {
+    public PointClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("GroupClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("PointClientHystrix:{},hystrix服务降级处理", message, throwable);
 
-        return new GroupClient() {
+        return new PointClient() {
 
             @Override
-            public R<Group> add(Group group) {
+            public R<Point> add(Point point) {
                 return R.fail(message);
             }
 
@@ -52,22 +52,22 @@ public class GroupClientHystrix implements FallbackFactory<GroupClient> {
             }
 
             @Override
-            public R<Group> update(Group group) {
+            public R<Point> update(Point point) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Group> selectById(Long id) {
+            public R<Point> selectById(Long id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Group> selectByName(String name) {
+            public R<Point> selectByName(String name) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Group>> list(GroupDto groupDto) {
+            public R<Page<Point>> list(PointDto pointDto) {
                 return R.fail(message);
             }
         };
