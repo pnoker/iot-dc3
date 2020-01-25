@@ -40,13 +40,14 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * 设备分组服务接口实现类
+ * <p>设备分组服务接口实现类
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class GroupServiceImpl implements GroupService {
+
     @Resource
     private DeviceService deviceService;
 

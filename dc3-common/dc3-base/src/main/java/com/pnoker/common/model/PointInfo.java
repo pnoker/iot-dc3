@@ -21,10 +21,12 @@ import com.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
- * 标签关系表
+ * 驱动连接信息表
  *
  * @author pnoker
  */
@@ -34,13 +36,22 @@ import javax.validation.constraints.NotNull;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class LabelBind extends Description {
+public class PointInfo extends Description {
 
-    @NotNull(message = "label id can't be empty", groups = {Insert.class, Update.class})
-    private Long labelId;
+    @NotBlank(message = "display name can't be empty", groups = {Insert.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid display name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
+    private String displayName;
 
-    @NotNull(message = "entity id can't be empty", groups = {Insert.class, Update.class})
-    private Long entityId;
+    @NotBlank(message = "name can't be empty", groups = {Insert.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
+    private String name;
 
     private String type;
+    private String value;
+
+    @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
+    private Long driverId;
+
+    @NotNull(message = "point id can't be empty", groups = {Insert.class, Update.class})
+    private Long pointId;
 }

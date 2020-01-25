@@ -17,12 +17,12 @@
 package com.pnoker.device.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.device.manager.feign.DriverClient;
+import com.pnoker.api.device.manager.feign.LabelClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.DriverDto;
-import com.pnoker.common.model.Driver;
-import com.pnoker.device.manager.service.DriverService;
+import com.pnoker.common.dto.LabelDto;
+import com.pnoker.common.model.Label;
+import com.pnoker.device.manager.service.LabelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,22 +30,22 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * <p>驱动 Client 接口实现
+ * <p>标签 Client 接口实现
  *
  * @author pnoker
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_POINT_URL_PREFIX)
-public class DriverApi implements DriverClient {
+@RequestMapping(Common.Service.DC3_MANAGER_GROUP_URL_PREFIX)
+public class LabelApi implements LabelClient {
 
     @Resource
-    private DriverService driverService;
+    private LabelService labelService;
 
     @Override
-    public R<Driver> add(Driver driver) {
+    public R<Label> add(Label label) {
         try {
-            Driver add = driverService.add(driver);
+            Label add = labelService.add(label);
             if (null != add) {
                 return R.ok(add);
             }
@@ -58,16 +58,16 @@ public class DriverApi implements DriverClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return driverService.delete(id) ? R.ok() : R.fail();
+            return labelService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<Driver> update(Driver driver) {
+    public R<Label> update(Label label) {
         try {
-            Driver update = driverService.update(driver);
+            Label update = labelService.update(label);
             if (null != update) {
                 return R.ok(update);
             }
@@ -78,9 +78,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> selectById(Long id) {
+    public R<Label> selectById(Long id) {
         try {
-            Driver select = driverService.selectById(id);
+            Label select = labelService.selectById(id);
             if (null != select) {
                 return R.ok(select);
             }
@@ -91,9 +91,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> selectByName(String name) {
+    public R<Label> selectByName(String name) {
         try {
-            Driver select = driverService.selectByName(name);
+            Label select = labelService.selectByName(name);
             if (null != select) {
                 return R.ok(select);
             }
@@ -104,9 +104,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Page<Driver>> list(DriverDto driverDto) {
+    public R<Page<Label>> list(LabelDto labelDto) {
         try {
-            Page<Driver> page = driverService.list(driverDto);
+            Page<Label> page = labelService.list(labelDto);
             if (null != page) {
                 return R.ok(page);
             }

@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 位号 Client 接口实现
+ * <p>位号 Client 接口实现
  *
  * @author pnoker
  */
@@ -91,9 +91,9 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Point> selectByName(String name) {
+    public R<Point> selectByProfileAndName(Long profileId, String name) {
         try {
-            Point select = pointService.selectByName(name);
+            Point select = pointService.selectByProfileAndName(profileId, name);
             if (null != select) {
                 return R.ok(select);
             }

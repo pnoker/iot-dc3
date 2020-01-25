@@ -14,40 +14,23 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service;
+package com.pnoker.device.manager.service;
 
 import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.UserDto;
-import com.pnoker.common.model.User;
+import com.pnoker.common.dto.LabelDto;
+import com.pnoker.common.model.Label;
 
 /**
- * User Interface
+ * <p>Label Interface
  *
  * @author pnoker
  */
-public interface UserService extends Service<User, UserDto> {
-
+public interface LabelService extends Service<Label, LabelDto> {
     /**
-     * 根据用户名查询用户
-     *
-     * @param nama
-     * @return User
-     */
-    User selectByName(String nama);
-
-    /**
-     * 根据用户名判断用户是否存在
+     * 根据标签 NAME 查询分组
      *
      * @param name
-     * @return boolean
+     * @return
      */
-    boolean checkUserValid(String name);
-
-    /**
-     * 重置密码
-     *
-     * @param id
-     * @return boolean
-     */
-    boolean restPassword(Long id);
+    Label selectByName(String name);
 }

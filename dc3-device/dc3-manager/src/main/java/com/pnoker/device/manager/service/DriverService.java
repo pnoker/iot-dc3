@@ -21,13 +21,13 @@ import com.pnoker.common.dto.DriverDto;
 import com.pnoker.common.model.Driver;
 
 /**
- * Driver服务接口
+ * <p>Driver Interface
  *
  * @author pnoker
  */
 public interface DriverService extends Service<Driver, DriverDto> {
     /**
-     * 根据设备分组NAME查询分组
+     * 根据驱动 NAME 查询分组
      *
      * @param name
      * @return

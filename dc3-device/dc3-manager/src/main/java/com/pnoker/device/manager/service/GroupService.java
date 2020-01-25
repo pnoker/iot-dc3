@@ -21,7 +21,7 @@ import com.pnoker.common.dto.GroupDto;
 import com.pnoker.common.model.Group;
 
 /**
- * Group服务接口
+ * <p>Group Interface
  *
  * @author pnoker
  */

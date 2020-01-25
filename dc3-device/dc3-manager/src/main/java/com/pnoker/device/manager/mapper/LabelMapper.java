@@ -14,40 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service;
+package com.pnoker.device.manager.mapper;
 
-import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.UserDto;
-import com.pnoker.common.model.User;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pnoker.common.model.Label;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * User Interface
+ * Mapper
  *
  * @author pnoker
  */
-public interface UserService extends Service<User, UserDto> {
-
-    /**
-     * 根据用户名查询用户
-     *
-     * @param nama
-     * @return User
-     */
-    User selectByName(String nama);
-
-    /**
-     * 根据用户名判断用户是否存在
-     *
-     * @param name
-     * @return boolean
-     */
-    boolean checkUserValid(String name);
-
-    /**
-     * 重置密码
-     *
-     * @param id
-     * @return boolean
-     */
-    boolean restPassword(Long id);
+@Mapper
+public interface LabelMapper extends BaseMapper<Label> {
 }

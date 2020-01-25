@@ -14,40 +14,23 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service;
+package com.pnoker.device.manager.service;
 
 import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.UserDto;
-import com.pnoker.common.model.User;
+import com.pnoker.common.dto.ConnectInfoDto;
+import com.pnoker.common.model.ConnectInfo;
 
 /**
- * User Interface
+ * <p>ConnectInfo Interface
  *
  * @author pnoker
  */
-public interface UserService extends Service<User, UserDto> {
-
+public interface ConnectInfoService extends Service<ConnectInfo, ConnectInfoDto> {
     /**
-     * 根据用户名查询用户
-     *
-     * @param nama
-     * @return User
-     */
-    User selectByName(String nama);
-
-    /**
-     * 根据用户名判断用户是否存在
+     * 根据连接信息 NAME 查询分组
      *
      * @param name
-     * @return boolean
+     * @return
      */
-    boolean checkUserValid(String name);
-
-    /**
-     * 重置密码
-     *
-     * @param id
-     * @return boolean
-     */
-    boolean restPassword(Long id);
+    ConnectInfo selectByName(String name);
 }

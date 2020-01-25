@@ -21,6 +21,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
 
 /**
+ * <p>设备管理服务入口
+ *
  * @author pnoker
  */
 @EnableCaching
