@@ -14,33 +14,38 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model;
+package com.pnoker.common.dto;
 
-import com.pnoker.common.valid.Insert;
-import com.pnoker.common.valid.Update;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pnoker.common.base.Converter;
+import com.pnoker.common.bean.Pages;
+import com.pnoker.common.model.Label;
 import lombok.*;
-import lombok.experimental.Accessors;
-
-import javax.validation.constraints.NotNull;
+import org.springframework.beans.BeanUtils;
 
 /**
- * 标签关系表
+ * Label DTO
  *
  * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class LabelBind extends Description {
+public class LabelDto extends Label implements Converter<Label, LabelDto> {
 
-    @NotNull(message = "label id can't be empty", groups = {Insert.class, Update.class})
-    private Long labelId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
 
-    @NotNull(message = "entity id can't be empty", groups = {Insert.class, Update.class})
-    private Long entityId;
+    @Override
+    public void convertToDo(Label label) {
+        BeanUtils.copyProperties(this, label);
+    }
 
-    private String type;
+    @Override
+    public LabelDto convert(Label label) {
+        BeanUtils.copyProperties(label, this);
+        return this;
+    }
 }

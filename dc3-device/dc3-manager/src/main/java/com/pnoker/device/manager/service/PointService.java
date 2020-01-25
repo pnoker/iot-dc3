@@ -21,14 +21,14 @@ import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.model.Point;
 
 /**
- * Point服务接口
+ * <p>Point Interface
  *
  * @author pnoker
  */
 public interface PointService extends Service<Point, PointDto> {
 
     /**
-     * 根据位号NAME & 模板ID 查询位号
+     * 根据位号 NAME & 模板 ID 查询位号
      *
      * @param profileId
      * @param name

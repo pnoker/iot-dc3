@@ -110,6 +110,26 @@ public interface Common {
 
         String RTMP_ID = "transfer_rtmp_id";
         String RTMP_LIST = "transfer_rtmp_list";
+
+        String LABEL_ID = "manager_label_id";
+        String LABEL_NAME = "manager_label_name";
+        String LABEL_LIST = "manager_label_list";
+
+        String LABEL_BIND_ID = "manager_label_bind_id";
+        String LABEL_BIND_LIST = "manager_label_bind_list";
+
+        String CONNECT_INFO_ID = "manager_connect_info_id";
+        String CONNECT_INFO_NAME = "manager_connect_info_name";
+        String CONNECT_INFO_LIST = "manager_connect_info_list";
+
+        String PROFILE_INFO_ID = "manager_profile_info_id";
+        String PROFILE_INFO_NAME = "manager_profile_info_name";
+        String PROFILE_INFO_LIST = "manager_profile_info_list";
+
+        String POINT_INFO_ID = "manager_point_info_id";
+        String POINT_INFO_NAME = "manager_point_info_name";
+        String POINT_INFO_LIST = "manager_point_info_list";
+
     }
 
 }

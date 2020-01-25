@@ -14,33 +14,38 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model;
+package com.pnoker.common.dto;
 
-import com.pnoker.common.valid.Insert;
-import com.pnoker.common.valid.Update;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pnoker.common.base.Converter;
+import com.pnoker.common.bean.Pages;
+import com.pnoker.common.model.ConnectInfo;
 import lombok.*;
-import lombok.experimental.Accessors;
-
-import javax.validation.constraints.NotNull;
+import org.springframework.beans.BeanUtils;
 
 /**
- * 标签关系表
+ * ConnectInfo DTO
  *
  * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class LabelBind extends Description {
+public class ConnectInfoDto extends ConnectInfo implements Converter<ConnectInfo, ConnectInfoDto> {
 
-    @NotNull(message = "label id can't be empty", groups = {Insert.class, Update.class})
-    private Long labelId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
 
-    @NotNull(message = "entity id can't be empty", groups = {Insert.class, Update.class})
-    private Long entityId;
+    @Override
+    public void convertToDo(ConnectInfo info) {
+        BeanUtils.copyProperties(this, info);
+    }
 
-    private String type;
+    @Override
+    public ConnectInfoDto convert(ConnectInfo info) {
+        BeanUtils.copyProperties(info, this);
+        return this;
+    }
 }

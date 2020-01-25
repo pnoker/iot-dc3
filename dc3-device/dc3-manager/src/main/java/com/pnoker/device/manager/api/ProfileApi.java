@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 模板Client 接口实现
+ * <p>模板 Client 接口实现
  *
  * @author pnoker
  */

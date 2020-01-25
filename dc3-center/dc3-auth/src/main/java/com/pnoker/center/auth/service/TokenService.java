@@ -19,7 +19,7 @@ package com.pnoker.center.auth.service;
 import com.pnoker.common.model.User;
 
 /**
- * Token 服务接口
+ * Token Interface
  *
  * @author pnoker
  */

@@ -38,13 +38,14 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * 设备服务接口实现类
+ * <p>设备服务接口实现类
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class DeviceServiceImpl implements DeviceService {
+
     @Resource
     private DeviceMapper deviceMapper;
 

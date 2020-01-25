@@ -37,13 +37,14 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * 位号服务接口实现类
+ * <p>位号服务接口实现类
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class PointServiceImpl implements PointService {
+
     @Resource
     private PointMapper pointMapper;
 

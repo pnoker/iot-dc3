@@ -22,7 +22,7 @@ import com.pnoker.device.group.model.wia.WiaDevice;
 import java.util.List;
 
 /**
- * WiaDevice 服务接口
+ * WiaDevice Interface
  *
  * @author pnoker
  */

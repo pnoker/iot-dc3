@@ -14,40 +14,23 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.auth.service;
+package com.pnoker.device.manager.service;
 
 import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.UserDto;
-import com.pnoker.common.model.User;
+import com.pnoker.common.dto.PointInfoDto;
+import com.pnoker.common.model.PointInfo;
 
 /**
- * User Interface
+ * <p>PointInfo Interface
  *
  * @author pnoker
  */
-public interface UserService extends Service<User, UserDto> {
-
+public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
     /**
-     * 根据用户名查询用户
-     *
-     * @param nama
-     * @return User
-     */
-    User selectByName(String nama);
-
-    /**
-     * 根据用户名判断用户是否存在
+     * 根据模板 NAME 查询分组
      *
      * @param name
-     * @return boolean
+     * @return
      */
-    boolean checkUserValid(String name);
-
-    /**
-     * 重置密码
-     *
-     * @param id
-     * @return boolean
-     */
-    boolean restPassword(Long id);
+    PointInfo selectByName(String name);
 }

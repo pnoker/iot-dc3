@@ -21,13 +21,13 @@ import com.pnoker.common.dto.ProfileDto;
 import com.pnoker.common.model.Profile;
 
 /**
- * Profile服务接口
+ * <p>Profile Interface
  *
  * @author pnoker
  */
 public interface ProfileService extends Service<Profile, ProfileDto> {
     /**
-     * 根据设备分组NAME查询分组
+     * 根据模板 NAME 查询分组
      *
      * @param name
      * @return

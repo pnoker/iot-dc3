@@ -17,11 +17,11 @@
 package com.pnoker.api.device.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.device.manager.hystrix.PointClientHystrix;
+import com.pnoker.api.device.manager.hystrix.LabelClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.PointDto;
-import com.pnoker.common.model.Point;
+import com.pnoker.common.dto.LabelDto;
+import com.pnoker.common.model.Label;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -32,66 +32,65 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>位号 FeignClient
+ * <p>设备分组 FeignClient
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_POINT_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = PointClientHystrix.class)
-public interface PointClient {
+@FeignClient(path = Common.Service.DC3_MANAGER_POINT_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = LabelClientHystrix.class)
+public interface LabelClient {
 
     /**
-     * 新增 Point 记录
+     * 新增 Label 记录
      *
-     * @param point
-     * @return Point
+     * @param label
+     * @return Label
      */
     @PostMapping("/add")
-    R<Point> add(@Validated(Insert.class) @RequestBody Point point);
+    R<Label> add(@Validated(Insert.class) @RequestBody Label label);
 
     /**
-     * 根据 ID 删除 Point
+     * 根据 ID 删除 Label
      *
-     * @param id pointId
+     * @param id labelId
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Point 记录
+     * 修改 Label 记录
      *
-     * @param point
-     * @return Point
+     * @param label
+     * @return Label
      */
     @PostMapping("/update")
-    R<Point> update(@Validated(Update.class) @RequestBody Point point);
+    R<Label> update(@Validated(Update.class) @RequestBody Label label);
 
     /**
-     * 根据 ID 查询 Point
+     * 根据 ID 查询 Label
      *
      * @param id
-     * @return Point
+     * @return Label
      */
     @GetMapping("/id/{id}")
-    R<Point> selectById(@PathVariable(value = "id") Long id);
+    R<Label> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据模板 ID & 位号 Name 查询 Point
+     * 根据 Name 查询 Label
      *
-     * @param profileId
      * @param name
-     * @return Point
+     * @return Label
      */
-    @GetMapping("/profile/{profileId}/name/{name}")
-    R<Point> selectByProfileAndName(@PathVariable(value = "profileId") Long profileId, @PathVariable(value = "name") String name);
+    @GetMapping("/name/{name}")
+    R<Label> selectByName(@PathVariable(value = "name") String name);
 
     /**
-     * 分页查询 Point
+     * 分页查询 Label
      *
-     * @param pointDto
-     * @return Page<Point>
+     * @param labelDto
+     * @return Page<Label>
      */
     @PostMapping("/list")
-    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto);
+    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto);
 
 }
