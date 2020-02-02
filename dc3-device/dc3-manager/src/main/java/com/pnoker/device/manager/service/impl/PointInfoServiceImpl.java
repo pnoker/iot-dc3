@@ -93,7 +93,7 @@ public class PointInfoServiceImpl implements PointInfoService {
                     @CachePut(value = Common.Cache.POINT_INFO_ID, key = "#pointInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.POINT_INFO_NAME, key = "#pointInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result!=null")}
     )
     public PointInfo update(PointInfo pointInfo) {
         if (pointInfoMapper.updateById(pointInfo) > 0) {

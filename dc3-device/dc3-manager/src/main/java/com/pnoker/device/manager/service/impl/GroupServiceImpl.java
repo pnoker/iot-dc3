@@ -97,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
                     @CachePut(value = Common.Cache.GROUP_ID, key = "#group.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.GROUP_NAME, key = "#group.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.GROUP_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.GROUP_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Group update(Group group) {
         if (groupMapper.updateById(group) > 0) {

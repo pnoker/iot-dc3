@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_POINT_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = GroupClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_GROUP_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = GroupClientHystrix.class)
 public interface GroupClient {
 
     /**

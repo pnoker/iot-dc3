@@ -97,7 +97,7 @@ public class DriverServiceImpl implements DriverService {
                     @CachePut(value = Common.Cache.DRIVER_ID, key = "#driver.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DRIVER_NAME, key = "#driver.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DRIVER_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.DRIVER_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Driver update(Driver driver) {
         Driver selectById = driverMapper.selectById(driver.getId());

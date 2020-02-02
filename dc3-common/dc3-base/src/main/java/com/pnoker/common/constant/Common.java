@@ -72,8 +72,11 @@ public interface Common {
 
         String DC3_MANAGER = "DC3_MANAGER";
         String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
+        String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
         String DC3_MANAGER_GROUP_URL_PREFIX = "/manager/group";
+        String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
         String DC3_MANAGER_POINT_URL_PREFIX = "/manager/point";
+        String DC3_MANAGER_PROFILE_URL_PREFIX = "/manager/profile";
 
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";

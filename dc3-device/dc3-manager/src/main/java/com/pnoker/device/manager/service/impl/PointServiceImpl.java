@@ -85,7 +85,7 @@ public class PointServiceImpl implements PointService {
                     @CachePut(value = Common.Cache.POINT_ID, key = "#point.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.POINT_NAME, key = "#point.profileId+'.'+#point.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Point update(Point point) {
         Point selectById = pointMapper.selectById(point.getId());

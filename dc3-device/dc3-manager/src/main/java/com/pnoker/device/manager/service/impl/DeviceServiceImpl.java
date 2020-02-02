@@ -89,7 +89,7 @@ public class DeviceServiceImpl implements DeviceService {
                     @CachePut(value = Common.Cache.DEVICE_CODE, key = "#device.code", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DEVICE_GROUP_NAME, key = "#device.groupId+'.'+#device.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DEVICE_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.DEVICE_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Device update(Device device) {
         if (deviceMapper.updateById(device) > 0) {
