@@ -36,7 +36,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_GROUP_URL_PREFIX)
+@RequestMapping(Common.Service.DC3_MANAGER_LABEL_URL_PREFIX)
 public class LabelApi implements LabelClient {
 
     @Resource

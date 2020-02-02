@@ -97,7 +97,7 @@ public class LabelServiceImpl implements LabelService {
                     @CachePut(value = Common.Cache.LABEL_ID, key = "#label.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.LABEL_NAME, key = "#label.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.LABEL_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.LABEL_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Label update(Label label) {
         if (labelMapper.updateById(label) > 0) {

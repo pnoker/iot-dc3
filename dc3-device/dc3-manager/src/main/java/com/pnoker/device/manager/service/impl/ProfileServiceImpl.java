@@ -120,7 +120,7 @@ public class ProfileServiceImpl implements ProfileService {
                     @CachePut(value = Common.Cache.PROFILE_ID, key = "#profile.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.PROFILE_NAME, key = "#profile.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Profile update(Profile profile) {
         if (profileMapper.updateById(profile) > 0) {

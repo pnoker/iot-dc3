@@ -73,7 +73,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     @Caching(
             put = {@CachePut(value = Common.Cache.LABEL_BIND_ID, key = "#labelBind.id", condition = "#result!=null")},
-            evict = {@CacheEvict(value = Common.Cache.LABEL_BIND_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.LABEL_BIND_LIST, allEntries = true, condition = "#result!=null")}
     )
     public LabelBind update(LabelBind labelBind) {
         if (labelBindMapper.updateById(labelBind) > 0) {

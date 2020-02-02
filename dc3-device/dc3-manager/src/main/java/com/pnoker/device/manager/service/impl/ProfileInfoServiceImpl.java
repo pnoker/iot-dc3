@@ -85,7 +85,7 @@ public class ProfileInfoServiceImpl implements ProfileInfoService {
                     @CachePut(value = Common.Cache.PROFILE_INFO_ID, key = "#profileInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.PROFILE_INFO_NAME, key = "#profileInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.PROFILE_INFO_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.PROFILE_INFO_LIST, allEntries = true, condition = "#result!=null")}
     )
     public ProfileInfo update(ProfileInfo profileInfo) {
         if (profileInfoMapper.updateById(profileInfo) > 0) {

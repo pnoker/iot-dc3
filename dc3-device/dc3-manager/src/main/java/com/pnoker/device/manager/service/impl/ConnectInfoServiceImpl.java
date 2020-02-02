@@ -85,7 +85,7 @@ public class ConnectInfoServiceImpl implements ConnectInfoService {
                     @CachePut(value = Common.Cache.CONNECT_INFO_ID, key = "#connectInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.CONNECT_INFO_NAME, key = "#connectInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.CONNECT_INFO_LIST, allEntries = true, condition = "#result==true")}
+            evict = {@CacheEvict(value = Common.Cache.CONNECT_INFO_LIST, allEntries = true, condition = "#result!=null")}
     )
     public ConnectInfo update(ConnectInfo connectInfo) {
         if (connectInfoMapper.updateById(connectInfo) > 0) {
