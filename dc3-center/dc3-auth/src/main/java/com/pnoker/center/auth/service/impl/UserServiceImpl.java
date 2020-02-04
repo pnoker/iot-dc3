@@ -90,6 +90,7 @@ public class UserServiceImpl implements UserService {
             }
     )
     public User update(User user) {
+        user.setUpdateTime(null);
         if (userMapper.updateById(user) > 0) {
             User select = selectById(user.getId());
             user.setName(select.getName());

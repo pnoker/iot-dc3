@@ -43,7 +43,7 @@ public class TokenApi implements TokenClient {
     public R<String> generateToken(User user) {
         try {
             String token = tokenService.generateToken(user);
-            return null != token ? R.ok(token) : R.fail();
+            return null != token ? R.ok(token, "") : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

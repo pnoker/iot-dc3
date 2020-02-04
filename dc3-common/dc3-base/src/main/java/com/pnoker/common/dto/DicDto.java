@@ -14,37 +14,38 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.model;
+package com.pnoker.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.pnoker.common.valid.Insert;
+import com.pnoker.common.base.Converter;
+import com.pnoker.common.bean.Pages;
+import com.pnoker.common.model.Dic;
 import lombok.*;
-import lombok.experimental.Accessors;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import org.springframework.beans.BeanUtils;
 
 /**
- * 字典表
+ * Dic DTO
  *
  * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Dic extends Description {
-    @NotBlank(message = "label can't be empty", groups = {Insert.class})
-    private String label;
-
-    @NotNull(message = "value can't be empty", groups = {Insert.class})
-    private Long value;
+public class DicDto extends Dic implements Converter<Dic, DicDto> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean disabled;
+    private Pages page;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String type;
+    @Override
+    public void convertToDo(Dic dic) {
+        BeanUtils.copyProperties(this, dic);
+    }
+
+    @Override
+    public DicDto convert(Dic dic) {
+        BeanUtils.copyProperties(dic, this);
+        return this;
+    }
 }
