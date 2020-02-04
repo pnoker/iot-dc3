@@ -96,6 +96,7 @@ public class RtmpServiceImpl implements RtmpService {
             evict = {@CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result!=null")}
     )
     public Rtmp update(Rtmp rtmp) {
+        rtmp.setUpdateTime(null);
         Rtmp select = selectById(rtmp.getId());
         if (null != select) {
             Transcode transcode = TranscodePool.transcodeMap.get(rtmp.getId());

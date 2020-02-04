@@ -1,5 +1,5 @@
 server:
-  port: 8300
+  port: 8400
   undertow:
     io-threads: 2
     worker-threads: 20
@@ -26,7 +26,7 @@ spring:
     password: ${spring.security.user.password}
     sql-script-encoding: utf-8
     hikari:
-      pool-name: dc3-auth-hikaricp
+      pool-name: dc3-manager-hikaricp
       max-lifetime: 1765000
       maximum-pool-size: 16
       minimum-idle: 4
@@ -34,7 +34,7 @@ spring:
     host: dc3-redis
     port: 6379
     password: ${spring.security.user.password}
-    database: 1
+    database: 2
     timeout: 15S
     jedis:
       pool:
@@ -44,7 +44,7 @@ spring:
     rollback-on-commit-failure: true
   cache:
     type: redis
-    cache-names: dc3-auth-cache
+    cache-names: dc3-manager-cache
     redis:
       time-to-live: 60S
 
@@ -100,7 +100,7 @@ logging:
     com.netflix: ERROR
     com.pnoker: DEBUG
   file:
-    name: dc3/logs/center/${spring.application.name}.log
+    name: dc3/logs/device/${spring.application.name}.log
 
 eureka:
   instance:

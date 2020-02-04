@@ -17,12 +17,11 @@
 package com.pnoker.api.device.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.device.manager.hystrix.GroupClientHystrix;
+import com.pnoker.api.device.manager.hystrix.DicClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.GroupDto;
+import com.pnoker.common.dto.DicDto;
 import com.pnoker.common.model.Dic;
-import com.pnoker.common.model.Group;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -32,76 +31,67 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-
 /**
- * <p>设备分组 FeignClient
+ * <p>字典 FeignClient
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_GROUP_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = GroupClientHystrix.class)
-public interface GroupClient {
+@FeignClient(path = Common.Service.DC3_MANAGER_DIC_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DicClientHystrix.class)
+public interface DicClient {
 
     /**
-     * 新增 Group 记录
+     * 新增 Dic 记录
      *
-     * @param group
-     * @return Group
+     * @param dic
+     * @return Dic
      */
     @PostMapping("/add")
-    R<Group> add(@Validated(Insert.class) @RequestBody Group group);
+    R<Dic> add(@Validated(Insert.class) @RequestBody Dic dic);
 
     /**
-     * 根据 ID 删除 Group
+     * 根据 ID 删除 Dic
      *
-     * @param id groupId
+     * @param id dicId
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Group 记录
+     * 修改 Dic 记录
      *
-     * @param group
-     * @return Group
+     * @param dic
+     * @return Dic
      */
     @PostMapping("/update")
-    R<Group> update(@Validated(Update.class) @RequestBody Group group);
+    R<Dic> update(@Validated(Update.class) @RequestBody Dic dic);
 
     /**
-     * 根据 ID 查询 Group
+     * 根据 ID 查询 Dic
      *
      * @param id
-     * @return Group
+     * @return Dic
      */
     @GetMapping("/id/{id}")
-    R<Group> selectById(@PathVariable(value = "id") Long id);
+    R<Dic> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据 Name 查询 Group
+     * 根据 Name 查询 Dic
      *
-     * @param name
-     * @return Group
+     * @param label
+     * @param type
+     * @return Dic
      */
-    @GetMapping("/name/{name}")
-    R<Group> selectByName(@PathVariable(value = "name") String name);
+    @GetMapping("/label/{label}/type/{type}")
+    R<Dic> selectByLabelAndType(@PathVariable(value = "label") String label, @PathVariable(value = "type") String type);
 
     /**
-     * 查询 GroupDic
+     * 分页查询 Dic
      *
-     * @return List<Dic>
-     */
-    @GetMapping("/dic")
-    R<List<Dic>> groupDic();
-
-    /**
-     * 分页查询 Group
-     *
-     * @param groupDto
-     * @return Page<Group>
+     * @param dicDto
+     * @return Page<Dic>
      */
     @PostMapping("/list")
-    R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto);
+    R<Page<Dic>> list(@RequestBody(required = false) DicDto dicDto);
 
 }

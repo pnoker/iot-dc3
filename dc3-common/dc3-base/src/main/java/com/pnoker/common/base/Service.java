@@ -19,6 +19,8 @@ package com.pnoker.common.base;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.List;
+
 /**
  * 基础服务类接口
  *
@@ -64,6 +66,13 @@ public interface Service<T, D> {
      * @return
      */
     Page<T> list(D dto);
+
+    /**
+     * 获取字典信息
+     *
+     * @return
+     */
+    List<T> dictionary();
 
     /**
      * 统一接口 模糊查询构造器

@@ -53,11 +53,14 @@ public class Description implements Serializable {
     /**
      * 描述信息
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = Common.DATE_FORMAT, timezone = Common.TIMEZONE)
     private Date createTime;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = Common.DATE_FORMAT, timezone = Common.TIMEZONE)
     private Date updateTime;
 

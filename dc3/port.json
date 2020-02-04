@@ -17,12 +17,12 @@
         "description": "服务监控中心",
         "port": 8200
       },
-      "dc3-dbs": {
-        "description": "数据服务中心",
-        "port": 8300
-      },
       "dc3-auth": {
         "description": "权限中心",
+        "port": 8300
+      },
+      "dc3-manager": {
+        "description": "设备管理中心",
         "port": 8400
       }
     },
@@ -31,10 +31,6 @@
       "dc3-collect": {
         "description": "设备数据采集",
         "port": 8500
-      },
-      "dc3-manager": {
-        "description": "设备管理",
-        "port": 8600
       },
       "dc3-group": {
         "description": "设备组",

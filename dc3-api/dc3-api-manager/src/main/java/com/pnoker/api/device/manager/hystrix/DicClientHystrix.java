@@ -17,35 +17,32 @@
 package com.pnoker.api.device.manager.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.device.manager.feign.GroupClient;
+import com.pnoker.api.device.manager.feign.DicClient;
 import com.pnoker.common.bean.R;
-import com.pnoker.common.dto.GroupDto;
+import com.pnoker.common.dto.DicDto;
 import com.pnoker.common.model.Dic;
-import com.pnoker.common.model.Group;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
- * <p>设备 FeignHystrix
+ * <p>字典 FeignHystrix
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class GroupClientHystrix implements FallbackFactory<GroupClient> {
+public class DicClientHystrix implements FallbackFactory<DicClient> {
 
     @Override
-    public GroupClient create(Throwable throwable) {
+    public DicClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("GroupClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("DicClientHystrix:{},hystrix服务降级处理", message, throwable);
 
-        return new GroupClient() {
+        return new DicClient() {
 
             @Override
-            public R<Group> add(Group group) {
+            public R<Dic> add(Dic dic) {
                 return R.fail(message);
             }
 
@@ -55,27 +52,22 @@ public class GroupClientHystrix implements FallbackFactory<GroupClient> {
             }
 
             @Override
-            public R<Group> update(Group group) {
+            public R<Dic> update(Dic dic) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Group> selectById(Long id) {
+            public R<Dic> selectById(Long id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Group> selectByName(String name) {
+            public R<Dic> selectByLabelAndType(String label, String type) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dic>> groupDic() {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Page<Group>> list(GroupDto groupDto) {
+            public R<Page<Dic>> list(DicDto dicDto) {
                 return R.fail(message);
             }
         };

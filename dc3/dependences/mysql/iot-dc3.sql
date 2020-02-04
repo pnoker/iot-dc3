@@ -40,6 +40,11 @@ CREATE TABLE `dc3_driver`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Records of dc3_driver
+-- ----------------------------
+INSERT INTO `dc3_driver` VALUES (-1, '测试驱动', '测试驱动服务', '{}', '{}', '测试使用驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
 -- Table structure for dc3_connect_info
 -- ----------------------------
 DROP TABLE IF EXISTS `dc3_connect_info`;
@@ -98,6 +103,11 @@ CREATE TABLE `dc3_profile`  (
   INDEX `driver_id`(`driver_id`) USING BTREE,
   CONSTRAINT `dc3_profile_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备模板表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of dc3_profile
+-- ----------------------------
+INSERT INTO `dc3_profile` VALUES (-1, '测试模板', 0, '{}', -1, '测试使用模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_point
@@ -164,6 +174,10 @@ CREATE TABLE `dc3_group`  (
   UNIQUE INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备分组表' ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Records of dc3_group
+-- ----------------------------
+INSERT INTO `dc3_group` VALUES (-1, '测试分组', '测试使用分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_device
@@ -298,15 +312,14 @@ DROP TABLE IF EXISTS `dc3_dic`;
 CREATE TABLE `dc3_dic`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `label` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '字典标签',
-  `value` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '字典值',
+  `value` bigint(20) NULL DEFAULT 0 COMMENT '字典值',
   `disabled` tinyint(4) NULL DEFAULT 0 COMMENT '有效',
   `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '类型',
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
