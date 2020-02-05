@@ -87,9 +87,13 @@ public interface Common {
      * 缓存Key
      */
     interface Cache {
-        String USER_ID = "auth_user_id";
-        String USER_NAME = "auth_user_name";
-        String USER_LIST = "auth_user_list";
+        String ID = "_id";
+        String NAME = "_name";
+        String DIC = "_dic";
+        String LIST = "_list";
+
+        String USER = "auth_user";
+
 
         String GROUP_ID = "manager_group_id";
         String GROUP_NAME = "manager_group_name";
@@ -98,45 +102,56 @@ public interface Common {
 
         String DRIVER_ID = "manager_driver_id";
         String DRIVER_NAME = "manager_driver_name";
+        String DRIVER_DIC = "manager_driver_dir";
         String DRIVER_LIST = "manager_driver_list";
 
         String PROFILE_ID = "manager_profile_id";
         String PROFILE_NAME = "manager_profile_name";
+        String PROFILE_DIC = "manager_profile_dic";
         String PROFILE_LIST = "manager_profile_list";
 
         String POINT_ID = "manager_point_id";
         String POINT_NAME = "manager_point_name";
+        String POINT_DIC = "manager_point_dic";
         String POINT_LIST = "manager_point_list";
 
         String DEVICE_ID = "manager_device_id";
         String DEVICE_CODE = "manager_device_code";
+        String DEVICE_DIC = "manager_device_dic";
         String DEVICE_GROUP_NAME = "manager_device_group_name";
         String DEVICE_LIST = "manager_device_list";
 
         String RTMP_ID = "transfer_rtmp_id";
+        String RTMP_DIC = "transfer_rtmp_dic";
         String RTMP_LIST = "transfer_rtmp_list";
 
         String LABEL_ID = "manager_label_id";
         String LABEL_NAME = "manager_label_name";
+        String LABEL_DIC = "manager_label_dic";
         String LABEL_LIST = "manager_label_list";
 
         String LABEL_BIND_ID = "manager_label_bind_id";
+        String LABEL_BIND_DIC = "manager_label_bind_dic";
         String LABEL_BIND_LIST = "manager_label_bind_list";
 
         String CONNECT_INFO_ID = "manager_connect_info_id";
         String CONNECT_INFO_NAME = "manager_connect_info_name";
+        String CONNECT_INFO_DIC = "manager_connect_info_dic";
         String CONNECT_INFO_LIST = "manager_connect_info_list";
 
         String PROFILE_INFO_ID = "manager_profile_info_id";
         String PROFILE_INFO_NAME = "manager_profile_info_name";
+        String PROFILE_INFO_DIC = "manager_profile_info_dic";
         String PROFILE_INFO_LIST = "manager_profile_info_list";
 
         String POINT_INFO_ID = "manager_point_info_id";
         String POINT_INFO_NAME = "manager_point_info_name";
+        String POINT_INFO_DIC = "manager_point_info_dic";
         String POINT_INFO_LIST = "manager_point_info_list";
 
         String DIC_ID = "manager_dic_id";
         String DIC_LABEL_TYPE = "manager_dic_label_type";
+        String DIC_DIC = "manager_dic_dic";
         String DIC_LIST = "manager_dic_list";
 
     }

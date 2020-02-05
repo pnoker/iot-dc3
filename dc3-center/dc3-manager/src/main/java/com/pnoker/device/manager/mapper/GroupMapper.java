@@ -17,12 +17,8 @@
 package com.pnoker.device.manager.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
 
 /**
  * Mapper
@@ -31,11 +27,4 @@ import java.util.List;
  */
 @Mapper
 public interface GroupMapper extends BaseMapper<Group> {
-    /**
-     * 查询设备分组字典列表
-     *
-     * @return
-     */
-    @Select("select id, name as label, id as value from dc3_group where deleted=0")
-    List<Dic> groupDic();
 }

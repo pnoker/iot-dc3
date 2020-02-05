@@ -19,8 +19,10 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.LabelBindDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.LabelBind;
 import com.pnoker.device.manager.mapper.LabelBindMapper;
 import com.pnoker.device.manager.service.LabelBindService;
@@ -33,6 +35,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -50,7 +53,10 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     @Caching(
             put = {@CachePut(value = Common.Cache.LABEL_BIND_ID, key = "#labelBind.id", condition = "#result!=null")},
-            evict = {@CacheEvict(value = Common.Cache.LABEL_BIND_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.LABEL_BIND_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.LABEL_BIND_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public LabelBind add(LabelBind labelBind) {
         if (labelBindMapper.insert(labelBind) > 0) {
@@ -63,6 +69,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.LABEL_BIND_ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.LABEL_BIND_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.LABEL_BIND_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -73,7 +80,10 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     @Caching(
             put = {@CachePut(value = Common.Cache.LABEL_BIND_ID, key = "#labelBind.id", condition = "#result!=null")},
-            evict = {@CacheEvict(value = Common.Cache.LABEL_BIND_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.LABEL_BIND_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.LABEL_BIND_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public LabelBind update(LabelBind labelBind) {
         labelBind.setUpdateTime(null);
@@ -92,7 +102,17 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     @Cacheable(value = Common.Cache.LABEL_BIND_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<LabelBind> list(LabelBindDto labelBindDto) {
+        if (!Optional.ofNullable(labelBindDto.getPage()).isPresent()) {
+            labelBindDto.setPage(new Pages());
+        }
         return labelBindMapper.selectPage(labelBindDto.getPage().convert(), fuzzyQuery(labelBindDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.LABEL_BIND_DIC, key = "'label_bind_dic'", unless = "#result==null")
+    public List<LabelBind> dictionary() {
+        LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
+        return labelBindMapper.selectList(queryWrapper);
     }
 
     @Override

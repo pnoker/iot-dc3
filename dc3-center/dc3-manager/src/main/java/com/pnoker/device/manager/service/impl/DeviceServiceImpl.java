@@ -18,8 +18,10 @@ package com.pnoker.device.manager.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.exception.ServiceException;
@@ -35,6 +37,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -56,7 +59,10 @@ public class DeviceServiceImpl implements DeviceService {
                     @CachePut(value = Common.Cache.DEVICE_CODE, key = "#device.code", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DEVICE_GROUP_NAME, key = "#device.groupId+'.'+#device.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DEVICE_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.DEVICE_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Device add(Device device) {
         Device select = selectDeviceByNameAndGroup(device.getGroupId(), device.getName());
@@ -74,6 +80,7 @@ public class DeviceServiceImpl implements DeviceService {
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE_CODE, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DEVICE_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE_GROUP_NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE_LIST, allEntries = true, condition = "#result==true")
             }
@@ -89,7 +96,10 @@ public class DeviceServiceImpl implements DeviceService {
                     @CachePut(value = Common.Cache.DEVICE_CODE, key = "#device.code", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DEVICE_GROUP_NAME, key = "#device.groupId+'.'+#device.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DEVICE_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.DEVICE_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Device update(Device device) {
         device.setCode(null);
@@ -128,7 +138,17 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Cacheable(value = Common.Cache.DEVICE_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Device> list(DeviceDto deviceDto) {
+        if (!Optional.ofNullable(deviceDto.getPage()).isPresent()) {
+            deviceDto.setPage(new Pages());
+        }
         return deviceMapper.selectPage(deviceDto.getPage().convert(), fuzzyQuery(deviceDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DEVICE_DIC, key = "'device_dic'", unless = "#result==null")
+    public List<Device> dictionary() {
+        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
+        return deviceMapper.selectList(queryWrapper);
     }
 
     @Override

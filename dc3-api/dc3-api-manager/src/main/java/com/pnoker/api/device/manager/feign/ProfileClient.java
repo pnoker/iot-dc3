@@ -21,6 +21,7 @@ import com.pnoker.api.device.manager.hystrix.ProfileClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ProfileDto;
+import com.pnoker.common.model.Driver;
 import com.pnoker.common.model.Profile;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -30,6 +31,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * <p>位号 FeignClient
@@ -92,5 +95,13 @@ public interface ProfileClient {
      */
     @PostMapping("/list")
     R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto);
+
+    /**
+     * 查询 Profile 字典
+     *
+     * @return List<Profile>
+     */
+    @GetMapping("/dictionary")
+    R<List<Profile>> dictionary();
 
 }

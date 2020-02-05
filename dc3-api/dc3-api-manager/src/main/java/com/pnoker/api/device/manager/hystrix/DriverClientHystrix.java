@@ -25,6 +25,8 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * <p>驱动 FeignHystrix
  *
@@ -68,6 +70,11 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
 
             @Override
             public R<Page<Driver>> list(DriverDto driverDto) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<Driver>> dictionary() {
                 return R.fail(message);
             }
         };

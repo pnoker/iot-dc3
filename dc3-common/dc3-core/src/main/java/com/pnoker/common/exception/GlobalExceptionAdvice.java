@@ -16,6 +16,7 @@
 
 package com.pnoker.common.exception;
 
+import com.alibaba.fastjson.JSON;
 import com.pnoker.common.bean.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -69,7 +70,7 @@ public class GlobalExceptionAdvice {
             log.warn("Method Argument Not Valid Exception:{}({})", error.getField(), error.getDefaultMessage());
             map.put(error.getField(), error.getDefaultMessage());
         });
-        return R.fail(map);
+        return R.fail(JSON.toJSONString(map));
     }
 
 }

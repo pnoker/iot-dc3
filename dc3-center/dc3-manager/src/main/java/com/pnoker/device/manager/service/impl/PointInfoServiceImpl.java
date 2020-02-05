@@ -19,20 +19,13 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.DeviceDto;
-import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.dto.PointInfoDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Driver;
-import com.pnoker.common.model.Point;
 import com.pnoker.common.model.PointInfo;
 import com.pnoker.device.manager.mapper.PointInfoMapper;
-import com.pnoker.device.manager.service.DeviceService;
-import com.pnoker.device.manager.service.DriverService;
 import com.pnoker.device.manager.service.PointInfoService;
-import com.pnoker.device.manager.service.PointService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -42,6 +35,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -62,7 +56,10 @@ public class PointInfoServiceImpl implements PointInfoService {
                     @CachePut(value = Common.Cache.POINT_INFO_ID, key = "#pointInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.POINT_INFO_NAME, key = "#pointInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.POINT_INFO_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public PointInfo add(PointInfo pointInfo) {
         PointInfo select = selectByName(pointInfo.getName());
@@ -80,6 +77,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -93,7 +91,10 @@ public class PointInfoServiceImpl implements PointInfoService {
                     @CachePut(value = Common.Cache.POINT_INFO_ID, key = "#pointInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.POINT_INFO_NAME, key = "#pointInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.POINT_INFO_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public PointInfo update(PointInfo pointInfo) {
         pointInfo.setUpdateTime(null);
@@ -122,7 +123,17 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Override
     @Cacheable(value = Common.Cache.POINT_INFO_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<PointInfo> list(PointInfoDto pointInfoDto) {
+        if (!Optional.ofNullable(pointInfoDto.getPage()).isPresent()) {
+            pointInfoDto.setPage(new Pages());
+        }
         return pointInfoMapper.selectPage(pointInfoDto.getPage().convert(), fuzzyQuery(pointInfoDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.POINT_INFO_DIC, key = "'point_info_dic'", unless = "#result==null")
+    public List<PointInfo> dictionary() {
+        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
+        return pointInfoMapper.selectList(queryWrapper);
     }
 
     @Override

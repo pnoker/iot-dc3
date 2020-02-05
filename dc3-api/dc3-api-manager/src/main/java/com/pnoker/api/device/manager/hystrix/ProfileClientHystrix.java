@@ -25,6 +25,8 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * <p>位号 FeignHystrix
  *
@@ -68,6 +70,11 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
 
             @Override
             public R<Page<Profile>> list(ProfileDto profileDto) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<Profile>> dictionary() {
                 return R.fail(message);
             }
         };

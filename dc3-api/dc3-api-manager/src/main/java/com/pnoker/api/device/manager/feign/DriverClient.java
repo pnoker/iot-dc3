@@ -22,6 +22,7 @@ import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
 import com.pnoker.common.model.Driver;
+import com.pnoker.common.model.Group;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -30,6 +31,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * <p>驱动 FeignClient
@@ -93,4 +96,11 @@ public interface DriverClient {
     @PostMapping("/list")
     R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto);
 
+    /**
+     * 查询 Driver 字典
+     *
+     * @return List<Driver>
+     */
+    @GetMapping("/dictionary")
+    R<List<Driver>> dictionary();
 }

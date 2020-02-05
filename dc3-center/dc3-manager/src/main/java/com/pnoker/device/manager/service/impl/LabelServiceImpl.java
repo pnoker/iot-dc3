@@ -19,6 +19,7 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.LabelBindDto;
 import com.pnoker.common.dto.LabelDto;
@@ -37,6 +38,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -60,7 +62,10 @@ public class LabelServiceImpl implements LabelService {
                     @CachePut(value = Common.Cache.LABEL_ID, key = "#label.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.LABEL_NAME, key = "#label.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.LABEL_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.LABEL_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.LABEL_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Label add(Label label) {
         Label select = selectByName(label.getName());
@@ -78,6 +83,7 @@ public class LabelServiceImpl implements LabelService {
             evict = {
                     @CacheEvict(value = Common.Cache.LABEL_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.LABEL_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.LABEL_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.LABEL_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -97,7 +103,10 @@ public class LabelServiceImpl implements LabelService {
                     @CachePut(value = Common.Cache.LABEL_ID, key = "#label.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.LABEL_NAME, key = "#label.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.LABEL_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.LABEL_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.LABEL_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Label update(Label label) {
         label.setUpdateTime(null);
@@ -126,7 +135,17 @@ public class LabelServiceImpl implements LabelService {
     @Override
     @Cacheable(value = Common.Cache.LABEL_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Label> list(LabelDto labelDto) {
+        if (!Optional.ofNullable(labelDto.getPage()).isPresent()) {
+            labelDto.setPage(new Pages());
+        }
         return labelMapper.selectPage(labelDto.getPage().convert(), fuzzyQuery(labelDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.LABEL_DIC, key = "'label_dic'", unless = "#result==null")
+    public List<Label> dictionary() {
+        LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
+        return labelMapper.selectList(queryWrapper);
     }
 
     @Override

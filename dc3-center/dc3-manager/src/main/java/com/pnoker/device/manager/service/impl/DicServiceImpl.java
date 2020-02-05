@@ -19,9 +19,11 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DicDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Dic;
 import com.pnoker.device.manager.mapper.DicMapper;
 import com.pnoker.device.manager.service.DicService;
@@ -34,6 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -54,7 +57,10 @@ public class DicServiceImpl implements DicService {
                     @CachePut(value = Common.Cache.DIC_ID, key = "#dic.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DIC_LABEL_TYPE, key = "#dic.label+'.'+#dic.type", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DIC_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.DIC_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DIC_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Dic add(Dic dic) {
         Dic select = selectByLabelAndType(dic.getLabel(), dic.getType());
@@ -72,6 +78,7 @@ public class DicServiceImpl implements DicService {
             evict = {
                     @CacheEvict(value = Common.Cache.DIC_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DIC_LABEL_TYPE, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DIC_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DIC_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -85,7 +92,10 @@ public class DicServiceImpl implements DicService {
                     @CachePut(value = Common.Cache.DIC_ID, key = "#dic.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DIC_LABEL_TYPE, key = "#dic.label+'.'+#dic.type", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DIC_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.DIC_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DIC_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Dic update(Dic dic) {
         dic.setUpdateTime(null);
@@ -115,7 +125,17 @@ public class DicServiceImpl implements DicService {
     @Override
     @Cacheable(value = Common.Cache.DIC_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Dic> list(DicDto dicDto) {
+        if (!Optional.ofNullable(dicDto.getPage()).isPresent()) {
+            dicDto.setPage(new Pages());
+        }
         return dicMapper.selectPage(dicDto.getPage().convert(), fuzzyQuery(dicDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DIC_DIC, key = "'dic_dic'", unless = "#result==null")
+    public List<Dic> dictionary() {
+        LambdaQueryWrapper<Dic> queryWrapper = Wrappers.<Dic>query().lambda();
+        return dicMapper.selectList(queryWrapper);
     }
 
     @Override

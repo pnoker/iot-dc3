@@ -19,9 +19,11 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ProfileInfoDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Point;
 import com.pnoker.common.model.ProfileInfo;
 import com.pnoker.device.manager.mapper.ProfileInfoMapper;
 import com.pnoker.device.manager.service.ProfileInfoService;
@@ -34,6 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -54,7 +57,10 @@ public class ProfileInfoServiceImpl implements ProfileInfoService {
                     @CachePut(value = Common.Cache.PROFILE_INFO_ID, key = "#profileInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.PROFILE_INFO_NAME, key = "#profileInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.PROFILE_INFO_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_INFO_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_INFO_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public ProfileInfo add(ProfileInfo profileInfo) {
         ProfileInfo select = selectByName(profileInfo.getName());
@@ -72,6 +78,7 @@ public class ProfileInfoServiceImpl implements ProfileInfoService {
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE_INFO_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_INFO_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_INFO_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_INFO_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -85,7 +92,10 @@ public class ProfileInfoServiceImpl implements ProfileInfoService {
                     @CachePut(value = Common.Cache.PROFILE_INFO_ID, key = "#profileInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.PROFILE_INFO_NAME, key = "#profileInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.PROFILE_INFO_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_INFO_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_INFO_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public ProfileInfo update(ProfileInfo profileInfo) {
         profileInfo.setUpdateTime(null);
@@ -114,7 +124,17 @@ public class ProfileInfoServiceImpl implements ProfileInfoService {
     @Override
     @Cacheable(value = Common.Cache.PROFILE_INFO_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<ProfileInfo> list(ProfileInfoDto profileInfoDto) {
+        if (!Optional.ofNullable(profileInfoDto.getPage()).isPresent()) {
+            profileInfoDto.setPage(new Pages());
+        }
         return profileInfoMapper.selectPage(profileInfoDto.getPage().convert(), fuzzyQuery(profileInfoDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.PROFILE_INFO_DIC, key = "'profile_info_dic'", unless = "#result==null")
+    public List<ProfileInfo> dictionary() {
+        LambdaQueryWrapper<ProfileInfo> queryWrapper = Wrappers.<ProfileInfo>query().lambda();
+        return profileInfoMapper.selectList(queryWrapper);
     }
 
     @Override

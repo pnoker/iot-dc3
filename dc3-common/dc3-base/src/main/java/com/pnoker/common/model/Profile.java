@@ -39,7 +39,7 @@ import javax.validation.constraints.Pattern;
 public class Profile extends Description {
 
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{2,32}$", message = "invalid name , /^[a-zA-Z]\\w{2,32}$/", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5]{2,32}$", message = "invalid name , /^[A-Za-z0-9\\u4e00-\\u9fa5]{2,32}$/", groups = {Insert.class, Update.class})
     private String name;
 
     private boolean share;

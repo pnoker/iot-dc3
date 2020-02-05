@@ -19,6 +19,7 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
 import com.pnoker.common.dto.ProfileDto;
@@ -37,6 +38,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -60,7 +62,10 @@ public class DriverServiceImpl implements DriverService {
                     @CachePut(value = Common.Cache.DRIVER_ID, key = "#driver.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DRIVER_NAME, key = "#driver.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DRIVER_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.DRIVER_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DRIVER_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Driver add(Driver driver) {
         Driver select = selectByName(driver.getName());
@@ -78,6 +83,7 @@ public class DriverServiceImpl implements DriverService {
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DRIVER_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -97,7 +103,10 @@ public class DriverServiceImpl implements DriverService {
                     @CachePut(value = Common.Cache.DRIVER_ID, key = "#driver.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DRIVER_NAME, key = "#driver.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.DRIVER_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.DRIVER_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DRIVER_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Driver update(Driver driver) {
         driver.setUpdateTime(null);
@@ -130,7 +139,17 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Driver> list(DriverDto driverDto) {
+        if (!Optional.ofNullable(driverDto.getPage()).isPresent()) {
+            driverDto.setPage(new Pages());
+        }
         return driverMapper.selectPage(driverDto.getPage().convert(), fuzzyQuery(driverDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DRIVER_DIC, key = "'dirver_dic'", unless = "#result==null")
+    public List<Driver> dictionary() {
+        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
+        return driverMapper.selectList(queryWrapper);
     }
 
     @Override
