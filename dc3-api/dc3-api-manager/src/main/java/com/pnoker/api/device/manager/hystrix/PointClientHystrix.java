@@ -62,7 +62,7 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
             }
 
             @Override
-            public R<Point> selectByProfileAndName(Long profileId, String name) {
+            public R<Point> selectByNameAndProfile(Long profileId, String name) {
                 return R.fail(message);
             }
 

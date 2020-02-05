@@ -91,9 +91,9 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Point> selectByProfileAndName(Long profileId, String name) {
+    public R<Point> selectByNameAndProfile(Long profileId, String name) {
         try {
-            Point select = pointService.selectByProfileAndName(profileId, name);
+            Point select = pointService.selectByNameAndProfile(profileId, name);
             if (null != select) {
                 return R.ok(select);
             }

@@ -18,7 +18,6 @@ package com.pnoker.device.manager.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.bean.Pages;
@@ -67,7 +66,7 @@ public class DeviceServiceImpl implements DeviceService {
     public Device add(Device device) {
         Device select = selectDeviceByNameAndGroup(device.getGroupId(), device.getName());
         if (null != select) {
-            throw new ServiceException("device already exists");
+            throw new ServiceException("device already exists in the group");
         }
         if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
             return deviceMapper.selectById(device.getId());

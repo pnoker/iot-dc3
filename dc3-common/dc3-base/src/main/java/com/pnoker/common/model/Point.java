@@ -43,13 +43,13 @@ public class Point extends Description {
     private String name;
 
     private String type;
-    private short rw;
+    private Short rw;
     private String value;
-    private float base;
-    private float minimum;
-    private float maximum;
-    private float multiple;
-    private boolean accrue;
+    private Float base;
+    private Float minimum;
+    private Float maximum;
+    private Float multiple;
+    private Boolean accrue;
     private String format;
     private String unit;
 

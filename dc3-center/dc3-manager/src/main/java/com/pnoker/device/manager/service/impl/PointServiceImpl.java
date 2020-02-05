@@ -62,9 +62,9 @@ public class PointServiceImpl implements PointService {
             }
     )
     public Point add(Point point) {
-        Point select = selectByProfileAndName(point.getProfileId(), point.getName());
+        Point select = selectByNameAndProfile(point.getProfileId(), point.getName());
         if (null != select) {
-            throw new ServiceException("point already exists");
+            throw new ServiceException("point already exists in the profile");
         }
         if (pointMapper.insert(point) > 0) {
             return pointMapper.selectById(point.getId());
@@ -100,7 +100,7 @@ public class PointServiceImpl implements PointService {
         point.setUpdateTime(null);
         Point selectById = pointMapper.selectById(point.getId());
         if (!selectById.getProfileId().equals(point.getProfileId()) || !selectById.getName().equals(point.getName())) {
-            Point select = selectByProfileAndName(point.getProfileId(), point.getName());
+            Point select = selectByNameAndProfile(point.getProfileId(), point.getName());
             if (null != select) {
                 throw new ServiceException("point already exists");
             }
@@ -121,10 +121,10 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT_NAME, key = "#profileId+'.'+#name", unless = "#result==null")
-    public Point selectByProfileAndName(Long profileId, String name) {
+    public Point selectByNameAndProfile(Long profileId, String name) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        queryWrapper.eq(Point::getProfileId, profileId);
         queryWrapper.eq(Point::getName, name);
+        queryWrapper.eq(Point::getProfileId, profileId);
         return pointMapper.selectOne(queryWrapper);
     }
 
@@ -150,6 +150,18 @@ public class PointServiceImpl implements PointService {
         Optional.ofNullable(pointDto).ifPresent(dto -> {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Point::getName, dto.getName());
+            }
+            if (null != dto.getProfileId()) {
+                queryWrapper.eq(Point::getProfileId, dto.getProfileId());
+            }
+            if (StringUtils.isNotBlank(dto.getType())) {
+                queryWrapper.eq(Point::getType, dto.getType());
+            }
+            if (null != dto.getRw()) {
+                queryWrapper.eq(Point::getRw, dto.getRw());
+            }
+            if (null != dto.getAccrue()) {
+                queryWrapper.eq(Point::getAccrue, dto.getAccrue());
             }
         });
         return queryWrapper;
