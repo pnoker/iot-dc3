@@ -83,7 +83,7 @@ public interface PointClient {
      * @return Point
      */
     @GetMapping("/profile/{profileId}/name/{name}")
-    R<Point> selectByProfileAndName(@PathVariable(value = "profileId") Long profileId, @PathVariable(value = "name") String name);
+    R<Point> selectByNameAndProfile(@PathVariable(value = "profileId") Long profileId, @PathVariable(value = "name") String name);
 
     /**
      * 分页查询 Point

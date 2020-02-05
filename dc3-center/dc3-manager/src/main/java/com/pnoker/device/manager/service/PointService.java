@@ -34,5 +34,5 @@ public interface PointService extends Service<Point, PointDto> {
      * @param name
      * @return
      */
-    Point selectByProfileAndName(Long profileId, String name);
+    Point selectByNameAndProfile(Long profileId, String name);
 }

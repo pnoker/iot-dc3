@@ -65,7 +65,7 @@ public class DicServiceImpl implements DicService {
     public Dic add(Dic dic) {
         Dic select = selectByLabelAndType(dic.getLabel(), dic.getType());
         if (null != select) {
-            throw new ServiceException("dic already exists");
+            throw new ServiceException("dic label already exists in the type");
         }
         if (dicMapper.insert(dic) > 0) {
             return dicMapper.selectById(dic.getId());
