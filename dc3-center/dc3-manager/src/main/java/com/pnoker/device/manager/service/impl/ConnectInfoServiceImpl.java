@@ -19,6 +19,7 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ConnectInfoDto;
 import com.pnoker.common.exception.ServiceException;
@@ -34,6 +35,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -54,7 +56,10 @@ public class ConnectInfoServiceImpl implements ConnectInfoService {
                     @CachePut(value = Common.Cache.CONNECT_INFO_ID, key = "#connectInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.CONNECT_INFO_NAME, key = "#connectInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.CONNECT_INFO_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.CONNECT_INFO_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.CONNECT_INFO_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public ConnectInfo add(ConnectInfo connectInfo) {
         ConnectInfo select = selectByName(connectInfo.getName());
@@ -72,6 +77,7 @@ public class ConnectInfoServiceImpl implements ConnectInfoService {
             evict = {
                     @CacheEvict(value = Common.Cache.CONNECT_INFO_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.CONNECT_INFO_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.CONNECT_INFO_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.CONNECT_INFO_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -85,7 +91,10 @@ public class ConnectInfoServiceImpl implements ConnectInfoService {
                     @CachePut(value = Common.Cache.CONNECT_INFO_ID, key = "#connectInfo.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.CONNECT_INFO_NAME, key = "#connectInfo.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.CONNECT_INFO_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.CONNECT_INFO_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.CONNECT_INFO_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public ConnectInfo update(ConnectInfo connectInfo) {
         connectInfo.setUpdateTime(null);
@@ -114,7 +123,17 @@ public class ConnectInfoServiceImpl implements ConnectInfoService {
     @Override
     @Cacheable(value = Common.Cache.CONNECT_INFO_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<ConnectInfo> list(ConnectInfoDto connectInfoDto) {
+        if (!Optional.ofNullable(connectInfoDto.getPage()).isPresent()) {
+            connectInfoDto.setPage(new Pages());
+        }
         return connectInfoMapper.selectPage(connectInfoDto.getPage().convert(), fuzzyQuery(connectInfoDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.CONNECT_INFO_DIC, key = "'connection_info_dic'", unless = "#result==null")
+    public List<ConnectInfo> dictionary() {
+        LambdaQueryWrapper<ConnectInfo> queryWrapper = Wrappers.<ConnectInfo>query().lambda();
+        return connectInfoMapper.selectList(queryWrapper);
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package com.pnoker.common.bean;
 
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,8 @@ import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 基础查询类，其中包括分页以及排序
@@ -39,10 +42,12 @@ public class Pages implements Serializable {
 
     private long current = 1;
     private long size = 20;
+    private List<OrderItem> orders = new ArrayList<>();
 
     public <T> Page<T> convert() {
         Page<T> page = new Page<>();
         BeanUtils.copyProperties(this, page);
+        page.getOrders().add(OrderItem.desc("create_time"));
         return page;
     }
 

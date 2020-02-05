@@ -19,6 +19,7 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.dto.PointDto;
@@ -42,6 +43,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -71,7 +73,10 @@ public class ProfileServiceImpl implements ProfileService {
                     @CachePut(value = Common.Cache.PROFILE_ID, key = "#profile.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.PROFILE_NAME, key = "#profile.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Profile add(Profile profile) {
         Driver driver = driverService.selectById(profile.getDriverId());
@@ -93,6 +98,7 @@ public class ProfileServiceImpl implements ProfileService {
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -120,7 +126,10 @@ public class ProfileServiceImpl implements ProfileService {
                     @CachePut(value = Common.Cache.PROFILE_ID, key = "#profile.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.PROFILE_NAME, key = "#profile.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Profile update(Profile profile) {
         profile.setUpdateTime(null);
@@ -149,7 +158,17 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Cacheable(value = Common.Cache.PROFILE_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Profile> list(ProfileDto profileDto) {
+        if (!Optional.ofNullable(profileDto.getPage()).isPresent()) {
+            profileDto.setPage(new Pages());
+        }
         return profileMapper.selectPage(profileDto.getPage().convert(), fuzzyQuery(profileDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.PROFILE_DIC, key = "'profile_dic'", unless = "#result==null")
+    public List<Profile> dictionary() {
+        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
+        return profileMapper.selectList(queryWrapper);
     }
 
     @Override

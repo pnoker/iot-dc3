@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.auth.mapper.UserMapper;
 import com.pnoker.center.auth.service.UserService;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.UserDto;
 import com.pnoker.common.exception.ServiceException;
@@ -34,6 +35,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,10 +53,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.USER_ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER_NAME, key = "#user.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.USER + Common.Cache.ID, key = "#user.id", condition = "#result!=null"),
+                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.USER_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public User add(User user) {
         User select = selectByName(user.getName());
@@ -70,9 +75,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.USER_ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.USER_NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.USER_LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -82,11 +88,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.USER_ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER_NAME, key = "#user.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.USER + Common.Cache.ID, key = "#user.id", condition = "#result!=null"),
+                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.USER_LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public User update(User user) {
@@ -100,13 +107,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER_ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = Common.Cache.USER + Common.Cache.ID, key = "#id", unless = "#result==null")
     public User selectById(Long id) {
         return userMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER_NAME, key = "#name", unless = "#result==null")
+    @Cacheable(value = Common.Cache.USER + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public User selectByName(String name) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda()
                 .eq(User::getName, name)
@@ -115,9 +122,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = Common.Cache.USER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<User> list(UserDto userDto) {
+        if (!Optional.ofNullable(userDto.getPage()).isPresent()) {
+            userDto.setPage(new Pages());
+        }
         return userMapper.selectPage(userDto.getPage().convert(), fuzzyQuery(userDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.USER + Common.Cache.DIC, key = "'user_dic'", unless = "#result==null")
+    public List<User> dictionary() {
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
+        return userMapper.selectList(queryWrapper);
     }
 
     @Override

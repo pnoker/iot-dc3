@@ -22,12 +22,14 @@ import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
 import com.pnoker.common.model.Driver;
+import com.pnoker.common.model.Group;
 import com.pnoker.device.manager.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>驱动 Client 接口实现
@@ -109,6 +111,19 @@ public class DriverApi implements DriverClient {
             Page<Driver> page = driverService.list(driverDto);
             if (null != page) {
                 return R.ok(page);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<Driver>> dictionary() {
+        try {
+            List<Driver> list = driverService.dictionary();
+            if (null != list) {
+                return R.ok(list);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());

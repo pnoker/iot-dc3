@@ -21,7 +21,6 @@ import com.pnoker.api.device.manager.hystrix.GroupClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.GroupDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -88,14 +87,6 @@ public interface GroupClient {
     R<Group> selectByName(@PathVariable(value = "name") String name);
 
     /**
-     * 查询 GroupDic
-     *
-     * @return List<Dic>
-     */
-    @GetMapping("/dic")
-    R<List<Dic>> groupDic();
-
-    /**
      * 分页查询 Group
      *
      * @param groupDto
@@ -104,4 +95,11 @@ public interface GroupClient {
     @PostMapping("/list")
     R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto);
 
+    /**
+     * 查询 Group 字典
+     *
+     * @return List<Group>
+     */
+    @GetMapping("/dictionary")
+    R<List<Group>> dictionary();
 }

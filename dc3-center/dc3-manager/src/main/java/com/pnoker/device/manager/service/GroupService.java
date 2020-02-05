@@ -37,10 +37,4 @@ public interface GroupService extends Service<Group, GroupDto> {
      */
     Group selectByName(String name);
 
-    /**
-     * 获取设备分组字典信息
-     *
-     * @return
-     */
-    List<Dic> groupDic();
 }

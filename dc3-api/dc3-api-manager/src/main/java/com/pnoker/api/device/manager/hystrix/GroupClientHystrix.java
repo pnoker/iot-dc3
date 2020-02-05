@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.device.manager.feign.GroupClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.GroupDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -70,12 +69,12 @@ public class GroupClientHystrix implements FallbackFactory<GroupClient> {
             }
 
             @Override
-            public R<List<Dic>> groupDic() {
+            public R<Page<Group>> list(GroupDto groupDto) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Group>> list(GroupDto groupDto) {
+            public R<List<Group>> dictionary() {
                 return R.fail(message);
             }
         };

@@ -19,12 +19,12 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.dto.GroupDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import com.pnoker.device.manager.mapper.GroupMapper;
 import com.pnoker.device.manager.service.DeviceService;
@@ -62,7 +62,10 @@ public class GroupServiceImpl implements GroupService {
                     @CachePut(value = Common.Cache.GROUP_ID, key = "#group.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.GROUP_NAME, key = "#group.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.GROUP_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.GROUP_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.GROUP_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Group add(Group group) {
         Group select = selectByName(group.getName());
@@ -130,15 +133,19 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP_DIC, key = "'group_dic'", unless = "#result==null")
-    public List<Dic> groupDic() {
-        return groupMapper.groupDic();
+    @Cacheable(value = Common.Cache.GROUP_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public Page<Group> list(GroupDto groupDto) {
+        if (!Optional.ofNullable(groupDto.getPage()).isPresent()) {
+            groupDto.setPage(new Pages());
+        }
+        return groupMapper.selectPage(groupDto.getPage().convert(), fuzzyQuery(groupDto));
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Page<Group> list(GroupDto groupDto) {
-        return groupMapper.selectPage(groupDto.getPage().convert(), fuzzyQuery(groupDto));
+    @Cacheable(value = Common.Cache.GROUP_DIC, key = "'group_dic'", unless = "#result==null")
+    public List<Group> dictionary() {
+        LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
+        return groupMapper.selectList(queryWrapper);
     }
 
     @Override

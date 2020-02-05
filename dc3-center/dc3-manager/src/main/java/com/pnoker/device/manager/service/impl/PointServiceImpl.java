@@ -19,6 +19,7 @@ package com.pnoker.device.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.exception.ServiceException;
@@ -34,6 +35,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -54,7 +56,10 @@ public class PointServiceImpl implements PointService {
                     @CachePut(value = Common.Cache.POINT_ID, key = "#point.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.POINT_NAME, key = "#point.name+'.'+#point.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.POINT_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Point add(Point point) {
         Point select = selectByProfileAndName(point.getProfileId(), point.getName());
@@ -72,6 +77,7 @@ public class PointServiceImpl implements PointService {
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -85,7 +91,10 @@ public class PointServiceImpl implements PointService {
                     @CachePut(value = Common.Cache.POINT_ID, key = "#point.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.POINT_NAME, key = "#point.profileId+'.'+#point.name", condition = "#result!=null")
             },
-            evict = {@CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result!=null")}
+            evict = {
+                    @CacheEvict(value = Common.Cache.POINT_DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_LIST, allEntries = true, condition = "#result!=null")
+            }
     )
     public Point update(Point point) {
         point.setUpdateTime(null);
@@ -122,7 +131,17 @@ public class PointServiceImpl implements PointService {
     @Override
     @Cacheable(value = Common.Cache.POINT_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Point> list(PointDto pointDto) {
+        if (!Optional.ofNullable(pointDto.getPage()).isPresent()) {
+            pointDto.setPage(new Pages());
+        }
         return pointMapper.selectPage(pointDto.getPage().convert(), fuzzyQuery(pointDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.POINT_DIC, key = "'point_dic'", unless = "#result==null")
+    public List<Point> dictionary() {
+        LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
+        return pointMapper.selectList(queryWrapper);
     }
 
     @Override
