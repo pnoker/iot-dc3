@@ -22,6 +22,8 @@ import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.model.Device;
+import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.Group;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -30,6 +32,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * <p>设备 FeignClient
@@ -102,5 +106,13 @@ public interface DeviceClient {
      */
     @PostMapping("/list")
     R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto);
+
+    /**
+     * 查询 Device 字典
+     *
+     * @return List<Device>
+     */
+    @GetMapping("/dictionary")
+    R<List<Dic>> dictionary();
 
 }

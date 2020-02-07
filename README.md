@@ -1,6 +1,6 @@
 :boom: 非常欢迎广大兴趣爱好者的加入，第一时间 [联系作者](#6-联系作者)，`show me you code`，让我们肩并肩 :alien:！
 >
-:rocket: 说明：项目目前处于代码整合阶段，预计元旦左右能完事，敬请关注，你的 `Star` :star: [ [GitHub](https://github.com/pnoker/iot-dc3) , [Gitee](https://gitee.com/pnoker/iot-dc3) ]，是我们动力的源泉，谢谢你们 :tada:！
+:rocket: 说明：项目目前处于代码整合阶段，敬请关注，你的 `Star` :star: [ [GitHub](https://github.com/pnoker/iot-dc3) , [Gitee](https://gitee.com/pnoker/iot-dc3) ]，是我们动力的源泉，谢谢你们 :tada:！
 
 <p align="center">
     <img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
@@ -77,3 +77,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 > 文档持续更新中...
 
 **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
+
+### 5 关于WEB UI
+
+![iot-dc3-web-login](dc3/images/iot-dc3-web-login.gif)

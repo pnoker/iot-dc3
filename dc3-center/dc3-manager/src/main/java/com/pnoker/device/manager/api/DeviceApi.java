@@ -22,12 +22,14 @@ import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.model.Device;
+import com.pnoker.common.model.Dic;
 import com.pnoker.device.manager.service.DeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>设备 Client 接口实现
@@ -122,6 +124,19 @@ public class DeviceApi implements DeviceClient {
             Page<Device> page = deviceService.list(deviceDto);
             if (null != page) {
                 return R.ok(page);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<Dic>> dictionary() {
+        try {
+            List<Dic> list = deviceService.dictionary();
+            if (null != list) {
+                return R.ok(list);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());

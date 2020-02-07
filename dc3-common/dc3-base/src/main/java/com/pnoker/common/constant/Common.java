@@ -71,12 +71,15 @@ public interface Common {
         String DC3_TOKEN_URL_PREFIX = "/auth/token";
 
         String DC3_MANAGER = "DC3_MANAGER";
-        String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
         String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
-        String DC3_MANAGER_GROUP_URL_PREFIX = "/manager/group";
-        String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
-        String DC3_MANAGER_POINT_URL_PREFIX = "/manager/point";
+        String DC3_MANAGER_CONNECT_INFO_URL_PREFIX = "/manager/connectInfo";
+        String DC3_MANAGER_PROFILE_INFO_URL_PREFIX = "/manager/profileInfo";
         String DC3_MANAGER_PROFILE_URL_PREFIX = "/manager/profile";
+        String DC3_MANAGER_POINT_URL_PREFIX = "/manager/point";
+        String DC3_MANAGER_GROUP_URL_PREFIX = "/manager/group";
+        String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
+        String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/pointInfo";
+        String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
         String DC3_MANAGER_DIC_URL_PREFIX = "/manager/dic";
 
         String DC3_RTMP = "DC3-RTMP";
@@ -145,7 +148,7 @@ public interface Common {
         String PROFILE_INFO_LIST = "manager_profile_info_list";
 
         String POINT_INFO_ID = "manager_point_info_id";
-        String POINT_INFO_NAME = "manager_point_info_name";
+        String POINT_INFO_PROFILE_INFO_ID = "manager_point_info_profile_info_id";
         String POINT_INFO_DIC = "manager_point_info_dic";
         String POINT_INFO_LIST = "manager_point_info_list";
 

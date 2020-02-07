@@ -16,6 +16,7 @@
 
 package com.pnoker.common.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.valid.Insert;
 import lombok.*;
@@ -23,6 +24,8 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 字典表
@@ -46,5 +49,11 @@ public class Dic extends Description {
     private Boolean disabled;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean expand = true;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
+
+    @TableField(exist = false)
+    private List<Dic> children = new ArrayList<>();
 }

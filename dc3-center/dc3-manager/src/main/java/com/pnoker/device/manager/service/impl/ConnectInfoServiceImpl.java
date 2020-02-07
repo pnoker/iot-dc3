@@ -24,6 +24,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ConnectInfoDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.ConnectInfo;
+import com.pnoker.common.model.Dic;
 import com.pnoker.device.manager.mapper.ConnectInfoMapper;
 import com.pnoker.device.manager.service.ConnectInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -131,9 +132,10 @@ public class ConnectInfoServiceImpl implements ConnectInfoService {
 
     @Override
     @Cacheable(value = Common.Cache.CONNECT_INFO_DIC, key = "'connection_info_dic'", unless = "#result==null")
-    public List<ConnectInfo> dictionary() {
-        LambdaQueryWrapper<ConnectInfo> queryWrapper = Wrappers.<ConnectInfo>query().lambda();
-        return connectInfoMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        /*LambdaQueryWrapper<ConnectInfo> queryWrapper = Wrappers.<ConnectInfo>query().lambda();
+        return connectInfoMapper.selectList(queryWrapper);*/
+        return null;
     }
 
     @Override

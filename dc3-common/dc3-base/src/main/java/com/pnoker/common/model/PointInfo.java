@@ -21,9 +21,7 @@ import com.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 /**
  * 驱动连接信息表
@@ -38,19 +36,13 @@ import javax.validation.constraints.Pattern;
 @EqualsAndHashCode(callSuper = true)
 public class PointInfo extends Description {
 
-    @NotBlank(message = "display name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5]{2,32}$", message = "invalid display name , /^[A-Za-z0-9\\u4e00-\\u9fa5]{2,32}$/", groups = {Insert.class, Update.class})
-    private String displayName;
+    @NotNull(message = "profine info id can't be empty", groups = {Insert.class, Update.class})
+    private Long profileInfoId;
 
-    @NotBlank(message = "name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5]{2,32}$", message = "invalid name , /^[A-Za-z0-9\\u4e00-\\u9fa5]{2,32}$/", groups = {Insert.class, Update.class})
-    private String name;
-
-    private String type;
     private String value;
 
-    @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
-    private Long driverId;
+    @NotNull(message = "device id can't be empty", groups = {Insert.class, Update.class})
+    private Long deviceId;
 
     @NotNull(message = "point id can't be empty", groups = {Insert.class, Update.class})
     private Long pointId;

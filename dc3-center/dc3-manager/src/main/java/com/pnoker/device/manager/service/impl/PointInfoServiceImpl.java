@@ -23,11 +23,11 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointInfoDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.PointInfo;
 import com.pnoker.device.manager.mapper.PointInfoMapper;
 import com.pnoker.device.manager.service.PointInfoService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -54,7 +54,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO_ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO_NAME, key = "#pointInfo.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO_PROFILE_INFO_ID, key = "#pointInfo.profileInfoId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO_DIC, allEntries = true, condition = "#result!=null"),
@@ -62,7 +62,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo add(PointInfo pointInfo) {
-        PointInfo select = selectByName(pointInfo.getName());
+        PointInfo select = selectByProfileInfoID(pointInfo.getProfileInfoId());
         if (null != select) {
             throw new ServiceException("point info already exists");
         }
@@ -76,7 +76,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO_ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_INFO_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO_PROFILE_INFO_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO_DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO_LIST, allEntries = true, condition = "#result==true")
             }
@@ -89,7 +89,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO_ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO_NAME, key = "#pointInfo.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO_PROFILE_INFO_ID, key = "#pointInfo.profileInfoId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO_DIC, allEntries = true, condition = "#result!=null"),
@@ -100,7 +100,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         pointInfo.setUpdateTime(null);
         if (pointInfoMapper.updateById(pointInfo) > 0) {
             PointInfo select = selectById(pointInfo.getId());
-            pointInfo.setName(select.getName());
+            pointInfo.setProfileInfoId(select.getProfileInfoId());
             return select;
         }
         return null;
@@ -113,10 +113,10 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_INFO_NAME, key = "#name", unless = "#result==null")
-    public PointInfo selectByName(String name) {
+    @Cacheable(value = Common.Cache.POINT_INFO_PROFILE_INFO_ID, key = "#id", unless = "#result==null")
+    public PointInfo selectByProfileInfoID(Long id) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        queryWrapper.like(PointInfo::getName, name);
+        queryWrapper.like(PointInfo::getProfileInfoId, id);
         return pointInfoMapper.selectOne(queryWrapper);
     }
 
@@ -131,17 +131,24 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT_INFO_DIC, key = "'point_info_dic'", unless = "#result==null")
-    public List<PointInfo> dictionary() {
-        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        return pointInfoMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        /*LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
+        return pointInfoMapper.selectList(queryWrapper);*/
+        return null;
     }
 
     @Override
     public LambdaQueryWrapper<PointInfo> fuzzyQuery(PointInfoDto pointInfoDto) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         Optional.ofNullable(pointInfoDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(PointInfo::getName, dto.getName());
+            if (null != dto.getProfileInfoId()) {
+                queryWrapper.eq(PointInfo::getProfileInfoId, dto.getProfileInfoId());
+            }
+            if (null != dto.getDeviceId()) {
+                queryWrapper.eq(PointInfo::getDeviceId, dto.getDeviceId());
+            }
+            if (null != dto.getPointId()) {
+                queryWrapper.eq(PointInfo::getPointId, dto.getPointId());
             }
         });
         return queryWrapper;

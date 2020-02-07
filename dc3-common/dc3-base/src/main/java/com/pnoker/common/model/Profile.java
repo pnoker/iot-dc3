@@ -43,7 +43,6 @@ public class Profile extends Description {
     private String name;
 
     private boolean share;
-    private String config;
 
     @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
     private Long driverId;

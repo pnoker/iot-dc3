@@ -110,9 +110,10 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     @Cacheable(value = Common.Cache.LABEL_BIND_DIC, key = "'label_bind_dic'", unless = "#result==null")
-    public List<LabelBind> dictionary() {
-        LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
-        return labelBindMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        /*LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
+        return labelBindMapper.selectList(queryWrapper);*/
+        return null;
     }
 
     @Override

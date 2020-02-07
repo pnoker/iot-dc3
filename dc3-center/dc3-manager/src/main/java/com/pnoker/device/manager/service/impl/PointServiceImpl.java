@@ -16,6 +16,7 @@
 
 package com.pnoker.device.manager.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,9 +24,11 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Point;
 import com.pnoker.device.manager.mapper.PointMapper;
 import com.pnoker.device.manager.service.PointService;
+import com.pnoker.device.manager.service.ProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,6 +38,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +50,9 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PointServiceImpl implements PointService {
+
+    @Resource
+    private ProfileService profileService;
 
     @Resource
     private PointMapper pointMapper;
@@ -139,9 +146,26 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT_DIC, key = "'point_dic'", unless = "#result==null")
-    public List<Point> dictionary() {
-        LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        return pointMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        List<Dic> profileDicList = profileService.dictionary();
+        for (Dic driverDic : profileDicList) {
+            for (Dic profileDic : driverDic.getChildren()) {
+                List<Dic> dicList = new ArrayList<>();
+                LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
+                queryWrapper.eq(Point::getProfileId, profileDic.getValue());
+                List<Point> pointList = pointMapper.selectList(queryWrapper);
+                profileDic.setDisabled(true);
+                profileDic.setValue(RandomUtil.randomLong());
+                for (Point point : pointList) {
+                    Dic pointDic = new Dic().setLabel(point.getName()).setValue(point.getId());
+                    dicList.add(pointDic);
+                }
+                profileDic.setChildren(dicList);
+            }
+            driverDic.setDisabled(true);
+            driverDic.setValue(RandomUtil.randomLong());
+        }
+        return profileDicList;
     }
 
     @Override
@@ -151,11 +175,11 @@ public class PointServiceImpl implements PointService {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Point::getName, dto.getName());
             }
-            if (null != dto.getProfileId()) {
-                queryWrapper.eq(Point::getProfileId, dto.getProfileId());
-            }
             if (StringUtils.isNotBlank(dto.getType())) {
                 queryWrapper.eq(Point::getType, dto.getType());
+            }
+            if (null != dto.getProfileId()) {
+                queryWrapper.eq(Point::getProfileId, dto.getProfileId());
             }
             if (null != dto.getRw()) {
                 queryWrapper.eq(Point::getRw, dto.getRw());

@@ -21,6 +21,7 @@ import com.pnoker.api.device.manager.hystrix.DriverClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Driver;
 import com.pnoker.common.model.Group;
 import com.pnoker.common.valid.Insert;
@@ -102,5 +103,5 @@ public interface DriverClient {
      * @return List<Driver>
      */
     @GetMapping("/dictionary")
-    R<List<Driver>> dictionary();
+    R<List<Dic>> dictionary();
 }
