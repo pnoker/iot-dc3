@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.device.manager.feign.ProfileClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.ProfileDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Profile;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,7 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
             }
 
             @Override
-            public R<List<Profile>> dictionary() {
+            public R<List<Dic>> dictionary() {
                 return R.fail(message);
             }
         };

@@ -29,20 +29,13 @@ CREATE TABLE `dc3_driver`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT ' 协议名称',
   `service_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '协议服务名称',
-  `connect_info` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '设备驱动连接属性',
-  `profile_info` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '设备位号配置属性',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of dc3_driver
--- ----------------------------
-INSERT INTO `dc3_driver` VALUES (-1, '测试驱动', '测试驱动服务', '{}', '{}', '测试使用驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '协议驱动表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_connect_info
@@ -62,7 +55,7 @@ CREATE TABLE `dc3_connect_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `driver_id`(`driver_id`) USING BTREE,
   CONSTRAINT `dc3_connect_info_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '连接配置信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_profile_info
@@ -82,7 +75,7 @@ CREATE TABLE `dc3_profile_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `driver_id`(`driver_id`) USING BTREE,
   CONSTRAINT `dc3_profile_info_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '模板配置信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_profile
@@ -92,7 +85,6 @@ CREATE TABLE `dc3_profile`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '模板名称',
   `share` tinyint(4) NULL DEFAULT 0 COMMENT '公有/私有模板标识',
-  `config` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '位号配置信息，Json字符串',
   `driver_id` bigint(20) NOT NULL COMMENT '设备驱动ID',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
@@ -103,11 +95,6 @@ CREATE TABLE `dc3_profile`  (
   INDEX `driver_id`(`driver_id`) USING BTREE,
   CONSTRAINT `dc3_profile_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备模板表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of dc3_profile
--- ----------------------------
-INSERT INTO `dc3_profile` VALUES (-1, '测试模板', 0, '{}', -1, '测试使用模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_point
@@ -142,10 +129,8 @@ CREATE TABLE `dc3_point`  (
 DROP TABLE IF EXISTS `dc3_point_info`;
 CREATE TABLE `dc3_point_info`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `display_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '显示名称',
-  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '名称',
-  `type` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '类型',
-  `value` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '默认值',
+  `profile_info_id` bigint(20) NOT NULL COMMENT '模板配置ID',
+  `value` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '值',
   `device_id` bigint(20) NOT NULL COMMENT '设备ID',
   `point_id` bigint(20) NOT NULL COMMENT '位号ID',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
@@ -153,10 +138,12 @@ CREATE TABLE `dc3_point_info`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
+  INDEX `profile_info_id`(`profile_info_id`) USING BTREE,
   INDEX `device_id`(`device_id`) USING BTREE,
   INDEX `point_id`(`point_id`) USING BTREE,
-  CONSTRAINT `dc3_point_info_ibfk_1` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `dc3_point_info_ibfk_2` FOREIGN KEY (`point_id`) REFERENCES `dc3_point` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `dc3_point_info_ibfk_1` FOREIGN KEY (`profile_info_id`) REFERENCES `dc3_profile_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_point_info_ibfk_2` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_point_info_ibfk_3` FOREIGN KEY (`point_id`) REFERENCES `dc3_point` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -173,11 +160,6 @@ CREATE TABLE `dc3_group`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备分组表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of dc3_group
--- ----------------------------
-INSERT INTO `dc3_group` VALUES (-1, '测试分组', '测试使用分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_device
@@ -221,11 +203,6 @@ CREATE TABLE `dc3_user`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of dc3_user
--- ----------------------------
-INSERT INTO `dc3_user` VALUES (-1, 'pnoker', 'dc3dc3dc3', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-
--- ----------------------------
 -- Table structure for dc3_rtmp
 -- ----------------------------
 DROP TABLE IF EXISTS `dc3_rtmp`;
@@ -245,12 +222,6 @@ CREATE TABLE `dc3_rtmp`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'rtmp表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of dc3_rtmp
--- ----------------------------
-INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0,'本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for dc3_schedule
@@ -321,5 +292,53 @@ CREATE TABLE `dc3_dic`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of dc3_driver
+-- ----------------------------
+INSERT INTO `dc3_driver` VALUES (-1, '测试驱动', '测试驱动服务', '测试使用驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_connect_info
+-- ----------------------------
+INSERT INTO `dc3_connect_info` VALUES (-2, '主机', 'host', 'string', 'localhost', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_connect_info` VALUES (-1, '端口', 'port', 'string', '8888', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_profile_info
+-- ----------------------------
+INSERT INTO `dc3_profile_info` VALUES (-1, '位号', 'name', 'string', 'tag', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_profile
+-- ----------------------------
+INSERT INTO `dc3_profile` VALUES (-1, '测试模板', 0, -1, '测试使用模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_group
+-- ----------------------------
+INSERT INTO `dc3_group` VALUES (-1, '测试分组', '测试使用分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_device
+-- ----------------------------
+INSERT INTO `dc3_device` VALUES (-1, '测试设备', 'd1b60e969d3e4a26931a935e8ec62b44', 2, -1, -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_point
+-- ----------------------------
+INSERT INTO `dc3_point` VALUES (-1, '温度', 'string', 0, '--', 0, -999999, 999999, 1, 0, '#.##', '℃', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_user
+-- ----------------------------
+INSERT INTO `dc3_user` VALUES (-1, 'pnoker', 'dc3dc3dc3', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_rtmp
+-- ----------------------------
+INSERT INTO `dc3_rtmp` VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_online', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_rtmp` VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_local', '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0,'本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
 
 SET FOREIGN_KEY_CHECKS = 1;

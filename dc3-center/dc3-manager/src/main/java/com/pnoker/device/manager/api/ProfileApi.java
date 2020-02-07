@@ -21,6 +21,7 @@ import com.pnoker.api.device.manager.feign.ProfileClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ProfileDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Driver;
 import com.pnoker.common.model.Profile;
 import com.pnoker.device.manager.service.ProfileService;
@@ -119,9 +120,9 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<List<Profile>> dictionary() {
+    public R<List<Dic>> dictionary() {
         try {
-            List<Profile> list = profileService.dictionary();
+            List<Dic> list = profileService.dictionary();
             if (null != list) {
                 return R.ok(list);
             }

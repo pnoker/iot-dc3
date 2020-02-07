@@ -20,10 +20,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.device.manager.feign.PointClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.PointDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Point;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * <p>位号 FeignHystrix
@@ -68,6 +71,11 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
 
             @Override
             public R<Page<Point>> list(PointDto pointDto) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<Dic>> dictionary() {
                 return R.fail(message);
             }
         };

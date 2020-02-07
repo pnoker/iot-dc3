@@ -25,6 +25,7 @@ import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.dto.GroupDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Device;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import com.pnoker.device.manager.mapper.GroupMapper;
 import com.pnoker.device.manager.service.DeviceService;
@@ -38,6 +39,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,9 +145,15 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Cacheable(value = Common.Cache.GROUP_DIC, key = "'group_dic'", unless = "#result==null")
-    public List<Group> dictionary() {
+    public List<Dic> dictionary() {
+        List<Dic> dicList = new ArrayList<>();
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        return groupMapper.selectList(queryWrapper);
+        List<Group> groupList = groupMapper.selectList(queryWrapper);
+        for (Group group : groupList) {
+            Dic groupDic = new Dic().setLabel(group.getName()).setValue(group.getId());
+            dicList.add(groupDic);
+        }
+        return dicList;
     }
 
     @Override

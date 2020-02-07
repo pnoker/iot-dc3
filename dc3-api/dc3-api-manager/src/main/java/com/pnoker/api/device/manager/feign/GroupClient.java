@@ -21,6 +21,7 @@ import com.pnoker.api.device.manager.hystrix.GroupClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.GroupDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -101,5 +102,5 @@ public interface GroupClient {
      * @return List<Group>
      */
     @GetMapping("/dictionary")
-    R<List<Group>> dictionary();
+    R<List<Dic>> dictionary();
 }

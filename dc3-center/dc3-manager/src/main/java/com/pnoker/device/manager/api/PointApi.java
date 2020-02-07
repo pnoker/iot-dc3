@@ -21,6 +21,8 @@ import com.pnoker.api.device.manager.feign.PointClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointDto;
+import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.Group;
 import com.pnoker.common.model.Point;
 import com.pnoker.device.manager.service.PointService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>位号 Client 接口实现
@@ -109,6 +112,19 @@ public class PointApi implements PointClient {
             Page<Point> page = pointService.list(pointDto);
             if (null != page) {
                 return R.ok(page);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<Dic>> dictionary() {
+        try {
+            List<Dic> list = pointService.dictionary();
+            if (null != list) {
+                return R.ok(list);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());

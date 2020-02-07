@@ -21,6 +21,8 @@ import com.pnoker.api.device.manager.hystrix.PointClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointDto;
+import com.pnoker.common.model.Device;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Point;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -30,6 +32,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * <p>位号 FeignClient
@@ -93,5 +97,13 @@ public interface PointClient {
      */
     @PostMapping("/list")
     R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto);
+
+    /**
+     * 查询 Point 字典
+     *
+     * @return List<Point>
+     */
+    @GetMapping("/dictionary")
+    R<List<Dic>> dictionary();
 
 }

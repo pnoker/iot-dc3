@@ -21,6 +21,7 @@ import com.pnoker.api.device.manager.hystrix.ProfileClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ProfileDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Driver;
 import com.pnoker.common.model.Profile;
 import com.pnoker.common.valid.Insert;
@@ -102,6 +103,6 @@ public interface ProfileClient {
      * @return List<Profile>
      */
     @GetMapping("/dictionary")
-    R<List<Profile>> dictionary();
+    R<List<Dic>> dictionary();
 
 }

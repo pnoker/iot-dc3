@@ -16,6 +16,7 @@
 
 package com.pnoker.device.manager.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -25,10 +26,7 @@ import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.dto.ProfileDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Driver;
-import com.pnoker.common.model.Point;
-import com.pnoker.common.model.Profile;
+import com.pnoker.common.model.*;
 import com.pnoker.device.manager.mapper.ProfileMapper;
 import com.pnoker.device.manager.service.DeviceService;
 import com.pnoker.device.manager.service.DriverService;
@@ -43,6 +41,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -166,9 +165,22 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Cacheable(value = Common.Cache.PROFILE_DIC, key = "'profile_dic'", unless = "#result==null")
-    public List<Profile> dictionary() {
-        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        return profileMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        List<Dic> driverDicList = driverService.dictionary();
+        for (Dic driverDic : driverDicList) {
+            List<Dic> dicList = new ArrayList<>();
+            LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
+            queryWrapper.eq(Profile::getDriverId, driverDic.getValue());
+            List<Profile> profileList = profileMapper.selectList(queryWrapper);
+            driverDic.setDisabled(true);
+            driverDic.setValue(RandomUtil.randomLong());
+            for (Profile profile : profileList) {
+                Dic profileDic = new Dic().setLabel(profile.getName()).setValue(profile.getId());
+                dicList.add(profileDic);
+            }
+            driverDic.setChildren(dicList);
+        }
+        return driverDicList;
     }
 
     @Override

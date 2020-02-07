@@ -21,6 +21,7 @@ import com.pnoker.api.device.manager.feign.GroupClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.GroupDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import com.pnoker.device.manager.service.GroupService;
 import lombok.extern.slf4j.Slf4j;
@@ -118,9 +119,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<List<Group>> dictionary() {
+    public R<List<Dic>> dictionary() {
         try {
-            List<Group> list = groupService.dictionary();
+            List<Dic> list = groupService.dictionary();
             if (null != list) {
                 return R.ok(list);
             }

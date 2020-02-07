@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.device.manager.feign.DriverClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.DriverDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Driver;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,7 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
             }
 
             @Override
-            public R<List<Driver>> dictionary() {
+            public R<List<Dic>> dictionary() {
                 return R.fail(message);
             }
         };

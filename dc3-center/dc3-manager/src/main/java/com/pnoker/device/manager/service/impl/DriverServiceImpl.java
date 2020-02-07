@@ -24,6 +24,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
 import com.pnoker.common.dto.ProfileDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Driver;
 import com.pnoker.common.model.Profile;
 import com.pnoker.device.manager.mapper.DriverMapper;
@@ -38,6 +39,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,10 +112,6 @@ public class DriverServiceImpl implements DriverService {
     )
     public Driver update(Driver driver) {
         driver.setUpdateTime(null);
-        Driver selectById = driverMapper.selectById(driver.getId());
-        if (!selectById.getProfileInfo().equals(driver.getProfileInfo())) {
-            //todo throw new ServiceException("driver profile info has been modified");
-        }
         if (driverMapper.updateById(driver) > 0) {
             Driver select = selectById(driver.getId());
             driver.setName(select.getName());
@@ -147,9 +145,15 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Cacheable(value = Common.Cache.DRIVER_DIC, key = "'dirver_dic'", unless = "#result==null")
-    public List<Driver> dictionary() {
+    public List<Dic> dictionary() {
+        List<Dic> dicList = new ArrayList<>();
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        return driverMapper.selectList(queryWrapper);
+        List<Driver> driverList = driverMapper.selectList(queryWrapper);
+        for (Driver driver : driverList) {
+            Dic driverDic = new Dic().setLabel(driver.getName()).setValue(driver.getId());
+            dicList.add(driverDic);
+        }
+        return dicList;
     }
 
     @Override

@@ -27,10 +27,10 @@ import com.pnoker.common.model.PointInfo;
  */
 public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
     /**
-     * 根据模板 NAME 查询分组
+     * 根据模板属性配置 ID 查询分组
      *
-     * @param name
+     * @param id
      * @return
      */
-    PointInfo selectByName(String name);
+    PointInfo selectByProfileInfoID(Long id);
 }

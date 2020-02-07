@@ -21,6 +21,7 @@ import com.pnoker.api.device.manager.feign.DriverClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Driver;
 import com.pnoker.common.model.Group;
 import com.pnoker.device.manager.service.DriverService;
@@ -119,9 +120,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<List<Driver>> dictionary() {
+    public R<List<Dic>> dictionary() {
         try {
-            List<Driver> list = driverService.dictionary();
+            List<Dic> list = driverService.dictionary();
             if (null != list) {
                 return R.ok(list);
             }

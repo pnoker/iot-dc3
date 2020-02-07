@@ -16,6 +16,7 @@
 
 package com.pnoker.device.manager.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,9 +24,10 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ProfileInfoDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Point;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.ProfileInfo;
 import com.pnoker.device.manager.mapper.ProfileInfoMapper;
+import com.pnoker.device.manager.service.DriverService;
 import com.pnoker.device.manager.service.ProfileInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +38,8 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +51,9 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class ProfileInfoServiceImpl implements ProfileInfoService {
+
+    @Resource
+    private DriverService driverService;
 
     @Resource
     private ProfileInfoMapper profileInfoMapper;
@@ -132,9 +139,22 @@ public class ProfileInfoServiceImpl implements ProfileInfoService {
 
     @Override
     @Cacheable(value = Common.Cache.PROFILE_INFO_DIC, key = "'profile_info_dic'", unless = "#result==null")
-    public List<ProfileInfo> dictionary() {
-        LambdaQueryWrapper<ProfileInfo> queryWrapper = Wrappers.<ProfileInfo>query().lambda();
-        return profileInfoMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        List<Dic> driverDicList = driverService.dictionary();
+        for (Dic driverDic : driverDicList) {
+            List<Dic> dicList = new ArrayList<>();
+            LambdaQueryWrapper<ProfileInfo> queryWrapper = Wrappers.<ProfileInfo>query().lambda();
+            queryWrapper.eq(ProfileInfo::getDriverId, driverDic.getValue());
+            List<ProfileInfo> profileInfoList = profileInfoMapper.selectList(queryWrapper);
+            driverDic.setDisabled(true);
+            driverDic.setValue(RandomUtil.randomLong());
+            for (ProfileInfo profileInfo : profileInfoList) {
+                Dic profileInfoDic = new Dic().setLabel(profileInfo.getDisplayName()).setValue(profileInfo.getId());
+                dicList.add(profileInfoDic);
+            }
+            driverDic.setChildren(dicList);
+        }
+        return driverDicList;
     }
 
     @Override

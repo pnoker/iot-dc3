@@ -24,6 +24,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.LabelBindDto;
 import com.pnoker.common.dto.LabelDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Label;
 import com.pnoker.common.model.LabelBind;
 import com.pnoker.device.manager.mapper.LabelMapper;
@@ -143,9 +144,10 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     @Cacheable(value = Common.Cache.LABEL_DIC, key = "'label_dic'", unless = "#result==null")
-    public List<Label> dictionary() {
-        LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        return labelMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        /*LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
+        return labelMapper.selectList(queryWrapper);*/
+        return null;
     }
 
     @Override
