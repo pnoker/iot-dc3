@@ -82,14 +82,14 @@ public class Dc3Util {
     }
 
     /**
-     * 判断字符串是否为 用户名格式（3-16）
+     * 判断字符串是否为 用户名格式（2-32）
      *
-     * @param username
+     * @param name
      * @return
      */
-    public static boolean isName(String username) {
-        String regex = "^[a-zA-Z]\\w{2,15}$";
-        return ReUtil.isMatch(regex, username);
+    public static boolean isName(String name) {
+        String regex = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$";
+        return ReUtil.isMatch(regex, name);
     }
 
     /**

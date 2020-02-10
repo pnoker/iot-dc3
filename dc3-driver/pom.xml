@@ -29,7 +29,7 @@
     <description>IOT DC3 平台 设备协议驱动集合。</description>
 
     <modules>
-        <module>dc3-driver-wiapa</module>
+        <module>dc3-driver-virtual</module>
     </modules>
 
     <dependencies>
@@ -48,6 +48,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
+        </dependency>
+
+        <!-- dc3 Driver Sdk -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-sdk</artifactId>
         </dependency>
 
     </dependencies>

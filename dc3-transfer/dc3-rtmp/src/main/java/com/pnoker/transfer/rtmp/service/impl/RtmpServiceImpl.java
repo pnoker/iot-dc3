@@ -22,8 +22,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.RtmpDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Rtmp;
-import com.pnoker.common.model.User;
 import com.pnoker.transfer.rtmp.handler.Transcode;
 import com.pnoker.transfer.rtmp.handler.TranscodePool;
 import com.pnoker.transfer.rtmp.mapper.RtmpMapper;
@@ -137,9 +137,10 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Cacheable(value = Common.Cache.RTMP_DIC, key = "'rtmp_dic'", unless = "#result==null")
-    public List<Rtmp> dictionary() {
-        LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
-        return rtmpMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        /*LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
+        return rtmpMapper.selectList(queryWrapper);*/
+        return null;
     }
 
     @Override

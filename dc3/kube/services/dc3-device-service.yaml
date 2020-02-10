@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-device
+  name: dc3-device
+  namespace: dc3
+spec:
+  ports:
+    - name: "8600"
+      port: 8600
+      targetPort: 8600
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-device
