@@ -81,3 +81,4 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 ### 5 关于WEB UI
 
 ![iot-dc3-web-login](dc3/images/iot-dc3-web-login.gif)
+![iot-dc3-web-login](dc3/images/iot-dc3-web-device.png)
