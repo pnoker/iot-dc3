@@ -21,7 +21,7 @@
         "description": "权限中心",
         "port": 8300
       },
-      "dc3-manager": {
+      "dc3-device": {
         "description": "设备管理中心",
         "port": 8400
       }
@@ -31,10 +31,6 @@
       "dc3-collect": {
         "description": "设备数据采集",
         "port": 8500
-      },
-      "dc3-group": {
-        "description": "设备组",
-        "port": 8700
       }
     },
     "dc3-driver": {

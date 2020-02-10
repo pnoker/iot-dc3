@@ -25,6 +25,7 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.UserDto;
 import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -132,9 +133,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = Common.Cache.USER + Common.Cache.DIC, key = "'user_dic'", unless = "#result==null")
-    public List<User> dictionary() {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        return userMapper.selectList(queryWrapper);
+    public List<Dic> dictionary() {
+        /*LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
+        return userMapper.selectList(queryWrapper);*/
+        return null;
     }
 
     @Override

@@ -62,7 +62,6 @@ public class GlobalExceptionAdvice {
             BindException.class,
             MethodArgumentNotValidException.class
     })
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public R bodyValidExceptionHandler(MethodArgumentNotValidException exception) {
         HashMap<String, String> map = new HashMap<>(16);
         List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
