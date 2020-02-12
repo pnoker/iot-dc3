@@ -21,6 +21,7 @@ import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.model.Profile;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 /**

@@ -75,18 +75,18 @@ services:
 
   manager:
     build:
-      context: ../dc3-center/dc3-device/
+      context: ../dc3-center/dc3-manager/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-device:3.0
+    image: pnoker/dc3-manager:3.0
     restart: always
     ports:
       - 8400:8400
-    container_name: dc3-device
-    hostname: dc3-device
+    container_name: dc3-manager
+    hostname: dc3-manager
     networks:
       dc3net:
         aliases:
-          - dc3-device
+          - dc3-manager
   rtmp:
     build:
       context: ../dc3-transfer/dc3-rtmp/
