@@ -29,12 +29,14 @@ CREATE TABLE `dc3_driver`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT ' 协议名称',
   `service_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '协议服务名称',
+  `host` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主机IP',
+  `port` int(11) NOT NULL COMMENT '端口',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '协议驱动表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -91,7 +93,7 @@ CREATE TABLE `dc3_profile`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE,
   INDEX `driver_id`(`driver_id`) USING BTREE,
   CONSTRAINT `dc3_profile_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备模板表' ROW_FORMAT = Dynamic;
@@ -124,6 +126,45 @@ CREATE TABLE `dc3_point`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备位号表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for dc3_group
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_group`;
+CREATE TABLE `dc3_group`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '设备分组名称',
+  `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备分组表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for dc3_device
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_device`;
+CREATE TABLE `dc3_device`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '设备名称',
+  `code` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '设备编码',
+  `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '设备状态（离线0，在线1，维护2，故障3，失效4）',
+  `profile_id` bigint(20) NULL DEFAULT NULL COMMENT '模板ID',
+  `group_id` bigint(20) NULL DEFAULT NULL COMMENT '设备分组ID',
+  `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+  `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `name`(`name`) USING BTREE,
+  INDEX `code`(`code`) USING BTREE,
+  INDEX `profile_id`(`profile_id`) USING BTREE,
+  INDEX `group_id`(`group_id`) USING BTREE,
+  CONSTRAINT `dc3_device_ibfk_1` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_device_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `dc3_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for dc3_point_info
 -- ----------------------------
 DROP TABLE IF EXISTS `dc3_point_info`;
@@ -144,46 +185,28 @@ CREATE TABLE `dc3_point_info`  (
   CONSTRAINT `dc3_point_info_ibfk_1` FOREIGN KEY (`profile_info_id`) REFERENCES `dc3_profile_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_point_info_ibfk_2` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_point_info_ibfk_3` FOREIGN KEY (`point_id`) REFERENCES `dc3_point` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '位号配置信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for dc3_group
+-- Table structure for dc3_schedule
 -- ----------------------------
-DROP TABLE IF EXISTS `dc3_group`;
-CREATE TABLE `dc3_group`  (
+DROP TABLE IF EXISTS `dc3_schedule`;
+CREATE TABLE `dc3_schedule`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '设备分组名称',
-  `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
-  `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备分组表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for dc3_device
--- ----------------------------
-DROP TABLE IF EXISTS `dc3_device`;
-CREATE TABLE `dc3_device`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '设备名称',
-  `code` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '设备编码',
-  `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '设备状态（离线0，在线1，维护2，故障3，失效4）',
-  `profile_id` bigint(20) NULL DEFAULT NULL COMMENT '模板ID',
-  `group_id` bigint(20) NULL DEFAULT NULL COMMENT '设备分组ID',
+  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '任务名称',
+  `corn_expression` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '定时任务规则',
+  `bean_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '执行 Bean',
+  `status` tinyint(4) NULL DEFAULT 0 COMMENT '当前状态，0：停止，1：启动，2：暂停',
+  `device_id` bigint(20) NOT NULL COMMENT '设备ID',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `name`(`name`) USING BTREE,
-  UNIQUE INDEX `code`(`code`) USING BTREE,
-  INDEX `profile_id`(`profile_id`) USING BTREE,
-  INDEX `group_id`(`group_id`) USING BTREE,
-  CONSTRAINT `dc3_device_ibfk_1` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `dc3_device_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `dc3_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '设备表' ROW_FORMAT = Dynamic;
+  INDEX `device_id`(`device_id`) USING BTREE,
+  CONSTRAINT `dc3_schedule_ibfk_1` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '任务调度表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_user
@@ -199,7 +222,7 @@ CREATE TABLE `dc3_user`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -220,26 +243,8 @@ CREATE TABLE `dc3_rtmp`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'rtmp表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for dc3_schedule
--- ----------------------------
-DROP TABLE IF EXISTS `dc3_schedule`;
-CREATE TABLE `dc3_schedule`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '任务名称',
-  `corn_expression` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '定时任务规则',
-  `status` tinyint(4) NULL DEFAULT 0 COMMENT '当前状态',
-  `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '链接',
-  `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
-  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
-  `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '任务调度表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for dc3_label
@@ -254,7 +259,7 @@ CREATE TABLE `dc3_label`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `name`(`name`) USING BTREE
+  INDEX `name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '标签表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -296,7 +301,7 @@ CREATE TABLE `dc3_dic`  (
 -- ----------------------------
 -- Records of dc3_driver
 -- ----------------------------
-INSERT INTO `dc3_driver` VALUES (-1, '测试驱动', '测试驱动服务', '测试使用驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver` VALUES (-1, '测试驱动', '测试驱动服务','localhost', 9999, '测试使用驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_connect_info

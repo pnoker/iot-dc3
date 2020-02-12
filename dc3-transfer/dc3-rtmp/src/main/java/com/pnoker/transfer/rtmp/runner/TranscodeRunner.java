@@ -82,7 +82,7 @@ public class TranscodeRunner implements ApplicationRunner {
     }
 
     public List<Rtmp> list() {
-        Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages()));
+        Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages().setSize(-1L)));
         return null != page.getRecords() ? page.getRecords() : new ArrayList<>();
     }
 

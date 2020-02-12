@@ -66,9 +66,9 @@
         <mybatis.plus.version>3.3.0</mybatis.plus.version>
 
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
-        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring-boot.version>2.2.4.RELEASE</spring-boot.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
-        <spring-boot-admin.version>2.2.0-SNAPSHOT</spring-boot-admin.version>
+        <spring-boot-admin.version>2.2.2</spring-boot-admin.version>
 
         <codecov.version>2.7</codecov.version>
         <maven.jar.plugin>3.2.0</maven.jar.plugin>
@@ -195,7 +195,7 @@
             </dependency>
             <dependency>
                 <groupId>com.pnoker</groupId>
-                <artifactId>dc3-api-device</artifactId>
+                <artifactId>dc3-api-manager</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
@@ -220,7 +220,7 @@
                 <scope>compile</scope>
             </dependency>
 
-            <!-- dc3 Driver Sdk -->
+            <!-- dc3 Driver  -->
             <dependency>
                 <groupId>com.pnoker</groupId>
                 <artifactId>dc3-sdk</artifactId>
@@ -341,25 +341,6 @@
     </build>
 
     <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
         <repository>
             <id>aliyun</id>
             <name>aliyun</name>

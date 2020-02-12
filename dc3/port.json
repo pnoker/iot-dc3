@@ -21,7 +21,7 @@
         "description": "权限中心",
         "port": 8300
       },
-      "dc3-device": {
+      "dc3-manager": {
         "description": "设备管理中心",
         "port": 8400
       }
