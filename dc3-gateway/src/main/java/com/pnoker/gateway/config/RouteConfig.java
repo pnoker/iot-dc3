@@ -49,7 +49,7 @@ public class RouteConfig {
                 .route("generate_token",
                         r -> r.path("/api/v3/token")
                                 .filters(
-                                        f -> f.stripPrefix(3).prefixPath("/auth/token")
+                                        f -> f.setPath("/auth/token")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
                                                 .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
@@ -57,7 +57,7 @@ public class RouteConfig {
                 .route("register_user",
                         r -> r.path("/api/v3/register")
                                 .filters(
-                                        f -> f.stripPrefix(3).prefixPath("/auth/user/add")
+                                        f -> f.setPath("/auth/user/add")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
                                                 .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")

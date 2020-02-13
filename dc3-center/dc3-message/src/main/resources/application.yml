@@ -1,5 +1,5 @@
 server:
-  port: 8400
+  port: 8500
   undertow:
     io-threads: 2
     worker-threads: 20
@@ -18,6 +18,11 @@ spring:
     user:
       name: dc3
       password: dc3
+  rabbitmq:
+    host: dc3-rabbitmq
+    port: 5672
+    username: dc3
+    password: ${spring.security.user.password}
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://dc3-mysql:3306/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
@@ -26,7 +31,7 @@ spring:
     password: ${spring.security.user.password}
     sql-script-encoding: utf-8
     hikari:
-      pool-name: dc3-manager-hikaricp
+      pool-name: dc3-message-hikaricp
       max-lifetime: 1765000
       maximum-pool-size: 16
       minimum-idle: 4
@@ -34,7 +39,7 @@ spring:
     host: dc3-redis
     port: 6379
     password: ${spring.security.user.password}
-    database: 2
+    database: 3
     timeout: 15S
     jedis:
       pool:
@@ -44,7 +49,7 @@ spring:
     rollback-on-commit-failure: true
   cache:
     type: redis
-    cache-names: dc3-manager-cache
+    cache-names: dc3-message-cache
     redis:
       time-to-live: 60S
 

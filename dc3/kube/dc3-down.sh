@@ -29,6 +29,7 @@ function delete_services() {
   #kubectl delete -f "${DC3_ROOT}/services/dc3-resource-service.yaml"
   #kubectl delete -f "${DC3_ROOT}/services/dc3-nginx-service.yaml"
   #kubectl delete -f "${DC3_ROOT}/services/dc3-manager-service.yaml"
+  #kubectl delete -f "${DC3_ROOT}/services/dc3-message-service.yaml"
   #kubectl delete -f "${DC3_ROOT}/services/dc3-auth-service.yaml"
   #kubectl delete -f "${DC3_ROOT}/services/dc3-gateway-service.yaml"
   kubectl delete -f "${DC3_ROOT}/services/dc3-monitor-service.yaml"

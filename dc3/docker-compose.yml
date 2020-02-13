@@ -87,6 +87,22 @@ services:
       dc3net:
         aliases:
           - dc3-manager
+
+  message:
+    build:
+      context: ../dc3-center/dc3-message/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-message:3.0
+    restart: always
+    ports:
+      - 8500:8500
+    container_name: dc3-message
+    hostname: dc3-message
+    networks:
+      dc3net:
+        aliases:
+          - dc3-message
+
   rtmp:
     build:
       context: ../dc3-transfer/dc3-rtmp/

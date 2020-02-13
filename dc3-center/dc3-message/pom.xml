@@ -19,41 +19,38 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-center</artifactId>
         <version>3.0</version>
     </parent>
 
-    <artifactId>dc3-api</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dc3-message</artifactId>
+    <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Feign Client API 集合。</description>
-
-    <modules>
-        <module>dc3-api-auth</module>
-        <module>dc3-api-manager</module>
-        <module>dc3-api-rtmp</module>
-    </modules>
+    <description>IOT DC3 平台数据采集,包含Amqp,Websocket,Mqtt等通用消息中间件，通过消息订阅方式收集设备组信息。</description>
 
     <dependencies>
 
-        <!-- Open Feign -->
+        <!-- Spring RabbiitMq -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
         </dependency>
 
-        <!-- Feign OkHttp -->
-        <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-okhttp</artifactId>
-        </dependency>
-
-        <!-- dc3 Common Base -->
+        <!-- dc3 Common Core -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-base</artifactId>
+            <artifactId>dc3-core</artifactId>
         </dependency>
-
+        
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,33 +14,22 @@
  * limitations under the License.
  */
 
-package com.pnoker.gateway;
+package com.pnoker.center.message;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
- * 平台网关服务入口
+ * 消息中心中心服务启动入口
  *
  * @author pnoker
  */
 @EnableCaching
 @SpringCloudApplication
-@EnableFeignClients(basePackages = {
-        "com.pnoker.api.center.auth.user.*",
-        "com.pnoker.api.center.auth.token.*"
-})
-@ComponentScan(basePackages = {
-        "com.pnoker.api.center.auth.user",
-        "com.pnoker.api.center.auth.token",
-        "com.pnoker.gateway"
-})
-public class GatewayApplication {
-
+public class MessageApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+        SpringApplication.run(MessageApplication.class, args);
     }
 }
+
