@@ -73,7 +73,9 @@ public class DriverSdkSdkServiceImpl implements DriverSdkService {
             R<Driver> hostPort = driverClient.selectByHostPort(deviceDriver.getHost(), deviceDriver.getPort());
             if (!hostPort.isOk()) {
                 R<Driver> add = driverClient.add(driver);
-                deviceDriver.setId(driver.getId());
+                if (add.isOk()) {
+                    deviceDriver.setId(driver.getId());
+                }
                 return add.isOk();
             }
             log.error("the port({}) is already occupied by driver({}/{})", deviceDriver.getPort(), hostPort.getData().getName(), hostPort.getData().getServiceName());

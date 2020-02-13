@@ -54,12 +54,21 @@ public interface Common {
     String DEFAULT_PASSWORD = "dc3dc3";
 
     /**
+     * 消息通道
+     */
+    interface Msg {
+        String DRIVER_CHANNEL = "driver_channel";
+    }
+
+    /**
      * 驱动 SDK Job Bean 前缀 和 三个固定调度任务
      */
-    String SDK_JOB_PREFIX = "com.pnoker.common.sdk.config.quartz.job.";
-    String SDK_CUSTOMIZER_JOB = "CustomizerJob";
-    String SDK_READ_JOB = "ReadJob";
-    String SDK_WRITE_JOB = "WriteJob";
+    interface Sdk {
+        String JOB_PREFIX = "com.pnoker.common.sdk.config.quartz.job.";
+        String CUSTOMIZER_JOB = "CustomizerJob";
+        String READ_JOB = "ReadJob";
+        String WRITE_JOB = "WriteJob";
+    }
 
     /**
      * 属性常量

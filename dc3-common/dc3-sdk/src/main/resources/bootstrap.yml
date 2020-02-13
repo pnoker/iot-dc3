@@ -1,0 +1,58 @@
+server:
+  undertow:
+    io-threads: 2
+    worker-threads: 20
+    buffer-size: 512
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+  security:
+    user:
+      name: dc3
+      password: dc3
+  rabbitmq:
+    host: dc3-rabbitmq
+    port: 5672
+    username: dc3
+    password: ${spring.security.user.password}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+feign:
+  hystrix:
+    enabled: true
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+      useGzipDecoder: true
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 20
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/

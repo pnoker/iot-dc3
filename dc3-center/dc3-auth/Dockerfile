@@ -20,9 +20,9 @@ MAINTAINER pnoker <pnokers.icloud.com>
 ENV JAVA_OPS -server -Xms512m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-auth
+    && mkdir -p /dc3-center/dc3-auth
 
-WORKDIR /dc3-auth
+WORKDIR /dc3-center/dc3-auth
 
 ADD ./target/dc3-auth.jar ./
 

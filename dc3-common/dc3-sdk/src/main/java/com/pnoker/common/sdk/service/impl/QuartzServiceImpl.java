@@ -9,6 +9,7 @@ import com.pnoker.common.dto.ScheduleDto;
 import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Schedule;
 import com.pnoker.common.sdk.init.DeviceDriver;
+import com.pnoker.common.sdk.service.DriverOutput;
 import com.pnoker.common.sdk.service.QuartzService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,9 @@ public class QuartzServiceImpl implements QuartzService {
     private DeviceDriver deviceDriver;
     @Resource
     private ScheduleClient scheduleClient;
+
+    @Resource
+    private DriverOutput driverOutput;
 
     @Override
     @SneakyThrows
@@ -85,7 +89,7 @@ public class QuartzServiceImpl implements QuartzService {
 
     @SneakyThrows
     public void runJob(String group, Schedule schedule) {
-        Class<? extends Job> jobClass = (Class<? extends Job>) (Class.forName(Common.SDK_JOB_PREFIX + schedule.getBeanName()).newInstance().getClass());
+        Class<? extends Job> jobClass = (Class<? extends Job>) (Class.forName(Common.Sdk.JOB_PREFIX + schedule.getBeanName()).newInstance().getClass());
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(schedule.getName(), group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(schedule.getName(), group)

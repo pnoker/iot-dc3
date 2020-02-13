@@ -33,11 +33,11 @@
     </properties>
 
     <dependencies>
-        
-        <!-- dc3 Api -->
+
+        <!-- Spring RabbiitMq -->
         <dependency>
-            <groupId>com.pnoker</groupId>
-            <artifactId>dc3-api-manager</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
         </dependency>
 
         <!-- Quartz -->
@@ -50,6 +50,12 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
             <version>${quartz.version}</version>
+        </dependency>
+
+        <!-- dc3 Api -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
     </dependencies>

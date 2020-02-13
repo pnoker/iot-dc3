@@ -219,11 +219,11 @@ public class DeviceServiceImpl implements DeviceService {
 
     public void createSchedule(Device device) {
         Schedule schedule = new Schedule();
-        schedule.setDeviceId(device.getId()).setName(Common.SDK_READ_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.SDK_READ_JOB).setDescription("Automatically create by default");
+        schedule.setDeviceId(device.getId()).setName(Common.Sdk.READ_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.READ_JOB).setDescription("Automatically create by default");
         scheduleService.add(schedule);
-        schedule.setDeviceId(device.getId()).setName(Common.SDK_WRITE_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.SDK_WRITE_JOB).setDescription("Automatically create by default");
+        schedule.setDeviceId(device.getId()).setName(Common.Sdk.WRITE_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.WRITE_JOB).setDescription("Automatically create by default");
         scheduleService.add(schedule);
-        schedule.setDeviceId(device.getId()).setName(Common.SDK_CUSTOMIZER_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.SDK_CUSTOMIZER_JOB).setDescription("Automatically create by default");
+        schedule.setDeviceId(device.getId()).setName(Common.Sdk.CUSTOMIZER_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.CUSTOMIZER_JOB).setDescription("Automatically create by default");
         scheduleService.add(schedule);
     }
 
