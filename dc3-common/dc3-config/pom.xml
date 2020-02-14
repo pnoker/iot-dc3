@@ -19,20 +19,19 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-common</artifactId>
         <version>3.0</version>
     </parent>
 
-    <artifactId>dc3-common</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dc3-config</artifactId>
+    <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Common 公共模块。</description>
+    <description>IOT DC3 平台 配置集合。</description>
 
-    <modules>
-        <module>dc3-core</module>
-        <module>dc3-base</module>
-        <module>dc3-config</module>
-        <module>dc3-sdk</module>
-    </modules>
+    <dependencies>
+
+        
+
+    </dependencies>
 
 </project>

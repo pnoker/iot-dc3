@@ -5,12 +5,6 @@ server:
     buffer-size: 512
 
 spring:
-  main:
-    allow-bean-definition-overriding: true
-  mvc:
-    throw-exception-if-no-handler-found: true
-  resources:
-    add-mappings: false
   security:
     user:
       name: dc3
@@ -22,17 +16,38 @@ spring:
       cache:
         caffeine:
           spec: initialCapacity=10,maximumSize=500,expireAfterAccess=600s
-  quartz:
-    properties:
-      org.quartz:
-        scheduler:
-          instanceName: DriverQuartzScheduler
-          instanceId: AUTO
-        threadPool:
-          threadsInheritContextClassLoaderOfInitializingThread: true
-          class: org.quartz.simpl.SimpleThreadPool
-          threadPriority: 5
-          threadCount: 50
+  transaction:
+    rollback-on-commit-failure: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://dc3-mysql:3306/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    sql-script-encoding: utf-8
+    hikari:
+      pool-name: dc3-hikaricp
+      max-lifetime: 1765000
+      maximum-pool-size: 16
+      minimum-idle: 4
+  redis:
+    timeout: 15S
+    jedis:
+      pool:
+        max-idle: 16
+        min-idle: 4
+  cache:
+    type: redis
+    cache-names: dc3-cache
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapping
+  global-config:
+    banner: false
+    db-config:
+      table-prefix: dc3_
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
 management:
   endpoints:

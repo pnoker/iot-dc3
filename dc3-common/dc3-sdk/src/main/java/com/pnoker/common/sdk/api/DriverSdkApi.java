@@ -1,7 +1,7 @@
 package com.pnoker.common.sdk.api;
 
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.sdk.service.DriverOutput;
+import com.pnoker.common.sdk.message.DriverInput;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.integration.support.MessageBuilder;
@@ -16,14 +16,14 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@EnableBinding(DriverOutput.class)
+@EnableBinding(DriverInput.class)
 @RequestMapping(Common.Service.DC3_DRIVER_URL_PREFIX)
 public class DriverSdkApi {
     @Resource
-    private DriverOutput driverOutput;
+    private DriverInput driverInput;
 
     @GetMapping("/msg")
     public void msg() {
-        driverOutput.output().send(MessageBuilder.withPayload("hello 123").build());
+        driverInput.input().send(MessageBuilder.withPayload("hello 123").build());
     }
 }
