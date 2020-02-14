@@ -41,7 +41,7 @@
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-core</artifactId>
         </dependency>
-        
+
     </dependencies>
 
     <build>

@@ -64,7 +64,7 @@ public interface Common {
      * 驱动 SDK Job Bean 前缀 和 三个固定调度任务
      */
     interface Sdk {
-        String JOB_PREFIX = "com.pnoker.common.sdk.config.quartz.job.";
+        String JOB_PREFIX = "com.pnoker.common.sdk.quartz.job.";
         String CUSTOMIZER_JOB = "CustomizerJob";
         String READ_JOB = "ReadJob";
         String WRITE_JOB = "WriteJob";

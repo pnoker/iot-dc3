@@ -1,9 +1,7 @@
 package com.pnoker.common.sdk.init;
 
-import com.pnoker.api.center.manager.feign.DriverClient;
 import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Profile;
-import com.pnoker.common.model.Schedule;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +10,6 @@ import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.net.InetAddress;
 import java.util.List;
 

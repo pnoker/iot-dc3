@@ -1,12 +1,13 @@
 package com.pnoker.common.sdk.init;
 
+import com.pnoker.common.sdk.quartz.service.QuartzService;
 import com.pnoker.common.sdk.service.DriverCustomizersService;
 import com.pnoker.common.sdk.service.DriverSdkService;
-import com.pnoker.common.sdk.service.QuartzService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

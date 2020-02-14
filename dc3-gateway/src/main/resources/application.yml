@@ -16,25 +16,12 @@ spring:
     suffix: .html
     servlet:
       content-type: text/html
-  security:
-    user:
-      name: dc3
-      password: dc3
   redis:
+    database: 0
     host: dc3-redis
     port: 6379
-    password: ${spring.security.user.password}
-    database: 0
-    timeout: 15S
-    jedis:
-      pool:
-        max-idle: 16
-        min-idle: 4
-  transaction:
-    rollback-on-commit-failure: true
+    password: dc3
   cache:
-    type: redis
-    cache-names: dc3-gateway-cache
     redis:
       time-to-live: 60S
   cloud:
@@ -63,54 +50,8 @@ spring:
                 name: default
                 fallbackUri: 'forward:/fallback'
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  endpoint:
-    health:
-      show-details: ALWAYS
-
-feign:
-  hystrix:
-    enabled: true
-  httpclient:
-    enabled: false
-  okhttp:
-    enabled: true
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
-      useGzipDecoder: true
-
-hystrix:
-  threadpool:
-    default:
-      coreSize: 20
-
 logging:
   level:
-    org.springframework.cloud.gateway.route: ERROR
-    org.springframework.data: ERROR
-    org.springframework.web: ERROR
-    org.mybatis.spring: ERROR
-    org.mongodb.driver: ERROR
-    com.zaxxer.hikari: ERROR
-    com.ulisesbocchio: ERROR
-    io.lettuce.core: ERROR
-    io.undertow: ERROR
-    com.netflix: ERROR
     com.pnoker: DEBUG
   file:
     name: dc3/logs/${spring.application.name}.log
-
-eureka:
-  instance:
-    prefer-ip-address: true
-    health-check-url-path: /actuator/health
-  client:
-    service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/
