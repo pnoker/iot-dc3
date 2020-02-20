@@ -14,32 +14,27 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.manager.service;
+package com.pnoker.center.data.message;
 
-import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.DriverDto;
-import com.pnoker.common.model.Driver;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.messaging.support.MessageBuilder;
+
+import javax.annotation.Resource;
 
 /**
- * <p>Driver Interface
- *
  * @author pnoker
  */
-public interface DriverService extends Service<Driver, DriverDto> {
-    /**
-     * 根据 SERVICE NAME 查询驱动
-     *
-     * @param serviceName
-     * @return
-     */
-    Driver selectByServiceName(String serviceName);
+@Slf4j
+@EnableBinding(TopicOutput.class)
+public class Sender {
 
-    /**
-     * 根据 HOST & PORT 查询驱动
-     *
-     * @param host
-     * @param port
-     * @return
-     */
-    Driver selectByHostPort(String host, Integer port);
+    @Resource
+    private TopicOutput topicOutput;
+
+    public void driverSender(String message) {
+        topicOutput.driverOutput().send(
+                MessageBuilder.withPayload(message).build()
+        );
+    }
 }

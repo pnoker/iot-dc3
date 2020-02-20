@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.message;
+package com.pnoker.center.data.message;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.SpringCloudApplication;
+import com.pnoker.common.constant.Common;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
 
 /**
- * 消息中心中心服务启动入口
+ * 消息Output
  *
  * @author pnoker
  */
-@EnableCaching
-@SpringCloudApplication
-public class MessageApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(MessageApplication.class, args);
-    }
-}
+public interface TopicOutput {
 
+    /**
+     * 驱动消息主题 Output接口
+     *
+     * @return
+     */
+    @Output(Common.Topic.DRIVER_TOPIC)
+    MessageChannel driverOutput();
+}

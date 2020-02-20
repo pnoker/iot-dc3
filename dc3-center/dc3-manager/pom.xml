@@ -36,6 +36,12 @@
             <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
+        <!-- Spring RabbitMq -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
+
         <!-- dc3 Common Core -->
         <dependency>
             <groupId>com.pnoker</groupId>

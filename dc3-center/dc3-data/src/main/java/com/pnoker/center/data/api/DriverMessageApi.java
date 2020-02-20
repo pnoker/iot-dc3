@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.manager.service;
+package com.pnoker.center.data.api;
 
-import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.DriverDto;
-import com.pnoker.common.model.Driver;
+import com.pnoker.center.data.message.Sender;
+import com.pnoker.common.constant.Common;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
- * <p>Driver Interface
- *
  * @author pnoker
  */
-public interface DriverService extends Service<Driver, DriverDto> {
-    /**
-     * 根据 SERVICE NAME 查询驱动
-     *
-     * @param serviceName
-     * @return
-     */
-    Driver selectByServiceName(String serviceName);
+@Slf4j
+@RestController
+@RequestMapping(Common.Service.DC3_DATA_URL_PREFIX)
+public class DriverMessageApi {
+    @Resource
+    private Sender sender;
 
-    /**
-     * 根据 HOST & PORT 查询驱动
-     *
-     * @param host
-     * @param port
-     * @return
-     */
-    Driver selectByHostPort(String host, Integer port);
+    @GetMapping("/msg")
+    public void msg() {
+        sender.driverSender("hell");
+    }
 }
