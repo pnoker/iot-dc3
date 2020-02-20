@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.*;
 
 /**
- * 设备驱动表
+ * 驱动表
  *
  * @author pnoker
  */
