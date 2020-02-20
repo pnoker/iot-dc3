@@ -14,13 +14,18 @@ spring:
     username: root
     password: dc3
   redis:
-    database: 2
     host: dc3-redis
     port: 6379
     password: dc3
+    database: 2
   cache:
     redis:
       time-to-live: 60S
+  rabbitmq:
+    host: dc3-rabbitmq
+    port: 5672
+    username: dc3
+    password: dc3
 
 logging:
   level:
