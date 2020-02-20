@@ -61,6 +61,8 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     @Resource
     private PointInfoClient pointInfoClient;
     @Resource
+    private DriverInfoClient driverInfoClient;
+    @Resource
     private DeviceDriver driver;
     @Resource
     private DriverCustomizersService customizersService;
@@ -82,19 +84,32 @@ public class DriverSdkServiceImpl implements DriverSdkService {
         Profile profile = driver.getProfileMap().get(device.getProfileId());
         Point point = driver.getPointMap().get(profile.getId()).get(pointId);
 
+        DriverInfoDto driverInfoDto = new DriverInfoDto();
+        driverInfoDto.setProfileId(profile.getId());
+        driverInfoDto.setPage(new Pages().setSize(-1L));
+        Map<String, String> dd = new HashMap<>(16);
+        R<Page<DriverInfo>> rd = driverInfoClient.list(driverInfoDto);
+        if (rd.isOk()) {
+            List<DriverInfo> driverInfos = rd.getData().getRecords();
+            for (DriverInfo driverInfo : driverInfos) {
+                dd.put(driver.getConnectInfoMap().get(driverInfo.getConnectInfoId()).getName(), driverInfo.getValue());
+            }
+        }
+
         PointInfoDto pointInfoDto = new PointInfoDto();
         pointInfoDto.setDeviceId(deviceId).setPointId(pointId);
         pointInfoDto.setPage(new Pages().setSize(-1L));
-
         Map<String, String> pp = new HashMap<>(16);
-        R<Page<PointInfo>> r = pointInfoClient.list(pointInfoDto);
-        if (r.isOk()) {
-            List<PointInfo> pointInfos = r.getData().getRecords();
+        R<Page<PointInfo>> rp = pointInfoClient.list(pointInfoDto);
+        if (rp.isOk()) {
+            List<PointInfo> pointInfos = rp.getData().getRecords();
             for (PointInfo pointInfo : pointInfos) {
                 pp.put(driver.getProfileInfoMap().get(pointInfo.getProfileInfoId()).getName(), pointInfo.getValue());
             }
-        customizersService.read(pp, pp, point);
         }
+
+
+        customizersService.read(pp, pp, point);
     }
 
     @Override
