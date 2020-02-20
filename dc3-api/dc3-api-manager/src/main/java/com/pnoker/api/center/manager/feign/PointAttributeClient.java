@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 /**
- * <p>驱动属性配置信息 FeignClient
+ * <p>位号配置属性 FeignClient
  *
  * @author pnoker
  */
@@ -43,7 +43,7 @@ import java.util.List;
 public interface PointAttributeClient {
 
     /**
-     * 新增 ProfileInfo 记录
+     * 新增 ProfileInfo
      *
      * @param pointAttribute
      * @return ProfileInfo
@@ -52,7 +52,7 @@ public interface PointAttributeClient {
     R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 ID 删除 ProfileInfo
+     * 根据 Id 删除 ProfileInfo
      *
      * @param id profileInfoId
      * @return Boolean
@@ -61,7 +61,7 @@ public interface PointAttributeClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 ProfileInfo 记录
+     * 修改 ProfileInfo
      *
      * @param pointAttribute
      * @return ProfileInfo
@@ -70,7 +70,7 @@ public interface PointAttributeClient {
     R<PointAttribute> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 ID 查询 ProfileInfo
+     * 根据 Id 查询 ProfileInfo
      *
      * @param id
      * @return ProfileInfo

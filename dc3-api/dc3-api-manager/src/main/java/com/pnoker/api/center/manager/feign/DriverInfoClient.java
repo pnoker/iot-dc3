@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>位号配置信息 FeignClient
+ * <p>驱动配置信息 FeignClient
  *
  * @author pnoker
  */
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface DriverInfoClient {
 
     /**
-     * 新增 DriverInfo 记录
+     * 新增 DriverInfo
      *
      * @param driverInfo
      * @return DriverInfo
@@ -49,7 +49,7 @@ public interface DriverInfoClient {
     R<DriverInfo> add(@Validated(Insert.class) @RequestBody DriverInfo driverInfo);
 
     /**
-     * 根据 ID 删除 DriverInfo
+     * 根据 Id 删除 DriverInfo
      *
      * @param id driverInfoId
      * @return Boolean
@@ -58,7 +58,7 @@ public interface DriverInfoClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 DriverInfo 记录
+     * 修改 DriverInfo
      *
      * @param driverInfo
      * @return DriverInfo
@@ -67,7 +67,7 @@ public interface DriverInfoClient {
     R<DriverInfo> update(@Validated(Update.class) @RequestBody DriverInfo driverInfo);
 
     /**
-     * 根据 ID 查询 DriverInfo
+     * 根据 Id 查询 DriverInfo
      *
      * @param id
      * @return DriverInfo

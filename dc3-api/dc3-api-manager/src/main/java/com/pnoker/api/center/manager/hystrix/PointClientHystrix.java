@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * <p>位号 FeignHystrix
+ * <p>PointClientHystrix
  *
  * @author pnoker
  */

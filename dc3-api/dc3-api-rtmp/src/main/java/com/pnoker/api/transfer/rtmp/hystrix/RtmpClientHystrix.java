@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Rtmp转码任务 FeignHystrix
+ * RtmpClientHystrix
  *
  * @author pnoker
  */

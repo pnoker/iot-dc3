@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * <p>驱动 FeignHystrix
+ * <p>DriverClientHystrix
  *
  * @author pnoker
  */

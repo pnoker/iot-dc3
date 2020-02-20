@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 /**
- * <p> Schedule FeignClient
+ * <p>调度 FeignClient
  *
  * @author pnoker
  */
@@ -43,7 +43,7 @@ import java.util.List;
 public interface ScheduleClient {
 
     /**
-     * 新增 Schedule 记录
+     * 新增 Schedule
      *
      * @param schedule
      * @return Schedule
@@ -52,7 +52,7 @@ public interface ScheduleClient {
     R<Schedule> add(@Validated(Insert.class) @RequestBody Schedule schedule);
 
     /**
-     * 根据 ID 删除 Schedule
+     * 根据 Id 删除 Schedule
      *
      * @param id scheduleId
      * @return Boolean
@@ -61,7 +61,7 @@ public interface ScheduleClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Schedule 记录
+     * 修改 Schedule
      *
      * @param schedule
      * @return Schedule
@@ -70,7 +70,7 @@ public interface ScheduleClient {
     R<Schedule> update(@Validated(Update.class) @RequestBody Schedule schedule);
 
     /**
-     * 根据 ID 查询 Schedule
+     * 根据 Id 查询 Schedule
      *
      * @param id
      * @return Schedule

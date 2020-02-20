@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 用户 FeignHystrix
+ * UserClientHystrix
  *
  * @author pnoker
  */

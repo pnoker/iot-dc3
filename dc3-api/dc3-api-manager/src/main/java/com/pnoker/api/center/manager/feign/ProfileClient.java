@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 /**
- * <p>位号 FeignClient
+ * <p>模板 FeignClient
  *
  * @author pnoker
  */
@@ -43,7 +43,7 @@ import java.util.List;
 public interface ProfileClient {
 
     /**
-     * 新增 Profile 记录
+     * 新增 Profile
      *
      * @param profile
      * @return Profile
@@ -52,7 +52,7 @@ public interface ProfileClient {
     R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile);
 
     /**
-     * 根据 ID 删除 Profile
+     * 根据 Id 删除 Profile
      *
      * @param id profileId
      * @return Boolean
@@ -61,7 +61,7 @@ public interface ProfileClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Profile 记录
+     * 修改 Profile
      *
      * @param profile
      * @return Profile
@@ -70,7 +70,7 @@ public interface ProfileClient {
     R<Profile> update(@Validated(Update.class) @RequestBody Profile profile);
 
     /**
-     * 根据 ID 查询 Profile
+     * 根据 Id 查询 Profile
      *
      * @param id
      * @return Profile
