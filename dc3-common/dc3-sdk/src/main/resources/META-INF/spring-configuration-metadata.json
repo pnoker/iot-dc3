@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "driver.name",
+      "type": "java.lang.String",
+      "description": "device driver name."
+    },
+    {
+      "name": "driver.description",
+      "type": "java.lang.String",
+      "description": "device driver description."
+    },
+    {
+      "name": "driver.connect",
+      "type": "java.util.List",
+      "description": "device driver connect config."
+    },
+    {
+      "name": "driver.profile",
+      "type": "java.util.List",
+      "description": "device driver profile config."
+    }
+  ]
+}

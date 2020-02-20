@@ -44,7 +44,6 @@ public class Point extends Description {
 
     private String type;
     private Short rw;
-    private String value;
     private Float base;
     private Float minimum;
     private Float maximum;

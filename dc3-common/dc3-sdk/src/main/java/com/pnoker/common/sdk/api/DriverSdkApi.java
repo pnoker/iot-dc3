@@ -1,11 +1,27 @@
+/*
+ * Copyright 2019 Pnoker. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.pnoker.common.sdk.api;
 
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.sdk.message.DriverInput;
+import com.pnoker.common.sdk.message.Sender;
+import com.pnoker.common.sdk.service.DriverSdkService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,14 +32,21 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@EnableBinding(DriverInput.class)
 @RequestMapping(Common.Service.DC3_DRIVER_URL_PREFIX)
 public class DriverSdkApi {
     @Resource
-    private DriverInput driverInput;
+    private Sender sender;
+    @Resource
+    private DriverSdkService service;
+
 
     @GetMapping("/msg")
     public void msg() {
-        driverInput.input().send(MessageBuilder.withPayload("hello 123").build());
+        sender.driverSender("hello 123");
+    }
+
+    @GetMapping("/device/{deviceId}/point/{pointId}")
+    public void point(@PathVariable("deviceId") Long deviceId, @PathVariable("pointId") Long pointId) {
+        service.read(deviceId, pointId);
     }
 }

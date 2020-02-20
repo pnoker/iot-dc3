@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.utils;
+package com.pnoker.common.sdk.message;
+
+import com.pnoker.common.constant.Common;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
 
 /**
+ * 消息 Output
+ *
  * @author pnoker
  */
-public class Test {
+public interface TopicOutput {
 
-    public static void main(String[] args) {
-        float a = 5.98999f;
-        System.out.printf("%f\n", a);
-        System.out.printf("%.2f\n", a);
-        System.out.printf("%3.2f\n", a);
-    }
+    /**
+     * 驱动消息主题 Output 接口
+     *
+     * @return
+     */
+    @Output(Common.Topic.DRIVER_TOPIC)
+    MessageChannel driverOutput();
 }

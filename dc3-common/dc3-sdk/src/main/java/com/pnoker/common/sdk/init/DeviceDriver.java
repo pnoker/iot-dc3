@@ -1,7 +1,6 @@
 package com.pnoker.common.sdk.init;
 
-import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Profile;
+import com.pnoker.common.model.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +10,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author pnoker
@@ -22,11 +21,7 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
 
     @Setter
     @Getter
-    private long id;
-
-    @Getter
-    @Value("${driver.name}")
-    private String name;
+    private long driverId;
 
     @Getter
     @Value("${spring.application.name}")
@@ -37,15 +32,28 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
 
     @Setter
     @Getter
-    private List<Profile> profiles;
+    private Map<Long, ConnectInfo> connectInfoMap;
 
     @Setter
     @Getter
-    private List<Device> devices;
+    private Map<Long, ProfileInfo> profileInfoMap;
 
+    @Setter
     @Getter
-    @Value("${driver.description}")
-    private String description;
+    private Map<Long, PointInfo> pointInfoMap;
+
+    @Setter
+    @Getter
+    private Map<Long, Profile> profileMap;
+
+    @Setter
+    @Getter
+    private Map<Long, Device> deviceMap;
+
+    @Setter
+    @Getter
+    private Map<Long, Map<Long, Point>> pointMap;
+
 
     public String getHost() {
         try {

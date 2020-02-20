@@ -6,15 +6,18 @@ driver:
       name: host
       type: string
       value: localhost
+      description: 目标机器 Ip
     - displayName: 端口
       name: port
       type: int
       value: 18600
+      description: 目标机器 Port
   profile:
     - displayName: 位号
       name: tag
       type: string
       value: TAG
+      description: 位号名称
 
 server:
   port: 8600
