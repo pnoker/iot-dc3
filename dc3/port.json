@@ -28,7 +28,7 @@
         "port": 8400,
         "redis": 2
       },
-      "dc3-message": {
+      "dc3-data": {
         "description": "消息中心",
         "port": 8500,
         "redis": 3
