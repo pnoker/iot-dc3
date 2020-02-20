@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_PROFILE_INFO_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = PointAttributeClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = PointAttributeClientHystrix.class)
 public interface PointAttributeClient {
 
     /**

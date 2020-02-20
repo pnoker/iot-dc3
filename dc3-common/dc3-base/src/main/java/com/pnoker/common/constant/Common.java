@@ -89,23 +89,22 @@ public interface Common {
 
         String DC3_MANAGER = "DC3-MANAGER";
         String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
-        String DC3_MANAGER_CONNECT_INFO_URL_PREFIX = "/manager/connectInfo";
-        String DC3_MANAGER_PROFILE_INFO_URL_PREFIX = "/manager/profileInfo";
+        String DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX = "/manager/driverAttribute";
+        String DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX = "/manager/pointAttribute";
         String DC3_MANAGER_PROFILE_URL_PREFIX = "/manager/profile";
         String DC3_MANAGER_POINT_URL_PREFIX = "/manager/point";
         String DC3_MANAGER_GROUP_URL_PREFIX = "/manager/group";
         String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
         String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/pointInfo";
+        String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driverInfo";
         String DC3_MANAGER_SCHEDULE_URL_PREFIX = "/manager/schedule";
         String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
-        String DC3_MANAGER_DIC_URL_PREFIX = "/manager/dic";
 
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
 
         String DC3_DATA_URL_PREFIX = "/data";
         String DC3_DRIVER_URL_PREFIX = "/driver";
-
     }
 
     /**
@@ -137,8 +136,6 @@ public interface Common {
         String POINT_ATTRIBUTE = "point_attribute";
         String POINT_INFO = "point_info";
         String LABEL_BIND = "label_bind";
-
-
     }
 
 }

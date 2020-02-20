@@ -20,7 +20,7 @@ import com.pnoker.common.bean.driver.DriverOperation;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.constant.Operation;
 import com.pnoker.common.sdk.init.DeviceDriver;
-import com.pnoker.common.sdk.service.DriverSdkService;
+import com.pnoker.common.sdk.service.SdkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -36,29 +36,29 @@ public class DriverReceiver {
     @Resource
     private DeviceDriver deviceDriver;
     @Resource
-    private DriverSdkService driverSdkService;
+    private SdkService sdkService;
 
     @StreamListener(Common.Topic.DRIVER_TOPIC)
     public void driverReceive(DriverOperation operation) {
         if (operation.getDriverId() == deviceDriver.getDriverId()) {
             switch (operation.getCommand()) {
                 case Operation.Profile.ADD:
-                    driverSdkService.addProfile(operation.getId());
+                    sdkService.addProfile(operation.getId());
                     break;
                 case Operation.Profile.DELETE:
-                    driverSdkService.deleteProfile(operation.getId());
+                    sdkService.deleteProfile(operation.getId());
                     break;
                 case Operation.Profile.UPDATE:
-                    driverSdkService.updateProfile(operation.getId());
+                    sdkService.updateProfile(operation.getId());
                     break;
                 case Operation.Device.ADD:
-                    driverSdkService.addDevice(operation.getId());
+                    sdkService.addDevice(operation.getId());
                     break;
                 case Operation.Device.DELETE:
-                    driverSdkService.deleteDevice(operation.getId());
+                    sdkService.deleteDevice(operation.getId());
                     break;
                 case Operation.Device.UPDATE:
-                    driverSdkService.updateDevice(operation.getId());
+                    sdkService.updateDevice(operation.getId());
                     break;
                 default:
                     break;

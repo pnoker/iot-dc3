@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_CONNECT_INFO_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DriverAttributeClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DriverAttributeClientHystrix.class)
 public interface DriverAttributeClient {
 
     /**

@@ -36,7 +36,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_CONNECT_INFO_URL_PREFIX)
+@RequestMapping(Common.Service.DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX)
 public class DriverAttributeApi implements DriverAttributeClient {
 
     @Resource
