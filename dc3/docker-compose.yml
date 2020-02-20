@@ -88,20 +88,20 @@ services:
         aliases:
           - dc3-manager
 
-  message:
+  data:
     build:
-      context: ../dc3-center/dc3-message/
+      context: ../dc3-center/dc3-data/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-message:3.0
+    image: pnoker/dc3-data:3.0
     restart: always
     ports:
       - 8500:8500
-    container_name: dc3-message
-    hostname: dc3-message
+    container_name: dc3-data
+    hostname: dc3-data
     networks:
       dc3net:
         aliases:
-          - dc3-message
+          - dc3-data
 
   rtmp:
     build:
@@ -132,21 +132,6 @@ services:
       dc3net:
         aliases:
           - dc3-opcua
-
-  resource:
-    build:
-      context: ../dc3-transfer/dc3-resource/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-resource:3.0
-    restart: always
-    ports:
-      - 8800:8800
-    container_name: dc3-resource
-    hostname: dc3-resource
-    networks:
-      dc3net:
-        aliases:
-          - dc3-resource
 
   mysql:
     build:

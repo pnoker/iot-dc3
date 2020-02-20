@@ -33,7 +33,7 @@ function create_services() {
   kubectl apply -f "${DC3_ROOT}/services/dc3-monitor-service.yaml"
   #kubectl apply -f "${DC3_ROOT}/services/dc3-auth-service.yaml"
   #kubectl apply -f "${DC3_ROOT}/services/dc3-gateway-service.yaml"
-  #kubectl apply -f "${DC3_ROOT}/services/dc3-message-service.yaml"
+  #kubectl apply -f "${DC3_ROOT}/services/dc3-data-service.yaml"
   #kubectl apply -f "${DC3_ROOT}/services/dc3-manager-service.yaml"
   #kubectl apply -f "${DC3_ROOT}/services/dc3-resource-service.yaml"
   #kubectl apply -f "${DC3_ROOT}/services/dc3-rtmp-service.yaml"
