@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface PointInfoClient {
 
     /**
-     * 新增 PointInfo 记录
+     * 新增 PointInfo
      *
      * @param pointInfo
      * @return PointInfo
@@ -49,7 +49,7 @@ public interface PointInfoClient {
     R<PointInfo> add(@Validated(Insert.class) @RequestBody PointInfo pointInfo);
 
     /**
-     * 根据 ID 删除 PointInfo
+     * 根据 Id 删除 PointInfo
      *
      * @param id pointInfoId
      * @return Boolean
@@ -58,7 +58,7 @@ public interface PointInfoClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 PointInfo 记录
+     * 修改 PointInfo
      *
      * @param pointInfo
      * @return PointInfo
@@ -67,7 +67,7 @@ public interface PointInfoClient {
     R<PointInfo> update(@Validated(Update.class) @RequestBody PointInfo pointInfo);
 
     /**
-     * 根据 ID 查询 PointInfo
+     * 根据 Id 查询 PointInfo
      *
      * @param id
      * @return PointInfo

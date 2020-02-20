@@ -43,7 +43,7 @@ import java.util.List;
 public interface DriverClient {
 
     /**
-     * 新增 Driver 记录
+     * 新增 Driver
      *
      * @param driver
      * @return Driver
@@ -52,7 +52,7 @@ public interface DriverClient {
     R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver);
 
     /**
-     * 根据 ID 删除 Driver
+     * 根据 Id 删除 Driver
      *
      * @param id driverId
      * @return Boolean
@@ -61,7 +61,7 @@ public interface DriverClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Driver 记录
+     * 修改 Driver
      *
      * @param driver
      * @return Driver
@@ -70,7 +70,7 @@ public interface DriverClient {
     R<Driver> update(@Validated(Update.class) @RequestBody Driver driver);
 
     /**
-     * 根据 ID 查询 Driver
+     * 根据 Id 查询 Driver
      *
      * @param id
      * @return Driver

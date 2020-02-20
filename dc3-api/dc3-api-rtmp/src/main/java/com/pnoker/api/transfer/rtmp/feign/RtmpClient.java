@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * Rtmp转码任务 FeignClient
+ * Rtmp转码 FeignClient
  *
  * @author pnoker
  */
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface RtmpClient {
 
     /**
-     * 新增 Rtmp 任务记录
+     * 新增 Rtmp
      *
      * @param rtmp
      * @return Rtmp
@@ -47,7 +47,7 @@ public interface RtmpClient {
     R<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
 
     /**
-     * 根据 ID 删除 Rtmp
+     * 根据 Id 删除 Rtmp
      *
      * @param id rtmpId
      * @return Boolean
@@ -56,7 +56,7 @@ public interface RtmpClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Rtmp 任务记录
+     * 修改 Rtmp
      *
      * @param rtmp
      * @return Rtmp
@@ -65,7 +65,7 @@ public interface RtmpClient {
     R<Rtmp> update(@RequestBody Rtmp rtmp);
 
     /**
-     * 根据 ID 查询 Rtmp
+     * 根据 Id 查询 Rtmp
      *
      * @param id
      * @return Rtmp

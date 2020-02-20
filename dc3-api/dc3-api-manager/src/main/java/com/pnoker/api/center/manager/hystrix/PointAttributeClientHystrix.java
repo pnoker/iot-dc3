@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * <p>驱动属性配置信息 FeignHystrix
+ * <p>PointAttributeClientHystrix
  *
  * @author pnoker
  */
@@ -40,7 +40,7 @@ public class PointAttributeClientHystrix implements FallbackFactory<PointAttribu
     @Override
     public PointAttributeClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("ProfileInfoClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("PointAttributeClientHystrix:{},hystrix服务降级处理", message, throwable);
 
         return new PointAttributeClient() {
 

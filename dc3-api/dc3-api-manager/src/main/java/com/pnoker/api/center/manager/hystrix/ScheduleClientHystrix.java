@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * <p> Schedule FeignHystrix
+ * <p>ScheduleClientHystrix
  *
  * @author pnoker
  */

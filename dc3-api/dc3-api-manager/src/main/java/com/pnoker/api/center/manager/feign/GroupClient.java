@@ -43,7 +43,7 @@ import java.util.List;
 public interface GroupClient {
 
     /**
-     * 新增 Group 记录
+     * 新增 Group
      *
      * @param group
      * @return Group
@@ -52,7 +52,7 @@ public interface GroupClient {
     R<Group> add(@Validated(Insert.class) @RequestBody Group group);
 
     /**
-     * 根据 ID 删除 Group
+     * 根据 Id 删除 Group
      *
      * @param id groupId
      * @return Boolean
@@ -61,7 +61,7 @@ public interface GroupClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Group 记录
+     * 修改 Group
      *
      * @param group
      * @return Group
@@ -70,7 +70,7 @@ public interface GroupClient {
     R<Group> update(@Validated(Update.class) @RequestBody Group group);
 
     /**
-     * 根据 ID 查询 Group
+     * 根据 Id 查询 Group
      *
      * @param id
      * @return Group

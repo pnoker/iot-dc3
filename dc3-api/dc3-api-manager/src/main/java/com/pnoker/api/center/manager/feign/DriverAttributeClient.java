@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>驱动连接配置信息 FeignClient
+ * <p>驱动配置属性 FeignClient
  *
  * @author pnoker
  */
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface DriverAttributeClient {
 
     /**
-     * 新增 ConnectInfo 记录
+     * 新增 ConnectInfo
      *
      * @param driverAttribute
      * @return ConnectInfo
@@ -49,7 +49,7 @@ public interface DriverAttributeClient {
     R<DriverAttribute> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
-     * 根据 ID 删除 ConnectInfo
+     * 根据 Id 删除 ConnectInfo
      *
      * @param id connectInfoId
      * @return Boolean
@@ -58,7 +58,7 @@ public interface DriverAttributeClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 ConnectInfo 记录
+     * 修改 ConnectInfo
      *
      * @param driverAttribute
      * @return ConnectInfo
@@ -67,7 +67,7 @@ public interface DriverAttributeClient {
     R<DriverAttribute> update(@Validated(Update.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
-     * 根据 ID 查询 ConnectInfo
+     * 根据 Id 查询 ConnectInfo
      *
      * @param id
      * @return ConnectInfo

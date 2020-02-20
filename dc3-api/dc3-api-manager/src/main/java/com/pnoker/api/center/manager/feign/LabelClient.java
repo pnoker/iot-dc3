@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>设备分组 FeignClient
+ * <p>标签 FeignClient
  *
  * @author pnoker
  */
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface LabelClient {
 
     /**
-     * 新增 Label 记录
+     * 新增 Label
      *
      * @param label
      * @return Label
@@ -49,7 +49,7 @@ public interface LabelClient {
     R<Label> add(@Validated(Insert.class) @RequestBody Label label);
 
     /**
-     * 根据 ID 删除 Label
+     * 根据 Id 删除 Label
      *
      * @param id labelId
      * @return Boolean
@@ -58,7 +58,7 @@ public interface LabelClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Label 记录
+     * 修改 Label
      *
      * @param label
      * @return Label
@@ -67,7 +67,7 @@ public interface LabelClient {
     R<Label> update(@Validated(Update.class) @RequestBody Label label);
 
     /**
-     * 根据 ID 查询 Label
+     * 根据 Id 查询 Label
      *
      * @param id
      * @return Label

@@ -35,13 +35,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 /**
+ * 设备 FeignClient
+ *
  * @author pnoker
  */
 @FeignClient(path = Common.Service.DC3_MANAGER_DEVICE_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DeviceClientHystrix.class)
 public interface DeviceClient {
 
     /**
-     * 新增 Device 记录
+     * 新增 Device
      *
      * @param device
      * @return Device
@@ -50,7 +52,7 @@ public interface DeviceClient {
     R<Device> add(@Validated(Insert.class) @RequestBody Device device);
 
     /**
-     * 根据 ID 删除 Device
+     * 根据 Id 删除 Device
      *
      * @param id deviceId
      * @return Boolean
@@ -59,7 +61,7 @@ public interface DeviceClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Device 记录
+     * 修改 Device
      *
      * @param device
      * @return Device
@@ -68,7 +70,7 @@ public interface DeviceClient {
     R<Device> update(@Validated(Update.class) @RequestBody Device device);
 
     /**
-     * 根据 ID 查询 Device
+     * 根据 Id 查询 Device
      *
      * @param id
      * @return Device
@@ -77,7 +79,7 @@ public interface DeviceClient {
     R<Device> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据 CODE 查询 Device
+     * 根据 Code 查询 Device
      *
      * @param code
      * @return Device

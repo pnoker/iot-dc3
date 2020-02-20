@@ -43,7 +43,7 @@ import java.util.List;
 public interface PointClient {
 
     /**
-     * 新增 Point 记录
+     * 新增 Point
      *
      * @param point
      * @return Point
@@ -52,7 +52,7 @@ public interface PointClient {
     R<Point> add(@Validated(Insert.class) @RequestBody Point point);
 
     /**
-     * 根据 ID 删除 Point
+     * 根据 Id 删除 Point
      *
      * @param id pointId
      * @return Boolean
@@ -61,7 +61,7 @@ public interface PointClient {
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Point 记录
+     * 修改 Point
      *
      * @param point
      * @return Point
@@ -70,7 +70,7 @@ public interface PointClient {
     R<Point> update(@Validated(Update.class) @RequestBody Point point);
 
     /**
-     * 根据 ID 查询 Point
+     * 根据 Id 查询 Point
      *
      * @param id
      * @return Point

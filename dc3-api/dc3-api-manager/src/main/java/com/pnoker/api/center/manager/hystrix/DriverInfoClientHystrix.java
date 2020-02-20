@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>位号配置信息 FeignHystrix
+ * <p>DriverInfoClientHystrix
  *
  * @author pnoker
  */
