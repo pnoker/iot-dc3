@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.manager.service;
+package com.pnoker.center.manager.mapper;
 
-import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.ConnectInfoDto;
-import com.pnoker.common.model.ConnectInfo;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.pnoker.common.model.PointAttribute;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * <p>ConnectInfo Interface
+ * Mapper
  *
  * @author pnoker
  */
-public interface ConnectInfoService extends Service<ConnectInfo, ConnectInfoDto> {
-    /**
-     * 根据连接信息 NAME 查询分组
-     *
-     * @param name
-     * @return
-     */
-    ConnectInfo selectByName(String name);
+@Mapper
+public interface PointAttributeMapper extends BaseMapper<PointAttribute> {
 }

@@ -1,7 +1,6 @@
 package com.pnoker.driver.service;
 
 import com.pnoker.common.model.Point;
-import com.pnoker.common.sdk.init.DeviceDriver;
 import com.pnoker.common.sdk.service.DriverCustomizersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ import java.util.Map;
 public class DriverService implements DriverCustomizersService {
 
     @Override
-    public void initial(DeviceDriver deviceDriver) {
+    public void initial() {
         log.info("hello");
     }
 
@@ -26,7 +25,7 @@ public class DriverService implements DriverCustomizersService {
     }
 
     @Override
-    public void read(Map<String, String> connectInfo, Map<String, String> pointInfo, Point point) {
+    public void read(Map<String, String> driverInfo, Map<String, String> pointInfo, Point point) {
 
     }
 

@@ -17,11 +17,11 @@
 package com.pnoker.api.center.manager.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.manager.feign.ProfileInfoClient;
+import com.pnoker.api.center.manager.feign.PointAttributeClient;
 import com.pnoker.common.bean.R;
-import com.pnoker.common.dto.ProfileInfoDto;
+import com.pnoker.common.dto.PointAttributeDto;
 import com.pnoker.common.model.Dic;
-import com.pnoker.common.model.ProfileInfo;
+import com.pnoker.common.model.PointAttribute;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,17 +35,17 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class ProfileInfoClientHystrix implements FallbackFactory<ProfileInfoClient> {
+public class PointAttributeClientHystrix implements FallbackFactory<PointAttributeClient> {
 
     @Override
-    public ProfileInfoClient create(Throwable throwable) {
+    public PointAttributeClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
         log.error("ProfileInfoClientHystrix:{},hystrix服务降级处理", message, throwable);
 
-        return new ProfileInfoClient() {
+        return new PointAttributeClient() {
 
             @Override
-            public R<ProfileInfo> add(ProfileInfo profileInfo) {
+            public R<PointAttribute> add(PointAttribute pointAttribute) {
                 return R.fail(message);
             }
 
@@ -55,22 +55,22 @@ public class ProfileInfoClientHystrix implements FallbackFactory<ProfileInfoClie
             }
 
             @Override
-            public R<ProfileInfo> update(ProfileInfo profileInfo) {
+            public R<PointAttribute> update(PointAttribute pointAttribute) {
                 return R.fail(message);
             }
 
             @Override
-            public R<ProfileInfo> selectById(Long id) {
+            public R<PointAttribute> selectById(Long id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<ProfileInfo> selectByName(String name) {
+            public R<PointAttribute> selectByName(String name) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<ProfileInfo>> list(ProfileInfoDto profileInfoDto) {
+            public R<Page<PointAttribute>> list(PointAttributeDto profileInfoDto) {
                 return R.fail(message);
             }
 

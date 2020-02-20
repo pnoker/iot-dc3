@@ -17,7 +17,7 @@ public interface QuartzService {
      * @param group
      * @param schedule
      */
-    void start(String group, Schedule schedule);
+    void startJob(String group, Schedule schedule);
 
     /**
      * 批量 移除调度
@@ -25,7 +25,7 @@ public interface QuartzService {
      * @param group
      * @param schedule
      */
-    void delete(String group, Schedule schedule);
+    void deleteJob(String group, Schedule schedule);
 
     /**
      * 更新调度任务
@@ -41,7 +41,7 @@ public interface QuartzService {
      * @param group
      * @param schedule
      */
-    void stop(String group, Schedule schedule);
+    void pauseJob(String group, Schedule schedule);
 
     /**
      * 批量 恢复调度
@@ -49,5 +49,5 @@ public interface QuartzService {
      * @param group
      * @param schedule
      */
-    void resume(String group, Schedule schedule);
+    void resumeJob(String group, Schedule schedule);
 }

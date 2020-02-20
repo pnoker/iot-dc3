@@ -19,7 +19,7 @@ package com.pnoker.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
-import com.pnoker.common.model.ProfileInfo;
+import com.pnoker.common.model.PointAttribute;
 import lombok.*;
 import org.springframework.beans.BeanUtils;
 
@@ -33,18 +33,18 @@ import org.springframework.beans.BeanUtils;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ProfileInfoDto extends ProfileInfo implements Converter<ProfileInfo, ProfileInfoDto> {
+public class PointAttributeDto extends PointAttribute implements Converter<PointAttribute, PointAttributeDto> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     @Override
-    public void convertToDo(ProfileInfo info) {
+    public void convertToDo(PointAttribute info) {
         BeanUtils.copyProperties(this, info);
     }
 
     @Override
-    public ProfileInfoDto convert(ProfileInfo info) {
+    public PointAttributeDto convert(PointAttribute info) {
         BeanUtils.copyProperties(info, this);
         return this;
     }

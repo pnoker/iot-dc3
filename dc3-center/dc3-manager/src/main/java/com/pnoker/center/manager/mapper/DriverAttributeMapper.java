@@ -17,11 +17,8 @@
 package com.pnoker.center.manager.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.DriverAttribute;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
 
 /**
  * Mapper
@@ -29,7 +26,5 @@ import java.util.List;
  * @author pnoker
  */
 @Mapper
-public interface DicMapper extends BaseMapper<Dic> {
-    @Select("select")
-    List<Dic> groupDic();
+public interface DriverAttributeMapper extends BaseMapper<DriverAttribute> {
 }

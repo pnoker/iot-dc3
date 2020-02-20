@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.manager.service;
+package com.pnoker.common.sdk.message;
 
-import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.ProfileInfoDto;
-import com.pnoker.common.model.ProfileInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.messaging.support.MessageBuilder;
+
+import javax.annotation.Resource;
 
 /**
- * <p>ProfileInfo Interface
- *
  * @author pnoker
  */
-public interface ProfileInfoService extends Service<ProfileInfo, ProfileInfoDto> {
-    /**
-     * 根据模板配置信息 NAME 查询分组
-     *
-     * @param name
-     * @return
-     */
-    ProfileInfo selectByName(String name);
+@Slf4j
+@EnableBinding(TopicOutput.class)
+public class DriverSender {
+
+    @Resource
+    private TopicOutput topicOutput;
+
+    public void driverSender(String message) {
+        topicOutput.driverOutput().send(
+                MessageBuilder.withPayload(message).build()
+        );
+    }
 }
