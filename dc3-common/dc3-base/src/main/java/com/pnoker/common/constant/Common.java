@@ -122,6 +122,7 @@ public interface Common {
         String GROUP_NAME = "_group_name";
         String SERVICE_NAME = "_service_name";
         String PROFILE_INFO_ID = "_profile_info_id";
+        String CONNECT_INFO_ID = "_connect_info_id";
 
         String USER = "user";
         String RTMP = "rtmp";
@@ -132,6 +133,7 @@ public interface Common {
         String DEVICE = "device";
         String DRIVER = "driver";
         String PROFILE = "profile";
+        String DRIVER_INFO = "driver_info";
         String POINT_INFO = "point_info";
         String LABEL_BIND = "label_bind";
         String DICTIONARY = "dictionary";
