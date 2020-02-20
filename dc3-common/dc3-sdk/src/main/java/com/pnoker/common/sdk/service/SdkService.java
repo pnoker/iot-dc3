@@ -19,21 +19,13 @@ package com.pnoker.common.sdk.service;
 /**
  * @author pnoker
  */
-public interface DriverSdkService {
+public interface SdkService {
     /**
      * 初始化 SDK
      *
      * @return
      */
     void initial();
-
-    /**
-     * 读操作
-     *
-     * @param deviceId
-     * @param pointId
-     */
-    void read(Long deviceId, Long pointId);
 
     /**
      * 向DeviceDriver中添加设备

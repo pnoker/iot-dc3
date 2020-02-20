@@ -17,7 +17,6 @@
 package com.pnoker.common.sdk.service;
 
 import com.pnoker.common.model.Point;
-import com.pnoker.common.sdk.init.DeviceDriver;
 
 import java.util.Map;
 
@@ -26,10 +25,9 @@ import java.util.Map;
  *
  * @author pnoker
  */
-public interface DriverCustomizersService {
+public interface CustomizersService {
     /**
      * 初始化驱动
-     *
      */
     void initial();
 
@@ -41,7 +39,7 @@ public interface DriverCustomizersService {
     /**
      * 读操作
      */
-    void read(Map<String, String> driverInfo, Map<String, String> pointInfo, Point point);
+    void read(Map<String, String> driverInfo, Map<String, String> pointInfo);
 
     /**
      * 写操作

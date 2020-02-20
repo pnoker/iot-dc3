@@ -38,7 +38,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_PROFILE_INFO_URL_PREFIX)
+@RequestMapping(Common.Service.DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeApi implements PointAttributeClient {
 
     @Resource

@@ -22,10 +22,10 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.*;
 import com.pnoker.common.model.*;
+import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.bean.DriverProperty;
 import com.pnoker.common.sdk.init.DeviceDriver;
-import com.pnoker.common.sdk.service.DriverCustomizersService;
-import com.pnoker.common.sdk.service.DriverSdkService;
+import com.pnoker.common.sdk.service.SdkService;
 import com.pnoker.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -44,35 +44,30 @@ import java.util.Map;
 @Slf4j
 @Service
 @EnableConfigurationProperties({DriverProperty.class})
-public class DriverSdkServiceImpl implements DriverSdkService {
-
+public class SdkServiceImpl implements SdkService {
+    @Resource
+    private DeviceDriver deviceDriver;
+    @Resource
+    private DriverProperty driverProperty;
     @Resource
     private ApplicationContext applicationContext;
 
     @Resource
-    private DriverClient driverClient;
-    @Resource
     private DriverAttributeClient driverAttributeClient;
     @Resource
     private PointAttributeClient pointAttributeClient;
+    @Resource
+    private PointInfoClient pointInfoClient;
+    @Resource
+    private DriverInfoClient driverInfoClient;
+    @Resource
+    private DriverClient driverClient;
     @Resource
     private ProfileClient profileClient;
     @Resource
     private DeviceClient deviceClient;
     @Resource
     private PointClient pointClient;
-    @Resource
-    private PointInfoClient pointInfoClient;
-    @Resource
-    private DriverInfoClient driverInfoClient;
-    @Resource
-    private DeviceDriver deviceDriver;
-    @Resource
-    private DriverCustomizersService customizersService;
-
-
-    @Resource
-    private DriverProperty driverProperty;
 
     @Override
     public void initial() {
@@ -80,40 +75,6 @@ public class DriverSdkServiceImpl implements DriverSdkService {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
         loadData();
-    }
-
-    @Override
-    public void read(Long deviceId, Long pointId) {
-        Device device = deviceDriver.getDeviceMap().get(deviceId);
-        Profile profile = deviceDriver.getProfileMap().get(device.getProfileId());
-        Point point = deviceDriver.getPointMap().get(profile.getId()).get(pointId);
-
-        DriverInfoDto driverInfoDto = new DriverInfoDto();
-        driverInfoDto.setProfileId(profile.getId());
-        driverInfoDto.setPage(new Pages().setSize(-1L));
-        Map<String, String> dd = new HashMap<>(16);
-        R<Page<DriverInfo>> rd = driverInfoClient.list(driverInfoDto);
-        if (rd.isOk()) {
-            List<DriverInfo> driverInfos = rd.getData().getRecords();
-            for (DriverInfo driverInfo : driverInfos) {
-                dd.put(deviceDriver.getDriverAttributeMap().get(driverInfo.getDriverAttributeId()).getName(), driverInfo.getValue());
-            }
-        }
-
-        PointInfoDto pointInfoDto = new PointInfoDto();
-        pointInfoDto.setDeviceId(deviceId).setPointId(pointId);
-        pointInfoDto.setPage(new Pages().setSize(-1L));
-        Map<String, String> pp = new HashMap<>(16);
-        R<Page<PointInfo>> rp = pointInfoClient.list(pointInfoDto);
-        if (rp.isOk()) {
-            List<PointInfo> pointInfos = rp.getData().getRecords();
-            for (PointInfo pointInfo : pointInfos) {
-                pp.put(deviceDriver.getPointAttributeMap().get(pointInfo.getPointAttributeId()).getName(), pointInfo.getValue());
-            }
-        }
-
-
-        customizersService.read(pp, pp, point);
     }
 
     @Override
@@ -307,11 +268,13 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * 加载数据
      */
     public void loadData() {
-        deviceDriver.setDriverAttributeMap(getConnectInfoMap(deviceDriver.getDriverId()));
-        deviceDriver.setPointAttributeMap(getProfileInfoMap(deviceDriver.getDriverId()));
         deviceDriver.setProfileMap(getProfileMap(deviceDriver.getDriverId()));
+        deviceDriver.setDriverAttributeMap(getDriverAttributeMap(deviceDriver.getDriverId()));
+        deviceDriver.setDriverInfoMap(getDriverInfoMap(deviceDriver.getProfileMap()));
         deviceDriver.setDeviceMap(getDeviceMap(deviceDriver.getProfileMap()));
         deviceDriver.setPointMap(getPointMap(deviceDriver.getProfileMap()));
+        deviceDriver.setPointAttributeMap(getPointAttributeMap(deviceDriver.getDriverId()));
+        deviceDriver.setPointInfoMap(getPointInfoMap(deviceDriver.getDeviceMap()));
     }
 
     /**
@@ -320,7 +283,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @param driverId
      * @return
      */
-    public Map<Long, DriverAttribute> getConnectInfoMap(long driverId) {
+    public Map<Long, DriverAttribute> getDriverAttributeMap(long driverId) {
         Map<Long, DriverAttribute> infoMap = new HashMap<>(16);
         DriverAttributeDto connectInfoDto = new DriverAttributeDto();
         connectInfoDto.setDriverId(driverId);
@@ -340,7 +303,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @param driverId
      * @return
      */
-    public Map<Long, PointAttribute> getProfileInfoMap(long driverId) {
+    public Map<Long, PointAttribute> getPointAttributeMap(long driverId) {
         Map<Long, PointAttribute> infoMap = new HashMap<>(16);
         PointAttributeDto profileInfoDto = new PointAttributeDto();
         profileInfoDto.setDriverId(driverId);
@@ -398,6 +361,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
 
     /**
      * 获取位号
+     * profileId(pointId,point)
      *
      * @param profileMap
      * @return
@@ -418,6 +382,65 @@ public class DriverSdkServiceImpl implements DriverSdkService {
             }
         }
         return pointMap;
+    }
+
+    /**
+     * 获取驱动信息
+     * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
+     *
+     * @param profileMap
+     * @return
+     */
+    public Map<Long, Map<String, AttributeInfo>> getDriverInfoMap(Map<Long, Profile> profileMap) {
+        Map<Long, Map<String, AttributeInfo>> driverInfoMap = new HashMap<>(16);
+        for (Long profileId : profileMap.keySet()) {
+            DriverInfoDto driverInfoDto = new DriverInfoDto();
+            driverInfoDto.setProfileId(profileId);
+            driverInfoDto.setPage(new Pages().setSize(-1L));
+            R<Page<DriverInfo>> r = driverInfoClient.list(driverInfoDto);
+            if (r.isOk()) {
+                Map<String, AttributeInfo> infoMap = new HashMap<>(16);
+                List<DriverInfo> driverInfos = r.getData().getRecords();
+                for (DriverInfo driverInfo : driverInfos) {
+                    DriverAttribute attribute = deviceDriver.getDriverAttributeMap().get(driverInfo.getDriverAttributeId());
+                    infoMap.put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
+                }
+                driverInfoMap.put(profileId, infoMap);
+            }
+        }
+        return driverInfoMap;
+    }
+
+    /**
+     * 获取位号信息
+     * deviveId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
+     *
+     * @return
+     */
+    public Map<Long, Map<Long, Map<String, AttributeInfo>>> getPointInfoMap(Map<Long, Device> deviceMap) {
+        Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = new HashMap<>(16);
+        for (Device device : deviceMap.values()) {
+            Map<Long, Map<String, AttributeInfo>> tmp = new HashMap<>(16);
+            Profile profile = deviceDriver.getProfileMap().get(device.getProfileId());
+            Map<Long, Point> pointMap = deviceDriver.getPointMap().get(profile.getId());
+            for (Long pointId : pointMap.keySet()) {
+                PointInfoDto pointInfoDto = new PointInfoDto();
+                pointInfoDto.setDeviceId(device.getId()).setPointId(pointId);
+                pointInfoDto.setPage(new Pages().setSize(-1L));
+                R<Page<PointInfo>> r = pointInfoClient.list(pointInfoDto);
+                if (r.isOk()) {
+                    Map<String, AttributeInfo> infoMap = new HashMap<>(16);
+                    List<PointInfo> pointInfos = r.getData().getRecords();
+                    for (PointInfo pointInfo : pointInfos) {
+                        PointAttribute attribute = deviceDriver.getPointAttributeMap().get(pointInfo.getPointAttributeId());
+                        infoMap.put(attribute.getName(), new AttributeInfo(pointInfo.getValue(), attribute.getType()));
+                    }
+                    tmp.put(pointId, infoMap);
+                }
+            }
+            pointInfoMap.put(device.getId(), tmp);
+        }
+        return pointInfoMap;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.pnoker.common.sdk.init;
 
 import com.pnoker.common.model.*;
+import com.pnoker.common.sdk.bean.AttributeInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
 
     @Setter
     @Getter
-    private Map<Long, DriverInfo> driverInfoMap;
+    private Map<Long, Map<String, AttributeInfo>> driverInfoMap;
 
     @Setter
     @Getter
@@ -44,7 +45,7 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
 
     @Setter
     @Getter
-    private Map<Long, PointInfo> pointInfoMap;
+    private Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap;
 
     @Setter
     @Getter

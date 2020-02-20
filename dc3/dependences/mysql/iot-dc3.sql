@@ -115,7 +115,7 @@ CREATE TABLE `dc3_driver_info`  (
   INDEX `connect_info_id`(`connect_info_id`) USING BTREE,
   INDEX `profile_id`(`profile_id`) USING BTREE,
   CONSTRAINT `dc3_driver_info_ibfk_1` FOREIGN KEY (`connect_info_id`) REFERENCES `dc3_driver_attribute` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `dc3_driver_info_ibfk_2` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_driver_info_ibfk_2` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '模板连接配置信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -351,7 +351,7 @@ INSERT INTO `dc3_device` VALUES (-1, '测试设备', 'd1b60e969d3e4a26931a935e8e
 -- ----------------------------
 -- Records of dc3_point
 -- ----------------------------
-INSERT INTO `dc3_point` VALUES (-1, '温度', 'string', 0, '--', 0, -999999, 999999, 1, 0, '#.##', '℃', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-1, '温度', 'string', 0, 0, -999999, 999999, 1, 0, '#.##', '℃', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_user

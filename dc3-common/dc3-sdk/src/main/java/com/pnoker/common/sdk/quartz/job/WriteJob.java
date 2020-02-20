@@ -16,7 +16,7 @@
 
 package com.pnoker.common.sdk.quartz.job;
 
-import com.pnoker.common.sdk.service.DriverCustomizersService;
+import com.pnoker.common.sdk.service.CustomizersService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -34,7 +34,7 @@ import javax.annotation.Resource;
 @Component
 public class WriteJob extends QuartzJobBean {
     @Resource
-    private DriverCustomizersService customizersService;
+    private CustomizersService customizersService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
