@@ -17,10 +17,10 @@ spring:
     servlet:
       content-type: text/html
   redis:
-    database: 0
     host: dc3-redis
     port: 6379
     password: dc3
+    database: 0
   cache:
     redis:
       time-to-live: 60S
