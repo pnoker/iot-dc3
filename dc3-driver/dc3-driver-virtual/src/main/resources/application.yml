@@ -1,6 +1,20 @@
 driver:
   name: VirtualDriver
   description: @project.description@
+  connect:
+    - displayName: 主机
+      name: host
+      type: string
+      value: localhost
+    - displayName: 端口
+      name: port
+      type: int
+      value: 18600
+  profile:
+    - displayName: 位号
+      name: tag
+      type: string
+      value: TAG
 
 server:
   port: 8600
@@ -18,4 +32,4 @@ logging:
   level:
     com.pnoker: DEBUG
   file:
-    name: dc3/logs/driver/${spring.application.name}.log
+    name: dc3/logs/driver/virtual/${spring.application.name}.log
