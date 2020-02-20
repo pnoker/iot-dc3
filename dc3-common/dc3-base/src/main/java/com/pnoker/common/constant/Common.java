@@ -56,8 +56,8 @@ public interface Common {
     /**
      * 消息通道
      */
-    interface Msg {
-        String DRIVER_CHANNEL = "driver_channel";
+    interface Topic {
+        String DRIVER_TOPIC = "driver.topic";
     }
 
     /**
@@ -103,6 +103,7 @@ public interface Common {
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
 
+        String DC3_DATA_URL_PREFIX = "/data";
         String DC3_DRIVER_URL_PREFIX = "/driver";
 
     }
