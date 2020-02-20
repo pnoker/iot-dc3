@@ -36,8 +36,8 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class DriverInfo extends Description {
 
-    @NotNull(message = "connect info id can't be empty", groups = {Insert.class, Update.class})
-    private Long connectInfoId;
+    @NotNull(message = "driver attribute id can't be empty", groups = {Insert.class, Update.class})
+    private Long driverAttributeId;
 
     private String value;
 

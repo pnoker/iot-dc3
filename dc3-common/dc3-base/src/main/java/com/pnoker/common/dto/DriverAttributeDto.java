@@ -19,7 +19,7 @@ package com.pnoker.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
-import com.pnoker.common.model.ConnectInfo;
+import com.pnoker.common.model.DriverAttribute;
 import lombok.*;
 import org.springframework.beans.BeanUtils;
 
@@ -33,18 +33,18 @@ import org.springframework.beans.BeanUtils;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ConnectInfoDto extends ConnectInfo implements Converter<ConnectInfo, ConnectInfoDto> {
+public class DriverAttributeDto extends DriverAttribute implements Converter<DriverAttribute, DriverAttributeDto> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     @Override
-    public void convertToDo(ConnectInfo info) {
+    public void convertToDo(DriverAttribute info) {
         BeanUtils.copyProperties(this, info);
     }
 
     @Override
-    public ConnectInfoDto convert(ConnectInfo info) {
+    public DriverAttributeDto convert(DriverAttribute info) {
         BeanUtils.copyProperties(info, this);
         return this;
     }

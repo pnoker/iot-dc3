@@ -17,13 +17,13 @@
 package com.pnoker.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.manager.feign.ProfileInfoClient;
-import com.pnoker.center.manager.service.ProfileInfoService;
+import com.pnoker.api.center.manager.feign.PointAttributeClient;
+import com.pnoker.center.manager.service.PointAttributeService;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.ProfileInfoDto;
+import com.pnoker.common.dto.PointAttributeDto;
 import com.pnoker.common.model.Dic;
-import com.pnoker.common.model.ProfileInfo;
+import com.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,15 +39,15 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_PROFILE_INFO_URL_PREFIX)
-public class ProfileInfoApi implements ProfileInfoClient {
+public class PointAttributeApi implements PointAttributeClient {
 
     @Resource
-    private ProfileInfoService profileInfoService;
+    private PointAttributeService pointAttributeService;
 
     @Override
-    public R<ProfileInfo> add(ProfileInfo profileInfo) {
+    public R<PointAttribute> add(PointAttribute pointAttribute) {
         try {
-            ProfileInfo add = profileInfoService.add(profileInfo);
+            PointAttribute add = pointAttributeService.add(pointAttribute);
             if (null != add) {
                 return R.ok(add);
             }
@@ -60,16 +60,16 @@ public class ProfileInfoApi implements ProfileInfoClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return profileInfoService.delete(id) ? R.ok() : R.fail();
+            return pointAttributeService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<ProfileInfo> update(ProfileInfo profileInfo) {
+    public R<PointAttribute> update(PointAttribute pointAttribute) {
         try {
-            ProfileInfo update = profileInfoService.update(profileInfo);
+            PointAttribute update = pointAttributeService.update(pointAttribute);
             if (null != update) {
                 return R.ok(update);
             }
@@ -80,9 +80,9 @@ public class ProfileInfoApi implements ProfileInfoClient {
     }
 
     @Override
-    public R<ProfileInfo> selectById(Long id) {
+    public R<PointAttribute> selectById(Long id) {
         try {
-            ProfileInfo select = profileInfoService.selectById(id);
+            PointAttribute select = pointAttributeService.selectById(id);
             if (null != select) {
                 return R.ok(select);
             }
@@ -93,9 +93,9 @@ public class ProfileInfoApi implements ProfileInfoClient {
     }
 
     @Override
-    public R<ProfileInfo> selectByName(String name) {
+    public R<PointAttribute> selectByName(String name) {
         try {
-            ProfileInfo select = profileInfoService.selectByName(name);
+            PointAttribute select = pointAttributeService.selectByName(name);
             if (null != select) {
                 return R.ok(select);
             }
@@ -106,9 +106,9 @@ public class ProfileInfoApi implements ProfileInfoClient {
     }
 
     @Override
-    public R<Page<ProfileInfo>> list(ProfileInfoDto profileInfoDto) {
+    public R<Page<PointAttribute>> list(PointAttributeDto profileInfoDto) {
         try {
-            Page<ProfileInfo> page = profileInfoService.list(profileInfoDto);
+            Page<PointAttribute> page = pointAttributeService.list(profileInfoDto);
             if (null != page) {
                 return R.ok(page);
             }
@@ -121,7 +121,7 @@ public class ProfileInfoApi implements ProfileInfoClient {
     @Override
     public R<List<Dic>> dictionary() {
         try {
-            List<Dic> list = profileInfoService.dictionary();
+            List<Dic> list = pointAttributeService.dictionary();
             if (null != list) {
                 return R.ok(list);
             }

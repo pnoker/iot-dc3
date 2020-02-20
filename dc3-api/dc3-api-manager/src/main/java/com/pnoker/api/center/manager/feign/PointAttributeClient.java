@@ -17,11 +17,12 @@
 package com.pnoker.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.manager.hystrix.DicClientHystrix;
+import com.pnoker.api.center.manager.hystrix.PointAttributeClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.DicDto;
+import com.pnoker.common.dto.PointAttributeDto;
 import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.PointAttribute;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -31,67 +32,75 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 /**
- * <p>字典 FeignClient
+ * <p>驱动属性配置信息 FeignClient
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_DIC_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DicClientHystrix.class)
-public interface DicClient {
+@FeignClient(path = Common.Service.DC3_MANAGER_PROFILE_INFO_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = PointAttributeClientHystrix.class)
+public interface PointAttributeClient {
 
     /**
-     * 新增 Dic 记录
+     * 新增 ProfileInfo 记录
      *
-     * @param dic
-     * @return Dic
+     * @param pointAttribute
+     * @return ProfileInfo
      */
     @PostMapping("/add")
-    R<Dic> add(@Validated(Insert.class) @RequestBody Dic dic);
+    R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 ID 删除 Dic
+     * 根据 ID 删除 ProfileInfo
      *
-     * @param id dicId
+     * @param id profileInfoId
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Dic 记录
+     * 修改 ProfileInfo 记录
      *
-     * @param dic
-     * @return Dic
+     * @param pointAttribute
+     * @return ProfileInfo
      */
     @PostMapping("/update")
-    R<Dic> update(@Validated(Update.class) @RequestBody Dic dic);
+    R<PointAttribute> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 ID 查询 Dic
+     * 根据 ID 查询 ProfileInfo
      *
      * @param id
-     * @return Dic
+     * @return ProfileInfo
      */
     @GetMapping("/id/{id}")
-    R<Dic> selectById(@PathVariable(value = "id") Long id);
+    R<PointAttribute> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据 Name 查询 Dic
+     * 根据 Name 查询 ProfileInfo
      *
-     * @param label
-     * @param type
-     * @return Dic
+     * @param name
+     * @return ProfileInfo
      */
-    @GetMapping("/label/{label}/type/{type}")
-    R<Dic> selectByLabelAndType(@PathVariable(value = "label") String label, @PathVariable(value = "type") String type);
+    @GetMapping("/name/{name}")
+    R<PointAttribute> selectByName(@PathVariable(value = "name") String name);
 
     /**
-     * 分页查询 Dic
+     * 分页查询 ProfileInfo
      *
-     * @param dicDto
-     * @return Page<Dic>
+     * @param profileInfoDto
+     * @return Page<ProfileInfo>
      */
     @PostMapping("/list")
-    R<Page<Dic>> list(@RequestBody(required = false) DicDto dicDto);
+    R<Page<PointAttribute>> list(@RequestBody(required = false) PointAttributeDto profileInfoDto);
 
+    /**
+     * 查询 ProfileInfo 字典
+     *
+     * @return List<ProfileInfo>
+     */
+    @GetMapping("/dictionary")
+    R<List<Dic>> dictionary();
 }

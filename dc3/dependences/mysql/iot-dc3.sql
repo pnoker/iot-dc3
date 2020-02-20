@@ -40,10 +40,10 @@ CREATE TABLE `dc3_driver`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '协议驱动表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for dc3_connect_info
+-- Table structure for dc3_driver_attribute
 -- ----------------------------
-DROP TABLE IF EXISTS `dc3_connect_info`;
-CREATE TABLE `dc3_connect_info`  (
+DROP TABLE IF EXISTS `dc3_driver_attribute`;
+CREATE TABLE `dc3_driver_attribute`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `display_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '显示名称',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '名称',
@@ -56,14 +56,14 @@ CREATE TABLE `dc3_connect_info`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `driver_id`(`driver_id`) USING BTREE,
-  CONSTRAINT `dc3_connect_info_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `dc3_driver_attribute_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '连接配置信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for dc3_profile_info
+-- Table structure for dc3_point_attribute
 -- ----------------------------
-DROP TABLE IF EXISTS `dc3_profile_info`;
-CREATE TABLE `dc3_profile_info`  (
+DROP TABLE IF EXISTS `dc3_point_attribute`;
+CREATE TABLE `dc3_point_attribute`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `display_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '显示名称',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '名称',
@@ -76,7 +76,7 @@ CREATE TABLE `dc3_profile_info`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `driver_id`(`driver_id`) USING BTREE,
-  CONSTRAINT `dc3_profile_info_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `dc3_point_attribute_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `dc3_driver` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '模板配置信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -114,7 +114,7 @@ CREATE TABLE `dc3_driver_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `connect_info_id`(`connect_info_id`) USING BTREE,
   INDEX `profile_id`(`profile_id`) USING BTREE,
-  CONSTRAINT `dc3_driver_info_ibfk_1` FOREIGN KEY (`connect_info_id`) REFERENCES `dc3_connect_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_driver_info_ibfk_1` FOREIGN KEY (`connect_info_id`) REFERENCES `dc3_driver_attribute` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_driver_info_ibfk_2` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '模板连接配置信息表' ROW_FORMAT = Dynamic;
 
@@ -201,7 +201,7 @@ CREATE TABLE `dc3_point_info`  (
   INDEX `profile_info_id`(`profile_info_id`) USING BTREE,
   INDEX `device_id`(`device_id`) USING BTREE,
   INDEX `point_id`(`point_id`) USING BTREE,
-  CONSTRAINT `dc3_point_info_ibfk_1` FOREIGN KEY (`profile_info_id`) REFERENCES `dc3_profile_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_point_info_ibfk_1` FOREIGN KEY (`profile_info_id`) REFERENCES `dc3_point_attribute` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_point_info_ibfk_2` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_point_info_ibfk_3` FOREIGN KEY (`point_id`) REFERENCES `dc3_point` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '位号配置信息表' ROW_FORMAT = Dynamic;
@@ -323,15 +323,15 @@ CREATE TABLE `dc3_dic`  (
 INSERT INTO `dc3_driver` VALUES (-1, '测试驱动', '测试驱动服务','localhost', 9999, '测试使用驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
--- Records of dc3_connect_info
+-- Records of dc3_driver_attribute
 -- ----------------------------
-INSERT INTO `dc3_connect_info` VALUES (-2, '主机', 'host', 'string', 'localhost', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_connect_info` VALUES (-1, '端口', 'port', 'string', '8888', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-2, '主机', 'host', 'string', 'localhost', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-1, '端口', 'port', 'string', '8888', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
--- Records of dc3_profile_info
+-- Records of dc3_point_attribute
 -- ----------------------------
-INSERT INTO `dc3_profile_info` VALUES (-1, '位号', 'name', 'string', 'tag', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-1, '位号', 'name', 'string', 'tag', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_profile

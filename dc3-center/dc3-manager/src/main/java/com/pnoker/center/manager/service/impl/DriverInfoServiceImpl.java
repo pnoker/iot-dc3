@@ -62,7 +62,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo add(DriverInfo driverInfo) {
-        DriverInfo select = selectByConnectInfoId(driverInfo.getConnectInfoId());
+        DriverInfo select = selectByConnectInfoId(driverInfo.getDriverAttributeId());
         if (null != select) {
             throw new ServiceException("driver info already exists");
         }
@@ -100,7 +100,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         driverInfo.setUpdateTime(null);
         if (driverInfoMapper.updateById(driverInfo) > 0) {
             DriverInfo select = selectById(driverInfo.getId());
-            driverInfo.setConnectInfoId(select.getConnectInfoId());
+            driverInfo.setDriverAttributeId(select.getDriverAttributeId());
             return select;
         }
         return null;
@@ -116,7 +116,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.CONNECT_INFO_ID, key = "#id", unless = "#result==null")
     public DriverInfo selectByConnectInfoId(Long id) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        queryWrapper.like(DriverInfo::getConnectInfoId, id);
+        queryWrapper.like(DriverInfo::getDriverAttributeId, id);
         return driverInfoMapper.selectOne(queryWrapper);
     }
 
@@ -141,8 +141,8 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
         Optional.ofNullable(driverInfoDto).ifPresent(dto -> {
-            if (null != dto.getConnectInfoId()) {
-                queryWrapper.eq(DriverInfo::getConnectInfoId, dto.getConnectInfoId());
+            if (null != dto.getDriverAttributeId()) {
+                queryWrapper.eq(DriverInfo::getDriverAttributeId, dto.getDriverAttributeId());
             }
             if (null != dto.getProfileId()) {
                 queryWrapper.eq(DriverInfo::getProfileId, dto.getProfileId());

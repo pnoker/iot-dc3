@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
- * 驱动连接信息表
+ * 模板配置信息表
  *
  * @author pnoker
  */
@@ -36,7 +36,7 @@ import javax.validation.constraints.Pattern;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ConnectInfo extends Description {
+public class PointAttribute extends Description {
 
     @NotBlank(message = "display name can't be empty", groups = {Insert.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid display name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})

@@ -118,7 +118,6 @@ public interface Common {
         String CODE = "_code";
         String LIST = "_list";
         String HOST_PORT = "_host_port";
-        String LABEL_TYPE = "_label_type";
         String GROUP_NAME = "_group_name";
         String SERVICE_NAME = "_service_name";
         String PROFILE_INFO_ID = "_profile_info_id";
@@ -133,12 +132,11 @@ public interface Common {
         String DEVICE = "device";
         String DRIVER = "driver";
         String PROFILE = "profile";
+        String DRIVER_ATTRIBUTE = "driver_attribute";
         String DRIVER_INFO = "driver_info";
+        String POINT_ATTRIBUTE = "point_attribute";
         String POINT_INFO = "point_info";
         String LABEL_BIND = "label_bind";
-        String DICTIONARY = "dictionary";
-        String CONNECT_INFO = "connect_info";
-        String PROFILE_INFO = "profile_info";
 
 
     }

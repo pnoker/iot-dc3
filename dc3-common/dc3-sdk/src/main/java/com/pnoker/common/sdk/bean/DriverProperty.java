@@ -1,7 +1,7 @@
 package com.pnoker.common.sdk.bean;
 
-import com.pnoker.common.model.ConnectInfo;
-import com.pnoker.common.model.ProfileInfo;
+import com.pnoker.common.model.DriverAttribute;
+import com.pnoker.common.model.PointAttribute;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,6 +9,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 /**
+ * 驱动配置文件 driver 字段内容
+ *
  * @author pnoker
  */
 @Setter
@@ -17,6 +19,6 @@ import java.util.List;
 public class DriverProperty {
     private String name;
     private String description;
-    private List<ConnectInfo> connect;
-    private List<ProfileInfo> profile;
+    private List<DriverAttribute> connect;
+    private List<PointAttribute> profile;
 }

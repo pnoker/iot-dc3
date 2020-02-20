@@ -16,8 +16,6 @@
 
 package com.pnoker.common.sdk.service;
 
-import org.springframework.context.ApplicationContext;
-
 /**
  * @author pnoker
  */
@@ -25,11 +23,16 @@ public interface DriverSdkService {
     /**
      * 初始化 SDK
      *
-     * @param context
      * @return
      */
-    void initial(ApplicationContext context);
+    void initial();
 
+    /**
+     * 读操作
+     *
+     * @param deviceId
+     * @param pointId
+     */
     void read(Long deviceId, Long pointId);
 
     /**

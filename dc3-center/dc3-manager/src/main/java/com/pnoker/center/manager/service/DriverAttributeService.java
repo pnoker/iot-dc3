@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.message;
+package com.pnoker.center.manager.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.messaging.support.MessageBuilder;
-
-import javax.annotation.Resource;
+import com.pnoker.common.base.Service;
+import com.pnoker.common.dto.DriverAttributeDto;
+import com.pnoker.common.model.DriverAttribute;
 
 /**
+ * <p>ConnectInfo Interface
+ *
  * @author pnoker
  */
-@Slf4j
-@EnableBinding(TopicOutput.class)
-public class Sender {
-
-    @Resource
-    private TopicOutput topicOutput;
-
-    public void driverSender(String message) {
-        topicOutput.driverOutput().send(
-                MessageBuilder.withPayload(message).build()
-        );
-    }
+public interface DriverAttributeService extends Service<DriverAttribute, DriverAttributeDto> {
+    /**
+     * 根据连接信息 NAME 查询分组
+     *
+     * @param name
+     * @return
+     */
+    DriverAttribute selectByName(String name);
 }

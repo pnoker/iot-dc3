@@ -17,10 +17,10 @@
 package com.pnoker.api.center.manager.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.manager.feign.ConnectInfoClient;
+import com.pnoker.api.center.manager.feign.DriverAttributeClient;
 import com.pnoker.common.bean.R;
-import com.pnoker.common.dto.ConnectInfoDto;
-import com.pnoker.common.model.ConnectInfo;
+import com.pnoker.common.dto.DriverAttributeDto;
+import com.pnoker.common.model.DriverAttribute;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -32,17 +32,17 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class ConnectInfoClientHystrix implements FallbackFactory<ConnectInfoClient> {
+public class DriverAttributeClientHystrix implements FallbackFactory<DriverAttributeClient> {
 
     @Override
-    public ConnectInfoClient create(Throwable throwable) {
+    public DriverAttributeClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
         log.error("ConnectInfoClientHystrix:{},hystrix服务降级处理", message, throwable);
 
-        return new ConnectInfoClient() {
+        return new DriverAttributeClient() {
 
             @Override
-            public R<ConnectInfo> add(ConnectInfo connectInfo) {
+            public R<DriverAttribute> add(DriverAttribute driverAttribute) {
                 return R.fail(message);
             }
 
@@ -52,22 +52,22 @@ public class ConnectInfoClientHystrix implements FallbackFactory<ConnectInfoClie
             }
 
             @Override
-            public R<ConnectInfo> update(ConnectInfo connectInfo) {
+            public R<DriverAttribute> update(DriverAttribute driverAttribute) {
                 return R.fail(message);
             }
 
             @Override
-            public R<ConnectInfo> selectById(Long id) {
+            public R<DriverAttribute> selectById(Long id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<ConnectInfo> selectByName(String name) {
+            public R<DriverAttribute> selectByName(String name) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<ConnectInfo>> list(ConnectInfoDto connectInfoDto) {
+            public R<Page<DriverAttribute>> list(DriverAttributeDto connectInfoDto) {
                 return R.fail(message);
             }
 

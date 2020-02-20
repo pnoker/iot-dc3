@@ -17,11 +17,11 @@
 package com.pnoker.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.manager.hystrix.ConnectInfoClientHystrix;
+import com.pnoker.api.center.manager.hystrix.DriverAttributeClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.ConnectInfoDto;
-import com.pnoker.common.model.ConnectInfo;
+import com.pnoker.common.dto.DriverAttributeDto;
+import com.pnoker.common.model.DriverAttribute;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -36,17 +36,17 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_CONNECT_INFO_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = ConnectInfoClientHystrix.class)
-public interface ConnectInfoClient {
+@FeignClient(path = Common.Service.DC3_MANAGER_CONNECT_INFO_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DriverAttributeClientHystrix.class)
+public interface DriverAttributeClient {
 
     /**
      * 新增 ConnectInfo 记录
      *
-     * @param connectInfo
+     * @param driverAttribute
      * @return ConnectInfo
      */
     @PostMapping("/add")
-    R<ConnectInfo> add(@Validated(Insert.class) @RequestBody ConnectInfo connectInfo);
+    R<DriverAttribute> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
      * 根据 ID 删除 ConnectInfo
@@ -60,11 +60,11 @@ public interface ConnectInfoClient {
     /**
      * 修改 ConnectInfo 记录
      *
-     * @param connectInfo
+     * @param driverAttribute
      * @return ConnectInfo
      */
     @PostMapping("/update")
-    R<ConnectInfo> update(@Validated(Update.class) @RequestBody ConnectInfo connectInfo);
+    R<DriverAttribute> update(@Validated(Update.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
      * 根据 ID 查询 ConnectInfo
@@ -73,7 +73,7 @@ public interface ConnectInfoClient {
      * @return ConnectInfo
      */
     @GetMapping("/id/{id}")
-    R<ConnectInfo> selectById(@PathVariable(value = "id") Long id);
+    R<DriverAttribute> selectById(@PathVariable(value = "id") Long id);
 
     /**
      * 根据 Name 查询 ConnectInfo
@@ -82,7 +82,7 @@ public interface ConnectInfoClient {
      * @return ConnectInfo
      */
     @GetMapping("/name/{name}")
-    R<ConnectInfo> selectByName(@PathVariable(value = "name") String name);
+    R<DriverAttribute> selectByName(@PathVariable(value = "name") String name);
 
     /**
      * 分页查询 ConnectInfo
@@ -91,6 +91,6 @@ public interface ConnectInfoClient {
      * @return Page<ConnectInfo>
      */
     @PostMapping("/list")
-    R<Page<ConnectInfo>> list(@RequestBody(required = false) ConnectInfoDto connectInfoDto);
+    R<Page<DriverAttribute>> list(@RequestBody(required = false) DriverAttributeDto connectInfoDto);
 
 }

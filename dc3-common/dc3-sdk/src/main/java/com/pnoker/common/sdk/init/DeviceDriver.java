@@ -19,10 +19,6 @@ import java.util.Map;
 @Component
 public class DeviceDriver implements ApplicationListener<WebServerInitializedEvent> {
 
-    @Setter
-    @Getter
-    private long driverId;
-
     @Getter
     @Value("${spring.application.name}")
     private String serviceName;
@@ -32,11 +28,19 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
 
     @Setter
     @Getter
-    private Map<Long, ConnectInfo> connectInfoMap;
+    private long driverId;
 
     @Setter
     @Getter
-    private Map<Long, ProfileInfo> profileInfoMap;
+    private Map<Long, DriverAttribute> driverAttributeMap;
+
+    @Setter
+    @Getter
+    private Map<Long, DriverInfo> driverInfoMap;
+
+    @Setter
+    @Getter
+    private Map<Long, PointAttribute> pointAttributeMap;
 
     @Setter
     @Getter
@@ -50,6 +54,9 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
     @Getter
     private Map<Long, Device> deviceMap;
 
+    /**
+     * profileId,(pointId,point)
+     */
     @Setter
     @Getter
     private Map<Long, Map<Long, Point>> pointMap;

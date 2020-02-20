@@ -17,7 +17,7 @@
 package com.pnoker.common.sdk.api;
 
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.sdk.message.Sender;
+import com.pnoker.common.sdk.message.DriverSender;
 import com.pnoker.common.sdk.service.DriverSdkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,18 +35,18 @@ import javax.annotation.Resource;
 @RequestMapping(Common.Service.DC3_DRIVER_URL_PREFIX)
 public class DriverSdkApi {
     @Resource
-    private Sender sender;
+    private DriverSender driverSender;
     @Resource
-    private DriverSdkService service;
+    private DriverSdkService driverSdkService;
 
 
     @GetMapping("/msg")
     public void msg() {
-        sender.driverSender("hello 123");
+        driverSender.driverSender("hello 123");
     }
 
     @GetMapping("/device/{deviceId}/point/{pointId}")
-    public void point(@PathVariable("deviceId") Long deviceId, @PathVariable("pointId") Long pointId) {
-        service.read(deviceId, pointId);
+    public void readPoint(@PathVariable("deviceId") Long deviceId, @PathVariable("pointId") Long pointId) {
+        driverSdkService.read(deviceId, pointId);
     }
 }

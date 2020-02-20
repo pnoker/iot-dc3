@@ -21,15 +21,12 @@ import com.pnoker.common.sdk.service.DriverCustomizersService;
 import com.pnoker.common.sdk.service.DriverSdkService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
- * 初始化
- *
  * @author pnoker
  */
 @Component
@@ -41,22 +38,17 @@ import javax.annotation.Resource;
         "com.pnoker.common.sdk"
 })
 public class DriverSdkRunner implements CommandLineRunner {
-
-    @Resource
-    private ApplicationContext context;
-    @Resource
-    private DeviceDriver driver;
-    @Resource
-    private DriverSdkService service;
-    @Resource
-    private DriverCustomizersService customizers;
     @Resource
     private QuartzService quartzService;
+    @Resource
+    private DriverSdkService driverSdkService;
+    @Resource
+    private DriverCustomizersService driverCustomizersService;
 
     @Override
     public void run(String... args) throws Exception {
-        service.initial(context);
-        customizers.initial(driver);
+        driverSdkService.initial();
+        driverCustomizersService.initial();
         quartzService.initial();
     }
 }

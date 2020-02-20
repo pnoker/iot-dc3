@@ -35,8 +35,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 /**
- * <p>设备 FeignClient
- *
  * @author pnoker
  */
 @FeignClient(path = Common.Service.DC3_MANAGER_DEVICE_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DeviceClientHystrix.class)

@@ -47,11 +47,14 @@ import java.util.Map;
 public class DriverSdkServiceImpl implements DriverSdkService {
 
     @Resource
+    private ApplicationContext applicationContext;
+
+    @Resource
     private DriverClient driverClient;
     @Resource
-    private ConnectInfoClient connectInfoClient;
+    private DriverAttributeClient driverAttributeClient;
     @Resource
-    private ProfileInfoClient profileInfoClient;
+    private PointAttributeClient pointAttributeClient;
     @Resource
     private ProfileClient profileClient;
     @Resource
@@ -63,26 +66,27 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     @Resource
     private DriverInfoClient driverInfoClient;
     @Resource
-    private DeviceDriver driver;
+    private DeviceDriver deviceDriver;
     @Resource
     private DriverCustomizersService customizersService;
+
 
     @Resource
     private DriverProperty driverProperty;
 
     @Override
-    public void initial(ApplicationContext context) {
+    public void initial() {
         if (!register()) {
-            ((ConfigurableApplicationContext) context).close();
+            ((ConfigurableApplicationContext) applicationContext).close();
         }
         loadData();
     }
 
     @Override
     public void read(Long deviceId, Long pointId) {
-        Device device = driver.getDeviceMap().get(deviceId);
-        Profile profile = driver.getProfileMap().get(device.getProfileId());
-        Point point = driver.getPointMap().get(profile.getId()).get(pointId);
+        Device device = deviceDriver.getDeviceMap().get(deviceId);
+        Profile profile = deviceDriver.getProfileMap().get(device.getProfileId());
+        Point point = deviceDriver.getPointMap().get(profile.getId()).get(pointId);
 
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setProfileId(profile.getId());
@@ -92,7 +96,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
         if (rd.isOk()) {
             List<DriverInfo> driverInfos = rd.getData().getRecords();
             for (DriverInfo driverInfo : driverInfos) {
-                dd.put(driver.getConnectInfoMap().get(driverInfo.getConnectInfoId()).getName(), driverInfo.getValue());
+                dd.put(deviceDriver.getDriverAttributeMap().get(driverInfo.getDriverAttributeId()).getName(), driverInfo.getValue());
             }
         }
 
@@ -104,7 +108,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
         if (rp.isOk()) {
             List<PointInfo> pointInfos = rp.getData().getRecords();
             for (PointInfo pointInfo : pointInfos) {
-                pp.put(driver.getProfileInfoMap().get(pointInfo.getProfileInfoId()).getName(), pointInfo.getValue());
+                pp.put(deviceDriver.getPointAttributeMap().get(pointInfo.getPointAttributeId()).getName(), pointInfo.getValue());
             }
         }
 
@@ -116,13 +120,13 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     public void addDevice(Long id) {
         R<Device> r = deviceClient.selectById(id);
         if (r.isOk()) {
-            driver.getDeviceMap().put(r.getData().getId(), r.getData());
+            deviceDriver.getDeviceMap().put(r.getData().getId(), r.getData());
         }
     }
 
     @Override
     public void deleteDevice(Long id) {
-        driver.getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        deviceDriver.getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
     }
 
     @Override
@@ -135,13 +139,13 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     public void addProfile(Long id) {
         R<Profile> r = profileClient.selectById(id);
         if (r.isOk()) {
-            driver.getProfileMap().put(r.getData().getId(), r.getData());
+            deviceDriver.getProfileMap().put(r.getData().getId(), r.getData());
         }
     }
 
     @Override
     public void deleteProfile(Long id) {
-        driver.getProfileMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        deviceDriver.getProfileMap().entrySet().removeIf(next -> next.getKey().equals(id));
     }
 
     @Override
@@ -156,11 +160,11 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @return
      */
     public boolean register() {
-        if (!Dc3Util.isDriverPort(driver.getPort())) {
+        if (!Dc3Util.isDriverPort(deviceDriver.getPort())) {
             log.error("invalid driver port,port range is 8600-8799");
             return false;
         }
-        if (!Dc3Util.isName(driverProperty.getName()) || !Dc3Util.isName(driver.getServiceName()) || !Dc3Util.isHost(driver.getHost())) {
+        if (!Dc3Util.isName(driverProperty.getName()) || !Dc3Util.isName(deviceDriver.getServiceName()) || !Dc3Util.isHost(deviceDriver.getHost())) {
             log.error("driver name || driver service name || driver host is invalid");
             return false;
         }
@@ -173,24 +177,24 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @return
      */
     public boolean registerDriver() {
-        Driver tmp = new Driver(driverProperty.getName(), driver.getServiceName(), driver.getHost(), driver.getPort());
+        Driver tmp = new Driver(driverProperty.getName(), deviceDriver.getServiceName(), deviceDriver.getHost(), deviceDriver.getPort());
         tmp.setDescription(driverProperty.getDescription());
 
         R<Driver> byServiceName = driverClient.selectByServiceName(tmp.getServiceName());
         if (byServiceName.isOk()) {
             tmp.setId(byServiceName.getData().getId());
-            driver.setDriverId(tmp.getId());
+            deviceDriver.setDriverId(tmp.getId());
             return driverClient.update(tmp).isOk();
         } else {
-            R<Driver> byHostPort = driverClient.selectByHostPort(driver.getHost(), driver.getPort());
+            R<Driver> byHostPort = driverClient.selectByHostPort(deviceDriver.getHost(), deviceDriver.getPort());
             if (!byHostPort.isOk()) {
                 R<Driver> r = driverClient.add(tmp);
                 if (r.isOk()) {
-                    driver.setDriverId(tmp.getId());
+                    deviceDriver.setDriverId(tmp.getId());
                 }
                 return r.isOk();
             }
-            log.error("the port({}) is already occupied by driver({}/{})", driver.getPort(), byHostPort.getData().getName(), byHostPort.getData().getServiceName());
+            log.error("the port({}) is already occupied by driver({}/{})", deviceDriver.getPort(), byHostPort.getData().getName(), byHostPort.getData().getServiceName());
             return false;
         }
     }
@@ -201,33 +205,33 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @return
      */
     public boolean registerDriverConnectInfo() {
-        Map<String, ConnectInfo> infoMap = new HashMap<>(16);
-        ConnectInfoDto connectInfoDto = new ConnectInfoDto();
-        connectInfoDto.setDriverId(driver.getDriverId());
+        Map<String, DriverAttribute> infoMap = new HashMap<>(16);
+        DriverAttributeDto connectInfoDto = new DriverAttributeDto();
+        connectInfoDto.setDriverId(deviceDriver.getDriverId());
         connectInfoDto.setPage(new Pages().setSize(-1L));
-        R<Page<ConnectInfo>> list = connectInfoClient.list(connectInfoDto);
+        R<Page<DriverAttribute>> list = driverAttributeClient.list(connectInfoDto);
         if (list.isOk()) {
-            for (ConnectInfo info : list.getData().getRecords()) {
+            for (DriverAttribute info : list.getData().getRecords()) {
                 infoMap.put(info.getName(), info);
             }
         }
 
-        Map<String, ConnectInfo> connectInfoMap = new HashMap<>(16);
-        for (ConnectInfo info : driverProperty.getConnect()) {
+        Map<String, DriverAttribute> connectInfoMap = new HashMap<>(16);
+        for (DriverAttribute info : driverProperty.getConnect()) {
             connectInfoMap.put(info.getName(), info);
         }
 
         for (String name : connectInfoMap.keySet()) {
-            ConnectInfo info = connectInfoMap.get(name).setDriverId(driver.getDriverId());
+            DriverAttribute info = connectInfoMap.get(name).setDriverId(deviceDriver.getDriverId());
             if (infoMap.containsKey(name)) {
                 info.setId(infoMap.get(name).getId());
-                R<ConnectInfo> r = connectInfoClient.update(info);
+                R<DriverAttribute> r = driverAttributeClient.update(info);
                 if (!r.isOk()) {
                     log.error("the connect info ({}) update failed", name);
                     return false;
                 }
             } else {
-                R<ConnectInfo> r = connectInfoClient.add(info);
+                R<DriverAttribute> r = driverAttributeClient.add(info);
                 if (!r.isOk()) {
                     log.error("the connect info ({}) create failed", name);
                     return false;
@@ -237,7 +241,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
 
         for (String name : infoMap.keySet()) {
             if (!connectInfoMap.containsKey(name)) {
-                R<Boolean> r = connectInfoClient.delete(infoMap.get(name).getId());
+                R<Boolean> r = driverAttributeClient.delete(infoMap.get(name).getId());
                 if (!r.isOk()) {
                     log.error("the connect info ({}) delete failed", name);
                     return false;
@@ -253,33 +257,33 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @return
      */
     public boolean registerDriverProfileInfo() {
-        Map<String, ProfileInfo> infoMap = new HashMap<>(16);
-        ProfileInfoDto profileInfoDto = new ProfileInfoDto();
-        profileInfoDto.setDriverId(driver.getDriverId());
+        Map<String, PointAttribute> infoMap = new HashMap<>(16);
+        PointAttributeDto profileInfoDto = new PointAttributeDto();
+        profileInfoDto.setDriverId(deviceDriver.getDriverId());
         profileInfoDto.setPage(new Pages().setSize(-1L));
-        R<Page<ProfileInfo>> list = profileInfoClient.list(profileInfoDto);
+        R<Page<PointAttribute>> list = pointAttributeClient.list(profileInfoDto);
         if (list.isOk()) {
-            for (ProfileInfo info : list.getData().getRecords()) {
+            for (PointAttribute info : list.getData().getRecords()) {
                 infoMap.put(info.getName(), info);
             }
         }
 
-        Map<String, ProfileInfo> profileInfoMap = new HashMap<>(16);
-        for (ProfileInfo info : driverProperty.getProfile()) {
+        Map<String, PointAttribute> profileInfoMap = new HashMap<>(16);
+        for (PointAttribute info : driverProperty.getProfile()) {
             profileInfoMap.put(info.getName(), info);
         }
 
         for (String name : profileInfoMap.keySet()) {
-            ProfileInfo info = profileInfoMap.get(name).setDriverId(driver.getDriverId());
+            PointAttribute info = profileInfoMap.get(name).setDriverId(deviceDriver.getDriverId());
             if (infoMap.containsKey(name)) {
                 info.setId(infoMap.get(name).getId());
-                R<ProfileInfo> r = profileInfoClient.update(info);
+                R<PointAttribute> r = pointAttributeClient.update(info);
                 if (!r.isOk()) {
                     log.error("the profile info ({}) update failed", name);
                     return false;
                 }
             } else {
-                R<ProfileInfo> r = profileInfoClient.add(info);
+                R<PointAttribute> r = pointAttributeClient.add(info);
                 if (!r.isOk()) {
                     log.error("the profile info ({}) create failed", name);
                     return false;
@@ -289,7 +293,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
 
         for (String name : infoMap.keySet()) {
             if (!profileInfoMap.containsKey(name)) {
-                R<Boolean> r = profileInfoClient.delete(infoMap.get(name).getId());
+                R<Boolean> r = pointAttributeClient.delete(infoMap.get(name).getId());
                 if (!r.isOk()) {
                     log.error("the profile info ({}) delete failed", name);
                     return false;
@@ -303,11 +307,11 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * 加载数据
      */
     public void loadData() {
-        driver.setConnectInfoMap(getConnectInfoMap(driver.getDriverId()));
-        driver.setProfileInfoMap(getProfileInfoMap(driver.getDriverId()));
-        driver.setProfileMap(getProfileMap(driver.getDriverId()));
-        driver.setDeviceMap(getDeviceMap(driver.getProfileMap()));
-        driver.setPointMap(getPointMap(driver.getProfileMap()));
+        deviceDriver.setDriverAttributeMap(getConnectInfoMap(deviceDriver.getDriverId()));
+        deviceDriver.setPointAttributeMap(getProfileInfoMap(deviceDriver.getDriverId()));
+        deviceDriver.setProfileMap(getProfileMap(deviceDriver.getDriverId()));
+        deviceDriver.setDeviceMap(getDeviceMap(deviceDriver.getProfileMap()));
+        deviceDriver.setPointMap(getPointMap(deviceDriver.getProfileMap()));
     }
 
     /**
@@ -316,14 +320,14 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @param driverId
      * @return
      */
-    public Map<Long, ConnectInfo> getConnectInfoMap(long driverId) {
-        Map<Long, ConnectInfo> infoMap = new HashMap<>(16);
-        ConnectInfoDto connectInfoDto = new ConnectInfoDto();
+    public Map<Long, DriverAttribute> getConnectInfoMap(long driverId) {
+        Map<Long, DriverAttribute> infoMap = new HashMap<>(16);
+        DriverAttributeDto connectInfoDto = new DriverAttributeDto();
         connectInfoDto.setDriverId(driverId);
         connectInfoDto.setPage(new Pages().setSize(-1L));
-        R<Page<ConnectInfo>> r = connectInfoClient.list(connectInfoDto);
+        R<Page<DriverAttribute>> r = driverAttributeClient.list(connectInfoDto);
         if (r.isOk()) {
-            for (ConnectInfo info : r.getData().getRecords()) {
+            for (DriverAttribute info : r.getData().getRecords()) {
                 infoMap.put(info.getId(), info);
             }
         }
@@ -336,14 +340,14 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * @param driverId
      * @return
      */
-    public Map<Long, ProfileInfo> getProfileInfoMap(long driverId) {
-        Map<Long, ProfileInfo> infoMap = new HashMap<>(16);
-        ProfileInfoDto profileInfoDto = new ProfileInfoDto();
+    public Map<Long, PointAttribute> getProfileInfoMap(long driverId) {
+        Map<Long, PointAttribute> infoMap = new HashMap<>(16);
+        PointAttributeDto profileInfoDto = new PointAttributeDto();
         profileInfoDto.setDriverId(driverId);
         profileInfoDto.setPage(new Pages().setSize(-1L));
-        R<Page<ProfileInfo>> r = profileInfoClient.list(profileInfoDto);
+        R<Page<PointAttribute>> r = pointAttributeClient.list(profileInfoDto);
         if (r.isOk()) {
-            for (ProfileInfo info : r.getData().getRecords()) {
+            for (PointAttribute info : r.getData().getRecords()) {
                 infoMap.put(info.getId(), info);
             }
         }

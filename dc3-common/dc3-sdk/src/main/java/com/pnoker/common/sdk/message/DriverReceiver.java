@@ -32,33 +32,33 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @EnableBinding(TopicInput.class)
-public class Receiver {
+public class DriverReceiver {
     @Resource
     private DeviceDriver deviceDriver;
     @Resource
-    private DriverSdkService service;
+    private DriverSdkService driverSdkService;
 
     @StreamListener(Common.Topic.DRIVER_TOPIC)
     public void driverReceive(DriverOperation operation) {
         if (operation.getDriverId() == deviceDriver.getDriverId()) {
             switch (operation.getCommand()) {
                 case Operation.Profile.ADD:
-                    service.addProfile(operation.getId());
+                    driverSdkService.addProfile(operation.getId());
                     break;
                 case Operation.Profile.DELETE:
-                    service.deleteProfile(operation.getId());
+                    driverSdkService.deleteProfile(operation.getId());
                     break;
                 case Operation.Profile.UPDATE:
-                    service.updateProfile(operation.getId());
+                    driverSdkService.updateProfile(operation.getId());
                     break;
                 case Operation.Device.ADD:
-                    service.addDevice(operation.getId());
+                    driverSdkService.addDevice(operation.getId());
                     break;
                 case Operation.Device.DELETE:
-                    service.deleteDevice(operation.getId());
+                    driverSdkService.deleteDevice(operation.getId());
                     break;
                 case Operation.Device.UPDATE:
-                    service.updateDevice(operation.getId());
+                    driverSdkService.updateDevice(operation.getId());
                     break;
                 default:
                     break;

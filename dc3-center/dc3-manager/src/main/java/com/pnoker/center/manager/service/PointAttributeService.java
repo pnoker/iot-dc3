@@ -17,21 +17,20 @@
 package com.pnoker.center.manager.service;
 
 import com.pnoker.common.base.Service;
-import com.pnoker.common.dto.DicDto;
-import com.pnoker.common.model.Dic;
+import com.pnoker.common.dto.PointAttributeDto;
+import com.pnoker.common.model.PointAttribute;
 
 /**
- * <p>Dic Interface
+ * <p>ProfileInfo Interface
  *
  * @author pnoker
  */
-public interface DicService extends Service<Dic, DicDto> {
+public interface PointAttributeService extends Service<PointAttribute, PointAttributeDto> {
     /**
-     * 根据LABEL和TYPE查询字典
+     * 根据模板配置信息 NAME 查询分组
      *
-     * @param label
-     * @param type
+     * @param name
      * @return
      */
-    Dic selectByLabelAndType(String label, String type);
+    PointAttribute selectByName(String name);
 }

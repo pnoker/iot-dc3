@@ -30,9 +30,8 @@ public interface DriverCustomizersService {
     /**
      * 初始化驱动
      *
-     * @param driver
      */
-    void initial(DeviceDriver driver);
+    void initial();
 
     /**
      * 驱动本身存在定时器，用于定时采集数据和下发数据，该方法为用户自定义操作，系统根据配置定时执行
@@ -42,7 +41,7 @@ public interface DriverCustomizersService {
     /**
      * 读操作
      */
-    void read(Map<String, String> connectInfo, Map<String, String> pointInfo, Point point);
+    void read(Map<String, String> driverInfo, Map<String, String> pointInfo, Point point);
 
     /**
      * 写操作

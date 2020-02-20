@@ -17,12 +17,12 @@
 package com.pnoker.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.manager.feign.ConnectInfoClient;
-import com.pnoker.center.manager.service.ConnectInfoService;
+import com.pnoker.api.center.manager.feign.DriverAttributeClient;
+import com.pnoker.center.manager.service.DriverAttributeService;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.dto.ConnectInfoDto;
-import com.pnoker.common.model.ConnectInfo;
+import com.pnoker.common.dto.DriverAttributeDto;
+import com.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,15 +37,15 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_CONNECT_INFO_URL_PREFIX)
-public class ConnectInfoApi implements ConnectInfoClient {
+public class DriverAttributeApi implements DriverAttributeClient {
 
     @Resource
-    private ConnectInfoService connectInfoService;
+    private DriverAttributeService driverAttributeService;
 
     @Override
-    public R<ConnectInfo> add(ConnectInfo connectInfo) {
+    public R<DriverAttribute> add(DriverAttribute driverAttribute) {
         try {
-            ConnectInfo add = connectInfoService.add(connectInfo);
+            DriverAttribute add = driverAttributeService.add(driverAttribute);
             if (null != add) {
                 return R.ok(add);
             }
@@ -58,16 +58,16 @@ public class ConnectInfoApi implements ConnectInfoClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return connectInfoService.delete(id) ? R.ok() : R.fail();
+            return driverAttributeService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<ConnectInfo> update(ConnectInfo connectInfo) {
+    public R<DriverAttribute> update(DriverAttribute driverAttribute) {
         try {
-            ConnectInfo update = connectInfoService.update(connectInfo);
+            DriverAttribute update = driverAttributeService.update(driverAttribute);
             if (null != update) {
                 return R.ok(update);
             }
@@ -78,9 +78,9 @@ public class ConnectInfoApi implements ConnectInfoClient {
     }
 
     @Override
-    public R<ConnectInfo> selectById(Long id) {
+    public R<DriverAttribute> selectById(Long id) {
         try {
-            ConnectInfo select = connectInfoService.selectById(id);
+            DriverAttribute select = driverAttributeService.selectById(id);
             if (null != select) {
                 return R.ok(select);
             }
@@ -91,9 +91,9 @@ public class ConnectInfoApi implements ConnectInfoClient {
     }
 
     @Override
-    public R<ConnectInfo> selectByName(String name) {
+    public R<DriverAttribute> selectByName(String name) {
         try {
-            ConnectInfo select = connectInfoService.selectByName(name);
+            DriverAttribute select = driverAttributeService.selectByName(name);
             if (null != select) {
                 return R.ok(select);
             }
@@ -104,9 +104,9 @@ public class ConnectInfoApi implements ConnectInfoClient {
     }
 
     @Override
-    public R<Page<ConnectInfo>> list(ConnectInfoDto connectInfoDto) {
+    public R<Page<DriverAttribute>> list(DriverAttributeDto connectInfoDto) {
         try {
-            Page<ConnectInfo> page = connectInfoService.list(connectInfoDto);
+            Page<DriverAttribute> page = driverAttributeService.list(connectInfoDto);
             if (null != page) {
                 return R.ok(page);
             }

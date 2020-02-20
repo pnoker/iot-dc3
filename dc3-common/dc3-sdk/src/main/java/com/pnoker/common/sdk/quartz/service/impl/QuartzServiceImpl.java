@@ -46,16 +46,16 @@ public class QuartzServiceImpl implements QuartzService {
     @Resource
     private Scheduler scheduler;
     @Resource
-    private DeviceDriver driver;
+    private DeviceDriver deviceDriver;
     @Resource
     private ScheduleClient scheduleClient;
 
     @Override
     @SneakyThrows
     public void initial() {
-        Map<Long, Device> devices = driver.getDeviceMap();
-        for (Device device : devices.values()) {
-            List<Schedule> schedules = scheduleList(device);
+        Map<Long, Device> deviceMap = deviceDriver.getDeviceMap();
+        for (Device device : deviceMap.values()) {
+            List<Schedule> schedules = getScheduleList(device.getId());
             for (Schedule schedule : schedules) {
                 runJob(device.getName(), schedule);
             }
@@ -64,14 +64,18 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     @SneakyThrows
-    public void start(String group, Schedule schedule) {
+    public void startJob(String group, Schedule schedule) {
         JobKey jobKey = JobKey.jobKey(schedule.getName(), group);
         scheduler.triggerJob(jobKey);
+        R<Schedule> r = scheduleClient.update(schedule.setStatus((short) 1));
+        if (!r.isOk()) {
+            log.error("start device({}) job({}) failed ({})", group, schedule.getName(), r.getMessage());
+        }
     }
 
     @Override
     @SneakyThrows
-    public void delete(String group, Schedule schedule) {
+    public void deleteJob(String group, Schedule schedule) {
         JobKey jobKey = JobKey.jobKey(schedule.getName(), group);
         scheduler.deleteJob(jobKey);
     }
@@ -84,20 +88,32 @@ public class QuartzServiceImpl implements QuartzService {
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(schedule.getCornExpression());
         trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
         scheduler.rescheduleJob(triggerKey, trigger);
+        R<Schedule> r = scheduleClient.update(schedule.setStatus((short) 1));
+        if (!r.isOk()) {
+            log.error("update device({}) job({}) failed ({})", group, schedule.getName(), r.getMessage());
+        }
     }
 
     @Override
     @SneakyThrows
-    public void stop(String group, Schedule schedule) {
+    public void pauseJob(String group, Schedule schedule) {
         JobKey jobKey = JobKey.jobKey(schedule.getName(), group);
         scheduler.pauseJob(jobKey);
+        R<Schedule> r = scheduleClient.update(schedule.setStatus((short) 2));
+        if (!r.isOk()) {
+            log.error("pause device({}) job({}) failed ({})", group, schedule.getName(), r.getMessage());
+        }
     }
 
     @Override
     @SneakyThrows
-    public void resume(String group, Schedule schedule) {
+    public void resumeJob(String group, Schedule schedule) {
         JobKey jobKey = JobKey.jobKey(schedule.getName(), group);
         scheduler.resumeJob(jobKey);
+        R<Schedule> r = scheduleClient.update(schedule.setStatus((short) 1));
+        if (!r.isOk()) {
+            log.error("resume device({}) job({}) failed ({})", group, schedule.getName(), r.getMessage());
+        }
     }
 
     @SneakyThrows
@@ -112,17 +128,18 @@ public class QuartzServiceImpl implements QuartzService {
         scheduler.scheduleJob(jobDetail, trigger);
         if (!scheduler.isShutdown()) {
             scheduler.start();
+            R<Schedule> r = scheduleClient.update(schedule.setStatus((short) 0));
+            if (!r.isOk()) {
+                log.error("run device({}) job({}) failed ({})", group, schedule.getName(), r.getMessage());
+            }
         }
     }
 
-    public List<Schedule> scheduleList(Device device) {
+    public List<Schedule> getScheduleList(Long deviceId) {
         ScheduleDto scheduleDto = new ScheduleDto();
-        scheduleDto.setDeviceId(device.getId());
+        scheduleDto.setDeviceId(deviceId);
         scheduleDto.setPage(new Pages().setSize(-1L));
         R<Page<Schedule>> r = scheduleClient.list(scheduleDto);
-        if (r.isOk()) {
-            return r.getData().getRecords();
-        }
-        return new ArrayList<>();
+        return r.isOk() ? r.getData().getRecords() : new ArrayList<>();
     }
 }

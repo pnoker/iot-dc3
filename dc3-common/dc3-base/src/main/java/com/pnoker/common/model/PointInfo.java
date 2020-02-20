@@ -36,8 +36,8 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class PointInfo extends Description {
 
-    @NotNull(message = "profine info id can't be empty", groups = {Insert.class, Update.class})
-    private Long profileInfoId;
+    @NotNull(message = "point attribute id can't be empty", groups = {Insert.class, Update.class})
+    private Long pointAttributeId;
 
     private String value;
 
