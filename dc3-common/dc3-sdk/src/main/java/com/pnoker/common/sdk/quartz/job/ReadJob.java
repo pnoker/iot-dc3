@@ -23,7 +23,6 @@ public class ReadJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        customizersService.read();
         log.info("read job");
     }
 }

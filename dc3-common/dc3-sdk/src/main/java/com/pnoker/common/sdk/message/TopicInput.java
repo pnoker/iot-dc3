@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.utils;
+package com.pnoker.common.sdk.message;
+
+import com.pnoker.common.constant.Common;
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.messaging.SubscribableChannel;
 
 /**
+ * 消息 Input
+ *
  * @author pnoker
  */
-public class Test {
+public interface TopicInput {
 
-    public static void main(String[] args) {
-        float a = 5.98999f;
-        System.out.printf("%f\n", a);
-        System.out.printf("%.2f\n", a);
-        System.out.printf("%3.2f\n", a);
-    }
+    /**
+     * 驱动消息主题 Input 接口
+     *
+     * @return
+     */
+    @Input(Common.Topic.DRIVER_TOPIC)
+    SubscribableChannel driverInput();
 }

@@ -2,15 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    dc3.service: dc3-message
-  name: dc3-message
+    dc3.service: dc3-data
+  name: dc3-data
   namespace: dc3
 spec:
   ports:
-    - name: "8600"
-      port: 8600
-      targetPort: 8600
+    - name: "8500"
+      port: 8500
+      targetPort: 8500
   selector:
     dc3.version: develop
     dc3.network/dc3net: "true"
-    dc3.service: dc3-message
+    dc3.service: dc3-data

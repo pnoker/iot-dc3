@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.utils;
+package com.pnoker.common.sdk.message;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.messaging.support.MessageBuilder;
+
+import javax.annotation.Resource;
 
 /**
  * @author pnoker
  */
-public class Test {
+@Slf4j
+@EnableBinding(TopicOutput.class)
+public class Sender {
 
-    public static void main(String[] args) {
-        float a = 5.98999f;
-        System.out.printf("%f\n", a);
-        System.out.printf("%.2f\n", a);
-        System.out.printf("%3.2f\n", a);
+    @Resource
+    private TopicOutput topicOutput;
+
+    public void driverSender(String message) {
+        topicOutput.driverOutput().send(
+                MessageBuilder.withPayload(message).build()
+        );
     }
 }
