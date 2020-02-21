@@ -21,7 +21,6 @@ import com.pnoker.api.center.manager.hystrix.ProfileClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ProfileDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Profile;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>模板 FeignClient
@@ -58,7 +57,7 @@ public interface ProfileClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 Profile
@@ -76,7 +75,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @GetMapping("/id/{id}")
-    R<Profile> selectById(@PathVariable(value = "id") Long id);
+    R<Profile> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Profile
@@ -86,13 +85,5 @@ public interface ProfileClient {
      */
     @PostMapping("/list")
     R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto);
-
-    /**
-     * 查询 Profile 字典
-     *
-     * @return List<Profile>
-     */
-    @GetMapping("/dictionary")
-    R<List<Dic>> dictionary();
 
 }

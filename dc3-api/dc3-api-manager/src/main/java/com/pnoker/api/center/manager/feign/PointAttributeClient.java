@@ -21,7 +21,6 @@ import com.pnoker.api.center.manager.hystrix.PointAttributeClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointAttributeDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.PointAttribute;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>位号配置属性 FeignClient
@@ -58,7 +57,7 @@ public interface PointAttributeClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 ProfileInfo
@@ -76,7 +75,7 @@ public interface PointAttributeClient {
      * @return ProfileInfo
      */
     @GetMapping("/id/{id}")
-    R<PointAttribute> selectById(@PathVariable(value = "id") Long id);
+    R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 ProfileInfo
@@ -87,11 +86,4 @@ public interface PointAttributeClient {
     @PostMapping("/list")
     R<Page<PointAttribute>> list(@RequestBody(required = false) PointAttributeDto profileInfoDto);
 
-    /**
-     * 查询 ProfileInfo 字典
-     *
-     * @return List<ProfileInfo>
-     */
-    @GetMapping("/dictionary")
-    R<List<Dic>> dictionary();
 }

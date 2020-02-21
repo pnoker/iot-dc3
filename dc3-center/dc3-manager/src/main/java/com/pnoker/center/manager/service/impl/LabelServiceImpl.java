@@ -27,7 +27,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.LabelBindDto;
 import com.pnoker.common.dto.LabelDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.Dictionary;
 import com.pnoker.common.model.Label;
 import com.pnoker.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
@@ -138,14 +138,6 @@ public class LabelServiceImpl implements LabelService {
             labelDto.setPage(new Pages());
         }
         return labelMapper.selectPage(labelDto.getPage().convert(), fuzzyQuery(labelDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.LABEL + Common.Cache.DIC, key = "'label_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        /*LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        return labelMapper.selectList(queryWrapper);*/
-        return null;
     }
 
     @Override

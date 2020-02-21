@@ -38,7 +38,6 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX)
 public class DriverAttributeApi implements DriverAttributeClient {
-
     @Resource
     private DriverAttributeService driverAttributeService;
 

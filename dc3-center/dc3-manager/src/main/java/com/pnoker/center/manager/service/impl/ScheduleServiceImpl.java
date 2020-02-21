@@ -25,7 +25,6 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ScheduleDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +35,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -127,12 +125,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             scheduleDto.setPage(new Pages());
         }
         return scheduleMapper.selectPage(scheduleDto.getPage().convert(), fuzzyQuery(scheduleDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.SCHEDULE + Common.Cache.DIC, key = "'schedule_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        return null;
     }
 
     @Override

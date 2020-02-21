@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>驱动配置信息 FeignClient
  *
@@ -55,7 +57,7 @@ public interface DriverInfoClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 DriverInfo
@@ -73,7 +75,7 @@ public interface DriverInfoClient {
      * @return DriverInfo
      */
     @GetMapping("/id/{id}")
-    R<DriverInfo> selectById(@PathVariable(value = "id") Long id);
+    R<DriverInfo> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 DriverInfo

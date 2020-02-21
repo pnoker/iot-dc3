@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>令牌 FeignClient
  *
@@ -51,6 +53,6 @@ public interface TokenClient {
      * @return Boolean
      */
     @PostMapping("/{token}")
-    R<Boolean> checkTokenValid(@PathVariable(value = "token") String token);
+    R<Boolean> checkTokenValid(@NotNull @PathVariable(value = "token") String token);
 
 }

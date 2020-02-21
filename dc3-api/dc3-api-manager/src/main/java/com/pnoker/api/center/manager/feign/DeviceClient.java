@@ -22,7 +22,6 @@ import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * 设备 FeignClient
@@ -58,7 +57,7 @@ public interface DeviceClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 Device
@@ -76,7 +75,7 @@ public interface DeviceClient {
      * @return Device
      */
     @GetMapping("/id/{id}")
-    R<Device> selectById(@PathVariable(value = "id") Long id);
+    R<Device> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 根据 CODE 查询 Device
@@ -85,7 +84,7 @@ public interface DeviceClient {
      * @return Device
      */
     @GetMapping("/code/{code}")
-    R<Device> selectByCode(@PathVariable(value = "code") String code);
+    R<Device> selectByCode(@NotNull @PathVariable(value = "code") String code);
 
     /**
      * 分页查询 Device
@@ -95,13 +94,5 @@ public interface DeviceClient {
      */
     @PostMapping("/list")
     R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto);
-
-    /**
-     * 查询 Device 字典
-     *
-     * @return List<Device>
-     */
-    @GetMapping("/dictionary")
-    R<List<Dic>> dictionary();
 
 }

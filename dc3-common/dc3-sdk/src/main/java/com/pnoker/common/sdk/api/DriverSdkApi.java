@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author pnoker
@@ -46,7 +47,7 @@ public class DriverSdkApi {
     }
 
     @GetMapping("/device/{deviceId}/point/{pointId}")
-    public void readPoint(@PathVariable("deviceId") Long deviceId, @PathVariable("pointId") Long pointId) {
+    public void readPoint(@NotNull @PathVariable("deviceId") Long deviceId, @NotNull @PathVariable("pointId") Long pointId) {
         driverService.read(deviceId, pointId);
     }
 }

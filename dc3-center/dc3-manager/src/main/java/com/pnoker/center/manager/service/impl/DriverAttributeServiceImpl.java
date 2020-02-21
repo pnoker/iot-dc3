@@ -25,7 +25,6 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverAttributeDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +35,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -127,14 +125,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             connectInfoDto.setPage(new Pages());
         }
         return driverAttributeMapper.selectPage(connectInfoDto.getPage().convert(), fuzzyQuery(connectInfoDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, key = "'connection_info_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        /*LambdaQueryWrapper<ConnectInfo> queryWrapper = Wrappers.<ConnectInfo>query().lambda();
-        return connectInfoMapper.selectList(queryWrapper);*/
-        return null;
     }
 
     @Override

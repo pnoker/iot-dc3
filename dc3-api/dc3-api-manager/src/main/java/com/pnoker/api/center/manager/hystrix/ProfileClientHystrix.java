@@ -20,13 +20,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.api.center.manager.feign.ProfileClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.ProfileDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Profile;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * <p>ProfileClientHystrix
@@ -69,10 +66,6 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
                 return R.fail(message);
             }
 
-            @Override
-            public R<List<Dic>> dictionary() {
-                return R.fail(message);
-            }
         };
     }
 }

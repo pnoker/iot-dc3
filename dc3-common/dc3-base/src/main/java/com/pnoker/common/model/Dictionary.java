@@ -19,7 +19,9 @@ package com.pnoker.common.model;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.pnoker.common.valid.Insert;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
@@ -36,9 +38,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class Dic extends Description {
+public class Dictionary {
     @NotBlank(message = "label can't be empty", groups = {Insert.class})
     private String label;
 
@@ -55,5 +55,5 @@ public class Dic extends Description {
     private String type;
 
     @TableField(exist = false)
-    private List<Dic> children = new ArrayList<>();
+    private List<Dictionary> children = new ArrayList<>();
 }

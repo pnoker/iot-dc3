@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>标签 FeignClient
  *
@@ -55,7 +57,7 @@ public interface LabelClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 Label
@@ -73,7 +75,7 @@ public interface LabelClient {
      * @return Label
      */
     @GetMapping("/id/{id}")
-    R<Label> selectById(@PathVariable(value = "id") Long id);
+    R<Label> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Label

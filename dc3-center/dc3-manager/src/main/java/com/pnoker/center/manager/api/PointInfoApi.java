@@ -38,7 +38,6 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_POINT_INFO_URL_PREFIX)
 public class PointInfoApi implements PointInfoClient {
-
     @Resource
     private PointInfoService pointInfoService;
 

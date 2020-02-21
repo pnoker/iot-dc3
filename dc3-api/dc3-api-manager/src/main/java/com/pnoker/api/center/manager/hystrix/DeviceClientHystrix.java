@@ -21,7 +21,7 @@ import com.pnoker.api.center.manager.feign.DeviceClient;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.Dictionary;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -74,10 +74,6 @@ public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
                 return R.fail(message);
             }
 
-            @Override
-            public R<List<Dic>> dictionary() {
-                return R.fail(message);
-            }
         };
     }
 }
