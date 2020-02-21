@@ -1,115 +1,3 @@
-server:
-  port: 8803
-  undertow:
-    io-threads: 2
-    worker-threads: 20
-    buffer-size: 512
-
-spring:
-  application:
-    name: @project.artifactId@
-  main:
-    allow-bean-definition-overriding: true
-  mvc:
-    throw-exception-if-no-handler-found: true
-  resources:
-    add-mappings: false
-  security:
-    user:
-      name: dc3
-      password: dc3
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://dc3-mysql:3306/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: ${spring.security.user.password}
-    sql-script-encoding: utf-8
-    hikari:
-      pool-name: dc3-rtmp-hikaricp
-      max-lifetime: 1765000
-      maximum-pool-size: 16
-      minimum-idle: 4
-  redis:
-    host: dc3-redis
-    port: 6379
-    password: ${spring.security.user.password}
-    database: 2
-    timeout: 15S
-    jedis:
-      pool:
-        max-idle: 16
-        min-idle: 4
-  transaction:
-    rollback-on-commit-failure: true
-  cache:
-    type: redis
-    cache-names: dc3-rtmp-cache
-    redis:
-      time-to-live: 60S
-
-mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true
-  mapper-locations: classpath*:/mapping
-  global-config:
-    banner: false
-    db-config:
-      table-prefix: dc3_
-      logic-delete-value: 1
-      logic-not-delete-value: 0
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  endpoint:
-    health:
-      show-details: ALWAYS
-
-feign:
-  hystrix:
-    enabled: true
-  httpclient:
-    enabled: false
-  okhttp:
-    enabled: true
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
-      useGzipDecoder: true
-
-hystrix:
-  threadpool:
-    default:
-      coreSize: 20
-
-logging:
-  level:
-    org.springframework.data: ERROR
-    org.springframework.web: ERROR
-    org.mybatis.spring: ERROR
-    org.mongodb.driver: ERROR
-    com.zaxxer.hikari: ERROR
-    com.ulisesbocchio: ERROR
-    io.lettuce.core: ERROR
-    io.undertow: ERROR
-    com.netflix: ERROR
-    com.pnoker: DEBUG
-  file:
-    name: dc3/logs/transfer/${spring.application.name}.log
-
-eureka:
-  instance:
-    prefer-ip-address: true
-    health-check-url-path: /actuator/health
-  client:
-    service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/
-
 rtmp:
   ffmpeg:
     window: D:/FFmpeg/bin/ffmpeg.exe
@@ -121,3 +9,33 @@ rtmp:
     core-pool-size: 4
     maximum-sool-size: 32
     keep-alive-time: 10
+
+server:
+  port: 8803
+
+spring:
+  application:
+    name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+  datasource:
+    username: root
+    password: dc3
+  redis:
+    host: dc3-redis
+    port: 6379
+    password: dc3
+    database: 2
+  cache:
+    redis:
+      time-to-live: 60S
+
+logging:
+  level:
+    com.pnoker: DEBUG
+  file:
+    name: dc3/logs/transfer/${spring.application.name}.log

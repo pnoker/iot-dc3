@@ -1,0 +1,34 @@
+server:
+  port: 8400
+
+spring:
+  application:
+    name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+  datasource:
+    username: root
+    password: dc3
+  redis:
+    host: dc3-redis
+    port: 6379
+    password: dc3
+    database: 2
+  cache:
+    redis:
+      time-to-live: 60S
+  rabbitmq:
+    host: dc3-rabbitmq
+    port: 5672
+    username: dc3
+    password: dc3
+
+logging:
+  level:
+    com.pnoker: DEBUG
+  file:
+    name: dc3/logs/center/${spring.application.name}.log

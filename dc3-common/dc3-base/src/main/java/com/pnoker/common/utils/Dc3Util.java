@@ -126,6 +126,28 @@ public class Dc3Util {
     }
 
     /**
+     * 判断字符串是否为 Host格式
+     *
+     * @param host
+     * @return
+     */
+    public static boolean isHost(String host) {
+        String regex = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$";
+        return ReUtil.isMatch(regex, host);
+    }
+
+    /**
+     * 判断字符串是否为 驱动端口格式
+     *
+     * @param port
+     * @return
+     */
+    public static boolean isDriverPort(int port) {
+        String regex = "^8[6-7][0-9]{2}$";
+        return ReUtil.isMatch(regex, String.valueOf(port));
+    }
+
+    /**
      * 两层循环实现建树
      *
      * @param treeNodes 传入的树节点列表

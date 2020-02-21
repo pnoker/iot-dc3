@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>令牌 FeignHystrix
+ * <p>TokenClientHystrix
  *
  * @author pnoker
  */
@@ -35,7 +35,7 @@ public class TokenClientHystrix implements FallbackFactory<TokenClient> {
     @Override
     public TokenClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
-        log.error("TokenClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("Hystrix:{}", message, throwable);
 
         return new TokenClient() {
 

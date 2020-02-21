@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.pnoker.common.sdk.init.DriverRunner
+  com.pnoker.common.sdk.init.DriverSdkRunner

@@ -29,8 +29,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.constraints.NotNull;
+
 /**
- * Rtmp转码任务 FeignClient
+ * Rtmp转码 FeignClient
  *
  * @author pnoker
  */
@@ -38,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface RtmpClient {
 
     /**
-     * 新增 Rtmp 任务记录
+     * 新增 Rtmp
      *
      * @param rtmp
      * @return Rtmp
@@ -53,10 +55,10 @@ public interface RtmpClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Rtmp 任务记录
+     * 修改 Rtmp
      *
      * @param rtmp
      * @return Rtmp
@@ -71,7 +73,7 @@ public interface RtmpClient {
      * @return Rtmp
      */
     @GetMapping("/id/{id}")
-    R<Rtmp> selectById(@PathVariable(value = "id") Long id);
+    R<Rtmp> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Rtmp
@@ -89,7 +91,7 @@ public interface RtmpClient {
      * @return Boolean
      */
     @PostMapping("/start/{id}")
-    R<Boolean> start(@PathVariable(value = "id") Long id);
+    R<Boolean> start(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 停止 Rtmp 转码任务
@@ -98,6 +100,6 @@ public interface RtmpClient {
      * @return Boolean
      */
     @PostMapping("/stop/{id}")
-    R<Boolean> stop(@PathVariable(value = "id") Long id);
+    R<Boolean> stop(@NotNull @PathVariable(value = "id") Long id);
 
 }

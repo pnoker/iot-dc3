@@ -6,7 +6,8 @@
     },
     "dc3-gateway": {
       "description": "网关服务",
-      "port": 8000
+      "port": 8000,
+      "redis": 0
     },
     "dc3-center": {
       "dc3-register": {
@@ -19,22 +20,25 @@
       },
       "dc3-auth": {
         "description": "权限中心",
-        "port": 8300
+        "port": 8300,
+        "redis": 1
       },
-      "dc3-device": {
+      "dc3-manager": {
         "description": "设备管理中心",
-        "port": 8400
-      }
-    },
-    "dc3-device": {
-      "d": "设备相关服务，设备的数据采集和设备组管理",
-      "dc3-collect": {
-        "description": "设备数据采集",
-        "port": 8500
+        "port": 8400,
+        "redis": 2
+      },
+      "dc3-data": {
+        "description": "消息中心",
+        "port": 8500,
+        "redis": 3
       }
     },
     "dc3-driver": {
-      "d": "设备驱动，注册到设备组服务上去",
+      "dc3-driver-virtual": {
+        "description": "虚拟 驱动",
+        "port": 8600
+      },
       "dc3-driver-opc": {
         "description": "OPC 驱动",
         "port": 8601
@@ -49,7 +53,6 @@
       }
     },
     "dc3-transfer": {
-      "d": "文件资源服务、OPC UA Server、视频转码服务",
       "dc3-resource": {
         "description": "资源服务中心",
         "port": 8800

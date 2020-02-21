@@ -18,6 +18,13 @@ spring:
     user:
       name: dc3
       password: dc3
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+      cache:
+        caffeine:
+          spec: initialCapacity=10,maximumSize=500,expireAfterAccess=600s
 
 management:
   endpoints:
@@ -49,15 +56,6 @@ hystrix:
 
 logging:
   level:
-    org.springframework.data: ERROR
-    org.springframework.web: ERROR
-    org.mybatis.spring: ERROR
-    org.mongodb.driver: ERROR
-    com.zaxxer.hikari: ERROR
-    com.ulisesbocchio: ERROR
-    io.lettuce.core: ERROR
-    io.undertow: ERROR
-    com.netflix: ERROR
     com.pnoker: DEBUG
   file:
     name: dc3/logs/transfer/${spring.application.name}.log

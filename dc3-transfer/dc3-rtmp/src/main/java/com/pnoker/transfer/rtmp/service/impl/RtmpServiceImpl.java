@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.RtmpDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Rtmp;
 import com.pnoker.transfer.rtmp.handler.Transcode;
 import com.pnoker.transfer.rtmp.handler.TranscodePool;
@@ -37,7 +36,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -52,10 +50,10 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.RTMP_ID, key = "#rtmp.id", condition = "#result!=null")},
+            put = {@CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")},
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP_DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Rtmp add(Rtmp rtmp) {
@@ -73,9 +71,9 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP_ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP_DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -98,10 +96,10 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.RTMP_ID, key = "#rtmp.id", condition = "#result!=null")},
+            put = {@CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")},
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP_DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Rtmp update(Rtmp rtmp) {
@@ -124,31 +122,23 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.RTMP_ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Rtmp selectById(Long id) {
         return rtmpMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = Common.Cache.RTMP_LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = Common.Cache.RTMP + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Rtmp> list(RtmpDto rtmpDto) {
         return rtmpMapper.selectPage(rtmpDto.getPage().convert(), fuzzyQuery(rtmpDto));
     }
 
     @Override
-    @Cacheable(value = Common.Cache.RTMP_DIC, key = "'rtmp_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        /*LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
-        return rtmpMapper.selectList(queryWrapper);*/
-        return null;
-    }
-
-    @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP_ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP_DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean start(Long id) {
@@ -175,9 +165,9 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP_ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP_DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP_LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean stop(Long id) {

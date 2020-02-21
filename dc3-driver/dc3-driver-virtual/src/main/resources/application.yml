@@ -1,92 +1,38 @@
 driver:
   name: VirtualDriver
   description: @project.description@
+  connect:
+    - displayName: 主机
+      name: host
+      type: string
+      value: localhost
+      description: 目标机器 Ip
+    - displayName: 端口
+      name: port
+      type: int
+      value: 18600
+      description: 目标机器 Port
+  profile:
+    - displayName: 位号
+      name: tag
+      type: string
+      value: TAG
+      description: 位号名称
 
 server:
   port: 8600
-  undertow:
-    io-threads: 2
-    worker-threads: 20
-    buffer-size: 512
 
 spring:
   application:
     name: @project.artifactId@
-  main:
-    allow-bean-definition-overriding: true
-  mvc:
-    throw-exception-if-no-handler-found: true
-  resources:
-    add-mappings: false
-  security:
-    user:
-      name: dc3
-      password: dc3
-  redis:
-    host: dc3-redis
-    port: 6379
-    password: ${spring.security.user.password}
-    database: 3
-    timeout: 15S
-    jedis:
-      pool:
-        max-idle: 16
-        min-idle: 4
-  transaction:
-    rollback-on-commit-failure: true
-  cache:
-    type: redis
-    cache-names: dc3-driver-cache
-    redis:
-      time-to-live: 60S
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  endpoint:
-    health:
-      show-details: ALWAYS
-
-feign:
-  hystrix:
-    enabled: true
-  httpclient:
-    enabled: false
-  okhttp:
-    enabled: true
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
-      useGzipDecoder: true
-
-hystrix:
-  threadpool:
-    default:
-      coreSize: 20
+  rabbitmq:
+    host: dc3-rabbitmq
+    port: 5672
+    username: dc3
+    password: dc3
 
 logging:
   level:
-    org.springframework.data: ERROR
-    org.springframework.web: ERROR
-    org.mybatis.spring: ERROR
-    org.mongodb.driver: ERROR
-    com.zaxxer.hikari: ERROR
-    com.ulisesbocchio: ERROR
-    io.lettuce.core: ERROR
-    io.undertow: ERROR
-    com.netflix: ERROR
     com.pnoker: DEBUG
   file:
-    name: dc3/logs/center/${spring.application.name}.log
-
-eureka:
-  instance:
-    prefer-ip-address: true
-    health-check-url-path: /actuator/health
-  client:
-    service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/
+    name: dc3/logs/driver/virtual/${spring.application.name}.log

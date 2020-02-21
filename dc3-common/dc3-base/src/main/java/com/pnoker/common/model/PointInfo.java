@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotNull;
 
 /**
- * 驱动连接信息表
+ * 位号配置信息表
  *
  * @author pnoker
  */
@@ -36,8 +36,8 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class PointInfo extends Description {
 
-    @NotNull(message = "profine info id can't be empty", groups = {Insert.class, Update.class})
-    private Long profileInfoId;
+    @NotNull(message = "point attribute id can't be empty", groups = {Insert.class, Update.class})
+    private Long pointAttributeId;
 
     private String value;
 

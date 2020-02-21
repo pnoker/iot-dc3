@@ -26,18 +26,39 @@
     <artifactId>dc3-sdk</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 驱动的Sdk。</description>
+    <description>IOT DC3 平台 驱动 SDK 。</description>
+
+    <properties>
+        <quartz.version>2.3.2</quartz.version>
+    </properties>
 
     <dependencies>
+
+        <!-- Spring Configuration-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring RabbitMq -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
+
+        <!-- Quartz -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
         <!-- dc3 Api -->
         <dependency>
             <groupId>com.pnoker</groupId>
-            <artifactId>dc3-api-auth</artifactId>
+            <artifactId>dc3-api-manager</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.pnoker</groupId>
-            <artifactId>dc3-api-device</artifactId>
-        </dependency>
+
     </dependencies>
 
 </project>
