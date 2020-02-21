@@ -5,12 +5,10 @@ package com.pnoker.common.sdk.service;
  */
 public interface DriverService {
     /**
-     * 驱动注册
+     * 读操作
      *
-     * @param name        驱动名称
-     * @param serviceName 驱动服务名称
-     * @param description 驱动描述
-     * @return
+     * @param deviceId
+     * @param pointId
      */
-    boolean register(String name, String serviceName, String description);
+    void read(Long deviceId, Long pointId);
 }

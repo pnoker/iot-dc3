@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 用户 FeignHystrix
+ * UserClientHystrix
  *
  * @author pnoker
  */
@@ -37,7 +37,7 @@ public class UserClientHystrix implements FallbackFactory<UserClient> {
     @Override
     public UserClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
-        log.error("UserClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("Hystrix:{}", message, throwable);
 
         return new UserClient() {
 

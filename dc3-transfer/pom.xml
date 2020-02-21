@@ -31,7 +31,6 @@
     <modules>
         <module>dc3-rtmp</module>
         <module>dc3-opcua</module>
-        <module>dc3-resource</module>
     </modules>
 
     <dependencies>
@@ -50,6 +49,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
+        </dependency>
+
+        <!-- dc3 Common Config -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-config</artifactId>
         </dependency>
 
     </dependencies>

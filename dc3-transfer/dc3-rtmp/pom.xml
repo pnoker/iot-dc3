@@ -30,26 +30,16 @@
 
     <dependencies>
 
-        <!-- Mybatis Plus -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-        </dependency>
-
-        <!-- MySQL -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-
         <!-- dc3 Api Rtmp -->
         <dependency>
             <groupId>com.pnoker</groupId>
             <artifactId>dc3-api-rtmp</artifactId>
+        </dependency>
+
+        <!-- dc3 Common Core -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-core</artifactId>
         </dependency>
 
     </dependencies>

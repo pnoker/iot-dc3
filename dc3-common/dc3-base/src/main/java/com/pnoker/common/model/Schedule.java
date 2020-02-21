@@ -20,8 +20,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
- *
- *
  * @author pnoker
  */
 @Data
@@ -35,5 +33,6 @@ public class Schedule extends Description {
     private String name;
     private String cornExpression;
     private Short status;
-    private String url;
+    private Long deviceId;
+    private String beanName;
 }

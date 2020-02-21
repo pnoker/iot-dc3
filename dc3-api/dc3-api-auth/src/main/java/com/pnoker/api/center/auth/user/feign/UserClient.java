@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 用户 FeignClient
  *
@@ -40,7 +42,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface UserClient {
 
     /**
-     * 新增 User 记录
+     * 新增 User
      *
      * @param user
      * @return User
@@ -55,10 +57,10 @@ public interface UserClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 修改 User 记录
+     * 修改 User
      *
      * @param user
      * @return User
@@ -73,7 +75,7 @@ public interface UserClient {
      * @return Boolean
      */
     @PostMapping("/restPassword/{id}")
-    R<Boolean> restPassword(@PathVariable(value = "id") Long id);
+    R<Boolean> restPassword(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 根据 ID 查询 User
@@ -82,7 +84,7 @@ public interface UserClient {
      * @return User
      */
     @GetMapping("/id/{id}")
-    R<User> selectById(@PathVariable(value = "id") Long id);
+    R<User> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 根据 ID 查询 User
@@ -91,7 +93,7 @@ public interface UserClient {
      * @return User
      */
     @GetMapping("/name/{name}")
-    R<User> selectByName(@PathVariable(value = "name") String name);
+    R<User> selectByName(@NotNull @PathVariable(value = "name") String name);
 
     /**
      * 分页查询 User
@@ -109,6 +111,6 @@ public interface UserClient {
      * @return Boolean
      */
     @GetMapping("/check/{name}")
-    R<Boolean> checkUserValid(@PathVariable(value = "name") String name);
+    R<Boolean> checkUserValid(@NotNull @PathVariable(value = "name") String name);
 
 }
