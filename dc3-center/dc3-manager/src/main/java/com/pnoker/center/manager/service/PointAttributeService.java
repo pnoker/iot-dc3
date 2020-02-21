@@ -21,7 +21,7 @@ import com.pnoker.common.dto.PointAttributeDto;
 import com.pnoker.common.model.PointAttribute;
 
 /**
- * <p>ProfileInfo Interface
+ * <p>PointAttribute Interface
  *
  * @author pnoker
  */

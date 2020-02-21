@@ -22,14 +22,12 @@ import com.pnoker.center.manager.service.GroupService;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.GroupDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>设备 Client 接口实现
@@ -40,7 +38,6 @@ import java.util.List;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_GROUP_URL_PREFIX)
 public class GroupApi implements GroupClient {
-
     @Resource
     private GroupService groupService;
 
@@ -105,16 +102,4 @@ public class GroupApi implements GroupClient {
         return R.fail();
     }
 
-    @Override
-    public R<List<Dic>> dictionary() {
-        try {
-            List<Dic> list = groupService.dictionary();
-            if (null != list) {
-                return R.ok(list);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
 }

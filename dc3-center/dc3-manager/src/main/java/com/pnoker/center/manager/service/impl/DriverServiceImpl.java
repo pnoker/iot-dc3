@@ -27,7 +27,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
 import com.pnoker.common.dto.ProfileDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.Dictionary;
 import com.pnoker.common.model.Driver;
 import com.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -151,19 +151,6 @@ public class DriverServiceImpl implements DriverService {
             driverDto.setPage(new Pages());
         }
         return driverMapper.selectPage(driverDto.getPage().convert(), fuzzyQuery(driverDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DIC, key = "'dirver_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        List<Dic> dicList = new ArrayList<>();
-        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        List<Driver> driverList = driverMapper.selectList(queryWrapper);
-        for (Driver driver : driverList) {
-            Dic driverDic = new Dic().setLabel(driver.getName()).setValue(driver.getId());
-            dicList.add(driverDic);
-        }
-        return dicList;
     }
 
     @Override

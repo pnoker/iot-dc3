@@ -19,17 +19,16 @@ package com.pnoker.center.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.center.manager.mapper.GroupMapper;
+import com.pnoker.center.manager.service.DeviceService;
+import com.pnoker.center.manager.service.GroupService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.dto.GroupDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
-import com.pnoker.center.manager.mapper.GroupMapper;
-import com.pnoker.center.manager.service.DeviceService;
-import com.pnoker.center.manager.service.GroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -39,8 +38,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -139,19 +136,6 @@ public class GroupServiceImpl implements GroupService {
             groupDto.setPage(new Pages());
         }
         return groupMapper.selectPage(groupDto.getPage().convert(), fuzzyQuery(groupDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.GROUP + Common.Cache.DIC, key = "'group_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        List<Dic> dicList = new ArrayList<>();
-        LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        List<Group> groupList = groupMapper.selectList(queryWrapper);
-        for (Group group : groupList) {
-            Dic groupDic = new Dic().setLabel(group.getName()).setValue(group.getId());
-            dicList.add(groupDic);
-        }
-        return dicList;
     }
 
     @Override

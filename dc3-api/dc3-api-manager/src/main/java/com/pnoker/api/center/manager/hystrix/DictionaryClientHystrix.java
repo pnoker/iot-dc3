@@ -16,59 +16,66 @@
 
 package com.pnoker.api.center.manager.hystrix;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pnoker.api.center.manager.feign.ScheduleClient;
+import com.pnoker.api.center.manager.feign.DictionaryClient;
 import com.pnoker.common.bean.R;
-import com.pnoker.common.dto.ScheduleDto;
 import com.pnoker.common.model.Dictionary;
-import com.pnoker.common.model.Schedule;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * <p>ScheduleClientHystrix
+ * <p>DictionaryClientHystrix
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class ScheduleClientHystrix implements FallbackFactory<ScheduleClient> {
+public class DictionaryClientHystrix implements FallbackFactory<DictionaryClient> {
 
     @Override
-    public ScheduleClient create(Throwable throwable) {
+    public DictionaryClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
         log.error("Hystrix:{}", message, throwable);
 
-        return new ScheduleClient() {
+        return new DictionaryClient() {
 
             @Override
-            public R<Schedule> add(Schedule schedule) {
+            public R<List<Dictionary>> driverDictionary() {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<List<Dictionary>> driverAttributeDictionary() {
                 return R.fail(message);
             }
 
             @Override
-            public R<Schedule> update(Schedule schedule) {
+            public R<List<Dictionary>> pointAttributeDictionary() {
                 return R.fail(message);
             }
 
             @Override
-            public R<Schedule> selectById(Long id) {
+            public R<List<Dictionary>> profileDictionary() {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Schedule>> list(ScheduleDto scheduleDto) {
+            public R<List<Dictionary>> groupDictionary() {
                 return R.fail(message);
             }
 
+            @Override
+            public R<List<Dictionary>> deviceDictionary(@NotNull String parent) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<Dictionary>> pointDictionary(@NotNull String parent) {
+                return R.fail(message);
+            }
         };
     }
 }

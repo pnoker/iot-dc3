@@ -99,6 +99,7 @@ public interface Common {
         String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driverInfo";
         String DC3_MANAGER_SCHEDULE_URL_PREFIX = "/manager/schedule";
         String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
+        String DC3_DICTIONARY_URL_PREFIX = "/manager/dictionary";
 
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
@@ -112,29 +113,29 @@ public interface Common {
      */
     interface Cache {
         String ID = "_id";
-        String DIC = "_dic";
         String NAME = "_name";
         String CODE = "_code";
+        String DIC = "_dic";
         String LIST = "_list";
-        String HOST_PORT = "_host_port";
-        String GROUP_NAME = "_group_name";
         String SERVICE_NAME = "_service_name";
-        String PROFILE_INFO_ID = "_profile_info_id";
-        String CONNECT_INFO_ID = "_connect_info_id";
+        String HOST_PORT = "_host_port";
+        String DRIVER_INFO_ID = "_driver_info_id";
+        String POINT_INFO_ID = "_point_info_id";
+        String GROUP_NAME = "_group_name";
 
+        String DRIVER = "driver";
+        String DRIVER_ATTRIBUTE = "driver_attribute";
+        String POINT_ATTRIBUTE = "point_attribute";
+        String PROFILE = "profile";
+        String DRIVER_INFO = "driver_info";
+        String POINT = "point";
+        String GROUP = "group";
+        String DEVICE = "device";
+        String POINT_INFO = "point_info";
+        String SCHEDULE = "schedule";
         String USER = "user";
         String RTMP = "rtmp";
-        String GROUP = "group";
-        String SCHEDULE = "schedule";
-        String POINT = "point";
         String LABEL = "label";
-        String DEVICE = "device";
-        String DRIVER = "driver";
-        String PROFILE = "profile";
-        String DRIVER_ATTRIBUTE = "driver_attribute";
-        String DRIVER_INFO = "driver_info";
-        String POINT_ATTRIBUTE = "point_attribute";
-        String POINT_INFO = "point_info";
         String LABEL_BIND = "label_bind";
     }
 

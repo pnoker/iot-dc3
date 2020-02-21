@@ -38,7 +38,6 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_LABEL_URL_PREFIX)
 public class LabelApi implements LabelClient {
-
     @Resource
     private LabelService labelService;
 

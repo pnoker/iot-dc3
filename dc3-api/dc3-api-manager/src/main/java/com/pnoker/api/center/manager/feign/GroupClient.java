@@ -21,7 +21,6 @@ import com.pnoker.api.center.manager.hystrix.GroupClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.GroupDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Group;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -32,10 +31,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
- * <p>设备分组 FeignClient
+ * <p>分组 FeignClient
  *
  * @author pnoker
  */
@@ -58,7 +57,7 @@ public interface GroupClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 Group
@@ -76,7 +75,7 @@ public interface GroupClient {
      * @return Group
      */
     @GetMapping("/id/{id}")
-    R<Group> selectById(@PathVariable(value = "id") Long id);
+    R<Group> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Group
@@ -87,11 +86,4 @@ public interface GroupClient {
     @PostMapping("/list")
     R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto);
 
-    /**
-     * 查询 Group 字典
-     *
-     * @return List<Group>
-     */
-    @GetMapping("/dictionary")
-    R<List<Dic>> dictionary();
 }

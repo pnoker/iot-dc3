@@ -1288,7 +1288,7 @@
 					"name": "group",
 					"item": [
 						{
-							"name": "新增设备分组",
+							"name": "新增分组",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -1324,7 +1324,7 @@
 							"response": []
 						},
 						{
-							"name": "删除设备分组",
+							"name": "删除分组",
 							"request": {
 								"method": "POST",
 								"header": [],
@@ -1351,7 +1351,7 @@
 							"response": []
 						},
 						{
-							"name": "更新设备分组",
+							"name": "更新分组",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -1387,7 +1387,7 @@
 							"response": []
 						},
 						{
-							"name": "根据ID查询设备分组",
+							"name": "根据ID查询分组",
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -1414,7 +1414,7 @@
 							"response": []
 						},
 						{
-							"name": "设备分组分页&模糊查询",
+							"name": "分组分页&模糊查询",
 							"request": {
 								"method": "POST",
 								"header": [

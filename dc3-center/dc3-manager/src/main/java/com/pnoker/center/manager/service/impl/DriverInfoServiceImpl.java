@@ -25,7 +25,6 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverInfoDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,7 +34,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -53,7 +51,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.CONNECT_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -75,7 +73,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.CONNECT_INFO_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -88,7 +86,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.CONNECT_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -112,7 +110,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.CONNECT_INFO_ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#id", unless = "#result==null")
     public DriverInfo selectByDriverAttributeId(Long id) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
         queryWrapper.like(DriverInfo::getDriverAttributeId, id);
@@ -126,14 +124,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             driverInfoDto.setPage(new Pages());
         }
         return driverInfoMapper.selectPage(driverInfoDto.getPage().convert(), fuzzyQuery(driverInfoDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, key = "'driver_info_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        /*LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        return driverInfoMapper.selectList(queryWrapper);*/
-        return null;
     }
 
     @Override

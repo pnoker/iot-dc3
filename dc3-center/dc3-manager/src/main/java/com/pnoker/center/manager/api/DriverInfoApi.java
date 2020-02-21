@@ -38,7 +38,6 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_DRIVER_INFO_URL_PREFIX)
 public class DriverInfoApi implements DriverInfoClient {
-
     @Resource
     private DriverInfoService driverInfoService;
 

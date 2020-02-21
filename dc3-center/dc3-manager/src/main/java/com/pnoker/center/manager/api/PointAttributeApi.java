@@ -22,14 +22,12 @@ import com.pnoker.center.manager.service.PointAttributeService;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointAttributeDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>驱动属性配置信息 Client 接口实现
@@ -40,7 +38,6 @@ import java.util.List;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeApi implements PointAttributeClient {
-
     @Resource
     private PointAttributeService pointAttributeService;
 
@@ -105,16 +102,4 @@ public class PointAttributeApi implements PointAttributeClient {
         return R.fail();
     }
 
-    @Override
-    public R<List<Dic>> dictionary() {
-        try {
-            List<Dic> list = pointAttributeService.dictionary();
-            if (null != list) {
-                return R.ok(list);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
 }

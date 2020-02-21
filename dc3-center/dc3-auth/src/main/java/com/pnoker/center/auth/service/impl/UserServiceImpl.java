@@ -25,7 +25,6 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.UserDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +35,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -129,14 +127,6 @@ public class UserServiceImpl implements UserService {
             userDto.setPage(new Pages());
         }
         return userMapper.selectPage(userDto.getPage().convert(), fuzzyQuery(userDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.DIC, key = "'user_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        /*LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        return userMapper.selectList(queryWrapper);*/
-        return null;
     }
 
     @Override

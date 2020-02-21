@@ -21,7 +21,6 @@ import com.pnoker.api.center.manager.hystrix.PointClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Point;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>位号 FeignClient
@@ -58,7 +57,7 @@ public interface PointClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 Point
@@ -76,7 +75,7 @@ public interface PointClient {
      * @return Point
      */
     @GetMapping("/id/{id}")
-    R<Point> selectById(@PathVariable(value = "id") Long id);
+    R<Point> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Point
@@ -86,13 +85,5 @@ public interface PointClient {
      */
     @PostMapping("/list")
     R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto);
-
-    /**
-     * 查询 Point 字典
-     *
-     * @return List<Point>
-     */
-    @GetMapping("/dictionary")
-    R<List<Dic>> dictionary();
 
 }

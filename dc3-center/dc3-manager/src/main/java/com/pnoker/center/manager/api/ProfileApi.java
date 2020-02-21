@@ -22,14 +22,12 @@ import com.pnoker.center.manager.service.ProfileService;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ProfileDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>模板 Client 接口实现
@@ -40,7 +38,6 @@ import java.util.List;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_PROFILE_URL_PREFIX)
 public class ProfileApi implements ProfileClient {
-
     @Resource
     private ProfileService profileService;
 
@@ -105,16 +102,4 @@ public class ProfileApi implements ProfileClient {
         return R.fail();
     }
 
-    @Override
-    public R<List<Dic>> dictionary() {
-        try {
-            List<Dic> list = profileService.dictionary();
-            if (null != list) {
-                return R.ok(list);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
 }

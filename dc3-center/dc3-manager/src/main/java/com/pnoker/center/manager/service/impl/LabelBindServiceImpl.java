@@ -24,7 +24,6 @@ import com.pnoker.center.manager.service.LabelBindService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.LabelBindDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -35,7 +34,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -105,14 +103,6 @@ public class LabelBindServiceImpl implements LabelBindService {
             labelBindDto.setPage(new Pages());
         }
         return labelBindMapper.selectPage(labelBindDto.getPage().convert(), fuzzyQuery(labelBindDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.LABEL_BIND + Common.Cache.DIC, key = "'label_bind_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        /*LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
-        return labelBindMapper.selectList(queryWrapper);*/
-        return null;
     }
 
     @Override

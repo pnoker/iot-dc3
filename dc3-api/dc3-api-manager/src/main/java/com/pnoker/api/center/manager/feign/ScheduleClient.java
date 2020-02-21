@@ -21,7 +21,6 @@ import com.pnoker.api.center.manager.hystrix.ScheduleClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.ScheduleDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Schedule;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>调度 FeignClient
@@ -58,7 +57,7 @@ public interface ScheduleClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 Schedule
@@ -76,7 +75,7 @@ public interface ScheduleClient {
      * @return Schedule
      */
     @GetMapping("/id/{id}")
-    R<Schedule> selectById(@PathVariable(value = "id") Long id);
+    R<Schedule> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Schedule
@@ -87,11 +86,4 @@ public interface ScheduleClient {
     @PostMapping("/list")
     R<Page<Schedule>> list(@RequestBody(required = false) ScheduleDto scheduleDto);
 
-    /**
-     * 查询 Schedule 字典
-     *
-     * @return List<Schedule>
-     */
-    @GetMapping("/dictionary")
-    R<List<Dic>> dictionary();
 }

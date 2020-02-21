@@ -16,18 +16,15 @@
 
 package com.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.PointMapper;
 import com.pnoker.center.manager.service.PointService;
-import com.pnoker.center.manager.service.ProfileService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -38,8 +35,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -50,8 +45,6 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PointServiceImpl implements PointService {
-    @Resource
-    private ProfileService profileService;
     @Resource
     private PointMapper pointMapper;
 
@@ -140,30 +133,6 @@ public class PointServiceImpl implements PointService {
             pointDto.setPage(new Pages());
         }
         return pointMapper.selectPage(pointDto.getPage().convert(), fuzzyQuery(pointDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.DIC, key = "'point_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        List<Dic> profileDicList = profileService.dictionary();
-        for (Dic driverDic : profileDicList) {
-            for (Dic profileDic : driverDic.getChildren()) {
-                List<Dic> dicList = new ArrayList<>();
-                LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-                queryWrapper.eq(Point::getProfileId, profileDic.getValue());
-                List<Point> pointList = pointMapper.selectList(queryWrapper);
-                profileDic.setDisabled(true);
-                profileDic.setValue(RandomUtil.randomLong());
-                for (Point point : pointList) {
-                    Dic pointDic = new Dic().setLabel(point.getName()).setValue(point.getId());
-                    dicList.add(pointDic);
-                }
-                profileDic.setChildren(dicList);
-            }
-            driverDic.setDisabled(true);
-            driverDic.setValue(RandomUtil.randomLong());
-        }
-        return profileDicList;
     }
 
     @Override

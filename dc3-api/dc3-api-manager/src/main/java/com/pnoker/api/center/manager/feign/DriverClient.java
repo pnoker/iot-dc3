@@ -21,7 +21,6 @@ import com.pnoker.api.center.manager.hystrix.DriverClientHystrix;
 import com.pnoker.common.bean.R;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverDto;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Driver;
 import com.pnoker.common.valid.Insert;
 import com.pnoker.common.valid.Update;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>驱动 FeignClient
@@ -58,7 +57,7 @@ public interface DriverClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 修改 Driver
@@ -76,7 +75,7 @@ public interface DriverClient {
      * @return Driver
      */
     @GetMapping("/id/{id}")
-    R<Driver> selectById(@PathVariable(value = "id") Long id);
+    R<Driver> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 根据 SERVICENAME 查询 Driver
@@ -85,7 +84,7 @@ public interface DriverClient {
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
-    R<Driver> selectByServiceName(@PathVariable(value = "serviceName") String serviceName);
+    R<Driver> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName);
 
     /**
      * 根据 HOST & PORT 查询 Driver
@@ -95,7 +94,7 @@ public interface DriverClient {
      * @return Driver
      */
     @GetMapping("/host/{host}/port/{port}")
-    R<Driver> selectByHostPort(@PathVariable(value = "host") String host, @PathVariable(value = "port") Integer port);
+    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port);
 
     /**
      * 分页查询 Driver
@@ -106,11 +105,4 @@ public interface DriverClient {
     @PostMapping("/list")
     R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto);
 
-    /**
-     * 查询 Driver 字典
-     *
-     * @return List<Driver>
-     */
-    @GetMapping("/dictionary")
-    R<List<Dic>> dictionary();
 }

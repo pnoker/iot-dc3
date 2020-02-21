@@ -16,7 +16,6 @@
 
 package com.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,7 +26,6 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointAttributeDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -38,8 +36,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -132,26 +128,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             profileInfoDto.setPage(new Pages());
         }
         return pointAttributeMapper.selectPage(profileInfoDto.getPage().convert(), fuzzyQuery(profileInfoDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, key = "'profile_info_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        List<Dic> driverDicList = driverService.dictionary();
-        for (Dic driverDic : driverDicList) {
-            List<Dic> dicList = new ArrayList<>();
-            LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-            queryWrapper.eq(PointAttribute::getDriverId, driverDic.getValue());
-            List<PointAttribute> pointAttributeList = pointAttributeMapper.selectList(queryWrapper);
-            driverDic.setDisabled(true);
-            driverDic.setValue(RandomUtil.randomLong());
-            for (PointAttribute pointAttribute : pointAttributeList) {
-                Dic profileInfoDic = new Dic().setLabel(pointAttribute.getDisplayName()).setValue(pointAttribute.getId());
-                dicList.add(profileInfoDic);
-            }
-            driverDic.setChildren(dicList);
-        }
-        return driverDicList;
     }
 
     @Override

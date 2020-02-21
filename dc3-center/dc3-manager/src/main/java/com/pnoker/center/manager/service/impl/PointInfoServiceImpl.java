@@ -25,7 +25,6 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointInfoDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,7 +34,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -53,7 +51,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.PROFILE_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -75,7 +73,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.PROFILE_INFO_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -88,7 +86,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.PROFILE_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -112,7 +110,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.PROFILE_INFO_ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#id", unless = "#result==null")
     public PointInfo selectByPointAttributeID(Long id) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.like(PointInfo::getPointAttributeId, id);
@@ -126,14 +124,6 @@ public class PointInfoServiceImpl implements PointInfoService {
             pointInfoDto.setPage(new Pages());
         }
         return pointInfoMapper.selectPage(pointInfoDto.getPage().convert(), fuzzyQuery(pointInfoDto));
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.DIC, key = "'point_info_dic'", unless = "#result==null")
-    public List<Dic> dictionary() {
-        /*LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        return pointInfoMapper.selectList(queryWrapper);*/
-        return null;
     }
 
     @Override

@@ -21,7 +21,7 @@ import com.pnoker.common.dto.DriverAttributeDto;
 import com.pnoker.common.model.DriverAttribute;
 
 /**
- * <p>ConnectInfo Interface
+ * <p>DriverAttribute Interface
  *
  * @author pnoker
  */
