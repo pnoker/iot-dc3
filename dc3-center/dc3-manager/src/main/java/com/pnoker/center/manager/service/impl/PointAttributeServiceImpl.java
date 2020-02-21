@@ -43,17 +43,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>模板配置信息服务接口实现类
+ * <p>PointAttributeService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class PointAttributeServiceImpl implements PointAttributeService {
-
     @Resource
     private DriverService driverService;
-
     @Resource
     private PointAttributeMapper pointAttributeMapper;
 
@@ -160,8 +158,17 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto profileInfoDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         Optional.ofNullable(profileInfoDto).ifPresent(dto -> {
+            if (StringUtils.isNotBlank(dto.getDisplayName())) {
+                queryWrapper.like(PointAttribute::getDisplayName, dto.getDisplayName());
+            }
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(PointAttribute::getName, dto.getName());
+            }
+            if (StringUtils.isNotBlank(dto.getType())) {
+                queryWrapper.like(PointAttribute::getType, dto.getType());
+            }
+            if (null != dto.getDriverId()) {
+                queryWrapper.like(PointAttribute::getDriverId, dto.getDriverId());
             }
         });
         return queryWrapper;

@@ -52,7 +52,7 @@ public interface ScheduleClient {
     R<Schedule> add(@Validated(Insert.class) @RequestBody Schedule schedule);
 
     /**
-     * 根据 Id 删除 Schedule
+     * 根据 ID 删除 Schedule
      *
      * @param id scheduleId
      * @return Boolean
@@ -70,22 +70,13 @@ public interface ScheduleClient {
     R<Schedule> update(@Validated(Update.class) @RequestBody Schedule schedule);
 
     /**
-     * 根据 Id 查询 Schedule
+     * 根据 ID 查询 Schedule
      *
      * @param id
      * @return Schedule
      */
     @GetMapping("/id/{id}")
     R<Schedule> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 根据 Name 查询 Schedule
-     *
-     * @param name
-     * @return Schedule
-     */
-    @GetMapping("/name/{name}")
-    R<Schedule> selectByName(@PathVariable(value = "name") String name);
 
     /**
      * 分页查询 Schedule

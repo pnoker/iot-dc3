@@ -37,7 +37,7 @@ public class LabelClientHystrix implements FallbackFactory<LabelClient> {
     @Override
     public LabelClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("LabelClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("Hystrix:{}", message, throwable);
 
         return new LabelClient() {
 
@@ -58,11 +58,6 @@ public class LabelClientHystrix implements FallbackFactory<LabelClient> {
 
             @Override
             public R<Label> selectById(Long id) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Label> selectByName(String name) {
                 return R.fail(message);
             }
 

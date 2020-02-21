@@ -106,19 +106,6 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<Device> selectDeviceByNameAndGroup(Long groupId, String name) {
-        try {
-            Device select = deviceService.selectDeviceByNameAndGroup(groupId, name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<Device>> list(DeviceDto deviceDto) {
         try {
             Page<Device> page = deviceService.list(deviceDto);

@@ -49,7 +49,7 @@ public interface PointInfoClient {
     R<PointInfo> add(@Validated(Insert.class) @RequestBody PointInfo pointInfo);
 
     /**
-     * 根据 Id 删除 PointInfo
+     * 根据 ID 删除 PointInfo
      *
      * @param id pointInfoId
      * @return Boolean
@@ -67,7 +67,7 @@ public interface PointInfoClient {
     R<PointInfo> update(@Validated(Update.class) @RequestBody PointInfo pointInfo);
 
     /**
-     * 根据 Id 查询 PointInfo
+     * 根据 ID 查询 PointInfo
      *
      * @param id
      * @return PointInfo

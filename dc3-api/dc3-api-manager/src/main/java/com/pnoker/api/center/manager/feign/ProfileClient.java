@@ -52,7 +52,7 @@ public interface ProfileClient {
     R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile);
 
     /**
-     * 根据 Id 删除 Profile
+     * 根据 ID 删除 Profile
      *
      * @param id profileId
      * @return Boolean
@@ -70,22 +70,13 @@ public interface ProfileClient {
     R<Profile> update(@Validated(Update.class) @RequestBody Profile profile);
 
     /**
-     * 根据 Id 查询 Profile
+     * 根据 ID 查询 Profile
      *
      * @param id
      * @return Profile
      */
     @GetMapping("/id/{id}")
     R<Profile> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 根据 Name 查询 Profile
-     *
-     * @param name
-     * @return Profile
-     */
-    @GetMapping("/name/{name}")
-    R<Profile> selectByName(@PathVariable(value = "name") String name);
 
     /**
      * 分页查询 Profile

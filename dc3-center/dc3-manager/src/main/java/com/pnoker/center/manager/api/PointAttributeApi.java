@@ -93,19 +93,6 @@ public class PointAttributeApi implements PointAttributeClient {
     }
 
     @Override
-    public R<PointAttribute> selectByName(String name) {
-        try {
-            PointAttribute select = pointAttributeService.selectByName(name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<PointAttribute>> list(PointAttributeDto profileInfoDto) {
         try {
             Page<PointAttribute> page = pointAttributeService.list(profileInfoDto);

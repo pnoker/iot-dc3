@@ -93,19 +93,6 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<Profile> selectByName(String name) {
-        try {
-            Profile select = profileService.selectByName(name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<Profile>> list(ProfileDto profileDto) {
         try {
             Page<Profile> page = profileService.list(profileDto);

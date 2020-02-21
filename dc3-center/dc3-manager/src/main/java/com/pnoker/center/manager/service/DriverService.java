@@ -27,7 +27,7 @@ import com.pnoker.common.model.Driver;
  */
 public interface DriverService extends Service<Driver, DriverDto> {
     /**
-     * 根据 SERVICE NAME 查询驱动
+     * 根据驱动 SERVICE NAME 查询
      *
      * @param serviceName
      * @return
@@ -35,7 +35,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Driver selectByServiceName(String serviceName);
 
     /**
-     * 根据 HOST & PORT 查询驱动
+     * 根据驱动 HOST & PORT 查询
      *
      * @param host
      * @param port

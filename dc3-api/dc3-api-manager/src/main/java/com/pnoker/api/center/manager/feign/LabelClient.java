@@ -49,7 +49,7 @@ public interface LabelClient {
     R<Label> add(@Validated(Insert.class) @RequestBody Label label);
 
     /**
-     * 根据 Id 删除 Label
+     * 根据 ID 删除 Label
      *
      * @param id labelId
      * @return Boolean
@@ -67,22 +67,13 @@ public interface LabelClient {
     R<Label> update(@Validated(Update.class) @RequestBody Label label);
 
     /**
-     * 根据 Id 查询 Label
+     * 根据 ID 查询 Label
      *
      * @param id
      * @return Label
      */
     @GetMapping("/id/{id}")
     R<Label> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 根据 Name 查询 Label
-     *
-     * @param name
-     * @return Label
-     */
-    @GetMapping("/name/{name}")
-    R<Label> selectByName(@PathVariable(value = "name") String name);
 
     /**
      * 分页查询 Label

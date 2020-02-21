@@ -37,7 +37,7 @@ public class DriverInfoClientHystrix implements FallbackFactory<DriverInfoClient
     @Override
     public DriverInfoClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("DriverInfoClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("Hystrix:{}", message, throwable);
 
         return new DriverInfoClient() {
 

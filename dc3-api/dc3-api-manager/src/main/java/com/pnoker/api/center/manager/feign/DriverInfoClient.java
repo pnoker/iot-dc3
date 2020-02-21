@@ -49,7 +49,7 @@ public interface DriverInfoClient {
     R<DriverInfo> add(@Validated(Insert.class) @RequestBody DriverInfo driverInfo);
 
     /**
-     * 根据 Id 删除 DriverInfo
+     * 根据 ID 删除 DriverInfo
      *
      * @param id driverInfoId
      * @return Boolean
@@ -67,7 +67,7 @@ public interface DriverInfoClient {
     R<DriverInfo> update(@Validated(Update.class) @RequestBody DriverInfo driverInfo);
 
     /**
-     * 根据 Id 查询 DriverInfo
+     * 根据 ID 查询 DriverInfo
      *
      * @param id
      * @return DriverInfo

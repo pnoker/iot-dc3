@@ -91,19 +91,6 @@ public class DriverAttributeApi implements DriverAttributeClient {
     }
 
     @Override
-    public R<DriverAttribute> selectByName(String name) {
-        try {
-            DriverAttribute select = driverAttributeService.selectByName(name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<DriverAttribute>> list(DriverAttributeDto connectInfoDto) {
         try {
             Page<DriverAttribute> page = driverAttributeService.list(connectInfoDto);

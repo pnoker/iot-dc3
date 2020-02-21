@@ -47,7 +47,7 @@ public interface RtmpClient {
     R<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
 
     /**
-     * 根据 Id 删除 Rtmp
+     * 根据 ID 删除 Rtmp
      *
      * @param id rtmpId
      * @return Boolean
@@ -65,7 +65,7 @@ public interface RtmpClient {
     R<Rtmp> update(@RequestBody Rtmp rtmp);
 
     /**
-     * 根据 Id 查询 Rtmp
+     * 根据 ID 查询 Rtmp
      *
      * @param id
      * @return Rtmp

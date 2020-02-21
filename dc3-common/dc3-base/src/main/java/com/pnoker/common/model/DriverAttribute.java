@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
- * 驱动连接信息表
+ * 驱动配置属性表
  *
  * @author pnoker
  */

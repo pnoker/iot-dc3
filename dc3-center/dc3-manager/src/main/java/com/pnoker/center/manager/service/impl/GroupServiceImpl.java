@@ -44,17 +44,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>设备分组服务接口实现类
+ * <p>GroupService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class GroupServiceImpl implements GroupService {
-
     @Resource
     private DeviceService deviceService;
-
     @Resource
     private GroupMapper groupMapper;
 

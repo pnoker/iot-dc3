@@ -43,17 +43,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>标签服务接口实现类
+ * <p>LabelService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class LabelServiceImpl implements LabelService {
-
     @Resource
     private LabelBindService labelBindService;
-
     @Resource
     private LabelMapper labelMapper;
 

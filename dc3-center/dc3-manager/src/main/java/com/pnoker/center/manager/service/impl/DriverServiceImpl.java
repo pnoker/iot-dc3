@@ -44,17 +44,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>驱动服务接口实现类
+ * <p>DriverService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class DriverServiceImpl implements DriverService {
-
     @Resource
     private ProfileService profileService;
-
     @Resource
     private DriverMapper driverMapper;
 

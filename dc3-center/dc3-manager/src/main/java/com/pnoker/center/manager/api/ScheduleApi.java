@@ -93,19 +93,6 @@ public class ScheduleApi implements ScheduleClient {
     }
 
     @Override
-    public R<Schedule> selectByName(String name) {
-        try {
-            Schedule select = groupService.selectByName(name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<Schedule>> list(ScheduleDto groupDto) {
         try {
             Page<Schedule> page = groupService.list(groupDto);

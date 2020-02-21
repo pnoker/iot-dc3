@@ -52,7 +52,7 @@ public interface PointAttributeClient {
     R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 Id 删除 ProfileInfo
+     * 根据 ID 删除 ProfileInfo
      *
      * @param id profileInfoId
      * @return Boolean
@@ -70,22 +70,13 @@ public interface PointAttributeClient {
     R<PointAttribute> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 Id 查询 ProfileInfo
+     * 根据 ID 查询 ProfileInfo
      *
      * @param id
      * @return ProfileInfo
      */
     @GetMapping("/id/{id}")
     R<PointAttribute> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 根据 Name 查询 ProfileInfo
-     *
-     * @param name
-     * @return ProfileInfo
-     */
-    @GetMapping("/name/{name}")
-    R<PointAttribute> selectByName(@PathVariable(value = "name") String name);
 
     /**
      * 分页查询 ProfileInfo

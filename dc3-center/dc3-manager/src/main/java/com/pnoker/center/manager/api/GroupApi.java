@@ -93,19 +93,6 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> selectByName(String name) {
-        try {
-            Group select = groupService.selectByName(name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<Group>> list(GroupDto groupDto) {
         try {
             Page<Group> page = groupService.list(groupDto);

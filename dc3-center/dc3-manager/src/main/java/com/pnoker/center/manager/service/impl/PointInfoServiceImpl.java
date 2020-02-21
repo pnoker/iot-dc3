@@ -39,14 +39,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>位号配置信息服务接口实现类
+ * <p>PointInfoService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class PointInfoServiceImpl implements PointInfoService {
-
     @Resource
     private PointInfoMapper pointInfoMapper;
 
@@ -62,7 +61,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo add(PointInfo pointInfo) {
-        PointInfo select = selectByProfileInfoID(pointInfo.getPointAttributeId());
+        PointInfo select = selectByPointAttributeID(pointInfo.getPointAttributeId());
         if (null != select) {
             throw new ServiceException("point info already exists");
         }
@@ -114,7 +113,7 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.PROFILE_INFO_ID, key = "#id", unless = "#result==null")
-    public PointInfo selectByProfileInfoID(Long id) {
+    public PointInfo selectByPointAttributeID(Long id) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.like(PointInfo::getPointAttributeId, id);
         return pointInfoMapper.selectOne(queryWrapper);

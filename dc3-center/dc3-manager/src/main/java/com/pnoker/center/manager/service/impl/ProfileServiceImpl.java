@@ -46,23 +46,19 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>模板服务接口实现类
+ * <p>ProfileService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class ProfileServiceImpl implements ProfileService {
-
     @Resource
     private DriverService driverService;
-
     @Resource
     private DeviceService deviceService;
-
     @Resource
     private PointService pointService;
-
     @Resource
     private ProfileMapper profileMapper;
 

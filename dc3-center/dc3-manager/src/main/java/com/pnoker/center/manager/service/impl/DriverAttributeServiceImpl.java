@@ -25,8 +25,8 @@ import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverAttributeDto;
 import com.pnoker.common.exception.ServiceException;
-import com.pnoker.common.model.DriverAttribute;
 import com.pnoker.common.model.Dic;
+import com.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -40,14 +40,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>连接信息服务接口实现类
+ * <p>DriverAttributeService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class DriverAttributeServiceImpl implements DriverAttributeService {
-
     @Resource
     private DriverAttributeMapper driverAttributeMapper;
 
@@ -142,8 +141,17 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto connectInfoDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         Optional.ofNullable(connectInfoDto).ifPresent(dto -> {
+            if (StringUtils.isNotBlank(dto.getDisplayName())) {
+                queryWrapper.like(DriverAttribute::getDisplayName, dto.getDisplayName());
+            }
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(DriverAttribute::getName, dto.getName());
+            }
+            if (StringUtils.isNotBlank(dto.getType())) {
+                queryWrapper.like(DriverAttribute::getType, dto.getType());
+            }
+            if (null != dto.getDriverId()) {
+                queryWrapper.like(DriverAttribute::getDriverId, dto.getDriverId());
             }
         });
         return queryWrapper;

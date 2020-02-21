@@ -40,7 +40,7 @@ public class ScheduleClientHystrix implements FallbackFactory<ScheduleClient> {
     @Override
     public ScheduleClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("ScheduleClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("Hystrix:{}", message, throwable);
 
         return new ScheduleClient() {
 
@@ -61,11 +61,6 @@ public class ScheduleClientHystrix implements FallbackFactory<ScheduleClient> {
 
             @Override
             public R<Schedule> selectById(Long id) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Schedule> selectByName(String name) {
                 return R.fail(message);
             }
 

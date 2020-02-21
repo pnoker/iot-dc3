@@ -52,7 +52,7 @@ public interface PointClient {
     R<Point> add(@Validated(Insert.class) @RequestBody Point point);
 
     /**
-     * 根据 Id 删除 Point
+     * 根据 ID 删除 Point
      *
      * @param id pointId
      * @return Boolean
@@ -70,23 +70,13 @@ public interface PointClient {
     R<Point> update(@Validated(Update.class) @RequestBody Point point);
 
     /**
-     * 根据 Id 查询 Point
+     * 根据 ID 查询 Point
      *
      * @param id
      * @return Point
      */
     @GetMapping("/id/{id}")
     R<Point> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 根据模板 ID & 位号 Name 查询 Point
-     *
-     * @param profileId
-     * @param name
-     * @return Point
-     */
-    @GetMapping("/profile/{profileId}/name/{name}")
-    R<Point> selectByNameAndProfile(@PathVariable(value = "profileId") Long profileId, @PathVariable(value = "name") String name);
 
     /**
      * 分页查询 Point

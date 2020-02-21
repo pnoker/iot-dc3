@@ -27,7 +27,7 @@ import com.pnoker.common.model.DriverAttribute;
  */
 public interface DriverAttributeService extends Service<DriverAttribute, DriverAttributeDto> {
     /**
-     * 根据连接信息 NAME 查询分组
+     * 根据驱动配置属性 NAME 查询
      *
      * @param name
      * @return

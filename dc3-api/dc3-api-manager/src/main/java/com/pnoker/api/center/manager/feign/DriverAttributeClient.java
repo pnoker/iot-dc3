@@ -49,7 +49,7 @@ public interface DriverAttributeClient {
     R<DriverAttribute> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
-     * 根据 Id 删除 ConnectInfo
+     * 根据 ID 删除 ConnectInfo
      *
      * @param id connectInfoId
      * @return Boolean
@@ -67,22 +67,13 @@ public interface DriverAttributeClient {
     R<DriverAttribute> update(@Validated(Update.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
-     * 根据 Id 查询 ConnectInfo
+     * 根据 ID 查询 ConnectInfo
      *
      * @param id
      * @return ConnectInfo
      */
     @GetMapping("/id/{id}")
     R<DriverAttribute> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 根据 Name 查询 ConnectInfo
-     *
-     * @param name
-     * @return ConnectInfo
-     */
-    @GetMapping("/name/{name}")
-    R<DriverAttribute> selectByName(@PathVariable(value = "name") String name);
 
     /**
      * 分页查询 ConnectInfo

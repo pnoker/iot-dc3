@@ -27,7 +27,7 @@ import com.pnoker.common.model.Label;
  */
 public interface LabelService extends Service<Label, LabelDto> {
     /**
-     * 根据标签 NAME 查询分组
+     * 根据标签 NAME 查询
      *
      * @param name
      * @return
