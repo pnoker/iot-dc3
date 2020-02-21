@@ -27,10 +27,10 @@ import com.pnoker.common.model.DriverInfo;
  */
 public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
     /**
-     * 根据模板属性配置 ID 查询分组
+     * 根据模板属性配置 ID 查询
      *
      * @param id
      * @return
      */
-    DriverInfo selectByConnectInfoId(Long id);
+    DriverInfo selectByDriverAttributeId(Long id);
 }

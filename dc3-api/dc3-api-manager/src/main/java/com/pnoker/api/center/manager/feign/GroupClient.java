@@ -52,7 +52,7 @@ public interface GroupClient {
     R<Group> add(@Validated(Insert.class) @RequestBody Group group);
 
     /**
-     * 根据 Id 删除 Group
+     * 根据 ID 删除 Group
      *
      * @param id groupId
      * @return Boolean
@@ -70,22 +70,13 @@ public interface GroupClient {
     R<Group> update(@Validated(Update.class) @RequestBody Group group);
 
     /**
-     * 根据 Id 查询 Group
+     * 根据 ID 查询 Group
      *
      * @param id
      * @return Group
      */
     @GetMapping("/id/{id}")
     R<Group> selectById(@PathVariable(value = "id") Long id);
-
-    /**
-     * 根据 Name 查询 Group
-     *
-     * @param name
-     * @return Group
-     */
-    @GetMapping("/name/{name}")
-    R<Group> selectByName(@PathVariable(value = "name") String name);
 
     /**
      * 分页查询 Group

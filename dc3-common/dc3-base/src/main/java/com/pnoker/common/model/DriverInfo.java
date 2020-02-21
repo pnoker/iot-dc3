@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotNull;
 
 /**
- * 模板连接信息表
+ * 驱动配置信息表
  *
  * @author pnoker
  */

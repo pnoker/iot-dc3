@@ -52,7 +52,7 @@ public interface DriverClient {
     R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver);
 
     /**
-     * 根据 Id 删除 Driver
+     * 根据 ID 删除 Driver
      *
      * @param id driverId
      * @return Boolean
@@ -70,7 +70,7 @@ public interface DriverClient {
     R<Driver> update(@Validated(Update.class) @RequestBody Driver driver);
 
     /**
-     * 根据 Id 查询 Driver
+     * 根据 ID 查询 Driver
      *
      * @param id
      * @return Driver
@@ -79,7 +79,7 @@ public interface DriverClient {
     R<Driver> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据 ServiceName 查询 Driver
+     * 根据 SERVICENAME 查询 Driver
      *
      * @param serviceName
      * @return Driver
@@ -88,7 +88,7 @@ public interface DriverClient {
     R<Driver> selectByServiceName(@PathVariable(value = "serviceName") String serviceName);
 
     /**
-     * 根据 Host & Port 查询 Driver
+     * 根据 HOST & PORT 查询 Driver
      *
      * @param host
      * @param port

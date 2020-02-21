@@ -27,7 +27,7 @@ import com.pnoker.common.model.Group;
  */
 public interface GroupService extends Service<Group, GroupDto> {
     /**
-     * 根据设备分组NAME查询分组
+     * 根据分组 NAME 查询
      *
      * @param name
      * @return

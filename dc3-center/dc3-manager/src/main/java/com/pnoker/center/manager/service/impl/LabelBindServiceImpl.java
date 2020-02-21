@@ -39,14 +39,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>标签绑定服务接口实现类
+ * <p>LabelBindService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class LabelBindServiceImpl implements LabelBindService {
-
     @Resource
     private LabelBindMapper labelBindMapper;
 
@@ -120,8 +119,12 @@ public class LabelBindServiceImpl implements LabelBindService {
     public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindDto labelBindDto) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
         Optional.ofNullable(labelBindDto).ifPresent(dto -> {
-            queryWrapper.eq(LabelBind::getLabelId, dto.getLabelId());
-            queryWrapper.eq(LabelBind::getEntityId, dto.getEntityId());
+            if (null != dto.getLabelId()) {
+                queryWrapper.eq(LabelBind::getLabelId, dto.getLabelId());
+            }
+            if (null != dto.getEntityId()) {
+                queryWrapper.eq(LabelBind::getEntityId, dto.getEntityId());
+            }
             if (StringUtils.isNotBlank(dto.getType())) {
                 queryWrapper.eq(LabelBind::getType, dto.getType());
             }

@@ -27,7 +27,7 @@ import com.pnoker.common.model.Profile;
  */
 public interface ProfileService extends Service<Profile, ProfileDto> {
     /**
-     * 根据模板 NAME 查询分组
+     * 根据模板 NAME 查询
      *
      * @param name
      * @return

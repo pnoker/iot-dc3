@@ -27,7 +27,7 @@ import com.pnoker.common.model.Schedule;
  */
 public interface ScheduleService extends Service<Schedule, ScheduleDto> {
     /**
-     * 根据设备分组NAME查询分组
+     * 根据调度 NAME 查询
      *
      * @param name
      * @return

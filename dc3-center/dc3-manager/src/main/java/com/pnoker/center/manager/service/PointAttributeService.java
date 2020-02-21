@@ -27,7 +27,7 @@ import com.pnoker.common.model.PointAttribute;
  */
 public interface PointAttributeService extends Service<PointAttribute, PointAttributeDto> {
     /**
-     * 根据模板配置信息 NAME 查询分组
+     * 根据位号配置属性 NAME 查询
      *
      * @param name
      * @return

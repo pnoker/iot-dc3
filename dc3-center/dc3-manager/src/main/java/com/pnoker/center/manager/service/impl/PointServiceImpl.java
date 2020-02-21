@@ -20,15 +20,15 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.center.manager.mapper.PointMapper;
+import com.pnoker.center.manager.service.PointService;
+import com.pnoker.center.manager.service.ProfileService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.PointDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Dic;
 import com.pnoker.common.model.Point;
-import com.pnoker.center.manager.mapper.PointMapper;
-import com.pnoker.center.manager.service.PointService;
-import com.pnoker.center.manager.service.ProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,17 +43,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>位号服务接口实现类
+ * <p>PointService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class PointServiceImpl implements PointService {
-
     @Resource
     private ProfileService profileService;
-
     @Resource
     private PointMapper pointMapper;
 
@@ -178,14 +176,14 @@ public class PointServiceImpl implements PointService {
             if (StringUtils.isNotBlank(dto.getType())) {
                 queryWrapper.eq(Point::getType, dto.getType());
             }
-            if (null != dto.getProfileId()) {
-                queryWrapper.eq(Point::getProfileId, dto.getProfileId());
-            }
             if (null != dto.getRw()) {
                 queryWrapper.eq(Point::getRw, dto.getRw());
             }
             if (null != dto.getAccrue()) {
                 queryWrapper.eq(Point::getAccrue, dto.getAccrue());
+            }
+            if (null != dto.getProfileId()) {
+                queryWrapper.eq(Point::getProfileId, dto.getProfileId());
             }
         });
         return queryWrapper;

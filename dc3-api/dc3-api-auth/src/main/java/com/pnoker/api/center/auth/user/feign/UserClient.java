@@ -49,7 +49,7 @@ public interface UserClient {
     R<User> add(@Validated(Insert.class) @RequestBody User user);
 
     /**
-     * 根据 Id 删除 User
+     * 根据 ID 删除 User
      *
      * @param id userId
      * @return Boolean
@@ -67,7 +67,7 @@ public interface UserClient {
     R<User> update(@Validated(Update.class) @RequestBody User user);
 
     /**
-     * 根据 Id 重置 User 密码
+     * 根据 ID 重置 User 密码
      *
      * @param id userId
      * @return Boolean
@@ -76,7 +76,7 @@ public interface UserClient {
     R<Boolean> restPassword(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据 Id 查询 User
+     * 根据 ID 查询 User
      *
      * @param id
      * @return User
@@ -85,7 +85,7 @@ public interface UserClient {
     R<User> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据 Id 查询 User
+     * 根据 ID 查询 User
      *
      * @param name
      * @return User

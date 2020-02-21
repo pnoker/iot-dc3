@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.ScheduleMapper;
-import com.pnoker.center.manager.service.DeviceService;
 import com.pnoker.center.manager.service.ScheduleService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
@@ -41,17 +40,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p> Schedule 服务接口实现类
+ * <p>ScheduleService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
-
-    @Resource
-    private DeviceService deviceService;
-
     @Resource
     private ScheduleMapper scheduleMapper;
 
@@ -147,11 +142,11 @@ public class ScheduleServiceImpl implements ScheduleService {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Schedule::getName, dto.getName());
             }
-            if (null != dto.getDeviceId()) {
-                queryWrapper.eq(Schedule::getDeviceId, dto.getDeviceId());
-            }
             if (null != dto.getStatus()) {
                 queryWrapper.eq(Schedule::getStatus, dto.getStatus());
+            }
+            if (null != dto.getDeviceId()) {
+                queryWrapper.eq(Schedule::getDeviceId, dto.getDeviceId());
             }
         });
         return queryWrapper;

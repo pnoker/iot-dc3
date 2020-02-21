@@ -39,14 +39,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>位号配置信息服务接口实现类
+ * <p>DriverInfoService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class DriverInfoServiceImpl implements DriverInfoService {
-
     @Resource
     private DriverInfoMapper driverInfoMapper;
 
@@ -62,7 +61,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo add(DriverInfo driverInfo) {
-        DriverInfo select = selectByConnectInfoId(driverInfo.getDriverAttributeId());
+        DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId());
         if (null != select) {
             throw new ServiceException("driver info already exists");
         }
@@ -114,7 +113,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
 
     @Override
     @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.CONNECT_INFO_ID, key = "#id", unless = "#result==null")
-    public DriverInfo selectByConnectInfoId(Long id) {
+    public DriverInfo selectByDriverAttributeId(Long id) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
         queryWrapper.like(DriverInfo::getDriverAttributeId, id);
         return driverInfoMapper.selectOne(queryWrapper);

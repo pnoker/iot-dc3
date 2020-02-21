@@ -66,7 +66,7 @@ public class RouteConfig {
     }
 
     /**
-     * 根据 HostAddress 进行限流
+     * 根据 HOSTADDRESS 进行限流
      *
      * @return
      */

@@ -40,7 +40,7 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
     @Override
     public PointClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("PointClientHystrix:{},hystrix服务降级处理", message, throwable);
+        log.error("Hystrix:{}", message, throwable);
 
         return new PointClient() {
 
@@ -61,11 +61,6 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
 
             @Override
             public R<Point> selectById(Long id) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Point> selectByNameAndProfile(Long profileId, String name) {
                 return R.fail(message);
             }
 

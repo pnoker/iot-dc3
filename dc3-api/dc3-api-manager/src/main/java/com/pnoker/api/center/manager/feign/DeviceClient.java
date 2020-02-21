@@ -52,7 +52,7 @@ public interface DeviceClient {
     R<Device> add(@Validated(Insert.class) @RequestBody Device device);
 
     /**
-     * 根据 Id 删除 Device
+     * 根据 ID 删除 Device
      *
      * @param id deviceId
      * @return Boolean
@@ -70,7 +70,7 @@ public interface DeviceClient {
     R<Device> update(@Validated(Update.class) @RequestBody Device device);
 
     /**
-     * 根据 Id 查询 Device
+     * 根据 ID 查询 Device
      *
      * @param id
      * @return Device
@@ -79,23 +79,13 @@ public interface DeviceClient {
     R<Device> selectById(@PathVariable(value = "id") Long id);
 
     /**
-     * 根据 Code 查询 Device
+     * 根据 CODE 查询 Device
      *
      * @param code
      * @return Device
      */
     @GetMapping("/code/{code}")
     R<Device> selectByCode(@PathVariable(value = "code") String code);
-
-    /**
-     * 根据 GroupId & Name 查询 Device
-     *
-     * @param groupId
-     * @param name
-     * @return Device
-     */
-    @GetMapping("/group/{groupId}/name/{name}")
-    R<Device> selectDeviceByNameAndGroup(@PathVariable(value = "groupId") Long groupId, @PathVariable(value = "name") String name);
 
     /**
      * 分页查询 Device

@@ -47,20 +47,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>设备服务接口实现类
+ * <p>DeviceService Impl
  *
  * @author pnoker
  */
 @Slf4j
 @Service
 public class DeviceServiceImpl implements DeviceService {
-
     @Resource
     private GroupService groupService;
-
     @Resource
     private ScheduleService scheduleService;
-
     @Resource
     private DeviceMapper deviceMapper;
 
@@ -194,11 +191,11 @@ public class DeviceServiceImpl implements DeviceService {
             if (null != dto.getStatus()) {
                 queryWrapper.eq(Device::getStatus, dto.getStatus());
             }
-            if (null != dto.getGroupId()) {
-                queryWrapper.eq(Device::getGroupId, dto.getGroupId());
-            }
             if (null != dto.getProfileId()) {
                 queryWrapper.eq(Device::getProfileId, dto.getProfileId());
+            }
+            if (null != dto.getGroupId()) {
+                queryWrapper.eq(Device::getGroupId, dto.getGroupId());
             }
         });
         return queryWrapper;

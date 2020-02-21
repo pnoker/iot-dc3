@@ -37,7 +37,7 @@ public class DriverAttributeClientHystrix implements FallbackFactory<DriverAttri
     @Override
     public DriverAttributeClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("DriverAttributeClient:{},hystrix服务降级处理", message, throwable);
+        log.error("Hystrix:{}", message, throwable);
 
         return new DriverAttributeClient() {
 
@@ -58,11 +58,6 @@ public class DriverAttributeClientHystrix implements FallbackFactory<DriverAttri
 
             @Override
             public R<DriverAttribute> selectById(Long id) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<DriverAttribute> selectByName(String name) {
                 return R.fail(message);
             }
 

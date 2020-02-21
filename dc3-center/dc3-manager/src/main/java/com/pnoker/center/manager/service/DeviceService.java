@@ -28,7 +28,7 @@ import com.pnoker.common.model.Device;
 public interface DeviceService extends Service<Device, DeviceDto> {
 
     /**
-     * 根据设备 CODE 查询设备
+     * 根据设备 CODE 查询
      *
      * @param code
      * @return
@@ -36,7 +36,7 @@ public interface DeviceService extends Service<Device, DeviceDto> {
     Device selectByCode(String code);
 
     /**
-     * 根据设备 NAME 和分组 ID 查询设备
+     * 根据设备 NAME 和分组 ID 查询
      *
      * @param groupId
      * @param name

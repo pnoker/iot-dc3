@@ -28,7 +28,7 @@ import com.pnoker.common.model.Point;
 public interface PointService extends Service<Point, PointDto> {
 
     /**
-     * 根据位号 NAME & 模板 ID 查询位号
+     * 根据位号 NAME & 模板 ID 查询
      *
      * @param profileId
      * @param name

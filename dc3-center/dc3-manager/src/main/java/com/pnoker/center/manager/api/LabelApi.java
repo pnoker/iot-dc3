@@ -91,19 +91,6 @@ public class LabelApi implements LabelClient {
     }
 
     @Override
-    public R<Label> selectByName(String name) {
-        try {
-            Label select = labelService.selectByName(name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<Label>> list(LabelDto labelDto) {
         try {
             Page<Label> page = labelService.list(labelDto);

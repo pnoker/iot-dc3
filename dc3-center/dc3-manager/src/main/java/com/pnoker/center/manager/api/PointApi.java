@@ -93,19 +93,6 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Point> selectByNameAndProfile(Long profileId, String name) {
-        try {
-            Point select = pointService.selectByNameAndProfile(profileId, name);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<Page<Point>> list(PointDto pointDto) {
         try {
             Page<Point> page = pointService.list(pointDto);
