@@ -4,10 +4,8 @@
 
 <p align="center">
     <img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
-    <!--
     <a href="https://travis-ci.org/pnoker/iot-dc3"><img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master"></a>
     <a href="https://codecov.io/gh/pnoker/iot-dc3"><img src="https://codecov.io/gh/pnoker/iot-dc3/branch/master/graph/badge.svg"></a><br>
-    -->
 	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
 	<a><img src="https://img.shields.io/badge/Spring Boot-2.2.4.RELEASE-blue.svg"></a>
 	<a><img src="https://img.shields.io/badge/Spring Cloud-Hoxton.SR1-blue.svg"></a>
@@ -50,6 +48,8 @@
 * 完善性:设备快速接入、注册、权限校验;
 * 安全:数据加密传输;
 * Docker:容器化。
+
+![iot-dc3-architecture](dc3/images/iot-dc3-architecture5.jpg)
 
 ### 2 DC3 IOT平台架构？
 
