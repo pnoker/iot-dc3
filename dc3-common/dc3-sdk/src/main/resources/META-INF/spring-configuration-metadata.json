@@ -11,14 +11,14 @@
       "description": "device driver description."
     },
     {
-      "name": "driver.connect",
+      "name": "driver.driver-attribute",
       "type": "java.util.List",
-      "description": "device driver connect config."
+      "description": "device driver driver attribute list<p/><p>- displayName: attribute display name<p>- name: attribute name<p>- type: string/int/double/float/long/boolean<p>- value: default value<p>- description: description."
     },
     {
-      "name": "driver.profile",
+      "name": "driver.point-attribute",
       "type": "java.util.List",
-      "description": "device driver profile config."
+      "description": "device driver driver attribute list<p/><p>- displayName: attribute display name<p>- name: attribute name<p>- type: string/int/double/float/long/boolean<p>- value: default value<p>- description: description."
     }
   ]
 }

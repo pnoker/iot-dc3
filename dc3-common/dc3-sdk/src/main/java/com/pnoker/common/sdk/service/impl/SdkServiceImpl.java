@@ -178,7 +178,7 @@ public class SdkServiceImpl implements SdkService {
         }
 
         Map<String, DriverAttribute> driverAttributeMap = new HashMap<>(16);
-        for (DriverAttribute info : driverProperty.getConnect()) {
+        for (DriverAttribute info : driverProperty.getDriverAttribute()) {
             driverAttributeMap.put(info.getName(), info);
         }
 
@@ -230,7 +230,7 @@ public class SdkServiceImpl implements SdkService {
         }
 
         Map<String, PointAttribute> pointAttributeMap = new HashMap<>(16);
-        for (PointAttribute info : driverProperty.getProfile()) {
+        for (PointAttribute info : driverProperty.getPointAttribute()) {
             pointAttributeMap.put(info.getName(), info);
         }
 
