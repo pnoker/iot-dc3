@@ -49,8 +49,6 @@
 * 安全:数据加密传输;
 * Docker:容器化。
 
-![iot-dc3-architecture](dc3/images/iot-dc3-architecture5.jpg)
-
 ### 2 DC3 IOT平台架构？
 
 DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源的微服务集合。

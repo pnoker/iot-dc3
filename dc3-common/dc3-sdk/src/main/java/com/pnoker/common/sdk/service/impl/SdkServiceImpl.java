@@ -129,7 +129,7 @@ public class SdkServiceImpl implements SdkService {
             log.error("driver name || driver service name || driver host is invalid");
             return false;
         }
-        return registerDriver() && registerDriverConnectInfo() && registerDriverProfileInfo();
+        return registerDriver() && registerDriverAttribute() && registerPointAttribute();
     }
 
     /**
@@ -161,11 +161,11 @@ public class SdkServiceImpl implements SdkService {
     }
 
     /**
-     * 注册驱动 connect 配置信息
+     * 注册驱动 driver 配置属性
      *
      * @return
      */
-    public boolean registerDriverConnectInfo() {
+    public boolean registerDriverAttribute() {
         Map<String, DriverAttribute> infoMap = new HashMap<>(16);
         DriverAttributeDto connectInfoDto = new DriverAttributeDto();
         connectInfoDto.setDriverId(deviceDriver.getDriverId());
@@ -177,34 +177,34 @@ public class SdkServiceImpl implements SdkService {
             }
         }
 
-        Map<String, DriverAttribute> connectInfoMap = new HashMap<>(16);
+        Map<String, DriverAttribute> driverAttributeMap = new HashMap<>(16);
         for (DriverAttribute info : driverProperty.getConnect()) {
-            connectInfoMap.put(info.getName(), info);
+            driverAttributeMap.put(info.getName(), info);
         }
 
-        for (String name : connectInfoMap.keySet()) {
-            DriverAttribute info = connectInfoMap.get(name).setDriverId(deviceDriver.getDriverId());
+        for (String name : driverAttributeMap.keySet()) {
+            DriverAttribute info = driverAttributeMap.get(name).setDriverId(deviceDriver.getDriverId());
             if (infoMap.containsKey(name)) {
                 info.setId(infoMap.get(name).getId());
                 R<DriverAttribute> r = driverAttributeClient.update(info);
                 if (!r.isOk()) {
-                    log.error("the connect info ({}) update failed", name);
+                    log.error("the driver attribute ({}) update failed", name);
                     return false;
                 }
             } else {
                 R<DriverAttribute> r = driverAttributeClient.add(info);
                 if (!r.isOk()) {
-                    log.error("the connect info ({}) create failed", name);
+                    log.error("the driver attribute ({}) create failed", name);
                     return false;
                 }
             }
         }
 
         for (String name : infoMap.keySet()) {
-            if (!connectInfoMap.containsKey(name)) {
+            if (!driverAttributeMap.containsKey(name)) {
                 R<Boolean> r = driverAttributeClient.delete(infoMap.get(name).getId());
                 if (!r.isOk()) {
-                    log.error("the connect info ({}) delete failed", name);
+                    log.error("the driver attribute ({}) delete failed", name);
                     return false;
                 }
             }
@@ -213,11 +213,11 @@ public class SdkServiceImpl implements SdkService {
     }
 
     /**
-     * 注册驱动 profile 配置信息
+     * 注册驱动 point 配置属性
      *
      * @return
      */
-    public boolean registerDriverProfileInfo() {
+    public boolean registerPointAttribute() {
         Map<String, PointAttribute> infoMap = new HashMap<>(16);
         PointAttributeDto profileInfoDto = new PointAttributeDto();
         profileInfoDto.setDriverId(deviceDriver.getDriverId());
@@ -229,34 +229,34 @@ public class SdkServiceImpl implements SdkService {
             }
         }
 
-        Map<String, PointAttribute> profileInfoMap = new HashMap<>(16);
+        Map<String, PointAttribute> pointAttributeMap = new HashMap<>(16);
         for (PointAttribute info : driverProperty.getProfile()) {
-            profileInfoMap.put(info.getName(), info);
+            pointAttributeMap.put(info.getName(), info);
         }
 
-        for (String name : profileInfoMap.keySet()) {
-            PointAttribute info = profileInfoMap.get(name).setDriverId(deviceDriver.getDriverId());
+        for (String name : pointAttributeMap.keySet()) {
+            PointAttribute info = pointAttributeMap.get(name).setDriverId(deviceDriver.getDriverId());
             if (infoMap.containsKey(name)) {
                 info.setId(infoMap.get(name).getId());
                 R<PointAttribute> r = pointAttributeClient.update(info);
                 if (!r.isOk()) {
-                    log.error("the profile info ({}) update failed", name);
+                    log.error("the point attribute ({}) update failed", name);
                     return false;
                 }
             } else {
                 R<PointAttribute> r = pointAttributeClient.add(info);
                 if (!r.isOk()) {
-                    log.error("the profile info ({}) create failed", name);
+                    log.error("the point attribute ({}) create failed", name);
                     return false;
                 }
             }
         }
 
         for (String name : infoMap.keySet()) {
-            if (!profileInfoMap.containsKey(name)) {
+            if (!pointAttributeMap.containsKey(name)) {
                 R<Boolean> r = pointAttributeClient.delete(infoMap.get(name).getId());
                 if (!r.isOk()) {
-                    log.error("the profile info ({}) delete failed", name);
+                    log.error("the point attribute ({}) delete failed", name);
                     return false;
                 }
             }
@@ -269,12 +269,10 @@ public class SdkServiceImpl implements SdkService {
      */
     public void loadData() {
         deviceDriver.setProfileMap(getProfileMap(deviceDriver.getDriverId()));
-        deviceDriver.setDriverAttributeMap(getDriverAttributeMap(deviceDriver.getDriverId()));
-        deviceDriver.setDriverInfoMap(getDriverInfoMap(deviceDriver.getProfileMap()));
+        deviceDriver.setDriverInfoMap(getDriverInfoMap(deviceDriver.getProfileMap(), getDriverAttributeMap(deviceDriver.getDriverId())));
         deviceDriver.setDeviceMap(getDeviceMap(deviceDriver.getProfileMap()));
         deviceDriver.setPointMap(getPointMap(deviceDriver.getProfileMap()));
-        deviceDriver.setPointAttributeMap(getPointAttributeMap(deviceDriver.getDriverId()));
-        deviceDriver.setPointInfoMap(getPointInfoMap(deviceDriver.getDeviceMap()));
+        deviceDriver.setPointInfoMap(getPointInfoMap(deviceDriver.getDeviceMap(), getPointAttributeMap(deviceDriver.getDriverId())));
     }
 
     /**
@@ -391,7 +389,7 @@ public class SdkServiceImpl implements SdkService {
      * @param profileMap
      * @return
      */
-    public Map<Long, Map<String, AttributeInfo>> getDriverInfoMap(Map<Long, Profile> profileMap) {
+    public Map<Long, Map<String, AttributeInfo>> getDriverInfoMap(Map<Long, Profile> profileMap, Map<Long, DriverAttribute> driverAttributeMap) {
         Map<Long, Map<String, AttributeInfo>> driverInfoMap = new HashMap<>(16);
         for (Long profileId : profileMap.keySet()) {
             DriverInfoDto driverInfoDto = new DriverInfoDto();
@@ -402,7 +400,7 @@ public class SdkServiceImpl implements SdkService {
                 Map<String, AttributeInfo> infoMap = new HashMap<>(16);
                 List<DriverInfo> driverInfos = r.getData().getRecords();
                 for (DriverInfo driverInfo : driverInfos) {
-                    DriverAttribute attribute = deviceDriver.getDriverAttributeMap().get(driverInfo.getDriverAttributeId());
+                    DriverAttribute attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
                     infoMap.put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
                 }
                 driverInfoMap.put(profileId, infoMap);
@@ -413,11 +411,11 @@ public class SdkServiceImpl implements SdkService {
 
     /**
      * 获取位号信息
-     * deviveId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
+     * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
      *
      * @return
      */
-    public Map<Long, Map<Long, Map<String, AttributeInfo>>> getPointInfoMap(Map<Long, Device> deviceMap) {
+    public Map<Long, Map<Long, Map<String, AttributeInfo>>> getPointInfoMap(Map<Long, Device> deviceMap, Map<Long, PointAttribute> pointAttributeMap) {
         Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = new HashMap<>(16);
         for (Device device : deviceMap.values()) {
             Map<Long, Map<String, AttributeInfo>> tmp = new HashMap<>(16);
@@ -432,7 +430,7 @@ public class SdkServiceImpl implements SdkService {
                     Map<String, AttributeInfo> infoMap = new HashMap<>(16);
                     List<PointInfo> pointInfos = r.getData().getRecords();
                     for (PointInfo pointInfo : pointInfos) {
-                        PointAttribute attribute = deviceDriver.getPointAttributeMap().get(pointInfo.getPointAttributeId());
+                        PointAttribute attribute = pointAttributeMap.get(pointInfo.getPointAttributeId());
                         infoMap.put(attribute.getName(), new AttributeInfo(pointInfo.getValue(), attribute.getType()));
                     }
                     tmp.put(pointId, infoMap);

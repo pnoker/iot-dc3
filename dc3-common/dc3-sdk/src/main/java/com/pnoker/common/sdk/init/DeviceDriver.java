@@ -31,26 +31,30 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
     @Getter
     private long driverId;
 
-    @Setter
-    @Getter
-    private Map<Long, DriverAttribute> driverAttributeMap;
-
+    /**
+     * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
+     */
     @Setter
     @Getter
     private Map<Long, Map<String, AttributeInfo>> driverInfoMap;
 
-    @Setter
-    @Getter
-    private Map<Long, PointAttribute> pointAttributeMap;
-
+    /**
+     * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
+     */
     @Setter
     @Getter
     private Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap;
 
+    /**
+     * profileID,profile
+     */
     @Setter
     @Getter
     private Map<Long, Profile> profileMap;
 
+    /**
+     * deviceId,device
+     */
     @Setter
     @Getter
     private Map<Long, Device> deviceMap;

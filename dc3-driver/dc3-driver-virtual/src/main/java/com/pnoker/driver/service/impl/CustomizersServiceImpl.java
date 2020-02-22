@@ -1,5 +1,6 @@
 package com.pnoker.driver.service.impl;
 
+import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.service.CustomizersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class CustomizersServiceImpl implements CustomizersService {
     }
 
     @Override
-    public void read(Map<String, String> driverInfo, Map<String, String> pointInfo) {
+    public void read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo) {
 
     }
 
