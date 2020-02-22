@@ -1,7 +1,7 @@
 driver:
   name: VirtualDriver
   description: @project.description@
-  connect:
+  driver-attribute:
     - displayName: 主机
       name: host
       type: string
@@ -12,7 +12,7 @@ driver:
       type: int
       value: 18600
       description: 目标机器 Port
-  profile:
+  point-attribute:
     - displayName: 位号
       name: tag
       type: string
