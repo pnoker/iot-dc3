@@ -7,8 +7,8 @@
     <a href="https://travis-ci.org/pnoker/iot-dc3"><img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master"></a>
     <a href="https://codecov.io/gh/pnoker/iot-dc3"><img src="https://codecov.io/gh/pnoker/iot-dc3/branch/master/graph/badge.svg"></a><br>
 	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
-	<a><img src="https://img.shields.io/badge/Spring Boot-2.1.6.RELEASE-blue.svg"></a>
-	<a><img src="https://img.shields.io/badge/Spring Cloud-Greenwich.RELEASE-blue.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Boot-2.2.4.RELEASE-blue.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Cloud-Hoxton.SR1-blue.svg"></a>
 	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
@@ -49,6 +49,8 @@
 * 安全:数据加密传输;
 * Docker:容器化。
 
+![iot-dc3-architecture](dc3/images/iot-dc3-architecture5.jpg)
+
 ### 2 DC3 IOT平台架构？
 
 DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源的微服务集合。
@@ -81,4 +83,4 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 ### 5 关于WEB UI
 
 ![iot-dc3-web-login](dc3/images/iot-dc3-web-login.gif)
-![iot-dc3-web-login](dc3/images/iot-dc3-web-device.png)
+![iot-dc3-web-device](dc3/images/iot-dc3-web-device.png)
