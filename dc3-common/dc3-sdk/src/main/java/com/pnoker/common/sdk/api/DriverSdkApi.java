@@ -20,10 +20,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.sdk.message.DriverSender;
 import com.pnoker.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
@@ -47,7 +44,15 @@ public class DriverSdkApi {
     }
 
     @GetMapping("/device/{deviceId}/point/{pointId}")
-    public void readPoint(@NotNull @PathVariable("deviceId") Long deviceId, @NotNull @PathVariable("pointId") Long pointId) {
+    public void readPoint(@NotNull @PathVariable("deviceId") Long deviceId,
+                          @NotNull @PathVariable("pointId") Long pointId) {
         driverService.read(deviceId, pointId);
+    }
+
+    @PostMapping("/device/{deviceId}/point/{pointId}/value/{value}")
+    public void writePoint(@NotNull @PathVariable("deviceId") Long deviceId,
+                           @NotNull @PathVariable("pointId") Long pointId,
+                           @NotNull @PathVariable("value") String value) {
+        driverService.write(deviceId, pointId, value);
     }
 }

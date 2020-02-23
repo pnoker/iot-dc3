@@ -202,6 +202,14 @@ public class SdkServiceImpl implements SdkService {
 
         for (String name : infoMap.keySet()) {
             if (!driverAttributeMap.containsKey(name)) {
+                DriverInfoDto driverInfoDto = new DriverInfoDto();
+                driverInfoDto.setDriverAttributeId(infoMap.get(name).getId());
+                driverInfoDto.setPage(new Pages().setSize(-1L));
+                R<Page<DriverInfo>> tmp = driverInfoClient.list(driverInfoDto);
+                if (tmp.isOk() && tmp.getData().getTotal() > 0) {
+                    log.error("the driver attribute ({}) used by driver info", name);
+                    return false;
+                }
                 R<Boolean> r = driverAttributeClient.delete(infoMap.get(name).getId());
                 if (!r.isOk()) {
                     log.error("the driver attribute ({}) delete failed", name);
@@ -219,10 +227,10 @@ public class SdkServiceImpl implements SdkService {
      */
     public boolean registerPointAttribute() {
         Map<String, PointAttribute> infoMap = new HashMap<>(16);
-        PointAttributeDto profileInfoDto = new PointAttributeDto();
-        profileInfoDto.setDriverId(deviceDriver.getDriverId());
-        profileInfoDto.setPage(new Pages().setSize(-1L));
-        R<Page<PointAttribute>> list = pointAttributeClient.list(profileInfoDto);
+        PointAttributeDto pointAttributeDto = new PointAttributeDto();
+        pointAttributeDto.setDriverId(deviceDriver.getDriverId());
+        pointAttributeDto.setPage(new Pages().setSize(-1L));
+        R<Page<PointAttribute>> list = pointAttributeClient.list(pointAttributeDto);
         if (list.isOk()) {
             for (PointAttribute info : list.getData().getRecords()) {
                 infoMap.put(info.getName(), info);
@@ -254,6 +262,14 @@ public class SdkServiceImpl implements SdkService {
 
         for (String name : infoMap.keySet()) {
             if (!pointAttributeMap.containsKey(name)) {
+                PointInfoDto pointInfoDto = new PointInfoDto();
+                pointInfoDto.setPointAttributeId(infoMap.get(name).getId());
+                pointInfoDto.setPage(new Pages().setSize(-1L));
+                R<Page<PointInfo>> tmp = pointInfoClient.list(pointInfoDto);
+                if (tmp.isOk() && tmp.getData().getTotal() > 0) {
+                    log.error("the point attribute ({}) used by point info", name);
+                    return false;
+                }
                 R<Boolean> r = pointAttributeClient.delete(infoMap.get(name).getId());
                 if (!r.isOk()) {
                     log.error("the point attribute ({}) delete failed", name);
@@ -303,10 +319,10 @@ public class SdkServiceImpl implements SdkService {
      */
     public Map<Long, PointAttribute> getPointAttributeMap(long driverId) {
         Map<Long, PointAttribute> infoMap = new HashMap<>(16);
-        PointAttributeDto profileInfoDto = new PointAttributeDto();
-        profileInfoDto.setDriverId(driverId);
-        profileInfoDto.setPage(new Pages().setSize(-1L));
-        R<Page<PointAttribute>> r = pointAttributeClient.list(profileInfoDto);
+        PointAttributeDto pointAttributeDto = new PointAttributeDto();
+        pointAttributeDto.setDriverId(driverId);
+        pointAttributeDto.setPage(new Pages().setSize(-1L));
+        R<Page<PointAttribute>> r = pointAttributeClient.list(pointAttributeDto);
         if (r.isOk()) {
             for (PointAttribute info : r.getData().getRecords()) {
                 infoMap.put(info.getId(), info);

@@ -33,6 +33,7 @@ spring:
 
 logging:
   level:
+    com.pnoker.common.sdk: DEBUG
     com.pnoker: DEBUG
   file:
     name: dc3/logs/driver/virtual/${spring.application.name}.log

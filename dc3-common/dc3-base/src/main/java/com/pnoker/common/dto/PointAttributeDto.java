@@ -24,7 +24,7 @@ import lombok.*;
 import org.springframework.beans.BeanUtils;
 
 /**
- * ProfileInfo DTO
+ * PointAttribute DTO
  *
  * @author pnoker
  */

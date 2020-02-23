@@ -1,6 +1,8 @@
 package com.pnoker.common.sdk.init;
 
-import com.pnoker.common.model.*;
+import com.pnoker.common.model.Device;
+import com.pnoker.common.model.Point;
+import com.pnoker.common.model.Profile;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,25 +34,18 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
     private long driverId;
 
     /**
-     * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
-     */
-    @Setter
-    @Getter
-    private Map<Long, Map<String, AttributeInfo>> driverInfoMap;
-
-    /**
-     * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
-     */
-    @Setter
-    @Getter
-    private Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap;
-
-    /**
      * profileID,profile
      */
     @Setter
     @Getter
     private Map<Long, Profile> profileMap;
+
+    /**
+     * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
+     */
+    @Setter
+    @Getter
+    private Map<Long, Map<String, AttributeInfo>> driverInfoMap;
 
     /**
      * deviceId,device
@@ -66,6 +61,12 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
     @Getter
     private Map<Long, Map<Long, Point>> pointMap;
 
+    /**
+     * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
+     */
+    @Setter
+    @Getter
+    private Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap;
 
     public String getHost() {
         try {
