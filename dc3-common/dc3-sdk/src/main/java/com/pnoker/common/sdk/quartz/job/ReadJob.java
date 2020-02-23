@@ -22,6 +22,6 @@ public class ReadJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.info("read job");
+        log.debug("read job");
     }
 }

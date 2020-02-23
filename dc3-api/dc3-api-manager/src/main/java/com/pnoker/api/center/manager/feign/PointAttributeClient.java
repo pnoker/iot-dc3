@@ -42,48 +42,48 @@ import javax.validation.constraints.NotNull;
 public interface PointAttributeClient {
 
     /**
-     * 新增 ProfileInfo
+     * 新增 PointAttribute
      *
      * @param pointAttribute
-     * @return ProfileInfo
+     * @return PointAttribute
      */
     @PostMapping("/add")
     R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 ID 删除 ProfileInfo
+     * 根据 ID 删除 PointAttribute
      *
-     * @param id profileInfoId
+     * @param id pointAttributeId
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 修改 ProfileInfo
+     * 修改 PointAttribute
      *
      * @param pointAttribute
-     * @return ProfileInfo
+     * @return PointAttribute
      */
     @PostMapping("/update")
     R<PointAttribute> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute);
 
     /**
-     * 根据 ID 查询 ProfileInfo
+     * 根据 ID 查询 PointAttribute
      *
      * @param id
-     * @return ProfileInfo
+     * @return PointAttribute
      */
     @GetMapping("/id/{id}")
     R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 分页查询 ProfileInfo
+     * 分页查询 PointAttribute
      *
-     * @param profileInfoDto
-     * @return Page<ProfileInfo>
+     * @param pointAttributeDto
+     * @return Page<PointAttribute>
      */
     @PostMapping("/list")
-    R<Page<PointAttribute>> list(@RequestBody(required = false) PointAttributeDto profileInfoDto);
+    R<Page<PointAttribute>> list(@RequestBody(required = false) PointAttributeDto pointAttributeDto);
 
 }

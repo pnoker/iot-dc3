@@ -16,14 +16,11 @@
 
 package com.pnoker.common.sdk.quartz.job;
 
-import com.pnoker.common.sdk.service.CustomizersService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * 控制调度任务
@@ -33,12 +30,9 @@ import javax.annotation.Resource;
 @Slf4j
 @Component
 public class WriteJob extends QuartzJobBean {
-    @Resource
-    private CustomizersService customizersService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        customizersService.write();
-        log.info("write job");
+        log.debug("write job");
     }
 }

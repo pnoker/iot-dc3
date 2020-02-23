@@ -39,6 +39,6 @@ public class CustomizerJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         customizersService.schedule();
-        log.info("customizers job");
+        log.debug("customizers job");
     }
 }

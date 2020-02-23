@@ -16,7 +16,6 @@
 
 package com.pnoker.common.sdk.service;
 
-import com.pnoker.common.model.Point;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 
 import java.util.Map;
@@ -39,13 +38,22 @@ public interface CustomizersService {
 
     /**
      * 读操作
+     *
+     * @param driverInfo
+     * @param pointInfo
+     * @return
      */
-    void read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo);
+    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo);
 
     /**
      * 写操作
+     *
+     * @param driverInfo
+     * @param pointInfo
+     * @param value
+     * @return
      */
-    void write();
+    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value);
 
     /**
      * 提供http接口模式接收数据

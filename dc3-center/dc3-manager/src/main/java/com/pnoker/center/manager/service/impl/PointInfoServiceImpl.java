@@ -51,7 +51,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -59,7 +59,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo add(PointInfo pointInfo) {
-        PointInfo select = selectByPointAttributeID(pointInfo.getPointAttributeId());
+        PointInfo select = selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
         if (null != select) {
             throw new ServiceException("point info already exists");
         }
@@ -86,7 +86,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -96,9 +96,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     public PointInfo update(PointInfo pointInfo) {
         pointInfo.setUpdateTime(null);
         if (pointInfoMapper.updateById(pointInfo) > 0) {
-            PointInfo select = selectById(pointInfo.getId());
-            pointInfo.setPointAttributeId(select.getPointAttributeId());
-            return select;
+            return selectById(pointInfo.getId());
         }
         return null;
     }
@@ -110,10 +108,12 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#id", unless = "#result==null")
-    public PointInfo selectByPointAttributeID(Long id) {
+    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointAttributeId+'.'+#deviceId+'.'+#pointId", unless = "#result==null")
+    public PointInfo selectByPointAttributeId(Long pointAttributeId, Long deviceId, Long pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        queryWrapper.like(PointInfo::getPointAttributeId, id);
+        queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
+        queryWrapper.eq(PointInfo::getDeviceId, deviceId);
+        queryWrapper.eq(PointInfo::getPointId, pointId);
         return pointInfoMapper.selectOne(queryWrapper);
     }
 

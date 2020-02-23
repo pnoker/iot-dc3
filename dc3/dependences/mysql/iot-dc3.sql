@@ -104,7 +104,7 @@ CREATE TABLE `dc3_profile`  (
 DROP TABLE IF EXISTS `dc3_driver_info`;
 CREATE TABLE `dc3_driver_info`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `connect_info_id` bigint(20) NOT NULL COMMENT '连接配置ID',
+  `driver_attribute_id` bigint(20) NOT NULL COMMENT '连接配置ID',
   `value` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '值',
   `profile_id` bigint(20) NOT NULL COMMENT '模板ID',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
@@ -112,9 +112,9 @@ CREATE TABLE `dc3_driver_info`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `connect_info_id`(`connect_info_id`) USING BTREE,
+  INDEX `driver_attribute_id`(`driver_attribute_id`) USING BTREE,
   INDEX `profile_id`(`profile_id`) USING BTREE,
-  CONSTRAINT `dc3_driver_info_ibfk_1` FOREIGN KEY (`connect_info_id`) REFERENCES `dc3_driver_attribute` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `dc3_driver_info_ibfk_1` FOREIGN KEY (`driver_attribute_id`) REFERENCES `dc3_driver_attribute` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `dc3_driver_info_ibfk_2` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '模板连接配置信息表' ROW_FORMAT = Dynamic;
 
@@ -303,7 +303,7 @@ CREATE TABLE `dc3_label_bind`  (
 -- ----------------------------
 -- Records of dc3_driver
 -- ----------------------------
-INSERT INTO `dc3_driver` VALUES (-1, '测试驱动', '测试驱动服务','localhost', 9999, '测试使用驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver` VALUES (-1, 'VirtualDriver', 'dc3-driver-virtual','127.0.0.1', 9999, '虚拟驱动', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_driver_attribute
@@ -314,27 +314,55 @@ INSERT INTO `dc3_driver_attribute` VALUES (-1, '端口', 'port', 'string', '8888
 -- ----------------------------
 -- Records of dc3_point_attribute
 -- ----------------------------
-INSERT INTO `dc3_point_attribute` VALUES (-1, '位号', 'name', 'string', 'tag', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-1, '位号', 'tag', 'string', 'TAG', -1, '位号名称', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_profile
 -- ----------------------------
-INSERT INTO `dc3_profile` VALUES (-1, '测试模板', 0, -1, '测试使用模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_profile` VALUES (-1, 'VirtualProfile', 0, -1, '虚拟驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_driver_info
+-- ----------------------------
+INSERT INTO `dc3_driver_info` VALUES (-1, -1, '8888', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_info` VALUES (-2, -2, '127.0.0.1', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_group
 -- ----------------------------
-INSERT INTO `dc3_group` VALUES (-1, '测试分组', '测试使用分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_group` VALUES (-1, 'VirtuaGroup', '虚拟设备分组1', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_device
 -- ----------------------------
-INSERT INTO `dc3_device` VALUES (-1, '测试设备', 'd1b60e969d3e4a26931a935e8ec62b44', 2, -1, -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_device` VALUES (-1, 'VirtualDevice', 'd1b60e969d3e4a26931a935e8ec62b44', 2, -1, -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_point
 -- ----------------------------
-INSERT INTO `dc3_point` VALUES (-1, '温度', 'string', 0, 0, -999999, 999999, 1, 0, '#.##', '℃', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-1, '温度', 'float', 0, 0, -999999, 999999, 1, 0, '#.##', '℃', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-2, '压力', 'double', 0, 0, -999999, 999999, 1, 0, '#.##', 'kPa', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-7, '时钟', 'long', 0, 0, -999999, 999999, 1, 0, '#.##', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-8, '信号', 'int', 0, 0, -999999, 999999, 1, 0, '#.##', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-9, '状态', 'boolean', 0, 0, -999999, 999999, 1, 0, '#.##', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-10, '标签', 'string', 0, 0, -999999, 999999, 1, 0, '#.##', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_point_info
+-- ----------------------------
+INSERT INTO `dc3_point_info` VALUES (-1, -1, 'temperature', -1, -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-2, -1, 'pressure', -1, -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-3, -1, 'clock', -1, -7, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-4, -1, 'signal', -1, -8, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-5, -1, 'status', -1, -9, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-6, -1, 'label', -1, -10, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+-- ----------------------------
+-- Records of dc3_schedule
+-- ----------------------------
+INSERT INTO `dc3_schedule` VALUES (-1, 'ReadJob', '*/15 * * * * ?', 'ReadJob', 0, -1, 'Automatically create by default', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_schedule` VALUES (-2, 'WriteJob', '*/15 * * * * ?', 'WriteJob', 0, -1, 'Automatically create by default', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_schedule` VALUES (-3, 'CustomizerJob', '*/15 * * * * ?', 'CustomizerJob', 0, -1, 'Automatically create by default', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_user

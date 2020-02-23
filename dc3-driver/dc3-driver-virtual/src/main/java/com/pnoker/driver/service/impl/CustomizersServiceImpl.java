@@ -2,6 +2,7 @@ package com.pnoker.driver.service.impl;
 
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.service.CustomizersService;
+import com.pnoker.common.sdk.util.DriverUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +26,15 @@ public class CustomizersServiceImpl implements CustomizersService {
     }
 
     @Override
-    public void read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo) {
-
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo) {
+        String host = (String) DriverUtils.convertValue(driverInfo.get("host").getValue(), driverInfo.get("host").getType());
+        Integer port = (Integer) DriverUtils.convertValue(driverInfo.get("port").getValue(), driverInfo.get("port").getType());
+        return null;
     }
 
     @Override
-    public void write() {
-
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+        return false;
     }
 
     @Override

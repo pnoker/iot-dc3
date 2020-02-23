@@ -51,7 +51,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -59,7 +59,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo add(DriverInfo driverInfo) {
-        DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId());
+        DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
         if (null != select) {
             throw new ServiceException("driver info already exists");
         }
@@ -86,7 +86,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -96,9 +96,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public DriverInfo update(DriverInfo driverInfo) {
         driverInfo.setUpdateTime(null);
         if (driverInfoMapper.updateById(driverInfo) > 0) {
-            DriverInfo select = selectById(driverInfo.getId());
-            driverInfo.setDriverAttributeId(select.getDriverAttributeId());
-            return select;
+            return selectById(driverInfo.getId());
         }
         return null;
     }
@@ -110,10 +108,11 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#id", unless = "#result==null")
-    public DriverInfo selectByDriverAttributeId(Long id) {
+    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverAttributeId+'.'+#profileId", unless = "#result==null")
+    public DriverInfo selectByDriverAttributeId(Long driverAttributeId, Long profileId) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        queryWrapper.like(DriverInfo::getDriverAttributeId, id);
+        queryWrapper.eq(DriverInfo::getDriverAttributeId, driverAttributeId);
+        queryWrapper.eq(DriverInfo::getProfileId, profileId);
         return driverInfoMapper.selectOne(queryWrapper);
     }
 

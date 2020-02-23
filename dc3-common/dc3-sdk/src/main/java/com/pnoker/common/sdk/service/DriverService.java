@@ -10,5 +10,15 @@ public interface DriverService {
      * @param deviceId
      * @param pointId
      */
-    void read(Long deviceId, Long pointId);
+    String read(Long deviceId, Long pointId);
+
+    /**
+     * 写操作
+     *
+     * @param deviceId
+     * @param pointId
+     * @param value
+     * @return
+     */
+    Boolean write(Long deviceId, Long pointId, String value);
 }

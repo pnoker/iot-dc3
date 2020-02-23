@@ -123,17 +123,17 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Page<PointAttribute> list(PointAttributeDto profileInfoDto) {
-        if (!Optional.ofNullable(profileInfoDto.getPage()).isPresent()) {
-            profileInfoDto.setPage(new Pages());
+    public Page<PointAttribute> list(PointAttributeDto pointAttributeDto) {
+        if (!Optional.ofNullable(pointAttributeDto.getPage()).isPresent()) {
+            pointAttributeDto.setPage(new Pages());
         }
-        return pointAttributeMapper.selectPage(profileInfoDto.getPage().convert(), fuzzyQuery(profileInfoDto));
+        return pointAttributeMapper.selectPage(pointAttributeDto.getPage().convert(), fuzzyQuery(pointAttributeDto));
     }
 
     @Override
-    public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto profileInfoDto) {
+    public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        Optional.ofNullable(profileInfoDto).ifPresent(dto -> {
+        Optional.ofNullable(pointAttributeDto).ifPresent(dto -> {
             if (StringUtils.isNotBlank(dto.getDisplayName())) {
                 queryWrapper.like(PointAttribute::getDisplayName, dto.getDisplayName());
             }
