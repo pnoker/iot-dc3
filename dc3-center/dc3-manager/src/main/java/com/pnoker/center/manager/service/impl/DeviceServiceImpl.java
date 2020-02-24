@@ -21,10 +21,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.DeviceMapper;
+import com.pnoker.center.manager.message.ManagerMessageSender;
 import com.pnoker.center.manager.service.DeviceService;
 import com.pnoker.center.manager.service.ScheduleService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.constant.Operation;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.dto.ScheduleDto;
 import com.pnoker.common.exception.ServiceException;
@@ -53,6 +55,8 @@ public class DeviceServiceImpl implements DeviceService {
     private ScheduleService scheduleService;
     @Resource
     private DeviceMapper deviceMapper;
+    @Resource
+    private ManagerMessageSender messageSender;
 
     @Override
     @Caching(
@@ -73,6 +77,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
         if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
             createSchedule(device);
+            messageSender.notifyDriver(Operation.Device.ADD, device.getId());
             return deviceMapper.selectById(device.getId());
         }
         return null;
@@ -92,6 +97,7 @@ public class DeviceServiceImpl implements DeviceService {
         boolean delete = deviceMapper.deleteById(id) > 0;
         if (delete) {
             removeSchedule(id);
+            messageSender.notifyDriver(Operation.Device.DELETE, id);
         }
         return delete;
     }
@@ -189,11 +195,9 @@ public class DeviceServiceImpl implements DeviceService {
 
     public void createSchedule(Device device) {
         Schedule schedule = new Schedule();
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.READ_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.READ_JOB).setDescription("Automatically create by default");
+        schedule.setDeviceId(device.getId()).setName(Common.Sdk.READ_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.READ_JOB);
         scheduleService.add(schedule);
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.WRITE_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.WRITE_JOB).setDescription("Automatically create by default");
-        scheduleService.add(schedule);
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.CUSTOMIZER_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.CUSTOMIZER_JOB).setDescription("Automatically create by default");
+        schedule.setDeviceId(device.getId()).setName(Common.Sdk.CUSTOMIZER_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.CUSTOMIZER_JOB);
         scheduleService.add(schedule);
     }
 

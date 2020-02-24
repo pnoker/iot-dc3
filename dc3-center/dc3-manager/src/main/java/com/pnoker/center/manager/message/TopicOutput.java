@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.quartz.job;
+package com.pnoker.center.manager.message;
 
-import lombok.extern.slf4j.Slf4j;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.stereotype.Component;
+import com.pnoker.common.constant.Common;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
 
 /**
- * 控制调度任务
- *
  * @author pnoker
  */
-@Slf4j
-@Component
-public class WriteJob extends QuartzJobBean {
+public interface TopicOutput {
 
-    @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.debug("write job");
-    }
+    /**
+     * driver.topic
+     *
+     * @return
+     */
+    @Output(Common.Topic.DRIVER_TOPIC)
+    MessageChannel driverOutput();
 }

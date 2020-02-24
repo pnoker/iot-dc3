@@ -21,6 +21,7 @@ import com.pnoker.common.base.Converter;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.model.PointAttribute;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -31,6 +32,7 @@ import org.springframework.beans.BeanUtils;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class PointAttributeDto extends PointAttribute implements Converter<PointAttribute, PointAttributeDto> {

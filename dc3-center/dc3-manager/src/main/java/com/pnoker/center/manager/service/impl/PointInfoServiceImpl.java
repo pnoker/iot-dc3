@@ -20,9 +20,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.PointInfoMapper;
+import com.pnoker.center.manager.message.ManagerMessageSender;
 import com.pnoker.center.manager.service.PointInfoService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.constant.Operation;
 import com.pnoker.common.dto.PointInfoDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.PointInfo;
@@ -46,6 +48,8 @@ import java.util.Optional;
 public class PointInfoServiceImpl implements PointInfoService {
     @Resource
     private PointInfoMapper pointInfoMapper;
+    @Resource
+    private ManagerMessageSender messageSender;
 
     @Override
     @Caching(
@@ -64,6 +68,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             throw new ServiceException("point info already exists");
         }
         if (pointInfoMapper.insert(pointInfo) > 0) {
+            messageSender.notifyDriver(Operation.Device.UPDATE, pointInfo.getDeviceId());
             return pointInfoMapper.selectById(pointInfo.getId());
         }
         return null;
@@ -79,7 +84,12 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public boolean delete(Long id) {
-        return pointInfoMapper.deleteById(id) > 0;
+        PointInfo pointInfo = selectById(id);
+        if (null != pointInfo) {
+            messageSender.notifyDriver(Operation.Device.UPDATE, pointInfo.getDeviceId());
+            return pointInfoMapper.deleteById(id) > 0;
+        }
+        throw new ServiceException("point info does not exist");
     }
 
     @Override
@@ -95,7 +105,12 @@ public class PointInfoServiceImpl implements PointInfoService {
     )
     public PointInfo update(PointInfo pointInfo) {
         pointInfo.setUpdateTime(null);
+        PointInfo select = selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
+        if (null != select) {
+            throw new ServiceException("point info already exists");
+        }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
+            messageSender.notifyDriver(Operation.Device.UPDATE, pointInfo.getDeviceId());
             return selectById(pointInfo.getId());
         }
         return null;
