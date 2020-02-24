@@ -4,7 +4,7 @@ import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Point;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.init.DeviceDriver;
-import com.pnoker.common.sdk.service.CustomizersService;
+import com.pnoker.common.sdk.service.CustomService;
 import com.pnoker.common.sdk.service.DriverService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,18 +22,18 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private DeviceDriver deviceDriver;
     @Resource
-    private CustomizersService customizersService;
+    private CustomService customService;
 
     @Override
     @SneakyThrows
     public String read(Long deviceId, Long pointId) {
-        return customizersService.read(getDriverInfo(deviceId), getPointInfo(deviceId, pointId));
+        return customService.read(getDriverInfo(deviceId), getPointInfo(deviceId, pointId));
     }
 
     @Override
     @SneakyThrows
     public Boolean write(Long deviceId, Long pointId, String value) {
-        return customizersService.write(getDriverInfo(deviceId), getPointInfo(deviceId, pointId),
+        return customService.write(getDriverInfo(deviceId), getPointInfo(deviceId, pointId),
                 new AttributeInfo(value, getPoint(deviceId, pointId).getType()));
     }
 

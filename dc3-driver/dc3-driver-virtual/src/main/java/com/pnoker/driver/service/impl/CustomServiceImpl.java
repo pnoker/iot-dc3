@@ -1,7 +1,7 @@
 package com.pnoker.driver.service.impl;
 
 import com.pnoker.common.sdk.bean.AttributeInfo;
-import com.pnoker.common.sdk.service.CustomizersService;
+import com.pnoker.common.sdk.service.CustomService;
 import com.pnoker.common.sdk.util.DriverUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class CustomizersServiceImpl implements CustomizersService {
+public class CustomServiceImpl implements CustomService {
 
     @Override
     public void initial() {

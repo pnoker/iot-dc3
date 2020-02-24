@@ -25,6 +25,8 @@ import com.pnoker.common.model.*;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.bean.DriverProperty;
 import com.pnoker.common.sdk.init.DeviceDriver;
+import com.pnoker.common.sdk.quartz.service.QuartzService;
+import com.pnoker.common.sdk.service.CustomService;
 import com.pnoker.common.sdk.service.SdkService;
 import com.pnoker.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +73,10 @@ public class SdkServiceImpl implements SdkService {
     private PointClient pointClient;
     @Resource
     private PointInfoClient pointInfoClient;
+    @Resource
+    private QuartzService quartzService;
+    @Resource
+    private CustomService customService;
 
     @Override
     public void initial() {
@@ -78,6 +84,8 @@ public class SdkServiceImpl implements SdkService {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
         loadData();
+        customService.initial();
+        quartzService.initial(driverProperty.getSchedule());
     }
 
     /**

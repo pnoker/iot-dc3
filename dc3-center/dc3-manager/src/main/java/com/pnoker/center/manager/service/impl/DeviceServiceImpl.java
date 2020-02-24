@@ -23,15 +23,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.DeviceMapper;
 import com.pnoker.center.manager.message.ManagerMessageSender;
 import com.pnoker.center.manager.service.DeviceService;
-import com.pnoker.center.manager.service.ScheduleService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.constant.Operation;
 import com.pnoker.common.dto.DeviceDto;
-import com.pnoker.common.dto.ScheduleDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -51,8 +48,6 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class DeviceServiceImpl implements DeviceService {
-    @Resource
-    private ScheduleService scheduleService;
     @Resource
     private DeviceMapper deviceMapper;
     @Resource
@@ -76,7 +71,6 @@ public class DeviceServiceImpl implements DeviceService {
             throw new ServiceException("device already exists in the group");
         }
         if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
-            createSchedule(device);
             messageSender.notifyDriver(Operation.Device.ADD, device.getId());
             return deviceMapper.selectById(device.getId());
         }
@@ -96,7 +90,6 @@ public class DeviceServiceImpl implements DeviceService {
     public boolean delete(Long id) {
         boolean delete = deviceMapper.deleteById(id) > 0;
         if (delete) {
-            removeSchedule(id);
             messageSender.notifyDriver(Operation.Device.DELETE, id);
         }
         return delete;
@@ -191,23 +184,5 @@ public class DeviceServiceImpl implements DeviceService {
             return generateDeviceCode();
         }
         return code;
-    }
-
-    public void createSchedule(Device device) {
-        Schedule schedule = new Schedule();
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.READ_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.READ_JOB);
-        scheduleService.add(schedule);
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.CUSTOMIZER_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.CUSTOMIZER_JOB);
-        scheduleService.add(schedule);
-    }
-
-    public void removeSchedule(long deviceId) {
-        ScheduleDto scheduleDto = new ScheduleDto();
-        scheduleDto.setDeviceId(deviceId);
-        scheduleDto.setPage(new Pages().setSize(-1L));
-        Page<Schedule> page = scheduleService.list(scheduleDto);
-        for (Schedule schedule : page.getRecords()) {
-            scheduleService.delete(schedule.getId());
-        }
     }
 }
