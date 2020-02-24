@@ -1,6 +1,11 @@
 driver:
   name: VirtualDriver
   description: @project.description@
+  schedule:
+    read-schedule-enable: true
+    read-corn: '*/10 * * * * ?'
+    custom-schedule-enable: true
+    custom-corn:  '*/15 * * * * ?'
   driver-attribute:
     - displayName: 主机
       name: host

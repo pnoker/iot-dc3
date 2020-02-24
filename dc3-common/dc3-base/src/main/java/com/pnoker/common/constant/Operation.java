@@ -16,10 +16,4 @@ public interface Operation {
         String DELETE = "delete_profile";
         String UPDATE = "update_profile";
     }
-
-    interface Schedule {
-        String ADD = "add_schedule";
-        String DELETE = "delete_schedule";
-        String UPDATE = "update_schedule";
-    }
 }

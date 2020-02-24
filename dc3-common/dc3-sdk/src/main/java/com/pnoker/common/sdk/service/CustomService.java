@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author pnoker
  */
-public interface CustomizersService {
+public interface CustomService {
     /**
      * 初始化驱动
      */

@@ -21,4 +21,5 @@ public class DriverProperty {
     private String description;
     private List<DriverAttribute> driverAttribute;
     private List<PointAttribute> pointAttribute;
+    private ScheduleProperty schedule;
 }

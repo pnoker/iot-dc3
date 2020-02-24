@@ -16,7 +16,7 @@
 
 package com.pnoker.common.sdk.quartz.job;
 
-import com.pnoker.common.sdk.service.CustomizersService;
+import com.pnoker.common.sdk.service.CustomService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -32,13 +32,13 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-public class CustomizerJob extends QuartzJobBean {
+public class CustomJob extends QuartzJobBean {
     @Resource
-    private CustomizersService customizersService;
+    private CustomService customService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        customizersService.schedule();
-        log.debug("customizers job");
+        log.debug("execute custom schedule");
+        customService.schedule();
     }
 }

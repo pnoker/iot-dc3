@@ -34,7 +34,6 @@ import javax.annotation.Resource;
 @Slf4j
 @EnableBinding(TopicOutput.class)
 public class ManagerMessageSender {
-
     @Resource
     private TopicOutput topicOutput;
     @Resource
@@ -55,9 +54,6 @@ public class ManagerMessageSender {
             case Operation.Profile.UPDATE:
                 driverId = getDriverByProfile(id);
                 break;
-            case Operation.Schedule.ADD:
-            case Operation.Schedule.DELETE:
-            case Operation.Schedule.UPDATE:
             default:
                 return;
         }

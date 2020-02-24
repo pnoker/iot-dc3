@@ -72,4 +72,5 @@ public interface SdkService {
      * @param id
      */
     void updateProfile(Long id);
+
 }
