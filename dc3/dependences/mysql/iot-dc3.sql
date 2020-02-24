@@ -360,9 +360,8 @@ INSERT INTO `dc3_point_info` VALUES (-6, -1, 'label', -1, -10, '', '2019-10-01 0
 -- ----------------------------
 -- Records of dc3_schedule
 -- ----------------------------
-INSERT INTO `dc3_schedule` VALUES (-1, 'ReadJob', '*/15 * * * * ?', 'ReadJob', 0, -1, 'Automatically create by default', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_schedule` VALUES (-2, 'WriteJob', '*/15 * * * * ?', 'WriteJob', 0, -1, 'Automatically create by default', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_schedule` VALUES (-3, 'CustomizerJob', '*/15 * * * * ?', 'CustomizerJob', 0, -1, 'Automatically create by default', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_schedule` VALUES (-1, '定时采集任务', '*/15 * * * * ?', 'ReadJob', 0, -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_schedule` VALUES (-3, '自定义调度任务', '*/15 * * * * ?', 'CustomizerJob', 0, -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_user

@@ -34,13 +34,6 @@ public class DeviceDriver implements ApplicationListener<WebServerInitializedEve
     private long driverId;
 
     /**
-     * profileID,profile
-     */
-    @Setter
-    @Getter
-    private Map<Long, Profile> profileMap;
-
-    /**
      * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
      */
     @Setter

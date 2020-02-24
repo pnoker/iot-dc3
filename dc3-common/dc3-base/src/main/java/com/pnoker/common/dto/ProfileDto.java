@@ -32,6 +32,7 @@ import org.springframework.beans.BeanUtils;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ProfileDto extends Profile implements Converter<Profile, ProfileDto> {

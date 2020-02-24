@@ -65,9 +65,8 @@ public interface Common {
      */
     interface Sdk {
         String JOB_PREFIX = "com.pnoker.common.sdk.quartz.job.";
-        String CUSTOMIZER_JOB = "CustomizerJob";
-        String READ_JOB = "ReadJob";
-        String WRITE_JOB = "WriteJob";
+        String CUSTOMIZER_JOB = "自定义调度任务";
+        String READ_JOB = "定时采集任务";
     }
 
     /**
