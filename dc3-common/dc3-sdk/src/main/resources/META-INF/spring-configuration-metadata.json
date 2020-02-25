@@ -21,22 +21,22 @@
       "description": "device point attribute list<p/><p>- displayName: attribute display name<p>- name: attribute name<p>- type: string/int/double/float/long/boolean<p>- value: default value<p>- description: description."
     },
     {
-      "name": "driver.schedule.read-schedule-enable",
+      "name": "driver.schedule.read.enable",
       "type": "java.lang.Boolean",
       "description": "device driver read schedule status."
     },
     {
-      "name": "driver.schedule.read-corn",
+      "name": "driver.schedule.read.corn",
       "type": "java.lang.String",
       "description": "device driver read schedule corn."
     },
     {
-      "name": "driver.schedule.custom-schedule-enable",
+      "name": "driver.schedule.custom.enable",
       "type": "java.lang.Boolean",
       "description": "device driver custom schedule status."
     },
     {
-      "name": "driver.schedule.custom-corn",
+      "name": "driver.schedule.custom.corn",
       "type": "java.lang.String",
       "description": "device driver custom schedule corn."
     }

@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.message;
+package com.pnoker.common.sdk.service.job;
 
+import com.pnoker.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.messaging.support.MessageBuilder;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
+ * 自定义调度任务
+ *
  * @author pnoker
  */
 @Slf4j
-@EnableBinding(TopicOutput.class)
-public class DriverSender {
-
+@Component
+public class CustomScheduleJob extends QuartzJobBean {
     @Resource
-    private TopicOutput topicOutput;
+    private DriverService driverService;
 
-    public void driverSender(String message) {
-        topicOutput.driverOutput().send(
-                MessageBuilder.withPayload(message).build()
-        );
+    @Override
+    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        log.debug("execute custom schedule");
+        driverService.schedule();
     }
 }

@@ -14,31 +14,35 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.quartz.job;
+package com.pnoker.common.sdk.init;
 
-import com.pnoker.common.sdk.service.CustomService;
-import lombok.extern.slf4j.Slf4j;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.springframework.scheduling.quartz.QuartzJobBean;
+import com.pnoker.common.sdk.service.DriverCommonService;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
- * 自定义调度任务
+ * 初始化
  *
  * @author pnoker
  */
-@Slf4j
 @Component
-public class CustomJob extends QuartzJobBean {
+@EnableFeignClients(basePackages = {
+        "com.pnoker.api.center.manager.*"
+})
+@ComponentScan(basePackages = {
+        "com.pnoker.api.center.manager",
+        "com.pnoker.common.sdk"
+})
+public class DriverInitRunner implements CommandLineRunner {
     @Resource
-    private CustomService customService;
+    private DriverCommonService driverCommonService;
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.debug("execute custom schedule");
-        customService.schedule();
+    public void run(String... args) throws Exception {
+        driverCommonService.initial();
     }
 }

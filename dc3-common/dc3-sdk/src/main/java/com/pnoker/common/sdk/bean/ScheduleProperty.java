@@ -11,8 +11,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ScheduleProperty {
-    private Boolean readScheduleEnable;
-    private String readCorn;
-    private Boolean customScheduleEnable;
-    private String customCorn;
+    private ScheduleConfig read;
+    private ScheduleConfig custom;
 }

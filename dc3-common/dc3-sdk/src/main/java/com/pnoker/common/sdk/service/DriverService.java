@@ -1,24 +1,57 @@
+/*
+ * Copyright 2019 Pnoker. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.pnoker.common.sdk.service;
 
+import com.pnoker.common.sdk.bean.AttributeInfo;
+
+import java.util.Map;
+
 /**
+ * 驱动接口，用于驱动接口实现
+ *
  * @author pnoker
  */
 public interface DriverService {
     /**
+     * 初始化驱动
+     */
+    void initial();
+
+    /**
      * 读操作
      *
-     * @param deviceId
-     * @param pointId
+     * @param driverInfo
+     * @param pointInfo
+     * @return
      */
-    String read(Long deviceId, Long pointId);
+    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo);
 
     /**
      * 写操作
      *
-     * @param deviceId
-     * @param pointId
+     * @param driverInfo
+     * @param pointInfo
      * @param value
      * @return
      */
-    Boolean write(Long deviceId, Long pointId, String value);
+    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value);
+
+    /**
+     * 驱动本身存在定时器，用于定时采集数据和下发数据，该方法为用户自定义操作，系统根据配置定时执行
+     */
+    void schedule();
 }
