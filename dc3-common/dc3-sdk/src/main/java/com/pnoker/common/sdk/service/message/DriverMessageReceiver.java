@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.message;
+package com.pnoker.common.sdk.service.message;
 
 import com.pnoker.common.bean.driver.DriverOperation;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.constant.Operation;
-import com.pnoker.common.sdk.init.DeviceDriver;
-import com.pnoker.common.sdk.service.SdkService;
+import com.pnoker.common.sdk.bean.DriverContext;
+import com.pnoker.common.sdk.service.DriverCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -32,33 +32,33 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @EnableBinding(TopicInput.class)
-public class DriverReceiver {
+public class DriverMessageReceiver {
     @Resource
-    private DeviceDriver deviceDriver;
+    private DriverContext driverContext;
     @Resource
-    private SdkService sdkService;
+    private DriverCommonService driverCommonService;
 
     @StreamListener(Common.Topic.DRIVER_TOPIC)
     public void driverReceive(DriverOperation operation) {
-        if (operation.getDriverId() == deviceDriver.getDriverId()) {
+        if (operation.getDriverId() == driverContext.getDriverId()) {
             switch (operation.getCommand()) {
                 case Operation.Profile.ADD:
-                    sdkService.addProfile(operation.getId());
+                    driverCommonService.addProfile(operation.getId());
                     break;
                 case Operation.Profile.DELETE:
-                    sdkService.deleteProfile(operation.getId());
+                    driverCommonService.deleteProfile(operation.getId());
                     break;
                 case Operation.Profile.UPDATE:
-                    sdkService.updateProfile(operation.getId());
+                    driverCommonService.updateProfile(operation.getId());
                     break;
                 case Operation.Device.ADD:
-                    sdkService.addDevice(operation.getId());
+                    driverCommonService.addDevice(operation.getId());
                     break;
                 case Operation.Device.DELETE:
-                    sdkService.deleteDevice(operation.getId());
+                    driverCommonService.deleteDevice(operation.getId());
                     break;
                 case Operation.Device.UPDATE:
-                    sdkService.updateDevice(operation.getId());
+                    driverCommonService.updateDevice(operation.getId());
                     break;
                 default:
                     break;

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.quartz.service.impl;
+package com.pnoker.common.sdk.service.impl;
 
 import com.pnoker.common.sdk.bean.ScheduleProperty;
-import com.pnoker.common.sdk.quartz.job.CustomJob;
-import com.pnoker.common.sdk.quartz.job.ReadJob;
-import com.pnoker.common.sdk.quartz.service.QuartzService;
+import com.pnoker.common.sdk.service.job.CustomScheduleJob;
+import com.pnoker.common.sdk.service.job.ReadScheduleJob;
+import com.pnoker.common.sdk.service.DriverScheduleService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -32,18 +32,18 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Service
-public class QuartzServiceImpl implements QuartzService {
+public class DriverScheduleServiceImpl implements DriverScheduleService {
     @Resource
     private Scheduler scheduler;
 
     @Override
     @SneakyThrows
     public void initial(ScheduleProperty scheduleProperty) {
-        if (scheduleProperty.getReadScheduleEnable()) {
-            createJob("ReadGroup", "ReadScheduleJob", scheduleProperty.getReadCorn(), ReadJob.class);
+        if (scheduleProperty.getRead().getEnable()) {
+            createJob("ReadGroup", "ReadScheduleJob", scheduleProperty.getRead().getCorn(), ReadScheduleJob.class);
         }
-        if (scheduleProperty.getCustomScheduleEnable()) {
-            createJob("CustomGroup", "CustomScheduleJob", scheduleProperty.getCustomCorn(), CustomJob.class);
+        if (scheduleProperty.getCustom().getEnable()) {
+            createJob("CustomGroup", "CustomScheduleJob", scheduleProperty.getCustom().getCorn(), CustomScheduleJob.class);
         }
         if (!scheduler.isShutdown()) {
             scheduler.start();

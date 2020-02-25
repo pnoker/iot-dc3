@@ -1,8 +1,8 @@
-package com.pnoker.common.sdk.quartz.job;
+package com.pnoker.common.sdk.service.job;
 
 import com.pnoker.common.sdk.bean.AttributeInfo;
-import com.pnoker.common.sdk.init.DeviceDriver;
-import com.pnoker.common.sdk.service.DriverService;
+import com.pnoker.common.sdk.bean.DriverContext;
+import com.pnoker.common.sdk.service.DriverCommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -19,19 +19,19 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class ReadJob extends QuartzJobBean {
+public class ReadScheduleJob extends QuartzJobBean {
     @Resource
-    private DeviceDriver deviceDriver;
+    private DriverContext driverContext;
     @Resource
-    private DriverService driverService;
+    private DriverCommandService driverCommandService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = deviceDriver.getPointInfoMap();
+        Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getPointInfoMap();
         for (Long deviceId : pointInfoMap.keySet()) {
             for (Long pointId : pointInfoMap.get(deviceId).keySet()) {
                 log.debug("execute read schedule for device({}),point({})", deviceId, pointId);
-                driverService.read(deviceId, pointId);
+                driverCommandService.read(deviceId, pointId);
             }
         }
     }

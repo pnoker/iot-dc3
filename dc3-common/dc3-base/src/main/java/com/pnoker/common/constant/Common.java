@@ -58,6 +58,7 @@ public interface Common {
      */
     interface Topic {
         String DRIVER_TOPIC = "driver.topic";
+        String DRIVER_VALUE_TOPIC = "driver.value.topic";
     }
 
     /**

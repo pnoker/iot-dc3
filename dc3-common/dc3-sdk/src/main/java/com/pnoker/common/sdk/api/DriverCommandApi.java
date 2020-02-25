@@ -17,8 +17,7 @@
 package com.pnoker.common.sdk.api;
 
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.sdk.message.DriverSender;
-import com.pnoker.common.sdk.service.DriverService;
+import com.pnoker.common.sdk.service.DriverCommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,33 +25,40 @@ import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 
 /**
+ * 驱动操作指令 Rest Api
+ *
  * @author pnoker
  */
 @Slf4j
 @RestController
 @RequestMapping(Common.Service.DC3_DRIVER_URL_PREFIX)
-public class DriverSdkApi {
+public class DriverCommandApi {
     @Resource
-    private DriverSender driverSender;
-    @Resource
-    private DriverService driverService;
+    private DriverCommandService driverCommandService;
 
-
-    @GetMapping("/msg")
-    public void msg() {
-        driverSender.driverSender("hello 123");
-    }
-
+    /**
+     * 读
+     *
+     * @param deviceId
+     * @param pointId
+     */
     @GetMapping("/device/{deviceId}/point/{pointId}")
     public void readPoint(@NotNull @PathVariable("deviceId") Long deviceId,
                           @NotNull @PathVariable("pointId") Long pointId) {
-        driverService.read(deviceId, pointId);
+        driverCommandService.read(deviceId, pointId);
     }
 
+    /**
+     * 写
+     *
+     * @param deviceId
+     * @param pointId
+     * @param value
+     */
     @PostMapping("/device/{deviceId}/point/{pointId}/value/{value}")
     public void writePoint(@NotNull @PathVariable("deviceId") Long deviceId,
                            @NotNull @PathVariable("pointId") Long pointId,
                            @NotNull @PathVariable("value") String value) {
-        driverService.write(deviceId, pointId, value);
+        driverCommandService.write(deviceId, pointId, value);
     }
 }

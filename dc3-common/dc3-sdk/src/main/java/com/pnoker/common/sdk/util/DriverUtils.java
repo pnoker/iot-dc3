@@ -29,11 +29,12 @@ public class DriverUtils {
      * @return
      */
     public static Object convertValue(String value, String type) {
-        switch (type) {
+        value = value.trim();
+        switch (type.trim()) {
             case ValueType.INT:
                 int intValue = 0;
                 try {
-                    intValue = Integer.parseInt(value.trim());
+                    intValue = Integer.parseInt(value);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
@@ -41,7 +42,7 @@ public class DriverUtils {
             case ValueType.DOUBLE:
                 double doubleValue = 0;
                 try {
-                    BigDecimal decimal = new BigDecimal(value.trim());
+                    BigDecimal decimal = new BigDecimal(value);
                     doubleValue = decimal.doubleValue();
                 } catch (Exception e) {
                     log.error(e.getMessage());
@@ -50,7 +51,7 @@ public class DriverUtils {
             case ValueType.FLOAT:
                 float floatValue = 0;
                 try {
-                    floatValue = Float.parseFloat(value.trim());
+                    floatValue = Float.parseFloat(value);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
@@ -58,7 +59,7 @@ public class DriverUtils {
             case ValueType.LONG:
                 long longValue = 0;
                 try {
-                    longValue = Long.parseLong(value.trim());
+                    longValue = Long.parseLong(value);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
@@ -66,13 +67,13 @@ public class DriverUtils {
             case ValueType.BOOLEAN:
                 boolean booleanValue = false;
                 try {
-                    booleanValue = Boolean.parseBoolean(value.trim());
+                    booleanValue = Boolean.parseBoolean(value);
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
                 return booleanValue;
             default:
-                return value.trim();
+                return value;
         }
     }
 }

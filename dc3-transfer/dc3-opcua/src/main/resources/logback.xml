@@ -7,7 +7,7 @@
     <logger name="org.springframework.context.support" level="WARN"/>
     <logger name="org.springframework.cloud.context" level="WARN"/>
     <logger name="org.springframework.cloud.stream" level="WARN"/>
-    <logger name="org.springframework.boot.actuate" level="WARN"/>
+    <logger name="org.springframework.boot.actuate" level="ERROR"/>
     <logger name="org.springframework.integration" level="WARN"/>
     <logger name="org.springframework.scheduling" level="WARN"/>
     <logger name="org.springframework.amqp" level="WARN"/>
@@ -18,8 +18,8 @@
     <logger name="com.zaxxer.hikari" level="WARN"/>
     <logger name="com.ulisesbocchio" level="WARN"/>
     <logger name="io.lettuce.core" level="WARN"/>
-    <logger name="io.undertow" level="WARN"/>
-    <logger name="com.netflix" level="WARN"/>
+    <logger name="io.undertow" level="ERROR"/>
+    <logger name="com.netflix" level="ERROR"/>
     <logger name="org.quartz" level="WARN"/>
     <logger name="org.xnio" level="WARN"/>
 

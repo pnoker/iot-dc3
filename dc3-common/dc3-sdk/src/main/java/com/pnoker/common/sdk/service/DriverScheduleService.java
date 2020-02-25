@@ -1,11 +1,11 @@
-package com.pnoker.common.sdk.quartz.service;
+package com.pnoker.common.sdk.service;
 
 import com.pnoker.common.sdk.bean.ScheduleProperty;
 
 /**
  * @author pnoker
  */
-public interface QuartzService {
+public interface DriverScheduleService {
     /**
      * 初始化调度任务
      *

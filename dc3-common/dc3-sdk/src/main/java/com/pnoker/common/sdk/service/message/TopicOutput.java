@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.message;
+package com.pnoker.common.sdk.service.message;
 
 import com.pnoker.common.constant.Common;
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.messaging.SubscribableChannel;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
 
 /**
- * 消息 Input
+ * 消息 Output
  *
  * @author pnoker
  */
-public interface TopicInput {
+public interface TopicOutput {
 
     /**
-     * 驱动消息主题 Input 接口
+     * 驱动消息主题 Output 接口
      *
      * @return
      */
-    @Input(Common.Topic.DRIVER_TOPIC)
-    SubscribableChannel driverInput();
+    @Output(Common.Topic.DRIVER_VALUE_TOPIC)
+    MessageChannel driverOutput();
 }

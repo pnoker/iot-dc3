@@ -1,11 +1,13 @@
 package com.pnoker.common.sdk.service.impl;
 
+import com.pnoker.common.bean.driver.PointValue;
 import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Point;
 import com.pnoker.common.sdk.bean.AttributeInfo;
-import com.pnoker.common.sdk.init.DeviceDriver;
-import com.pnoker.common.sdk.service.CustomService;
+import com.pnoker.common.sdk.bean.DriverContext;
+import com.pnoker.common.sdk.service.DriverCommandService;
 import com.pnoker.common.sdk.service.DriverService;
+import com.pnoker.common.sdk.service.message.DriverMessageSender;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,22 +20,27 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class DriverServiceImpl implements DriverService {
+public class DriverCommandServiceImpl implements DriverCommandService {
     @Resource
-    private DeviceDriver deviceDriver;
+    private DriverContext driverContext;
     @Resource
-    private CustomService customService;
+    private DriverService driverService;
+    @Resource
+    private DriverMessageSender driverMessageSender;
 
     @Override
     @SneakyThrows
     public String read(Long deviceId, Long pointId) {
-        return customService.read(getDriverInfo(deviceId), getPointInfo(deviceId, pointId));
+        String value = driverService.read(getDriverInfo(deviceId), getPointInfo(deviceId, pointId));
+        PointValue pointValue = new PointValue(deviceId, pointId, getPoint(deviceId, pointId).getType(), value);
+        driverMessageSender.driverSender(pointValue);
+        return value;
     }
 
     @Override
     @SneakyThrows
     public Boolean write(Long deviceId, Long pointId, String value) {
-        return customService.write(getDriverInfo(deviceId), getPointInfo(deviceId, pointId),
+        return driverService.write(getDriverInfo(deviceId), getPointInfo(deviceId, pointId),
                 new AttributeInfo(value, getPoint(deviceId, pointId).getType()));
     }
 
@@ -44,7 +51,7 @@ public class DriverServiceImpl implements DriverService {
      * @return
      */
     private Map<String, AttributeInfo> getDriverInfo(Long deviceId) {
-        return deviceDriver.getDriverInfoMap().get(deviceDriver.getDeviceMap().get(deviceId).getProfileId());
+        return driverContext.getDriverInfoMap().get(driverContext.getDeviceIdMap().get(deviceId).getProfileId());
     }
 
     /**
@@ -55,7 +62,7 @@ public class DriverServiceImpl implements DriverService {
      * @return
      */
     private Map<String, AttributeInfo> getPointInfo(Long deviceId, Long pointId) {
-        return deviceDriver.getPointInfoMap().get(deviceId).get(pointId);
+        return driverContext.getPointInfoMap().get(deviceId).get(pointId);
     }
 
     /**
@@ -65,7 +72,7 @@ public class DriverServiceImpl implements DriverService {
      * @return
      */
     private Device getDevice(Long deviceId) {
-        return deviceDriver.getDeviceMap().get(deviceId);
+        return driverContext.getDeviceIdMap().get(deviceId);
     }
 
     /**
@@ -76,6 +83,6 @@ public class DriverServiceImpl implements DriverService {
      * @return
      */
     private Point getPoint(Long deviceId, Long pointId) {
-        return deviceDriver.getPointMap().get(getDevice(deviceId).getProfileId()).get(pointId);
+        return driverContext.getPointMap().get(getDevice(deviceId).getProfileId()).get(pointId);
     }
 }

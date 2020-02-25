@@ -19,7 +19,7 @@ package com.pnoker.common.sdk.service;
 /**
  * @author pnoker
  */
-public interface SdkService {
+public interface DriverCommonService {
     /**
      * 初始化 SDK
      *
@@ -28,7 +28,7 @@ public interface SdkService {
     void initial();
 
     /**
-     * 向DeviceDriver中添加设备
+     * 向 DeviceDriver 中添加设备
      *
      * @param id
      * @return
@@ -36,7 +36,7 @@ public interface SdkService {
     void addDevice(Long id);
 
     /**
-     * 删除DeviceDriver中设备
+     * 删除 DeviceDriver 中设备
      *
      * @param id
      * @return
@@ -44,14 +44,14 @@ public interface SdkService {
     void deleteDevice(Long id);
 
     /**
-     * 更新DeviceDriver中设备
+     * 更新 DeviceDriver 中设备
      *
      * @param id
      */
     void updateDevice(Long id);
 
     /**
-     * 向DeviceDriver中添加模板
+     * 向 DeviceDriver 中添加模板
      *
      * @param id
      * @return
@@ -59,7 +59,7 @@ public interface SdkService {
     void addProfile(Long id);
 
     /**
-     * 删除DeviceDriver中模板
+     * 删除 DeviceDriver 中模板
      *
      * @param id
      * @return
@@ -67,7 +67,7 @@ public interface SdkService {
     void deleteProfile(Long id);
 
     /**
-     * 更新DeviceDriver中模板
+     * 更新 DeviceDriver 中模板
      *
      * @param id
      */

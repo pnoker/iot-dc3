@@ -3,16 +3,14 @@ package com.pnoker.common.sdk.bean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-
 /**
+ * 属性配置
+ *
  * @author pnoker
  */
 @Data
 @AllArgsConstructor
 public class AttributeInfo {
-    @NotNull
     private String value;
-    @NotNull
     private String type;
 }
