@@ -21,11 +21,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.DeviceMapper;
-import com.pnoker.center.manager.message.ManagerMessageSender;
 import com.pnoker.center.manager.service.DeviceService;
+import com.pnoker.center.manager.service.NotifyService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.constant.Operation;
 import com.pnoker.common.dto.DeviceDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Device;
@@ -51,7 +50,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private DeviceMapper deviceMapper;
     @Resource
-    private ManagerMessageSender messageSender;
+    private NotifyService notifyService;
 
     @Override
     @Caching(
@@ -67,14 +66,13 @@ public class DeviceServiceImpl implements DeviceService {
     )
     public Device add(Device device) {
         Device select = selectDeviceByNameAndGroup(device.getGroupId(), device.getName());
-        if (null != select) {
-            throw new ServiceException("device already exists in the group");
+        if (null == select) {
+            if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
+                notifyService.notifyDriverAddDevice(device.getId(), device.getProfileId());
+                return deviceMapper.selectById(device.getId());
+            }
         }
-        if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
-            messageSender.notifyDriver(Operation.Device.ADD, device.getId());
-            return deviceMapper.selectById(device.getId());
-        }
-        return null;
+        throw new ServiceException("device already exists in the group");
     }
 
     @Override
@@ -88,11 +86,15 @@ public class DeviceServiceImpl implements DeviceService {
             }
     )
     public boolean delete(Long id) {
-        boolean delete = deviceMapper.deleteById(id) > 0;
-        if (delete) {
-            messageSender.notifyDriver(Operation.Device.DELETE, id);
+        Device device = selectById(id);
+        if (null != device) {
+            boolean delete = deviceMapper.deleteById(id) > 0;
+            if (delete) {
+                notifyService.notifyDriverDelDevice(device.getId(), device.getProfileId());
+            }
+            return delete;
         }
-        return delete;
+        throw new ServiceException("device does not exist");
     }
 
     @Override

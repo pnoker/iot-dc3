@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.data.message;
+package com.pnoker.center.data.service.message;
 
+import com.pnoker.center.data.service.PointValueService;
+import com.pnoker.common.bean.driver.PointValue;
 import com.pnoker.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 
+import javax.annotation.Resource;
+
 /**
+ * 接收驱动发送过来的数据
+ *
  * @author pnoker
  */
 @Slf4j
 @EnableBinding(TopicInput.class)
-public class Receiver {
+public class DriverValueReceiver {
+    @Resource
+    private PointValueService pointValueService;
 
-    @StreamListener(Common.Topic.DRIVER_TOPIC)
-    public void driverReceive(String msg) {
-        log.info("receiver {}", msg);
+    @StreamListener(Common.Topic.DRIVER_VALUE_TOPIC)
+    public void driverReceive(PointValue pointValue) {
+        pointValueService.addPointValue(pointValue);
     }
 }

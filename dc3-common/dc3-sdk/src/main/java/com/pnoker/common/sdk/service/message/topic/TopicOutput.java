@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.service.message;
+package com.pnoker.common.sdk.service.message.topic;
 
 import com.pnoker.common.constant.Common;
 import org.springframework.cloud.stream.annotation.Output;
@@ -28,10 +28,10 @@ import org.springframework.messaging.MessageChannel;
 public interface TopicOutput {
 
     /**
-     * 驱动消息主题 Output 接口
+     * driver.value.topic Output 接口
      *
      * @return
      */
     @Output(Common.Topic.DRIVER_VALUE_TOPIC)
-    MessageChannel driverOutput();
+    MessageChannel driverValueOutput();
 }

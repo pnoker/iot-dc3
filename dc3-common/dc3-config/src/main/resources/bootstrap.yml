@@ -28,7 +28,14 @@ spring:
       max-lifetime: 1765000
       maximum-pool-size: 16
       minimum-idle: 4
+  data:
+    mongodb:
+      host: dc3-mongo
+      port: 27017
+      database: dc3
   redis:
+    host: dc3-redis
+    port: 6379
     timeout: 15S
     jedis:
       pool:
@@ -37,6 +44,9 @@ spring:
   cache:
     type: redis
     cache-names: dc3-cache
+  rabbitmq:
+    host: dc3-rabbitmq
+    port: 5672
 
 mybatis-plus:
   configuration:

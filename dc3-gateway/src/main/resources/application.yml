@@ -17,8 +17,6 @@ spring:
     servlet:
       content-type: text/html
   redis:
-    host: dc3-redis
-    port: 6379
     password: dc3
     database: 0
   cache:

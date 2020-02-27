@@ -315,13 +315,15 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * 加载数据
      */
     public void loadData() {
+        log.info("driver initial basic data ……");
         List<Long> profileList = getProfileList(driverContext.getDriverId());
         this.driverAttributeMap = getDriverAttributeMap(driverContext.getDriverId());
         driverContext.setDriverInfoMap(getDriverInfoMap(profileList, this.driverAttributeMap));
-        getDeviceMap(driverContext.getDeviceIdMap(), driverContext.getDeviceNameMap(), profileList);
+        getDeviceMap(profileList);
         driverContext.setPointMap(getPointMap(profileList));
         this.pointAttributeMap = getPointAttributeMap(driverContext.getDriverId());
         driverContext.setPointInfoMap(getPointInfoMap(driverContext.getDeviceIdMap(), this.pointAttributeMap));
+        log.info("driver initial basic data is complete");
     }
 
     /**
@@ -402,17 +404,17 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @param profileList
      * @return
      */
-    public void getDeviceMap(Map<Long, Device> deviceIdMap, Map<String, Long> deviceNameMap, List<Long> profileList) {
-        deviceIdMap = new HashMap<>(16);
-        deviceNameMap = new HashMap<>(16);
+    public void getDeviceMap(List<Long> profileList) {
+        driverContext.setDeviceIdMap(new HashMap<>(16));
+        driverContext.setDeviceNameMap(new HashMap<>(16));
         for (Long profileId : profileList) {
             DeviceDto deviceDto = new DeviceDto();
             deviceDto.setPage(new Pages().setSize(-1L)).setProfileId(profileId);
             R<Page<Device>> rp = deviceClient.list(deviceDto);
             if (rp.isOk()) {
                 for (Device device : rp.getData().getRecords()) {
-                    deviceIdMap.put(device.getId(), device);
-                    deviceNameMap.put(device.getName(), device.getId());
+                    driverContext.getDeviceIdMap().put(device.getId(), device);
+                    driverContext.getDeviceNameMap().put(device.getName(), device.getId());
                 }
             }
         }
@@ -467,7 +469,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         R<Page<DriverInfo>> rp = driverInfoClient.list(driverInfoDto);
         if (rp.isOk()) {
             for (DriverInfo driverInfo : rp.getData().getRecords()) {
-                DriverAttribute attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
+                DriverAttribute attribute = this.driverAttributeMap.get(driverInfo.getDriverAttributeId());
                 attributeInfoMap.put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
             }
         }

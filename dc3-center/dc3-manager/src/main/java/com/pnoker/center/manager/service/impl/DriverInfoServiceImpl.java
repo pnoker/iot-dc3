@@ -20,11 +20,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.DriverInfoMapper;
-import com.pnoker.center.manager.message.ManagerMessageSender;
 import com.pnoker.center.manager.service.DriverInfoService;
+import com.pnoker.center.manager.service.NotifyService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.constant.Operation;
 import com.pnoker.common.dto.DriverInfoDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.DriverInfo;
@@ -49,7 +48,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Resource
     private DriverInfoMapper driverInfoMapper;
     @Resource
-    private ManagerMessageSender messageSender;
+    private NotifyService notifyService;
 
     @Override
     @Caching(
@@ -68,10 +67,10 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             throw new ServiceException("driver info already exists");
         }
         if (driverInfoMapper.insert(driverInfo) > 0) {
-            messageSender.notifyDriver(Operation.Profile.UPDATE, driverInfo.getProfileId());
+            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getProfileId());
             return driverInfoMapper.selectById(driverInfo.getId());
         }
-        return null;
+        throw new ServiceException("driver info create failed");
     }
 
     @Override
@@ -85,11 +84,14 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     )
     public boolean delete(Long id) {
         DriverInfo driverInfo = selectById(id);
-        if (null != driverInfo) {
-            messageSender.notifyDriver(Operation.Profile.UPDATE, driverInfo.getProfileId());
-            return driverInfoMapper.deleteById(id) > 0;
+        if (null == driverInfo) {
+            throw new ServiceException("driver info does not exist");
         }
-        throw new ServiceException("driver info does not exist");
+        boolean delete = driverInfoMapper.deleteById(id) > 0;
+        if (delete) {
+            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getProfileId());
+        }
+        return delete;
     }
 
     @Override
@@ -106,14 +108,15 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public DriverInfo update(DriverInfo driverInfo) {
         driverInfo.setUpdateTime(null);
         DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
-        if (null != select) {
+        boolean update = null == select || (select.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) && select.getProfileId().equals(driverInfo.getProfileId()));
+        if (!update) {
             throw new ServiceException("driver info already exists");
         }
         if (driverInfoMapper.updateById(driverInfo) > 0) {
-            messageSender.notifyDriver(Operation.Profile.UPDATE, driverInfo.getProfileId());
+            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getProfileId());
             return selectById(driverInfo.getId());
         }
-        return null;
+        throw new ServiceException("driver info update failed");
     }
 
     @Override
