@@ -67,7 +67,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             throw new ServiceException("driver info already exists");
         }
         if (driverInfoMapper.insert(driverInfo) > 0) {
-            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getProfileId());
+            notifyService.notifyDriverAddDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
             return driverInfoMapper.selectById(driverInfo.getId());
         }
         throw new ServiceException("driver info create failed");
@@ -89,7 +89,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         }
         boolean delete = driverInfoMapper.deleteById(id) > 0;
         if (delete) {
-            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getProfileId());
+            notifyService.notifyDriverDeleteDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
         }
         return delete;
     }
@@ -113,7 +113,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             throw new ServiceException("driver info already exists");
         }
         if (driverInfoMapper.updateById(driverInfo) > 0) {
-            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getProfileId());
+            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
             return selectById(driverInfo.getId());
         }
         throw new ServiceException("driver info update failed");

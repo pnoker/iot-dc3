@@ -74,18 +74,20 @@ public class ProfileServiceImpl implements ProfileService {
     )
     public Profile add(Profile profile) {
         Driver driver = driverService.selectById(profile.getDriverId());
-        if (null != driver) {
-            Profile select = selectByName(profile.getName());
-            if (null == select) {
-                if (profileMapper.insert(profile) > 0) {
-                    notifyService.notifyDriverAddProfile(profile.getId());
-                    return profileMapper.selectById(profile.getId());
-                }
-            }
+        if (null == driver) {
+            throw new ServiceException("driver does not exist");
+        }
+        Profile select = selectByName(profile.getName());
+        if (null != select) {
             throw new ServiceException("profile already exists");
         }
-        throw new ServiceException("driver does not exist");
+        if (profileMapper.insert(profile) > 0) {
+            notifyService.notifyDriverAddProfile(profile.getId());
+            return profileMapper.selectById(profile.getId());
+        }
+        throw new ServiceException("profile create failed");
     }
+
 
     @Override
     @Caching(
@@ -113,7 +115,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         boolean delete = profileMapper.deleteById(id) > 0;
         if (delete) {
-            notifyService.notifyDriverDelProfile(id);
+            notifyService.notifyDriverDeleteProfile(id);
         }
         return delete;
     }

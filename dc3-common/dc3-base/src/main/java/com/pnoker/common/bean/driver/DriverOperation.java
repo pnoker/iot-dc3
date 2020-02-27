@@ -1,16 +1,18 @@
 package com.pnoker.common.bean.driver;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * @author pnoker
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@Accessors(chain = true)
 public class DriverOperation {
     private String command;
     private Long id;
+    private Long parentId;
+    private Long attributeId;
 }

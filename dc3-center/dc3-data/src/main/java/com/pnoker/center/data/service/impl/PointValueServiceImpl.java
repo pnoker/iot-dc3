@@ -1,6 +1,7 @@
 package com.pnoker.center.data.service.impl;
 
 import com.pnoker.center.data.service.PointValueService;
+import com.pnoker.center.data.service.pool.ThreadPool;
 import com.pnoker.common.bean.driver.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,12 +16,16 @@ import javax.annotation.Resource;
 @Service
 public class PointValueServiceImpl implements PointValueService {
     @Resource
+    private ThreadPool threadPool;
+    @Resource
     private MongoTemplate mongoTemplate;
 
     @Override
     public void addPointValue(PointValue pointValue) {
-        long createTime = System.currentTimeMillis();
-        long interval = createTime - pointValue.getOriginTime();
-        mongoTemplate.save(pointValue.setCreateTime(createTime).setInterval(interval));
+        threadPool.executor.execute(() -> {
+            long createTime = System.currentTimeMillis();
+            long interval = createTime - pointValue.getOriginTime();
+            mongoTemplate.save(pointValue.setCreateTime(createTime).setInterval(interval));
+        });
     }
 }

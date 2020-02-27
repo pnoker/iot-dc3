@@ -92,5 +92,6 @@ eureka:
     prefer-ip-address: true
     health-check-url-path: /actuator/health
   client:
+    registry-fetch-interval-seconds: 5
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/

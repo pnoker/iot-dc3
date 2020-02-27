@@ -14,41 +14,34 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.handler;
+package com.pnoker.center.data.service.pool;
 
-import com.pnoker.transfer.rtmp.runner.Environment;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 转码任务执行线程池
- *
  * @author pnoker
  */
 @Slf4j
-public class TranscodePool {
-
-    /**
-     * 转码任务Map
-     */
-    public static volatile Map<Long, Transcode> transcodeMap = new HashMap<>(64);
+@Component
+public class ThreadPool {
+    public static int CORE_POOL_SIZE = 4;
+    public static int MAX_POOL_SIZE = 32;
+    public static int KEEP_ALIVE_TIME = 10;
 
     /**
      * 线程池
      */
-    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Environment.CORE_POOL_SIZE,
-            Environment.MAX_POOL_SIZE, Environment.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(Environment.MAX_POOL_SIZE * 2),
+    public ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(MAX_POOL_SIZE * 2),
             r -> {
                 Thread thread = new Thread(r, "dc3-thread-" + new AtomicInteger(1).getAndIncrement());
                 log.info("{} has been created", thread.getName());
                 return thread;
-            },
-            (r, e) -> log.error("{} rejected,completedTaskCount:{}", r.toString(), e.getCompletedTaskCount()));
+            }, (r, e) -> log.error("{} rejected,completedTaskCount:{}", r.toString(), e.getCompletedTaskCount()));
 }

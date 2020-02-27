@@ -66,13 +66,14 @@ public class DeviceServiceImpl implements DeviceService {
     )
     public Device add(Device device) {
         Device select = selectDeviceByNameAndGroup(device.getGroupId(), device.getName());
-        if (null == select) {
-            if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
-                notifyService.notifyDriverAddDevice(device.getId(), device.getProfileId());
-                return deviceMapper.selectById(device.getId());
-            }
+        if (null != select) {
+            throw new ServiceException("device already exists in the group");
         }
-        throw new ServiceException("device already exists in the group");
+        if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
+            notifyService.notifyDriverAddDevice(device.getId(), device.getProfileId());
+            return deviceMapper.selectById(device.getId());
+        }
+        throw new ServiceException("device create failed");
     }
 
     @Override
@@ -87,14 +88,14 @@ public class DeviceServiceImpl implements DeviceService {
     )
     public boolean delete(Long id) {
         Device device = selectById(id);
-        if (null != device) {
-            boolean delete = deviceMapper.deleteById(id) > 0;
-            if (delete) {
-                notifyService.notifyDriverDelDevice(device.getId(), device.getProfileId());
-            }
-            return delete;
+        if (null == device) {
+            throw new ServiceException("device does not exist");
         }
-        throw new ServiceException("device does not exist");
+        boolean delete = deviceMapper.deleteById(id) > 0;
+        if (delete) {
+            notifyService.notifyDriverDeleteDevice(device.getId(), device.getProfileId());
+        }
+        return delete;
     }
 
     @Override
@@ -115,9 +116,10 @@ public class DeviceServiceImpl implements DeviceService {
         if (deviceMapper.updateById(device) > 0) {
             Device select = selectById(device.getId());
             device.setCode(select.getCode()).setGroupId(select.getGroupId()).setName(select.getName());
+            notifyService.notifyDriverUpdateDevice(device.getId(), device.getProfileId());
             return select;
         }
-        return null;
+        throw new ServiceException("device update failed");
     }
 
     @Override
