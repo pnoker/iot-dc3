@@ -67,7 +67,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             throw new ServiceException("point info already exists");
         }
         if (pointInfoMapper.insert(pointInfo) > 0) {
-            notifyService.notifyDriverUpdatePointInfo(pointInfo.getDeviceId());
+            notifyService.notifyDriverAddPointInfo(pointInfo.getId(), pointInfo.getDeviceId());
             return pointInfoMapper.selectById(pointInfo.getId());
         }
         throw new ServiceException("point info create failed");
@@ -89,7 +89,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         }
         boolean delete = pointInfoMapper.deleteById(id) > 0;
         if (delete) {
-            notifyService.notifyDriverUpdatePointInfo(pointInfo.getDeviceId());
+            notifyService.notifyDriverDeletePointInfo(pointInfo.getPointId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId());
         }
         return delete;
     }
@@ -113,7 +113,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             throw new ServiceException("point info already exists");
         }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
-            notifyService.notifyDriverUpdatePointInfo(pointInfo.getDeviceId());
+            notifyService.notifyDriverUpdatePointInfo(pointInfo.getId(), pointInfo.getDeviceId());
             return selectById(pointInfo.getId());
         }
         throw new ServiceException("point info update failed");

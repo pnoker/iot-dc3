@@ -30,7 +30,7 @@ public class ReadScheduleJob extends QuartzJobBean {
         Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getPointInfoMap();
         for (Long deviceId : pointInfoMap.keySet()) {
             for (Long pointId : pointInfoMap.get(deviceId).keySet()) {
-                log.debug("execute read schedule for device({}),point({})", deviceId, pointId);
+                log.debug("execute read schedule for device({}),point({}),{}", deviceId, pointId,pointInfoMap.get(deviceId).get(pointId));
                 driverCommandService.read(deviceId, pointId);
             }
         }

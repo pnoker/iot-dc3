@@ -28,6 +28,22 @@ public interface DriverCommonService {
     void initial();
 
     /**
+     * 向 DeviceDriver 中添加模板
+     *
+     * @param id
+     * @return
+     */
+    void addProfile(Long id);
+
+    /**
+     * 删除 DeviceDriver 中模板
+     *
+     * @param id
+     * @return
+     */
+    void deleteProfile(Long id);
+
+    /**
      * 向 DeviceDriver 中添加设备
      *
      * @param id
@@ -47,30 +63,78 @@ public interface DriverCommonService {
      * 更新 DeviceDriver 中设备
      *
      * @param id
+     * @return
      */
     void updateDevice(Long id);
 
     /**
-     * 向 DeviceDriver 中添加模板
+     * 向 DeviceDriver 中添加位号
      *
      * @param id
      * @return
      */
-    void addProfile(Long id);
+    void addPoint(Long id);
 
     /**
-     * 删除 DeviceDriver 中模板
+     * 删除 DeviceDriver 中位号
+     *
+     * @param id
+     * @param profileId
+     * @return
+     */
+    void deletePoint(Long id, Long profileId);
+
+    /**
+     * 更新 DeviceDriver 中添加位号
      *
      * @param id
      * @return
      */
-    void deleteProfile(Long id);
+    void updatePoint(Long id);
 
     /**
-     * 更新 DeviceDriver 中模板
+     * 向 DeviceDriver 中添加驱动配置信息
      *
      * @param id
      */
-    void updateProfile(Long id);
+    void addDriverInfo(Long id);
+
+    /**
+     * 删除 DeviceDriver 中添加驱动配置信息
+     *
+     * @param attributeId
+     * @param profileId
+     */
+    void deleteDriverInfo(Long attributeId, Long profileId);
+
+    /**
+     * 更新 DeviceDriver 中添加驱动配置信息
+     *
+     * @param id
+     */
+    void updateDriverInfo(Long id);
+
+    /**
+     * 向 DeviceDriver 中添加位号配置信息
+     *
+     * @param id
+     */
+    void addPointInfo(Long id);
+
+    /**
+     * 删除 DeviceDriver 中添加位号配置信息
+     *
+     * @param pointId
+     * @param attributeId
+     * @param deviceId
+     */
+    void deletePointInfo(Long pointId, Long attributeId, Long deviceId);
+
+    /**
+     * 更新 DeviceDriver 中添加位号配置信息
+     *
+     * @param id
+     */
+    void updatePointInfo(Long id);
 
 }

@@ -43,27 +43,55 @@ public class DriverMemoryApi {
 
     @PostMapping("/memory")
     public void memory(@RequestBody DriverOperation operation) {
-        switch (operation.getCommand()) {
-            case Operation.Profile.ADD:
-                driverCommonService.addProfile(operation.getId());
-                break;
-            case Operation.Profile.DELETE:
-                driverCommonService.deleteProfile(operation.getId());
-                break;
-            case Operation.Profile.UPDATE:
-                driverCommonService.updateProfile(operation.getId());
-                break;
-            case Operation.Device.ADD:
-                driverCommonService.addDevice(operation.getId());
-                break;
-            case Operation.Device.DELETE:
-                driverCommonService.deleteDevice(operation.getId());
-                break;
-            case Operation.Device.UPDATE:
-                driverCommonService.updateDevice(operation.getId());
-                break;
-            default:
-                break;
+        try {
+            switch (operation.getCommand()) {
+                case Operation.Profile.ADD:
+                    driverCommonService.addProfile(operation.getId());
+                    break;
+                case Operation.Profile.DELETE:
+                    driverCommonService.deleteProfile(operation.getId());
+                    break;
+                case Operation.Device.ADD:
+                    driverCommonService.addDevice(operation.getId());
+                    break;
+                case Operation.Device.DELETE:
+                    driverCommonService.deleteDevice(operation.getId());
+                    break;
+                case Operation.Device.UPDATE:
+                    driverCommonService.updateDevice(operation.getId());
+                    break;
+                case Operation.Point.ADD:
+                    driverCommonService.addPoint(operation.getId());
+                    break;
+                case Operation.Point.DELETE:
+                    driverCommonService.deletePoint(operation.getId(), operation.getParentId());
+                    break;
+                case Operation.Point.UPDATE:
+                    driverCommonService.updatePoint(operation.getId());
+                    break;
+                case Operation.DriverInfo.ADD:
+                    driverCommonService.addDriverInfo(operation.getId());
+                    break;
+                case Operation.DriverInfo.DELETE:
+                    driverCommonService.deleteDriverInfo(operation.getAttributeId(), operation.getParentId());
+                    break;
+                case Operation.DriverInfo.UPDATE:
+                    driverCommonService.updateDriverInfo(operation.getId());
+                    break;
+                case Operation.PointInfo.ADD:
+                    driverCommonService.addPointInfo(operation.getId());
+                    break;
+                case Operation.PointInfo.DELETE:
+                    driverCommonService.deletePointInfo(operation.getId(), operation.getAttributeId(), operation.getParentId());
+                    break;
+                case Operation.PointInfo.UPDATE:
+                    driverCommonService.updatePointInfo(operation.getId());
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 }

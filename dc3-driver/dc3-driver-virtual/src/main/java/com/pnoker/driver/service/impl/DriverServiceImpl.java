@@ -18,7 +18,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public void initial() {
-        log.info("hello");
+        log.info("virtual driver");
     }
 
     @Override
