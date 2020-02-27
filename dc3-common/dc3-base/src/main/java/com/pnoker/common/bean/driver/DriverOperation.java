@@ -13,5 +13,4 @@ import lombok.NoArgsConstructor;
 public class DriverOperation {
     private String command;
     private Long id;
-    private Long driverId;
 }

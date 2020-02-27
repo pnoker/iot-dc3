@@ -16,14 +16,10 @@
 
 package com.pnoker.center.data.api;
 
-import com.pnoker.center.data.message.Sender;
 import com.pnoker.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker
@@ -32,11 +28,5 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_DATA_URL_PREFIX)
 public class DriverMessageApi {
-    @Resource
-    private Sender sender;
 
-    @GetMapping("/msg")
-    public void msg() {
-        sender.driverSender("hell");
-    }
 }

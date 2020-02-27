@@ -18,14 +18,10 @@ package com.pnoker.common.sdk.service.message;
 
 import com.pnoker.common.bean.driver.DriverOperation;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.constant.Operation;
-import com.pnoker.common.sdk.bean.DriverContext;
-import com.pnoker.common.sdk.service.DriverCommonService;
+import com.pnoker.common.sdk.service.message.topic.TopicInput;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker
@@ -33,36 +29,8 @@ import javax.annotation.Resource;
 @Slf4j
 @EnableBinding(TopicInput.class)
 public class DriverMessageReceiver {
-    @Resource
-    private DriverContext driverContext;
-    @Resource
-    private DriverCommonService driverCommonService;
 
     @StreamListener(Common.Topic.DRIVER_TOPIC)
     public void driverReceive(DriverOperation operation) {
-        if (operation.getDriverId() == driverContext.getDriverId()) {
-            switch (operation.getCommand()) {
-                case Operation.Profile.ADD:
-                    driverCommonService.addProfile(operation.getId());
-                    break;
-                case Operation.Profile.DELETE:
-                    driverCommonService.deleteProfile(operation.getId());
-                    break;
-                case Operation.Profile.UPDATE:
-                    driverCommonService.updateProfile(operation.getId());
-                    break;
-                case Operation.Device.ADD:
-                    driverCommonService.addDevice(operation.getId());
-                    break;
-                case Operation.Device.DELETE:
-                    driverCommonService.deleteDevice(operation.getId());
-                    break;
-                case Operation.Device.UPDATE:
-                    driverCommonService.updateDevice(operation.getId());
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 }

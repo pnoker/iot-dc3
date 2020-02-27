@@ -17,6 +17,7 @@
 package com.pnoker.common.sdk.service.message;
 
 import com.pnoker.common.bean.driver.PointValue;
+import com.pnoker.common.sdk.service.message.topic.TopicOutput;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.messaging.support.MessageBuilder;
@@ -34,7 +35,7 @@ public class DriverMessageSender {
     private TopicOutput topicOutput;
 
     public void driverSender(PointValue pointValue) {
-        topicOutput.driverOutput().send(
+        topicOutput.driverValueOutput().send(
                 MessageBuilder.withPayload(pointValue).build()
         );
     }

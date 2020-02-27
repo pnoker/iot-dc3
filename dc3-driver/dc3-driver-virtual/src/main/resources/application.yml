@@ -4,9 +4,9 @@ driver:
   schedule:
     read:
       enable: true
-      corn: '*/10 * * * * ?'
+      corn: '*/15 * * * * ?'
     custom:
-      enable: true
+      enable: false
       corn:  '*/15 * * * * ?'
   driver-attribute:
     - displayName: 主机
