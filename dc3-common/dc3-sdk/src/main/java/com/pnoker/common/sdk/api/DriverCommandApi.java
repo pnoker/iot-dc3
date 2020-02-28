@@ -16,6 +16,8 @@
 
 package com.pnoker.common.sdk.api;
 
+import com.pnoker.common.bean.R;
+import com.pnoker.common.bean.driver.PointValue;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.sdk.service.DriverCommandService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +45,17 @@ public class DriverCommandApi {
      * @param pointId
      */
     @GetMapping("/device/{deviceId}/point/{pointId}")
-    public void readPoint(@NotNull @PathVariable("deviceId") Long deviceId,
-                          @NotNull @PathVariable("pointId") Long pointId) {
-        driverCommandService.read(deviceId, pointId);
+    public R<PointValue> readPoint(@NotNull @PathVariable("deviceId") Long deviceId,
+                                   @NotNull @PathVariable("pointId") Long pointId) {
+        try {
+            PointValue pointValue = driverCommandService.read(deviceId, pointId);
+            if (null != pointValue) {
+                return R.ok(pointValue);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
     }
 
     /**
@@ -56,9 +66,9 @@ public class DriverCommandApi {
      * @param value
      */
     @PostMapping("/device/{deviceId}/point/{pointId}/value/{value}")
-    public void writePoint(@NotNull @PathVariable("deviceId") Long deviceId,
-                           @NotNull @PathVariable("pointId") Long pointId,
-                           @NotNull @PathVariable("value") String value) {
-        driverCommandService.write(deviceId, pointId, value);
+    public Boolean writePoint(@NotNull @PathVariable("deviceId") Long deviceId,
+                              @NotNull @PathVariable("pointId") Long pointId,
+                              @NotNull @PathVariable("value") String value) {
+        return driverCommandService.write(deviceId, pointId, value);
     }
 }
