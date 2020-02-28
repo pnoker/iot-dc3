@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -185,6 +186,9 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         if (rp.isOk()) {
             PointInfo info = rp.getData();
             PointAttribute attribute = this.pointAttributeMap.get(info.getPointAttributeId());
+            if (null == driverContext.getPointInfoMap().get(info.getDeviceId())) {
+                driverContext.getPointInfoMap().put(info.getDeviceId(), new ConcurrentHashMap<>(16));
+            }
             Map<Long, Map<String, AttributeInfo>> map = driverContext.getPointInfoMap().get(info.getDeviceId());
             if (null == map.get(info.getPointId())) {
                 map.put(info.getPointId(), new ConcurrentHashMap<>(16));
@@ -195,7 +199,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
     @Override
     public void deletePointInfo(Long pointId, Long attributeId, Long deviceId) {
-        String attributeName = this.pointAttributeMap.get(deviceId).getName();
+        String attributeName = this.pointAttributeMap.get(attributeId).getName();
         driverContext.getPointInfoMap().get(deviceId).get(pointId).entrySet().removeIf(next -> next.getKey().equals(attributeName));
         driverContext.getPointInfoMap().get(deviceId).entrySet().removeIf(next -> next.getValue().size() < 1);
     }
@@ -220,6 +224,22 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             return false;
         }
         return registerDriver() && registerDriverAttribute() && registerPointAttribute();
+    }
+
+    /**
+     * 加载数据
+     */
+    public void loadData() {
+        log.info("driver initial basic data ……");
+        List<Long> profileList = getProfileList(driverContext.getDriverId());
+        this.driverAttributeMap = getDriverAttributeMap(driverContext.getDriverId());
+        this.pointAttributeMap = getPointAttributeMap(driverContext.getDriverId());
+
+        driverContext.setDriverInfoMap(getDriverInfoMap(profileList));
+        getDeviceMap(profileList);
+        driverContext.setPointMap(getPointMap(profileList));
+        driverContext.setPointInfoMap(getPointInfoMap(driverContext.getDeviceIdMap()));
+        log.info("driver initial basic data is complete");
     }
 
     public String getHost() {
@@ -377,28 +397,13 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     }
 
     /**
-     * 加载数据
-     */
-    public void loadData() {
-        log.info("driver initial basic data ……");
-        List<Long> profileList = getProfileList(driverContext.getDriverId());
-        this.driverAttributeMap = getDriverAttributeMap(driverContext.getDriverId());
-        driverContext.setDriverInfoMap(getDriverInfoMap(profileList));
-        getDeviceMap(profileList);
-        driverContext.setPointMap(getPointMap(profileList));
-        this.pointAttributeMap = getPointAttributeMap(driverContext.getDriverId());
-        driverContext.setPointInfoMap(getPointInfoMap(driverContext.getDeviceIdMap()));
-        log.info("driver initial basic data is complete");
-    }
-
-    /**
      * 获取驱动 driver 配置
      *
      * @param driverId
      * @return
      */
     public Map<Long, DriverAttribute> getDriverAttributeMap(long driverId) {
-        Map<Long, DriverAttribute> infoMap = new ConcurrentHashMap<>(16);
+        Map<Long, DriverAttribute> infoMap = new HashMap<>(16);
         DriverAttributeDto connectInfoDto = new DriverAttributeDto();
         connectInfoDto.setPage(new Pages().setSize(-1L)).setDriverId(driverId);
         R<Page<DriverAttribute>> rp = driverAttributeClient.list(connectInfoDto);
@@ -417,7 +422,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @return
      */
     public Map<Long, PointAttribute> getPointAttributeMap(long driverId) {
-        Map<Long, PointAttribute> infoMap = new ConcurrentHashMap<>(16);
+        Map<Long, PointAttribute> infoMap = new HashMap<>(16);
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setPage(new Pages().setSize(-1L)).setDriverId(driverId);
         R<Page<PointAttribute>> rp = pointAttributeClient.list(pointAttributeDto);
