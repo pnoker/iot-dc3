@@ -16,6 +16,8 @@
 
 package com.pnoker.common.sdk.service;
 
+import com.pnoker.common.model.Device;
+import com.pnoker.common.model.Point;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 
 import java.util.Map;
@@ -36,9 +38,11 @@ public interface DriverService {
      *
      * @param driverInfo
      * @param pointInfo
+     * @param device
+     * @param point
      * @return
      */
-    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo);
+    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point);
 
     /**
      * 写操作

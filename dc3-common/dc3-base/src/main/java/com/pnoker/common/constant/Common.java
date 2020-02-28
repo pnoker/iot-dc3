@@ -62,21 +62,15 @@ public interface Common {
     }
 
     /**
-     * 驱动 SDK Job Bean 前缀 和 三个固定调度任务
+     * 数据类型
      */
-    interface Sdk {
-        String JOB_PREFIX = "com.pnoker.common.sdk.quartz.job.";
-        String CUSTOMIZER_JOB = "自定义调度任务";
-        String READ_JOB = "定时采集任务";
-    }
-
-    /**
-     * 属性常量
-     */
-    interface Property {
-        short READ_ONLY = 0;
-        short WRITE_ONLY = 1;
-        short READ_WRITE = 2;
+    interface ValueType {
+        String STRING = "string";
+        String INT = "int";
+        String DOUBLE = "double";
+        String FLOAT = "float";
+        String LONG = "long";
+        String BOOLEAN = "boolean";
     }
 
     /**
