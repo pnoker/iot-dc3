@@ -1,5 +1,7 @@
 package com.pnoker.common.sdk.service;
 
+import com.pnoker.common.bean.driver.PointValue;
+
 /**
  * @author pnoker
  */
@@ -12,7 +14,7 @@ public interface DriverCommandService {
      * @param pointId
      * @return
      */
-    String read(Long deviceId, Long pointId);
+    PointValue read(Long deviceId, Long pointId);
 
     /**
      * 写操作

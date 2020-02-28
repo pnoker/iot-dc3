@@ -1,6 +1,7 @@
 package com.pnoker.common.sdk.service.impl;
 
 import com.pnoker.common.bean.driver.PointValue;
+import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Point;
 import com.pnoker.common.sdk.bean.AttributeInfo;
@@ -8,6 +9,7 @@ import com.pnoker.common.sdk.bean.DriverContext;
 import com.pnoker.common.sdk.service.DriverCommandService;
 import com.pnoker.common.sdk.service.DriverService;
 import com.pnoker.common.sdk.service.message.DriverMessageSender;
+import com.pnoker.common.sdk.util.DriverUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,12 @@ public class DriverCommandServiceImpl implements DriverCommandService {
 
     @Override
     @SneakyThrows
-    public String read(Long deviceId, Long pointId) {
-        String value = driverService.read(getDriverInfo(deviceId), getPointInfo(deviceId, pointId));
-        PointValue pointValue = new PointValue(deviceId, pointId, getPoint(deviceId, pointId).getType(), value);
+    public PointValue read(Long deviceId, Long pointId) {
+        String rawValue = driverService.read(getDriverInfo(deviceId), getPointInfo(deviceId, pointId));
+        Point point = getPoint(deviceId, pointId);
+        PointValue pointValue = new PointValue(deviceId, pointId, rawValue, DriverUtils.processValue(rawValue, point));
         driverMessageSender.driverSender(pointValue);
-        return value;
+        return pointValue;
     }
 
     @Override
@@ -51,7 +54,15 @@ public class DriverCommandServiceImpl implements DriverCommandService {
      * @return
      */
     private Map<String, AttributeInfo> getDriverInfo(Long deviceId) {
-        return driverContext.getDriverInfoMap().get(driverContext.getDeviceIdMap().get(deviceId).getProfileId());
+        Device device = driverContext.getDeviceIdMap().get(deviceId);
+        if (null == device) {
+            throw new ServiceException("device does not exist");
+        }
+        Map<String, AttributeInfo> infoMap = driverContext.getDriverInfoMap().get(device.getProfileId());
+        if (null == infoMap) {
+            throw new ServiceException("device driver info does not exist");
+        }
+        return infoMap;
     }
 
     /**
@@ -62,7 +73,11 @@ public class DriverCommandServiceImpl implements DriverCommandService {
      * @return
      */
     private Map<String, AttributeInfo> getPointInfo(Long deviceId, Long pointId) {
-        return driverContext.getPointInfoMap().get(deviceId).get(pointId);
+        Map<String, AttributeInfo> infoMap = driverContext.getPointInfoMap().get(deviceId).get(pointId);
+        if (null == infoMap) {
+            throw new ServiceException("device point info does not exist");
+        }
+        return infoMap;
     }
 
     /**

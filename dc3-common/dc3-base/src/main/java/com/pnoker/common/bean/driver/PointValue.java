@@ -1,5 +1,6 @@
 package com.pnoker.common.bean.driver;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,16 +20,21 @@ public class PointValue implements Serializable {
 
     private Long deviceId;
     private Long pointId;
-    private String type;
-    private Object value;
-    private Long createTime;
+    private String rawValue;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String value;
     private Long originTime;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long createTime;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long interval;
 
-    public PointValue(Long deviceId, Long pointId, String type, Object value) {
+    public PointValue(Long deviceId, Long pointId, String rawValue, String value) {
         this.deviceId = deviceId;
         this.pointId = pointId;
-        this.type = type;
+        this.rawValue = rawValue;
         this.value = value;
         this.originTime = System.currentTimeMillis();
     }

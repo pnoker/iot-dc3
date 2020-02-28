@@ -1,5 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.pnoker.common.exception.GlobalExceptionAdvice,\
   com.pnoker.common.config.RestTemplateConfig,\
   com.pnoker.common.config.MybatisPlusConfig,\
   com.pnoker.common.config.RedisTemplateConfig,\

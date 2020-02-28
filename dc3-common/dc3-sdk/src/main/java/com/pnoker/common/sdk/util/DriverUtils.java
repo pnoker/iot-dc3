@@ -1,5 +1,7 @@
 package com.pnoker.common.sdk.util;
 
+import com.pnoker.common.exception.ServiceException;
+import com.pnoker.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -22,58 +24,48 @@ public class DriverUtils {
     }
 
     /**
-     * 将字符串数据转换为对应的数据类型
+     * 处理数值
      *
      * @param value
-     * @param type  string/int/double/float/long/boolean
+     * @param point point.type : string/int/double/float/long/boolean
      * @return
      */
-    public static Object convertValue(String value, String type) {
+    public static String processValue(String value, Point point) {
         value = value.trim();
-        switch (type.trim()) {
+        switch (point.getType()) {
+            case ValueType.STRING:
+                break;
             case ValueType.INT:
-                int intValue = 0;
-                try {
-                    intValue = Integer.parseInt(value);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-                return intValue;
-            case ValueType.DOUBLE:
-                double doubleValue = 0;
-                try {
-                    BigDecimal decimal = new BigDecimal(value);
-                    doubleValue = decimal.doubleValue();
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-                return doubleValue;
-            case ValueType.FLOAT:
-                float floatValue = 0;
-                try {
-                    floatValue = Float.parseFloat(value);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-                return floatValue;
             case ValueType.LONG:
-                long longValue = 0;
                 try {
-                    longValue = Long.parseLong(value);
+                    value = String.format("%.0f", (getDoubleValue(value) + point.getBase()) * point.getMultiple());
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
-                return longValue;
+                break;
+            case ValueType.DOUBLE:
+            case ValueType.FLOAT:
+                try {
+                    value = String.format(point.getFormat(), (getDoubleValue(value) + point.getBase()) * point.getMultiple());
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+                break;
             case ValueType.BOOLEAN:
-                boolean booleanValue = false;
                 try {
-                    booleanValue = Boolean.parseBoolean(value);
+                    value = String.valueOf(Boolean.parseBoolean(value));
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
-                return booleanValue;
+                break;
             default:
-                return value;
+                throw new ServiceException("invalid point value type");
         }
+        return value;
+    }
+
+    private static double getDoubleValue(String value) {
+        BigDecimal decimal = new BigDecimal(value);
+        return decimal.doubleValue();
     }
 }
