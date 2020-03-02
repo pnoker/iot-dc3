@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 public class TranscodePool {
+    private static final AtomicInteger mThreadNum = new AtomicInteger(1);
 
     /**
      * 转码任务Map
@@ -46,7 +47,7 @@ public class TranscodePool {
             Environment.MAX_POOL_SIZE, Environment.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(Environment.MAX_POOL_SIZE * 2),
             r -> {
-                Thread thread = new Thread(r, "dc3-thread-" + new AtomicInteger(1).getAndIncrement());
+                Thread thread = new Thread(r, "dc3-thread-" + mThreadNum.getAndIncrement());
                 log.info("{} has been created", thread.getName());
                 return thread;
             },

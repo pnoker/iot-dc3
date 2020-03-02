@@ -16,10 +16,18 @@
 
 package com.pnoker.center.data.api;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pnoker.api.center.data.user.feign.PointValueClient;
+import com.pnoker.center.data.service.PointValueService;
+import com.pnoker.common.bean.R;
+import com.pnoker.common.bean.driver.PointValue;
+import com.pnoker.common.bean.driver.PointValueDto;
 import com.pnoker.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @author pnoker
@@ -27,6 +35,20 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping(Common.Service.DC3_DATA_URL_PREFIX)
-public class DriverMessageApi {
+public class PointValueApi implements PointValueClient {
+    @Resource
+    private PointValueService pointValueService;
 
+    @Override
+    public R<Page<PointValue>> list(PointValueDto pointValueDto) {
+        try {
+            Page<PointValue> page = pointValueService.list(pointValueDto);
+            if (null != page) {
+                return R.ok(page);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
 }

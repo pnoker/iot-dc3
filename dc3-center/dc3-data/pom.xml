@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
+        <!-- dc3 Api -->
+        <dependency>
+            <groupId>com.pnoker</groupId>
+            <artifactId>dc3-api-data</artifactId>
+        </dependency>
+
         <!-- dc3 Common Core -->
         <dependency>
             <groupId>com.pnoker</groupId>
