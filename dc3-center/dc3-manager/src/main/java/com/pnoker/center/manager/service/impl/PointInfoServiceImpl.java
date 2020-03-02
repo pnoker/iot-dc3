@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.PointInfoMapper;
+import com.pnoker.center.manager.service.NotifyService;
 import com.pnoker.center.manager.service.PointInfoService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
@@ -46,12 +47,14 @@ import java.util.Optional;
 public class PointInfoServiceImpl implements PointInfoService {
     @Resource
     private PointInfoMapper pointInfoMapper;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -59,14 +62,15 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo add(PointInfo pointInfo) {
-        PointInfo select = selectByPointAttributeID(pointInfo.getPointAttributeId());
+        PointInfo select = selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
         if (null != select) {
             throw new ServiceException("point info already exists");
         }
         if (pointInfoMapper.insert(pointInfo) > 0) {
+            notifyService.notifyDriverAddPointInfo(pointInfo.getId(), pointInfo.getDeviceId());
             return pointInfoMapper.selectById(pointInfo.getId());
         }
-        return null;
+        throw new ServiceException("point info create failed");
     }
 
     @Override
@@ -79,14 +83,22 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public boolean delete(Long id) {
-        return pointInfoMapper.deleteById(id) > 0;
+        PointInfo pointInfo = selectById(id);
+        if (null == pointInfo) {
+            throw new ServiceException("point info does not exist");
+        }
+        boolean delete = pointInfoMapper.deleteById(id) > 0;
+        if (delete) {
+            notifyService.notifyDriverDeletePointInfo(pointInfo.getPointId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId());
+        }
+        return delete;
     }
 
     @Override
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -95,12 +107,16 @@ public class PointInfoServiceImpl implements PointInfoService {
     )
     public PointInfo update(PointInfo pointInfo) {
         pointInfo.setUpdateTime(null);
-        if (pointInfoMapper.updateById(pointInfo) > 0) {
-            PointInfo select = selectById(pointInfo.getId());
-            pointInfo.setPointAttributeId(select.getPointAttributeId());
-            return select;
+        PointInfo select = selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
+        boolean update = null == select || (select.getPointAttributeId().equals(pointInfo.getPointAttributeId()) && select.getDeviceId().equals(pointInfo.getDeviceId()) && select.getPointId().equals(pointInfo.getPointId()));
+        if (!update) {
+            throw new ServiceException("point info already exists");
         }
-        return null;
+        if (pointInfoMapper.updateById(pointInfo) > 0) {
+            notifyService.notifyDriverUpdatePointInfo(pointInfo.getId(), pointInfo.getDeviceId());
+            return selectById(pointInfo.getId());
+        }
+        throw new ServiceException("point info update failed");
     }
 
     @Override
@@ -110,10 +126,12 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#id", unless = "#result==null")
-    public PointInfo selectByPointAttributeID(Long id) {
+    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointAttributeId+'.'+#deviceId+'.'+#pointId", unless = "#result==null")
+    public PointInfo selectByPointAttributeId(Long pointAttributeId, Long deviceId, Long pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        queryWrapper.like(PointInfo::getPointAttributeId, id);
+        queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
+        queryWrapper.eq(PointInfo::getDeviceId, deviceId);
+        queryWrapper.eq(PointInfo::getPointId, pointId);
         return pointInfoMapper.selectOne(queryWrapper);
     }
 

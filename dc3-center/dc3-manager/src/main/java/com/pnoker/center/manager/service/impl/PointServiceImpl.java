@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.PointMapper;
+import com.pnoker.center.manager.service.NotifyService;
 import com.pnoker.center.manager.service.PointService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
@@ -47,6 +48,8 @@ import java.util.Optional;
 public class PointServiceImpl implements PointService {
     @Resource
     private PointMapper pointMapper;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     @Caching(
@@ -65,9 +68,10 @@ public class PointServiceImpl implements PointService {
             throw new ServiceException("point already exists in the profile");
         }
         if (pointMapper.insert(point) > 0) {
+            notifyService.notifyDriverAddPoint(point.getId(), point.getProfileId());
             return pointMapper.selectById(point.getId());
         }
-        return null;
+        throw new ServiceException("point create failed");
     }
 
     @Override
@@ -80,7 +84,15 @@ public class PointServiceImpl implements PointService {
             }
     )
     public boolean delete(Long id) {
-        return pointMapper.deleteById(id) > 0;
+        Point point = selectById(id);
+        if (null == point) {
+            throw new ServiceException("point does not exist");
+        }
+        boolean delete = pointMapper.deleteById(id) > 0;
+        if (delete) {
+            notifyService.notifyDriverDeletePoint(point.getId(), point.getProfileId());
+        }
+        return delete;
     }
 
     @Override
@@ -106,9 +118,10 @@ public class PointServiceImpl implements PointService {
         if (pointMapper.updateById(point) > 0) {
             Point select = selectById(point.getId());
             point.setName(select.getName());
+            notifyService.notifyDriverUpdatePoint(point.getId(), point.getProfileId());
             return select;
         }
-        return null;
+        throw new ServiceException("point update failed");
     }
 
     @Override

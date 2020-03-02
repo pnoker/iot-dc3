@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * 属性配置
+ *
  * @author pnoker
  */
 @Data

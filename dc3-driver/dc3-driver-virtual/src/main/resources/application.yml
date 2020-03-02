@@ -1,7 +1,14 @@
 driver:
   name: VirtualDriver
   description: @project.description@
-  connect:
+  schedule:
+    read:
+      enable: true
+      corn: '*/5 * * * * ?'
+    custom:
+      enable: false
+      corn:  '*/15 * * * * ?'
+  driver-attribute:
     - displayName: 主机
       name: host
       type: string
@@ -12,7 +19,12 @@ driver:
       type: int
       value: 18600
       description: 目标机器 Port
-  profile:
+  point-attribute:
+    - displayName: 分组
+      name: group
+      type: string
+      value: GROUP
+      description: 分组名称
     - displayName: 位号
       name: tag
       type: string
@@ -33,6 +45,7 @@ spring:
 
 logging:
   level:
+    com.pnoker.common.sdk: DEBUG
     com.pnoker: DEBUG
   file:
     name: dc3/logs/driver/virtual/${spring.application.name}.log

@@ -20,10 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.ProfileMapper;
-import com.pnoker.center.manager.service.DeviceService;
-import com.pnoker.center.manager.service.DriverService;
-import com.pnoker.center.manager.service.PointService;
-import com.pnoker.center.manager.service.ProfileService;
+import com.pnoker.center.manager.service.*;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
@@ -61,6 +58,8 @@ public class ProfileServiceImpl implements ProfileService {
     private PointService pointService;
     @Resource
     private ProfileMapper profileMapper;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     @Caching(
@@ -83,10 +82,12 @@ public class ProfileServiceImpl implements ProfileService {
             throw new ServiceException("profile already exists");
         }
         if (profileMapper.insert(profile) > 0) {
+            notifyService.notifyDriverAddProfile(profile.getId());
             return profileMapper.selectById(profile.getId());
         }
-        return null;
+        throw new ServiceException("profile create failed");
     }
+
 
     @Override
     @Caching(
@@ -112,7 +113,11 @@ public class ProfileServiceImpl implements ProfileService {
             throw new ServiceException("profile already bound by the point");
         }
 
-        return profileMapper.deleteById(id) > 0;
+        boolean delete = profileMapper.deleteById(id) > 0;
+        if (delete) {
+            notifyService.notifyDriverDeleteProfile(id);
+        }
+        return delete;
     }
 
     @Override

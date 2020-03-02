@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.DriverInfoMapper;
 import com.pnoker.center.manager.service.DriverInfoService;
+import com.pnoker.center.manager.service.NotifyService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DriverInfoDto;
@@ -46,12 +47,14 @@ import java.util.Optional;
 public class DriverInfoServiceImpl implements DriverInfoService {
     @Resource
     private DriverInfoMapper driverInfoMapper;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -59,14 +62,15 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo add(DriverInfo driverInfo) {
-        DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId());
+        DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
         if (null != select) {
             throw new ServiceException("driver info already exists");
         }
         if (driverInfoMapper.insert(driverInfo) > 0) {
+            notifyService.notifyDriverAddDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
             return driverInfoMapper.selectById(driverInfo.getId());
         }
-        return null;
+        throw new ServiceException("driver info create failed");
     }
 
     @Override
@@ -79,14 +83,22 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public boolean delete(Long id) {
-        return driverInfoMapper.deleteById(id) > 0;
+        DriverInfo driverInfo = selectById(id);
+        if (null == driverInfo) {
+            throw new ServiceException("driver info does not exist");
+        }
+        boolean delete = driverInfoMapper.deleteById(id) > 0;
+        if (delete) {
+            notifyService.notifyDriverDeleteDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
+        }
+        return delete;
     }
 
     @Override
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.profileInfoId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -95,12 +107,16 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     )
     public DriverInfo update(DriverInfo driverInfo) {
         driverInfo.setUpdateTime(null);
-        if (driverInfoMapper.updateById(driverInfo) > 0) {
-            DriverInfo select = selectById(driverInfo.getId());
-            driverInfo.setDriverAttributeId(select.getDriverAttributeId());
-            return select;
+        DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
+        boolean update = null == select || (select.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) && select.getProfileId().equals(driverInfo.getProfileId()));
+        if (!update) {
+            throw new ServiceException("driver info already exists");
         }
-        return null;
+        if (driverInfoMapper.updateById(driverInfo) > 0) {
+            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
+            return selectById(driverInfo.getId());
+        }
+        throw new ServiceException("driver info update failed");
     }
 
     @Override
@@ -110,10 +126,11 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#id", unless = "#result==null")
-    public DriverInfo selectByDriverAttributeId(Long id) {
+    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverAttributeId+'.'+#profileId", unless = "#result==null")
+    public DriverInfo selectByDriverAttributeId(Long driverAttributeId, Long profileId) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        queryWrapper.like(DriverInfo::getDriverAttributeId, id);
+        queryWrapper.eq(DriverInfo::getDriverAttributeId, driverAttributeId);
+        queryWrapper.eq(DriverInfo::getProfileId, profileId);
         return driverInfoMapper.selectOne(queryWrapper);
     }
 
