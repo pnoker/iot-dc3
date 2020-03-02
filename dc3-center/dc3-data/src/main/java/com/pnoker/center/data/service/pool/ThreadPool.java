@@ -34,13 +34,15 @@ public class ThreadPool {
     public static int MAX_POOL_SIZE = 32;
     public static int KEEP_ALIVE_TIME = 10;
 
+    private final AtomicInteger mThreadNum = new AtomicInteger(1);
+
     /**
      * 线程池
      */
     public ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(MAX_POOL_SIZE * 2),
             r -> {
-                Thread thread = new Thread(r, "dc3-thread-" + new AtomicInteger(1).getAndIncrement());
+                Thread thread = new Thread(r, "dc3-thread-" + mThreadNum.getAndIncrement());
                 log.info("{} has been created", thread.getName());
                 return thread;
             }, (r, e) -> log.error("{} rejected,completedTaskCount:{}", r.toString(), e.getCompletedTaskCount()));

@@ -38,6 +38,6 @@ public class DriverValueReceiver {
 
     @StreamListener(Common.Topic.DRIVER_VALUE_TOPIC)
     public void driverReceive(PointValue pointValue) {
-        pointValueService.addPointValue(pointValue);
+        pointValueService.add(pointValue);
     }
 }

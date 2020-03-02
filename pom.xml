@@ -209,6 +209,12 @@
             </dependency>
             <dependency>
                 <groupId>com.pnoker</groupId>
+                <artifactId>dc3-api-data</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.pnoker</groupId>
                 <artifactId>dc3-api-rtmp</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>

@@ -91,13 +91,13 @@ public interface Common {
         String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
         String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/pointInfo";
         String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driverInfo";
-        String DC3_MANAGER_SCHEDULE_URL_PREFIX = "/manager/schedule";
         String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
         String DC3_DICTIONARY_URL_PREFIX = "/manager/dictionary";
 
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
 
+        String DC3_DATA = "DC3-DATA";
         String DC3_DATA_URL_PREFIX = "/data";
         String DC3_DRIVER_URL_PREFIX = "/driver";
     }
@@ -126,7 +126,6 @@ public interface Common {
         String GROUP = "group";
         String DEVICE = "device";
         String POINT_INFO = "point_info";
-        String SCHEDULE = "schedule";
         String USER = "user";
         String RTMP = "rtmp";
         String LABEL = "label";

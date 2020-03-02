@@ -42,6 +42,8 @@ public class Pages implements Serializable {
 
     private long current = 1;
     private long size = 20;
+    private long startTime;
+    private long endTime;
     private List<OrderItem> orders = new ArrayList<>();
 
     public <T> Page<T> convert() {
