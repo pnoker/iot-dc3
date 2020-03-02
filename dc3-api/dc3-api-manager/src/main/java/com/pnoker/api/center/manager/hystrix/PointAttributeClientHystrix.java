@@ -65,7 +65,7 @@ public class PointAttributeClientHystrix implements FallbackFactory<PointAttribu
             }
 
             @Override
-            public R<Page<PointAttribute>> list(PointAttributeDto profileInfoDto) {
+            public R<Page<PointAttribute>> list(PointAttributeDto pointAttributeDto) {
                 return R.fail(message);
             }
 

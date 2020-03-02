@@ -58,25 +58,19 @@ public interface Common {
      */
     interface Topic {
         String DRIVER_TOPIC = "driver.topic";
+        String DRIVER_VALUE_TOPIC = "driver.value.topic";
     }
 
     /**
-     * 驱动 SDK Job Bean 前缀 和 三个固定调度任务
+     * 数据类型
      */
-    interface Sdk {
-        String JOB_PREFIX = "com.pnoker.common.sdk.quartz.job.";
-        String CUSTOMIZER_JOB = "CustomizerJob";
-        String READ_JOB = "ReadJob";
-        String WRITE_JOB = "WriteJob";
-    }
-
-    /**
-     * 属性常量
-     */
-    interface Property {
-        short READ_ONLY = 0;
-        short WRITE_ONLY = 1;
-        short READ_WRITE = 2;
+    interface ValueType {
+        String STRING = "string";
+        String INT = "int";
+        String DOUBLE = "double";
+        String FLOAT = "float";
+        String LONG = "long";
+        String BOOLEAN = "boolean";
     }
 
     /**
@@ -97,13 +91,13 @@ public interface Common {
         String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
         String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/pointInfo";
         String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driverInfo";
-        String DC3_MANAGER_SCHEDULE_URL_PREFIX = "/manager/schedule";
         String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
         String DC3_DICTIONARY_URL_PREFIX = "/manager/dictionary";
 
         String DC3_RTMP = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
 
+        String DC3_DATA = "DC3-DATA";
         String DC3_DATA_URL_PREFIX = "/data";
         String DC3_DRIVER_URL_PREFIX = "/driver";
     }
@@ -132,7 +126,6 @@ public interface Common {
         String GROUP = "group";
         String DEVICE = "device";
         String POINT_INFO = "point_info";
-        String SCHEDULE = "schedule";
         String USER = "user";
         String RTMP = "rtmp";
         String LABEL = "label";

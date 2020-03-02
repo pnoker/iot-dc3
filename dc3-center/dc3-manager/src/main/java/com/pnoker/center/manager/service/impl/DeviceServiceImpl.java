@@ -22,14 +22,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.DeviceMapper;
 import com.pnoker.center.manager.service.DeviceService;
-import com.pnoker.center.manager.service.ScheduleService;
+import com.pnoker.center.manager.service.NotifyService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
 import com.pnoker.common.dto.DeviceDto;
-import com.pnoker.common.dto.ScheduleDto;
 import com.pnoker.common.exception.ServiceException;
 import com.pnoker.common.model.Device;
-import com.pnoker.common.model.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -50,9 +48,9 @@ import java.util.Optional;
 @Service
 public class DeviceServiceImpl implements DeviceService {
     @Resource
-    private ScheduleService scheduleService;
-    @Resource
     private DeviceMapper deviceMapper;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     @Caching(
@@ -72,10 +70,10 @@ public class DeviceServiceImpl implements DeviceService {
             throw new ServiceException("device already exists in the group");
         }
         if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
-            createSchedule(device);
+            notifyService.notifyDriverAddDevice(device.getId(), device.getProfileId());
             return deviceMapper.selectById(device.getId());
         }
-        return null;
+        throw new ServiceException("device create failed");
     }
 
     @Override
@@ -89,9 +87,13 @@ public class DeviceServiceImpl implements DeviceService {
             }
     )
     public boolean delete(Long id) {
+        Device device = selectById(id);
+        if (null == device) {
+            throw new ServiceException("device does not exist");
+        }
         boolean delete = deviceMapper.deleteById(id) > 0;
         if (delete) {
-            removeSchedule(id);
+            notifyService.notifyDriverDeleteDevice(device.getId(), device.getProfileId());
         }
         return delete;
     }
@@ -114,9 +116,10 @@ public class DeviceServiceImpl implements DeviceService {
         if (deviceMapper.updateById(device) > 0) {
             Device select = selectById(device.getId());
             device.setCode(select.getCode()).setGroupId(select.getGroupId()).setName(select.getName());
+            notifyService.notifyDriverUpdateDevice(device.getId(), device.getProfileId());
             return select;
         }
-        return null;
+        throw new ServiceException("device update failed");
     }
 
     @Override
@@ -185,25 +188,5 @@ public class DeviceServiceImpl implements DeviceService {
             return generateDeviceCode();
         }
         return code;
-    }
-
-    public void createSchedule(Device device) {
-        Schedule schedule = new Schedule();
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.READ_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.READ_JOB).setDescription("Automatically create by default");
-        scheduleService.add(schedule);
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.WRITE_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.WRITE_JOB).setDescription("Automatically create by default");
-        scheduleService.add(schedule);
-        schedule.setDeviceId(device.getId()).setName(Common.Sdk.CUSTOMIZER_JOB).setCornExpression("*/15 * * * * ?").setBeanName(Common.Sdk.CUSTOMIZER_JOB).setDescription("Automatically create by default");
-        scheduleService.add(schedule);
-    }
-
-    public void removeSchedule(long deviceId) {
-        ScheduleDto scheduleDto = new ScheduleDto();
-        scheduleDto.setDeviceId(deviceId);
-        scheduleDto.setPage(new Pages().setSize(-1L));
-        Page<Schedule> page = scheduleService.list(scheduleDto);
-        for (Schedule schedule : page.getRecords()) {
-            scheduleService.delete(schedule.getId());
-        }
     }
 }

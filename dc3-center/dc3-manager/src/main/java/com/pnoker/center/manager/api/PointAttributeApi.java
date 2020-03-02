@@ -90,9 +90,9 @@ public class PointAttributeApi implements PointAttributeClient {
     }
 
     @Override
-    public R<Page<PointAttribute>> list(PointAttributeDto profileInfoDto) {
+    public R<Page<PointAttribute>> list(PointAttributeDto pointAttributeDto) {
         try {
-            Page<PointAttribute> page = pointAttributeService.list(profileInfoDto);
+            Page<PointAttribute> page = pointAttributeService.list(pointAttributeDto);
             if (null != page) {
                 return R.ok(page);
             }
