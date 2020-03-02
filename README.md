@@ -28,7 +28,7 @@
 
   #### 1.2 DC3致力于
 
- * 跨平台分布式、多设备、多协议（目前支持`Mqtt(:hammer:)`、`Rtsp`、`Rtmp`、`Http(:hammer:)`、`Plc-S7(:hammer:)`、`Opc(:hammer:)`、`Opc-Ua(:hammer:)`、`自定义Tcp(:hammer:)`、`自定义Socket(:hammer:)`）;
+ * 跨平台分布式、多设备、多协议（目前支持`Mqtt`(:hammer:)、`Rtsp`、`Rtmp`、`Http`(:hammer:)、`Plc-S7`(:hammer:)、`Opc`(:hammer:)、`Opc-Ua`(:hammer:)、`自定义Tcp`(:hammer:)、`自定义Socket`(:hammer:)）;
  * 物联设备数据采集、边缘处理、数据持久化、数据缓存、功能性微服务调用;
  * 物联驱动端代码快速开发,快速安全的接入设备和物联设备管理（目前支持`Java`）;
  * 安全权限控制、数据加密（目前支持`AES\RSA`）;
