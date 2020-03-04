@@ -3,6 +3,7 @@ package com.pnoker.common.sdk.service.job;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.bean.DriverContext;
 import com.pnoker.common.sdk.service.DriverCommandService;
+import com.pnoker.common.sdk.service.pool.ThreadPool;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -21,6 +22,8 @@ import java.util.Map;
 @Component
 public class ReadScheduleJob extends QuartzJobBean {
     @Resource
+    private ThreadPool threadPool;
+    @Resource
     private DriverContext driverContext;
     @Resource
     private DriverCommandService driverCommandService;
@@ -30,8 +33,10 @@ public class ReadScheduleJob extends QuartzJobBean {
         Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getPointInfoMap();
         for (Long deviceId : pointInfoMap.keySet()) {
             for (Long pointId : pointInfoMap.get(deviceId).keySet()) {
-                log.debug("execute read schedule for device({}),point({}),{}", deviceId, pointId,pointInfoMap.get(deviceId).get(pointId));
-                driverCommandService.read(deviceId, pointId);
+                threadPool.execute(() -> {
+                    log.debug("execute read schedule for device({}),point({}),{}", deviceId, pointId, pointInfoMap.get(deviceId).get(pointId));
+                    driverCommandService.read(deviceId, pointId);
+                });
             }
         }
     }

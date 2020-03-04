@@ -43,4 +43,13 @@ public interface PointValueClient {
     @PostMapping("/list")
     R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto);
 
+    /**
+     * 查询最新 PointValue
+     *
+     * @param pointValueDto
+     * @return PointValue
+     */
+    @PostMapping("/latest")
+    R<PointValue> latest(@RequestBody PointValueDto pointValueDto);
+
 }

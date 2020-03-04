@@ -4,7 +4,7 @@ driver:
   schedule:
     read:
       enable: true
-      corn: '*/5 * * * * ?'
+      corn: '*/1 * * * * ?'
     custom:
       enable: false
       corn:  '*/15 * * * * ?'
@@ -37,11 +37,6 @@ server:
 spring:
   application:
     name: @project.artifactId@
-  rabbitmq:
-    host: dc3-rabbitmq
-    port: 5672
-    username: dc3
-    password: dc3
 
 logging:
   level:

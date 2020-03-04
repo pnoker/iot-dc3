@@ -17,7 +17,8 @@
 package com.pnoker.common.sdk.init;
 
 import com.pnoker.common.sdk.service.DriverCommonService;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
@@ -37,12 +38,12 @@ import javax.annotation.Resource;
         "com.pnoker.api.center.manager",
         "com.pnoker.common.sdk"
 })
-public class DriverInitRunner implements CommandLineRunner {
+public class DriverInitRunner implements ApplicationRunner {
     @Resource
     private DriverCommonService driverCommonService;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
         driverCommonService.initial();
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.runner;
+package com.pnoker.transfer.rtmp.init;
 
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,7 +35,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.pnoker.transfer.rtmp.runner.Environment.initial;
+import static com.pnoker.transfer.rtmp.bean.RtmpProperty.initial;
 import static java.lang.System.getProperty;
 
 /**
@@ -58,7 +58,7 @@ public class TranscodeRunner implements ApplicationRunner {
     private int reconnectMaxTimes;
     @Value("${rtmp.thread.core-pool-size}")
     private int corePoolSize;
-    @Value("${rtmp.thread.maximum-sool-size}")
+    @Value("${rtmp.thread.maximum-pool-size}")
     private int maximumPoolSize;
     @Value("${rtmp.thread.keep-alive-time}")
     private int keepAliveTime;

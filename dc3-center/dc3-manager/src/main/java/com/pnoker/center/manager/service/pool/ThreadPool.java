@@ -27,17 +27,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Component
-public class ScheduledThreadPool {
+public class ThreadPool {
     public static int CORE_POOL_SIZE = 4;
 
-    private final AtomicInteger mThreadNum = new AtomicInteger(1);
+    private final AtomicInteger atomicInteger = new AtomicInteger(1);
 
     /**
      * 线程池
      */
-    public ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(CORE_POOL_SIZE, r -> {
-        Thread thread = new Thread(r, "dc3-thread-" + mThreadNum.getAndIncrement());
+    public ScheduledThreadPoolExecutor poolExecutor = new ScheduledThreadPoolExecutor(CORE_POOL_SIZE, r -> {
+        Thread thread = new Thread(r, "dc3-thread-" + atomicInteger.getAndIncrement());
         log.info("{} has been created", thread.getName());
         return thread;
-    }, (r, e) -> log.error("{} rejected,completedTaskCount:{}", r.toString(), e.getCompletedTaskCount()));
+    }, (r, e) -> log.error("thread pool rejected"));
 }

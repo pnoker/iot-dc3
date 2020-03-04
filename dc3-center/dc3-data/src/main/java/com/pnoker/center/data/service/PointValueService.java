@@ -22,4 +22,12 @@ public interface PointValueService {
      * @return
      */
     Page<PointValue> list(PointValueDto pointValueDto);
+
+    /**
+     * 获取最新的一个位号数据
+     *
+     * @param pointValueDto
+     * @return
+     */
+    PointValue latest(PointValueDto pointValueDto);
 }

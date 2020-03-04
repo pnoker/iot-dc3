@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.service.message;
+package com.pnoker.common.sdk.service.rabbit;
 
 import com.pnoker.common.bean.driver.PointValue;
-import com.pnoker.common.sdk.service.message.topic.TopicOutput;
+import com.pnoker.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -28,15 +28,14 @@ import javax.annotation.Resource;
  * @author pnoker
  */
 @Slf4j
-@EnableBinding(TopicOutput.class)
-public class DriverMessageSender {
+@Service
+public class PointValueService {
 
     @Resource
-    private TopicOutput topicOutput;
+    private RabbitTemplate rabbitTemplate;
 
-    public void driverSender(PointValue pointValue) {
-        topicOutput.driverValueOutput().send(
-                MessageBuilder.withPayload(pointValue).build()
-        );
+    public void pointValueSender(PointValue pointValue) {
+        log.debug("send point value,{}", pointValue);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, Common.Rabbit.POINT_VALUE_QUEUE, pointValue);
     }
 }

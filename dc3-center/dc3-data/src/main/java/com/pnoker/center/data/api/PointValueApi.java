@@ -51,4 +51,17 @@ public class PointValueApi implements PointValueClient {
         }
         return R.fail();
     }
+
+    @Override
+    public R<PointValue> latest(PointValueDto pointValueDto) {
+        try {
+            PointValue pointValue = pointValueService.latest(pointValueDto);
+            if (null != pointValue) {
+                return R.ok(pointValue);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
 }

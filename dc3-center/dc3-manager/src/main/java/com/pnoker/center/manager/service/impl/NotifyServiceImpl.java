@@ -5,7 +5,7 @@ import com.pnoker.center.manager.service.DeviceService;
 import com.pnoker.center.manager.service.DriverService;
 import com.pnoker.center.manager.service.NotifyService;
 import com.pnoker.center.manager.service.ProfileService;
-import com.pnoker.center.manager.service.pool.ScheduledThreadPool;
+import com.pnoker.center.manager.service.pool.ThreadPool;
 import com.pnoker.common.bean.driver.DriverOperation;
 import com.pnoker.common.constant.Operation;
 import com.pnoker.common.model.Device;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class NotifyServiceImpl implements NotifyService {
     @Resource
-    private ScheduledThreadPool scheduledThreadPool;
+    private ThreadPool threadPool;
     @Resource
     private RestTemplate restTemplate;
     @Resource
@@ -39,7 +39,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverAddProfile(Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Profile.ADD).setId(profileId);
             try {
@@ -52,7 +52,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverDeleteProfile(Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Profile.DELETE).setId(profileId);
             try {
@@ -65,7 +65,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverAddDevice(Long deviceId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Device.ADD).setId(deviceId);
             try {
@@ -78,7 +78,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverDeleteDevice(Long deviceId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Device.DELETE).setId(deviceId);
             try {
@@ -91,7 +91,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverUpdateDevice(Long deviceId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Device.UPDATE).setId(deviceId);
             try {
@@ -104,7 +104,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverAddPoint(Long pointId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Point.ADD).setId(pointId);
             try {
@@ -117,7 +117,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverDeletePoint(Long pointId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Point.DELETE).setId(pointId).setParentId(profileId);
             try {
@@ -130,7 +130,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverUpdatePoint(Long pointId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Point.UPDATE).setId(pointId);
             try {
@@ -143,7 +143,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverAddDriverInfo(Long driverInfoId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.DriverInfo.ADD).setId(driverInfoId);
             try {
@@ -156,7 +156,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverDeleteDriverInfo(Long driverInfoId, Long attributeId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.DriverInfo.DELETE).setParentId(profileId).setAttributeId(attributeId);
             try {
@@ -169,7 +169,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverUpdateDriverInfo(Long driverInfoId, Long profileId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByProfile(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.ADD).setId(driverInfoId);
             try {
@@ -182,7 +182,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverAddPointInfo(Long pointInfoId, Long deviceId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByDevice(deviceId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.ADD).setId(pointInfoId);
             try {
@@ -195,7 +195,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverDeletePointInfo(Long pointId, Long attributeId, Long deviceId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByDevice(deviceId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.DELETE).setId(pointId).setParentId(deviceId).setAttributeId(attributeId);
             try {
@@ -208,7 +208,7 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverUpdatePointInfo(Long pointInfoId, Long deviceId) {
-        scheduledThreadPool.executor.schedule(() -> {
+        threadPool.poolExecutor.schedule(() -> {
             Driver driver = getDriverByDevice(deviceId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.UPDATE).setId(pointInfoId);
             try {

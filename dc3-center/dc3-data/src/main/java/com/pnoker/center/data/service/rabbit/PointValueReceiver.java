@@ -14,23 +14,32 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.service.message;
+package com.pnoker.center.data.service.rabbit;
 
-import com.pnoker.common.bean.driver.DriverOperation;
+import com.pnoker.center.data.service.PointValueService;
+import com.pnoker.common.bean.driver.PointValue;
 import com.pnoker.common.constant.Common;
-import com.pnoker.common.sdk.service.message.topic.TopicInput;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
+ * 接收驱动发送过来的数据
+ *
  * @author pnoker
  */
 @Slf4j
-@EnableBinding(TopicInput.class)
-public class DriverMessageReceiver {
+@Component
+@RabbitListener(queues = Common.Rabbit.POINT_VALUE_QUEUE)
+public class PointValueReceiver {
+    @Resource
+    private PointValueService pointValueService;
 
-    @StreamListener(Common.Topic.DRIVER_TOPIC)
-    public void driverReceive(DriverOperation operation) {
+    @RabbitHandler
+    public void pointValueReceive(PointValue pointValue) {
+        pointValueService.add(pointValue);
     }
 }
