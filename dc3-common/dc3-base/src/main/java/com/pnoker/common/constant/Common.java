@@ -54,11 +54,11 @@ public interface Common {
     String DEFAULT_PASSWORD = "dc3dc3";
 
     /**
-     * 消息通道
+     * 消息常量
      */
-    interface Topic {
-        String DRIVER_TOPIC = "driver.topic";
-        String DRIVER_VALUE_TOPIC = "driver.value.topic";
+    interface Rabbit {
+        String TOPIC_EXCHANGE = "dc3.exchange";
+        String POINT_VALUE_QUEUE = "topic.point.value";
     }
 
     /**

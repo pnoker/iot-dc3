@@ -46,6 +46,11 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
                 return R.fail(message);
             }
 
+            @Override
+            public R<PointValue> latest(PointValueDto pointValueDto) {
+                return R.fail(message);
+            }
+
         };
     }
 }

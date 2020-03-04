@@ -17,7 +17,6 @@
 package com.pnoker.center.data;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
 
 /**
@@ -25,7 +24,6 @@ import org.springframework.cloud.client.SpringCloudApplication;
  *
  * @author pnoker
  */
-@EnableCaching
 @SpringCloudApplication
 public class DataApplication {
     public static void main(String[] args) {

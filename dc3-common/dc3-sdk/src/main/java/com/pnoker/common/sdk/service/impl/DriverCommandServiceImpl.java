@@ -10,7 +10,7 @@ import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.bean.DriverContext;
 import com.pnoker.common.sdk.service.DriverCommandService;
 import com.pnoker.common.sdk.service.DriverService;
-import com.pnoker.common.sdk.service.message.DriverMessageSender;
+import com.pnoker.common.sdk.service.rabbit.PointValueService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,11 +25,11 @@ import java.util.Map;
 @Service
 public class DriverCommandServiceImpl implements DriverCommandService {
     @Resource
+    private PointValueService pointValueService;
+    @Resource
     private DriverContext driverContext;
     @Resource
     private DriverService driverService;
-    @Resource
-    private DriverMessageSender driverMessageSender;
 
     @Override
     @SneakyThrows
@@ -37,7 +37,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
         Device device = getDevice(deviceId);
         String rawValue = driverService.read(getDriverInfo(device), getPointInfo(deviceId, pointId), device, getPoint(device, pointId));
         PointValue pointValue = new PointValue(deviceId, pointId, rawValue, processValue(rawValue, getPoint(device, pointId)));
-        driverMessageSender.driverSender(pointValue);
+        pointValueService.pointValueSender(pointValue);
         return pointValue;
     }
 

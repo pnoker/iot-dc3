@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.handler;
+package com.pnoker.transfer.rtmp.bean;
 
 import cn.hutool.core.util.RuntimeUtil;
 import com.pnoker.common.model.Rtmp;
-import com.pnoker.transfer.rtmp.runner.Environment;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +41,7 @@ public class Transcode {
         this.id = rtmp.getId();
         this.run = false;
         this.command = rtmp.getCommand()
-                .replace("{exe}", Environment.FFMPEG)
+                .replace("{exe}", RtmpProperty.FFMPEG)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
     }
@@ -54,7 +53,7 @@ public class Transcode {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         try {
-            while (StringUtils.isNotEmpty((line = reader.readLine()))&&run) {
+            while (StringUtils.isNotEmpty((line = reader.readLine())) && run) {
                 log.error(line);
                 line = line.toLowerCase();
                 if (line.contains("fail") || line.contains("error")) {

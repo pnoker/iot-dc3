@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.pnoker.transfer.rtmp.runner;
+package com.pnoker.transfer.rtmp.bean;
 
 /**
- *
- *
  * @author pnoker
  */
-public class Environment {
+public class RtmpProperty {
     public static String FFMPEG;
     public static int RECONNECT_INTERVAL;
     public static int RECONNECT_MAX_TIMES;
@@ -30,13 +28,13 @@ public class Environment {
     public static int KEEP_ALIVE_TIME;
 
     public static void initial(String ffmpeg, int reconnectInterval, int reconnectMaxTimes, int corePoolSize, int maximumPoolSize, int keepAliveTime) {
-        Environment.FFMPEG = ffmpeg;
+        RtmpProperty.FFMPEG = ffmpeg;
 
-        Environment.RECONNECT_INTERVAL = reconnectInterval;
-        Environment.RECONNECT_MAX_TIMES = reconnectMaxTimes;
+        RtmpProperty.RECONNECT_INTERVAL = reconnectInterval;
+        RtmpProperty.RECONNECT_MAX_TIMES = reconnectMaxTimes;
 
-        Environment.CORE_POOL_SIZE = corePoolSize;
-        Environment.MAX_POOL_SIZE = maximumPoolSize;
-        Environment.KEEP_ALIVE_TIME = keepAliveTime;
+        RtmpProperty.CORE_POOL_SIZE = corePoolSize;
+        RtmpProperty.MAX_POOL_SIZE = maximumPoolSize;
+        RtmpProperty.KEEP_ALIVE_TIME = keepAliveTime;
     }
 }

@@ -31,10 +31,11 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public void add(PointValue pointValue) {
-        threadPool.executor.execute(() -> {
+        threadPool.execute(() -> {
             long createTime = System.currentTimeMillis();
             long interval = createTime - pointValue.getOriginTime();
             mongoTemplate.insert(pointValue.setCreateTime(createTime).setInterval(interval));
+            log.debug("interval:{}", interval);
         });
     }
 
@@ -52,8 +53,21 @@ public class PointValueServiceImpl implements PointValueService {
                 criteria.and("originTime").gte(dto.getPage().getStartTime()).lte(dto.getPage().getEndTime());
             }
         });
-        Page<PointValue> page = query(criteria, pointValueDto.getPage());
-        return page;
+        return pageQuery(criteria, pointValueDto.getPage());
+    }
+
+    @Override
+    public PointValue latest(PointValueDto pointValueDto) {
+        Criteria criteria = new Criteria();
+        Optional.ofNullable(pointValueDto).ifPresent(dto -> {
+            if (null != dto.getDeviceId()) {
+                criteria.and("deviceId").is(dto.getDeviceId());
+            }
+            if (null != dto.getPointId()) {
+                criteria.and("pointId").is(dto.getPointId());
+            }
+        });
+        return oneQuery(criteria);
     }
 
     /**
@@ -63,13 +77,23 @@ public class PointValueServiceImpl implements PointValueService {
      * @param pages
      * @return
      */
-    private Page<PointValue> query(CriteriaDefinition criteriaDefinition, Pages pages) {
-        Query query = queryBySort(criteriaDefinition);
+    private Page<PointValue> pageQuery(CriteriaDefinition criteriaDefinition, Pages pages) {
+        Query query = desc(criteriaDefinition);
         long count = mongoTemplate.count(query, PointValue.class);
-        List<PointValue> pointValues = mongoTemplate.find(queryByPage(query, pages), PointValue.class);
+        List<PointValue> pointValues = mongoTemplate.find(page(query, pages), PointValue.class);
         Page<PointValue> page = (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count);
         page.setRecords(pointValues);
         return page;
+    }
+
+    /**
+     * 查询 One
+     *
+     * @param criteriaDefinition
+     * @return
+     */
+    private PointValue oneQuery(CriteriaDefinition criteriaDefinition) {
+        return mongoTemplate.findOne(desc(criteriaDefinition), PointValue.class);
     }
 
     /**
@@ -78,7 +102,7 @@ public class PointValueServiceImpl implements PointValueService {
      * @param criteriaDefinition
      * @return
      */
-    private Query queryBySort(CriteriaDefinition criteriaDefinition) {
+    private Query desc(CriteriaDefinition criteriaDefinition) {
         Query query = new Query(criteriaDefinition);
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
         return query;
@@ -91,7 +115,7 @@ public class PointValueServiceImpl implements PointValueService {
      * @param pages
      * @return
      */
-    private Query queryByPage(Query query, Pages pages) {
+    private Query page(Query query, Pages pages) {
         int size = (int) pages.getSize();
         long page = pages.getCurrent();
         query.limit(size).skip(size * (page - 1));

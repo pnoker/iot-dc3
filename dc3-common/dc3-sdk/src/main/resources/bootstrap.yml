@@ -22,6 +22,11 @@ spring:
       cache:
         caffeine:
           spec: initialCapacity=10,maximumSize=500,expireAfterAccess=600s
+  rabbitmq:
+    host: dc3-rabbitmq
+    port: 5672
+    username: dc3
+    password: dc3
   quartz:
     properties:
       org.quartz:

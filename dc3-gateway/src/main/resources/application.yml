@@ -17,7 +17,6 @@ spring:
     servlet:
       content-type: text/html
   redis:
-    password: dc3
     database: 0
   cache:
     redis:

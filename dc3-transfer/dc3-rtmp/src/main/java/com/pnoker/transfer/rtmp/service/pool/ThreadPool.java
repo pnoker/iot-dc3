@@ -14,46 +14,45 @@
  * limitations under the License.
  */
 
-package com.pnoker.center.data.service.pool;
+package com.pnoker.transfer.rtmp.service.pool;
 
+import com.pnoker.transfer.rtmp.bean.Transcode;
+import com.pnoker.transfer.rtmp.bean.RtmpProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 转码任务执行线程池
+ *
  * @author pnoker
  */
 @Slf4j
 @Component
 public class ThreadPool {
-    private static int CORE_POOL_SIZE = 4;
-    private static int MAX_POOL_SIZE = 32;
-    private static int KEEP_ALIVE_TIME = 10;
-    private static int QUEUE_CAPACITY = 4096;
+    private final AtomicInteger mThreadNum = new AtomicInteger(1);
 
-    private final AtomicInteger atomicInteger = new AtomicInteger(1);
+    /**
+     * 转码任务Map
+     */
+    public volatile Map<Long, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
 
     /**
      * 线程池
      */
-    private ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(QUEUE_CAPACITY),
+    public ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(RtmpProperty.CORE_POOL_SIZE,
+            RtmpProperty.MAX_POOL_SIZE, RtmpProperty.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(RtmpProperty.MAX_POOL_SIZE * 2),
             r -> {
-                Thread thread = new Thread(r, "dc3-thread-" + atomicInteger.getAndIncrement());
+                Thread thread = new Thread(r, "dc3-thread-" + mThreadNum.getAndIncrement());
                 log.info("{} has been created", thread.getName());
                 return thread;
-            }, (r, e) -> log.error("thread pool rejected"));
-
-    /**
-     * 在线程池中执行线程
-     *
-     * @param runnable
-     */
-    public void execute(Runnable runnable) {
-        poolExecutor.execute(runnable);
-    }
+            },
+            (r, e) -> log.error("thread pool rejected"));
 }
