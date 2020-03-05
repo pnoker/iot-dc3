@@ -28,15 +28,17 @@ spring:
     hikari:
       pool-name: dc3-hikaricp
       max-lifetime: 1765000
-      maximum-pool-size: 16
+      maximum-pool-size: 32
       minimum-idle: 4
   data:
     mongodb:
-      host: dc3-mongo
-      port: 27017
       database: dc3
       username: dc3
       password: dc3
+      client-name: dc3-mongo-pool
+      min-connections-per-host: 4
+      connections-per-host: 32
+      threads-allowed-to-block-for-connection-multiplier: 10
   redis:
     host: dc3-redis
     port: 6379
@@ -44,7 +46,7 @@ spring:
     timeout: 15S
     jedis:
       pool:
-        max-idle: 16
+        max-idle: 32
         min-idle: 4
   cache:
     type: redis

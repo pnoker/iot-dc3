@@ -9,6 +9,8 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
+import java.io.Serializable;
+
 /**
  * @author pnoker
  */
@@ -17,7 +19,9 @@ import org.springframework.beans.BeanUtils;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class PointValueDto {
+public class PointValueDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long deviceId;
     private Long pointId;
 
