@@ -1,6 +1,7 @@
 package com.pnoker.common.sdk.config;
 
 import com.pnoker.common.constant.Common;
+import com.pnoker.common.sdk.bean.DriverProperty;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -13,11 +14,15 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
+
 /**
  * @author pnoker
  */
 @Configuration
 public class TopicRabbitConfig {
+    @Resource
+    private DriverProperty driverProperty;
 
     @Bean
     public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
@@ -46,7 +51,7 @@ public class TopicRabbitConfig {
 
     @Bean
     Binding binding() {
-        return BindingBuilder.bind(pointValueQueue()).to(exchange()).with(Common.Rabbit.POINT_VALUE_QUEUE);
+        return BindingBuilder.bind(pointValueQueue()).to(exchange()).with("key." + driverProperty.getName());
     }
 
 }

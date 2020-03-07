@@ -55,7 +55,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ![iot-dc3-architecture](dc3/images/iot-dc3-architecture2.jpg)
 
-[`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign)、[`Spring Cloud Config`](https://cloud.spring.io/spring-cloud-config)、[`Spring Cloud Bus`](https://cloud.spring.io/spring-cloud-bus) 等微服务模块。
+[`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign) 等微服务模块。
 
 ### 3 联系作者
 
@@ -65,9 +65,14 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
  - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
  - 提交`pull request`改进 `iot-dc3` 的代码；
  - 提出新想法和设计方案；
- - 参与平台贡献。
+ - 参与平台贡献,通过以下二维码加入微信交流群。
+
+<p align="center">
+<img src="./dc3/images/wechart.png" width="300"><br>
+</p>
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
+
 
 ### 4 项目文档
 

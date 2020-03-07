@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pnoker.center.manager.mapper.PointAttributeMapper;
-import com.pnoker.center.manager.service.DriverService;
 import com.pnoker.center.manager.service.PointAttributeService;
 import com.pnoker.common.bean.Pages;
 import com.pnoker.common.constant.Common;
@@ -47,8 +46,6 @@ import java.util.Optional;
 @Service
 public class PointAttributeServiceImpl implements PointAttributeService {
     @Resource
-    private DriverService driverService;
-    @Resource
     private PointAttributeMapper pointAttributeMapper;
 
     @Override
@@ -63,9 +60,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             }
     )
     public PointAttribute add(PointAttribute pointAttribute) {
-        PointAttribute select = selectByName(pointAttribute.getName());
+        PointAttribute select = selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId());
         if (null != select) {
-            throw new ServiceException("profile info already exists");
+            throw new ServiceException("profile attribute already exists");
         }
         if (pointAttributeMapper.insert(pointAttribute) > 0) {
             return pointAttributeMapper.selectById(pointAttribute.getId());
@@ -115,9 +112,10 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
-    public PointAttribute selectByName(String name) {
+    public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         queryWrapper.like(PointAttribute::getName, name);
+        queryWrapper.like(PointAttribute::getDriverId, driverId);
         return pointAttributeMapper.selectOne(queryWrapper);
     }
 

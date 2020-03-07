@@ -46,7 +46,7 @@ public class TopicRabbitConfig {
 
     @Bean
     Binding binding() {
-        return BindingBuilder.bind(pointValueQueue()).to(exchange()).with(Common.Rabbit.POINT_VALUE_QUEUE);
+        return BindingBuilder.bind(pointValueQueue()).to(exchange()).with("key.*");
     }
 
 }

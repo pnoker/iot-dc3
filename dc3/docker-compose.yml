@@ -195,6 +195,7 @@ services:
       dc3net:
         aliases:
           - dc3-rabbitmq
+
   nginx:
     image: pnoker/alpine-nginx:rtmp
     restart: always

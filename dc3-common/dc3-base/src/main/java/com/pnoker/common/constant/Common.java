@@ -58,7 +58,7 @@ public interface Common {
      */
     interface Rabbit {
         String TOPIC_EXCHANGE = "dc3.exchange";
-        String POINT_VALUE_QUEUE = "topic.point.value";
+        String POINT_VALUE_QUEUE = "point.value.queue";
     }
 
     /**

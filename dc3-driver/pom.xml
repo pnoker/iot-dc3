@@ -30,6 +30,7 @@
 
     <modules>
         <module>dc3-driver-virtual</module>
+        <module>dc3-driver-listening-virtual</module>
     </modules>
 
     <dependencies>

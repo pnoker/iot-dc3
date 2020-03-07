@@ -60,9 +60,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             }
     )
     public DriverAttribute add(DriverAttribute driverAttribute) {
-        DriverAttribute select = selectByName(driverAttribute.getName());
+        DriverAttribute select = selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId());
         if (null != select) {
-            throw new ServiceException("connect info already exists");
+            throw new ServiceException("driver attribute already exists");
         }
         if (driverAttributeMapper.insert(driverAttribute) > 0) {
             return driverAttributeMapper.selectById(driverAttribute.getId());
@@ -112,9 +112,10 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
-    public DriverAttribute selectByName(String name) {
+    public DriverAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         queryWrapper.like(DriverAttribute::getName, name);
+        queryWrapper.like(DriverAttribute::getDriverId, driverId);
         return driverAttributeMapper.selectOne(queryWrapper);
     }
 

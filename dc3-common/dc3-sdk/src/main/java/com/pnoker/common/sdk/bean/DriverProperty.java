@@ -19,7 +19,7 @@ import java.util.List;
 public class DriverProperty {
     private String name;
     private String description;
+    private ScheduleProperty schedule;
     private List<DriverAttribute> driverAttribute;
     private List<PointAttribute> pointAttribute;
-    private ScheduleProperty schedule;
 }
