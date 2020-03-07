@@ -258,20 +258,24 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @return
      */
     public boolean registerDriver() {
-        Driver tmp = new Driver(driverProperty.getName(), this.serviceName, getHost(), this.port);
-        tmp.setDescription(driverProperty.getDescription());
+        Driver driver = new Driver(driverProperty.getName(), this.serviceName, getHost(), this.port);
+        driver.setDescription(driverProperty.getDescription());
 
-        R<Driver> byServiceName = driverClient.selectByServiceName(tmp.getServiceName());
+        R<Driver> byServiceName = driverClient.selectByServiceName(driver.getServiceName());
         if (byServiceName.isOk()) {
-            tmp.setId(byServiceName.getData().getId());
-            driverContext.setDriverId(tmp.getId());
-            return driverClient.update(tmp).isOk();
+            if (!driverProperty.getName().equals(byServiceName.getData().getName())) {
+                log.error("the driver repeat({},{})", byServiceName.getData().getName(), byServiceName.getData().getServiceName());
+                return false;
+            }
+            driver.setId(byServiceName.getData().getId());
+            driverContext.setDriverId(driver.getId());
+            return driverClient.update(driver).isOk();
         } else {
             R<Driver> byHostPort = driverClient.selectByHostPort(getHost(), this.port);
             if (!byHostPort.isOk()) {
-                R<Driver> r = driverClient.add(tmp);
+                R<Driver> r = driverClient.add(driver);
                 if (r.isOk()) {
-                    driverContext.setDriverId(tmp.getId());
+                    driverContext.setDriverId(r.getData().getId());
                 }
                 return r.isOk();
             }
@@ -286,13 +290,13 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @return
      */
     public boolean registerDriverAttribute() {
-        Map<String, DriverAttribute> infoMap = new ConcurrentHashMap<>(16);
+        Map<String, DriverAttribute> attributeMap = new ConcurrentHashMap<>(16);
         DriverAttributeDto connectInfoDto = new DriverAttributeDto();
         connectInfoDto.setPage(new Pages().setSize(-1L)).setDriverId(driverContext.getDriverId());
         R<Page<DriverAttribute>> list = driverAttributeClient.list(connectInfoDto);
         if (list.isOk()) {
             for (DriverAttribute info : list.getData().getRecords()) {
-                infoMap.put(info.getName(), info);
+                attributeMap.put(info.getName(), info);
             }
         }
 
@@ -303,8 +307,8 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
         for (String name : driverAttributeMap.keySet()) {
             DriverAttribute info = driverAttributeMap.get(name).setDriverId(driverContext.getDriverId());
-            if (infoMap.containsKey(name)) {
-                info.setId(infoMap.get(name).getId());
+            if (attributeMap.containsKey(name)) {
+                info.setId(attributeMap.get(name).getId());
                 R<DriverAttribute> r = driverAttributeClient.update(info);
                 if (!r.isOk()) {
                     log.error("the driver attribute ({}) update failed", name);
@@ -319,16 +323,16 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             }
         }
 
-        for (String name : infoMap.keySet()) {
+        for (String name : attributeMap.keySet()) {
             if (!driverAttributeMap.containsKey(name)) {
                 DriverInfoDto driverInfoDto = new DriverInfoDto();
-                driverInfoDto.setPage(new Pages().setSize(-1L)).setDriverAttributeId(infoMap.get(name).getId());
+                driverInfoDto.setPage(new Pages().setSize(-1L)).setDriverAttributeId(attributeMap.get(name).getId());
                 R<Page<DriverInfo>> tmp = driverInfoClient.list(driverInfoDto);
-                if (tmp.isOk() && tmp.getData().getTotal() > 0) {
+                if (tmp.isOk() && tmp.getData().getRecords().size() > 0) {
                     log.error("the driver attribute ({}) used by driver info", name);
                     return false;
                 }
-                R<Boolean> r = driverAttributeClient.delete(infoMap.get(name).getId());
+                R<Boolean> r = driverAttributeClient.delete(attributeMap.get(name).getId());
                 if (!r.isOk()) {
                     log.error("the driver attribute ({}) delete failed", name);
                     return false;
@@ -344,32 +348,32 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @return
      */
     public boolean registerPointAttribute() {
-        Map<String, PointAttribute> infoMap = new ConcurrentHashMap<>(16);
+        Map<String, PointAttribute> attributeMap = new ConcurrentHashMap<>(16);
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setPage(new Pages().setSize(-1L)).setDriverId(driverContext.getDriverId());
         R<Page<PointAttribute>> list = pointAttributeClient.list(pointAttributeDto);
         if (list.isOk()) {
-            for (PointAttribute info : list.getData().getRecords()) {
-                infoMap.put(info.getName(), info);
+            for (PointAttribute attribute : list.getData().getRecords()) {
+                attributeMap.put(attribute.getName(), attribute);
             }
         }
 
         Map<String, PointAttribute> pointAttributeMap = new ConcurrentHashMap<>(16);
-        for (PointAttribute info : driverProperty.getPointAttribute()) {
-            pointAttributeMap.put(info.getName(), info);
+        for (PointAttribute attribute : driverProperty.getPointAttribute()) {
+            pointAttributeMap.put(attribute.getName(), attribute);
         }
 
         for (String name : pointAttributeMap.keySet()) {
-            PointAttribute info = pointAttributeMap.get(name).setDriverId(driverContext.getDriverId());
-            if (infoMap.containsKey(name)) {
-                info.setId(infoMap.get(name).getId());
-                R<PointAttribute> r = pointAttributeClient.update(info);
+            PointAttribute attribute = pointAttributeMap.get(name).setDriverId(driverContext.getDriverId());
+            if (attributeMap.containsKey(name)) {
+                attribute.setId(attributeMap.get(name).getId());
+                R<PointAttribute> r = pointAttributeClient.update(attribute);
                 if (!r.isOk()) {
                     log.error("the point attribute ({}) update failed", name);
                     return false;
                 }
             } else {
-                R<PointAttribute> r = pointAttributeClient.add(info);
+                R<PointAttribute> r = pointAttributeClient.add(attribute);
                 if (!r.isOk()) {
                     log.error("the point attribute ({}) create failed", name);
                     return false;
@@ -377,16 +381,16 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             }
         }
 
-        for (String name : infoMap.keySet()) {
+        for (String name : attributeMap.keySet()) {
             if (!pointAttributeMap.containsKey(name)) {
                 PointInfoDto pointInfoDto = new PointInfoDto();
-                pointInfoDto.setPage(new Pages().setSize(-1L)).setPointAttributeId(infoMap.get(name).getId());
+                pointInfoDto.setPage(new Pages().setSize(-1L)).setPointAttributeId(attributeMap.get(name).getId());
                 R<Page<PointInfo>> tmp = pointInfoClient.list(pointInfoDto);
-                if (tmp.isOk() && tmp.getData().getTotal() > 0) {
+                if (tmp.isOk() && tmp.getData().getRecords().size() > 0) {
                     log.error("the point attribute ({}) used by point info", name);
                     return false;
                 }
-                R<Boolean> r = pointAttributeClient.delete(infoMap.get(name).getId());
+                R<Boolean> r = pointAttributeClient.delete(attributeMap.get(name).getId());
                 if (!r.isOk()) {
                     log.error("the point attribute ({}) delete failed", name);
                     return false;

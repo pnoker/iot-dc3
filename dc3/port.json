@@ -29,7 +29,7 @@
         "redis": 2
       },
       "dc3-data": {
-        "description": "消息中心",
+        "description": "数据中心",
         "port": 8500,
         "redis": 3
       }

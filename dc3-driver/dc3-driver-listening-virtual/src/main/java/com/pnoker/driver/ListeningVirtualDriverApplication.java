@@ -14,32 +14,36 @@
  * limitations under the License.
  */
 
-package com.pnoker.common.sdk.service.rabbit;
+package com.pnoker.driver;
 
-import com.pnoker.common.bean.driver.PointValue;
-import com.pnoker.common.constant.Common;
-import com.pnoker.common.sdk.bean.DriverProperty;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.pnoker.driver.service.socket.NettyServer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cloud.client.SpringCloudApplication;
 
 import javax.annotation.Resource;
 
 /**
  * @author pnoker
  */
-@Slf4j
-@Service
-public class PointValueService {
-    @Resource
-    private DriverProperty driverProperty;
+@EnableCaching
+@SpringCloudApplication
+public class ListeningVirtualDriverApplication implements CommandLineRunner {
+    @Value("${driver.port}")
+    private Integer port;
 
     @Resource
-    private RabbitTemplate rabbitTemplate;
+    private NettyServer nettyServer;
 
-    public void pointValueSender(PointValue pointValue) {
-        log.debug("send point value,{}", pointValue);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "key." + driverProperty.getName(), pointValue);
+    public static void main(String[] args) {
+        SpringApplication.run(ListeningVirtualDriverApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        nettyServer.start(port);
     }
 }
+

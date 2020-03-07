@@ -1,0 +1,40 @@
+driver:
+  name: ListeningVirtualDriver
+  description: @project.description@
+  port: 6788
+  driver-attribute:
+    - displayName: 开发端口
+      name: devPort
+      type: int
+      value: 6270
+      description: Socket 开发端口
+    - displayName: 生产端口
+      name: proPort
+      type: int
+      value: 6280
+      description: Socket 生产端口
+  point-attribute:
+    - displayName: 分组
+      name: group
+      type: string
+      value: GROUP
+      description: 分组名称
+    - displayName: 位号
+      name: tag
+      type: string
+      value: TAG
+      description: 位号名称
+
+server:
+  port: 8700
+
+spring:
+  application:
+    name: @project.artifactId@
+
+logging:
+  level:
+    com.pnoker.common.sdk: DEBUG
+    com.pnoker: DEBUG
+  file:
+    name: dc3/logs/driver/virtual/${spring.application.name}.log
