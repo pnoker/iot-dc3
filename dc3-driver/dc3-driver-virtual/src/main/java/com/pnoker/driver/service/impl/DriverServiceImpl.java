@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-import static com.pnoker.common.sdk.util.Utils.attribute;
+import static com.pnoker.common.sdk.util.DriverUtils.attribute;
 
 /**
  * @author pnoker

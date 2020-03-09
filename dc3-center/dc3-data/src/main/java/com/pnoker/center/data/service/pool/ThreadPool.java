@@ -43,8 +43,8 @@ public class ThreadPool {
     private ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(QUEUE_CAPACITY),
             r -> {
-                Thread thread = new Thread(r, "dc3-thread-" + atomicInteger.getAndIncrement());
-                log.info("{} has been created", thread.getName());
+                Thread thread = new Thread(r, "dc3-data-thread-" + atomicInteger.getAndIncrement());
+                log.debug("{} has been created", thread.getName());
                 return thread;
             }, (r, e) -> log.error("thread pool rejected"));
 

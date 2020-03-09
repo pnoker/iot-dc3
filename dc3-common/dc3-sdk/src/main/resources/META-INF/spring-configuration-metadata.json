@@ -39,6 +39,11 @@
       "name": "driver.schedule.custom.corn",
       "type": "java.lang.String",
       "description": "device driver custom schedule corn."
+    },
+    {
+      "name": "driver.custom",
+      "type": "java.lang.String",
+      "description": "device driver custom config."
     }
   ]
 }

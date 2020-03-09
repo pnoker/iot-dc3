@@ -1,4 +1,4 @@
-package com.pnoker.driver.service.socket;
+package com.pnoker.driver.service.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

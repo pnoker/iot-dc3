@@ -25,13 +25,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 线程池
+ *
  * @author pnoker
  */
 @Slf4j
 @Component
 public class ThreadPool {
     private static int CORE_POOL_SIZE = 4;
-    private static int MAX_POOL_SIZE = 32;
+    private static int MAX_POOL_SIZE = 128;
     private static int KEEP_ALIVE_TIME = 10;
     private static int QUEUE_CAPACITY = 4096;
 
@@ -43,8 +45,8 @@ public class ThreadPool {
     private ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(QUEUE_CAPACITY),
             r -> {
-                Thread thread = new Thread(r, "dc3-thread-" + atomicInteger.getAndIncrement());
-                log.info("{} has been created", thread.getName());
+                Thread thread = new Thread(r, "dc3-driver-thread-" + atomicInteger.getAndIncrement());
+                log.debug("{} has been created", thread.getName());
                 return thread;
             }, (r, e) -> log.error("thread pool rejected"));
 

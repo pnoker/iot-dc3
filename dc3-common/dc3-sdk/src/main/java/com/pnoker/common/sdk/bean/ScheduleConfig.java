@@ -3,6 +3,8 @@ package com.pnoker.common.sdk.bean;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Pattern;
+
 /**
  * @author pnoker
  */

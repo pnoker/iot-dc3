@@ -1,7 +1,6 @@
 driver:
   name: ListeningVirtualDriver
   description: @project.description@
-  port: 6788
   driver-attribute:
     - displayName: 开发端口
       name: devPort
@@ -24,6 +23,10 @@ driver:
       type: string
       value: TAG
       description: 位号名称
+  custom:
+    socket:
+      dev-port: 6270
+      pro-port: 6280
 
 server:
   port: 8700

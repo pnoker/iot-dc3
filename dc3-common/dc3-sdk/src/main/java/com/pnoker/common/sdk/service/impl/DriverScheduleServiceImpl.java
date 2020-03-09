@@ -18,8 +18,8 @@ package com.pnoker.common.sdk.service.impl;
 
 import com.pnoker.common.sdk.bean.ScheduleProperty;
 import com.pnoker.common.sdk.service.DriverScheduleService;
-import com.pnoker.common.sdk.service.job.CustomScheduleJob;
-import com.pnoker.common.sdk.service.job.ReadScheduleJob;
+import com.pnoker.common.sdk.service.job.DriverCustomScheduleJob;
+import com.pnoker.common.sdk.service.job.DriverReadScheduleJob;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -41,10 +41,10 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     public void initial(ScheduleProperty scheduleProperty) {
         if (null != scheduleProperty) {
             if (scheduleProperty.getRead().getEnable()) {
-                createJob("ReadGroup", "ReadScheduleJob", scheduleProperty.getRead().getCorn(), ReadScheduleJob.class);
+                createJob("ReadGroup", "ReadScheduleJob", scheduleProperty.getRead().getCorn(), DriverReadScheduleJob.class);
             }
             if (scheduleProperty.getCustom().getEnable()) {
-                createJob("CustomGroup", "CustomScheduleJob", scheduleProperty.getCustom().getCorn(), CustomScheduleJob.class);
+                createJob("CustomGroup", "CustomScheduleJob", scheduleProperty.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
             if (!scheduler.isShutdown()) {
                 scheduler.start();
