@@ -16,34 +16,20 @@
 
 package com.pnoker.driver;
 
-import com.pnoker.driver.service.socket.NettyServer;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker
  */
 @EnableCaching
 @SpringCloudApplication
-public class ListeningVirtualDriverApplication implements CommandLineRunner {
-    @Value("${driver.port}")
-    private Integer port;
-
-    @Resource
-    private NettyServer nettyServer;
+public class ListeningVirtualDriverApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ListeningVirtualDriverApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        nettyServer.start(port);
-    }
 }
 

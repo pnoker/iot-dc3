@@ -32,7 +32,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-public class CustomScheduleJob extends QuartzJobBean {
+public class DriverCustomScheduleJob extends QuartzJobBean {
     @Resource
     private DriverService driverService;
 

@@ -1,10 +1,10 @@
-package com.pnoker.driver.service.socket;
+package com.pnoker.driver.service.netty;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.CharsetUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,16 +18,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void channelActive(ChannelHandlerContext context) {
-        //连接激活后，可做处理
+        log.info("channelActive:{}", context.channel().remoteAddress());
     }
 
     @Override
     @SneakyThrows
-    public void channelRead(ChannelHandlerContext context, Object data) {
-        ByteBuf byteBuf = (ByteBuf) data;
-        log.info("received:" + byteBuf.toString(CharsetUtil.UTF_8));
-        //根据消息类型回复报文数据
-        context.writeAndFlush(data);
+    public void channelRead(ChannelHandlerContext context, Object msg) {
+        ByteBuf byteBuf = (ByteBuf) msg;
+        String hexDump = ByteBufUtil.hexDump(byteBuf);
+        log.info("{}->{}", context.channel().remoteAddress(), hexDump);
     }
 
     @Override
@@ -38,7 +37,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        throwable.printStackTrace();
+        log.error("exception:{}", context.channel().remoteAddress());
         context.close();
     }
 

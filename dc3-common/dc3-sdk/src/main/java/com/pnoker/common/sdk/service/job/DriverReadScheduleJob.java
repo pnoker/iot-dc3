@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class ReadScheduleJob extends QuartzJobBean {
+public class DriverReadScheduleJob extends QuartzJobBean {
     @Resource
     private ThreadPool threadPool;
     @Resource
