@@ -1,5 +1,7 @@
 package com.pnoker.driver.service.netty;
 
+import com.pnoker.common.sdk.bean.DriverContext;
+import com.pnoker.common.sdk.service.rabbit.PointValueService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandler;
@@ -8,12 +10,18 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Resource;
+
 /**
  * @author pnoker
  */
 @Slf4j
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
+    @Resource
+    private PointValueService pointValueService;
+    @Resource
+    private DriverContext driverContext;
 
     @Override
     @SneakyThrows
@@ -31,13 +39,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     @SneakyThrows
-    public void channelReadComplete(ChannelHandlerContext context) {
-    }
-
-    @Override
-    @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.error("exception:{}", context.channel().remoteAddress());
         context.close();
     }
 
