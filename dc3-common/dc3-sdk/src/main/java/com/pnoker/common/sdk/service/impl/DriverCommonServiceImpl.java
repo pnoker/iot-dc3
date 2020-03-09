@@ -121,6 +121,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         if (r.isOk()) {
             driverContext.getDeviceIdMap().put(r.getData().getId(), r.getData());
             driverContext.getDeviceCodeMap().put(r.getData().getCode(), r.getData().getId());
+            driverContext.getDeviceNameMap().put(r.getData().getName(), r.getData().getId());
             Map<Long, Map<String, AttributeInfo>> infoMap = getPointAttributeInfoByDevice(r.getData());
             if (infoMap.size() > 0) {
                 driverContext.getPointInfoMap().put(r.getData().getId(), infoMap);
@@ -132,6 +133,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     public void deleteDevice(Long id) {
         driverContext.getDeviceIdMap().entrySet().removeIf(next -> next.getKey().equals(id));
         driverContext.getDeviceCodeMap().entrySet().removeIf(next -> next.getValue().equals(id));
+        driverContext.getDeviceNameMap().entrySet().removeIf(next -> next.getValue().equals(id));
         driverContext.getPointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
     }
 
@@ -492,6 +494,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
                 for (Device device : rp.getData().getRecords()) {
                     driverContext.getDeviceIdMap().put(device.getId(), device);
                     driverContext.getDeviceCodeMap().put(device.getCode(), device.getId());
+                    driverContext.getDeviceNameMap().put(device.getName(), device.getId());
                 }
             }
         }

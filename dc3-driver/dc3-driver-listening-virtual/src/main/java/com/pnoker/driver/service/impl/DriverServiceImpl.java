@@ -5,6 +5,7 @@ import com.pnoker.common.model.Point;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import com.pnoker.common.sdk.service.DriverService;
 import com.pnoker.common.sdk.service.pool.ThreadPool;
+import com.pnoker.common.sdk.service.rabbit.PointValueService;
 import com.pnoker.driver.service.netty.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,12 +24,10 @@ public class DriverServiceImpl implements DriverService {
     private Integer devPort;
     @Value("${driver.custom.socket.pro-port}")
     private Integer proPort;
-
-    @Resource
-    private ThreadPool threadPool;
-
     @Resource
     private NettyServer nettyServer;
+    @Resource
+    private ThreadPool threadPool;
 
     @Override
     public void initial() {
