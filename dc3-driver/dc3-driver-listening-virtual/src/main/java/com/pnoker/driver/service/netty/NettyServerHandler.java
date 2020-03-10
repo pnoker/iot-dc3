@@ -34,12 +34,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext context, Object msg) {
         ByteBuf byteBuf = (ByteBuf) msg;
         String hexDump = ByteBufUtil.hexDump(byteBuf);
-        log.info("{}->{}", context.channel().remoteAddress(), hexDump);
+        log.info("{}->{},{}", context.channel().remoteAddress(), hexDump);
     }
 
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
+        log.debug(throwable.getMessage());
         context.close();
     }
 

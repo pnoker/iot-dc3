@@ -26,7 +26,7 @@
     <artifactId>dc3-driver-virtual</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 虚拟驱动，仅用于测试用途。</description>
+    <description>IOT DC3 平台 Virtual驱动，仅用于测试用途。</description>
 
     <dependencies>
 
