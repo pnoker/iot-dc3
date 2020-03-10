@@ -5,8 +5,6 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -40,165 +38,19 @@ public class DriverUtils {
     }
 
     /**
-     * 将byte[]转成string
-     *
-     * @param bytes
-     * @param charset
-     * @return
-     */
-    public static String bytesToString(byte[] bytes, String charset) {
-        return new String(bytes, Charset.forName(charset));
-    }
-
-    /**
      * 将bcd byte[]转成string
      *
      * @param bytes
      * @return
      */
     public static String bcdToString(byte[] bytes) {
-        StringBuilder temp = new StringBuilder(bytes.length * 2);
+        StringBuilder builder = new StringBuilder(bytes.length * 2);
 
-        for (byte aByte : bytes) {
-            temp.append((byte) ((aByte & 0xf0) >>> 4));
-            temp.append((byte) (aByte & 0x0f));
+        for (byte b : bytes) {
+            builder.append((byte) ((b & 0xF0) >>> 4));
+            builder.append((byte) (b & 0x0F));
         }
-        return "0".equalsIgnoreCase(temp.toString().substring(0, 1)) ? temp.toString().substring(1) : temp.toString();
-    }
-
-    /**
-     * 将byte[]转成Ascii码
-     *
-     * @param bytes
-     * @return
-     */
-    public static String bytesToAscii(byte[] bytes) {
-        return bytesToAscii(bytes, 0, bytes.length);
-    }
-
-    /**
-     * 以小端模式将byte[]转成short
-     *
-     * @param bytes
-     * @param offset
-     * @return
-     */
-    public static short bytesToLittleShort(byte[] bytes, int offset) {
-        short value;
-        value = (short) ((bytes[offset] & 0xFF) | ((bytes[offset + 1] & 0xFF) << 8));
-        return value;
-    }
-
-    /**
-     * 以大端模式将byte[]转成short
-     *
-     * @param bytes
-     * @param offset
-     * @return
-     */
-    public static short bytesToBigShort(byte[] bytes, int offset) {
-        short value;
-        value = (short) (((bytes[offset + 1] & 0xFF) << 8) | (bytes[offset] & 0xFF));
-        return value;
-    }
-
-    /**
-     * 以小端模式将byte[]转成int
-     *
-     * @param bytes
-     * @param offset
-     * @return
-     */
-    public static int bytesToLittleInt(byte[] bytes, int offset) {
-        int value;
-        value = (bytes[offset] & 0xFF)
-                | ((bytes[offset + 1] & 0xFF) << 8)
-                | ((bytes[offset + 2] & 0xFF) << 16)
-                | ((bytes[offset + 3] & 0xFF) << 24);
-        return value;
-    }
-
-    /**
-     * 以大端模式将byte[]转成int
-     *
-     * @param bytes
-     * @param offset
-     * @return
-     */
-    public static int bytesToBigInt(byte[] bytes, int offset) {
-        int value;
-        value = ((bytes[offset] & 0xFF) << 24)
-                | ((bytes[offset + 1] & 0xFF) << 16)
-                | ((bytes[offset + 2] & 0xFF) << 8)
-                | (bytes[offset + 3] & 0xFF);
-        return value;
-    }
-
-    /**
-     * 将string转成byte[]
-     *
-     * @param value
-     * @param charset
-     * @return
-     */
-    public static byte[] stringToBytes(String value, String charset) {
-        return value.getBytes(Charset.forName(charset));
-    }
-
-    /**
-     * 以小端模式将short转成byte[]
-     *
-     * @param value
-     * @return
-     */
-    public static byte[] shortToLittleBytes(short value) {
-        byte[] src = new byte[2];
-        src[0] = (byte) (value & 0xFF);
-        src[1] = (byte) ((value >> 8) & 0xFF);
-        return src;
-    }
-
-    /**
-     * 以大端模式将short转成byte[]
-     *
-     * @param value
-     * @return
-     */
-    public static byte[] shortToBigBytes(short value) {
-        byte[] src = new byte[2];
-        src[0] = (byte) ((value >> 8) & 0xFF);
-        src[1] = (byte) (value & 0xFF);
-        return src;
-    }
-
-    /**
-     * 以小端模式将int转成byte[]
-     *
-     * @param value
-     * @return
-     */
-    public static byte[] intToLittleBytes(int value) {
-        byte[] src = new byte[4];
-        src[0] = (byte) (value & 0xFF);
-        src[1] = (byte) ((value >> 8) & 0xFF);
-        src[2] = (byte) ((value >> 16) & 0xFF);
-        src[3] = (byte) ((value >> 24) & 0xFF);
-        return src;
-    }
-
-    /**
-     * 以大端模式将int转成byte[]
-     *
-     * @param value
-     * @return
-     */
-    public static byte[] intToBigBytes(int value) {
-        byte[] src = new byte[4];
-        src[0] = (byte) ((value >> 24) & 0xFF);
-        src[1] = (byte) ((value >> 16) & 0xFF);
-        src[2] = (byte) ((value >> 8) & 0xFF);
-        src[3] = (byte) (value & 0xFF);
-        return src;
+        return "0".equalsIgnoreCase(builder.toString().substring(0, 1)) ? builder.toString().substring(1) : builder.toString();
     }
 
     /**
@@ -237,7 +89,6 @@ public class DriverUtils {
         return xor;
     }
 
-
     /**
      * 获取基本类型 Class Name
      *
@@ -266,32 +117,6 @@ public class DriverUtils {
                 break;
         }
         return className;
-    }
-
-    /**
-     * bytes 转 Ascii
-     *
-     * @param bytes
-     * @param offset
-     * @param dateLen
-     * @return
-     */
-    private static String bytesToAscii(byte[] bytes, int offset, int dateLen) {
-        if ((bytes == null) || (bytes.length == 0) || (offset < 0) || (dateLen <= 0)) {
-            return null;
-        }
-        if ((offset >= bytes.length) || (bytes.length - offset < dateLen)) {
-            return null;
-        }
-
-        String asciiStr = null;
-        byte[] data = new byte[dateLen];
-        System.arraycopy(bytes, offset, data, 0, dateLen);
-        try {
-            asciiStr = new String(data, "ISO8859-1");
-        } catch (UnsupportedEncodingException e) {
-        }
-        return asciiStr;
     }
 
 }

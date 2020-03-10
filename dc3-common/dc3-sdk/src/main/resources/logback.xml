@@ -3,6 +3,7 @@
 <configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org.springframework.boot.web.embedded.undertow" level="WARN"/>
+    <logger name="org.springframework.cloud.commons.util" level="ERROR"/>
     <logger name="org.springframework.context.support" level="WARN"/>
     <logger name="org.springframework.cloud.context" level="WARN"/>
     <logger name="org.springframework.cloud.stream" level="WARN"/>
@@ -16,7 +17,6 @@
     <logger name="org.mybatis.spring" level="WARN"/>
     <logger name="org.mongodb.driver" level="WARN"/>
     <logger name="com.zaxxer.hikari" level="WARN"/>
-    <logger name="com.ulisesbocchio" level="WARN"/>
     <logger name="io.lettuce.core" level="WARN"/>
     <logger name="io.undertow" level="ERROR"/>
     <logger name="com.netflix" level="ERROR"/>

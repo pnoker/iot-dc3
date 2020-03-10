@@ -4,10 +4,13 @@ import cn.hutool.core.util.RandomUtil;
 import com.pnoker.common.model.Device;
 import com.pnoker.common.model.Point;
 import com.pnoker.common.sdk.bean.AttributeInfo;
+import com.pnoker.common.sdk.bean.DriverContext;
 import com.pnoker.common.sdk.service.DriverService;
+import com.pnoker.common.sdk.service.rabbit.PointValueService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 import static com.pnoker.common.sdk.util.DriverUtils.attribute;
@@ -18,6 +21,10 @@ import static com.pnoker.common.sdk.util.DriverUtils.attribute;
 @Slf4j
 @Service
 public class DriverServiceImpl implements DriverService {
+    @Resource
+    private PointValueService pointValueService;
+    @Resource
+    private DriverContext driverContext;
 
     @Override
     public void initial() {

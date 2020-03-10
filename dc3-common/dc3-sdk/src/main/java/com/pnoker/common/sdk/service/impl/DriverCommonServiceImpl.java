@@ -303,8 +303,10 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         }
 
         Map<String, DriverAttribute> driverAttributeMap = new ConcurrentHashMap<>(16);
-        for (DriverAttribute info : driverProperty.getDriverAttribute()) {
-            driverAttributeMap.put(info.getName(), info);
+        if (null != driverProperty.getDriverAttribute()) {
+            for (DriverAttribute info : driverProperty.getDriverAttribute()) {
+                driverAttributeMap.put(info.getName(), info);
+            }
         }
 
         for (String name : driverAttributeMap.keySet()) {
@@ -361,8 +363,10 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         }
 
         Map<String, PointAttribute> pointAttributeMap = new ConcurrentHashMap<>(16);
-        for (PointAttribute attribute : driverProperty.getPointAttribute()) {
-            pointAttributeMap.put(attribute.getName(), attribute);
+        if (null != driverProperty.getPointAttribute()) {
+            for (PointAttribute attribute : driverProperty.getPointAttribute()) {
+                pointAttributeMap.put(attribute.getName(), attribute);
+            }
         }
 
         for (String name : pointAttributeMap.keySet()) {
@@ -486,6 +490,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     public void getDeviceMap(List<Long> profileList) {
         driverContext.setDeviceIdMap(new ConcurrentHashMap<>(16));
         driverContext.setDeviceCodeMap(new ConcurrentHashMap<>(16));
+        driverContext.setDeviceNameMap(new ConcurrentHashMap<>(16));
         for (Long profileId : profileList) {
             DeviceDto deviceDto = new DeviceDto();
             deviceDto.setPage(new Pages().setSize(-1L)).setProfileId(profileId);

@@ -1,28 +1,6 @@
 driver:
   name: ListeningVirtualDriver
   description: @project.description@
-  driver-attribute:
-    - displayName: 开发端口
-      name: devPort
-      type: int
-      value: 6270
-      description: Socket 开发端口
-    - displayName: 生产端口
-      name: proPort
-      type: int
-      value: 6280
-      description: Socket 生产端口
-  point-attribute:
-    - displayName: 分组
-      name: group
-      type: string
-      value: GROUP
-      description: 分组名称
-    - displayName: 位号
-      name: tag
-      type: string
-      value: TAG
-      description: 位号名称
   custom:
     socket:
       dev-port: 6270
