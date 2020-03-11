@@ -31,6 +31,7 @@
     <modules>
         <module>dc3-driver-virtual</module>
         <module>dc3-driver-listening-virtual</module>
+        <module>dc3-driver-plcs7</module>
     </modules>
 
     <dependencies>

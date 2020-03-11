@@ -27,12 +27,7 @@ public class DriverContext {
     /**
      * deviceId,device
      */
-    private volatile Map<Long, Device> deviceIdMap;
-
-    /**
-     * deviceCode,deviceId
-     */
-    private volatile Map<String, Long> deviceCodeMap;
+    private volatile Map<Long, Device> deviceMap;
 
     /**
      * deviceName,deviceId
@@ -42,12 +37,17 @@ public class DriverContext {
     /**
      * profileId,(pointId,point)
      */
-    private volatile Map<Long, Map<Long, Point>> pointMap;
+    private volatile Map<Long, Map<Long, Point>> profilePointMap;
 
     /**
      * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
      */
-    private volatile Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap;
+    private volatile Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap;
+
+    /**
+     * deviceId(pointName,pointId)
+     */
+    private volatile Map<Long, Map<String, Long>> devicePointNameMap;
 
     /**
      * 获取设备
@@ -56,7 +56,7 @@ public class DriverContext {
      * @return
      */
     public Device getDevice(Long deviceId) {
-        Device device = deviceIdMap.get(deviceId);
+        Device device = deviceMap.get(deviceId);
         if (null == device) {
             throw new ServiceException("device does not exist");
         }
@@ -64,42 +64,28 @@ public class DriverContext {
     }
 
     /**
-     * 通过设备 Code 获取设备
-     *
-     * @param deviceCode
-     * @return
-     */
-    public Device getDeviceByCode(String deviceCode) {
-        Device device = deviceIdMap.get(deviceCodeMap.get(deviceCode));
-        if (null == device) {
-            throw new ServiceException("device does not exist");
-        }
-        return device;
-    }
-
-    /**
-     * 通过设备 Name 获取设备
+     * 通过 Device Name 获取设备 ID
      *
      * @param deviceName
      * @return
      */
-    public Device getDeviceByName(String deviceName) {
-        Device device = deviceIdMap.get(deviceNameMap.get(deviceName));
-        if (null == device) {
+    public Long getDeviceIdByName(String deviceName) {
+        Long deviceId = deviceNameMap.get(deviceName);
+        if (null == deviceId) {
             throw new ServiceException("device does not exist");
         }
-        return device;
+        return deviceId;
     }
 
     /**
-     * 获取位号
+     * 获取设备位号
      *
-     * @param device
+     * @param deviceId
      * @param pointId
      * @return
      */
-    public Point getPoint(Device device, Long pointId) {
-        Map<Long, Point> map = pointMap.get(device.getProfileId());
+    public Point getDevicePoint(Long deviceId, Long pointId) {
+        Map<Long, Point> map = profilePointMap.get(getDevice(deviceId).getProfileId());
         if (null == map) {
             throw new ServiceException("device profile does not exist");
         }
@@ -111,34 +97,53 @@ public class DriverContext {
     }
 
     /**
-     * 获取 驱动信息
+     * 通过 Device ID & Point Name 获取位号 ID
      *
-     * @param device
+     * @param deviceId
+     * @param pointName
      * @return
      */
-    public Map<String, AttributeInfo> getDriverInfo(Device device) {
-        Map<String, AttributeInfo> infoMap = driverInfoMap.get(device.getProfileId());
+    public Long getDevicePointIdByName(Long deviceId, String pointName) {
+        Map<String, Long> map = devicePointNameMap.get(deviceId);
+        if (null == map) {
+            throw new ServiceException("device does not exist");
+        }
+        Long pointId = map.get(pointName);
+        if (null == pointId) {
+            throw new ServiceException("point does not exist");
+        }
+        return pointId;
+    }
+
+    /**
+     * 获取 驱动信息
+     *
+     * @param profileId
+     * @return
+     */
+    public Map<String, AttributeInfo> getProfileDriverInfo(Long profileId) {
+        Map<String, AttributeInfo> infoMap = driverInfoMap.get(profileId);
         if (null == infoMap) {
-            throw new ServiceException("device profile driver info does not exist");
+            throw new ServiceException("profile driver info does not exist");
         }
         return infoMap;
     }
 
     /**
-     * 获取位号信息
+     * 通过 Device Id & Point Id 获取设备位号配置信息
      *
      * @param deviceId
      * @param pointId
      * @return
      */
-    public Map<String, AttributeInfo> getPointInfo(Long deviceId, Long pointId) {
-        Map<Long, Map<String, AttributeInfo>> tmpMap = pointInfoMap.get(deviceId);
+    public Map<String, AttributeInfo> getDevicePointInfo(Long deviceId, Long pointId) {
+        Map<Long, Map<String, AttributeInfo>> tmpMap = devicePointInfoMap.get(deviceId);
         if (null == tmpMap) {
-            throw new ServiceException("device point info does not exist");
+            throw new ServiceException("device does not exist");
         }
         Map<String, AttributeInfo> infoMap = tmpMap.get(pointId);
         if (null == infoMap) {
-            throw new ServiceException("device point info does not exist");
+            throw new ServiceException("point info does not exist");
         }
         return infoMap;
     }
@@ -151,23 +156,23 @@ public class DriverContext {
         this.driverInfoMap = driverInfoMap;
     }
 
-    public synchronized void setDeviceIdMap(Map<Long, Device> deviceIdMap) {
-        this.deviceIdMap = deviceIdMap;
-    }
-
-    public synchronized void setDeviceCodeMap(Map<String, Long> deviceCodeMap) {
-        this.deviceCodeMap = deviceCodeMap;
+    public synchronized void setDeviceMap(Map<Long, Device> deviceMap) {
+        this.deviceMap = deviceMap;
     }
 
     public synchronized void setDeviceNameMap(Map<String, Long> deviceNameMap) {
         this.deviceNameMap = deviceNameMap;
     }
 
-    public synchronized void setPointMap(Map<Long, Map<Long, Point>> pointMap) {
-        this.pointMap = pointMap;
+    public synchronized void setProfilePointMap(Map<Long, Map<Long, Point>> profilePointMap) {
+        this.profilePointMap = profilePointMap;
     }
 
-    public synchronized void setPointInfoMap(Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap) {
-        this.pointInfoMap = pointInfoMap;
+    public synchronized void setDevicePointInfoMap(Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap) {
+        this.devicePointInfoMap = devicePointInfoMap;
+    }
+
+    public synchronized void setDevicePointNameMap(Map<Long, Map<String, Long>> devicePointNameMap) {
+        this.devicePointNameMap = devicePointNameMap;
     }
 }

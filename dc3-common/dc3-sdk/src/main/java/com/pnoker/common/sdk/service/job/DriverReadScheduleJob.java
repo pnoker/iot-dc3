@@ -30,7 +30,7 @@ public class DriverReadScheduleJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getPointInfoMap();
+        Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getDevicePointInfoMap();
         for (Long deviceId : pointInfoMap.keySet()) {
             for (Long pointId : pointInfoMap.get(deviceId).keySet()) {
                 threadPool.execute(() -> {

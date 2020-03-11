@@ -295,7 +295,9 @@ INSERT INTO `dc3_driver_attribute` VALUES (-2, '端口', 'port', 'string', '1860
 -- Records of dc3_point_attribute
 -- ----------------------------
 INSERT INTO `dc3_point_attribute` VALUES (-1, '位号', 'tag', 'string', 'TAG', -1, '位号Tag', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point_attribute` VALUES (-2, '分组', 'group', 'string', 'GROUP', -1, '位号Group', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-2, '关键字', 'key', 'string', '62', -2, '报文关键字', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-3, '起始字节', 'start', 'int', '0', -2, '起始字节，包含该字节', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-4, '结束字节', 'end', 'int', '8', -2, '结束字节，不包含该字节', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_profile
@@ -347,12 +349,25 @@ INSERT INTO `dc3_point_info` VALUES (-3, -1, 'clock', -1, -3, '', '2019-10-01 00
 INSERT INTO `dc3_point_info` VALUES (-4, -1, 'signal', -1, -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_info` VALUES (-5, -1, 'status', -1, -5, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_info` VALUES (-6, -1, 'label', -1, -6, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point_info` VALUES (-7, -2, 'group', -1, -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point_info` VALUES (-8, -2, 'group', -1, -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point_info` VALUES (-9, -2, 'group', -1, -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point_info` VALUES (-10, -2, 'group', -1, -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point_info` VALUES (-11, -2, 'group', -1, -5, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point_info` VALUES (-12, -2, 'group', -1, -6, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+INSERT INTO `dc3_point_info` VALUES (-7, -2, '62', -2, -7, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-8, -3, '23', -2, -7, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-9, -4, '27', -2, -7, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-10, -2, '62', -2, -8, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-11, -3, '27', -2, -8, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-12, -4, '35', -2, -8, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-13, -2, '62', -2, -9, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-14, -3, '35', -2, -9, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-15, -4, '43', -2, -9, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-16, -2, '62', -2, -10, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-17, -3, '43', -2, -10, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-18, -4, '47', -2, -10, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-19, -2, '62', -2, -11, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-20, -3, '47', -2, -11, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-21, -4, '48', -2, -11, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-22, -2, '62', -2, -12, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-23, -3, '48', -2, -12, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-24, -4, '69', -2, -12, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_user

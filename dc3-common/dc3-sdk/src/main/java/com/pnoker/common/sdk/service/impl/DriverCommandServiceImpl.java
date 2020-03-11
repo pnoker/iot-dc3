@@ -30,7 +30,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @SneakyThrows
     public PointValue read(Long deviceId, Long pointId) {
         Device device = driverContext.getDevice(deviceId);
-        String rawValue = driverService.read(driverContext.getDriverInfo(device), driverContext.getPointInfo(deviceId, pointId), device, driverContext.getPoint(device, pointId));
+        String rawValue = driverService.read(driverContext.getProfileDriverInfo(device.getProfileId()), driverContext.getDevicePointInfo(deviceId, pointId), device, driverContext.getDevicePoint(deviceId, pointId));
         PointValue pointValue = pointValueService.convertValue(deviceId, pointId, rawValue);
         pointValueService.pointValueSender(pointValue);
         return pointValue;
@@ -40,8 +40,8 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @SneakyThrows
     public Boolean write(Long deviceId, Long pointId, String value) {
         Device device = driverContext.getDevice(deviceId);
-        return driverService.write(driverContext.getDriverInfo(device), driverContext.getPointInfo(deviceId, pointId),
-                new AttributeInfo(value, driverContext.getPoint(device, pointId).getType()));
+        return driverService.write(driverContext.getProfileDriverInfo(device.getProfileId()), driverContext.getDevicePointInfo(deviceId, pointId),
+                new AttributeInfo(value, driverContext.getDevicePoint(deviceId, pointId).getType()));
     }
 
 }
