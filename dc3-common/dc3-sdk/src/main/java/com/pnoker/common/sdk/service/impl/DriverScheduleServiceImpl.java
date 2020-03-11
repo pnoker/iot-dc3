@@ -46,12 +46,22 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             if (scheduleProperty.getCustom().getEnable()) {
                 createJob("CustomGroup", "CustomScheduleJob", scheduleProperty.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
-            if (!scheduler.isShutdown()) {
-                scheduler.start();
+            if (scheduleProperty.getRead().getEnable() || scheduleProperty.getCustom().getEnable()) {
+                if (!scheduler.isShutdown()) {
+                    scheduler.start();
+                }
             }
         }
     }
 
+    /**
+     * 创建调度任务
+     *
+     * @param group
+     * @param name
+     * @param corn
+     * @param jobClass
+     */
     @SneakyThrows
     public void createJob(String group, String name, String corn, Class<? extends Job> jobClass) {
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();

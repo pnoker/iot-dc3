@@ -28,6 +28,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author pnoker
@@ -51,7 +52,7 @@ public class PointValueService {
      * @return
      */
     public PointValue convertValue(Long deviceId, Long pointId, String rawValue) {
-        return new PointValue(deviceId, pointId, rawValue, processValue(rawValue, driverContext.getPoint(driverContext.getDevice(deviceId), pointId)));
+        return new PointValue(deviceId, pointId, rawValue, processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId)));
     }
 
     /**
@@ -62,6 +63,17 @@ public class PointValueService {
     public void pointValueSender(PointValue pointValue) {
         log.debug("send point value,{}", pointValue);
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "key." + driverProperty.getName(), pointValue);
+    }
+
+    /**
+     * 批量发送位号值到消息组件
+     *
+     * @param pointValues
+     */
+    public void pointValueSender(List<PointValue> pointValues) {
+        for (PointValue pointValue : pointValues) {
+            pointValueSender(pointValue);
+        }
     }
 
     /**

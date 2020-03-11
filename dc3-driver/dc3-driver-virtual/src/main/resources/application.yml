@@ -20,11 +20,6 @@ driver:
       value: 18600
       description: 目标机器 Port
   point-attribute:
-    - displayName: 分组
-      name: group
-      type: string
-      value: GROUP
-      description: 分组名称
     - displayName: 位号
       name: tag
       type: string

@@ -3,8 +3,23 @@ driver:
   description: @project.description@
   custom:
     socket:
-      dev-port: 6270
-      pro-port: 6280
+      port: 6270
+  point-attribute:
+    - displayName: 关键字
+      name: key
+      type: string
+      value: 62
+      description: 报文关键字
+    - displayName: 起始字节
+      name: start
+      type: int
+      value: 0
+      description: 起始字节，包含该字节
+    - displayName: 结束字节
+      name: end
+      type: int
+      value: 8
+      description: 结束字节，不包含该字节
 
 server:
   port: 8700

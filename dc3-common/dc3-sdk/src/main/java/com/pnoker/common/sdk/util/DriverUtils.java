@@ -5,6 +5,7 @@ import com.pnoker.common.constant.Common;
 import com.pnoker.common.sdk.bean.AttributeInfo;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
@@ -38,19 +39,36 @@ public class DriverUtils {
     }
 
     /**
-     * 将bcd byte[]转成string
+     * 将byte[]转成十六进制字符串
      *
      * @param bytes
      * @return
      */
-    public static String bcdToString(byte[] bytes) {
-        StringBuilder builder = new StringBuilder(bytes.length * 2);
-
-        for (byte b : bytes) {
-            builder.append((byte) ((b & 0xF0) >>> 4));
-            builder.append((byte) (b & 0x0F));
+    public static String bytesToHex(byte[] bytes) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(bytes[i] & 0xFF);
+            if (hex.length() < 2) {
+                sb.append(0);
+            }
+            sb.append(hex);
         }
-        return "0".equalsIgnoreCase(builder.toString().substring(0, 1)) ? builder.toString().substring(1) : builder.toString();
+        return sb.toString();
+    }
+
+    /**
+     * 将byte[]转成Ascii码
+     *
+     * @param bytes
+     * @return
+     */
+    public static String bytesToAscii(byte[] bytes) {
+        String asciiStr = null;
+        try {
+            asciiStr = new String(bytes, "ISO8859-1");
+        } catch (UnsupportedEncodingException ignored) {
+        }
+        return asciiStr;
     }
 
     /**
