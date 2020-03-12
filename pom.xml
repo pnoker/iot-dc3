@@ -18,7 +18,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pnoker</groupId>
+    <groupId>com.github.pnoker</groupId>
     <artifactId>iot-dc3</artifactId>
     <version>3.0</version>
     <packaging>pom</packaging>
@@ -203,25 +203,25 @@
 
             <!-- dc3 Api -->
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-api-auth</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-api-manager</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-api-data</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-api-rtmp</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
@@ -229,7 +229,7 @@
 
             <!-- dc3 Driver  -->
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-sdk</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
@@ -237,19 +237,19 @@
 
             <!-- dc3 Common -->
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-core</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-config</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
-                <groupId>com.pnoker</groupId>
+                <groupId>com.github.pnoker</groupId>
                 <artifactId>dc3-base</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>

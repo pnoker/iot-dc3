@@ -20,6 +20,11 @@ driver:
       type: int
       value: 8
       description: 结束字节，不包含该字节
+    - displayName: 类型
+      name: type
+      type: string
+      value: string
+      description: 解析类型，short\int\long\float\double\boolean\string
 
 server:
   port: 8700
