@@ -1,0 +1,35 @@
+driver:
+  name: PlcS7Driver
+  description: @project.description@
+  schedule:
+    read:
+      enable: true
+      corn: '*/1 * * * * ?'
+    custom:
+      enable: false
+      corn:  '*/15 * * * * ?'
+  driver-attribute:
+    - displayName: 主机
+      name: host
+      type: string
+      value: 192.168.0.20
+      description: Ip
+    - displayName: 端口
+      name: port
+      type: int
+      value: 102
+      description: Port
+
+server:
+  port: 8601
+
+spring:
+  application:
+    name: @project.artifactId@
+
+logging:
+  level:
+    com.pnoker.common.sdk: DEBUG
+    com.pnoker: DEBUG
+  file:
+    name: dc3/logs/driver/virtual/${spring.application.name}.log

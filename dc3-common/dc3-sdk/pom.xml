@@ -18,7 +18,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.pnoker</groupId>
+        <groupId>com.github.pnoker</groupId>
         <artifactId>dc3-common</artifactId>
         <version>3.0</version>
     </parent>
@@ -48,7 +48,7 @@
 
         <!-- dc3 Api -->
         <dependency>
-            <groupId>com.pnoker</groupId>
+            <groupId>com.github.pnoker</groupId>
             <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
