@@ -90,9 +90,9 @@ public class DriverAttributeApi implements DriverAttributeClient {
     }
 
     @Override
-    public R<Page<DriverAttribute>> list(DriverAttributeDto connectInfoDto) {
+    public R<Page<DriverAttribute>> list(DriverAttributeDto driverAttributeDto) {
         try {
-            Page<DriverAttribute> page = driverAttributeService.list(connectInfoDto);
+            Page<DriverAttribute> page = driverAttributeService.list(driverAttributeDto);
             if (null != page) {
                 return R.ok(page);
             }

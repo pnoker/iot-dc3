@@ -62,7 +62,7 @@ public class DriverAttributeClientHystrix implements FallbackFactory<DriverAttri
             }
 
             @Override
-            public R<Page<DriverAttribute>> list(DriverAttributeDto connectInfoDto) {
+            public R<Page<DriverAttribute>> list(DriverAttributeDto driverAttributeDto) {
                 return R.fail(message);
             }
 

@@ -19,8 +19,8 @@ package com.github.pnoker.center.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.pnoker.center.manager.service.PointAttributeService;
 import com.github.pnoker.center.manager.mapper.PointAttributeMapper;
+import com.github.pnoker.center.manager.service.PointAttributeService;
 import com.github.pnoker.common.bean.Pages;
 import com.github.pnoker.common.constant.Common;
 import com.github.pnoker.common.dto.PointAttributeDto;
@@ -114,8 +114,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        queryWrapper.like(PointAttribute::getName, name);
-        queryWrapper.like(PointAttribute::getDriverId, driverId);
+        queryWrapper.eq(PointAttribute::getName, name);
+        queryWrapper.eq(PointAttribute::getDriverId, driverId);
         return pointAttributeMapper.selectOne(queryWrapper);
     }
 
@@ -136,13 +136,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
                 queryWrapper.like(PointAttribute::getDisplayName, dto.getDisplayName());
             }
             if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(PointAttribute::getName, dto.getName());
+                queryWrapper.eq(PointAttribute::getName, dto.getName());
             }
             if (StringUtils.isNotBlank(dto.getType())) {
-                queryWrapper.like(PointAttribute::getType, dto.getType());
+                queryWrapper.eq(PointAttribute::getType, dto.getType());
             }
             if (null != dto.getDriverId()) {
-                queryWrapper.like(PointAttribute::getDriverId, dto.getDriverId());
+                queryWrapper.eq(PointAttribute::getDriverId, dto.getDriverId());
             }
         });
         return queryWrapper;
