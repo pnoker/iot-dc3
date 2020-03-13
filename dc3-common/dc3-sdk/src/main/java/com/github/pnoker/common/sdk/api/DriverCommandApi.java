@@ -19,12 +19,18 @@ package com.github.pnoker.common.sdk.api;
 import com.github.pnoker.common.bean.R;
 import com.github.pnoker.common.bean.driver.PointValue;
 import com.github.pnoker.common.constant.Common;
+import com.github.pnoker.common.sdk.bean.CmdParameter;
 import com.github.pnoker.common.sdk.service.DriverCommandService;
+import com.github.pnoker.common.valid.Read;
+import com.github.pnoker.common.valid.ValidatableList;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 驱动操作指令 Rest Api
@@ -38,24 +44,30 @@ public class DriverCommandApi {
     @Resource
     private DriverCommandService driverCommandService;
 
+    private static final int MAX_REQUEST_SIZE = 100;
+
     /**
      * 读
      *
-     * @param deviceId
-     * @param pointId
+     * @param cmdParameters
      */
-    @GetMapping("/device/{deviceId}/point/{pointId}")
-    public R<PointValue> readPoint(@NotNull @PathVariable("deviceId") Long deviceId,
-                                   @NotNull @PathVariable("pointId") Long pointId) {
+    @PostMapping("/read")
+    public R<List<PointValue>> readPoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters) {
+        List<PointValue> pointValues = new ArrayList<>();
         try {
-            PointValue pointValue = driverCommandService.read(deviceId, pointId);
-            if (null != pointValue) {
-                return R.ok(pointValue);
+            if (cmdParameters.size() > MAX_REQUEST_SIZE) {
+                return R.fail("point request size are limited to " + MAX_REQUEST_SIZE);
+            }
+            for (CmdParameter cmdParameter : cmdParameters) {
+                PointValue pointValue = driverCommandService.read(cmdParameter.getDeviceId(), cmdParameter.getPointId());
+                if (null != pointValue) {
+                    pointValues.add(pointValue);
+                }
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+        return R.ok(pointValues);
     }
 
     /**

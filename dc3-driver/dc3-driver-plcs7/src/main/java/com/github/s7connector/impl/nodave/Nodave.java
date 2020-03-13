@@ -20,6 +20,9 @@
 
 package com.github.s7connector.impl.nodave;
 
+/**
+ * @author Thomas Rudin
+ */
 public final class Nodave {
 	public final static int MAX_RAW_LEN = 2048;
 	public final static int MPIReachable = 0x30;

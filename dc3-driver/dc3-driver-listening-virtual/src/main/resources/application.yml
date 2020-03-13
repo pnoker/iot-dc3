@@ -24,7 +24,7 @@ driver:
       name: type
       type: string
       value: string
-      description: 解析类型，short\int\long\float\double\boolean\string
+      description: 解析类型，short、int、long、float、double、boolean、string
 
 server:
   port: 8700
@@ -35,7 +35,7 @@ spring:
 
 logging:
   level:
-    com.pnoker.common.sdk: DEBUG
-    com.pnoker: DEBUG
+    com.github.pnoker.common.sdk: DEBUG
+    com.github.pnoker: DEBUG
   file:
-    name: dc3/logs/driver/virtual/${spring.application.name}.log
+    name: dc3/logs/driver/listeningVirtual/${spring.application.name}.log

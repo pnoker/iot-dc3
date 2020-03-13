@@ -13,12 +13,12 @@ driver:
       name: host
       type: string
       value: localhost
-      description: 目标机器 Ip
+      description: Ip
     - displayName: 端口
       name: port
       type: int
       value: 18600
-      description: 目标机器 Port
+      description: Port
   point-attribute:
     - displayName: 位号
       name: tag
@@ -35,7 +35,7 @@ spring:
 
 logging:
   level:
-    com.pnoker.common.sdk: DEBUG
-    com.pnoker: DEBUG
+    com.github.pnoker.common.sdk: DEBUG
+    com.github.pnoker: DEBUG
   file:
     name: dc3/logs/driver/virtual/${spring.application.name}.log

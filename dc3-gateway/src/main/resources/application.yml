@@ -49,6 +49,6 @@ spring:
 
 logging:
   level:
-    com.pnoker: DEBUG
+    com.github.pnoker: DEBUG
   file:
     name: dc3/logs/${spring.application.name}.log

@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.github.s7connector.impl.serializer;
 
+import com.github.pnoker.driver.bean.PointVariable;
 import com.github.s7connector.api.DaveArea;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
@@ -22,20 +23,24 @@ import com.github.s7connector.exception.S7Exception;
 import com.github.s7connector.impl.serializer.parser.BeanEntry;
 import com.github.s7connector.impl.serializer.parser.BeanParseResult;
 import com.github.s7connector.impl.serializer.parser.BeanParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Array;
 
 /**
  * The Class S7Serializer is responsible for serializing S7 TCP Connection
  */
+@Slf4j
 public final class S7SerializerImpl implements S7Serializer {
 
-    /**
-     * Local Logger.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(S7SerializerImpl.class);
+    public static Object extractBytes(PointVariable pointVariable, final byte[] buffer, final int byteOffset) {
+        try {
+            final BeanEntry entry = BeanParser.parse(pointVariable);
+            return entry.serializer.extract(entry.type, buffer, entry.byteOffset + byteOffset, entry.bitOffset);
+        } catch (Exception e) {
+            throw new S7Exception("extractBytes", e);
+        }
+    }
 
     /**
      * Extracts bytes from a buffer.
@@ -47,8 +52,7 @@ public final class S7SerializerImpl implements S7Serializer {
      * @return the t
      */
     public static <T> T extractBytes(final Class<T> beanClass, final byte[] buffer, final int byteOffset) {
-        logger.trace("Extracting type {} from buffer with size: {} at offset {}", beanClass.getName(), buffer.length,
-                byteOffset);
+        log.trace("Extracting type {} from buffer with size: {} at offset {}", beanClass.getName(), buffer.length, byteOffset);
 
         try {
             final T obj = beanClass.newInstance();
@@ -64,8 +68,7 @@ public final class S7SerializerImpl implements S7Serializer {
                         Array.set(value, i, component);
                     }
                 } else {
-                    value = entry.serializer.extract(entry.type, buffer, entry.byteOffset + byteOffset,
-                            entry.bitOffset);
+                    value = entry.serializer.extract(entry.type, buffer, entry.byteOffset + byteOffset, entry.bitOffset);
                 }
 
                 if (entry.field.getType() == byte[].class) {
@@ -96,7 +99,7 @@ public final class S7SerializerImpl implements S7Serializer {
      * @param byteOffset the byte offset
      */
     public static void insertBytes(final Object bean, final byte[] buffer, final int byteOffset) {
-        logger.trace("Inerting buffer with size: {} at offset {} into bean: {}", buffer.length, byteOffset, bean);
+        log.trace("Inerting buffer with size: {} at offset {} into bean: {}", buffer.length, byteOffset, bean);
 
         try {
             final BeanParseResult result = BeanParser.parse(bean);
@@ -144,8 +147,7 @@ public final class S7SerializerImpl implements S7Serializer {
      * {@inheritDoc}
      */
     @Override
-    public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset)
-            throws S7Exception {
+    public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset) throws S7Exception {
         try {
             final BeanParseResult result = BeanParser.parse(beanClass);
             final byte[] buffer = this.connector.read(DaveArea.DB, dbNum, result.blockSize, byteOffset);
@@ -159,14 +161,25 @@ public final class S7SerializerImpl implements S7Serializer {
      * {@inheritDoc}
      */
     @Override
-    public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset,
-                                       final int blockSize) throws S7Exception {
+    public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset, final int blockSize) throws S7Exception {
         try {
             final byte[] buffer = this.connector.read(DaveArea.DB, dbNum, blockSize, byteOffset);
             return extractBytes(beanClass, buffer, 0);
         } catch (final Exception e) {
-            throw new S7Exception(
-                    "dispense dbnum(" + dbNum + ") byteoffset(" + byteOffset + ") blocksize(" + blockSize + ")", e);
+            throw new S7Exception("dispense dbnum(" + dbNum + ") byteoffset(" + byteOffset + ") blocksize(" + blockSize + ")", e);
+        }
+    }
+
+    /**
+     * add by pnoker
+     */
+    @Override
+    public Object dispense(PointVariable pointVariable) throws S7Exception {
+        try {
+            final byte[] buffer = this.connector.read(DaveArea.DB, pointVariable.getDbNum(), pointVariable.getSize(), pointVariable.getByteOffset());
+            return extractBytes(pointVariable, buffer, 0);
+        } catch (final Exception e) {
+            throw new S7Exception("dispense dbnum(" + pointVariable.getDbNum() + ") byteoffset(" + pointVariable.getByteOffset() + ") blocksize(" + pointVariable.getSize() + ")", e);
         }
     }
 
@@ -179,7 +192,7 @@ public final class S7SerializerImpl implements S7Serializer {
             final BeanParseResult result = BeanParser.parse(bean);
 
             final byte[] buffer = new byte[result.blockSize];
-            logger.trace("store-buffer-size: " + buffer.length);
+            log.trace("store-buffer-size: " + buffer.length);
 
             insertBytes(bean, buffer, 0);
 

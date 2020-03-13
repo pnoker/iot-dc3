@@ -284,26 +284,38 @@ CREATE TABLE `dc3_label_bind`  (
 -- ----------------------------
 INSERT INTO `dc3_driver` VALUES (-1, 'VirtualDriver', 'dc3-driver-virtual','127.0.0.1', 8600, 'IOT DC3 平台 Virtual驱动，仅用于测试用途。', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_driver` VALUES (-2, 'ListeningVirtualDriver', 'dc3-driver-listening-virtual','127.0.0.1', 8700, 'IOT DC3 平台 Virtual驱动，监听模式，仅用于测试用途。', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver` VALUES (-3, 'PlcS7Driver', 'dc3-driver-plcs7','127.0.0.1', 8601, 'IOT DC3 平台 Plc S7 Tcp 驱动。', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_driver_attribute
 -- ----------------------------
 INSERT INTO `dc3_driver_attribute` VALUES (-1, '主机', 'host', 'string', 'localhost', -1, 'Ip', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_driver_attribute` VALUES (-2, '端口', 'port', 'string', '18600', -1, 'Port', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-2, '端口', 'port', 'int', '18600', -1, 'Port', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-3, '主机', 'host', 'string', '192.168.0.20', -3, 'Ip', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-4, '端口', 'port', 'int', '102', -3, 'Port', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_point_attribute
 -- ----------------------------
-INSERT INTO `dc3_point_attribute` VALUES (-1, '位号', 'tag', 'string', 'TAG', -1, '位号Tag', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-1, '位号', 'tag', 'string', 'TAG', -1, '位号名称', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
 INSERT INTO `dc3_point_attribute` VALUES (-2, '关键字', 'key', 'string', '62', -2, '报文关键字', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_attribute` VALUES (-3, '起始字节', 'start', 'int', '0', -2, '起始字节，包含该字节', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_attribute` VALUES (-4, '结束字节', 'end', 'int', '8', -2, '结束字节，不包含该字节', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-5, '类型', 'type', 'string', 'string', -2, '解析类型，short、int、long、float、double、boolean、string', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+INSERT INTO `dc3_point_attribute` VALUES (-6, 'DB序号', 'dbNum', 'int', '0', -3, '数据块号，从 0 开始计数', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-7, '类型', 'type', 'string', 'string', -3, '解析类型，bool、byte、int、dint、word、dword、real、date、time、datetime、string', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-8, '数据块长度', 'blockSize', 'int', '8', -3, '数据块长度', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-9, '字偏移', 'byteOffset', 'int', '0', -3, '字偏移', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-10, '位偏移', 'bitOffset', 'int', '0', -3, '位偏移', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_profile
 -- ----------------------------
 INSERT INTO `dc3_profile` VALUES (-1, 'VirtualDriverProfile', 0, -1, 'Virtual驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_profile` VALUES (-2, 'ListeningVirtualDriverProfile', 0, -2, 'ListeningVirtual驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_profile` VALUES (-3, 'PlcS7DriverProfile', 0, -3, 'PlcS7驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_driver_info
@@ -311,17 +323,22 @@ INSERT INTO `dc3_profile` VALUES (-2, 'ListeningVirtualDriverProfile', 0, -2, 'L
 INSERT INTO `dc3_driver_info` VALUES (-1, -1, '127.0.0.1', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_driver_info` VALUES (-2, -2, '8888', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
+INSERT INTO `dc3_driver_info` VALUES (-3, -3, '192.168.0.20', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_info` VALUES (-4, -4, '102', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
 -- ----------------------------
 -- Records of dc3_group
 -- ----------------------------
 INSERT INTO `dc3_group` VALUES (-1, 'VirtualDriverGroup', 'Virtual分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_group` VALUES (-2, 'ListeningVirtualDriverGroup', 'ListeningVirtual分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_group` VALUES (-3, 'PlcS7DriverGroup', 'PlcS7分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_device
 -- ----------------------------
 INSERT INTO `dc3_device` VALUES (-1, 'VirtualDevice', 'd1b60e969d3e4a26931a935e8ec62b44', 2, -1, -1, 'Virtual测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_device` VALUES (-2, 'ListeningVirtualDevice', '3e1bc62b49e964e69d31a95e8d4a2360', 2, -2, -2, 'ListeningVirtual测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_device` VALUES (-3, 'PlcS7Device', 'e1b31a953c62b49e964e69de8d4a2360', 2, -3, -3, 'PlcS7测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_point
@@ -339,6 +356,11 @@ INSERT INTO `dc3_point` VALUES (-9, '液位', 'long', 0, 0, -999999, 999999, 1, 
 INSERT INTO `dc3_point` VALUES (-10, '方向', 'int', 0, 0, -999999, 999999, 1, 0, '%.3f', '°', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point` VALUES (-11, '锁定', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point` VALUES (-12, '经纬', 'string', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+INSERT INTO `dc3_point` VALUES (-13, '设备运行状态', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-14, '生产次数', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-15, '滑块速度', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-16, '运行时长', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_point_info
@@ -368,6 +390,12 @@ INSERT INTO `dc3_point_info` VALUES (-21, -4, '48', -2, -11, '', '2019-10-01 00:
 INSERT INTO `dc3_point_info` VALUES (-22, -2, '62', -2, -12, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_info` VALUES (-23, -3, '48', -2, -12, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_info` VALUES (-24, -4, '69', -2, -12, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+INSERT INTO `dc3_point_info` VALUES (-25, -6, '0', -3, -13, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-26, -7, 'bool', -3, -13, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-27, -8, '4', -3, -13, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-28, -9, '0', -3, -13, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-29, -10, '0', -3, -13, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_user
