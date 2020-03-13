@@ -114,35 +114,35 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public DriverAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        queryWrapper.like(DriverAttribute::getName, name);
-        queryWrapper.like(DriverAttribute::getDriverId, driverId);
+        queryWrapper.eq(DriverAttribute::getName, name);
+        queryWrapper.eq(DriverAttribute::getDriverId, driverId);
         return driverAttributeMapper.selectOne(queryWrapper);
     }
 
     @Override
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Page<DriverAttribute> list(DriverAttributeDto connectInfoDto) {
-        if (!Optional.ofNullable(connectInfoDto.getPage()).isPresent()) {
-            connectInfoDto.setPage(new Pages());
+    public Page<DriverAttribute> list(DriverAttributeDto driverAttributeDto) {
+        if (!Optional.ofNullable(driverAttributeDto.getPage()).isPresent()) {
+            driverAttributeDto.setPage(new Pages());
         }
-        return driverAttributeMapper.selectPage(connectInfoDto.getPage().convert(), fuzzyQuery(connectInfoDto));
+        return driverAttributeMapper.selectPage(driverAttributeDto.getPage().convert(), fuzzyQuery(driverAttributeDto));
     }
 
     @Override
-    public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto connectInfoDto) {
+    public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        Optional.ofNullable(connectInfoDto).ifPresent(dto -> {
+        Optional.ofNullable(driverAttributeDto).ifPresent(dto -> {
             if (StringUtils.isNotBlank(dto.getDisplayName())) {
                 queryWrapper.like(DriverAttribute::getDisplayName, dto.getDisplayName());
             }
             if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(DriverAttribute::getName, dto.getName());
+                queryWrapper.eq(DriverAttribute::getName, dto.getName());
             }
             if (StringUtils.isNotBlank(dto.getType())) {
-                queryWrapper.like(DriverAttribute::getType, dto.getType());
+                queryWrapper.eq(DriverAttribute::getType, dto.getType());
             }
             if (null != dto.getDriverId()) {
-                queryWrapper.like(DriverAttribute::getDriverId, dto.getDriverId());
+                queryWrapper.eq(DriverAttribute::getDriverId, dto.getDriverId());
             }
         });
         return queryWrapper;

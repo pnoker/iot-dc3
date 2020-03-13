@@ -42,48 +42,48 @@ import javax.validation.constraints.NotNull;
 public interface DriverAttributeClient {
 
     /**
-     * 新增 ConnectInfo
+     * 新增 DriverAttribute
      *
      * @param driverAttribute
-     * @return ConnectInfo
+     * @return DriverAttribute
      */
     @PostMapping("/add")
     R<DriverAttribute> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
-     * 根据 ID 删除 ConnectInfo
+     * 根据 ID 删除 DriverAttribute
      *
-     * @param id connectInfoId
+     * @param id DriverAttributeId
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 修改 ConnectInfo
+     * 修改 DriverAttribute
      *
      * @param driverAttribute
-     * @return ConnectInfo
+     * @return DriverAttribute
      */
     @PostMapping("/update")
     R<DriverAttribute> update(@Validated(Update.class) @RequestBody DriverAttribute driverAttribute);
 
     /**
-     * 根据 ID 查询 ConnectInfo
+     * 根据 ID 查询 DriverAttribute
      *
      * @param id
-     * @return ConnectInfo
+     * @return DriverAttribute
      */
     @GetMapping("/id/{id}")
     R<DriverAttribute> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 分页查询 ConnectInfo
+     * 分页查询 DriverAttribute
      *
-     * @param connectInfoDto
-     * @return Page<ConnectInfo>
+     * @param driverAttributeDto
+     * @return Page<DriverAttribute>
      */
     @PostMapping("/list")
-    R<Page<DriverAttribute>> list(@RequestBody(required = false) DriverAttributeDto connectInfoDto);
+    R<Page<DriverAttribute>> list(@RequestBody(required = false) DriverAttributeDto driverAttributeDto);
 
 }
