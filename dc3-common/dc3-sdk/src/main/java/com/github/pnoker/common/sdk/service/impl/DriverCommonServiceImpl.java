@@ -21,6 +21,7 @@ import com.github.pnoker.api.center.manager.feign.*;
 import com.github.pnoker.common.bean.Pages;
 import com.github.pnoker.common.bean.R;
 import com.github.pnoker.common.dto.*;
+import com.github.pnoker.common.exception.ServiceException;
 import com.github.pnoker.common.model.*;
 import com.github.pnoker.common.sdk.bean.AttributeInfo;
 import com.github.pnoker.common.sdk.bean.DriverContext;
@@ -91,6 +92,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     public void initial() {
         if (!register()) {
             close();
+            throw new ServiceException("driver register failed");
         }
         loadData();
         driverService.initial();
@@ -432,6 +434,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         R<Page<DriverAttribute>> rp = driverAttributeClient.list(connectInfoDto);
         if (!rp.isOk()) {
             close();
+            throw new ServiceException(rp.getMessage());
         }
         for (DriverAttribute attribute : rp.getData().getRecords()) {
             infoMap.put(attribute.getId(), attribute);
@@ -453,6 +456,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         R<Page<PointAttribute>> rp = pointAttributeClient.list(pointAttributeDto);
         if (!rp.isOk()) {
             close();
+            throw new ServiceException(rp.getMessage());
         }
         for (PointAttribute attribute : rp.getData().getRecords()) {
             infoMap.put(attribute.getId(), attribute);
@@ -473,6 +477,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         R<Page<Profile>> rp = profileClient.list(profileDto);
         if (!rp.isOk()) {
             close();
+            throw new ServiceException(rp.getMessage());
         }
         for (Profile profile : rp.getData().getRecords()) {
             profileList.add(profile.getId());
@@ -513,6 +518,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             R<Page<Device>> rp = deviceClient.list(deviceDto);
             if (!rp.isOk()) {
                 close();
+                throw new ServiceException(rp.getMessage());
             }
             for (Device device : rp.getData().getRecords()) {
                 driverContext.getDeviceMap().put(device.getId(), device);
@@ -571,6 +577,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         R<Page<Point>> rp = pointClient.list(pointDto);
         if (!rp.isOk()) {
             close();
+            throw new ServiceException(rp.getMessage());
         }
         for (Point point : rp.getData().getRecords()) {
             pointMap.put(point.getId(), point);
@@ -606,6 +613,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         R<Page<DriverInfo>> rp = driverInfoClient.list(driverInfoDto);
         if (!rp.isOk()) {
             close();
+            throw new ServiceException(rp.getMessage());
         }
         for (DriverInfo driverInfo : rp.getData().getRecords()) {
             DriverAttribute attribute = this.driverAttributeMap.get(driverInfo.getDriverAttributeId());
@@ -629,6 +637,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             R<Page<PointInfo>> rp = pointInfoClient.list(pointInfoDto);
             if (!rp.isOk()) {
                 close();
+                throw new ServiceException(rp.getMessage());
             }
             Map<String, AttributeInfo> infoMap = new ConcurrentHashMap<>(16);
             List<PointInfo> pointInfos = rp.getData().getRecords();

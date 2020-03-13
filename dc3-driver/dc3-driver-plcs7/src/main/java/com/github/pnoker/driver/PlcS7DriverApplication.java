@@ -25,9 +25,9 @@ import org.springframework.cloud.client.SpringCloudApplication;
  */
 @EnableCaching
 @SpringCloudApplication
-public class VirtualDriverApplication {
+public class PlcS7DriverApplication {
     public static void main(String[] args) {
-        SpringApplication.run(VirtualDriverApplication.class, args);
+        SpringApplication.run(PlcS7DriverApplication.class, args);
     }
 }
 

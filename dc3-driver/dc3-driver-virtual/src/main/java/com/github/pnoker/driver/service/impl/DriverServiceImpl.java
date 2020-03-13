@@ -28,7 +28,6 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public void initial() {
-        log.info("virtual driver");
     }
 
     @Override
@@ -37,7 +36,7 @@ public class DriverServiceImpl implements DriverService {
         Integer port = attribute(driverInfo, "port");
         String tag = attribute(pointInfo, "tag");
         String value = String.valueOf(RandomUtil.randomDouble(100));
-        log.info("driverInfo:{},{},pointInfo:{},device:{}.{},point:{}.{},value:{}", host, port, tag, device.getId(), device.getName(), point.getId(), point.getName(), value);
+        log.debug("driverInfo:{},{},pointInfo:{},device:{}.{},point:{}.{},value:{}", host, port, tag, device.getId(), device.getName(), point.getId(), point.getName(), value);
         return value;
     }
 

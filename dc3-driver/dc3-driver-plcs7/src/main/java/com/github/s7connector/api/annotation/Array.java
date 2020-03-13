@@ -15,20 +15,16 @@ limitations under the License.
 */
 package com.github.s7connector.api.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Annotation for array-declaration
- * 
+ *
  * @author Thomas Rudin
  */
-@Target(value = { ElementType.FIELD })
+@Target(value = {ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Array {
-	int size();
+    int size();
 }

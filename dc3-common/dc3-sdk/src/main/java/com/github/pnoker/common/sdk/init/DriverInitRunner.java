@@ -32,11 +32,11 @@ import javax.annotation.Resource;
  */
 @Component
 @EnableFeignClients(basePackages = {
-        "com.pnoker.api.center.manager.*"
+        "com.github.pnoker.api.center.manager.*"
 })
 @ComponentScan(basePackages = {
-        "com.pnoker.api.center.manager",
-        "com.pnoker.common.sdk"
+        "com.github.pnoker.api.center.manager",
+        "com.github.pnoker.common.sdk"
 })
 public class DriverInitRunner implements ApplicationRunner {
     @Resource

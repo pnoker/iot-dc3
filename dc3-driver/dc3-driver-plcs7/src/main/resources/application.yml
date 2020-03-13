@@ -19,6 +19,32 @@ driver:
       type: int
       value: 102
       description: Port
+  point-attribute:
+    - displayName: DB序号
+      name: dbNum
+      type: int
+      value: 0
+      description: 数据块号，从 0 开始计数
+    - displayName: 字偏移
+      name: byteOffset
+      type: int
+      value: 0
+      description: 字偏移
+    - displayName: 位偏移
+      name: bitOffset
+      type: int
+      value: 0
+      description: 位偏移
+    - displayName: 数据块长度
+      name: blockSize
+      type: int
+      value: 8
+      description: 数据块长度
+    - displayName: 类型
+      name: type
+      type: string
+      value: string
+      description: 解析类型，bool、byte、int、dint、word、dword、real、date、time、datetime、string
 
 server:
   port: 8601
@@ -29,7 +55,7 @@ spring:
 
 logging:
   level:
-    com.pnoker.common.sdk: DEBUG
-    com.pnoker: DEBUG
+    com.github.pnoker.common.sdk: DEBUG
+    com.github.pnoker: DEBUG
   file:
-    name: dc3/logs/driver/virtual/${spring.application.name}.log
+    name: dc3/logs/driver/plcs7/${spring.application.name}.log

@@ -58,7 +58,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void channelActive(ChannelHandlerContext context) {
-        log.info("listener({}) accept clint({})", context.channel().localAddress(), context.channel().remoteAddress());
+        log.debug("listener({}) accept clint({})", context.channel().localAddress(), context.channel().remoteAddress());
     }
 
     @Override

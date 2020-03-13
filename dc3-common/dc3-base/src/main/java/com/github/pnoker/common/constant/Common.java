@@ -66,6 +66,7 @@ public interface Common {
      */
     interface ValueType {
         String STRING = "string";
+        String BYTE = "byte";
         String INT = "int";
         String DOUBLE = "double";
         String FLOAT = "float";

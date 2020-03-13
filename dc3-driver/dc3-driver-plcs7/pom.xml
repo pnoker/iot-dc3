@@ -26,7 +26,7 @@
     <artifactId>dc3-driver-plcs7</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Plc S7 Tcp 驱动,视具体情况开发 blocks 使用。</description>
+    <description>IOT DC3 平台 Plc S7 Tcp 驱动。</description>
 
     <dependencies>
 

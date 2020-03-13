@@ -1,8 +1,8 @@
 package com.github.pnoker.common.sdk.util;
 
 import cn.hutool.core.convert.Convert;
-import com.github.pnoker.common.sdk.bean.AttributeInfo;
 import com.github.pnoker.common.constant.Common;
+import com.github.pnoker.common.sdk.bean.AttributeInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
@@ -113,9 +113,12 @@ public class DriverUtils {
      * @param type
      * @return
      */
-    private static String getTypeClassName(String type) {
+    public static String getTypeClassName(String type) {
         String className = "java.lang.String";
         switch (type.toLowerCase()) {
+            case Common.ValueType.BYTE:
+                className = "java.lang.Byte";
+                break;
             case Common.ValueType.INT:
                 className = "java.lang.Integer";
                 break;
@@ -135,6 +138,39 @@ public class DriverUtils {
                 break;
         }
         return className;
+    }
+
+    /**
+     * 获取基本类型 Class
+     *
+     * @param type
+     * @return
+     */
+    public static Class<?> getTypeClass(String type) {
+        Class<?> classType = String.class;
+        switch (type.toLowerCase()) {
+            case Common.ValueType.BYTE:
+                classType = Byte.class;
+                break;
+            case Common.ValueType.INT:
+                classType = Integer.class;
+                break;
+            case Common.ValueType.DOUBLE:
+                classType = Double.class;
+                break;
+            case Common.ValueType.FLOAT:
+                classType = Float.class;
+                break;
+            case Common.ValueType.LONG:
+                classType = Long.class;
+                break;
+            case Common.ValueType.BOOLEAN:
+                classType = Boolean.class;
+                break;
+            default:
+                break;
+        }
+        return classType;
     }
 
 }
