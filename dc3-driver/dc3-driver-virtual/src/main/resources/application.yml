@@ -4,7 +4,7 @@ driver:
   schedule:
     read:
       enable: true
-      corn: '*/1 * * * * ?'
+      corn: '* */1 * * * ?'
     custom:
       enable: false
       corn:  '*/15 * * * * ?'

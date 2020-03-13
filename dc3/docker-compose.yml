@@ -121,20 +121,20 @@ services:
         aliases:
           - dc3-rtmp
 
-  opcua:
+  virtual:
     build:
-      context: ../dc3-transfer/dc3-opcua/
+      context: ../dc3-driver/dc3-driver-virtual/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-opcua:3.0
+    image: pnoker/dc3-driver-virtual:3.0
     restart: always
     ports:
-      - 8802:8802
-    container_name: dc3-opcua
-    hostname: dc3-opcua
+      - 8600:8600
+    container_name: dc3-driver-virtual
+    hostname: dc3-driver-virtual
     networks:
       dc3net:
         aliases:
-          - dc3-opcua
+          - dc3-driver-virtual
 
   mysql:
     build:
