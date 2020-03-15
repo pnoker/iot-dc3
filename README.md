@@ -28,7 +28,7 @@
 
 #### 1.2 DC3致力于
 
- * 跨平台分布式、多设备、多协议（目前支持`Mqtt`:hammer:、`Rtsp`、`Rtmp`、`Http`:hammer:、`Plc-S7`:hammer:、`Opc`:hammer:、`Opc-Ua`:hammer:、`自定义Tcp`:hammer:、`自定义Socket`:hammer:）;
+ * 跨平台分布式、多设备、多协议（目前支持`Mqtt`:hammer:、`Rtsp`、`Rtmp`、`Http`:hammer:、`Plc-S7`、`Opc`:hammer:、`Opc-Ua`:hammer:、`自定义Tcp`:hammer:、`自定义Socket`:hammer:）;
  * 物联驱动端代码快速开发,快速安全的接入设备和物联设备管理（目前支持`Java`）;
  * 物联设备数据采集、边缘处理、数据持久化、数据缓存、功能性微服务调用;
  * 安全权限控制、数据加密（目前支持`AES\RSA`）;
@@ -68,7 +68,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
  - 参与平台贡献,通过以下二维码加入微信交流群。
 
 <p align="center">
-<img src="./dc3/images/wechart.png" width="300"><br>
+<img src="./dc3/images/wechart.jpg" width="300"><br>
 </p>
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
