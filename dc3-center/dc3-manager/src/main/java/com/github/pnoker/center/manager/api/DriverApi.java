@@ -80,39 +80,30 @@ public class DriverApi implements DriverClient {
     public R<Driver> selectById(Long id) {
         try {
             Driver select = driverService.selectById(id);
-            if (null != select) {
-                return R.ok(select);
-            }
+            return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     @Override
     public R<Driver> selectByServiceName(String serviceName) {
         try {
             Driver select = driverService.selectByServiceName(serviceName);
-            if (null != select) {
-                return R.ok(select);
-            }
+            return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     @Override
     public R<Driver> selectByHostPort(String host, Integer port) {
         try {
             Driver select = driverService.selectByHostPort(host, port);
-            if (null != select) {
-                return R.ok(select);
-            }
+            return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     @Override
