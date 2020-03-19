@@ -279,25 +279,30 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
         R<Driver> byServiceName = driverClient.selectByServiceName(driver.getServiceName());
         if (byServiceName.isOk()) {
-            if (!driverProperty.getName().equals(byServiceName.getData().getName())) {
-                log.error("the driver repeat({},{})", byServiceName.getData().getName(), byServiceName.getData().getServiceName());
-                return false;
-            }
-            driver.setId(byServiceName.getData().getId());
-            driverContext.setDriverId(driver.getId());
-            return driverClient.update(driver).isOk();
-        } else {
-            R<Driver> byHostPort = driverClient.selectByHostPort(getHost(), this.port);
-            if (!byHostPort.isOk()) {
-                R<Driver> r = driverClient.add(driver);
-                if (r.isOk()) {
-                    driverContext.setDriverId(r.getData().getId());
+            if (null != byServiceName.getData()) {
+                if (!driverProperty.getName().equals(byServiceName.getData().getName())) {
+                    log.error("the driver repeat({},{})", byServiceName.getData().getName(), byServiceName.getData().getServiceName());
+                    return false;
                 }
-                return r.isOk();
+                driver.setId(byServiceName.getData().getId());
+                driverContext.setDriverId(driver.getId());
+                return driverClient.update(driver).isOk();
+            } else {
+                R<Driver> byHostPort = driverClient.selectByHostPort(getHost(), this.port);
+                if (byHostPort.isOk()) {
+                    if (null != byHostPort.getData()) {
+                        log.error("the port({}) is already occupied by driver({}/{})", this.port, byHostPort.getData().getName(), byHostPort.getData().getServiceName());
+                        return false;
+                    }
+                    R<Driver> r = driverClient.add(driver);
+                    if (r.isOk()) {
+                        driverContext.setDriverId(r.getData().getId());
+                    }
+                    return r.isOk();
+                }
             }
-            log.error("the port({}) is already occupied by driver({}/{})", this.port, byHostPort.getData().getName(), byHostPort.getData().getServiceName());
-            return false;
         }
+        return false;
     }
 
     /**
