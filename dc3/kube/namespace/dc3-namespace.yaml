@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    dc3.version: develop
-  name: dc3
