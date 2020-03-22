@@ -4,10 +4,10 @@ driver:
   schedule:
     read:
       enable: true
-      corn: '* */1 * * * ?'
+      corn: '0/30 * * * * ?'
     custom:
       enable: false
-      corn:  '*/15 * * * * ?'
+      corn:  '0/30 * * * * ?'
   driver-attribute:
     - displayName: 主机
       name: host

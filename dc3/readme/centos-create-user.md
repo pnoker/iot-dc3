@@ -22,6 +22,11 @@ chmod -v u+w /etc/sudoers
 
 ```bash
 vim /etc/sudoers
+# 找到一下这个地方添加一条即可 centos centos  ALL=(ALL)       ALL
+## Allow root to run any commands anywhere 
+root    ALL=(ALL)       ALL
+centos  ALL=(ALL)       ALL
+#centos  ALL=(ALL)       NOPASSWD:ALL
 ```
 
 ## 回收权限

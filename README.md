@@ -73,8 +73,23 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
 
-
 ### 4 项目文档
+
+一键启动Demo，按照以下三行命令进行操作即可，首次启动需要下载镜像会比较慢，执行完访问 [http://localhost:8000](http://localhost:8000)即可。
+<p>Web UI 仅供演示使用，切换到 '数据' 菜单即可查看 Virtual 驱动定时采集的模拟数据。
+
+> 必须保证提前安装了 `docker`和`docker-compose`
+
+```bash
+# git clone
+git clone https://github.com/pnoker/iot-dc3.git
+
+# cd
+cd iot-dc3/dc3
+
+# docker compose up
+docker-compose -f docker-compose-demo.yml up -d
+```
 
 详细内容请阅读 [`WiKi`](https://github.com/pnoker/iot-dc3/wiki) 文档。
 

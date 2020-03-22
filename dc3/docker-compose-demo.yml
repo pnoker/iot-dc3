@@ -1,0 +1,142 @@
+version: '3.3'
+
+services:
+
+  register:
+    image: pnoker/dc3-register:demo
+    restart: always
+    ports:
+      - 8100:8100
+    container_name: dc3-register
+    hostname: dc3-register
+    networks:
+      dc3net:
+        aliases:
+          - dc3-register
+
+  mysql:
+    image: pnoker/dc3-mysql:demo
+    restart: always
+    ports:
+      - 3306:3306
+    container_name: dc3-mysql
+    hostname: dc3-mysql
+    networks:
+      dc3net:
+        aliases:
+          - dc3-mysql
+
+  redis:
+    image: pnoker/dc3-redis:demo
+    restart: always
+    ports:
+      - 6379:6379
+    container_name: dc3-redis
+    hostname: dc3-redis
+    networks:
+      dc3net:
+        aliases:
+          - dc3-redis
+
+  manager:
+    image: pnoker/dc3-manager:demo
+    restart: always
+    ports:
+      - 8400:8400
+    container_name: dc3-manager
+    hostname: dc3-manager
+    networks:
+      dc3net:
+        aliases:
+          - dc3-manager
+
+  mongo:
+    image: pnoker/dc3-mongo:demo
+    restart: always
+    ports:
+      - 27017:27017
+    container_name: dc3-mongo
+    hostname: dc3-mongo
+    networks:
+      dc3net:
+        aliases:
+          - dc3-mongo
+
+  rabbitmq:
+    image: pnoker/dc3-rabbitmq:demo
+    restart: always
+    ports:
+      - 5672:5672
+      - 1883:1883
+      - 61613:61613
+      - 15672:15672
+    container_name: dc3-rabbitmq
+    hostname: dc3-rabbitmq
+    networks:
+      dc3net:
+        aliases:
+          - dc3-rabbitmq
+  monitor:
+    image: pnoker/dc3-monitor:demo
+    restart: always
+    ports:
+      - 8200:8200
+    container_name: dc3-monitor
+    hostname: dc3-monitor
+    networks:
+      dc3net:
+        aliases:
+          - dc3-monitor
+  data:
+    image: pnoker/dc3-data:demo
+    restart: always
+    ports:
+      - 8500:8500
+    container_name: dc3-data
+    hostname: dc3-data
+    networks:
+      dc3net:
+        aliases:
+          - dc3-data
+
+  auth:
+    image: pnoker/dc3-auth:demo
+    restart: always
+    ports:
+      - 8300:8300
+    container_name: dc3-auth
+    hostname: dc3-auth
+    networks:
+      dc3net:
+        aliases:
+          - dc3-auth
+
+  web:
+    image: pnoker/dc3-web:demo
+    restart: always
+    ports:
+      - 8000:80
+      - 8443:443
+    container_name: dc3-web
+    hostname: dc3-web
+    networks:
+      dc3net:
+        aliases:
+          - dc3-web
+
+  virtual:
+    image: pnoker/dc3-driver-virtual:demo
+    restart: always
+    ports:
+      - 8600:8600
+    container_name: dc3-driver-virtual
+    hostname: dc3-driver-virtual
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-virtual
+
+networks:
+  dc3net:
+    driver: 'bridge'
+...
