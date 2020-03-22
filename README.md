@@ -12,7 +12,6 @@
 	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
-
 ------
 
 ### 1 什么是DC3 IOT平台？
@@ -57,26 +56,15 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 [`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign) 等微服务模块。
 
-### 3 联系作者
+### 3 项目文档
 
-:whale2: 邮箱:pnokers@icloud.com
-
-**:mega: 非常欢迎**
- - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
- - 提交`pull request`改进 `iot-dc3` 的代码；
- - 提出新想法和设计方案；
- - 参与平台贡献,通过以下二维码加入微信交流群。
+一键启动Demo，按照以下三行命令进行操作即可，首次启动需要下载镜像会比较慢，执行完访问 [https://localhost](https://localhost:8000) `是https哈`，切换到 '数据' 菜单即可查看 Virtual 驱动定时采集的模拟数据 。
 
 <p align="center">
-<img src="./dc3/images/wechart.jpg" width="300"><br>
+<img src="./dc3/images/iot-dc3-web.png"><br>
 </p>
 
-:lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
-
-### 4 项目文档
-
-一键启动Demo，按照以下三行命令进行操作即可，首次启动需要下载镜像会比较慢，执行完访问 [https://localhost](https://localhost:8000) `是https哈` 即可。
-<p>Web UI 仅供演示使用，切换到 '数据' 菜单即可查看 Virtual 驱动定时采集的模拟数据。
+:rotating_light:Web UI 提供简单配置界面，该UIDC3项目的一部分:rotating_light:
 
 > 必须保证提前安装了 `docker`和`docker-compose`
 
@@ -97,19 +85,34 @@ docker-compose -f docker-compose-demo.yml up -d
 
 **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
+### 4 联系作者
+
+:whale2: 邮箱:pnokers@icloud.com
+
+**:mega: 非常欢迎**
+ - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
+ - 提交`pull request`改进 `iot-dc3` 的代码；
+ - 提出新想法和设计方案；
+ - 参与平台贡献,通过以下二维码加入微信交流群。
+
+<p align="center">
+<img src="./dc3/images/wechart.png" width="300"><br>
+</p>
+
+:lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
+
 ### 5 大家关心的问题
 
 - 项目目前开发到什么阶段了？
 
-> 完全情况：70% \
-> 其中: \
-> 网关服务 需要完善开发，驱动协议需要丰富（包括Mqtt,Opcua,Opcda）\
-> 管理配置服务 需要优化（接口部分做小改动）\
-> 数据存储&开放服务 需要添加流式计算模块（后期支持）\
+> 完全情况：70% 
+> 其中: 
+> 网关服务 需要完善开发，驱动协议需要丰富（包括Mqtt,Opcua,Opcda）
+> 管理配置服务 需要优化（接口部分做小改动）
+> 数据存储&开放服务 需要添加流式计算模块（后期支持）
 > 驱动快速开发SDK模块 需要拓展功能（后期支持边缘计算）
 
 - 项目目前支持的协议有哪些？
 
-> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式） \
+> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式） 
 > 计划开发协议驱动: mqtt、opcua、opcda、modbus-tcp
-
