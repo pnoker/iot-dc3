@@ -12,31 +12,21 @@
 	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
+
 ------
 
 ### 1 什么是DC3 IOT平台？
 
  ![iot-dc3-architecture](dc3/images/iot-dc3-architecture1.jpg)
 
-#### 1.1 模块
+#### DC3设计模块
 
  * 设备微服务层:用于提供标准或者私有协议连接物理设备的`SDK`;
  * 核心微服务层:用于提供微服务注册中心、设备指令接口、设备注册与关联配对、数据管理中心,是所有微服务交互的核心部分;
  * 支持微服务层:用于提供任务调度、报警与消息通知、日志管理;
  * 开放微服务层:用于提供数据开放等服务...
 
-#### 1.2 DC3致力于
-
- * 跨平台分布式、多设备、多协议（目前支持`Mqtt`:hammer:、`Rtsp`、`Rtmp`、`Http`:hammer:、`Plc-S7`、`Opc`:hammer:、`Opc-Ua`:hammer:、`自定义Tcp`:hammer:、`自定义Socket`:hammer:）;
- * 物联驱动端代码快速开发,快速安全的接入设备和物联设备管理（目前支持`Java`）;
- * 物联设备数据采集、边缘处理、数据持久化、数据缓存、功能性微服务调用;
- * 安全权限控制、数据加密（目前支持`AES\RSA`）;
- * 物联设备远程指令透传、监控和控制;
- * 对外开放数据接口及微服务接口;
- * 支持网关端和云端部署;
- * 容器化部署。
-
-#### 1.3 DC3设计为
+#### DC3设计
 
  * 可伸缩:水平可伸缩的平台,构建使用领先的`Spring Cloud`开源技术;
  * 容错:没有单点故障弱,集群中的每个节点是相同的;
@@ -105,14 +95,14 @@ docker-compose -f docker-compose-demo.yml up -d
 
 - 项目目前开发到什么阶段了？
 
-> 完全情况：70% 
-> 其中: 
-> 网关服务 需要完善开发，驱动协议需要丰富（包括Mqtt,Opcua,Opcda）
-> 管理配置服务 需要优化（接口部分做小改动）
-> 数据存储&开放服务 需要添加流式计算模块（后期支持）
+> 完全情况：70% \
+> 其中: \
+> 网关服务 需要完善开发，驱动协议需要丰富（包括Mqtt,Opcua,Opcda）\
+> 管理配置服务 需要优化（接口部分做小改动）\
+> 数据存储&开放服务 需要添加流式计算模块（后期支持）\
 > 驱动快速开发SDK模块 需要拓展功能（后期支持边缘计算）
 
 - 项目目前支持的协议有哪些？
 
-> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式） 
+> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式） \
 > 计划开发协议驱动: mqtt、opcua、opcda、modbus-tcp
