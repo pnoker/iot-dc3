@@ -75,7 +75,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 4 项目文档
 
-一键启动Demo，按照以下三行命令进行操作即可，首次启动需要下载镜像会比较慢，执行完访问 [http://localhost:8000](http://localhost:8000)即可。
+一键启动Demo，按照以下三行命令进行操作即可，首次启动需要下载镜像会比较慢，执行完访问 [https://localhost](https://localhost:8000) `是https哈` 即可。
 <p>Web UI 仅供演示使用，切换到 '数据' 菜单即可查看 Virtual 驱动定时采集的模拟数据。
 
 > 必须保证提前安装了 `docker`和`docker-compose`
