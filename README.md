@@ -54,7 +54,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 <img src="./dc3/images/iot-dc3-web.png"><br>
 </p>
 
-:rotating_light:Web UI 提供简单配置界面，该UIDC3项目的一部分:rotating_light:
+:rotating_light::rotating_light::rotating_light: DC3 Web UI 仅供开发环境&demo演示环境的配置使用，该UI不属于DC3项目的一部分 :rotating_light::rotating_light::rotating_light:
 
 > 必须保证提前安装了 `docker`和`docker-compose`
 
