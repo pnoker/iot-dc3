@@ -25,3 +25,8 @@ logging:
     com.github.pnoker: DEBUG
   file:
     name: dc3/logs/center/${spring.application.name}.log
+
+# 用于在分布式部署 driver 情况下，driver 不在 docker 中启动
+#eureka:
+#  instance:
+#    ip-address: 192.168.100.6

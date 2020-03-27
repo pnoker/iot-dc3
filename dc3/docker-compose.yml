@@ -10,6 +10,7 @@ services:
       - "9000:9000"
     command: -H unix:///var/run/docker.sock
     volumes:
+      - portainer:/data
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       dc3net:
@@ -146,6 +147,8 @@ services:
       - 3306:3306
     container_name: dc3-mysql
     hostname: dc3-mysql
+    volumes:
+      - mysql:/var/lib/mysql
     networks:
       dc3net:
         aliases:
@@ -161,6 +164,9 @@ services:
       - 27017:27017
     container_name: dc3-mongo
     hostname: dc3-mongo
+    volumes:
+      - mongo_config:/data/configdb
+      - mongo_db:/data/db
     networks:
       dc3net:
         aliases:
@@ -176,6 +182,8 @@ services:
       - 6379:6379
     container_name: dc3-redis
     hostname: dc3-redis
+    volumes:
+      - redis:/data
     networks:
       dc3net:
         aliases:
@@ -194,6 +202,8 @@ services:
       - 15672:15672
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
     networks:
       dc3net:
         aliases:
@@ -210,6 +220,14 @@ services:
       dc3net:
         aliases:
           - dc3-nginx
+
+volumes:
+  portainer:
+  mysql:
+  redis:
+  mongo_config:
+  mongo_db:
+  rabbitmq:
 
 networks:
   dc3net:
