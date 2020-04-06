@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-register
+  name: dc3-register
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-register
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-register
+    spec:
+      containers:
+        - image: pnoker/dc3-register:3.0
+          name: dc3-register
+          ports:
+            - containerPort: 8100
+      hostname: dc3-register
+      restartPolicy: Always

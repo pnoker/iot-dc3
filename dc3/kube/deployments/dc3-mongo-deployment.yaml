@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-mongo
+  name: dc3-mongo
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-mongo
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-mongo
+    spec:
+      containers:
+        - image: pnoker/dc3-mongo:3.0
+          name: dc3-mongo
+          ports:
+            - containerPort: 27017
+      hostname: dc3-mongo
+      restartPolicy: Always

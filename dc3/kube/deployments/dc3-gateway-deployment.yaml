@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-gateway
+  name: dc3-gateway
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-gateway
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-gateway
+    spec:
+      containers:
+        - image: pnoker/dc3-gateway:3.0
+          name: dc3-gateway
+          ports:
+            - containerPort: 8000
+      hostname: dc3-gateway
+      restartPolicy: Always

@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dc3-ingress
+  namespace: kube-dc3
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /register
+            backend:
+              serviceName: dc3-register
+              servicePort: 8100
+          - path: /monitor
+            backend:
+              serviceName: dc3-monitor
+              servicePort: 8200

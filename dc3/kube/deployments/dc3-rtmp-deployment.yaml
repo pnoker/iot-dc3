@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-rtmp
+  name: dc3-rtmp
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-rtmp
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-rtmp
+    spec:
+      containers:
+        - image: pnoker/dc3-rtmp:3.0
+          name: dc3-rtmp
+          ports:
+            - containerPort: 8803
+      hostname: dc3-rtmp
+      restartPolicy: Always

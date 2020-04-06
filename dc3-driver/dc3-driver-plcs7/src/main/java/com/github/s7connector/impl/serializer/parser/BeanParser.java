@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.github.s7connector.impl.serializer.parser;
 
-import com.github.pnoker.driver.bean.PointVariable;
+import com.github.pnoker.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.api.S7Serializable;
 import com.github.s7connector.api.S7Type;
 import com.github.s7connector.api.annotation.S7Variable;
@@ -52,13 +52,13 @@ public final class BeanParser {
     }
 
 
-    public static BeanEntry parse(PointVariable pointVariable) throws Exception {
+    public static BeanEntry parse(Plcs7PointVariable plcs7PointVariable) throws Exception {
         final BeanEntry entry = new BeanEntry();
-        entry.byteOffset = pointVariable.getByteOffset();
-        entry.bitOffset = pointVariable.getBitOffset();
-        entry.size = pointVariable.getSize();
-        entry.s7type = pointVariable.getType();
-        entry.type = getWrapperForPrimitiveType(pointVariable.getFieldType());
+        entry.byteOffset = plcs7PointVariable.getByteOffset();
+        entry.bitOffset = plcs7PointVariable.getBitOffset();
+        entry.size = plcs7PointVariable.getSize();
+        entry.s7type = plcs7PointVariable.getType();
+        entry.type = getWrapperForPrimitiveType(plcs7PointVariable.getFieldType());
         entry.serializer = entry.s7type.getSerializer().newInstance();
 
         return entry;

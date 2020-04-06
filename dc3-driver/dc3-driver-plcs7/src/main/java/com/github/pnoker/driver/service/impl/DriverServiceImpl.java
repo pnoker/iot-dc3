@@ -7,7 +7,7 @@ import com.github.pnoker.common.sdk.bean.AttributeInfo;
 import com.github.pnoker.common.sdk.bean.DriverContext;
 import com.github.pnoker.common.sdk.service.DriverService;
 import com.github.pnoker.common.sdk.service.rabbit.PointValueService;
-import com.github.pnoker.driver.bean.PointVariable;
+import com.github.pnoker.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
 import com.github.s7connector.api.factory.S7ConnectorFactory;
@@ -45,8 +45,8 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
-        PointVariable pointVariable = getPointVariable(pointInfo);
-        return String.valueOf(serializer.dispense(pointVariable));
+        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo);
+        return String.valueOf(serializer.dispense(plcs7PointVariable));
     }
 
     @Override
@@ -91,13 +91,13 @@ public class DriverServiceImpl implements DriverService {
      * @param pointInfo
      * @return
      */
-    private PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo) {
+    private Plcs7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo) {
         int dbNum = attribute(pointInfo, "dbNum");
         int byteOffset = attribute(pointInfo, "byteOffset");
         int bitOffset = attribute(pointInfo, "bitOffset");
         int blockSize = attribute(pointInfo, "blockSize");
         String type = attribute(pointInfo, "type");
-        return new PointVariable(dbNum, byteOffset, bitOffset, blockSize, type);
+        return new Plcs7PointVariable(dbNum, byteOffset, bitOffset, blockSize, type);
     }
 
 }

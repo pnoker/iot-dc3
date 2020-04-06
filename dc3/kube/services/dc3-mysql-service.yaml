@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-mysql
+  name: dc3-mysql
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-mysql
