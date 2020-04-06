@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-rabbitmq
+  name: dc3-rabbitmq
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "5672"
+      port: 5672
+      targetPort: 5672
+    - name: "1883"
+      port: 1883
+      targetPort: 1883
+    - name: "61613"
+      port: 61613
+      targetPort: 61613
+    - name: "15672"
+      port: 15672
+      targetPort: 15672
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-rabbitmq

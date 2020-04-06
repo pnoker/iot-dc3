@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-mysql
+  name: dc3-mysql
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-mysql
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-mysql
+    spec:
+      containers:
+        - image: pnoker/dc3-mysql:3.0
+          name: dc3-mysql
+          ports:
+            - containerPort: 3306
+      hostname: dc3-mysql
+      restartPolicy: Always

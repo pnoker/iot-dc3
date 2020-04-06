@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.github.s7connector.api;
 
-import com.github.pnoker.driver.bean.PointVariable;
+import com.github.pnoker.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.exception.S7Exception;
 
 /**
@@ -52,11 +52,11 @@ public interface S7Serializer {
     /**
      * Dispense.
      *
-     * @param pointVariable the point
+     * @param plcs7PointVariable the point
      * @return
      * @throws S7Exception the s7 exception
      */
-    Object dispense(PointVariable pointVariable) throws S7Exception;
+    Object dispense(Plcs7PointVariable plcs7PointVariable) throws S7Exception;
 
     /**
      * Stores an Object to the Datablock.

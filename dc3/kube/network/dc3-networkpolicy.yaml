@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dc3net
+  namespace: kube-dc3
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              dc3.network/dc3net: "true"
+  podSelector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"

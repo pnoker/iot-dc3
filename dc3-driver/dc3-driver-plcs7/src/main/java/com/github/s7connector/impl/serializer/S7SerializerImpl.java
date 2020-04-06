@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.github.s7connector.impl.serializer;
 
-import com.github.pnoker.driver.bean.PointVariable;
+import com.github.pnoker.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.api.DaveArea;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
@@ -33,9 +33,9 @@ import java.lang.reflect.Array;
 @Slf4j
 public final class S7SerializerImpl implements S7Serializer {
 
-    public static Object extractBytes(PointVariable pointVariable, final byte[] buffer, final int byteOffset) {
+    public static Object extractBytes(Plcs7PointVariable plcs7PointVariable, final byte[] buffer, final int byteOffset) {
         try {
-            final BeanEntry entry = BeanParser.parse(pointVariable);
+            final BeanEntry entry = BeanParser.parse(plcs7PointVariable);
             return entry.serializer.extract(entry.type, buffer, entry.byteOffset + byteOffset, entry.bitOffset);
         } catch (Exception e) {
             throw new S7Exception("extractBytes", e);
@@ -174,12 +174,12 @@ public final class S7SerializerImpl implements S7Serializer {
      * add by pnoker
      */
     @Override
-    public Object dispense(PointVariable pointVariable) throws S7Exception {
+    public Object dispense(Plcs7PointVariable plcs7PointVariable) throws S7Exception {
         try {
-            final byte[] buffer = this.connector.read(DaveArea.DB, pointVariable.getDbNum(), pointVariable.getSize(), pointVariable.getByteOffset());
-            return extractBytes(pointVariable, buffer, 0);
+            final byte[] buffer = this.connector.read(DaveArea.DB, plcs7PointVariable.getDbNum(), plcs7PointVariable.getSize(), plcs7PointVariable.getByteOffset());
+            return extractBytes(plcs7PointVariable, buffer, 0);
         } catch (final Exception e) {
-            throw new S7Exception("dispense dbnum(" + pointVariable.getDbNum() + ") byteoffset(" + pointVariable.getByteOffset() + ") blocksize(" + pointVariable.getSize() + ")", e);
+            throw new S7Exception("dispense dbnum(" + plcs7PointVariable.getDbNum() + ") byteoffset(" + plcs7PointVariable.getByteOffset() + ") blocksize(" + plcs7PointVariable.getSize() + ")", e);
         }
     }
 

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-auth
+  name: dc3-auth
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-auth
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-auth
+    spec:
+      containers:
+        - image: pnoker/dc3-auth:3.0
+          name: dc3-auth
+          ports:
+            - containerPort: 8400
+      hostname: dc3-auth
+      restartPolicy: Always
