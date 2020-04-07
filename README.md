@@ -76,6 +76,7 @@ docker-compose -f docker-compose-demo.yml up -d
 ### 4 联系作者
 
 :whale2: 邮箱:pnokers@icloud.com
+:speech_balloon: 微信:peter-no
 
 **:mega: 非常欢迎**
  - 提交`issue`，请标明遇到的问题、开发环境和如何复现；

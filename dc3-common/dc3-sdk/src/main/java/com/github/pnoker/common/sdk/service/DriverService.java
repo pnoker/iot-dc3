@@ -49,10 +49,11 @@ public interface DriverService {
      *
      * @param driverInfo
      * @param pointInfo
+     * @param device
      * @param value
      * @return
      */
-    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value);
+    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value);
 
     /**
      * 驱动本身存在定时器，用于定时采集数据和下发数据，该方法为用户自定义操作，系统根据配置定时执行

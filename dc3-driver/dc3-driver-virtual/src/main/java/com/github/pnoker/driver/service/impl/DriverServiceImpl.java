@@ -41,7 +41,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
         return false;
     }
 

@@ -140,37 +140,4 @@ public class DriverUtils {
         return className;
     }
 
-    /**
-     * 获取基本类型 Class
-     *
-     * @param type
-     * @return
-     */
-    public static Class<?> getTypeClass(String type) {
-        Class<?> classType = String.class;
-        switch (type.toLowerCase()) {
-            case Common.ValueType.BYTE:
-                classType = Byte.class;
-                break;
-            case Common.ValueType.INT:
-                classType = Integer.class;
-                break;
-            case Common.ValueType.DOUBLE:
-                classType = Double.class;
-                break;
-            case Common.ValueType.FLOAT:
-                classType = Float.class;
-                break;
-            case Common.ValueType.LONG:
-                classType = Long.class;
-                break;
-            case Common.ValueType.BOOLEAN:
-                classType = Boolean.class;
-                break;
-            default:
-                break;
-        }
-        return classType;
-    }
-
 }
