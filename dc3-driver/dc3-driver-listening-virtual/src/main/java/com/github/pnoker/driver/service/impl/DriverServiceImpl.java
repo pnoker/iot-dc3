@@ -29,7 +29,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public void initial() {
         threadPool.execute(() -> {
-            log.info("starting(::{}) incoming data listener", port);
+            log.debug("starting(::{}) incoming data listener", port);
             nettyServer.start(port);
         });
     }
@@ -40,7 +40,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
         return false;
     }
 

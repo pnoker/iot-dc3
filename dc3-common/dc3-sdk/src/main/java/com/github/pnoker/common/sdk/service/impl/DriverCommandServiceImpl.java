@@ -40,8 +40,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @SneakyThrows
     public Boolean write(Long deviceId, Long pointId, String value) {
         Device device = driverContext.getDevice(deviceId);
-        return driverService.write(driverContext.getProfileDriverInfo(device.getProfileId()), driverContext.getDevicePointInfo(deviceId, pointId),
-                new AttributeInfo(value, driverContext.getDevicePoint(deviceId, pointId).getType()));
+        return driverService.write(driverContext.getProfileDriverInfo(device.getProfileId()), driverContext.getDevicePointInfo(deviceId, pointId), device, new AttributeInfo(value, driverContext.getDevicePoint(deviceId, pointId).getType()));
     }
 
 }

@@ -50,7 +50,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
         return false;
     }
 
@@ -72,6 +72,7 @@ public class DriverServiceImpl implements DriverService {
         if (null == s7Connector) {
             String host = attribute(driverInfo, "host");
             Integer port = attribute(driverInfo, "port");
+            log.debug("connectInfo: host:{},port:{}", host, port);
             try {
                 s7Connector = S7ConnectorFactory.buildTCPConnector().withHost(host).withPort(port).build();
             } catch (Exception e) {
@@ -97,6 +98,7 @@ public class DriverServiceImpl implements DriverService {
         int bitOffset = attribute(pointInfo, "bitOffset");
         int blockSize = attribute(pointInfo, "blockSize");
         String type = attribute(pointInfo, "type");
+        log.debug("pointVariable: dbNum:{},byteOffset:{},bitOffset:{},blockSize:{},type:{}", dbNum, byteOffset, bitOffset, blockSize, type);
         return new Plcs7PointVariable(dbNum, byteOffset, bitOffset, blockSize, type);
     }
 

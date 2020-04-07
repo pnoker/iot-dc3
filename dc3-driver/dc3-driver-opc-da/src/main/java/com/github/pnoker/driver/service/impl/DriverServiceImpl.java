@@ -16,6 +16,7 @@
 
 package com.github.pnoker.driver.service.impl;
 
+import com.github.pnoker.common.constant.Common;
 import com.github.pnoker.common.model.Device;
 import com.github.pnoker.common.model.Point;
 import com.github.pnoker.common.sdk.bean.AttributeInfo;
@@ -26,6 +27,7 @@ import com.github.pnoker.driver.bean.OpcDaPointVariable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
+import org.jinterop.dcom.core.JIVariant;
 import org.openscada.opc.lib.common.AlreadyConnectedException;
 import org.openscada.opc.lib.common.ConnectionInformation;
 import org.openscada.opc.lib.da.Group;
@@ -39,6 +41,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static com.github.pnoker.common.sdk.util.DriverUtils.attribute;
+import static com.github.pnoker.common.sdk.util.DriverUtils.value;
 
 /**
  * @author pnoker
@@ -69,13 +72,20 @@ public class DriverServiceImpl implements DriverService {
         Item item = group.addItem(opcDaPointVariable.getTag());
         String value = item.read(false).getValue().getObjectAsString2();
         server.dispose();
-        log.debug("value:{}", value);
+        log.debug("read: device:{}, value:{}", device.getId(), value);
         return value;
     }
 
     @Override
     @SneakyThrows
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+        Server server = getServer(device.getId(), driverInfo);
+        OpcDaPointVariable opcDaPointVariable = getOpcDaPointVariable(pointInfo);
+        Group group = server.addGroup(opcDaPointVariable.getGroup());
+        Item item = group.addItem(opcDaPointVariable.getTag());
+        writeItem(item, value.getType(), value.getValue());
+        server.dispose();
+        log.debug("write: device:{}, value:{}", device.getId(), value);
         return false;
     }
 
@@ -84,6 +94,15 @@ public class DriverServiceImpl implements DriverService {
 
     }
 
+    /**
+     * 获取 Opc Da Server
+     *
+     * @param deviceId
+     * @param driverInfo
+     * @return
+     * @throws JIException
+     * @throws UnknownHostException
+     */
     private Server getServer(Long deviceId, Map<String, AttributeInfo> driverInfo) throws JIException, UnknownHostException {
         Server server = serverMap.get(deviceId);
         if (null == server) {
@@ -110,7 +129,7 @@ public class DriverServiceImpl implements DriverService {
         String domain = attribute(driverInfo, "domain");
         String username = attribute(driverInfo, "username");
         String password = attribute(driverInfo, "password");
-        log.debug("host:{},domain:{},username:{},password:{}", host, domain, username, password);
+        log.debug("connectInfo: host:{},domain:{},username:{},password:{}", host, domain, username, password);
 
         ConnectionInformation connectionInformation = new ConnectionInformation();
         connectionInformation.setHost(host);
@@ -130,7 +149,7 @@ public class DriverServiceImpl implements DriverService {
     private OpcDaPointVariable getOpcDaPointVariable(Map<String, AttributeInfo> pointInfo) {
         String group = attribute(pointInfo, "group");
         String tag = attribute(pointInfo, "tag");
-        log.debug("group:{},tag:{}", group, tag);
+        log.debug("pointVariable: group:{},tag:{}", group, tag);
 
         OpcDaPointVariable opcDaPointVariable = new OpcDaPointVariable();
         opcDaPointVariable.setGroup(group);
@@ -138,5 +157,43 @@ public class DriverServiceImpl implements DriverService {
         return opcDaPointVariable;
     }
 
+    /**
+     * 向 Opc Da 写数据
+     *
+     * @param item
+     * @param type
+     * @param value
+     * @throws JIException
+     */
+    private void writeItem(Item item, String type, String value) throws JIException {
+        switch (type.toLowerCase()) {
+            case Common.ValueType.BYTE:
+                byte vb = value(type, value);
+                item.write(new JIVariant(vb, false));
+                break;
+            case Common.ValueType.INT:
+                int vi = value(type, value);
+                item.write(new JIVariant(vi, false));
+                break;
+            case Common.ValueType.DOUBLE:
+                double vd = value(type, value);
+                item.write(new JIVariant(vd, false));
+                break;
+            case Common.ValueType.FLOAT:
+                float vf = value(type, value);
+                item.write(new JIVariant(vf, false));
+                break;
+            case Common.ValueType.LONG:
+                long vl = value(type, value);
+                item.write(new JIVariant(vl, false));
+                break;
+            case Common.ValueType.BOOLEAN:
+                boolean vo = value(type, value);
+                item.write(new JIVariant(vo, false));
+                break;
+            default:
+                break;
+        }
+    }
 
 }
