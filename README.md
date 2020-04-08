@@ -21,21 +21,21 @@
 
 #### DC3设计模块
 
- * 设备微服务层:用于提供标准或者私有协议连接物理设备的`SDK`;
- * 核心微服务层:用于提供微服务注册中心、设备指令接口、设备注册与关联配对、数据管理中心,是所有微服务交互的核心部分;
- * 支持微服务层:用于提供任务调度、报警与消息通知、日志管理;
- * 开放微服务层:用于提供数据开放等服务...
+ * [x] 设备微服务层:用于提供标准或者私有协议连接物理设备的`SDK`;
+ * [x] 核心微服务层:用于提供微服务注册中心、设备指令接口、设备注册与关联配对、数据管理中心,是所有微服务交互的核心部分;
+ * [ ] 支持微服务层:用于提供任务调度、报警与消息通知、日志管理;
+ * [x] 开放微服务层:用于提供数据开放等服务...
 
 #### DC3设计
 
- * 可伸缩:水平可伸缩的平台,构建使用领先的`Spring Cloud`开源技术;
- * 容错:没有单点故障弱,集群中的每个节点是相同的;
- * 健壮和高效:单一服务器节点可以处理甚至数百成千上万的设备根据用例;
- * 可定制:添加新的设备协议,并注册到服务中心;
- * 跨平台:使用`Java`环境可异地、分布式多平台部署;
- * 完善性:设备快速接入、注册、权限校验;
- * 安全:数据加密传输;
- * Docker:容器化。
+ * [x] 可伸缩:水平可伸缩的平台,构建使用领先的`Spring Cloud`开源技术;
+ * [x] 容错:没有单点故障弱,集群中的每个节点是相同的;
+ * [x] 健壮和高效:单一服务器节点可以处理甚至数百成千上万的设备根据用例;
+ * [x] 可定制:添加新的设备协议,并注册到服务中心;
+ * [x] 跨平台:使用`Java`环境可异地、分布式多平台部署;
+ * [ ] 完善性:设备快速接入、注册、权限校验;
+ * [ ] 安全:数据加密传输;
+ * [x] Docker:容器化。
 
 ### 2 DC3 IOT平台架构？
 
@@ -48,9 +48,19 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 3 项目文档
 
-一键启动Demo，按照以下三行命令进行操作即可（另外也可以参考详细的 [安装部署](https://github.com/pnoker/iot-dc3/wiki/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE) 文档），首次启动需要下载镜像会比较慢（可在`docker`中配置国内加速源:`http://f1361db2.m.daocloud.io`,如何配置加速源，可参考[如何配置镜像加速？](https://github.com/pnoker/iot-dc3/wiki/Docker%E5%8A%A0%E9%80%9F)），执行完访问 [https://localhost](https://localhost:8000) `是https哈`，切换到 '数据' 菜单即可查看 Virtual 驱动定时采集的模拟数据 。
+详细说明内容请阅读 [`WiKi`](https://github.com/pnoker/iot-dc3/wiki) 文档。
 
-**注：DC3 Web UI 仅供开发环境&demo演示环境的配置使用，该UI不属于DC3项目的一部分**
+**其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
+
+### 4 Demo [一个简单的平台应用]
+
+**注：DC3 Web UI 是基于DC3开发的前端应用界面，仅供开发环境&demo演示环境的配置使用，该UI不属于DC3项目的一部分**
+
+<p align="center">
+<img src="./dc3/images/iot-dc3-web.png"><br>
+</p>
+
+一键启动Demo，按照以下三行命令进行操作即可（另外也可以参考详细的 [安装部署](https://github.com/pnoker/iot-dc3/wiki/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE) 文档），首次启动需要下载镜像会比较慢（可在`docker`中配置国内加速源:`http://f1361db2.m.daocloud.io`,如何配置加速源，可参考[如何配置镜像加速？](https://github.com/pnoker/iot-dc3/wiki/Docker%E5%8A%A0%E9%80%9F)），执行完访问 [https://localhost](https://localhost:8000) `是https哈`，切换到 '数据' 菜单即可查看 Virtual 驱动定时采集的模拟数据 。
 
 > 必须保证提前安装了 `docker`和`docker-compose`
 
@@ -65,18 +75,13 @@ cd iot-dc3/dc3
 docker-compose -f docker-compose-demo.yml up -d
 ```
 
-<p align="center">
-<img src="./dc3/images/iot-dc3-web.png"><br>
-</p>
-
-详细说明内容请阅读 [`WiKi`](https://github.com/pnoker/iot-dc3/wiki) 文档。
-
-**其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
-
-### 4 联系作者
+### 5 联系作者
 
 :whale2: 邮箱:pnokers@icloud.com
+
 :speech_balloon: 微信:peter-no
+
+*平时工作较忙，回复不及时，请谅解*
 
 **:mega: 非常欢迎**
  - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
@@ -90,7 +95,15 @@ docker-compose -f docker-compose-demo.yml up -d
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
 
-### 5 大家关心的问题
+### 6 大家关心的问题
+
+- 版权？
+
+> Apache License Version 2.0
+
+- 合作？
+
+> pnokers@icloud.com
 
 - 项目目前开发到什么阶段了？
 
@@ -108,7 +121,7 @@ docker-compose -f docker-compose-demo.yml up -d
 
 - 并发能力如何？
 
-> 16G,i5机器可目前测试可承受5万并发（测试工具jMeter），目前Mongo数据库部分当并发很大时有较大的延时，后期采用Cassandra替代Mongo。
+> 16G,i5机器可目前测试可承受5万并发（测试工具jMeter），目前Mongo数据库当并发很大时有较大的延时，后期采用Cassandra替代Mongo。
 
 - Demo的镜像pull超时或报错？
 

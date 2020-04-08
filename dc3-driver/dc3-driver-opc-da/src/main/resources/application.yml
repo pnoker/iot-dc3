@@ -42,7 +42,7 @@ driver:
       description: 位号名称
 
 server:
-  port: 8601
+  port: 8602
 
 spring:
   application:
