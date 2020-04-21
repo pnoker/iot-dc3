@@ -1,9 +1,6 @@
-:boom: :rocket: 非常欢迎广大兴趣爱好者的加入，第一时间 [联系作者](#6-联系作者)，`show me you code`，让我们肩并肩 :alien:！
->说明：项目目前处于代码整合阶段（其他功能初版已完成，正在进行协议的整合）
->
->敬请关注，你的 <img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gray' alt='star'> :star:  [Gitee](https://gitee.com/pnoker/iot-dc3)  :star: [GitHub](https://github.com/pnoker/iot-dc3) :star:，是我们动力的源泉，谢谢你们 :tada:！
->
->:pushpin: :pushpin: 项目已正式迁移到 Gitee 上，git clone url ：https://gitee.com/pnoker/iot-dc3.git
+ :rocket: 非常欢迎广大兴趣爱好者的加入，第一时间 [联系作者](#6-联系作者)，`show me you code`，让我们肩并肩 :alien:！
+
+ :boom:   项目已正式迁移到 Gitee 上，git clone url ：https://gitee.com/pnoker/iot-dc3.git , 你的点赞是我们开发的动力！
 
 <p align="center">
     <img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
@@ -16,6 +13,7 @@
 	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
+
 ------
 
 ### 1 什么是DC3 IOT平台？
