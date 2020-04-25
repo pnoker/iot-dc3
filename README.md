@@ -50,32 +50,17 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 3 项目文档
 
-详细说明内容请阅读 [`Gitee WiKi`](https://gitee.com/pnoker/iot-dc3/wikis/Home) 或  [`Github WiKi`](https://github.com/pnoker/iot-dc3/wiki) 文档。
+> 请阅读 [`WiKi`](https://gitee.com/pnoker/iot-dc3/wikis/Home) 文档
 
 **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
-### 4 Demo [一个简单的平台应用]
+### 4 Demo 
 
-**注：DC3 Web UI 是基于DC3开发的前端应用界面，仅供开发环境&demo演示环境的配置使用，该UI不属于DC3项目的一部分**
+> 请阅读：[启动Demo演示](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201)
 
 <p align="center">
 <img src="./dc3/images/iot-dc3-web.png"><br>
 </p>
-
-一键启动Demo，按照以下三行命令进行操作即可（另外也可以参考详细的 [安装部署](https://github.com/pnoker/iot-dc3/wiki/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE) 文档），首次启动需要下载镜像会比较慢（可在`docker`中配置国内加速源:`http://f1361db2.m.daocloud.io`,如何配置加速源，可参考[如何配置镜像加速？](https://github.com/pnoker/iot-dc3/wiki/Docker%E5%8A%A0%E9%80%9F)），执行完访问 [https://localhost](https://localhost:8000) `是https哈`，切换到 '数据' 菜单即可查看 Virtual 驱动定时采集的模拟数据 。
-
-> 必须保证提前安装了 `docker`和`docker-compose`
-
-```bash
-# git clone
-git clone https://github.com/pnoker/iot-dc3.git
-
-# cd
-cd iot-dc3/dc3
-
-# docker compose up
-docker-compose -f docker-compose-demo.yml up -d
-```
 
 ### 5 联系作者
 
