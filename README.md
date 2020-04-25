@@ -1,7 +1,9 @@
  :rocket: 非常欢迎广大兴趣爱好者的加入，第一时间 [联系作者](#6-联系作者)，`show me you code`，让我们肩并肩 :alien:！
 
- :boom:   项目已正式迁移到 Gitee 上，git clone url ：https://gitee.com/pnoker/iot-dc3.git , 你的点赞是我们开发的动力！
+ :boom: 项目已正式迁移到 Gitee 上，gitee clone url ：https://gitee.com/pnoker/iot-dc3.git , 你的点赞是我们开发的动力！
 
+ :seedling: 项目Web UI 已经开源了，gitee url ： https://gitee.com/pnoker/dc3-web
+ 
 <p align="center">
     <img src="./dc3/images/iot-dc3-logo.png" width="400"><br>
     <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gray' alt='star'></a>
@@ -56,7 +58,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 4 Demo 
 
-> 请阅读：[启动Demo演示](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201)
+> 请阅读：[`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
 
 <p align="center">
 <img src="./dc3/images/iot-dc3-web.png"><br>
@@ -82,10 +84,6 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 6 大家关心的问题
 
-- 版权？
-
-> Apache License Version 2.0
-
 - 项目目前开发到什么阶段了？
 
 > 完全情况：70% \
@@ -103,7 +101,3 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 - 并发能力如何？
 
 > 16G,i5机器可目前测试可承受5万并发（测试工具jMeter），目前Mongo数据库当并发很大时有较大的延时，后期采用Cassandra替代Mongo。
-
-- Demo的镜像pull超时或报错？
-
-> 可以配置加速源，请参考 [如何配置镜像加速？](https://github.com/pnoker/iot-dc3/wiki/Docker%E5%8A%A0%E9%80%9F) 进行配置。
