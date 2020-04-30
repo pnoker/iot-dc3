@@ -14,3 +14,5 @@ jobs:
           java-version: 1.8
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+      - name: Build with Docker
+        run: cd dc3 && docker-compose build && docker-compose push
