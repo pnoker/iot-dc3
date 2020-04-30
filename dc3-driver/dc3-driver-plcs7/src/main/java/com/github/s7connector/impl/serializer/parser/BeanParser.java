@@ -15,7 +15,7 @@ limitations under the License.
 */
 package com.github.s7connector.impl.serializer.parser;
 
-import com.github.pnoker.driver.bean.Plcs7PointVariable;
+import com.dc3.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.api.S7Serializable;
 import com.github.s7connector.api.S7Type;
 import com.github.s7connector.api.annotation.S7Variable;
