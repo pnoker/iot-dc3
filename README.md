@@ -74,7 +74,11 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
  - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
  - 提交`pull request`改进 `iot-dc3` 的代码；
  - 提出新想法和设计方案；
- - 添加微信号&申请加入DC3技术微信交流群。
+ - 添加微信号&申请加入DC3技术微信交流群，或者扫码加入钉钉群。
+
+<p align="center">
+<img src="./dc3/images/wechart.png" width="300"><br>
+</p>
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
 
