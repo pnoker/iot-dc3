@@ -58,7 +58,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 4 Demo 
 
-> 请阅读：[`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
+> 请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
 
 <p align="center">
 <img src="./dc3/images/iot-dc3-web.png"><br>
@@ -68,17 +68,13 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 :whale2: 邮箱:pnokers@icloud.com
 
-:speech_balloon: 微信:peter-no
+:speech_balloon: 微信:18304071393
 
 **:mega: 非常欢迎**
  - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
  - 提交`pull request`改进 `iot-dc3` 的代码；
  - 提出新想法和设计方案；
- - 参与平台贡献,通过以下二维码加入微信交流群。
-
-<p align="center">
-<img src="./dc3/images/wechart.png" width="300"><br>
-</p>
+ - 添加微信号&申请加入DC3技术微信交流群。
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
 
