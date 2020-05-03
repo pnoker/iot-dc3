@@ -14,20 +14,20 @@ driver:
       type: string
       value: localhost
       description: Opc Da Host
-    - displayName: 域
-      name: domain
+    - displayName: CLSID
+      name: clsId
       type: string
-      value: ''
-      description: Opc Da Domain
+      value: 'F8582CF2-88FB-11D0-B850-00C0F0104305'
+      description: Opc Da Program ID
     - displayName: 用户名
       name: username
       type: string
-      value: ''
+      value: 'dc3'
       description: Opc Da UserName
     - displayName: 密码
       name: password
       type: string
-      value: ''
+      value: 'dc3dc3'
       description: Opc Da Passward
   point-attribute:
     - displayName: 分组
@@ -53,5 +53,6 @@ logging:
     com.freud.dcom.utgard.cases.*: INFO
     com.dc3.common.sdk: DEBUG
     com.dc3: DEBUG
+    org.jinterop: ERROR
   file:
     name: dc3/logs/driver/opcda/${spring.application.name}.log

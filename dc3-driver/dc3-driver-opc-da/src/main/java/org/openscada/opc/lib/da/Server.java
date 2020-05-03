@@ -112,6 +112,7 @@ public class Server {
                         this.connectionInformation.getUser(),
                         this.connectionInformation.getPassword());
                 this.session.setGlobalSocketTimeout(socketTimeout);
+                this.session.useSessionSecurity(true);
                 this.comServer = new JIComServer(
                         JIClsid.valueOf(this.connectionInformation.getClsid()),
                         this.connectionInformation.getHost(), this.session);

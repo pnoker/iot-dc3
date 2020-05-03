@@ -39,11 +39,11 @@ import javax.validation.constraints.Pattern;
 public class PointAttribute extends Description {
 
     @NotBlank(message = "display name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid display name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{0,31}$", message = "invalid display name,contains invalid characters or length is not in the range of 1~32", groups = {Insert.class, Update.class})
     private String displayName;
 
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String name;
 
     /**
