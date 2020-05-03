@@ -87,7 +87,7 @@ public interface UserClient {
     R<User> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 根据 ID 查询 User
+     * 根据 Name 查询 User
      *
      * @param name
      * @return User

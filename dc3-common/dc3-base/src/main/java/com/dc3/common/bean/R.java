@@ -35,7 +35,10 @@ public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private boolean ok = false;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message = "fail";
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 

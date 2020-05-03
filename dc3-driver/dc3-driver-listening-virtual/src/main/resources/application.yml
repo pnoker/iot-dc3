@@ -35,7 +35,7 @@ spring:
 
 logging:
   level:
-    com.github.pnoker.common.sdk: DEBUG
-    com.github.pnoker: DEBUG
+    com.dc3.common.sdk: DEBUG
+    com.dc3: DEBUG
   file:
     name: dc3/logs/driver/listeningVirtual/${spring.application.name}.log
