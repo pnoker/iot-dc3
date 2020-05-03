@@ -7,7 +7,7 @@ spring:
 
 logging:
   level:
-    com.github.pnoker: DEBUG
+    com.dc3: DEBUG
   file:
     name: dc3/logs/center/${spring.application.name}.log
 

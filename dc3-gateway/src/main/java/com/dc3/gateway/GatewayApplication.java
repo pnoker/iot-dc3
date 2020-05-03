@@ -30,13 +30,13 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableCaching
 @SpringCloudApplication
 @EnableFeignClients(basePackages = {
-        "com.github.pnoker.api.center.auth.user.*",
-        "com.github.pnoker.api.center.auth.token.*"
+        "com.dc3.api.center.auth.user.*",
+        "com.dc3.api.center.auth.token.*"
 })
 @ComponentScan(basePackages = {
-        "com.github.pnoker.api.center.auth.user",
-        "com.github.pnoker.api.center.auth.token",
-        "com.github.pnoker.gateway"
+        "com.dc3.api.center.auth.user",
+        "com.dc3.api.center.auth.token",
+        "com.dc3.gateway"
 })
 public class GatewayApplication {
 
