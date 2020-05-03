@@ -1,0 +1,112 @@
+### --------------------- User ---------------------
+### 新增 User
+#/auth/user/add
+POST http://localhost:8300/auth/user/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "dc3",
+  "password": "dc3dc3dc3",
+  "description": "平台开发者账号"
+}
+
+
+### 修改 User
+#/auth/user/update
+POST http://localhost:8300/auth/user/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "password":"dc3dc3dc3",
+  "enable": true,
+  "description": "平台开发者账号"
+}
+
+
+### 根据 ID 重置 User 密码
+#/auth/user/restPassword/:id
+POST http://localhost:8300/auth/user/restPassword/-1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+
+### 根据 ID 查询 User
+#/auth/user/id/:id
+GET http://localhost:8300/auth/user/id/-1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 Name 查询 User
+#/auth/user/name/:name
+GET http://localhost:8300/auth/user/name/pnoker
+Accept: */*
+Cache-Control: no-cache
+
+
+### 分页查询 User
+#/auth/user/list，支持name模糊查询
+POST http://localhost:8300/auth/user/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "size": 500,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 检测用户是否存在
+#/auth/user/check/:name
+GET http://localhost:8300/auth/user/check/pnoker
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 ID 删除 User
+#/auth/user/delete/:id
+POST http://localhost:8300/auth/user/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+
+### --------------------- Token ---------------------
+### 生成用户 Token 令牌
+#/auth/token
+POST http://localhost:8300/auth/token
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "pnoker",
+  "password": "dc3dc3"
+}
+
+
+### 检测用户 Token 令牌是否有效
+#/auth/token/:token
+POST http://localhost:8300/auth/token/eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1ODg0OTIyNDUsImV4cCI6MTU4ODUxMzg0NX0.0bq97QGR4oTyvlFKWMAhw2W5_lqIOg4OfKamNwwanhY
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+###
+

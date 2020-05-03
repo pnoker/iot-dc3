@@ -125,7 +125,7 @@ public class GroupServiceImpl implements GroupService {
     @Cacheable(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public Group selectByName(String name) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        queryWrapper.like(Group::getName, name);
+        queryWrapper.eq(Group::getName, name);
         return groupMapper.selectOne(queryWrapper);
     }
 

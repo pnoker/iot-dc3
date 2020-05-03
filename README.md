@@ -58,7 +58,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 ### 4 Demo 
 
-> 请阅读：[`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
+> 请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
 
 <p align="center">
 <img src="./dc3/images/iot-dc3-web.png"><br>
@@ -68,13 +68,13 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 :whale2: 邮箱:pnokers@icloud.com
 
-:speech_balloon: 微信:peter-no
+:speech_balloon: 微信:18304071393
 
 **:mega: 非常欢迎**
  - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
  - 提交`pull request`改进 `iot-dc3` 的代码；
  - 提出新想法和设计方案；
- - 参与平台贡献,通过以下二维码加入微信交流群。
+ - 添加微信号&申请加入DC3技术微信交流群，或者扫码加入钉钉群。
 
 <p align="center">
 <img src="./dc3/images/wechart.png" width="300"><br>
@@ -88,7 +88,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 > 完全情况：70% \
 > 其中: \
-> 网关服务 需要完善开发，驱动协议需要丰富（包括Mqtt,Opcua,Opcda）\
+> 网关服务 需要完善开发，驱动协议需要丰富（包括Mqtt,Opcua）\
 > 管理配置服务 需要优化（接口部分做小改动）\
 > 数据存储&开放服务 需要添加流式计算模块（后期支持）\
 > 驱动快速开发SDK模块 需要拓展功能（后期支持边缘计算）

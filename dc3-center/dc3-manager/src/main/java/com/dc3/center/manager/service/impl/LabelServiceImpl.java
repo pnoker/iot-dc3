@@ -125,7 +125,7 @@ public class LabelServiceImpl implements LabelService {
     @Cacheable(value = Common.Cache.LABEL + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public Label selectByName(String name) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        queryWrapper.like(Label::getName, name);
+        queryWrapper.eq(Label::getName, name);
         return labelMapper.selectOne(queryWrapper);
     }
 
