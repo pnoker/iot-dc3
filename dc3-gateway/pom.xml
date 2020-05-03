@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>iot-dc3</artifactId>
-        <groupId>com.github.pnoker</groupId>
+        <groupId>com.dc3</groupId>
         <version>3.0</version>
     </parent>
 
@@ -50,13 +50,13 @@
 
         <!-- dc3 Api -->
         <dependency>
-            <groupId>com.github.pnoker</groupId>
+            <groupId>com.dc3</groupId>
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
         <!-- dc3 Common Config -->
         <dependency>
-            <groupId>com.github.pnoker</groupId>
+            <groupId>com.dc3</groupId>
             <artifactId>dc3-config</artifactId>
         </dependency>
 

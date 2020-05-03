@@ -151,7 +151,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public Profile selectByName(String name) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.like(Profile::getName, name);
+        queryWrapper.eq(Profile::getName, name);
         return profileMapper.selectOne(queryWrapper);
     }
 
