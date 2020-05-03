@@ -51,7 +51,7 @@ public interface Common {
     /**
      * 默认密码
      */
-    String DEFAULT_PASSWORD = "dc3dc3";
+    String DEFAULT_PASSWORD = "dc3dc3dc3";
 
     /**
      * 消息常量
