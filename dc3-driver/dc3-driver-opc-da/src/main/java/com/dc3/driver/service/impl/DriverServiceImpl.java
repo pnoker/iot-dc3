@@ -30,13 +30,13 @@ import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIVariant;
 import org.openscada.opc.lib.common.AlreadyConnectedException;
 import org.openscada.opc.lib.common.ConnectionInformation;
-import org.openscada.opc.lib.da.Group;
-import org.openscada.opc.lib.da.Item;
-import org.openscada.opc.lib.da.Server;
+import org.openscada.opc.lib.common.NotConnectedException;
+import org.openscada.opc.lib.da.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
@@ -57,7 +57,7 @@ public class DriverServiceImpl implements DriverService {
     /**
      * Opc Da Server Map
      */
-    private volatile Map<Long, Server> serverMap;
+    private volatile Map<Long, Server> serverMap = new HashMap<>(64);
 
     @Override
     public void initial() {
@@ -70,7 +70,7 @@ public class DriverServiceImpl implements DriverService {
         OpcDaPointVariable opcDaPointVariable = getOpcDaPointVariable(pointInfo);
         Group group = server.addGroup(opcDaPointVariable.getGroup());
         Item item = group.addItem(opcDaPointVariable.getTag());
-        String value = item.read(false).getValue().getObjectAsString2();
+        String value = item.read(false).getValue().getObject().toString();
         server.dispose();
         log.debug("read: device:{}, value:{}", device.getId(), value);
         return value;
@@ -126,17 +126,16 @@ public class DriverServiceImpl implements DriverService {
      */
     private ConnectionInformation getConnectionInformation(Map<String, AttributeInfo> driverInfo) {
         String host = attribute(driverInfo, "host");
-        String domain = attribute(driverInfo, "domain");
+        String clsId = attribute(driverInfo, "clsId");
         String username = attribute(driverInfo, "username");
         String password = attribute(driverInfo, "password");
-        log.debug("connectInfo: host:{},domain:{},username:{},password:{}", host, domain, username, password);
+        log.debug("connectInfo: host:{},proId:{},username:{},password:{}", host, clsId, username, password);
 
         ConnectionInformation connectionInformation = new ConnectionInformation();
         connectionInformation.setHost(host);
-        connectionInformation.setDomain(domain);
+        connectionInformation.setClsid(clsId);
         connectionInformation.setUser(username);
         connectionInformation.setPassword(password);
-        connectionInformation.setClsid("F8582CF2-88FB-11D0-B850-00C0F0104305");
         return connectionInformation;
     }
 
@@ -195,5 +194,41 @@ public class DriverServiceImpl implements DriverService {
                 break;
         }
     }
+
+
+    /*public static void main(String[] args) {
+        // create connection information
+        final ConnectionInformation ci = new ConnectionInformation();
+        ci.setHost("localhost");
+        ci.setUser("pnoke");
+        ci.setPassword("abcd4455563");
+        //ci.setProgId("Matrikon.OPC.Simulation.1");
+       ci.setClsid("F8582CF2-88FB-11D0-B850-00C0F0104305"); // if ProgId is not working, try it using the Clsid instead
+        // create a new server
+        final Server server = new Server(ci, Executors.newSingleThreadScheduledExecutor());
+
+        try {
+            // connect to server
+            server.connect();
+
+            Group group = server.addGroup("dc3");
+            Item item = group.addItem("Random.Int4");
+            int value = item.read(false).getValue().getObjectAsInt();
+            log.info(String.valueOf(value));
+        } catch (final JIException e) {
+            System.out.println(String.format("%08X: %s", e.getErrorCode(), server.getErrorMessage(e.getErrorCode())));
+            e.printStackTrace();
+        } catch (AlreadyConnectedException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (AddFailedException e) {
+            e.printStackTrace();
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
+        } catch (DuplicateGroupException e) {
+            e.printStackTrace();
+        }
+    }*/
 
 }
