@@ -19,6 +19,7 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.dcom.common.*;
 import org.openscada.opc.dcom.da.*;
@@ -26,14 +27,12 @@ import org.openscada.opc.dcom.da.impl.OPCAsyncIO2;
 import org.openscada.opc.dcom.da.impl.OPCGroupStateMgt;
 import org.openscada.opc.dcom.da.impl.OPCItemMgt;
 import org.openscada.opc.dcom.da.impl.OPCSyncIO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
 import java.util.*;
 
+@Slf4j
 public class Group {
-    private static Logger _log = LoggerFactory.getLogger(Group.class);
 
     private static Random _random = new Random();
 
@@ -54,7 +53,7 @@ public class Group {
     private final Map<Integer, Item> _itemClientMap = new HashMap<Integer, Item>();
 
     Group(final Server server, final int serverHandle, final OPCGroupStateMgt group) throws IllegalArgumentException, UnknownHostException, JIException {
-        _log.debug("Creating new group instance with COM group " + group);
+        log.debug("Creating new group instance with COM group " + group);
         this._server = server;
         this._serverHandle = serverHandle;
         this._group = group;
@@ -208,7 +207,7 @@ public class Group {
     }
 
     private synchronized void addItem(final Item item) {
-        _log.debug(String.format("Adding item: '%s', %d", item.getId(), item.getServerHandle()));
+        log.debug(String.format("Adding item: '%s', %d", item.getId(), item.getServerHandle()));
 
         this._itemHandleMap.put(item.getId(), item.getServerHandle());
         this._itemMap.put(item.getServerHandle(), item);
@@ -224,10 +223,10 @@ public class Group {
     protected Item getItemByOPCItemId(final String opcItemId) {
         Integer serverHandle = this._itemHandleMap.get(opcItemId);
         if (serverHandle == null) {
-            _log.debug(String.format("Failed to locate item with id '%s'", opcItemId));
+            log.debug(String.format("Failed to locate item with id '%s'", opcItemId));
             return null;
         }
-        _log.debug(String.format("Item '%s' has server id '%d'", opcItemId, serverHandle));
+        log.debug(String.format("Item '%s' has server id '%d'", opcItemId, serverHandle));
         return this._itemMap.get(serverHandle);
     }
 
@@ -355,14 +354,14 @@ public class Group {
     }
 
     public synchronized void removeItem(final String opcItemId) throws IllegalArgumentException, UnknownHostException, JIException {
-        _log.debug(String.format("Removing item '%s'", opcItemId));
+        log.debug(String.format("Removing item '%s'", opcItemId));
         Item item = getItemByOPCItemId(opcItemId);
         if (item != null) {
             this._group.getItemManagement().remove(item.getServerHandle());
             removeItem(item);
-            _log.debug(String.format("Removed item '%s'", opcItemId));
+            log.debug(String.format("Removed item '%s'", opcItemId));
         } else {
-            _log.warn(String.format("Unable to find item '%s'", opcItemId));
+            log.warn(String.format("Unable to find item '%s'", opcItemId));
         }
     }
 

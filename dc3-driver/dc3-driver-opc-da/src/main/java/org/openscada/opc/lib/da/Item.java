@@ -19,13 +19,12 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIVariant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class Item {
-    private static Logger _log = LoggerFactory.getLogger(Item.class);
 
     private Group _group = null;
 
@@ -37,7 +36,7 @@ public class Item {
 
     Item(final Group group, final int serverHandle, final int clientHandle, final String id) {
         super();
-        _log.debug(String.format("Adding new item '%s' (0x%08X) for group %s", id, serverHandle, group.toString()));
+        log.debug(String.format("Adding new item '%s' (0x%08X) for group %s", id, serverHandle, group.toString()));
         this._group = group;
         this._serverHandle = serverHandle;
         this._clientHandle = clientHandle;

@@ -19,18 +19,17 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openscada.opc.dcom.da.OPCSERVERSTATUS;
 import org.openscada.opc.dcom.da.impl.OPCServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A server state operation which can be interruped
  *
  * @author Jens Reimann
  */
+@Slf4j
 public class ServerStateOperation implements Runnable {
-    private static Logger _log = LoggerFactory.getLogger(ServerStateOperation.class);
 
     public OPCSERVERSTATUS _serverStatus = null;
 
@@ -65,7 +64,7 @@ public class ServerStateOperation implements Runnable {
                 this._lock.notify();
             }
         } catch (Throwable e) {
-            _log.info("Failed to get server state", e);
+            log.info("Failed to get server state", e);
             this._error = e;
             this._running = false;
             synchronized (this._lock) {
@@ -84,7 +83,7 @@ public class ServerStateOperation implements Runnable {
      */
     public OPCSERVERSTATUS getServerState(final int timeout) throws Throwable {
         if (this._server == null) {
-            _log.debug("No connection to server. Skipping...");
+            log.debug("No connection to server. Skipping...");
             return null;
         }
 
@@ -94,13 +93,13 @@ public class ServerStateOperation implements Runnable {
             t.start();
             this._lock.wait(timeout);
             if (this._running) {
-                _log.warn("State operation still running. Interrupting...");
+                log.warn("State operation still running. Interrupting...");
                 t.interrupt();
                 throw new InterruptedException("Interrupted getting server state");
             }
         }
         if (this._error != null) {
-            _log.warn("An error occurred while getting server state", this._error);
+            log.warn("An error occurred while getting server state", this._error);
             throw this._error;
         }
 

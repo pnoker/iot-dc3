@@ -285,14 +285,21 @@ CREATE TABLE `dc3_label_bind`  (
 INSERT INTO `dc3_driver` VALUES (-1, 'VirtualDriver', 'dc3-driver-virtual','127.0.0.1', 8600, 'IOT DC3 平台 Virtual驱动，仅用于测试用途。', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_driver` VALUES (-2, 'ListeningVirtualDriver', 'dc3-driver-listening-virtual','127.0.0.1', 8700, 'IOT DC3 平台 Virtual驱动，监听模式，仅用于测试用途。', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_driver` VALUES (-3, 'PlcS7Driver', 'dc3-driver-plcs7','127.0.0.1', 8601, 'IOT DC3 平台 Plc S7 Tcp 驱动。', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver` VALUES (-4, 'OpcDaDriver', 'dc3-driver-opc-da','127.0.0.1', 8602, 'IOT DC3 平台 Opc Da 驱动。', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_driver_attribute
 -- ----------------------------
 INSERT INTO `dc3_driver_attribute` VALUES (-1, '主机', 'host', 'string', 'localhost', -1, 'Ip', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_driver_attribute` VALUES (-2, '端口', 'port', 'int', '18600', -1, 'Port', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
 INSERT INTO `dc3_driver_attribute` VALUES (-3, '主机', 'host', 'string', '192.168.0.20', -3, 'Ip', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_driver_attribute` VALUES (-4, '端口', 'port', 'int', '102', -3, 'Port', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+INSERT INTO `dc3_driver_attribute` VALUES (-5, '主机', 'host', 'string', 'localhost', -4, 'Opc Da Host', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-6, 'CLSID', 'clsId', 'string', 'F8582CF2-88FB-11D0-B850-00C0F0104305', -4, 'Opc Da Server CLAID', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-7, '用户名', 'username', 'string', 'dc3', -4, 'Opc Da UserName', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_attribute` VALUES (-8, '密码', 'password', 'string', 'dc3dc3', -4, 'Opc Da Passward', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_point_attribute
@@ -310,12 +317,16 @@ INSERT INTO `dc3_point_attribute` VALUES (-8, '数据块长度', 'blockSize', 'i
 INSERT INTO `dc3_point_attribute` VALUES (-9, '字偏移', 'byteOffset', 'int', '0', -3, '字偏移', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_attribute` VALUES (-10, '位偏移', 'bitOffset', 'int', '0', -3, '位偏移', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
+INSERT INTO `dc3_point_attribute` VALUES (-11, '分组', 'group', 'string', 'GROUP', -4, '位号分组名称', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_attribute` VALUES (-12, '位号', 'tag', 'string', 'TAG', -4, '位号名称', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
 -- ----------------------------
 -- Records of dc3_profile
 -- ----------------------------
 INSERT INTO `dc3_profile` VALUES (-1, 'VirtualDriverProfile', 0, -1, 'Virtual驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_profile` VALUES (-2, 'ListeningVirtualDriverProfile', 0, -2, 'ListeningVirtual驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_profile` VALUES (-3, 'PlcS7DriverProfile', 0, -3, 'PlcS7驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_profile` VALUES (-4, 'OpcDaDriverProfile', 0, -4, 'OpcDa驱动模板', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_driver_info
@@ -326,41 +337,55 @@ INSERT INTO `dc3_driver_info` VALUES (-2, -2, '8888', -1, '', '2019-10-01 00:00:
 INSERT INTO `dc3_driver_info` VALUES (-3, -3, '192.168.0.20', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_driver_info` VALUES (-4, -4, '102', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
+INSERT INTO `dc3_driver_info` VALUES (-5, -5, '127.0.0.1', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_info` VALUES (-6, -6, 'F8582CF2-88FB-11D0-B850-00C0F0104305', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_info` VALUES (-7, -7, 'pnoke', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_driver_info` VALUES (-8, -8, 'abcd4455563', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
 -- ----------------------------
 -- Records of dc3_group
 -- ----------------------------
 INSERT INTO `dc3_group` VALUES (-1, 'VirtualDriverGroup', 'Virtual分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_group` VALUES (-2, 'ListeningVirtualDriverGroup', 'ListeningVirtual分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_group` VALUES (-3, 'PlcS7DriverGroup', 'PlcS7分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_group` VALUES (-4, 'OpcDaDriverGroup', 'OpcDa分组', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_device
 -- ----------------------------
-INSERT INTO `dc3_device` VALUES (-1, 'VirtualDevice', 'd1b60e969d3e4a26931a935e8ec62b44', 2, -1, -1, 'Virtual测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_device` VALUES (-2, 'ListeningVirtualDevice', '3e1bc62b49e964e69d31a95e8d4a2360', 2, -2, -2, 'ListeningVirtual测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_device` VALUES (-3, 'PlcS7Device', 'e1b31a953c62b49e964e69de8d4a2360', 2, -3, -3, 'PlcS7测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_device` VALUES (-1, 'VirtualDevice', 'D1B60E969D3E4A26931A935E8EC62B44', 2, -1, -1, 'Virtual测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_device` VALUES (-2, 'ListeningVirtualDevice', '3E1BC62B49E964E69D31A95E8D4A2360', 2, -2, -2, 'ListeningVirtual测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_device` VALUES (-3, 'PlcS7Device', 'E1B31A953C62B49E964E69DE8D4A2360', 2, -3, -3, 'PlcS7测试设备', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_device` VALUES (-4, 'OpcDaDevice', 'E3834B8BA44D47799CE91E551485F415', 2, -4, -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_point
 -- ----------------------------
-INSERT INTO `dc3_point` VALUES (-1, '温度', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', '℃', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-2, '压力', 'double', 0, 0, -999999, 999999, 1, 0, '%.3f', 'kPa', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-3, '时钟', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-4, '信号', 'int', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-5, '状态', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-6, '标签', 'string', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-1, '模拟温度', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', '℃', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-2, '模拟压力', 'double', 0, 0, -999999, 999999, 1, 0, '%.3f', 'kPa', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-3, '模拟时钟', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-4, '模拟信号', 'int', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-5, '模拟状态', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-6, '模拟标签', 'string', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -1, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
-INSERT INTO `dc3_point` VALUES (-7, '海拔', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', 'km', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-8, '速度', 'double', 0, 0, -999999, 999999, 1, 0, '%.3f', 'km/h', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-9, '液位', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', 'mm', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-10, '方向', 'int', 0, 0, -999999, 999999, 1, 0, '%.3f', '°', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-11, '锁定', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-12, '经纬', 'string', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-7, '模拟海拔', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', 'km', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-8, '模拟速度', 'double', 0, 0, -999999, 999999, 1, 0, '%.3f', 'km/h', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-9, '模拟液位', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', 'mm', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-10, '模拟方向', 'int', 0, 0, -999999, 999999, 1, 0, '%.3f', '°', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-11, '模拟锁定', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-12, '模拟经纬', 'string', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -2, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
-INSERT INTO `dc3_point` VALUES (-13, '设备运行状态', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-14, '生产次数', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-15, '滑块速度', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
-INSERT INTO `dc3_point` VALUES (-16, '运行时长', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-13, '模拟设备运行状态', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-14, '模拟生产次数', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-15, '模拟滑块速度', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-16, '模拟运行时长', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -3, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+INSERT INTO `dc3_point` VALUES (-17, '随机int', 'int', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-18, '随机long', 'long', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-19, '随机float', 'float', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-20, '随机double', 'double', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-21, '随机boolean', 'boolean', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point` VALUES (-22, '随机string', 'string', 0, 0, -999999, 999999, 1, 0, '%.3f', '', -4, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_point_info
@@ -411,6 +436,19 @@ INSERT INTO `dc3_point_info` VALUES (-41, -7, 'long', -3, -16, '', '2019-10-01 0
 INSERT INTO `dc3_point_info` VALUES (-42, -8, '4', -3, -16, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_info` VALUES (-43, -9, '12', -3, -16, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 INSERT INTO `dc3_point_info` VALUES (-44, -10, '0', -3, -16, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+
+INSERT INTO `dc3_point_info` VALUES (-45, -11, 'dc3', -4, -17, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-46, -12, 'Bucket Brigade.Int2', -4, -17, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-47, -11, 'dc3', -4, -18, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-48, -12, 'Bucket Brigade.Int4', -4, -18, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-49, -11, 'dc3', -4, -19, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-50, -12, 'Bucket Brigade.Real4', -4, -19, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-51, -11, 'dc3', -4, -20, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-52, -12, 'Bucket Brigade.Real8', -4, -20, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-53, -11, 'dc3', -4, -21, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-54, -12, 'Bucket Brigade.Boolean', -4, -21, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-55, -11, 'dc3', -4, -22, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_point_info` VALUES (-56, -12, 'Bucket Brigade.String', -4, -22, '', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_user

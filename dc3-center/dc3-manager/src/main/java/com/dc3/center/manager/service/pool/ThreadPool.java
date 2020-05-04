@@ -37,7 +37,7 @@ public class ThreadPool {
      */
     public ScheduledThreadPoolExecutor poolExecutor = new ScheduledThreadPoolExecutor(CORE_POOL_SIZE, r -> {
         Thread thread = new Thread(r, "dc3-manager-thread-" + atomicInteger.getAndIncrement());
-        log.debug("{} has been created", thread.getName());
+        log.debug("Create thread {}", thread.getName());
         return thread;
     }, (r, e) -> log.error("thread pool rejected"));
 }
