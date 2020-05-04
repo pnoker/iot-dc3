@@ -19,10 +19,9 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.dcom.common.impl.OPCCommon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +32,8 @@ import java.util.Map;
  *
  * @author Jens Reimann
  */
+@Slf4j
 public class ErrorMessageResolver {
-    private static Logger _log = LoggerFactory.getLogger(ErrorMessageResolver.class);
 
     private OPCCommon _opcCommon = null;
 
@@ -60,9 +59,9 @@ public class ErrorMessageResolver {
         if (message == null) {
             try {
                 message = this._opcCommon.getErrorString(errorCode, this._localeId);
-                _log.info(String.format("Resolved %08X to '%s'", errorCode, message));
+                log.info(String.format("Resolved %08X to '%s'", errorCode, message));
             } catch (JIException e) {
-                _log.warn(String.format("Failed to resolve error code for %08X", errorCode), e);
+                log.warn(String.format("Failed to resolve error code for %08X", errorCode), e);
             }
             if (message != null) {
                 this._messageCache.put(errorCode, message);

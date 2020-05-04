@@ -19,9 +19,8 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openscada.opc.dcom.da.OPCSERVERSTATUS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +29,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class ServerStateReader {
-    private static Logger _log = LoggerFactory.getLogger(ServerStateReader.class);
 
     private Server _server = null;
 
@@ -79,7 +78,7 @@ public class ServerStateReader {
     }
 
     protected void once() {
-        _log.debug("Reading server state");
+        log.debug("Reading server state");
 
         final OPCSERVERSTATUS state = this._server.getServerState();
 

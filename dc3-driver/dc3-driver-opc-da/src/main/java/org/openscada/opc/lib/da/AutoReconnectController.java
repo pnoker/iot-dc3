@@ -19,14 +19,13 @@
 
 package org.openscada.opc.lib.da;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+@Slf4j
 public class AutoReconnectController implements ServerConnectionStateListener {
-    private static Logger _log = LoggerFactory.getLogger(AutoReconnectController.class);
 
     private static final int DEFAULT_DELAY = 5 * 1000;
 
@@ -92,7 +91,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
             return;
         }
 
-        _log.debug("Requesting connection");
+        log.debug("Requesting connection");
         notifyStateChange(AutoReconnectState.DISCONNECTED);
 
         triggerReconnect(false);
@@ -103,7 +102,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
             return;
         }
 
-        _log.debug("Un-Requesting connection");
+        log.debug("Un-Requesting connection");
 
         notifyStateChange(AutoReconnectState.DISABLED);
         this._server.disconnect();
@@ -114,7 +113,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
     }
 
     public synchronized void connectionStateChanged(final boolean connected) {
-        _log.debug("Connection state changed: " + connected);
+        log.debug("Connection state changed: " + connected);
 
         if (!connected) {
             if (isRequested()) {
@@ -132,11 +131,11 @@ public class AutoReconnectController implements ServerConnectionStateListener {
 
     private synchronized void triggerReconnect(final boolean wait) {
         if (this._connectTask != null) {
-            _log.info("Connect thread already running");
+            log.info("Connect thread already running");
             return;
         }
 
-        _log.debug("Trigger reconnect");
+        log.debug("Trigger reconnect");
 
         this._connectTask = new Thread(new Runnable() {
 
@@ -146,7 +145,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
                     result = performReconnect(wait);
                 } finally {
                     AutoReconnectController.this._connectTask = null;
-                    _log.debug(String.format("performReconnect completed : %s", result));
+                    log.debug(String.format("performReconnect completed : %s", result));
                     if (!result) {
                         triggerReconnect(true);
                     }
@@ -161,19 +160,19 @@ public class AutoReconnectController implements ServerConnectionStateListener {
         try {
             if (wait) {
                 notifyStateChange(AutoReconnectState.WAITING);
-                _log.debug(String.format("Delaying (%s)...", this._delay));
+                log.debug(String.format("Delaying (%s)...", this._delay));
                 Thread.sleep(this._delay);
             }
         } catch (InterruptedException e) {
         }
 
         if (!isRequested()) {
-            _log.debug("Request canceled during delay");
+            log.debug("Request canceled during delay");
             return true;
         }
 
         try {
-            _log.debug("Connecting to server");
+            log.debug("Connecting to server");
             notifyStateChange(AutoReconnectState.CONNECTING);
             synchronized (this) {
                 this._server.connect();
@@ -181,7 +180,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
             }
             // CONNECTED state will be set by server callback
         } catch (Throwable e) {
-            _log.info("Re-connect failed", e);
+            log.info("Re-connect failed", e);
             notifyStateChange(AutoReconnectState.DISCONNECTED);
             return false;
         }

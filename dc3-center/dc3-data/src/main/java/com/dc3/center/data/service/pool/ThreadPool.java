@@ -44,7 +44,7 @@ public class ThreadPool {
             new LinkedBlockingQueue<>(QUEUE_CAPACITY),
             r -> {
                 Thread thread = new Thread(r, "dc3-data-thread-" + atomicInteger.getAndIncrement());
-                log.debug("{} has been created", thread.getName());
+                log.debug("Create thread {}", thread.getName());
                 return thread;
             }, (r, e) -> log.error("thread pool rejected"));
 
