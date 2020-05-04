@@ -19,6 +19,7 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.lib.common.NotConnectedException;
 import org.slf4j.Logger;
@@ -31,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Slf4j
 public abstract class AccessBase implements ServerConnectionStateListener {
-    private static Logger logger = LoggerFactory.getLogger(AccessBase.class);
 
     protected Server server = null;
 
@@ -166,7 +167,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
                 stop();
             }
         } catch (final Exception e) {
-            logger.error(String.format("Failed to change state (%s)", connected), e);
+            log.error(String.format("Failed to change state (%s)", connected), e);
         }
     }
 
@@ -175,7 +176,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
             return;
         }
 
-        logger.debug("Create a new group");
+        log.debug("Create a new group");
         this.group = this.server.addGroup();
         this.group.setActive(true);
         this.active = true;
@@ -186,7 +187,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
     }
 
     protected void realizeItem(final String itemId) throws JIException, AddFailedException {
-        logger.debug("Realizing item: {}", itemId);
+        log.debug("Realizing item: {}", itemId);
 
         final DataCallback dataCallback = this.itemSet.get(itemId);
         if (dataCallback == null) {
@@ -206,7 +207,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
         try {
             this.group.removeItem(itemId);
         } catch (final Throwable e) {
-            logger.error(String.format("Failed to unrealize item '%s'", itemId), e);
+            log.error(String.format("Failed to unrealize item '%s'", itemId), e);
         }
     }
 
@@ -222,10 +223,10 @@ public abstract class AccessBase implements ServerConnectionStateListener {
                 if (rc == null) {
                     rc = -1;
                 }
-                logger.warn(String.format("Failed to add item: %s (%08X)", itemId, rc));
+                log.warn(String.format("Failed to add item: %s (%08X)", itemId, rc));
 
             } catch (final Exception e) {
-                logger.warn("Failed to realize item: " + itemId, e);
+                log.warn("Failed to realize item: " + itemId, e);
             }
         }
     }
@@ -236,7 +237,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
         try {
             this.group.clear();
         } catch (final JIException e) {
-            logger.info("Failed to clear group. No problem if we already lost the connection", e);
+            log.info("Failed to clear group. No problem if we already lost the connection", e);
         }
     }
 
@@ -253,7 +254,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
         try {
             this.group.remove();
         } catch (final Throwable t) {
-            logger.warn("Failed to disable group. No problem if we already lost connection");
+            log.warn("Failed to disable group. No problem if we already lost connection");
         }
         this.group = null;
     }

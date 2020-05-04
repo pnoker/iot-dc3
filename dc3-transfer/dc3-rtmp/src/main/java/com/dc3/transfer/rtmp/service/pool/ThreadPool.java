@@ -51,7 +51,7 @@ public class ThreadPool {
             new LinkedBlockingQueue<>(RtmpProperty.MAX_POOL_SIZE * 2),
             r -> {
                 Thread thread = new Thread(r, "dc3-rtmp-thread-" + mThreadNum.getAndIncrement());
-                log.debug("{} has been created", thread.getName());
+                log.debug("Create thread {}", thread.getName());
                 return thread;
             },
             (r, e) -> log.error("thread pool rejected"));

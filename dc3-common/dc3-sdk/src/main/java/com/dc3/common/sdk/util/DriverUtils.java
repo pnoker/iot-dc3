@@ -132,9 +132,6 @@ public class DriverUtils {
     public static String getTypeClassName(String type) {
         String className = "java.lang.String";
         switch (type.toLowerCase()) {
-            case Common.ValueType.BYTE:
-                className = "java.lang.Byte";
-                break;
             case Common.ValueType.INT:
                 className = "java.lang.Integer";
                 break;

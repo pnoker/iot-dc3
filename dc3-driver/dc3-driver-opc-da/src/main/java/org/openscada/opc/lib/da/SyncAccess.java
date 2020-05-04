@@ -19,16 +19,15 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.lib.common.NotConnectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
 import java.util.Map;
 
+@Slf4j
 public class SyncAccess extends AccessBase implements Runnable {
-    private static Logger logger = LoggerFactory.getLogger(SyncAccess.class);
 
     private Thread runner = null;
 
@@ -51,7 +50,7 @@ public class SyncAccess extends AccessBase implements Runnable {
                     handleError(null);
                 }
             } catch (Throwable e) {
-                logger.error("Sync read failed", e);
+                log.error("Sync read failed", e);
                 handleError(e);
                 this.server.disconnect();
             }

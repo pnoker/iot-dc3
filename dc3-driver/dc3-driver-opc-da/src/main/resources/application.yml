@@ -3,7 +3,7 @@ driver:
   description: @project.description@
   schedule:
     read:
-      enable: true
+      enable: false
       corn: '0/30 * * * * ?'
     custom:
       enable: false
@@ -17,17 +17,17 @@ driver:
     - displayName: CLSID
       name: clsId
       type: string
-      value: 'F8582CF2-88FB-11D0-B850-00C0F0104305'
-      description: Opc Da Program ID
+      value: F8582CF2-88FB-11D0-B850-00C0F0104305
+      description: Opc Da Server CLAID
     - displayName: 用户名
       name: username
       type: string
-      value: 'dc3'
+      value: dc3
       description: Opc Da UserName
     - displayName: 密码
       name: password
       type: string
-      value: 'dc3dc3'
+      value: dc3dc3
       description: Opc Da Passward
   point-attribute:
     - displayName: 分组
@@ -53,6 +53,5 @@ logging:
     com.freud.dcom.utgard.cases.*: INFO
     com.dc3.common.sdk: DEBUG
     com.dc3: DEBUG
-    org.jinterop: ERROR
   file:
     name: dc3/logs/driver/opcda/${spring.application.name}.log

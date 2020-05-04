@@ -19,12 +19,11 @@
 
 package org.openscada.opc.lib.da.browser;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.dcom.common.impl.EnumString;
 import org.openscada.opc.dcom.da.OPCBROWSETYPE;
 import org.openscada.opc.dcom.da.impl.OPCBrowseServerAddressSpace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
 import java.util.Collection;
@@ -35,8 +34,8 @@ import java.util.EnumSet;
  *
  * @author Jens Reimann
  */
+@Slf4j
 public class BaseBrowser {
-    private static Logger _log = LoggerFactory.getLogger(BaseBrowser.class);
 
     protected OPCBrowseServerAddressSpace _browser;
 
@@ -98,7 +97,7 @@ public class BaseBrowser {
             accessMaskValue |= Access.WRITE.getCode();
         }
 
-        _log.debug("Browsing with a batch size of " + this._batchSize);
+        log.debug("Browsing with a batch size of " + this._batchSize);
 
         return this._browser.browse(type, filterCriteria, accessMaskValue, variantType).asCollection(this._batchSize);
     }

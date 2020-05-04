@@ -18,6 +18,8 @@
     <logger name="org.mongodb.driver" level="WARN"/>
     <logger name="com.zaxxer.hikari" level="WARN"/>
     <logger name="io.lettuce.core" level="WARN"/>
+    <logger name="org.openscada" level="ERROR"/>
+    <logger name="org.jinterop" level="ERROR"/>
     <logger name="io.undertow" level="ERROR"/>
     <logger name="com.netflix" level="ERROR"/>
     <logger name="org.quartz" level="WARN"/>

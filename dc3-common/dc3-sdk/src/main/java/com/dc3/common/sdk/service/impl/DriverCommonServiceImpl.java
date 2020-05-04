@@ -242,7 +242,6 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * 加载数据
      */
     public void loadData() {
-        log.debug("driver initial basic data ……");
         List<Long> profileList = getProfileList(driverContext.getDriverId());
         this.driverAttributeMap = getDriverAttributeMap(driverContext.getDriverId());
         this.pointAttributeMap = getPointAttributeMap(driverContext.getDriverId());
@@ -251,7 +250,6 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         loadDevice(profileList);
         driverContext.setProfilePointMap(getProfilePointMap(profileList));
         loadPoint(driverContext.getDeviceMap());
-        log.debug("driver initial basic data is complete");
     }
 
     private void close() {

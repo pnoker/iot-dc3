@@ -66,26 +66,30 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @SneakyThrows
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        Server server = getServer(device.getId(), driverInfo);
         OpcDaPointVariable opcDaPointVariable = getOpcDaPointVariable(pointInfo);
-        Group group = server.addGroup(opcDaPointVariable.getGroup());
+
+        Server server = getServer(device.getId(), driverInfo);
+        Group group = getGroup(server, opcDaPointVariable.getGroup());
         Item item = group.addItem(opcDaPointVariable.getTag());
-        String value = item.read(false).getValue().getObject().toString();
-        server.dispose();
+
+        String value = readItem(item);
         log.debug("read: device:{}, value:{}", device.getId(), value);
+        server.dispose();
         return value;
     }
 
     @Override
     @SneakyThrows
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
-        Server server = getServer(device.getId(), driverInfo);
         OpcDaPointVariable opcDaPointVariable = getOpcDaPointVariable(pointInfo);
-        Group group = server.addGroup(opcDaPointVariable.getGroup());
+
+        Server server = getServer(device.getId(), driverInfo);
+        Group group = getGroup(server, opcDaPointVariable.getGroup());
         Item item = group.addItem(opcDaPointVariable.getTag());
+
         writeItem(item, value.getType(), value.getValue());
-        server.dispose();
         log.debug("write: device:{}, value:{}", device.getId(), value);
+        server.dispose();
         return false;
     }
 
@@ -119,41 +123,83 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
+     * 获取 Opc Da 分组
+     *
+     * @param server
+     * @param groupName
+     * @return
+     * @throws UnknownGroupException
+     * @throws NotConnectedException
+     * @throws JIException
+     * @throws UnknownHostException
+     * @throws DuplicateGroupException
+     */
+    public Group getGroup(Server server, String groupName) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException {
+        Group group;
+        try {
+            group = server.findGroup(groupName);
+        } catch (UnknownGroupException e) {
+            group = server.addGroup(groupName);
+        }
+
+        return group;
+    }
+
+    /**
      * 获取 Opc Da 连接信息
      *
      * @param driverInfo
      * @return
      */
     private ConnectionInformation getConnectionInformation(Map<String, AttributeInfo> driverInfo) {
-        String host = attribute(driverInfo, "host");
-        String clsId = attribute(driverInfo, "clsId");
-        String username = attribute(driverInfo, "username");
-        String password = attribute(driverInfo, "password");
-        log.debug("connectInfo: host:{},proId:{},username:{},password:{}", host, clsId, username, password);
-
-        ConnectionInformation connectionInformation = new ConnectionInformation();
-        connectionInformation.setHost(host);
-        connectionInformation.setClsid(clsId);
-        connectionInformation.setUser(username);
-        connectionInformation.setPassword(password);
-        return connectionInformation;
+        log.debug("OpcDa server connection information {}", driverInfo);
+        return new ConnectionInformation(attribute(driverInfo, "host"), attribute(driverInfo, "clsId"), attribute(driverInfo, "username"), attribute(driverInfo, "password"));
     }
 
     /**
-     * 获取位号变量信息
+     * 获取 Opc Da 位号变量信息
      *
      * @param pointInfo
      * @return
      */
     private OpcDaPointVariable getOpcDaPointVariable(Map<String, AttributeInfo> pointInfo) {
-        String group = attribute(pointInfo, "group");
-        String tag = attribute(pointInfo, "tag");
-        log.debug("pointVariable: group:{},tag:{}", group, tag);
+        log.debug("OpcDa point information {}", pointInfo);
+        return new OpcDaPointVariable(attribute(pointInfo, "group"), attribute(pointInfo, "tag"));
+    }
 
-        OpcDaPointVariable opcDaPointVariable = new OpcDaPointVariable();
-        opcDaPointVariable.setGroup(group);
-        opcDaPointVariable.setTag(tag);
-        return opcDaPointVariable;
+    /**
+     * 读取 Opc Da 数据
+     *
+     * @param item
+     * @return
+     * @throws JIException
+     */
+    public String readItem(Item item) throws JIException {
+        JIVariant jiVariant = item.read(false).getValue();
+        switch (jiVariant.getType()) {
+            case JIVariant.VT_I2:
+                short shortValue = jiVariant.getObjectAsShort();
+                return String.valueOf(shortValue);
+            case JIVariant.VT_I4:
+                int intValue = jiVariant.getObjectAsInt();
+                return String.valueOf(intValue);
+            case JIVariant.VT_I8:
+                long longValue = jiVariant.getObjectAsLong();
+                return String.valueOf(longValue);
+            case JIVariant.VT_R4:
+                float floatValue = jiVariant.getObjectAsFloat();
+                return String.valueOf(floatValue);
+            case JIVariant.VT_R8:
+                double doubleValue = jiVariant.getObjectAsDouble();
+                return String.valueOf(doubleValue);
+            case JIVariant.VT_BOOL:
+                boolean boolValue = jiVariant.getObjectAsBoolean();
+                return String.valueOf(boolValue);
+            case JIVariant.VT_BSTR:
+                return jiVariant.getObjectAsString2();
+            default:
+                return jiVariant.getObject().toString();
+        }
     }
 
     /**
@@ -166,69 +212,32 @@ public class DriverServiceImpl implements DriverService {
      */
     private void writeItem(Item item, String type, String value) throws JIException {
         switch (type.toLowerCase()) {
-            case Common.ValueType.BYTE:
-                byte vb = value(type, value);
-                item.write(new JIVariant(vb, false));
-                break;
             case Common.ValueType.INT:
                 int vi = value(type, value);
                 item.write(new JIVariant(vi, false));
-                break;
-            case Common.ValueType.DOUBLE:
-                double vd = value(type, value);
-                item.write(new JIVariant(vd, false));
-                break;
-            case Common.ValueType.FLOAT:
-                float vf = value(type, value);
-                item.write(new JIVariant(vf, false));
                 break;
             case Common.ValueType.LONG:
                 long vl = value(type, value);
                 item.write(new JIVariant(vl, false));
                 break;
+            case Common.ValueType.FLOAT:
+                float vf = value(type, value);
+                item.write(new JIVariant(vf, false));
+                break;
+            case Common.ValueType.DOUBLE:
+                double vd = value(type, value);
+                item.write(new JIVariant(vd, false));
+                break;
             case Common.ValueType.BOOLEAN:
                 boolean vo = value(type, value);
                 item.write(new JIVariant(vo, false));
+                break;
+            case Common.ValueType.STRING:
+                item.write(new JIVariant(value, false));
                 break;
             default:
                 break;
         }
     }
-
-
-    /*public static void main(String[] args) {
-        // create connection information
-        final ConnectionInformation ci = new ConnectionInformation();
-        ci.setHost("localhost");
-        ci.setUser("pnoke");
-        ci.setPassword("abcd4455563");
-        //ci.setProgId("Matrikon.OPC.Simulation.1");
-       ci.setClsid("F8582CF2-88FB-11D0-B850-00C0F0104305"); // if ProgId is not working, try it using the Clsid instead
-        // create a new server
-        final Server server = new Server(ci, Executors.newSingleThreadScheduledExecutor());
-
-        try {
-            // connect to server
-            server.connect();
-
-            Group group = server.addGroup("dc3");
-            Item item = group.addItem("Random.Int4");
-            int value = item.read(false).getValue().getObjectAsInt();
-            log.info(String.valueOf(value));
-        } catch (final JIException e) {
-            System.out.println(String.format("%08X: %s", e.getErrorCode(), server.getErrorMessage(e.getErrorCode())));
-            e.printStackTrace();
-        } catch (AlreadyConnectedException e) {
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (AddFailedException e) {
-            e.printStackTrace();
-        } catch (NotConnectedException e) {
-            e.printStackTrace();
-        } catch (DuplicateGroupException e) {
-            e.printStackTrace();
-        }
-    }*/
 
 }
