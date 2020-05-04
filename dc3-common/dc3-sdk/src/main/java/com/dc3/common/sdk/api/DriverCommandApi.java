@@ -16,19 +16,21 @@
 
 package com.dc3.common.sdk.api;
 
-import com.dc3.common.sdk.bean.CmdParameter;
-import com.dc3.common.sdk.service.DriverCommandService;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
+import com.dc3.common.sdk.bean.CmdParameter;
+import com.dc3.common.sdk.service.DriverCommandService;
 import com.dc3.common.valid.Read;
 import com.dc3.common.valid.ValidatableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,7 @@ public class DriverCommandApi {
      * 读
      *
      * @param cmdParameters
+     * @return
      */
     @PostMapping("/read")
     public R<List<PointValue>> readPoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters) {
@@ -73,14 +76,21 @@ public class DriverCommandApi {
     /**
      * 写
      *
-     * @param deviceId
-     * @param pointId
-     * @param value
+     * @param cmdParameters
+     * @return
      */
-    @PostMapping("/device/{deviceId}/point/{pointId}/value/{value}")
-    public Boolean writePoint(@NotNull @PathVariable("deviceId") Long deviceId,
-                              @NotNull @PathVariable("pointId") Long pointId,
-                              @NotNull @PathVariable("value") String value) {
-        return driverCommandService.write(deviceId, pointId, value);
+    @PostMapping("/write")
+    public R<Boolean> writePoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters) {
+        try {
+            if (cmdParameters.size() > MAX_REQUEST_SIZE) {
+                return R.fail("point request size are limited to " + MAX_REQUEST_SIZE);
+            }
+            for (CmdParameter cmdParameter : cmdParameters) {
+                driverCommandService.write(cmdParameter.getDeviceId(), cmdParameter.getPointId(), cmdParameter.getValue());
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.ok();
     }
 }

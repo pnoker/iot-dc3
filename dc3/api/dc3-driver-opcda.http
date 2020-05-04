@@ -1,0 +1,76 @@
+### 读取指定设备位号值
+#driver/read
+POST http://localhost:8602/driver/read
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+[
+  {
+    "deviceId": -4,
+    "pointId": -17
+  },
+  {
+    "deviceId": -4,
+    "pointId": -18
+  },
+  {
+    "deviceId": -4,
+    "pointId": -19
+  },
+  {
+    "deviceId": -4,
+    "pointId": -20
+  },
+  {
+    "deviceId": -4,
+    "pointId": -21
+  },
+  {
+    "deviceId": -4,
+    "pointId": -22
+  }
+]
+
+
+### 写入指定设备位号值
+#driver/write
+POST http://localhost:8602/driver/write
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+[
+  {
+    "deviceId": -4,
+    "pointId": -17,
+    "value": "3"
+  },
+  {
+    "deviceId": -4,
+    "pointId": -18,
+    "value": "45"
+  },
+  {
+    "deviceId": -4,
+    "pointId": -19,
+    "value": "87"
+  },
+  {
+    "deviceId": -4,
+    "pointId": -20,
+    "value": "56.78"
+  },
+  {
+    "deviceId": -4,
+    "pointId": -21,
+    "value": "false"
+  },
+  {
+    "deviceId": -4,
+    "pointId": -22,
+    "value": "DC3"
+  }
+]
+
+###

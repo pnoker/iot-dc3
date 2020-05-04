@@ -44,6 +44,13 @@ public class ConnectionInformation {
         super();
     }
 
+    public ConnectionInformation(String host, String clsid, String user, String password) {
+        this._host = host;
+        this._clsid = clsid;
+        this._user = user;
+        this._password = password;
+    }
+
     public ConnectionInformation(final String user, final String password) {
         super();
         this._user = user;

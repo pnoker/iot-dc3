@@ -19,6 +19,7 @@
 
 package org.openscada.opc.lib.da;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIClsid;
 import org.jinterop.dcom.core.JIComServer;
@@ -34,8 +35,6 @@ import org.openscada.opc.lib.common.ConnectionInformation;
 import org.openscada.opc.lib.common.NotConnectedException;
 import org.openscada.opc.lib.da.browser.FlatBrowser;
 import org.openscada.opc.lib.da.browser.TreeBrowser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -45,8 +44,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 
+@Slf4j
 public class Server {
-    private static Logger logger = LoggerFactory.getLogger(Server.class);
 
     private final ConnectionInformation connectionInformation;
 
@@ -68,9 +67,9 @@ public class Server {
 
     private ErrorMessageResolver errorMessageResolver;
 
-    private final Map<Integer, Group> groups = new HashMap<Integer, Group>();
+    private final Map<Integer, Group> groups = new HashMap<>();
 
-    private final List<ServerConnectionStateListener> stateListeners = new CopyOnWriteArrayList<ServerConnectionStateListener>();
+    private final List<ServerConnectionStateListener> stateListeners = new CopyOnWriteArrayList<>();
 
     private final ScheduledExecutorService scheduler;
 
@@ -96,14 +95,13 @@ public class Server {
         return this.session != null;
     }
 
-    public synchronized void connect() throws IllegalArgumentException,
-            UnknownHostException, JIException, AlreadyConnectedException {
+    public synchronized void connect() throws IllegalArgumentException, UnknownHostException, JIException, AlreadyConnectedException {
         if (isConnected()) {
             throw new AlreadyConnectedException();
         }
 
         final int socketTimeout = Integer.getInteger("rpc.socketTimeout", 0);
-        logger.info(String.format("Socket timeout: %s ", socketTimeout));
+        log.debug(String.format("Socket timeout: %s ", socketTimeout));
 
         try {
             if (this.connectionInformation.getClsid() != null) {
@@ -126,23 +124,22 @@ public class Server {
                         JIProgId.valueOf(this.connectionInformation.getProgId()),
                         this.connectionInformation.getHost(), this.session);
             } else {
-                throw new IllegalArgumentException(
-                        "Neither clsid nor progid is valid!");
+                throw new IllegalArgumentException("Neither clsid nor progid is valid!");
             }
 
             this.server = new OPCServer(this.comServer.createInstance());
             this.errorMessageResolver = new ErrorMessageResolver(
                     this.server.getCommon(), this.defaultLocaleID);
         } catch (final UnknownHostException e) {
-            logger.info("Unknown host when connecting to server", e);
+            log.error("Unknown host when connecting to server", e);
             cleanup();
             throw e;
         } catch (final JIException e) {
-            logger.info("Failed to connect to server", e);
+            log.error("Failed to connect to server", e);
             cleanup();
             throw e;
         } catch (final Throwable e) {
-            logger.warn("Unknown error", e);
+            log.error("Unknown error", e);
             cleanup();
             throw new RuntimeException(e);
         }
@@ -154,28 +151,25 @@ public class Server {
      * cleanup after the connection is closed
      */
     protected void cleanup() {
-        logger.info("Destroying DCOM session...");
+        log.debug("Destroying DCOM session...");
         final JISession destructSession = this.session;
         final Thread destructor = new Thread(new Runnable() {
 
             public void run() {
                 final long ts = System.currentTimeMillis();
                 try {
-                    logger.debug("Starting destruction of DCOM session");
+                    log.debug("Starting destruction of DCOM session");
                     JISession.destroySession(destructSession);
-                    logger.info("Destructed DCOM session");
+                    log.debug("Destructed DCOM session");
                 } catch (final Throwable e) {
-                    logger.warn("Failed to destruct DCOM session", e);
-                } finally {
-                    logger.info(String.format("Session destruction took %s ms",
-                            System.currentTimeMillis() - ts));
+                    log.error("Failed to destruct DCOM session", e);
                 }
             }
         }, "UtgardSessionDestructor");
         destructor.setName("OPCSessionDestructor");
         destructor.setDaemon(true);
         destructor.start();
-        logger.info("Destroying DCOM session... forked");
+        log.debug("Destroying DCOM session... forked");
 
         this.errorMessageResolver = null;
         this.session = null;
@@ -208,8 +202,7 @@ public class Server {
         disconnect();
     }
 
-    protected synchronized Group getGroup(final OPCGroupStateMgt groupMgt)
-            throws JIException, IllegalArgumentException, UnknownHostException {
+    protected synchronized Group getGroup(final OPCGroupStateMgt groupMgt) throws JIException, IllegalArgumentException, UnknownHostException {
         final Integer serverHandle = groupMgt.getState().getServerHandle();
         if (this.groups.containsKey(serverHandle)) {
             return this.groups.get(serverHandle);
@@ -232,9 +225,7 @@ public class Server {
      * @throws JIException
      * @throws DuplicateGroupException  If a group with this name already exists
      */
-    public synchronized Group addGroup(final String name)
-            throws NotConnectedException, IllegalArgumentException,
-            UnknownHostException, JIException, DuplicateGroupException {
+    public synchronized Group addGroup(final String name) throws NotConnectedException, IllegalArgumentException, UnknownHostException, JIException, DuplicateGroupException {
         if (!isConnected()) {
             throw new NotConnectedException();
         }
@@ -246,12 +237,10 @@ public class Server {
                     this.defaultLocaleID);
             return getGroup(groupMgt);
         } catch (final JIException e) {
-            switch (e.getErrorCode()) {
-                case 0xC004000C:
-                    throw new DuplicateGroupException();
-                default:
-                    throw e;
+            if (e.getErrorCode() == 0xC004000C) {
+                throw new DuplicateGroupException();
             }
+            throw e;
         }
     }
 
@@ -285,9 +274,7 @@ public class Server {
      * @throws UnknownGroupException    If the group was not found
      * @throws NotConnectedException    If the server is not connected
      */
-    public Group findGroup(final String name) throws IllegalArgumentException,
-            UnknownHostException, JIException, UnknownGroupException,
-            NotConnectedException {
+    public Group findGroup(final String name) throws IllegalArgumentException, UnknownHostException, JIException, UnknownGroupException, NotConnectedException {
         if (!isConnected()) {
             throw new NotConnectedException();
         }
@@ -424,7 +411,7 @@ public class Server {
         try {
             return getServerState(2500);
         } catch (final Throwable e) {
-            logger.info("Server connection failed", e);
+            log.error("Server connection failed", e);
             dispose();
             return null;
         }
