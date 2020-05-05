@@ -16,10 +16,10 @@
 
 package com.dc3.common.sdk.api;
 
-import com.dc3.common.sdk.service.DriverCommonService;
 import com.dc3.common.bean.driver.DriverOperation;
 import com.dc3.common.constant.Common;
 import com.dc3.common.constant.Operation;
+import com.dc3.common.sdk.service.DriverCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -91,7 +91,7 @@ public class DriverMemoryApi {
                     break;
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
     }
 }

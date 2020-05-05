@@ -6,7 +6,7 @@
 - [x] 读 OpcDa 点位
 - [x] 定时读 OpcDa 点位
 - [x] 写 OpcDa 数据
-- [x] 定时写 OpcDa 点位
+- [ ] 定时写 OpcDa 点位
 - [x] 跨平台
 - [x] 支持 OpcDa 2.0
 - [ ] 支持 OpcDa 3.0
