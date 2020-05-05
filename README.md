@@ -68,17 +68,13 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 :whale2: 邮箱:pnokers@icloud.com
 
-:speech_balloon: 微信:18304071393
+:speech_balloon: 感兴趣可以加入DC3微信技术交流群（微信：18304071393，备注：DC3微信技术交流群）
 
 **:mega: 非常欢迎**
  - 提交`issue`，请标明遇到的问题、开发环境和如何复现；
  - 提交`pull request`改进 `iot-dc3` 的代码；
- - 提出新想法和设计方案；
- - 添加微信号&申请加入DC3技术微信交流群，或者扫码加入钉钉群。
+ - 提出新想法和设计方案。
 
-<p align="center">
-<img src="./dc3/images/wechart.png" width="300"><br>
-</p>
 
 :lollipop: 感谢:`lombok`、`netty`、`spring boot`、`spring cloud`、[`s7connector`](https://github.com/s7connector/s7connector) 等提供的工具以及源码。
 
@@ -95,9 +91,10 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 - 项目目前支持的协议有哪些？
 
-> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式）、opcda \
-> 计划开发协议驱动: mqtt、opcua、modbus-tcp
+> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式）、opcda、opcua \
+> 计划开发协议驱动: mqtt、modbus-tcp
 
 - 并发能力如何？
 
-> 16G,i5机器可目前测试可承受5万并发（测试工具jMeter），目前Mongo数据库当并发很大时有较大的延时，后期采用Cassandra替代Mongo。
+> 16G,i5机器测试可承受5万并发（测试工具jMeter）\
+> Mongo数据库当并发很大时有较大的延时，后期采用Cassandra替代Mongo。
