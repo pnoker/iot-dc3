@@ -16,14 +16,12 @@
 
 package com.dc3.driver.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
-import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.common.sdk.service.rabbit.PointValueService;
-import com.dc3.driver.bean.OpcDaPointVariable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
@@ -34,7 +32,6 @@ import org.openscada.opc.lib.common.NotConnectedException;
 import org.openscada.opc.lib.da.*;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,10 +46,6 @@ import static com.dc3.common.sdk.util.DriverUtils.value;
 @Slf4j
 @Service
 public class DriverServiceImpl implements DriverService {
-    @Resource
-    private PointValueService pointValueService;
-    @Resource
-    private DriverContext driverContext;
 
     /**
      * Opc Da Server Map
@@ -66,31 +59,31 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @SneakyThrows
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        OpcDaPointVariable opcDaPointVariable = getOpcDaPointVariable(pointInfo);
-
+        log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         Server server = getServer(device.getId(), driverInfo);
-        Group group = getGroup(server, opcDaPointVariable.getGroup());
-        Item item = group.addItem(opcDaPointVariable.getTag());
+        try {
+            Item item = getItem(server, pointInfo);
 
-        String value = readItem(item);
-        log.debug("read: device:{}, value:{}", device.getId(), value);
-        server.dispose();
-        return value;
+            String value = readItem(item);
+            return value;
+        } finally {
+            server.dispose();
+        }
     }
 
     @Override
     @SneakyThrows
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
-        OpcDaPointVariable opcDaPointVariable = getOpcDaPointVariable(pointInfo);
-
+        log.debug("Opc Da Write, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
         Server server = getServer(device.getId(), driverInfo);
-        Group group = getGroup(server, opcDaPointVariable.getGroup());
-        Item item = group.addItem(opcDaPointVariable.getTag());
+        try {
+            Item item = getItem(server, pointInfo);
 
-        writeItem(item, value.getType(), value.getValue());
-        log.debug("write: device:{}, value:{}", device.getId(), value);
-        server.dispose();
-        return false;
+            writeItem(item, value.getType(), value.getValue());
+            return true;
+        } finally {
+            server.dispose();
+        }
     }
 
     @Override
@@ -110,23 +103,23 @@ public class DriverServiceImpl implements DriverService {
     private Server getServer(Long deviceId, Map<String, AttributeInfo> driverInfo) throws JIException, UnknownHostException {
         Server server = serverMap.get(deviceId);
         if (null == server) {
-            server = new Server(
-                    getConnectionInformation(driverInfo),
-                    Executors.newSingleThreadScheduledExecutor());
+            ConnectionInformation connectionInformation = new ConnectionInformation(attribute(driverInfo, "host"), attribute(driverInfo, "clsId"), attribute(driverInfo, "username"), attribute(driverInfo, "password"));
+            log.debug("Opc Da Server Connection Info {}", JSON.toJSONString(connectionInformation));
+            server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
         }
         try {
             server.connect();
-        } catch (AlreadyConnectedException e) {
+        } catch (AlreadyConnectedException ignored) {
         }
         serverMap.put(deviceId, server);
         return server;
     }
 
     /**
-     * 获取 Opc Da 分组
+     * 获取 Opc Da Item
      *
      * @param server
-     * @param groupName
+     * @param pointInfo
      * @return
      * @throws UnknownGroupException
      * @throws NotConnectedException
@@ -134,41 +127,19 @@ public class DriverServiceImpl implements DriverService {
      * @throws UnknownHostException
      * @throws DuplicateGroupException
      */
-    public Group getGroup(Server server, String groupName) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException {
+    public Item getItem(Server server, Map<String, AttributeInfo> pointInfo) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
         Group group;
+        String groupName = attribute(pointInfo, "group");
         try {
             group = server.findGroup(groupName);
         } catch (UnknownGroupException e) {
             group = server.addGroup(groupName);
         }
-
-        return group;
+        return group.addItem(attribute(pointInfo, "tag"));
     }
 
     /**
-     * 获取 Opc Da 连接信息
-     *
-     * @param driverInfo
-     * @return
-     */
-    private ConnectionInformation getConnectionInformation(Map<String, AttributeInfo> driverInfo) {
-        log.debug("OpcDa server connection information {}", driverInfo);
-        return new ConnectionInformation(attribute(driverInfo, "host"), attribute(driverInfo, "clsId"), attribute(driverInfo, "username"), attribute(driverInfo, "password"));
-    }
-
-    /**
-     * 获取 Opc Da 位号变量信息
-     *
-     * @param pointInfo
-     * @return
-     */
-    private OpcDaPointVariable getOpcDaPointVariable(Map<String, AttributeInfo> pointInfo) {
-        log.debug("OpcDa point information {}", pointInfo);
-        return new OpcDaPointVariable(attribute(pointInfo, "group"), attribute(pointInfo, "tag"));
-    }
-
-    /**
-     * 读取 Opc Da 数据
+     * 读取 Opc Da 位号值
      *
      * @param item
      * @return
@@ -203,7 +174,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
-     * 向 Opc Da 写数据
+     * 修改 Opc Da 位号值
      *
      * @param item
      * @param type
@@ -213,24 +184,24 @@ public class DriverServiceImpl implements DriverService {
     private void writeItem(Item item, String type, String value) throws JIException {
         switch (type.toLowerCase()) {
             case Common.ValueType.INT:
-                int vi = value(type, value);
-                item.write(new JIVariant(vi, false));
+                int intValue = value(type, value);
+                item.write(new JIVariant(intValue, false));
                 break;
             case Common.ValueType.LONG:
-                long vl = value(type, value);
-                item.write(new JIVariant(vl, false));
+                long longValue = value(type, value);
+                item.write(new JIVariant(longValue, false));
                 break;
             case Common.ValueType.FLOAT:
-                float vf = value(type, value);
-                item.write(new JIVariant(vf, false));
+                float floatValue = value(type, value);
+                item.write(new JIVariant(floatValue, false));
                 break;
             case Common.ValueType.DOUBLE:
-                double vd = value(type, value);
-                item.write(new JIVariant(vd, false));
+                double doubleValue = value(type, value);
+                item.write(new JIVariant(doubleValue, false));
                 break;
             case Common.ValueType.BOOLEAN:
-                boolean vo = value(type, value);
-                item.write(new JIVariant(vo, false));
+                boolean booleanValue = value(type, value);
+                item.write(new JIVariant(booleanValue, false));
                 break;
             case Common.ValueType.STRING:
                 item.write(new JIVariant(value, false));

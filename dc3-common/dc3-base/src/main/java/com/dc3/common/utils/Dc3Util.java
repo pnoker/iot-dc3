@@ -19,15 +19,21 @@ package com.dc3.common.utils;
 import cn.hutool.core.util.ReUtil;
 import com.dc3.common.dto.NodeDto;
 import com.google.common.base.Charsets;
+import lombok.extern.slf4j.Slf4j;
 
+import java.net.*;
 import java.util.*;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Dc3 平台自定义工具类集合
  *
  * @author pnoker
  */
+@Slf4j
 public class Dc3Util {
+
     /**
      * 将字符串进行Base64编码
      *
@@ -203,6 +209,76 @@ public class Dc3Util {
             }
         }
         return treeNode;
+    }
+
+    /**
+     * @return the local hostname, if possible. Failure results in "localhost".
+     */
+    public static String getHostName() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            return "localhost";
+        }
+    }
+
+    /**
+     * Given an address resolve it to as many unique addresses or hostnames as can be found.
+     *
+     * @param address the address to resolve.
+     * @return the addresses and hostnames that were resolved from {@code address}.
+     */
+    public static Set<String> getHostNames(String address) {
+        return getHostNames(address, true);
+    }
+
+    /**
+     * Given an address resolve it to as many unique addresses or hostnames as can be found.
+     *
+     * @param address         the address to resolve.
+     * @param includeLoopback if {@code true} loopback addresses will be included in the returned set.
+     * @return the addresses and hostnames that were resolved from {@code address}.
+     */
+    public static Set<String> getHostNames(String address, boolean includeLoopback) {
+        Set<String> hostNames = newHashSet();
+
+        try {
+            InetAddress inetAddress = InetAddress.getByName(address);
+
+            if (inetAddress.isAnyLocalAddress()) {
+                try {
+                    Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
+
+                    for (NetworkInterface ni : Collections.list(nis)) {
+                        Collections.list(ni.getInetAddresses()).forEach(ia -> {
+                            if (ia instanceof Inet4Address) {
+                                boolean loopback = ia.isLoopbackAddress();
+
+                                if (!loopback || includeLoopback) {
+                                    hostNames.add(ia.getHostName());
+                                    hostNames.add(ia.getHostAddress());
+                                    hostNames.add(ia.getCanonicalHostName());
+                                }
+                            }
+                        });
+                    }
+                } catch (SocketException e) {
+                    log.warn("Failed to NetworkInterfaces for bind address: {}", address, e);
+                }
+            } else {
+                boolean loopback = inetAddress.isLoopbackAddress();
+
+                if (!loopback || includeLoopback) {
+                    hostNames.add(inetAddress.getHostName());
+                    hostNames.add(inetAddress.getHostAddress());
+                    hostNames.add(inetAddress.getCanonicalHostName());
+                }
+            }
+        } catch (UnknownHostException e) {
+            log.warn("Failed to get InetAddress for bind address: {}", address, e);
+        }
+
+        return hostNames;
     }
 
 }

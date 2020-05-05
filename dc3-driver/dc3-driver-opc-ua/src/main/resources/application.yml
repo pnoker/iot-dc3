@@ -3,7 +3,7 @@ driver:
   description: @project.description@
   schedule:
     read:
-      enable: true
+      enable: false
       corn: '0/30 * * * * ?'
     custom:
       enable: false
@@ -13,13 +13,23 @@ driver:
       name: host
       type: string
       value: localhost
-      description: Ip
+      description: Opc Ua IP
     - displayName: 端口
       name: port
       type: int
       value: 18600
-      description: Port
+      description: Opc Ua Port
+    - displayName: 路径
+      name: path
+      type: string
+      value: /
+      description: Opc Ua Path
   point-attribute:
+    - displayName: 命名空间
+      name: namespace
+      type: int
+      value: 5
+      description: 命名空间索引
     - displayName: 位号
       name: tag
       type: string
