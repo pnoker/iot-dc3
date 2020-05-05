@@ -48,7 +48,7 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public R exception(Exception exception) {
-        log.error("Global Exception:{}", exception.getMessage());
+        log.error("Global Exception:{}", exception.getMessage(), exception);
         return R.fail(exception.getMessage());
     }
 

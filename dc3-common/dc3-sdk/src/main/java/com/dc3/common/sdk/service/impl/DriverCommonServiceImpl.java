@@ -104,9 +104,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         R<Profile> r = profileClient.selectById(id);
         if (r.isOk()) {
             Map<String, AttributeInfo> infoMap = getProfileDriverInfoMap(r.getData().getId());
-            if (infoMap.size() > 0) {
-                driverContext.getDriverInfoMap().put(r.getData().getId(), infoMap);
-            }
+            driverContext.getDriverInfoMap().put(r.getData().getId(), infoMap);
             driverContext.getProfilePointMap().put(r.getData().getId(), getPointMap(r.getData().getId()));
         } else {
             log.error("add profile failed {}", r.getMessage());
@@ -126,9 +124,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             driverContext.getDeviceMap().put(r.getData().getId(), r.getData());
             driverContext.getDeviceNameMap().put(r.getData().getName(), r.getData().getId());
             Map<Long, Map<String, AttributeInfo>> infoMap = getDevicePointInfoMap(r.getData());
-            if (infoMap.size() > 0) {
-                driverContext.getDevicePointInfoMap().put(r.getData().getId(), infoMap);
-            }
+            driverContext.getDevicePointInfoMap().put(r.getData().getId(), infoMap);
         } else {
             log.error("add device failed {}", r.getMessage());
         }
@@ -261,7 +257,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             InetAddress address = InetAddress.getLocalHost();
             return address.getHostAddress();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
         return null;
     }
