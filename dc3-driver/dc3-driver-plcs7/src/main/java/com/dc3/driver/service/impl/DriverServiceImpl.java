@@ -16,13 +16,13 @@
 
 package com.dc3.driver.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
-import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.common.sdk.service.rabbit.PointValueService;
 import com.dc3.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
@@ -31,11 +31,11 @@ import com.github.s7connector.api.factory.S7SerializerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.dc3.common.sdk.util.DriverUtils.attribute;
+import static com.dc3.common.sdk.util.DriverUtils.value;
 
 /**
  * @author pnoker
@@ -43,10 +43,6 @@ import static com.dc3.common.sdk.util.DriverUtils.attribute;
 @Slf4j
 @Service
 public class DriverServiceImpl implements DriverService {
-    @Resource
-    private PointValueService pointValueService;
-    @Resource
-    private DriverContext driverContext;
 
     /**
      * Plc Connector Map
@@ -60,6 +56,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+        log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
         Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo);
         return String.valueOf(serializer.dispense(plcs7PointVariable));
@@ -67,7 +64,11 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
-        return false;
+        log.debug("Opc Da Read, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
+        S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
+        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo);
+        store(serializer, plcs7PointVariable, value.getType(), value.getValue());
+        return true;
     }
 
     @Override
@@ -86,11 +87,9 @@ public class DriverServiceImpl implements DriverService {
     private S7Serializer getS7Serializer(Long deviceId, Map<String, AttributeInfo> driverInfo) {
         S7Connector s7Connector = s7ConnectorMap.get(deviceId);
         if (null == s7Connector) {
-            String host = attribute(driverInfo, "host");
-            Integer port = attribute(driverInfo, "port");
-            log.debug("connectInfo: host:{},port:{}", host, port);
+            log.debug("Plc S7 Connection Info {}", JSON.toJSONString(driverInfo));
             try {
-                s7Connector = S7ConnectorFactory.buildTCPConnector().withHost(host).withPort(port).build();
+                s7Connector = S7ConnectorFactory.buildTCPConnector().withHost(attribute(driverInfo, "host")).withPort(attribute(driverInfo, "port")).build();
             } catch (Exception e) {
                 throw new ServiceException("new s7connector fail" + e.getMessage());
             }
@@ -109,13 +108,46 @@ public class DriverServiceImpl implements DriverService {
      * @return
      */
     private Plcs7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo) {
-        int dbNum = attribute(pointInfo, "dbNum");
-        int byteOffset = attribute(pointInfo, "byteOffset");
-        int bitOffset = attribute(pointInfo, "bitOffset");
-        int blockSize = attribute(pointInfo, "blockSize");
-        String type = attribute(pointInfo, "type");
-        log.debug("pointVariable: dbNum:{},byteOffset:{},bitOffset:{},blockSize:{},type:{}", dbNum, byteOffset, bitOffset, blockSize, type);
-        return new Plcs7PointVariable(dbNum, byteOffset, bitOffset, blockSize, type);
+        log.debug("Plc S7 Point Info {}", JSON.toJSONString(pointInfo));
+        return new Plcs7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), attribute(pointInfo, "type"));
+    }
+
+    /**
+     * 向 Plc S7 写数据
+     *
+     * @param serializer
+     * @param plcs7PointVariable
+     * @param type
+     * @param value
+     */
+    private void store(S7Serializer serializer, Plcs7PointVariable plcs7PointVariable, String type, String value) {
+        switch (type.toLowerCase()) {
+            case Common.ValueType.INT:
+                int intValue = value(type, value);
+                serializer.store(intValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                break;
+            case Common.ValueType.LONG:
+                long longValue = value(type, value);
+                serializer.store(longValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                break;
+            case Common.ValueType.FLOAT:
+                float floatValue = value(type, value);
+                serializer.store(floatValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                break;
+            case Common.ValueType.DOUBLE:
+                double doubleValue = value(type, value);
+                serializer.store(doubleValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                break;
+            case Common.ValueType.BOOLEAN:
+                boolean booleanValue = value(type, value);
+                serializer.store(booleanValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                break;
+            case Common.ValueType.STRING:
+                serializer.store(value, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                break;
+            default:
+                break;
+        }
     }
 
 }

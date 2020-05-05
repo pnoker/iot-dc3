@@ -45,14 +45,14 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public void initial() {
         threadPool.execute(() -> {
-            log.debug("starting(::{}) incoming data listener", port);
+            log.debug("Virtual Listening Driver Starting(::{}) incoming data listener", port);
             nettyServer.start(port);
         });
     }
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        return "";
+        return "nil";
     }
 
     @Override

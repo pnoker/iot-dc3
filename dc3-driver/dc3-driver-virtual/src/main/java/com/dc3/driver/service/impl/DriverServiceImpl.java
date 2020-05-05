@@ -17,19 +17,15 @@
 package com.dc3.driver.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.fastjson.JSON;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
-import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.common.sdk.service.rabbit.PointValueService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Map;
-
-import static com.dc3.common.sdk.util.DriverUtils.attribute;
 
 /**
  * @author pnoker
@@ -37,10 +33,6 @@ import static com.dc3.common.sdk.util.DriverUtils.attribute;
 @Slf4j
 @Service
 public class DriverServiceImpl implements DriverService {
-    @Resource
-    private PointValueService pointValueService;
-    @Resource
-    private DriverContext driverContext;
 
     @Override
     public void initial() {
@@ -48,11 +40,8 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        String host = attribute(driverInfo, "host");
-        Integer port = attribute(driverInfo, "port");
-        String tag = attribute(pointInfo, "tag");
+        log.debug("Virtual Driver Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         String value = String.valueOf(RandomUtil.randomDouble(100));
-        log.debug("driverInfo:{},{},pointInfo:{},device:{}.{},point:{}.{},value:{}", host, port, tag, device.getId(), device.getName(), point.getId(), point.getName(), value);
         return value;
     }
 
