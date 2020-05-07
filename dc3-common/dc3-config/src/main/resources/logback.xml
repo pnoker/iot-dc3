@@ -17,6 +17,7 @@
     <logger name="org.mybatis.spring" level="WARN"/>
     <logger name="org.mongodb.driver" level="WARN"/>
     <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="org.eclipse.milo" level="ERROR"/>
     <logger name="io.lettuce.core" level="WARN"/>
     <logger name="org.openscada" level="ERROR"/>
     <logger name="org.jinterop" level="ERROR"/>
