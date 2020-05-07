@@ -153,6 +153,51 @@ services:
         aliases:
           - dc3-driver-virtual
 
+  listening-virtual:
+    build:
+      context: ../dc3-driver/dc3-driver-listening-virtual/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-listening-virtual:3.0
+    restart: always
+    ports:
+      - 8700:8700
+    container_name: dc3-driver-listening-virtual
+    hostname: dc3-driver-listening-virtual
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-listening-virtual
+
+  opc-da:
+    build:
+      context: ../dc3-driver/dc3-driver-opc-da/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-opc-da:3.0
+    restart: always
+    ports:
+      - 8601:8601
+    container_name: dc3-driver-opc-da
+    hostname: dc3-driver-opc-da
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-da
+
+  opc-ua:
+    build:
+      context: ../dc3-driver/dc3-driver-opc-ua/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-opc-ua:3.0
+    restart: always
+    ports:
+      - 8602:8602
+    container_name: dc3-driver-opc-ua
+    hostname: dc3-driver-opc-ua
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-ua
+
   mysql:
     build:
       context: ./dependences/mysql/
