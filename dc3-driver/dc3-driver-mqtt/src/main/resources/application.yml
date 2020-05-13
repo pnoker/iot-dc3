@@ -27,11 +27,20 @@ driver:
       description: 位号名称
 
 server:
-  port: 8603
+  port: 8701
 
 spring:
   application:
     name: @project.artifactId@
+  mqtt:
+    url: tcp://dc3-rabbitmq:1883
+    client:
+      id: dc3-mqtt-client
+    default:
+      topic: dc3-mqtt-topic
+    completionTimeout: 3000
+    username: dc3
+    password: dc3
 
 logging:
   level:
