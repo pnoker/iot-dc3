@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.dc3.driver;
+package com.dc3.driver.controller;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.SpringCloudApplication;
+import com.dc3.driver.service.mqtt.MqttGateway;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author pnoker
- */
-@EnableCaching
-@SpringCloudApplication
-public class VirtualDriverApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(VirtualDriverApplication.class, args);
+@RestController
+@RequestMapping("/test")
+public class TestController {
+
+    @Autowired
+    private MqttGateway mqttGateway;
+
+    @RequestMapping("/sendMqtt")
+    public String sendMqtt(String sendData) {
+        mqttGateway.sendToMqtt(sendData, "hello");
+        return "OK";
     }
 }
-
