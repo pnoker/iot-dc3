@@ -1,0 +1,50 @@
+driver:
+  name: MqttDriver
+  description: @project.description@
+  schedule:
+    read:
+      enable: true
+      corn: '0/30 * * * * ?'
+    custom:
+      enable: false
+      corn:  '0/30 * * * * ?'
+  driver-attribute:
+    - displayName: 主机
+      name: host
+      type: string
+      value: localhost
+      description: Ip
+    - displayName: 端口
+      name: port
+      type: int
+      value: 18600
+      description: Port
+  point-attribute:
+    - displayName: 位号
+      name: tag
+      type: string
+      value: TAG
+      description: 位号名称
+
+server:
+  port: 8701
+
+spring:
+  application:
+    name: @project.artifactId@
+  mqtt:
+    url: tcp://dc3-rabbitmq:1883
+    client:
+      id: dc3-mqtt-client
+    default:
+      topic: dc3-mqtt-topic
+    completionTimeout: 3000
+    username: dc3
+    password: dc3
+
+logging:
+  level:
+    com.dc3.common.sdk: DEBUG
+    com.dc3: DEBUG
+  file:
+    name: dc3/logs/driver/mqtt/${spring.application.name}.log

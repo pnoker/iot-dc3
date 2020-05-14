@@ -34,6 +34,7 @@
         <module>dc3-driver-plcs7</module>
         <module>dc3-driver-opc-da</module>
         <module>dc3-driver-opc-ua</module>
+        <module>dc3-driver-mqtt</module>
     </modules>
 
     <dependencies>
