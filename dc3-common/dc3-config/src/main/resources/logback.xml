@@ -2,13 +2,16 @@
 <!DOCTYPE configuration>
 <configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="ERROR"/>
     <logger name="org.springframework.boot.web.embedded.undertow" level="WARN"/>
+    <logger name="org.springframework.cloud.netflix.eureka" level="WARN"/>
     <logger name="org.springframework.cloud.gateway.route" level="WARN"/>
     <logger name="org.springframework.cloud.commons.util" level="ERROR"/>
     <logger name="org.springframework.context.support" level="WARN"/>
     <logger name="org.springframework.cloud.context" level="WARN"/>
-    <logger name="org.springframework.cloud.stream" level="WARN"/>
     <logger name="org.springframework.boot.actuate" level="ERROR"/>
+    <logger name="org.springframework.security.web" level="WARN"/>
+    <logger name="org.springframework.cloud.stream" level="WARN"/>
     <logger name="org.springframework.integration" level="WARN"/>
     <logger name="org.springframework.scheduling" level="WARN"/>
     <logger name="org.springframework.amqp" level="WARN"/>
@@ -19,6 +22,7 @@
     <logger name="com.zaxxer.hikari" level="WARN"/>
     <logger name="org.eclipse.milo" level="ERROR"/>
     <logger name="io.lettuce.core" level="WARN"/>
+    <logger name="com.sun.jersey" level="WARN"/>
     <logger name="org.openscada" level="ERROR"/>
     <logger name="org.jinterop" level="ERROR"/>
     <logger name="io.undertow" level="ERROR"/>
