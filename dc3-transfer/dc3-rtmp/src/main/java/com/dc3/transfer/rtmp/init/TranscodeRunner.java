@@ -18,11 +18,11 @@ package com.dc3.transfer.rtmp.init;
 
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.transfer.rtmp.service.RtmpService;
-import com.dc3.transfer.rtmp.bean.RtmpProperty;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.model.Rtmp;
+import com.dc3.transfer.rtmp.bean.Transcode;
+import com.dc3.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -52,32 +52,21 @@ public class TranscodeRunner implements ApplicationRunner {
     private String window;
     @Value("${rtmp.ffmpeg.unix}")
     private String unix;
-    @Value("${rtmp.task.reconnect-interval}")
-    private int reconnectInterval;
-    @Value("${rtmp.task.reconnect-max-times}")
-    private int reconnectMaxTimes;
-    @Value("${rtmp.thread.core-pool-size}")
-    private int corePoolSize;
-    @Value("${rtmp.thread.maximum-pool-size}")
-    private int maximumPoolSize;
-    @Value("${rtmp.thread.keep-alive-time}")
-    private int keepAliveTime;
 
     @Resource
     private RtmpService rtmpService;
 
     @Override
     public void run(ApplicationArguments args) {
-        String ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        if (StringUtils.isBlank(ffmpeg)) {
+        Transcode.ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
+        if (StringUtils.isBlank(Transcode.ffmpeg)) {
             log.error("FFmpeg path is null,Please fill absolute path!");
             System.exit(1);
         }
-        if (!FileUtil.isFile(ffmpeg)) {
-            log.error("{} does not exist,Please fill absolute path!", ffmpeg);
+        if (!FileUtil.isFile(Transcode.ffmpeg)) {
+            log.error("{} does not exist,Please fill absolute path!", Transcode.ffmpeg);
             System.exit(1);
         }
-        RtmpProperty.initial(ffmpeg, reconnectInterval, reconnectMaxTimes, corePoolSize, maximumPoolSize, keepAliveTime);
         list().forEach(rtmp -> rtmpService.start(rtmp.getId()));
     }
 

@@ -1,17 +1,15 @@
 rtmp:
   ffmpeg:
-    window: D:/FFmpeg/bin/ffmpeg.exe
+    window: D:/Documents/FFmpeg/bin/ffmpeg.exe
     unix: /usr/local/bin/ffmpeg
-  task:
-    reconnect-interval: 5000
-    reconnect-max-times: 10
-  thread:
-    core-pool-size: 4
-    maximum-pool-size: 32
-    keep-alive-time: 10
 
 server:
   port: 8803
+  thread:
+    prefix: dc3-rtmp-thread-
+    core-pool-size: 4
+    maximum-pool-size: 32
+    keep-alive-time: 10
 
 spring:
   application:
