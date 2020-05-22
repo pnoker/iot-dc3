@@ -32,6 +32,8 @@ import java.io.*;
 @Data
 @Slf4j
 public class Transcode {
+    public static String ffmpeg;
+
     private Long id;
     private volatile boolean run;
     private String command;
@@ -41,7 +43,7 @@ public class Transcode {
         this.id = rtmp.getId();
         this.run = false;
         this.command = rtmp.getCommand()
-                .replace("{exe}", RtmpProperty.FFMPEG)
+                .replace("{exe}", ffmpeg)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
     }

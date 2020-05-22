@@ -16,13 +16,13 @@
 
 package com.dc3.transfer.rtmp.service.pool;
 
-import com.dc3.transfer.rtmp.bean.Transcode;
-import com.dc3.transfer.rtmp.bean.RtmpProperty;
+import com.dc3.transfer.rtmp.bean.ThreadProperty;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -34,25 +34,26 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author pnoker
  */
 @Slf4j
-@Component
+@Configuration
+@ConfigurationProperties(prefix = "server")
 public class ThreadPool {
-    private final AtomicInteger mThreadNum = new AtomicInteger(1);
+    @Setter
+    private ThreadProperty thread;
+
+    private final AtomicInteger atomicInteger = new AtomicInteger(1);
 
     /**
-     * 转码任务Map
+     * thread pool
      */
-    public volatile Map<Long, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
-
-    /**
-     * 线程池
-     */
-    public ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(RtmpProperty.CORE_POOL_SIZE,
-            RtmpProperty.MAX_POOL_SIZE, RtmpProperty.KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(RtmpProperty.MAX_POOL_SIZE * 2),
-            r -> {
-                Thread thread = new Thread(r, "dc3-rtmp-thread-" + mThreadNum.getAndIncrement());
-                log.debug("Create thread {}", thread.getName());
-                return thread;
-            },
-            (r, e) -> log.error("thread pool rejected"));
+    @Bean
+    public ThreadPoolExecutor poolExecutor() {
+        return new ThreadPoolExecutor(thread.getCorePoolSize(), thread.getMaximumPoolSize(), thread.getKeepAliveTime(), TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
+                r -> {
+                    Thread mThread = new Thread(r, thread.getPrefix() + atomicInteger.getAndIncrement());
+                    log.debug("Create thread {}", mThread.getName());
+                    return mThread;
+                },
+                (r, e) -> log.error("thread pool rejected"));
+    }
 }

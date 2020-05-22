@@ -11,27 +11,22 @@
       "description": "ffmpeg path."
     },
     {
-      "name": "rtmp.task.reconnect-interval",
-      "type": "java.lang.Integer",
-      "description": "task reconnect interval."
+      "name": "server.thread.prefix",
+      "type": "java.lang.String",
+      "description": "thread prefix."
     },
     {
-      "name": "rtmp.task.reconnect-max-times",
-      "type": "java.lang.Integer",
-      "description": "task reconnect max times."
-    },
-    {
-      "name": "rtmp.thread.core-pool-size",
+      "name": "server.thread.core-pool-size",
       "type": "java.lang.Integer",
       "description": "thread core pool size."
     },
     {
-      "name": "rtmp.thread.maximum-pool-size",
+      "name": "server.thread.maximum-pool-size",
       "type": "java.lang.Integer",
       "description": "thread maximum pool size."
     },
     {
-      "name": "rtmp.thread.keep-alive-time",
+      "name": "server.thread.keep-alive-time",
       "type": "java.lang.Integer",
       "description": "thread keep alive time."
     }

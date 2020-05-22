@@ -19,14 +19,14 @@ package com.dc3.transfer.rtmp.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.transfer.rtmp.mapper.RtmpMapper;
-import com.dc3.transfer.rtmp.service.RtmpService;
-import com.dc3.transfer.rtmp.service.pool.ThreadPool;
-import com.dc3.transfer.rtmp.bean.Transcode;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Rtmp;
+import com.dc3.transfer.rtmp.bean.Transcode;
+import com.dc3.transfer.rtmp.mapper.RtmpMapper;
+import com.dc3.transfer.rtmp.service.RtmpService;
+import com.dc3.transfer.rtmp.service.pool.ThreadPool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -36,7 +36,10 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author pnoker
@@ -44,8 +47,13 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class RtmpServiceImpl implements RtmpService {
+    /**
+     * 转码任务Map
+     */
+    public volatile Map<Long, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
+
     @Resource
-    private ThreadPool threadPool;
+    private ThreadPoolExecutor poolExecutor;
     @Resource
     private RtmpMapper rtmpMapper;
 
@@ -60,8 +68,8 @@ public class RtmpServiceImpl implements RtmpService {
     public Rtmp add(Rtmp rtmp) {
         if (rtmpMapper.insert(rtmp) > 0) {
             Transcode transcode = new Transcode(rtmp);
-            if (!threadPool.transcodeMap.containsKey(transcode.getId())) {
-                threadPool.transcodeMap.put(transcode.getId(), transcode);
+            if (!transcodeMap.containsKey(transcode.getId())) {
+                transcodeMap.put(transcode.getId(), transcode);
                 return selectById(rtmp.getId());
             }
             throw new ServiceException("任务重复,表记录添加成功");
@@ -80,12 +88,12 @@ public class RtmpServiceImpl implements RtmpService {
     public boolean delete(Long id) {
         Rtmp select = selectById(id);
         if (null != select) {
-            Transcode transcode = threadPool.transcodeMap.get(id);
+            Transcode transcode = transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
                     throw new ServiceException("任务运行中");
                 }
-                threadPool.transcodeMap.remove(id);
+                transcodeMap.remove(id);
             }
             if (rtmpMapper.deleteById(id) > 0) {
                 return true;
@@ -107,12 +115,12 @@ public class RtmpServiceImpl implements RtmpService {
         rtmp.setUpdateTime(null);
         Rtmp select = selectById(rtmp.getId());
         if (null != select) {
-            Transcode transcode = threadPool.transcodeMap.get(rtmp.getId());
+            Transcode transcode = transcodeMap.get(rtmp.getId());
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
                     throw new ServiceException("任务运行中");
                 }
-                threadPool.transcodeMap.put(transcode.getId(), new Transcode(rtmp));
+                transcodeMap.put(transcode.getId(), new Transcode(rtmp));
             }
             if (rtmpMapper.updateById(rtmp) > 0) {
                 return select;
@@ -145,16 +153,16 @@ public class RtmpServiceImpl implements RtmpService {
     public boolean start(Long id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null != select) {
-            Transcode transcode = threadPool.transcodeMap.get(id);
+            Transcode transcode = transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
                     throw new ServiceException("任务已是启动状态");
                 }
             } else {
                 transcode = new Transcode(select);
-                threadPool.transcodeMap.put(transcode.getId(), transcode);
+                transcodeMap.put(transcode.getId(), transcode);
             }
-            threadPool.poolExecutor.execute(() -> threadPool.transcodeMap.get(id).start());
+            poolExecutor.execute(() -> transcodeMap.get(id).start());
             if (rtmpMapper.updateById(select.setRun(true)) > 0) {
                 return true;
             }
@@ -174,7 +182,7 @@ public class RtmpServiceImpl implements RtmpService {
     public boolean stop(Long id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null != select) {
-            Transcode transcode = threadPool.transcodeMap.get(id);
+            Transcode transcode = transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
                     transcode.stop();
