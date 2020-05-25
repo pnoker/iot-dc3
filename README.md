@@ -82,7 +82,7 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 - 项目目前开发到什么阶段了？
 
-> 完全情况：70% \
+> 完全情况：基本功能都有 \
 > 其中: \
 > 网关服务 需要完善开发，驱动协议需要丰富（包括Mqtt,Opcua）\
 > 管理配置服务 需要优化（接口部分做小改动）\
@@ -91,10 +91,5 @@ DC3 平台是基于`Spring Cloud`架构开发的,是一系列松耦合、开源�
 
 - 项目目前支持的协议有哪些？
 
-> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式）、opcda、opcua \
-> 计划开发协议驱动: mqtt、modbus-tcp
-
-- 并发能力如何？
-
-> 16G,i5机器测试可承受5万并发（测试工具jMeter）\
-> Mongo数据库当并发很大时有较大的延时，后期采用Cassandra替代Mongo。
+> 已完成的协议驱动：rtmp、plcs7、socket（client模式、server模式）、mqtt、opcda、opcua \
+> 计划开发协议驱动: modbus-tcp
