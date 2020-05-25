@@ -16,13 +16,14 @@
 
 package com.dc3.common.sdk.bean;
 
-import com.dc3.common.model.Point;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
+import com.dc3.common.model.Point;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,32 +39,32 @@ public class DriverContext {
     /**
      * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
      */
-    private volatile Map<Long, Map<String, AttributeInfo>> driverInfoMap;
+    private volatile Map<Long, Map<String, AttributeInfo>> driverInfoMap = new HashMap<>(16);
 
     /**
      * deviceId,device
      */
-    private volatile Map<Long, Device> deviceMap;
+    private volatile Map<Long, Device> deviceMap = new HashMap<>(16);
 
     /**
      * deviceName,deviceId
      */
-    private volatile Map<String, Long> deviceNameMap;
+    private volatile Map<String, Long> deviceNameMap = new HashMap<>(16);
 
     /**
      * profileId,(pointId,point)
      */
-    private volatile Map<Long, Map<Long, Point>> profilePointMap;
+    private volatile Map<Long, Map<Long, Point>> profilePointMap = new HashMap<>(16);
 
     /**
      * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
      */
-    private volatile Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap;
+    private volatile Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap = new HashMap<>(16);
 
     /**
      * deviceId(pointName,pointId)
      */
-    private volatile Map<Long, Map<String, Long>> devicePointNameMap;
+    private volatile Map<Long, Map<String, Long>> devicePointNameMap = new HashMap<>(16);
 
     /**
      * 获取设备

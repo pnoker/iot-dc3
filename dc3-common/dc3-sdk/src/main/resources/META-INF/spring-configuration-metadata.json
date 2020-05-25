@@ -3,17 +3,17 @@
     {
       "name": "driver.name",
       "type": "java.lang.String",
-      "description": "device driver name."
+      "description": "driver name."
     },
     {
       "name": "driver.description",
       "type": "java.lang.String",
-      "description": "device driver description."
+      "description": "driver description."
     },
     {
       "name": "driver.driver-attribute",
       "type": "java.util.List",
-      "description": "device driver attribute list<p/><p>- displayName: attribute display name<p>- name: attribute name<p>- type: string/int/double/float/long/boolean<p>- value: default value<p>- description: description."
+      "description": "driver attribute list<p/><p>- displayName: attribute display name<p>- name: attribute name<p>- type: string/int/double/float/long/boolean<p>- value: default value<p>- description: description."
     },
     {
       "name": "driver.point-attribute",
@@ -23,27 +23,87 @@
     {
       "name": "driver.schedule.read.enable",
       "type": "java.lang.Boolean",
-      "description": "device driver read schedule status."
+      "description": "driver read schedule status."
     },
     {
       "name": "driver.schedule.read.corn",
       "type": "java.lang.String",
-      "description": "device driver read schedule corn."
+      "description": "driver read schedule corn."
     },
     {
       "name": "driver.schedule.custom.enable",
       "type": "java.lang.Boolean",
-      "description": "device driver custom schedule status."
+      "description": "driver custom schedule status."
     },
     {
       "name": "driver.schedule.custom.corn",
       "type": "java.lang.String",
-      "description": "device driver custom schedule corn."
+      "description": "driver custom schedule corn."
     },
     {
       "name": "driver.custom",
       "type": "java.lang.String",
-      "description": "device driver custom config."
+      "description": "driver custom config."
+    },
+    {
+      "name": "driver.mqtt.username",
+      "type": "java.lang.String",
+      "description": "driver username for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.password",
+      "type": "java.lang.String",
+      "description": "driver password for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.url",
+      "type": "java.lang.String",
+      "description": "driver url for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.keep-alive",
+      "type": "java.lang.Integer",
+      "description": "driver keep alive interval for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.completion-timeout",
+      "type": "java.lang.Integer",
+      "description": "driver completion timeout for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.url",
+      "type": "java.lang.String",
+      "description": "driver url for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.qos",
+      "type": "java.util.List",
+      "description": "driver qos(int list) for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.topics",
+      "type": "java.util.List",
+      "description": "driver topics(string list) for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.client.id",
+      "type": "java.lang.String",
+      "description": "driver client id for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.default.qos",
+      "type": "java.lang.Integer",
+      "description": "driver default qos for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.default.topic",
+      "type": "java.lang.String",
+      "description": "driver default topic for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.default.receive.enable",
+      "type": "java.lang.Boolean",
+      "description": "driver default topic receive enable for mqtt server."
     }
   ]
 }

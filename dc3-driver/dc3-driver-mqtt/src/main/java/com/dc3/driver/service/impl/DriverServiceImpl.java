@@ -16,16 +16,18 @@
 
 package com.dc3.driver.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.service.DriverService;
+import com.dc3.driver.service.mqtt.MqttSendHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Map;
+
+import static com.dc3.common.sdk.util.DriverUtils.attribute;
 
 /**
  * @author pnoker
@@ -34,25 +36,32 @@ import java.util.Map;
 @Service
 public class DriverServiceImpl implements DriverService {
 
+    @Resource
+    private MqttSendHandler mqttSendHandler;
+
     @Override
     public void initial() {
     }
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        log.debug("Virtual Driver Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
-        String value = String.valueOf(RandomUtil.randomDouble(100));
-        return value;
+        return "nil";
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
-        return false;
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) {
+        String commandTopic = attribute(pointInfo, "commandTopic"), value = values.getValue();
+        try {
+            int commandQos = attribute(pointInfo, "commandQos");
+            mqttSendHandler.sendToMqtt(commandTopic, commandQos, value);
+        } catch (Exception e) {
+            mqttSendHandler.sendToMqtt(commandTopic, value);
+        }
+        return true;
     }
 
     @Override
     public void schedule() {
-
     }
 
 }

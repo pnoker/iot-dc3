@@ -40,7 +40,11 @@ public class ThreadPool {
     /**
      * 线程池
      */
-    private ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+    private ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
+            CORE_POOL_SIZE,
+            MAX_POOL_SIZE,
+            KEEP_ALIVE_TIME,
+            TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(QUEUE_CAPACITY),
             r -> {
                 Thread thread = new Thread(r, "dc3-data-thread-" + atomicInteger.getAndIncrement());
