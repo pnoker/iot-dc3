@@ -1,0 +1,16 @@
+### 写入指定设备位号值
+#driver/write
+POST http://localhost:8701/driver/write
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+[
+  {
+    "deviceId": 1,
+    "pointId": 1,
+    "value": "34"
+  }
+]
+
+###

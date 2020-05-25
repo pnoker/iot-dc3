@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.dc3.driver.controller;
+package com.dc3.driver.bean;
 
-import com.dc3.driver.service.mqtt.MqttGateway;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-@RestController
-@RequestMapping("/test")
-public class TestController {
-
-    @Autowired
-    private MqttGateway mqttGateway;
-
-    @RequestMapping("/sendMqtt")
-    public String sendMqtt(String sendData) {
-        mqttGateway.sendToMqtt(sendData, "hello");
-        return "OK";
-    }
+/**
+ * @author pnoker
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
+public class DevicePayLoad {
+    private Long deviceId;
+    private Long pointId;
+    private String value;
 }
