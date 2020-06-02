@@ -123,20 +123,24 @@ services:
         aliases:
           - dc3-data
 
-  rtmp:
-    build:
-      context: ../dc3-transfer/dc3-rtmp/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-rtmp:3.0
+  flink:
+    image: flink:1.10
     restart: always
-    ports:
-      - 8803:8803
-    container_name: dc3-rtmp
-    hostname: dc3-rtmp
+    expose:
+      - "6121"
+      - "6122"
+    depends_on:
+      - jobmanager
+    container_name: dc3-flink-task
+    command: taskmanager
+    links:
+      - "jobmanager:jobmanager"
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
     networks:
       dc3net:
         aliases:
-          - dc3-rtmp
+          - dc3-flink-task
 
   virtual:
     build:
@@ -269,6 +273,37 @@ services:
       dc3net:
         aliases:
           - dc3-rabbitmq
+  
+  rtmp:
+    build:
+      context: ../dc3-transfer/dc3-rtmp/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-rtmp:3.0
+    restart: always
+    ports:
+      - 8803:8803
+    container_name: dc3-rtmp
+    hostname: dc3-rtmp
+    networks:
+      dc3net:
+        aliases:
+          - dc3-rtmp
+
+  jobmanager:
+    image: flink:1.10
+    restart: always
+    expose:
+      - "6123"
+    ports:
+      - "8081:8081"
+    container_name: dc3-flink-job
+    command: jobmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    networks:
+      dc3net:
+        aliases:
+          - dc3-flink-job
 
   nginx:
     image: pnoker/alpine-nginx:rtmp
