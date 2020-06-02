@@ -123,25 +123,6 @@ services:
         aliases:
           - dc3-data
 
-  flink:
-    image: flink:1.10
-    restart: always
-    expose:
-      - "6121"
-      - "6122"
-    depends_on:
-      - jobmanager
-    container_name: dc3-flink-task
-    command: taskmanager
-    links:
-      - "jobmanager:jobmanager"
-    environment:
-      - JOB_MANAGER_RPC_ADDRESS=jobmanager
-    networks:
-      dc3net:
-        aliases:
-          - dc3-flink-task
-
   virtual:
     build:
       context: ../dc3-driver/dc3-driver-virtual/
@@ -156,6 +137,51 @@ services:
       dc3net:
         aliases:
           - dc3-driver-virtual
+
+  plcs7:
+    build:
+      context: ../dc3-driver/dc3-driver-plcs7/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-plcs7:3.0
+    restart: always
+    ports:
+      - 8601:8601
+    container_name: dc3-driver-plcs7
+    hostname: dc3-driver-plcs7
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-plcs7
+
+  opc-da:
+    build:
+      context: ../dc3-driver/dc3-driver-opc-da/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-opc-da:3.0
+    restart: always
+    ports:
+      - 8602:8602
+    container_name: dc3-driver-opc-da
+    hostname: dc3-driver-opc-da
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-da
+
+  opc-ua:
+    build:
+      context: ../dc3-driver/dc3-driver-opc-ua/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-opc-ua:3.0
+    restart: always
+    ports:
+      - 8603:8603
+    container_name: dc3-driver-opc-ua
+    hostname: dc3-driver-opc-ua
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-ua
 
   listening-virtual:
     build:
@@ -172,35 +198,35 @@ services:
         aliases:
           - dc3-driver-listening-virtual
 
-  opc-da:
+  mqtt:
     build:
-      context: ../dc3-driver/dc3-driver-opc-da/
+      context: ../dc3-driver/dc3-driver-mqtt/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-opc-da:3.0
+    image: pnoker/dc3-driver-mqtt:3.0
     restart: always
     ports:
-      - 8601:8601
-    container_name: dc3-driver-opc-da
-    hostname: dc3-driver-opc-da
+      - 8701:8701
+    container_name: dc3-driver-mqtt
+    hostname: dc3-driver-mqtt
     networks:
       dc3net:
         aliases:
-          - dc3-driver-opc-da
+          - dc3-driver-mqtt
 
-  opc-ua:
+  modbus-tcp:
     build:
-      context: ../dc3-driver/dc3-driver-opc-ua/
+      context: ../dc3-driver/dc3-driver-modbus-tcp/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-opc-ua:3.0
+    image: pnoker/dc3-driver-modbus-tcp:3.0
     restart: always
     ports:
-      - 8602:8602
-    container_name: dc3-driver-opc-ua
-    hostname: dc3-driver-opc-ua
+      - 8702:8702
+    container_name: dc3-driver-modbus-tcp
+    hostname: dc3-driver-modbus-tcp
     networks:
       dc3net:
         aliases:
-          - dc3-driver-opc-ua
+          - dc3-driver-modbus-tcp
 
   mysql:
     build:
@@ -273,7 +299,26 @@ services:
       dc3net:
         aliases:
           - dc3-rabbitmq
-  
+
+  flink:
+    image: flink:1.10
+    restart: always
+    expose:
+      - "6121"
+      - "6122"
+    depends_on:
+      - jobmanager
+    container_name: dc3-flink-task
+    command: taskmanager
+    links:
+      - "jobmanager:jobmanager"
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    networks:
+      dc3net:
+        aliases:
+          - dc3-flink-task
+
   rtmp:
     build:
       context: ../dc3-transfer/dc3-rtmp/

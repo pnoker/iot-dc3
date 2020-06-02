@@ -3,11 +3,11 @@ driver:
   description: @project.description@
   schedule:
     read:
-      enable: true
-      corn: '*/1 * * * * ?'
+      enable: false
+      corn: '0/30 * * * * ?'
     custom:
       enable: false
-      corn:  '*/15 * * * * ?'
+      corn:  '0/30 * * * * ?'
   driver-attribute:
     - displayName: 主机
       name: host
@@ -40,11 +40,6 @@ driver:
       type: int
       value: 8
       description: 数据块长度
-    - displayName: 类型
-      name: type
-      type: string
-      value: string
-      description: 解析类型，bool、byte、int、dint、word、dword、real、date、time、datetime、string
 
 server:
   port: 8601

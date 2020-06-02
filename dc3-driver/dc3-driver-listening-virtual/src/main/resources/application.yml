@@ -4,6 +4,13 @@ driver:
   custom:
     socket:
       port: 6270
+  schedule:
+    read:
+      enable: false
+      corn: '0/30 * * * * ?'
+    custom:
+      enable: false
+      corn:  '0/30 * * * * ?'
   point-attribute:
     - displayName: 关键字
       name: key

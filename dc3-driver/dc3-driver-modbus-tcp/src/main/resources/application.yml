@@ -1,0 +1,51 @@
+driver:
+  name: ModbusDriver
+  description: @project.description@
+  schedule:
+    read:
+      enable: false
+      corn: '0/30 * * * * ?'
+    custom:
+      enable: false
+      corn:  '0/30 * * * * ?'
+  driver-attribute:
+    - displayName: 主机
+      name: host
+      type: string
+      value: localhost
+      description: Modbus IP
+    - displayName: 端口
+      name: port
+      type: int
+      value: 502
+      description: Modbus Port
+  point-attribute:
+    - displayName: 从站编号
+      name: slaveId
+      type: int
+      value: 1
+      description: 从站编号
+    - displayName: 功能码
+      name: functionCode
+      type: int
+      value: 1
+      description: 功能码 [1、2、3、4]
+    - displayName: 偏移量
+      name: offset
+      type: int
+      value: 0
+      description: 偏移量
+
+server:
+  port: 8702
+
+spring:
+  application:
+    name: @project.artifactId@
+
+logging:
+  level:
+    com.dc3.common.sdk: DEBUG
+    com.dc3: DEBUG
+  file:
+    name: dc3/logs/driver/listeningVirtual/${spring.application.name}.log

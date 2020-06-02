@@ -58,7 +58,7 @@ public class DriverServiceImpl implements DriverService {
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
-        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo);
+        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getType());
         return String.valueOf(serializer.dispense(plcs7PointVariable));
     }
 
@@ -66,7 +66,7 @@ public class DriverServiceImpl implements DriverService {
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
         log.debug("Opc Da Read, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
-        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo);
+        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType());
         store(serializer, plcs7PointVariable, value.getType(), value.getValue());
         return true;
     }
@@ -107,9 +107,9 @@ public class DriverServiceImpl implements DriverService {
      * @param pointInfo
      * @return
      */
-    private Plcs7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo) {
+    private Plcs7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo, String type) {
         log.debug("Plc S7 Point Info {}", JSON.toJSONString(pointInfo));
-        return new Plcs7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), attribute(pointInfo, "type"));
+        return new Plcs7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), type);
     }
 
     /**
