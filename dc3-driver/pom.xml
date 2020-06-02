@@ -35,6 +35,7 @@
         <module>dc3-driver-opc-da</module>
         <module>dc3-driver-opc-ua</module>
         <module>dc3-driver-mqtt</module>
+        <module>dc3-driver-modbus-tcp</module>
     </modules>
 
     <dependencies>

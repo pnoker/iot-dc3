@@ -1,6 +1,13 @@
 driver:
   name: MqttDriver
   description: @project.description@
+  schedule:
+    read:
+      enable: false
+      corn: '0/30 * * * * ?'
+    custom:
+      enable: false
+      corn:  '0/30 * * * * ?'
   point-attribute:
     - displayName: 指令Topic
       name: commandTopic
