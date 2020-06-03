@@ -7,8 +7,8 @@ Cache-Control: no-cache
 
 [
   {
-    "deviceId": 7,
-    "pointId": 8
+    "deviceId": 1,
+    "pointId": 1
   }
 ]
 
@@ -24,7 +24,7 @@ Cache-Control: no-cache
   {
     "deviceId": 1,
     "pointId": 1,
-    "value": "34"
+    "value": "23"
   }
 ]
 
