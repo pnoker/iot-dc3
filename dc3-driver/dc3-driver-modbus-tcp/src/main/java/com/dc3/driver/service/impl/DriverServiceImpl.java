@@ -30,6 +30,8 @@ import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
+import com.serotonin.modbus4j.msg.WriteCoilRequest;
+import com.serotonin.modbus4j.msg.WriteCoilResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.dc3.common.sdk.util.DriverUtils.attribute;
+import static com.dc3.common.sdk.util.DriverUtils.value;
 
 /**
  * @author pnoker
@@ -61,14 +64,14 @@ public class DriverServiceImpl implements DriverService {
     @SneakyThrows
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         ModbusMaster modbusMaster = getMaster(device.getId(), driverInfo);
-        String value = readValue(modbusMaster, pointInfo, point.getType());
-        return value;
+        return readValue(modbusMaster, pointInfo, point.getType());
     }
 
     @Override
     @SneakyThrows
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
-        return false;
+        ModbusMaster modbusMaster = getMaster(device.getId(), driverInfo);
+        return writeValue(modbusMaster, pointInfo, value.getType(), value.getValue());
     }
 
     @Override
@@ -133,27 +136,45 @@ public class DriverServiceImpl implements DriverService {
         }
     }
 
-    public void writeValue(String type) {
-        switch (type.toLowerCase()) {
-            case Common.ValueType.INT:
-                break;
-            case Common.ValueType.LONG:
-                break;
-            case Common.ValueType.FLOAT:
-                break;
-            case Common.ValueType.DOUBLE:
-                break;
-            case Common.ValueType.BOOLEAN:
-                break;
-            case Common.ValueType.STRING:
-                break;
+    /**
+     * 写 Value
+     *
+     * @param modbusMaster
+     * @param pointInfo
+     * @param type
+     * @param value
+     * @return
+     * @throws ModbusTransportException
+     * @throws ErrorResponseException
+     */
+    public boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, String type, String value) throws ModbusTransportException, ErrorResponseException {
+        int slaveId = attribute(pointInfo, "slaveId");
+        int functionCode = attribute(pointInfo, "functionCode");
+        int offset = attribute(pointInfo, "offset");
+        switch (functionCode) {
+            case 1:
+                boolean coilValue = value(type, value);
+                WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, coilValue);
+                WriteCoilResponse coilResponse = (WriteCoilResponse) modbusMaster.send(coilRequest);
+                if (coilResponse.isException()) {
+                    return false;
+                }
+                return true;
+            case 3:
+                BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset, getValueType(type));
+                modbusMaster.setValue(locator, value(type, value));
+                return true;
             default:
-                break;
+                return false;
         }
     }
 
     /**
      * 获取数据类型
+     * 说明：此处可根据实际项目情况进行拓展
+     * 1.swap 交换
+     * 2.大端/小端,默认是大端
+     * 3.拓展其他数据类型
      *
      * @param type
      * @return
@@ -161,15 +182,14 @@ public class DriverServiceImpl implements DriverService {
     public int getValueType(String type) {
         switch (type.toLowerCase()) {
             case Common.ValueType.INT:
-                return DataType.FOUR_BYTE_INT_SIGNED;
+            case Common.ValueType.BOOLEAN:
+                return DataType.TWO_BYTE_INT_SIGNED;
             case Common.ValueType.LONG:
-                return DataType.EIGHT_BYTE_INT_SIGNED;
+                return DataType.FOUR_BYTE_INT_SIGNED;
             case Common.ValueType.FLOAT:
                 return DataType.FOUR_BYTE_FLOAT;
             case Common.ValueType.DOUBLE:
                 return DataType.EIGHT_BYTE_FLOAT;
-            case Common.ValueType.BOOLEAN:
-                return DataType.TWO_BYTE_INT_SIGNED;
             default:
                 return DataType.VARCHAR;
         }
