@@ -36,7 +36,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_RTMP_URL_PREFIX, name = Common.Service.DC3_RTMP, fallbackFactory = RtmpClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_RTMP_URL_PREFIX, name = Common.Service.DC3_RTMP_SERVICE_NAME, fallbackFactory = RtmpClientHystrix.class)
 public interface RtmpClient {
 
     /**

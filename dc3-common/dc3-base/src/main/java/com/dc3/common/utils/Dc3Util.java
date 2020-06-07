@@ -17,6 +17,7 @@
 package com.dc3.common.utils;
 
 import cn.hutool.core.util.ReUtil;
+import cn.hutool.crypto.digest.MD5;
 import com.dc3.common.dto.NodeDto;
 import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,28 @@ public class Dc3Util {
      */
     public static byte[] decode(byte[] input) {
         return Base64.getDecoder().decode(input);
+    }
+
+    /**
+     * 获取 md5 加密编码
+     *
+     * @param str
+     * @return
+     */
+    public static String md5(String str) {
+        MD5 md5 = MD5.create();
+        return md5.digestHex(str, Charsets.UTF_8);
+    }
+
+    /**
+     * 获取 md5 & salt 加密编码
+     *
+     * @param str
+     * @param salt
+     * @return
+     */
+    public static String md5(String str, String salt) {
+        return md5(md5(str) + salt);
     }
 
     /**

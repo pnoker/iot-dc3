@@ -22,7 +22,7 @@ Cache-Control: no-cache
 
 {
   "id": 1,
-  "password":"dc3dc3dc3",
+  "password": "dc3dc3dc3",
   "enable": true,
   "description": "平台开发者账号"
 }
@@ -90,20 +90,120 @@ Cache-Control: no-cache
 ### --------------------- Token ---------------------
 ### 生成用户 Token 令牌
 #/auth/token
-POST http://localhost:8300/auth/token
+GET http://localhost:8300/auth/token/salt
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=pnoker
+
+
+### 生成用户 Token 令牌
+#/auth/token
+POST http://localhost:8300/auth/token/generate
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
 {
   "name": "pnoker",
-  "password": "dc3dc3"
+  "password": "dc3dc3dc3"
 }
 
 
 ### 检测用户 Token 令牌是否有效
 #/auth/token/:token
-POST http://localhost:8300/auth/token/eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1ODg0OTIyNDUsImV4cCI6MTU4ODUxMzg0NX0.0bq97QGR4oTyvlFKWMAhw2W5_lqIOg4OfKamNwwanhY
+GET http://localhost:8300/auth/token/check
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=pnoker&token=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1OTE0OTQ5MTQsImV4cCI6MTU5MTUxNjUxNH0.J2ND1WkIRKf68t3pPVj9iO-rAq5jl_1raTa4zPVfJnw
+
+
+### 检测用户 Token 令牌是否有效
+#/auth/token/:token
+GET http://localhost:8300/auth/token/cancel
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=pnoker
+
+### --------------------- BlackIp ---------------------
+### 新增 BlackIp
+#/auth/blackIp/add
+POST http://localhost:8300/auth/blackIp/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "ip": "192.168.0.1",
+  "description": "测试黑名单Ip"
+}
+
+
+### 修改 BlackIp
+#/auth/blackIp/update
+POST http://localhost:8300/auth/blackIp/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "ip": "192.168.0.2",
+  "description": "测试黑名单Ip"
+}
+
+
+### 根据 ID 查询 BlackIp
+#/auth/blackIp/id/:id
+GET http://localhost:8300/auth/blackIp/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 Ip 查询 BlackIp
+#/auth/user/ip/:ip
+GET http://localhost:8300/auth/blackIp/ip/192.168.0.1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 分页查询 BlackIp
+#/auth/blackIp/list，支持ip模糊查询
+POST http://localhost:8300/auth/blackIp/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "ip": ".2",
+  "page": {
+    "current": 1,
+    "size": 500,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 检测用户是否存在
+#/auth/blackIp/check/:ip
+GET http://localhost:8300/auth/blackIp/check/192.168.0.1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 ID 删除 BlackIp
+#/auth/blackIp/delete/:id
+POST http://localhost:8300/auth/blackIp/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

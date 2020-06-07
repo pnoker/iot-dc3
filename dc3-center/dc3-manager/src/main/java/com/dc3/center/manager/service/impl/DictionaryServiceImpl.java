@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dc3.center.manager.mapper.*;
 import com.dc3.center.manager.service.DictionaryService;
+import com.dc3.common.bean.Dictionary;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.*;
 import lombok.extern.slf4j.Slf4j;

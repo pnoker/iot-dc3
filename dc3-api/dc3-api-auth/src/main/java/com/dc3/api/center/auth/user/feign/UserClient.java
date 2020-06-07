@@ -38,7 +38,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_USER_URL_PREFIX, name = Common.Service.DC3_AUTH, fallbackFactory = UserClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_AUTH_USER_URL_PREFIX, name = Common.Service.DC3_AUTH_SERVICE_NAME, fallbackFactory = UserClientHystrix.class)
 public interface UserClient {
 
     /**

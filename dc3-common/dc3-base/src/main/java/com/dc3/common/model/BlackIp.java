@@ -14,34 +14,23 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean;
+package com.dc3.common.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 /**
- * Aes/Rsa 加密密钥
+ * Ip 黑名单表
  *
  * @author pnoker
  */
-public class Keys {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class BlackIp extends Description {
 
-    /**
-     * Aes 密钥
-     */
-    @Data
-    @AllArgsConstructor
-    public class Aes {
-        private String privateKey;
-    }
-
-    /**
-     * RSA 密钥对
-     */
-    @Data
-    @AllArgsConstructor
-    public class Rsa {
-        private String publicKey;
-        private String privateKey;
-    }
+    private String ip;
 }

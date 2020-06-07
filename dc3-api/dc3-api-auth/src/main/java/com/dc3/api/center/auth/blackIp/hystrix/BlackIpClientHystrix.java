@@ -14,51 +14,67 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.auth.token.hystrix;
+package com.dc3.api.center.auth.blackIp.hystrix;
 
-import com.dc3.api.center.auth.token.feign.TokenClient;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc3.api.center.auth.blackIp.feign.BlackIpClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.model.User;
+import com.dc3.common.dto.BlackIpDto;
+import com.dc3.common.model.BlackIp;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>TokenClientHystrix
+ * BlackIpClientHystrix
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class TokenClientHystrix implements FallbackFactory<TokenClient> {
+public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
 
     @Override
-    public TokenClient create(Throwable throwable) {
+    public BlackIpClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
         log.error("Hystrix:{}", message, throwable);
 
-        return new TokenClient() {
+        return new BlackIpClient() {
 
             @Override
-            public R<String> randomSalt(String username) {
+            public R<BlackIp> add(BlackIp blackIp) {
                 return R.fail(message);
             }
 
             @Override
-            public R<String> generateToken(User user) {
+            public R<Boolean> delete(Long id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> checkTokenValid(String username, String token) {
+            public R<BlackIp> update(BlackIp blackIp) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> cancelToken(String username) {
+            public R<BlackIp> selectById(Long id) {
                 return R.fail(message);
             }
 
+            @Override
+            public R<BlackIp> selectByIp(String ip) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Boolean> checkBlackIpValid(String ip) {
+                return R.fail(message);
+            }
         };
     }
 }

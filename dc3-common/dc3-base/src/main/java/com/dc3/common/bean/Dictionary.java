@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.model;
+package com.dc3.common.bean;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonInclude;

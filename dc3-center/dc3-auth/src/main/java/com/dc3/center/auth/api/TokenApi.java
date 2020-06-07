@@ -34,23 +34,46 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_TOKEN_URL_PREFIX)
+@RequestMapping(Common.Service.DC3_AUTH_TOKEN_URL_PREFIX)
 public class TokenApi implements TokenClient {
     @Resource
     private TokenService tokenService;
 
     @Override
-    public R<String> generateToken(User user) {
+    public R<String> randomSalt(String username) {
         try {
-            String token = tokenService.generateToken(user);
-            return null != token ? R.ok(token, "") : R.fail();
+            String salt = tokenService.randomSalt(username);
+            return null != salt ? R.ok(salt, "ok") : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<Boolean> checkTokenValid(String token) {
-        return tokenService.checkTokenValid(token) ? R.ok() : R.fail();
+    public R<String> generateToken(User user) {
+        try {
+            String token = tokenService.generateToken(user);
+            return null != token ? R.ok(token, "ok") : R.fail();
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public R<Boolean> checkTokenValid(String username, String token) {
+        try {
+            return tokenService.checkTokenValid(username, token) ? R.ok() : R.fail();
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public R<Boolean> cancelToken(String username) {
+        try {
+            return tokenService.cancelToken(username) ? R.ok() : R.fail();
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
     }
 }
