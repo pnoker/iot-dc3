@@ -18,11 +18,13 @@ package com.dc3.common.utils;
 
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.crypto.digest.MD5;
+import com.dc3.common.constant.Common;
 import com.dc3.common.dto.NodeDto;
 import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -34,6 +36,7 @@ import static com.google.common.collect.Sets.newHashSet;
  */
 @Slf4j
 public class Dc3Util {
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Common.DATE_FORMAT);
 
     /**
      * 将字符串进行Base64编码
@@ -98,15 +101,26 @@ public class Dc3Util {
     }
 
     /**
-     * 按小时推迟时间
+     * 使用 yyyy-MM-dd HH:mm:ss 格式化时间
      *
-     * @param hour
+     * @param date
      * @return
      */
-    public static Date expireTime(int hour) {
+    public static String formatData(Date date) {
+        return simpleDateFormat.format(date);
+    }
+
+    /**
+     * 按小时推迟时间
+     *
+     * @param amount
+     * @param field  Calendar field : Calendar.HOUR/MINUTE/...
+     * @return
+     */
+    public static Date expireTime(int amount, int field) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.add(Calendar.HOUR, hour);
+        calendar.add(field, amount);
         return calendar.getTime();
     }
 

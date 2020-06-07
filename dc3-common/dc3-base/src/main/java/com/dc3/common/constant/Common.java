@@ -124,6 +124,11 @@ public interface Common {
          */
         int TOKEN_CACHE_TIMEOUT = 5;
 
+        /**
+         * 分隔符
+         */
+        String SEPARATOR = "::";
+
         String ID = "_id";
         String IP = "_ip";
         String NAME = "_name";
@@ -132,6 +137,7 @@ public interface Common {
         String LIST = "_list";
         String SALT = "_salt";
         String TOKEN = "_token";
+        String LIMIT = "_limit";
         String SERVICE_NAME = "_service_name";
         String HOST_PORT = "_host_port";
         String DRIVER_INFO_ID = "_driver_info_id";
