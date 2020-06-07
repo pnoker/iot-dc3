@@ -34,6 +34,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -165,7 +166,7 @@ public class KeyUtil {
         JwtBuilder builder = Jwts.builder()
                 .setId(name)
                 .setIssuedAt(new Date())
-                .setExpiration(Dc3Util.expireTime(6))
+                .setExpiration(Dc3Util.expireTime(6, Calendar.HOUR))
                 .signWith(SignatureAlgorithm.HS256, Common.KEY);
         return builder.compact();
     }
