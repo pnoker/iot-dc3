@@ -38,7 +38,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_GROUP_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = GroupClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_GROUP_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = GroupClientHystrix.class)
 public interface GroupClient {
 
     /**

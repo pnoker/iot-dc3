@@ -14,34 +14,17 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean;
+package com.dc3.center.auth.mapper;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.dc3.common.model.BlackIp;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * Aes/Rsa 加密密钥
+ * Mapper
  *
  * @author pnoker
  */
-public class Keys {
-
-    /**
-     * Aes 密钥
-     */
-    @Data
-    @AllArgsConstructor
-    public class Aes {
-        private String privateKey;
-    }
-
-    /**
-     * RSA 密钥对
-     */
-    @Data
-    @AllArgsConstructor
-    public class Rsa {
-        private String publicKey;
-        private String privateKey;
-    }
+@Mapper
+public interface BlackIpMapper extends BaseMapper<BlackIp> {
 }

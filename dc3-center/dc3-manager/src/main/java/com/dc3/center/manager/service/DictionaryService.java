@@ -16,7 +16,7 @@
 
 package com.dc3.center.manager.service;
 
-import com.dc3.common.model.Dictionary;
+import com.dc3.common.bean.Dictionary;
 
 import java.util.List;
 

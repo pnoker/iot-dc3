@@ -38,7 +38,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_LABEL_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = LabelClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_LABEL_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = LabelClientHystrix.class)
 public interface LabelClient {
 
     /**

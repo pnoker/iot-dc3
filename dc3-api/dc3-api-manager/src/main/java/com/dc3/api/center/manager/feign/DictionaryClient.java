@@ -19,7 +19,7 @@ package com.dc3.api.center.manager.feign;
 import com.dc3.api.center.manager.hystrix.DictionaryClientHystrix;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.Dictionary;
+import com.dc3.common.bean.Dictionary;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_DICTIONARY_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = DictionaryClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_DICTIONARY_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = DictionaryClientHystrix.class)
 public interface DictionaryClient {
 
     /**

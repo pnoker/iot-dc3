@@ -17,12 +17,12 @@
 package com.dc3.center.auth.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.auth.user.feign.UserClient;
-import com.dc3.center.auth.service.UserService;
+import com.dc3.api.center.auth.blackIp.feign.BlackIpClient;
+import com.dc3.center.auth.service.BlackIpService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.dto.UserDto;
-import com.dc3.common.model.User;
+import com.dc3.common.dto.BlackIpDto;
+import com.dc3.common.model.BlackIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,15 +36,15 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_AUTH_USER_URL_PREFIX)
-public class UserApi implements UserClient {
+@RequestMapping(Common.Service.DC3_AUTH_BLACK_IP_URL_PREFIX)
+public class BlackIpApi implements BlackIpClient {
     @Resource
-    private UserService userService;
+    private BlackIpService blackIpService;
 
     @Override
-    public R<User> add(User user) {
+    public R<BlackIp> add(BlackIp blackIp) {
         try {
-            User add = userService.add(user);
+            BlackIp add = blackIpService.add(blackIp);
             if (null != add) {
                 return R.ok(add);
             }
@@ -57,16 +57,16 @@ public class UserApi implements UserClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return userService.delete(id) ? R.ok() : R.fail();
+            return blackIpService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<User> update(User user) {
+    public R<BlackIp> update(BlackIp blackIp) {
         try {
-            User update = userService.update(user.setName(null));
+            BlackIp update = blackIpService.update(blackIp);
             if (null != update) {
                 return R.ok(update);
             }
@@ -77,18 +77,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Boolean> restPassword(Long id) {
+    public R<BlackIp> selectById(Long id) {
         try {
-            return userService.restPassword(id) ? R.ok() : R.fail();
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-    }
-
-    @Override
-    public R<User> selectById(Long id) {
-        try {
-            User select = userService.selectById(id);
+            BlackIp select = blackIpService.selectById(id);
             if (null != select) {
                 return R.ok(select);
             }
@@ -99,9 +90,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<User> selectByName(String name) {
+    public R<BlackIp> selectByIp(String ip) {
         try {
-            User select = userService.selectByName(name);
+            BlackIp select = blackIpService.selectByIp(ip);
             if (null != select) {
                 return R.ok(select);
             }
@@ -112,9 +103,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Page<User>> list(UserDto userDto) {
+    public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
         try {
-            Page<User> page = userService.list(userDto);
+            Page<BlackIp> page = blackIpService.list(blackIpDto);
             if (null != page) {
                 return R.ok(page);
             }
@@ -125,9 +116,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Boolean> checkUserValid(String name) {
+    public R<Boolean> checkBlackIpValid(String ip) {
         try {
-            return userService.checkUserValid(name) ? R.ok() : R.fail();
+            return blackIpService.checkBlackIpValid(ip) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

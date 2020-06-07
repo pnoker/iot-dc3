@@ -20,7 +20,7 @@ import com.dc3.api.center.manager.feign.DictionaryClient;
 import com.dc3.center.manager.service.DictionaryService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.Dictionary;
+import com.dc3.common.bean.Dictionary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_DICTIONARY_URL_PREFIX)
+@RequestMapping(Common.Service.DC3_MANAGER_DICTIONARY_URL_PREFIX)
 public class DictionaryApi implements DictionaryClient {
     @Resource
     private DictionaryService dictionaryService;

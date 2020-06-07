@@ -65,23 +65,30 @@ public interface Common {
      * 数据类型
      */
     interface ValueType {
-        String STRING = "string";
         String INT = "int";
-        String DOUBLE = "double";
-        String FLOAT = "float";
         String LONG = "long";
+        String FLOAT = "float";
+        String DOUBLE = "double";
         String BOOLEAN = "boolean";
+        String STRING = "string";
     }
 
     /**
      * 服务名称 & 服务基地址
      */
     interface Service {
-        String DC3_AUTH = "DC3-AUTH";
-        String DC3_USER_URL_PREFIX = "/auth/user";
-        String DC3_TOKEN_URL_PREFIX = "/auth/token";
+        /**
+         * dc3-auth 服务
+         */
+        String DC3_AUTH_SERVICE_NAME = "DC3-AUTH";
+        String DC3_AUTH_USER_URL_PREFIX = "/auth/user";
+        String DC3_AUTH_TOKEN_URL_PREFIX = "/auth/token";
+        String DC3_AUTH_BLACK_IP_URL_PREFIX = "/auth/blackIp";
 
-        String DC3_MANAGER = "DC3-MANAGER";
+        /**
+         * dc3-manager 服务
+         */
+        String DC3_MANAGER_SERVICE_NAME = "DC3-MANAGER";
         String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
         String DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX = "/manager/driverAttribute";
         String DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX = "/manager/pointAttribute";
@@ -92,12 +99,18 @@ public interface Common {
         String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/pointInfo";
         String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driverInfo";
         String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
-        String DC3_DICTIONARY_URL_PREFIX = "/manager/dictionary";
+        String DC3_MANAGER_DICTIONARY_URL_PREFIX = "/manager/dictionary";
 
-        String DC3_RTMP = "DC3-RTMP";
+        /**
+         * dc3-rtmp 服务
+         */
+        String DC3_RTMP_SERVICE_NAME = "DC3-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
 
-        String DC3_DATA = "DC3-DATA";
+        /**
+         * dc3-data 服务
+         */
+        String DC3_DATA_SERVICE_NAME = "DC3-DATA";
         String DC3_DATA_URL_PREFIX = "/data";
         String DC3_DRIVER_URL_PREFIX = "/driver";
     }
@@ -106,11 +119,19 @@ public interface Common {
      * 缓存Key
      */
     interface Cache {
+        /**
+         * token 在 redis 中的失效时间
+         */
+        int TOKEN_CACHE_TIMEOUT = 5;
+
         String ID = "_id";
+        String IP = "_ip";
         String NAME = "_name";
         String CODE = "_code";
         String DIC = "_dic";
         String LIST = "_list";
+        String SALT = "_salt";
+        String TOKEN = "_token";
         String SERVICE_NAME = "_service_name";
         String HOST_PORT = "_host_port";
         String DRIVER_INFO_ID = "_driver_info_id";
@@ -130,6 +151,7 @@ public interface Common {
         String RTMP = "rtmp";
         String LABEL = "label";
         String LABEL_BIND = "label_bind";
+        String BLACK_IP = "black_ip";
     }
 
 }

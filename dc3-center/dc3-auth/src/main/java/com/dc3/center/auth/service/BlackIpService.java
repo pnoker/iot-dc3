@@ -14,34 +14,31 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean;
+package com.dc3.center.auth.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.dc3.common.base.Service;
+import com.dc3.common.dto.BlackIpDto;
+import com.dc3.common.model.BlackIp;
 
 /**
- * Aes/Rsa 加密密钥
+ * User Interface
  *
  * @author pnoker
  */
-public class Keys {
+public interface BlackIpService extends Service<BlackIp, BlackIpDto> {
+    /**
+     * 根据 Ip 查询 BlackIp
+     *
+     * @param ip
+     * @return BlackIp
+     */
+    BlackIp selectByIp(String ip);
 
     /**
-     * Aes 密钥
+     * 根据 Ip 是否在Ip黑名单列表
+     *
+     * @param ip
+     * @return boolean
      */
-    @Data
-    @AllArgsConstructor
-    public class Aes {
-        private String privateKey;
-    }
-
-    /**
-     * RSA 密钥对
-     */
-    @Data
-    @AllArgsConstructor
-    public class Rsa {
-        private String publicKey;
-        private String privateKey;
-    }
+    boolean checkBlackIpValid(String ip);
 }

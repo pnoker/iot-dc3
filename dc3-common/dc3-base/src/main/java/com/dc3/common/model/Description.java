@@ -20,10 +20,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.dc3.common.constant.Common;
 import com.dc3.common.valid.Update;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -66,7 +66,9 @@ public class Description implements Serializable {
     private Date updateTime;
 
     /**
-     * 逻辑删除标识 1：删除，0：未删除
+     * 逻辑删除标识
+     * 1：删除
+     * 0：未删除
      */
     @TableLogic
     @TableField(select = false)

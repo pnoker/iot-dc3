@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.manager.feign;
+package com.dc3.api.center.auth.blackIp.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.manager.hystrix.DeviceClientHystrix;
+import com.dc3.api.center.auth.blackIp.hystrix.BlackIpClientHystrix;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.dto.DeviceDto;
-import com.dc3.common.model.Device;
+import com.dc3.common.dto.BlackIpDto;
+import com.dc3.common.model.BlackIp;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,65 +34,74 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.constraints.NotNull;
 
 /**
- * 设备 FeignClient
+ * Ip 黑名单 FeignClient
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_DEVICE_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = DeviceClientHystrix.class)
-public interface DeviceClient {
+@FeignClient(path = Common.Service.DC3_AUTH_BLACK_IP_URL_PREFIX, name = Common.Service.DC3_AUTH_SERVICE_NAME, fallbackFactory = BlackIpClientHystrix.class)
+public interface BlackIpClient {
 
     /**
-     * 新增 Device
+     * 新增 BlackIp
      *
-     * @param device
-     * @return Device
+     * @param blackIp
+     * @return BlackIp
      */
     @PostMapping("/add")
-    R<Device> add(@Validated(Insert.class) @RequestBody Device device);
+    R<BlackIp> add(@Validated(Insert.class) @RequestBody BlackIp blackIp);
 
     /**
-     * 根据 ID 删除 Device
+     * 根据 ID 删除 BlackIp
      *
-     * @param id deviceId
+     * @param id blackIpId
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 修改 Device
+     * 修改 BlackIp
      *
-     * @param device
-     * @return Device
+     * @param blackIp
+     * @return BlackIp
      */
     @PostMapping("/update")
-    R<Device> update(@Validated(Update.class) @RequestBody Device device);
+    R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp);
 
     /**
-     * 根据 ID 查询 Device
+     * 根据 ID 查询 BlackIp
      *
      * @param id
-     * @return Device
+     * @return BlackIp
      */
     @GetMapping("/id/{id}")
-    R<Device> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<BlackIp> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 根据 CODE 查询 Device
+     * 根据 Ip 查询 BlackIp
      *
-     * @param code
-     * @return Device
+     * @param ip
+     * @return BlackIp
      */
-    @GetMapping("/code/{code}")
-    R<Device> selectByCode(@NotNull @PathVariable(value = "code") String code);
+    @GetMapping("/ip/{ip}")
+    R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip);
 
     /**
-     * 分页查询 Device
+     * 分页查询 BlackIp
      *
-     * @param deviceDto
-     * @return Page<Device>
+     * @param blackIpDto
+     * @return Page<BlackIp>
      */
     @PostMapping("/list")
-    R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto);
+    R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpDto blackIpDto);
+
+    /**
+     * 检测 Ip 是否在 Ip 黑名单列表
+     *
+     * @param ip
+     * @return Boolean
+     */
+    @GetMapping("/check/{ip}")
+    R<Boolean> checkBlackIpValid(@NotNull @PathVariable(value = "ip") String ip);
 
 }

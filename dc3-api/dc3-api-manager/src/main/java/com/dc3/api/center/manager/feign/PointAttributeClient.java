@@ -38,7 +38,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX, name = Common.Service.DC3_MANAGER, fallbackFactory = PointAttributeClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = PointAttributeClientHystrix.class)
 public interface PointAttributeClient {
 
     /**
