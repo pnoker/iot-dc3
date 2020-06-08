@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Pnoker. All Rights Reserved.
+ * Copyright 2018-2020 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,10 +127,11 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public boolean checkBlackIpValid(String ip) {
-        LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda()
-                .eq(BlackIp::getIp, ip);
-        Integer count = blackIpMapper.selectCount(queryWrapper);
-        return count > 0;
+        BlackIp blackIp = selectByIp(ip);
+        if (null != blackIp) {
+            return blackIp.getEnable();
+        }
+        return false;
     }
 
     @Override

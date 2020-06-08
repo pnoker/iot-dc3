@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Pnoker. All Rights Reserved.
+ * Copyright 2018-2020 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package com.dc3.gateway.filter;
 
-import com.dc3.common.utils.KeyUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,23 +29,28 @@ import org.springframework.stereotype.Component;
  * @author pnoker
  */
 @Component
-public class AuthenticFilter extends AbstractGatewayFilterFactory {
+public class AuthenticFilter extends AbstractGatewayFilterFactory<Object> {
+    /*@Resource
+    private TokenClient tokenClient;*/
 
     @Override
     public GatewayFilter apply(Object config) {
         return (exchange, chain) -> {
-            // 获取Header信息
-            String token = exchange.getRequest().getHeaders().getFirst("Token");
-            if (!StringUtils.isBlank(token)) {
+            ServerHttpRequest request = exchange.getRequest();
+            String token = request.getHeaders().getFirst("Auth-Token");
+            String user = request.getHeaders().getFirst("Auth-User");
+            if (StringUtils.isNotBlank(token) && StringUtils.isNotBlank(user)) {
                 try {
-                    // 校验Token
-                    KeyUtil.parserToken(token);
+                    /*R<Boolean> tokenValid = tokenClient.checkTokenValid(user, token);
+                    if (tokenValid.isOk()) {*/
                     return chain.filter(exchange);
-                } catch (Exception e) {
+                    /*}*/
+                } catch (Exception ignored) {
                 }
             }
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         };
     }
+
 }

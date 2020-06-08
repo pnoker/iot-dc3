@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Pnoker. All Rights Reserved.
+ * Copyright 2018-2020 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package com.dc3.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.SpringCloudApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * 平台网关服务入口
@@ -29,15 +27,6 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @EnableCaching
 @SpringCloudApplication
-@EnableFeignClients(basePackages = {
-        "com.dc3.api.center.auth.user.*",
-        "com.dc3.api.center.auth.token.*"
-})
-@ComponentScan(basePackages = {
-        "com.dc3.api.center.auth.user",
-        "com.dc3.api.center.auth.token",
-        "com.dc3.gateway"
-})
 public class GatewayApplication {
 
     public static void main(String[] args) {

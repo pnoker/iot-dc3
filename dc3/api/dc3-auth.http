@@ -1,3 +1,19 @@
+#
+#  Copyright 2018-2020 Pnoker. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
 ### --------------------- User ---------------------
 ### 新增 User
 #/auth/user/add
@@ -88,8 +104,8 @@ Cache-Control: no-cache
 
 
 ### --------------------- Token ---------------------
-### 生成用户 Token 令牌
-#/auth/token
+### 生成用户 Salt
+#/auth/token/salt
 GET http://localhost:8300/auth/token/salt
 Accept: */*
 Content-Type: application/x-www-form-urlencoded
@@ -99,7 +115,7 @@ username=pnoker
 
 
 ### 生成用户 Token 令牌
-#/auth/token
+#/auth/token/generate
 POST http://localhost:8300/auth/token/generate
 Accept: */*
 Content-Type: application/json
@@ -121,8 +137,8 @@ Cache-Control: no-cache
 username=pnoker&token=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1OTE0OTQ5MTQsImV4cCI6MTU5MTUxNjUxNH0.J2ND1WkIRKf68t3pPVj9iO-rAq5jl_1raTa4zPVfJnw
 
 
-### 检测用户 Token 令牌是否有效
-#/auth/token/:token
+### 注销用户 Token 令牌
+#/auth/token/cancel
 GET http://localhost:8300/auth/token/cancel
 Accept: */*
 Content-Type: application/x-www-form-urlencoded
@@ -139,7 +155,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "ip": "192.168.0.1",
+  "ip": "localhost",
   "description": "测试黑名单Ip"
 }
 
@@ -194,7 +210,7 @@ Cache-Control: no-cache
 }
 
 
-### 检测用户是否存在
+### 检测BlackIp是否存在
 #/auth/blackIp/check/:ip
 GET http://localhost:8300/auth/blackIp/check/192.168.0.1
 Accept: */*
@@ -203,7 +219,7 @@ Cache-Control: no-cache
 
 ### 根据 ID 删除 BlackIp
 #/auth/blackIp/delete/:id
-POST http://localhost:8300/auth/blackIp/delete/1
+POST http://localhost:8300/auth/blackIp/delete/3
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

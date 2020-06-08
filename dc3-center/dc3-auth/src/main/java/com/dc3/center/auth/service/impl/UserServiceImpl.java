@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Pnoker. All Rights Reserved.
+ * Copyright 2018-2020 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,8 +115,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = Common.Cache.USER + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public User selectByName(String name) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda()
-                .eq(User::getName, name)
-                .eq(User::getEnable, true);
+                .eq(User::getName, name);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -131,11 +130,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkUserValid(String name) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda()
-                .eq(User::getName, name)
-                .eq(User::getEnable, true);
-        Integer count = userMapper.selectCount(queryWrapper);
-        return count > 0;
+        User user = selectByName(name);
+        if (null != user) {
+            return user.getEnable();
+        }
+        return false;
     }
 
     @Override

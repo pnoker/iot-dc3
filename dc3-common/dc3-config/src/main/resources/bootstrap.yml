@@ -87,6 +87,7 @@ feign:
   compression:
     request:
       enabled: true
+      mime-types: application/json
     response:
       enabled: true
       useGzipDecoder: true

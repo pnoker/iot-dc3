@@ -1,5 +1,5 @@
 #
-#  Copyright 2019 Pnoker. All Rights Reserved.
+#  Copyright 2018-2020 Pnoker. All Rights Reserved.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM pnoker/alpine-java:1.8.221 AS base
+FROM pnoker/alpine-java:1.8.251 AS base
 MAINTAINER pnoker pnokers.icloud.com
 
 ENV JAVA_OPS -server -Xms128m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
