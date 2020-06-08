@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Pnoker. All Rights Reserved.
+ * Copyright 2018-2020 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,62 @@
 
 package com.dc3.gateway.config;
 
+import com.dc3.api.center.auth.blackIp.feign.BlackIpClient;
+import com.dc3.common.bean.R;
+import feign.codec.Decoder;
+import feign.codec.Encoder;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Resource;
+import java.util.Objects;
+
 /**
- * 自定义过滤器配置
- *
  * @author pnoker
  */
 @Slf4j
 @Configuration
 public class GatewayConfig {
+    @Resource
+    private BlackIpClient blackIpClient;
 
-    /**
-     * 统计请求时间
-     *
-     * @return
-     */
     @Bean
-    @Order(-5)
-    public GlobalFilter elapsedGlobalFilter() {
+    public Encoder encoder() {
+        return new JacksonEncoder();
+    }
+
+    @Bean
+    public Decoder decoder() {
+        return new JacksonDecoder();
+    }
+
+    @Bean
+    @Order(-100)
+    public GlobalFilter globalFilter() {
         return (exchange, chain) -> {
             //调用请求之前统计时间
             Long startTime = System.currentTimeMillis();
+
+            ServerHttpRequest request = exchange.getRequest();
+            String remoteIp = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
+            R<Boolean> blackIpValid = blackIpClient.checkBlackIpValid(remoteIp);
+            if (blackIpValid.isOk()) {
+                log.error("Forbidden Ip: {}", remoteIp);
+                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                return exchange.getResponse().setComplete();
+            }
             return chain.filter(exchange).then().then(Mono.fromRunnable(() -> {
                 //调用请求之后统计时间
                 Long endTime = System.currentTimeMillis();
-                log.debug("{}, cost time : {}ms", exchange.getRequest().getURI().getRawPath(), (endTime - startTime));
+                log.info("Remote Ip: {}; Request url: {}; Response code: {}; Time: {}ms", remoteIp, request.getURI().getRawPath(), exchange.getResponse().getStatusCode(), (endTime - startTime));
             }));
         };
     }

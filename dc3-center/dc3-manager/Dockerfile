@@ -1,5 +1,5 @@
 #
-#  Copyright 2019 Pnoker. All Rights Reserved.
+#  Copyright 2018-2020 Pnoker. All Rights Reserved.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 #  limitations under the License.
 #
 
-FROM pnoker/alpine-java:1.8.221
+FROM pnoker/alpine-java:1.8.251
 MAINTAINER pnoker <pnokers.icloud.com>
 
-ENV JAVA_OPS -server -Xms128m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+ENV JAVA_OPS -server -javaagent:/usr/local/java/lib/aspectjweaver.jar -Xms128m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-center/dc3-manager

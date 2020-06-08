@@ -10,7 +10,7 @@ spring:
     cache: false
     enabled: true
     check-template: true
-    mode: HTML5
+    mode: HTML
     encoding: UTF-8
     prefix: classpath:/templates/
     suffix: .html

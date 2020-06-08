@@ -1,5 +1,5 @@
 /*
-  Copyright 2019 Pnoker. All Rights Reserved.
+  Copyright 2018-2020 Pnoker. All Rights Reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -286,6 +286,7 @@ DROP TABLE IF EXISTS `dc3_black_ip`;
 CREATE TABLE `dc3_black_ip`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `ip` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ip',
+  `enable` tinyint(4) NULL DEFAULT 1 COMMENT '是否可用',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',

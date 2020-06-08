@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Pnoker. All Rights Reserved.
+ * Copyright 2018-2020 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.dc3.gateway.config;
 
 import com.dc3.gateway.hystrix.GatewayHystrix;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
@@ -32,24 +31,72 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 /**
  * 自定义Route配置
  *
  * @author pnoker
  */
 @Slf4j
+@Order(10)
 @Configuration
-@AllArgsConstructor
 public class RouteConfig {
     private final GatewayHystrix gatewayHystrix;
 
+    public RouteConfig(GatewayHystrix gatewayHystrix) {
+        this.gatewayHystrix = gatewayHystrix;
+    }
+
+    /**
+     * 根据 HostAddress 进行限流
+     *
+     * @return
+     */
     @Bean
-    public RouteLocator myRouteLocator(RouteLocatorBuilder builder) {
+    public KeyResolver hostKeyResolver() {
+        return exchange -> Mono.just(Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getHostString());
+    }
+
+    /**
+     * Redis 令牌桶 限流
+     *
+     * @return
+     */
+    @Bean
+    RedisRateLimiter redisRateLimiter() {
+        return new RedisRateLimiter(100, 2000);
+    }
+
+    /**
+     * 自定义 RouteLocator
+     *
+     * @param builder
+     * @return
+     */
+    @Bean
+    public RouteLocator gatewayRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("generate_token",
-                        r -> r.path("/api/v3/token")
+                        r -> r.path("/api/v3/token/generate")
                                 .filters(
-                                        f -> f.setPath("/auth/token")
+                                        f -> f.setPath("/auth/token/generate")
+                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
+                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                ).uri("lb://dc3-auth")
+                )
+                .route("cancel_token",
+                        r -> r.path("/api/v3/token/cancel")
+                                .filters(
+                                        f -> f.setPath("/auth/token/cancel")
+                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
+                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                ).uri("lb://dc3-auth")
+                )
+                .route("user_salt",
+                        r -> r.path("/api/v3/salt")
+                                .filters(
+                                        f -> f.setPath("/auth/token/salt")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
                                                 .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
@@ -63,27 +110,6 @@ public class RouteConfig {
                                 ).uri("lb://dc3-auth")
                 )
                 .build();
-    }
-
-    /**
-     * 根据 HOSTADDRESS 进行限流
-     *
-     * @return
-     */
-    @Bean
-    @Order(-10)
-    public KeyResolver hostKeyResolver() {
-        return exchange -> Mono.just(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
-    }
-
-    /**
-     * 限流
-     *
-     * @return
-     */
-    @Bean
-    RedisRateLimiter redisRateLimiter() {
-        return new RedisRateLimiter(100, 2000);
     }
 
     @Bean
