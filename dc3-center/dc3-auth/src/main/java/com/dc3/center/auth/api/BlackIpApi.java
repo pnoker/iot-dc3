@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 用户 Client 接口实现
+ * Ip 黑名单 Feign Client 接口实现
  *
  * @author pnoker
  */
@@ -38,6 +38,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_AUTH_BLACK_IP_URL_PREFIX)
 public class BlackIpApi implements BlackIpClient {
+
     @Resource
     private BlackIpService blackIpService;
 
@@ -61,19 +62,6 @@ public class BlackIpApi implements BlackIpClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-    }
-
-    @Override
-    public R<BlackIp> update(BlackIp blackIp) {
-        try {
-            BlackIp update = blackIpService.update(blackIp);
-            if (null != update) {
-                return R.ok(update);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
     }
 
     @Override
