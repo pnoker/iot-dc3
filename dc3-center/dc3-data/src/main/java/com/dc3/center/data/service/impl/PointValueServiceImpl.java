@@ -18,7 +18,6 @@ package com.dc3.center.data.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.data.service.PointValueService;
-import com.dc3.center.data.service.pool.ThreadPool;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
@@ -41,30 +40,22 @@ import java.util.Optional;
 @Service
 public class PointValueServiceImpl implements PointValueService {
     @Resource
-    private ThreadPool threadPool;
-    @Resource
     private MongoTemplate mongoTemplate;
 
     @Override
     public void add(PointValue pointValue) {
-        threadPool.execute(() -> {
-            long createTime = System.currentTimeMillis();
-            long interval = createTime - pointValue.getOriginTime();
-            mongoTemplate.insert(pointValue.setCreateTime(createTime).setInterval(interval));
-            log.debug("interval:{}", interval);
-        });
+        long createTime = System.currentTimeMillis();
+        long interval = createTime - pointValue.getOriginTime();
+        mongoTemplate.insert(pointValue.setCreateTime(createTime).setInterval(interval));
+        log.debug("interval:{}", interval);
     }
 
     @Override
     public Page<PointValue> list(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
         Optional.ofNullable(pointValueDto).ifPresent(dto -> {
-            if (null != dto.getDeviceId()) {
-                criteria.and("deviceId").is(dto.getDeviceId());
-            }
-            if (null != dto.getPointId()) {
-                criteria.and("pointId").is(dto.getPointId());
-            }
+            Optional.ofNullable(dto.getDeviceId()).ifPresent(deviceId -> criteria.and("deviceId").is(deviceId));
+            Optional.ofNullable(dto.getPointId()).ifPresent(pointId -> criteria.and("pointId").is(pointId));
             if (dto.getPage().getStartTime() > 0 && dto.getPage().getEndTime() > 0 && dto.getPage().getStartTime() <= dto.getPage().getEndTime()) {
                 criteria.and("originTime").gte(dto.getPage().getStartTime()).lte(dto.getPage().getEndTime());
             }
@@ -76,12 +67,8 @@ public class PointValueServiceImpl implements PointValueService {
     public PointValue latest(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
         Optional.ofNullable(pointValueDto).ifPresent(dto -> {
-            if (null != dto.getDeviceId()) {
-                criteria.and("deviceId").is(dto.getDeviceId());
-            }
-            if (null != dto.getPointId()) {
-                criteria.and("pointId").is(dto.getPointId());
-            }
+            Optional.ofNullable(dto.getDeviceId()).ifPresent(deviceId -> criteria.and("deviceId").is(deviceId));
+            Optional.ofNullable(dto.getPointId()).ifPresent(pointId -> criteria.and("pointId").is(pointId));
         });
         return oneQuery(criteria);
     }

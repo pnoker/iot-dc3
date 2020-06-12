@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.System.getProperty;
 
@@ -72,7 +73,7 @@ public class TranscodeRunner implements ApplicationRunner {
 
     public List<Rtmp> list() {
         Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages().setSize(-1L)));
-        return null != page.getRecords() ? page.getRecords() : new ArrayList<>();
+        return Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>());
     }
 
 }

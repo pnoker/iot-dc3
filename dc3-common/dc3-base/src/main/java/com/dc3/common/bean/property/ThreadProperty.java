@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Pnoker. All Rights Reserved.
+ * Copyright 2019 Pnoker. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dc3.transfer.rtmp.bean;
+package com.dc3.common.bean.property;
 
 import lombok.Getter;
 import lombok.Setter;
