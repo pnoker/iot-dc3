@@ -160,20 +160,6 @@ Cache-Control: no-cache
 }
 
 
-### 修改 BlackIp
-#/auth/blackIp/update
-POST http://localhost:8300/auth/blackIp/update
-Accept: */*
-Content-Type: application/json
-Cache-Control: no-cache
-
-{
-  "id": 1,
-  "ip": "192.168.0.2",
-  "description": "测试黑名单Ip"
-}
-
-
 ### 根据 ID 查询 BlackIp
 #/auth/blackIp/id/:id
 GET http://localhost:8300/auth/blackIp/id/1

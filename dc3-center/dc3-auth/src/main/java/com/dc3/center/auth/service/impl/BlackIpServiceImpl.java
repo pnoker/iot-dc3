@@ -61,13 +61,13 @@ public class BlackIpServiceImpl implements BlackIpService {
     )
     public BlackIp add(BlackIp blackIp) {
         BlackIp select = selectByIp(blackIp.getIp());
-        if (null != select) {
-            throw new ServiceException("blackIp already exists");
-        }
+        Optional.ofNullable(select).ifPresent(ip -> {
+            throw new ServiceException("The ip already exists in the blacklist");
+        });
         if (blackIpMapper.insert(blackIp) > 0) {
             return blackIpMapper.selectById(blackIp.getId());
         }
-        return null;
+        throw new ServiceException("The ip add failed");
     }
 
     @Override
@@ -79,27 +79,11 @@ public class BlackIpServiceImpl implements BlackIpService {
             }
     )
     public boolean delete(Long id) {
-        return blackIpMapper.deleteById(id) > 0;
-    }
-
-    @Override
-    @Caching(
-            put = {
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#blackIp.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
-    public BlackIp update(BlackIp blackIp) {
-        blackIp.setUpdateTime(null);
-        if (blackIpMapper.updateById(blackIp) > 0) {
-            BlackIp select = selectById(blackIp.getId());
-            blackIp.setIp(select.getIp());
-            return select;
+        BlackIp blackIp = selectById(id);
+        if (null == blackIp) {
+            throw new ServiceException("The ip does not exist in the blacklist");
         }
-        return null;
+        return blackIpMapper.deleteById(id) > 0;
     }
 
     @Override

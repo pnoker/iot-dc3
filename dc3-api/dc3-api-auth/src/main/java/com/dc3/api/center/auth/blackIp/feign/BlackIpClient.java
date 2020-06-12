@@ -60,15 +60,6 @@ public interface BlackIpClient {
     R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 修改 BlackIp
-     *
-     * @param blackIp
-     * @return BlackIp
-     */
-    @PostMapping("/update")
-    R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp);
-
-    /**
      * 根据 ID 查询 BlackIp
      *
      * @param id
