@@ -16,13 +16,12 @@
 
 package com.dc3.center.manager.service.impl;
 
-import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DeviceMapper;
-import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.DeviceService;
+import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
@@ -56,7 +55,6 @@ public class DeviceServiceImpl implements DeviceService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.CODE, key = "#device.code", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, key = "#device.groupId+'.'+#device.name", condition = "#result!=null")
             },
             evict = {
@@ -66,21 +64,20 @@ public class DeviceServiceImpl implements DeviceService {
     )
     public Device add(Device device) {
         Device select = selectDeviceByNameAndGroup(device.getGroupId(), device.getName());
-        if (null != select) {
-            throw new ServiceException("device already exists in the group");
-        }
-        if (deviceMapper.insert(device.setCode(generateDeviceCode())) > 0) {
+        Optional.ofNullable(select).ifPresent(d -> {
+            throw new ServiceException("The device already exists in the group");
+        });
+        if (deviceMapper.insert(device) > 0) {
             notifyService.notifyDriverAddDevice(device.getId(), device.getProfileId());
             return deviceMapper.selectById(device.getId());
         }
-        throw new ServiceException("device create failed");
+        throw new ServiceException("The device add failed");
     }
 
     @Override
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.CODE, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
@@ -89,7 +86,7 @@ public class DeviceServiceImpl implements DeviceService {
     public boolean delete(Long id) {
         Device device = selectById(id);
         if (null == device) {
-            throw new ServiceException("device does not exist");
+            throw new ServiceException("The device does not exist");
         }
         boolean delete = deviceMapper.deleteById(id) > 0;
         if (delete) {
@@ -102,7 +99,6 @@ public class DeviceServiceImpl implements DeviceService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.CODE, key = "#device.code", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, key = "#device.groupId+'.'+#device.name", condition = "#result!=null")
             },
             evict = {
@@ -111,29 +107,20 @@ public class DeviceServiceImpl implements DeviceService {
             }
     )
     public Device update(Device device) {
-        device.setCode(null);
         device.setUpdateTime(null);
         if (deviceMapper.updateById(device) > 0) {
             Device select = selectById(device.getId());
-            device.setCode(select.getCode()).setGroupId(select.getGroupId()).setName(select.getName());
+            device.setGroupId(select.getGroupId()).setName(select.getName());
             notifyService.notifyDriverUpdateDevice(device.getId(), device.getProfileId());
             return select;
         }
-        throw new ServiceException("device update failed");
+        throw new ServiceException("The device update failed");
     }
 
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Device selectById(Long id) {
         return deviceMapper.selectById(id);
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.CODE, key = "#code", unless = "#result==null")
-    public Device selectByCode(String code) {
-        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.eq(Device::getCode, code);
-        return deviceMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -161,32 +148,11 @@ public class DeviceServiceImpl implements DeviceService {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Device::getName, dto.getName());
             }
-            if (StringUtils.isNotBlank(dto.getCode())) {
-                queryWrapper.eq(Device::getCode, dto.getCode());
-            }
-            if (null != dto.getStatus()) {
-                queryWrapper.eq(Device::getStatus, dto.getStatus());
-            }
-            if (null != dto.getProfileId()) {
-                queryWrapper.eq(Device::getProfileId, dto.getProfileId());
-            }
-            if (null != dto.getGroupId()) {
-                queryWrapper.eq(Device::getGroupId, dto.getGroupId());
-            }
+            Optional.ofNullable(dto.getStatus()).ifPresent(status -> queryWrapper.eq(Device::getStatus, status));
+            Optional.ofNullable(dto.getProfileId()).ifPresent(profileId -> queryWrapper.eq(Device::getProfileId, profileId));
+            Optional.ofNullable(dto.getGroupId()).ifPresent(groupId -> queryWrapper.eq(Device::getGroupId, groupId));
         });
         return queryWrapper;
     }
 
-    /**
-     * 获取全局唯一的设备CODE编码
-     *
-     * @return
-     */
-    public String generateDeviceCode() {
-        String code = IdUtil.fastSimpleUUID().toUpperCase();
-        if (null != selectByCode(code)) {
-            return generateDeviceCode();
-        }
-        return code;
-    }
 }
