@@ -16,16 +16,17 @@
 
 package com.dc3.common.sdk.service.impl;
 
-import com.dc3.common.sdk.service.job.DriverCustomScheduleJob;
-import com.dc3.common.sdk.service.job.DriverReadScheduleJob;
 import com.dc3.common.sdk.bean.ScheduleProperty;
 import com.dc3.common.sdk.service.DriverScheduleService;
+import com.dc3.common.sdk.service.job.DriverCustomScheduleJob;
+import com.dc3.common.sdk.service.job.DriverReadScheduleJob;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * @author pnoker
@@ -39,19 +40,19 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     @Override
     @SneakyThrows
     public void initial(ScheduleProperty scheduleProperty) {
-        if (null != scheduleProperty) {
-            if (scheduleProperty.getRead().getEnable()) {
-                createJob("ReadGroup", "ReadScheduleJob", scheduleProperty.getRead().getCorn(), DriverReadScheduleJob.class);
+        Optional.ofNullable(scheduleProperty).ifPresent(property -> {
+            if (property.getRead().getEnable()) {
+                createJob("ReadGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
             }
-            if (scheduleProperty.getCustom().getEnable()) {
-                createJob("CustomGroup", "CustomScheduleJob", scheduleProperty.getCustom().getCorn(), DriverCustomScheduleJob.class);
+            if (property.getCustom().getEnable()) {
+                createJob("CustomGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
-            if (scheduleProperty.getRead().getEnable() || scheduleProperty.getCustom().getEnable()) {
+            if (property.getRead().getEnable() || property.getCustom().getEnable()) {
                 if (!scheduler.isShutdown()) {
                     scheduler.start();
                 }
             }
-        }
+        });
     }
 
     /**

@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
+import java.util.Optional;
 
 /**
  * Command 指令执行任务信息类
@@ -75,7 +76,7 @@ public class Transcode {
 
     public void stop() {
         run = false;
-        if (null != process) {
+        Optional.ofNullable(process).ifPresent(process -> {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
             try {
                 writer.write("q");
@@ -85,7 +86,7 @@ public class Transcode {
                 log.error(e.getMessage(), e);
             }
             process.destroyForcibly();
-        }
+        });
     }
 
 }
