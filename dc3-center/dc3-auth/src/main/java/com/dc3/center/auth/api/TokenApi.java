@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 用户 Client 接口实现
+ * 令牌 Feign Client 接口实现
  *
  * @author pnoker
  */
@@ -40,9 +40,9 @@ public class TokenApi implements TokenClient {
     private TokenService tokenService;
 
     @Override
-    public R<String> randomSalt(String username) {
+    public R<String> generateSalt(String username) {
         try {
-            String salt = tokenService.randomSalt(username);
+            String salt = tokenService.generateSalt(username);
             return null != salt ? R.ok(salt, "ok") : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());

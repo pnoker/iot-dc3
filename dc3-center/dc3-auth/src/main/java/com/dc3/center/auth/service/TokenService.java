@@ -30,7 +30,7 @@ public interface TokenService {
      * @param username
      * @return
      */
-    String randomSalt(String username);
+    String generateSalt(String username);
 
     /**
      * 生成用户的Token令牌，5小时失效

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,7 +50,7 @@ public class TokenServiceImpl implements TokenService {
     private RedisUtil redisUtil;
 
     @Override
-    public String randomSalt(String username) {
+    public String generateSalt(String username) {
         String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + username;
         String salt = redisUtil.getKey(redisSaltKey);
         if (StringUtils.isBlank(salt)) {
@@ -61,11 +62,13 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(User user) {
-        UserLimit limit = checkUserLimit(user.getName());
-        if (null != limit && limit.getTimes() > 3) {
-            updateUserLimit(user.getName());
-            throw new ServiceException("请求受限，请在 " + Dc3Util.formatData(limit.getExpireTime()) + " 之后重试");
-        }
+        UserLimit userLimit = checkUserLimit(user.getName());
+        Optional.ofNullable(userLimit).ifPresent(limit -> {
+            if (limit.getTimes() > 3) {
+                updateUserLimit(user.getName());
+                throw new ServiceException("请求受限，请在 " + Dc3Util.formatData(limit.getExpireTime()) + " 之后重试");
+            }
+        });
         User select = userService.selectByName(user.getName());
         if (null != select) {
             String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + user.getName();
@@ -122,10 +125,7 @@ public class TokenServiceImpl implements TokenService {
     private void updateUserLimit(String username) {
         int amount = 1;
         String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
-        UserLimit limit = redisUtil.getKey(redisKey);
-        if (null == limit) {
-            limit = new UserLimit(0, new Date());
-        }
+        UserLimit limit = (UserLimit) Optional.ofNullable(redisUtil.getKey(redisKey)).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
         if (limit.getTimes() > 3) {
             amount = (limit.getTimes() - 3) * Common.Cache.TOKEN_CACHE_TIMEOUT;
