@@ -46,7 +46,7 @@ public interface UserService extends Service<User, UserDto> {
     /**
      * 重置密码
      *
-     * @param id
+     * @param id Id
      * @return boolean
      */
     boolean restPassword(Long id);

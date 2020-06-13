@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 用户 Client 接口实现
+ * 用户 Feign Client 接口实现
  *
  * @author pnoker
  */
@@ -95,7 +95,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+        return R.fail("Resource does not exist");
     }
 
     @Override
@@ -108,7 +108,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+        return R.fail("Resource does not exist");
     }
 
     @Override
@@ -121,7 +121,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+        return R.fail("Resource does not exist");
     }
 
     @Override

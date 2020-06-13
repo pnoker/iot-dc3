@@ -46,7 +46,7 @@ Cache-Control: no-cache
 
 ### 根据 ID 重置 User 密码
 #/auth/user/restPassword/:id
-POST http://localhost:8300/auth/user/restPassword/-1
+POST http://localhost:8300/auth/user/rest/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -54,14 +54,14 @@ Cache-Control: no-cache
 
 ### 根据 ID 查询 User
 #/auth/user/id/:id
-GET http://localhost:8300/auth/user/id/-1
+GET http://localhost:8300/auth/user/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Name 查询 User
 #/auth/user/name/:name
-GET http://localhost:8300/auth/user/name/pnoker
+GET http://localhost:8300/auth/user/name/dc3
 Accept: */*
 Cache-Control: no-cache
 
@@ -90,7 +90,7 @@ Cache-Control: no-cache
 
 ### 检测用户是否存在
 #/auth/user/check/:name
-GET http://localhost:8300/auth/user/check/pnoker
+GET http://localhost:8300/auth/user/check/dc3
 Accept: */*
 Cache-Control: no-cache
 
@@ -155,7 +155,22 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "ip": "localhost",
+  "ip": "192.168.0.1",
+  "description": "测试黑名单Ip"
+}
+
+
+### 修改 BlackIp
+#/auth/blackIp/update
+POST http://localhost:8300/auth/blackIp/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "ip": "192.168.0.1",
+  "enable": true,
   "description": "测试黑名单Ip"
 }
 
@@ -182,7 +197,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "ip": ".2",
+  "ip": "",
   "page": {
     "current": 1,
     "size": 500,
