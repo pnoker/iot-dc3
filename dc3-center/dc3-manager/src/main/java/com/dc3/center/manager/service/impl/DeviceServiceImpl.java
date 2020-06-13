@@ -107,6 +107,10 @@ public class DeviceServiceImpl implements DeviceService {
             }
     )
     public Device update(Device device) {
+        Device temp = selectById(device.getId());
+        if (null == temp) {
+            throw new ServiceException("The device does not exist");
+        }
         device.setUpdateTime(null);
         if (deviceMapper.updateById(device) > 0) {
             Device select = selectById(device.getId());
