@@ -127,7 +127,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP + Common.Cache.DIC, key = "'group_dic'", unless = "#result==null")
+    @Cacheable(value = Common.Cache.GROUP + Common.Cache.DIC, key = Common.Cache.GROUP + Common.Cache.DIC, unless = "#result==null")
     public List<Dictionary> groupDictionary() {
         List<Dictionary> dictionaryList = new ArrayList<>();
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
