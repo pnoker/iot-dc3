@@ -44,7 +44,7 @@ public interface PointInfoClient {
     /**
      * 新增 PointInfo
      *
-     * @param pointInfo
+     * @param pointInfo PointInfo
      * @return PointInfo
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface PointInfoClient {
     /**
      * 根据 ID 删除 PointInfo
      *
-     * @param id pointInfoId
+     * @param id PointInfo Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -62,7 +62,7 @@ public interface PointInfoClient {
     /**
      * 修改 PointInfo
      *
-     * @param pointInfo
+     * @param pointInfo PointInfo
      * @return PointInfo
      */
     @PostMapping("/update")
@@ -71,7 +71,7 @@ public interface PointInfoClient {
     /**
      * 根据 ID 查询 PointInfo
      *
-     * @param id
+     * @param id PointInfo Id
      * @return PointInfo
      */
     @GetMapping("/id/{id}")
@@ -80,7 +80,7 @@ public interface PointInfoClient {
     /**
      * 分页查询 PointInfo
      *
-     * @param pointInfoDto
+     * @param pointInfoDto PointInfo Dto
      * @return Page<PointInfo>
      */
     @PostMapping("/list")
