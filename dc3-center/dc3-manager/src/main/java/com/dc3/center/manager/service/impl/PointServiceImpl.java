@@ -65,13 +65,13 @@ public class PointServiceImpl implements PointService {
     public Point add(Point point) {
         Point select = selectByNameAndProfile(point.getProfileId(), point.getName());
         if (null != select) {
-            throw new ServiceException("point already exists in the profile");
+            throw new ServiceException("The point already exists in the profile");
         }
         if (pointMapper.insert(point) > 0) {
             notifyService.notifyDriverAddPoint(point.getId(), point.getProfileId());
             return pointMapper.selectById(point.getId());
         }
-        throw new ServiceException("point create failed");
+        throw new ServiceException("The point add failed");
     }
 
     @Override
@@ -86,7 +86,7 @@ public class PointServiceImpl implements PointService {
     public boolean delete(Long id) {
         Point point = selectById(id);
         if (null == point) {
-            throw new ServiceException("point does not exist");
+            throw new ServiceException("The point does not exist");
         }
         boolean delete = pointMapper.deleteById(id) > 0;
         if (delete) {
@@ -107,12 +107,16 @@ public class PointServiceImpl implements PointService {
             }
     )
     public Point update(Point point) {
+        Point temp = selectById(point.getId());
+        if (null == temp) {
+            throw new ServiceException("The point does not exist");
+        }
         point.setUpdateTime(null);
         Point selectById = pointMapper.selectById(point.getId());
         if (!selectById.getProfileId().equals(point.getProfileId()) || !selectById.getName().equals(point.getName())) {
             Point select = selectByNameAndProfile(point.getProfileId(), point.getName());
             if (null != select) {
-                throw new ServiceException("point already exists");
+                throw new ServiceException("The point already exists");
             }
         }
         if (pointMapper.updateById(point) > 0) {
@@ -121,7 +125,7 @@ public class PointServiceImpl implements PointService {
             notifyService.notifyDriverUpdatePoint(point.getId(), point.getProfileId());
             return select;
         }
-        throw new ServiceException("point update failed");
+        throw new ServiceException("The point update failed");
     }
 
     @Override
