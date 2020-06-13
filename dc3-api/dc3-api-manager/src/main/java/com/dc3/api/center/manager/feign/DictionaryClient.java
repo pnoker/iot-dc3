@@ -78,7 +78,7 @@ public interface DictionaryClient {
     /**
      * 查询设备 Dictionary
      *
-     * @param parent
+     * @param parent group/driver/profile
      * @return List<Dictionary>
      */
     @GetMapping("/device/{parent}")
@@ -87,7 +87,7 @@ public interface DictionaryClient {
     /**
      * 查询位号 Dictionary
      *
-     * @param parent
+     * @param parent profile/device
      * @return List<Dictionary>
      */
     @GetMapping("/point/{parent}")
