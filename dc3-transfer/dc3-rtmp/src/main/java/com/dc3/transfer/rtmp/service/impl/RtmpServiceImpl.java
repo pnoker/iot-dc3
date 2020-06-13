@@ -26,7 +26,6 @@ import com.dc3.common.model.Rtmp;
 import com.dc3.transfer.rtmp.bean.Transcode;
 import com.dc3.transfer.rtmp.mapper.RtmpMapper;
 import com.dc3.transfer.rtmp.service.RtmpService;
-import com.dc3.transfer.rtmp.service.pool.ThreadPool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -53,13 +52,15 @@ public class RtmpServiceImpl implements RtmpService {
     public volatile Map<Long, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
 
     @Resource
-    private ThreadPoolExecutor poolExecutor;
+    private ThreadPoolExecutor threadPoolExecutor;
     @Resource
     private RtmpMapper rtmpMapper;
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")},
+            put = {
+                    @CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")
+            },
             evict = {
                     @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
@@ -70,11 +71,10 @@ public class RtmpServiceImpl implements RtmpService {
             Transcode transcode = new Transcode(rtmp);
             if (!transcodeMap.containsKey(transcode.getId())) {
                 transcodeMap.put(transcode.getId(), transcode);
-                return selectById(rtmp.getId());
             }
-            throw new ServiceException("任务重复,表记录添加成功");
+            return selectById(rtmp.getId());
         }
-        return null;
+        throw new ServiceException("The rtmp task add failed");
     }
 
     @Override
@@ -91,21 +91,20 @@ public class RtmpServiceImpl implements RtmpService {
             Transcode transcode = transcodeMap.get(id);
             if (Optional.ofNullable(transcode).isPresent()) {
                 if (transcode.isRun()) {
-                    throw new ServiceException("任务运行中");
+                    throw new ServiceException("The rmp task is running");
                 }
                 transcodeMap.remove(id);
             }
-            if (rtmpMapper.deleteById(id) > 0) {
-                return true;
-            }
-            throw new ServiceException("任务删除成功,表记录删除失败");
+            return rtmpMapper.deleteById(id) > 0;
         }
-        throw new ServiceException("任务不存在");
+        throw new ServiceException("The rtmp task does not exist");
     }
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")},
+            put = {
+                    @CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")
+            },
             evict = {
                     @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
@@ -114,20 +113,20 @@ public class RtmpServiceImpl implements RtmpService {
     public Rtmp update(Rtmp rtmp) {
         rtmp.setUpdateTime(null);
         Rtmp select = selectById(rtmp.getId());
-        if (null != select) {
-            Transcode transcode = transcodeMap.get(rtmp.getId());
-            if (Optional.ofNullable(transcode).isPresent()) {
-                if (transcode.isRun()) {
-                    throw new ServiceException("任务运行中");
-                }
-                transcodeMap.put(transcode.getId(), new Transcode(rtmp));
-            }
-            if (rtmpMapper.updateById(rtmp) > 0) {
-                return select;
-            }
-            throw new ServiceException("任务更新成功,表记录更新失败");
+        if (null == select) {
+            throw new ServiceException("The rtmp task does not exist");
         }
-        throw new ServiceException("任务不存在");
+        Transcode transcode = transcodeMap.get(rtmp.getId());
+        if (Optional.ofNullable(transcode).isPresent()) {
+            if (transcode.isRun()) {
+                throw new ServiceException("The rtmp task is running");
+            }
+            transcodeMap.put(transcode.getId(), new Transcode(rtmp));
+        }
+        if (rtmpMapper.updateById(rtmp) > 0) {
+            return rtmp;
+        }
+        throw new ServiceException("The rtmp task update failed");
     }
 
     @Override
@@ -152,23 +151,23 @@ public class RtmpServiceImpl implements RtmpService {
     )
     public boolean start(Long id) {
         Rtmp select = rtmpMapper.selectById(id);
-        if (null != select) {
-            Transcode transcode = transcodeMap.get(id);
-            if (Optional.ofNullable(transcode).isPresent()) {
-                if (transcode.isRun()) {
-                    throw new ServiceException("任务已是启动状态");
-                }
-            } else {
-                transcode = new Transcode(select);
-                transcodeMap.put(transcode.getId(), transcode);
-            }
-            poolExecutor.execute(() -> transcodeMap.get(id).start());
-            if (rtmpMapper.updateById(select.setRun(true)) > 0) {
-                return true;
-            }
-            throw new ServiceException("任务启动成功，表记录更新失败");
+        if (null == select) {
+            throw new ServiceException("The rtmp task does not exist");
         }
-        throw new ServiceException("任务不存在");
+        Transcode transcode = transcodeMap.get(id);
+        if (Optional.ofNullable(transcode).isPresent()) {
+            if (transcode.isRun()) {
+                throw new ServiceException("The rtmp task is running");
+            }
+        } else {
+            transcode = new Transcode(select);
+            transcodeMap.put(transcode.getId(), transcode);
+        }
+        threadPoolExecutor.execute(() -> transcodeMap.get(id).start());
+        if (rtmpMapper.updateById(select.setRun(true)) > 0) {
+            return true;
+        }
+        throw new ServiceException("The rtmp task started successfully，database update failed");
     }
 
     @Override
@@ -189,12 +188,12 @@ public class RtmpServiceImpl implements RtmpService {
                     if (rtmpMapper.updateById(select.setRun(false)) > 0) {
                         return true;
                     }
-                    throw new ServiceException("任务停止成功，表记录更新失败");
+                    throw new ServiceException("The rtmp task stop failed，database update failed");
                 }
             }
-            throw new ServiceException("任务已是停止状态");
+            throw new ServiceException("The rtmp task is stopped");
         }
-        throw new ServiceException("任务不存在");
+        throw new ServiceException("The rtmp task does not exist");
     }
 
     @Override
@@ -204,9 +203,7 @@ public class RtmpServiceImpl implements RtmpService {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Rtmp::getName, dto.getName());
             }
-            if (null != rtmpDto.getAutoStart()) {
-                queryWrapper.eq(Rtmp::getAutoStart, dto.getAutoStart());
-            }
+            Optional.ofNullable(dto.getAutoStart()).ifPresent(autoStart -> queryWrapper.eq(Rtmp::getAutoStart, dto.getAutoStart()));
         });
         return queryWrapper;
     }
