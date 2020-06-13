@@ -24,6 +24,7 @@ import com.dc3.center.manager.service.LabelBindService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.LabelBindDto;
+import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -59,7 +60,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         if (labelBindMapper.insert(labelBind) > 0) {
             return labelBindMapper.selectById(labelBind.getId());
         }
-        return null;
+        throw new ServiceException("The label bind add failed");
     }
 
     @Override
@@ -71,6 +72,10 @@ public class LabelBindServiceImpl implements LabelBindService {
             }
     )
     public boolean delete(Long id) {
+        LabelBind labelBind = selectById(id);
+        if (null == labelBind) {
+            throw new ServiceException("The label bind does not exist");
+        }
         return labelBindMapper.deleteById(id) > 0;
     }
 
@@ -83,11 +88,15 @@ public class LabelBindServiceImpl implements LabelBindService {
             }
     )
     public LabelBind update(LabelBind labelBind) {
+        LabelBind temp = selectById(labelBind.getId());
+        if (null == temp) {
+            throw new ServiceException("The label bind does not exist");
+        }
         labelBind.setUpdateTime(null);
         if (labelBindMapper.updateById(labelBind) > 0) {
-            return selectById(labelBind.getId());
+            return labelBindMapper.selectById(labelBind.getId());
         }
-        return null;
+        throw new ServiceException("The label bind update failed");
     }
 
     @Override

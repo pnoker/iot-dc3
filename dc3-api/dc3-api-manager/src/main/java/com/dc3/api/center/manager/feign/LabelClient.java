@@ -44,7 +44,7 @@ public interface LabelClient {
     /**
      * 新增 Label
      *
-     * @param label
+     * @param label Label
      * @return Label
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface LabelClient {
     /**
      * 根据 ID 删除 Label
      *
-     * @param id labelId
+     * @param id Label Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -62,7 +62,7 @@ public interface LabelClient {
     /**
      * 修改 Label
      *
-     * @param label
+     * @param label Label
      * @return Label
      */
     @PostMapping("/update")
@@ -71,7 +71,7 @@ public interface LabelClient {
     /**
      * 根据 ID 查询 Label
      *
-     * @param id
+     * @param id Label Id
      * @return Label
      */
     @GetMapping("/id/{id}")
@@ -80,7 +80,7 @@ public interface LabelClient {
     /**
      * 分页查询 Label
      *
-     * @param labelDto
+     * @param labelDto Label Dto
      * @return Page<Label>
      */
     @PostMapping("/list")

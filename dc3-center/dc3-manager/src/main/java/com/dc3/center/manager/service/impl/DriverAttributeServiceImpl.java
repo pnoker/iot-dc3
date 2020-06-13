@@ -105,7 +105,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         }
         driverAttribute.setUpdateTime(null);
         if (driverAttributeMapper.updateById(driverAttribute) > 0) {
-            DriverAttribute select = selectById(driverAttribute.getId());
+            DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
             driverAttribute.setName(select.getName());
             return select;
         }

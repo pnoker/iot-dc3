@@ -66,13 +66,13 @@ public class LabelServiceImpl implements LabelService {
     )
     public Label add(Label label) {
         Label select = selectByName(label.getName());
-        if (null != select) {
-            throw new ServiceException("label already exists");
-        }
+        Optional.ofNullable(select).ifPresent(l -> {
+            throw new ServiceException("The label already exists");
+        });
         if (labelMapper.insert(label) > 0) {
             return labelMapper.selectById(label.getId());
         }
-        return null;
+        throw new ServiceException("The label add failed");
     }
 
     @Override
@@ -89,7 +89,11 @@ public class LabelServiceImpl implements LabelService {
         labelBindDto.setLabelId(id);
         Page<LabelBind> labelBindPage = labelBindService.list(labelBindDto);
         if (labelBindPage.getTotal() > 0) {
-            throw new ServiceException("label already bound by the entity");
+            throw new ServiceException("The label already bound by the entity");
+        }
+        Label label = selectById(id);
+        if (null == label) {
+            throw new ServiceException("The label does not exist");
         }
         return labelMapper.deleteById(id) > 0;
     }
@@ -106,13 +110,17 @@ public class LabelServiceImpl implements LabelService {
             }
     )
     public Label update(Label label) {
+        Label temp = selectById(label.getId());
+        if (null == temp) {
+            throw new ServiceException("The label does not exist");
+        }
         label.setUpdateTime(null);
         if (labelMapper.updateById(label) > 0) {
-            Label select = selectById(label.getId());
+            Label select = labelMapper.selectById(label.getId());
             label.setName(select.getName());
             return select;
         }
-        return null;
+        throw new ServiceException("The label update failed");
     }
 
     @Override

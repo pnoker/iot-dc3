@@ -113,7 +113,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
         device.setUpdateTime(null);
         if (deviceMapper.updateById(device) > 0) {
-            Device select = selectById(device.getId());
+            Device select = deviceMapper.selectById(device.getId());
             device.setGroupId(select.getGroupId()).setName(select.getName());
             notifyService.notifyDriverUpdateDevice(device.getId(), device.getProfileId());
             return select;
