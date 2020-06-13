@@ -105,7 +105,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         }
         pointAttribute.setUpdateTime(null);
         if (pointAttributeMapper.updateById(pointAttribute) > 0) {
-            PointAttribute select = selectById(pointAttribute.getId());
+            PointAttribute select = pointAttributeMapper.selectById(pointAttribute.getId());
             pointAttribute.setName(select.getName());
             return select;
         }

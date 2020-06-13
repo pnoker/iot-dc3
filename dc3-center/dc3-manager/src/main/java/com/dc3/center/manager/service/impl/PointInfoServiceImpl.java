@@ -118,7 +118,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
             notifyService.notifyDriverUpdatePointInfo(pointInfo.getId(), pointInfo.getDeviceId());
-            return selectById(pointInfo.getId());
+            return pointInfoMapper.selectById(pointInfo.getId());
         }
         throw new ServiceException("The point info update failed");
     }

@@ -120,7 +120,7 @@ public class PointServiceImpl implements PointService {
             }
         }
         if (pointMapper.updateById(point) > 0) {
-            Point select = selectById(point.getId());
+            Point select = pointMapper.selectById(point.getId());
             point.setName(select.getName());
             notifyService.notifyDriverUpdatePoint(point.getId(), point.getProfileId());
             return select;

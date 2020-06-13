@@ -116,7 +116,7 @@ public class GroupServiceImpl implements GroupService {
         }
         group.setUpdateTime(null);
         if (groupMapper.updateById(group) > 0) {
-            Group select = selectById(group.getId());
+            Group select = groupMapper.selectById(group.getId());
             group.setName(select.getName());
             return select;
         }

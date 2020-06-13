@@ -120,7 +120,7 @@ public class DriverServiceImpl implements DriverService {
         }
         driver.setUpdateTime(null);
         if (driverMapper.updateById(driver) > 0) {
-            Driver select = selectById(driver.getId());
+            Driver select = driverMapper.selectById(driver.getId());
             driver.setServiceName(select.getServiceName());
             return select;
         }

@@ -118,7 +118,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         }
         if (driverInfoMapper.updateById(driverInfo) > 0) {
             notifyService.notifyDriverUpdateDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
-            return selectById(driverInfo.getId());
+            return driverInfoMapper.selectById(driverInfo.getId());
         }
         throw new ServiceException("The driver info update failed");
     }

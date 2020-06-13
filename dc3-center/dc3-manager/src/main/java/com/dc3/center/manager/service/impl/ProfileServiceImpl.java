@@ -141,7 +141,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
         profile.setUpdateTime(null);
         if (profileMapper.updateById(profile) > 0) {
-            Profile select = selectById(profile.getId());
+            Profile select = profileMapper.selectById(profile.getId());
             profile.setName(select.getName());
             return select;
         }
