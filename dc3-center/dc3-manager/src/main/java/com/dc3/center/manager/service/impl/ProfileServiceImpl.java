@@ -75,17 +75,17 @@ public class ProfileServiceImpl implements ProfileService {
     public Profile add(Profile profile) {
         Driver driver = driverService.selectById(profile.getDriverId());
         if (null == driver) {
-            throw new ServiceException("driver does not exist");
+            throw new ServiceException("The driver does not exist");
         }
         Profile select = selectByName(profile.getName());
         if (null != select) {
-            throw new ServiceException("profile already exists");
+            throw new ServiceException("The profile already exists");
         }
         if (profileMapper.insert(profile) > 0) {
             notifyService.notifyDriverAddProfile(profile.getId());
             return profileMapper.selectById(profile.getId());
         }
-        throw new ServiceException("profile create failed");
+        throw new ServiceException("The profile add failed");
     }
 
 
@@ -103,16 +103,19 @@ public class ProfileServiceImpl implements ProfileService {
         deviceDto.setProfileId(id);
         Page<Device> devicePage = deviceService.list(deviceDto);
         if (devicePage.getTotal() > 0) {
-            throw new ServiceException("profile already bound by the device");
+            throw new ServiceException("The profile already bound by the device");
         }
 
         PointDto pointDto = new PointDto();
         pointDto.setProfileId(id);
         Page<Point> pointPage = pointService.list(pointDto);
         if (pointPage.getTotal() > 0) {
-            throw new ServiceException("profile already bound by the point");
+            throw new ServiceException("The profile already bound by the point");
         }
-
+        Profile profile = selectById(id);
+        if (null == profile) {
+            throw new ServiceException("The profile does not exist");
+        }
         boolean delete = profileMapper.deleteById(id) > 0;
         if (delete) {
             notifyService.notifyDriverDeleteProfile(id);
@@ -132,13 +135,17 @@ public class ProfileServiceImpl implements ProfileService {
             }
     )
     public Profile update(Profile profile) {
+        Profile temp = selectById(profile.getId());
+        if (null == temp) {
+            throw new ServiceException("The profile does not exist");
+        }
         profile.setUpdateTime(null);
         if (profileMapper.updateById(profile) > 0) {
             Profile select = selectById(profile.getId());
             profile.setName(select.getName());
             return select;
         }
-        return null;
+        throw new ServiceException("The profile update failed");
     }
 
     @Override
