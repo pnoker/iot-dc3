@@ -123,7 +123,7 @@ Cache-Control: no-cache
 
 {
   "name": "pnoker",
-  "password": "dc3dc3dc3"
+  "password": "bc2ba1e15665142459135c4d7e83e4b8"
 }
 
 
@@ -134,7 +134,7 @@ Accept: */*
 Content-Type: application/x-www-form-urlencoded
 Cache-Control: no-cache
 
-username=pnoker&token=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1OTE0OTQ5MTQsImV4cCI6MTU5MTUxNjUxNH0.J2ND1WkIRKf68t3pPVj9iO-rAq5jl_1raTa4zPVfJnw
+username=pnoker&token=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1OTIwNTgyMTEsImV4cCI6MTU5MjA3OTgxMX0.nJ2fmItykFVqaRIbjIeqNVc4vDAOP5lPyNZtfcfNzgg
 
 
 ### 注销用户 Token 令牌
