@@ -62,13 +62,13 @@ public class UserServiceImpl implements UserService {
     )
     public User add(User user) {
         User select = selectByName(user.getName());
-        if (null != select) {
-            throw new ServiceException("user already exists");
-        }
+        Optional.ofNullable(select).ifPresent(ip -> {
+            throw new ServiceException("The user already exists");
+        });
         if (userMapper.insert(user) > 0) {
             return userMapper.selectById(user.getId());
         }
-        return null;
+        throw new ServiceException("The user add failed");
     }
 
     @Override
@@ -81,6 +81,10 @@ public class UserServiceImpl implements UserService {
             }
     )
     public boolean delete(Long id) {
+        User user = selectById(id);
+        if (null == user) {
+            throw new ServiceException("The user does not exist");
+        }
         return userMapper.deleteById(id) > 0;
     }
 
@@ -96,13 +100,13 @@ public class UserServiceImpl implements UserService {
             }
     )
     public User update(User user) {
-        user.setUpdateTime(null);
+        user.setName(null).setUpdateTime(null);
         if (userMapper.updateById(user) > 0) {
-            User select = selectById(user.getId());
+            User select = userMapper.selectById(user.getId());
             user.setName(select.getName());
             return select;
         }
-        return null;
+        throw new ServiceException("The user update failed");
     }
 
     @Override
