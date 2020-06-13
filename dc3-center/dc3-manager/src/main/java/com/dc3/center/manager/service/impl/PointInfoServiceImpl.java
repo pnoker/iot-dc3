@@ -64,13 +64,13 @@ public class PointInfoServiceImpl implements PointInfoService {
     public PointInfo add(PointInfo pointInfo) {
         PointInfo select = selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
         if (null != select) {
-            throw new ServiceException("point info already exists");
+            throw new ServiceException("The point info already exists");
         }
         if (pointInfoMapper.insert(pointInfo) > 0) {
             notifyService.notifyDriverAddPointInfo(pointInfo.getId(), pointInfo.getDeviceId());
             return pointInfoMapper.selectById(pointInfo.getId());
         }
-        throw new ServiceException("point info create failed");
+        throw new ServiceException("The point info add failed");
     }
 
     @Override
@@ -85,7 +85,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     public boolean delete(Long id) {
         PointInfo pointInfo = selectById(id);
         if (null == pointInfo) {
-            throw new ServiceException("point info does not exist");
+            throw new ServiceException("The point info does not exist");
         }
         boolean delete = pointInfoMapper.deleteById(id) > 0;
         if (delete) {
@@ -106,17 +106,21 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo update(PointInfo pointInfo) {
+        PointInfo temp = selectById(pointInfo.getId());
+        if (null == temp) {
+            throw new ServiceException("The point info does not exist");
+        }
         pointInfo.setUpdateTime(null);
         PointInfo select = selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
         boolean update = null == select || (select.getPointAttributeId().equals(pointInfo.getPointAttributeId()) && select.getDeviceId().equals(pointInfo.getDeviceId()) && select.getPointId().equals(pointInfo.getPointId()));
         if (!update) {
-            throw new ServiceException("point info already exists");
+            throw new ServiceException("The point info already exists");
         }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
             notifyService.notifyDriverUpdatePointInfo(pointInfo.getId(), pointInfo.getDeviceId());
             return selectById(pointInfo.getId());
         }
-        throw new ServiceException("point info update failed");
+        throw new ServiceException("The point info update failed");
     }
 
     @Override
