@@ -44,7 +44,7 @@ public interface DriverAttributeClient {
     /**
      * 新增 DriverAttribute
      *
-     * @param driverAttribute
+     * @param driverAttribute DriverAttribute
      * @return DriverAttribute
      */
     @PostMapping("/add")
@@ -62,7 +62,7 @@ public interface DriverAttributeClient {
     /**
      * 修改 DriverAttribute
      *
-     * @param driverAttribute
+     * @param driverAttribute DriverAttribute
      * @return DriverAttribute
      */
     @PostMapping("/update")
@@ -71,7 +71,7 @@ public interface DriverAttributeClient {
     /**
      * 根据 ID 查询 DriverAttribute
      *
-     * @param id
+     * @param id DriverAttribute Id
      * @return DriverAttribute
      */
     @GetMapping("/id/{id}")
@@ -80,7 +80,7 @@ public interface DriverAttributeClient {
     /**
      * 分页查询 DriverAttribute
      *
-     * @param driverAttributeDto
+     * @param driverAttributeDto DriverAttribute Dto
      * @return Page<DriverAttribute>
      */
     @PostMapping("/list")
