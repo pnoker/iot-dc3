@@ -44,7 +44,7 @@ public interface DriverInfoClient {
     /**
      * 新增 DriverInfo
      *
-     * @param driverInfo
+     * @param driverInfo DriverInfo
      * @return DriverInfo
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface DriverInfoClient {
     /**
      * 根据 ID 删除 DriverInfo
      *
-     * @param id driverInfoId
+     * @param id DriverInfo Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -62,7 +62,7 @@ public interface DriverInfoClient {
     /**
      * 修改 DriverInfo
      *
-     * @param driverInfo
+     * @param driverInfo DriverInfo
      * @return DriverInfo
      */
     @PostMapping("/update")
@@ -71,7 +71,7 @@ public interface DriverInfoClient {
     /**
      * 根据 ID 查询 DriverInfo
      *
-     * @param id
+     * @param id DriverInfo Id
      * @return DriverInfo
      */
     @GetMapping("/id/{id}")
@@ -80,7 +80,7 @@ public interface DriverInfoClient {
     /**
      * 分页查询 DriverInfo
      *
-     * @param driverInfoDto
+     * @param driverInfoDto DriverInfo Dto
      * @return Page<DriverInfo>
      */
     @PostMapping("/list")

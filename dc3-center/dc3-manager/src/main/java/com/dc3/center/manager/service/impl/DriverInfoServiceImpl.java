@@ -20,8 +20,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DriverInfoMapper;
-import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.DriverInfoService;
+import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverInfoDto;
@@ -63,14 +63,14 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     )
     public DriverInfo add(DriverInfo driverInfo) {
         DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
-        if (null != select) {
-            throw new ServiceException("driver info already exists");
-        }
+        Optional.ofNullable(select).ifPresent(d -> {
+            throw new ServiceException("The driver info already exists in the profile");
+        });
         if (driverInfoMapper.insert(driverInfo) > 0) {
             notifyService.notifyDriverAddDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
             return driverInfoMapper.selectById(driverInfo.getId());
         }
-        throw new ServiceException("driver info create failed");
+        throw new ServiceException("The driver info add failed");
     }
 
     @Override
@@ -85,7 +85,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public boolean delete(Long id) {
         DriverInfo driverInfo = selectById(id);
         if (null == driverInfo) {
-            throw new ServiceException("driver info does not exist");
+            throw new ServiceException("The driver info does not exist");
         }
         boolean delete = driverInfoMapper.deleteById(id) > 0;
         if (delete) {
@@ -106,17 +106,21 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo update(DriverInfo driverInfo) {
+        DriverInfo temp = selectById(driverInfo.getId());
+        if (null == temp) {
+            throw new ServiceException("The driver info does not exist");
+        }
         driverInfo.setUpdateTime(null);
         DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
         boolean update = null == select || (select.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) && select.getProfileId().equals(driverInfo.getProfileId()));
         if (!update) {
-            throw new ServiceException("driver info already exists");
+            throw new ServiceException("The driver info already exists");
         }
         if (driverInfoMapper.updateById(driverInfo) > 0) {
             notifyService.notifyDriverUpdateDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
             return selectById(driverInfo.getId());
         }
-        throw new ServiceException("driver info update failed");
+        throw new ServiceException("The driver info update failed");
     }
 
     @Override
@@ -147,12 +151,10 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
         Optional.ofNullable(driverInfoDto).ifPresent(dto -> {
-            if (null != dto.getDriverAttributeId()) {
-                queryWrapper.eq(DriverInfo::getDriverAttributeId, dto.getDriverAttributeId());
-            }
-            if (null != dto.getProfileId()) {
-                queryWrapper.eq(DriverInfo::getProfileId, dto.getProfileId());
-            }
+            Optional.ofNullable(dto.getDriverAttributeId()).ifPresent(driverAttributeId ->
+                    queryWrapper.eq(DriverInfo::getDriverAttributeId, driverAttributeId));
+            Optional.ofNullable(dto.getProfileId()).ifPresent(profileId ->
+                    queryWrapper.eq(DriverInfo::getProfileId, profileId));
         });
         return queryWrapper;
     }
