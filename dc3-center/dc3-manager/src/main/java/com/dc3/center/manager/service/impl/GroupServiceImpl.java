@@ -20,8 +20,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.GroupMapper;
-import com.dc3.center.manager.service.GroupService;
 import com.dc3.center.manager.service.DeviceService;
+import com.dc3.center.manager.service.GroupService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
@@ -66,13 +66,13 @@ public class GroupServiceImpl implements GroupService {
     )
     public Group add(Group group) {
         Group select = selectByName(group.getName());
-        if (null != select) {
-            throw new ServiceException("device group already exists");
-        }
+        Optional.ofNullable(select).ifPresent(g -> {
+            throw new ServiceException("The device group already exists");
+        });
         if (groupMapper.insert(group) > 0) {
             return groupMapper.selectById(group.getId());
         }
-        return null;
+        throw new ServiceException("The group add failed");
     }
 
     @Override
@@ -89,7 +89,11 @@ public class GroupServiceImpl implements GroupService {
         deviceDto.setGroupId(id);
         Page<Device> devicePage = deviceService.list(deviceDto);
         if (devicePage.getTotal() > 0) {
-            throw new ServiceException("group already bound by the device");
+            throw new ServiceException("The group already bound by the device");
+        }
+        Group group = selectById(id);
+        if (null == group) {
+            throw new ServiceException("The group does not exist");
         }
         return groupMapper.deleteById(id) > 0;
     }
@@ -106,13 +110,17 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public Group update(Group group) {
+        Group temp = selectById(group.getId());
+        if (null == temp) {
+            throw new ServiceException("The group does not exist");
+        }
         group.setUpdateTime(null);
         if (groupMapper.updateById(group) > 0) {
             Group select = selectById(group.getId());
             group.setName(select.getName());
             return select;
         }
-        return null;
+        throw new ServiceException("The group update failed");
     }
 
     @Override

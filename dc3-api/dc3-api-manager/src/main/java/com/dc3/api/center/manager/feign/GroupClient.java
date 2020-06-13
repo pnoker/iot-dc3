@@ -44,7 +44,7 @@ public interface GroupClient {
     /**
      * 新增 Group
      *
-     * @param group
+     * @param group Group
      * @return Group
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface GroupClient {
     /**
      * 根据 ID 删除 Group
      *
-     * @param id groupId
+     * @param id Group Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -62,7 +62,7 @@ public interface GroupClient {
     /**
      * 修改 Group
      *
-     * @param group
+     * @param group Group
      * @return Group
      */
     @PostMapping("/update")
@@ -71,7 +71,7 @@ public interface GroupClient {
     /**
      * 根据 ID 查询 Group
      *
-     * @param id
+     * @param id Group Id
      * @return Group
      */
     @GetMapping("/id/{id}")
@@ -80,7 +80,7 @@ public interface GroupClient {
     /**
      * 分页查询 Group
      *
-     * @param groupDto
+     * @param groupDto Group Dto
      * @return Page<Group>
      */
     @PostMapping("/list")
