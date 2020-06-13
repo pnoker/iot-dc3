@@ -52,6 +52,11 @@ public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
             }
 
             @Override
+            public R<BlackIp> update(BlackIp blackIp) {
+                return R.fail(message);
+            }
+
+            @Override
             public R<BlackIp> selectById(Long id) {
                 return R.fail(message);
             }

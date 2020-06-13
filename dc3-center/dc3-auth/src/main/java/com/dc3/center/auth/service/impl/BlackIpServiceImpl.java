@@ -67,7 +67,7 @@ public class BlackIpServiceImpl implements BlackIpService {
         if (blackIpMapper.insert(blackIp) > 0) {
             return blackIpMapper.selectById(blackIp.getId());
         }
-        throw new ServiceException("The ip add failed");
+        throw new ServiceException("The ip add to the blacklist failed");
     }
 
     @Override
@@ -84,6 +84,26 @@ public class BlackIpServiceImpl implements BlackIpService {
             throw new ServiceException("The ip does not exist in the blacklist");
         }
         return blackIpMapper.deleteById(id) > 0;
+    }
+
+    @Override
+    @Caching(
+            put = {
+                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#blackIp.id", condition = "#result!=null"),
+                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip", condition = "#result!=null")
+            },
+            evict = {
+                    @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+            }
+    )
+    public BlackIp update(BlackIp blackIp) {
+        blackIp.setIp(null).setUpdateTime(null);
+        if (blackIpMapper.updateById(blackIp) > 0) {
+            BlackIp select = blackIpMapper.selectById(blackIp.getId());
+            blackIp.setIp(select.getIp());
+            return select;
+        }
+        throw new ServiceException("The ip update failed in the blacklist");
     }
 
     @Override

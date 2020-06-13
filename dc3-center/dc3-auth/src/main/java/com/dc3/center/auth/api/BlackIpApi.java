@@ -65,6 +65,19 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
+    public R<BlackIp> update(BlackIp blackIp) {
+        try {
+            BlackIp update = blackIpService.update(blackIp);
+            if (null != update) {
+                return R.ok(update);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
     public R<BlackIp> selectById(Long id) {
         try {
             BlackIp select = blackIpService.selectById(id);
@@ -74,7 +87,7 @@ public class BlackIpApi implements BlackIpClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+        return R.fail("Resource does not exist");
     }
 
     @Override
@@ -87,7 +100,7 @@ public class BlackIpApi implements BlackIpClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+        return R.fail("Resource does not exist");
     }
 
     @Override
@@ -100,7 +113,7 @@ public class BlackIpApi implements BlackIpClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+        return R.fail("Resource does not exist");
     }
 
     @Override
