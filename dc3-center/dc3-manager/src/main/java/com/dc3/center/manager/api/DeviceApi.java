@@ -66,7 +66,7 @@ public class DeviceApi implements DeviceClient {
     @Override
     public R<Device> update(Device device) {
         try {
-            Device update = deviceService.update(device.setCode(null));
+            Device update = deviceService.update(device);
             if (null != update) {
                 return R.ok(update);
             }
@@ -80,19 +80,6 @@ public class DeviceApi implements DeviceClient {
     public R<Device> selectById(Long id) {
         try {
             Device select = deviceService.selectById(id);
-            if (null != select) {
-                return R.ok(select);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
-    public R<Device> selectByCode(String code) {
-        try {
-            Device select = deviceService.selectByCode(code);
             if (null != select) {
                 return R.ok(select);
             }
