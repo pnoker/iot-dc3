@@ -18,7 +18,6 @@ package com.dc3.center.data.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.data.service.PointValueService;
-import com.dc3.center.data.service.pool.ThreadPool;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
@@ -41,30 +40,32 @@ import java.util.Optional;
 @Service
 public class PointValueServiceImpl implements PointValueService {
     @Resource
-    private ThreadPool threadPool;
-    @Resource
     private MongoTemplate mongoTemplate;
 
     @Override
     public void add(PointValue pointValue) {
-        threadPool.execute(() -> {
+        long createTime = System.currentTimeMillis();
+        long interval = createTime - pointValue.getOriginTime();
+        mongoTemplate.insert(pointValue.setCreateTime(createTime).setInterval(interval));
+        log.debug("interval:{}", interval);
+    }
+
+    @Override
+    public void batchAdd(List<PointValue> pointValues) {
+        pointValues.stream().map(pointValue -> {
             long createTime = System.currentTimeMillis();
             long interval = createTime - pointValue.getOriginTime();
-            mongoTemplate.insert(pointValue.setCreateTime(createTime).setInterval(interval));
-            log.debug("interval:{}", interval);
+            return pointValue.setCreateTime(createTime).setInterval(interval);
         });
+        mongoTemplate.insert(pointValues, PointValue.class);
     }
 
     @Override
     public Page<PointValue> list(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
         Optional.ofNullable(pointValueDto).ifPresent(dto -> {
-            if (null != dto.getDeviceId()) {
-                criteria.and("deviceId").is(dto.getDeviceId());
-            }
-            if (null != dto.getPointId()) {
-                criteria.and("pointId").is(dto.getPointId());
-            }
+            Optional.ofNullable(dto.getDeviceId()).ifPresent(deviceId -> criteria.and("deviceId").is(deviceId));
+            Optional.ofNullable(dto.getPointId()).ifPresent(pointId -> criteria.and("pointId").is(pointId));
             if (dto.getPage().getStartTime() > 0 && dto.getPage().getEndTime() > 0 && dto.getPage().getStartTime() <= dto.getPage().getEndTime()) {
                 criteria.and("originTime").gte(dto.getPage().getStartTime()).lte(dto.getPage().getEndTime());
             }
@@ -76,20 +77,26 @@ public class PointValueServiceImpl implements PointValueService {
     public PointValue latest(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
         Optional.ofNullable(pointValueDto).ifPresent(dto -> {
-            if (null != dto.getDeviceId()) {
-                criteria.and("deviceId").is(dto.getDeviceId());
-            }
-            if (null != dto.getPointId()) {
-                criteria.and("pointId").is(dto.getPointId());
-            }
+            Optional.ofNullable(dto.getDeviceId()).ifPresent(deviceId -> criteria.and("deviceId").is(deviceId));
+            Optional.ofNullable(dto.getPointId()).ifPresent(pointId -> criteria.and("pointId").is(pointId));
         });
         return oneQuery(criteria);
     }
 
     /**
+     * 查询 One
+     *
+     * @param criteriaDefinition CriteriaDefinition
+     * @return
+     */
+    private PointValue oneQuery(CriteriaDefinition criteriaDefinition) {
+        return mongoTemplate.findOne(desc(criteriaDefinition), PointValue.class);
+    }
+
+    /**
      * 分页&排序&查询
      *
-     * @param criteriaDefinition
+     * @param criteriaDefinition CriteriaDefinition
      * @param pages
      * @return
      */
@@ -103,19 +110,9 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     /**
-     * 查询 One
-     *
-     * @param criteriaDefinition
-     * @return
-     */
-    private PointValue oneQuery(CriteriaDefinition criteriaDefinition) {
-        return mongoTemplate.findOne(desc(criteriaDefinition), PointValue.class);
-    }
-
-    /**
      * 排序
      *
-     * @param criteriaDefinition
+     * @param criteriaDefinition CriteriaDefinition
      * @return
      */
     private Query desc(CriteriaDefinition criteriaDefinition) {
@@ -127,8 +124,8 @@ public class PointValueServiceImpl implements PointValueService {
     /**
      * 分页
      *
-     * @param query
-     * @param pages
+     * @param query Query
+     * @param pages Pages
      * @return
      */
     private Query page(Query query, Pages pages) {

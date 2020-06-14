@@ -44,7 +44,7 @@ public interface ProfileClient {
     /**
      * 新增 Profile
      *
-     * @param profile
+     * @param profile Profile
      * @return Profile
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface ProfileClient {
     /**
      * 根据 ID 删除 Profile
      *
-     * @param id profileId
+     * @param id profile Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -62,7 +62,7 @@ public interface ProfileClient {
     /**
      * 修改 Profile
      *
-     * @param profile
+     * @param profile Profile
      * @return Profile
      */
     @PostMapping("/update")
@@ -71,7 +71,7 @@ public interface ProfileClient {
     /**
      * 根据 ID 查询 Profile
      *
-     * @param id
+     * @param id Profile Id
      * @return Profile
      */
     @GetMapping("/id/{id}")
@@ -80,7 +80,7 @@ public interface ProfileClient {
     /**
      * 分页查询 Profile
      *
-     * @param profileDto
+     * @param profileDto Profile Dto
      * @return Page<Profile>
      */
     @PostMapping("/list")

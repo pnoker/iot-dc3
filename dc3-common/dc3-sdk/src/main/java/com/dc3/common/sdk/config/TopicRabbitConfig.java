@@ -16,8 +16,8 @@
 
 package com.dc3.common.sdk.config;
 
-import com.dc3.common.sdk.bean.DriverProperty;
 import com.dc3.common.constant.Common;
+import com.dc3.common.sdk.bean.DriverProperty;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -37,6 +37,7 @@ import javax.annotation.Resource;
  */
 @Configuration
 public class TopicRabbitConfig {
+
     @Resource
     private DriverProperty driverProperty;
 

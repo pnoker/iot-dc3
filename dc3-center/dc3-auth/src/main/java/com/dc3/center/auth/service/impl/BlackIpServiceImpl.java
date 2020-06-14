@@ -61,13 +61,13 @@ public class BlackIpServiceImpl implements BlackIpService {
     )
     public BlackIp add(BlackIp blackIp) {
         BlackIp select = selectByIp(blackIp.getIp());
-        if (null != select) {
-            throw new ServiceException("blackIp already exists");
-        }
+        Optional.ofNullable(select).ifPresent(ip -> {
+            throw new ServiceException("The ip already exists in the blacklist");
+        });
         if (blackIpMapper.insert(blackIp) > 0) {
             return blackIpMapper.selectById(blackIp.getId());
         }
-        return null;
+        throw new ServiceException("The ip add to the blacklist failed");
     }
 
     @Override
@@ -79,6 +79,10 @@ public class BlackIpServiceImpl implements BlackIpService {
             }
     )
     public boolean delete(Long id) {
+        BlackIp blackIp = selectById(id);
+        if (null == blackIp) {
+            throw new ServiceException("The ip does not exist in the blacklist");
+        }
         return blackIpMapper.deleteById(id) > 0;
     }
 
@@ -93,13 +97,13 @@ public class BlackIpServiceImpl implements BlackIpService {
             }
     )
     public BlackIp update(BlackIp blackIp) {
-        blackIp.setUpdateTime(null);
+        blackIp.setIp(null).setUpdateTime(null);
         if (blackIpMapper.updateById(blackIp) > 0) {
-            BlackIp select = selectById(blackIp.getId());
+            BlackIp select = blackIpMapper.selectById(blackIp.getId());
             blackIp.setIp(select.getIp());
             return select;
         }
-        return null;
+        throw new ServiceException("The ip update failed in the blacklist");
     }
 
     @Override

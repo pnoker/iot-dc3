@@ -1,6 +1,36 @@
 {
   "properties": [
     {
+      "name": "rtmp.ffmpeg.window",
+      "type": "java.lang.String",
+      "description": "ffmpeg path."
+    },
+    {
+      "name": "rtmp.ffmpeg.unix",
+      "type": "java.lang.String",
+      "description": "ffmpeg path."
+    },
+    {
+      "name": "server.thread.prefix",
+      "type": "java.lang.String",
+      "description": "thread prefix."
+    },
+    {
+      "name": "server.thread.core-pool-size",
+      "type": "java.lang.Integer",
+      "description": "thread core pool size."
+    },
+    {
+      "name": "server.thread.maximum-pool-size",
+      "type": "java.lang.Integer",
+      "description": "thread maximum pool size."
+    },
+    {
+      "name": "server.thread.keep-alive-time",
+      "type": "java.lang.Integer",
+      "description": "thread keep alive time."
+    },
+    {
       "name": "driver.name",
       "type": "java.lang.String",
       "description": "driver name."

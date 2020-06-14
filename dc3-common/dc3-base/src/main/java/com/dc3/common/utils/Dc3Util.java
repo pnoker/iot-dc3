@@ -36,7 +36,16 @@ import static com.google.common.collect.Sets.newHashSet;
  */
 @Slf4j
 public class Dc3Util {
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Common.DATE_FORMAT);
+    /**
+     * SimpleDateFormat ThreadLocal 保证线程安全
+     */
+    private static ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected synchronized SimpleDateFormat initialValue() {
+            return new SimpleDateFormat(Common.DATE_FORMAT);
+        }
+    };
+
 
     /**
      * 将字符串进行Base64编码
@@ -107,7 +116,7 @@ public class Dc3Util {
      * @return
      */
     public static String formatData(Date date) {
-        return simpleDateFormat.format(date);
+        return simpleDateFormatThreadLocal.get().format(date);
     }
 
     /**

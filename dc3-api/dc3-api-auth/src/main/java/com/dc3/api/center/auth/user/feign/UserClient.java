@@ -44,7 +44,7 @@ public interface UserClient {
     /**
      * 新增 User
      *
-     * @param user
+     * @param user User
      * @return User
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface UserClient {
     /**
      * 根据 ID 删除 User
      *
-     * @param id userId
+     * @param id User Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -61,8 +61,11 @@ public interface UserClient {
 
     /**
      * 修改 User
+     * <p>
+     * 支  持: Enable,Password
+     * 不支持: Name
      *
-     * @param user
+     * @param user User
      * @return User
      */
     @PostMapping("/update")
@@ -71,16 +74,16 @@ public interface UserClient {
     /**
      * 根据 ID 重置 User 密码
      *
-     * @param id userId
+     * @param id User Id
      * @return Boolean
      */
-    @PostMapping("/restPassword/{id}")
+    @PostMapping("/rest/{id}")
     R<Boolean> restPassword(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 根据 ID 查询 User
      *
-     * @param id
+     * @param id User Id
      * @return User
      */
     @GetMapping("/id/{id}")
@@ -89,7 +92,7 @@ public interface UserClient {
     /**
      * 根据 Name 查询 User
      *
-     * @param name
+     * @param name User Name
      * @return User
      */
     @GetMapping("/name/{name}")
@@ -98,7 +101,7 @@ public interface UserClient {
     /**
      * 分页查询 User
      *
-     * @param userDto
+     * @param userDto Dto
      * @return Page<User>
      */
     @PostMapping("/list")
@@ -107,7 +110,7 @@ public interface UserClient {
     /**
      * 检测用户是否存在
      *
-     * @param name
+     * @param name User Name
      * @return Boolean
      */
     @GetMapping("/check/{name}")

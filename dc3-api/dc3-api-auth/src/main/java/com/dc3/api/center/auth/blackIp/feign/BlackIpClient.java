@@ -44,7 +44,7 @@ public interface BlackIpClient {
     /**
      * 新增 BlackIp
      *
-     * @param blackIp
+     * @param blackIp BlackIp
      * @return BlackIp
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface BlackIpClient {
     /**
      * 根据 ID 删除 BlackIp
      *
-     * @param id blackIpId
+     * @param id BlackIp Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -61,8 +61,11 @@ public interface BlackIpClient {
 
     /**
      * 修改 BlackIp
+     * <p>
+     * 支  持: Enable
+     * 不支持: Ip
      *
-     * @param blackIp
+     * @param blackIp BlackIp
      * @return BlackIp
      */
     @PostMapping("/update")
@@ -71,7 +74,7 @@ public interface BlackIpClient {
     /**
      * 根据 ID 查询 BlackIp
      *
-     * @param id
+     * @param id BlackIp Id
      * @return BlackIp
      */
     @GetMapping("/id/{id}")
@@ -80,7 +83,7 @@ public interface BlackIpClient {
     /**
      * 根据 Ip 查询 BlackIp
      *
-     * @param ip
+     * @param ip Black Ip
      * @return BlackIp
      */
     @GetMapping("/ip/{ip}")
@@ -89,7 +92,7 @@ public interface BlackIpClient {
     /**
      * 分页查询 BlackIp
      *
-     * @param blackIpDto
+     * @param blackIpDto Dto
      * @return Page<BlackIp>
      */
     @PostMapping("/list")
@@ -98,7 +101,7 @@ public interface BlackIpClient {
     /**
      * 检测 Ip 是否在 Ip 黑名单列表
      *
-     * @param ip
+     * @param ip Black Ip
      * @return Boolean
      */
     @GetMapping("/check/{ip}")

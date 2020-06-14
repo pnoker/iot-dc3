@@ -61,13 +61,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     )
     public PointAttribute add(PointAttribute pointAttribute) {
         PointAttribute select = selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId());
-        if (null != select) {
-            throw new ServiceException("profile attribute already exists");
-        }
+        Optional.ofNullable(select).ifPresent(s -> {
+            throw new ServiceException("The point attribute already exists");
+        });
         if (pointAttributeMapper.insert(pointAttribute) > 0) {
             return pointAttributeMapper.selectById(pointAttribute.getId());
         }
-        return null;
+        throw new ServiceException("The point attribute add failed");
     }
 
     @Override
@@ -80,6 +80,10 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             }
     )
     public boolean delete(Long id) {
+        PointAttribute pointAttribute = selectById(id);
+        if (null == pointAttribute) {
+            throw new ServiceException("The point attribute does not exist");
+        }
         return pointAttributeMapper.deleteById(id) > 0;
     }
 
@@ -95,13 +99,17 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             }
     )
     public PointAttribute update(PointAttribute pointAttribute) {
+        PointAttribute temp = selectById(pointAttribute.getId());
+        if (null == temp) {
+            throw new ServiceException("The point attribute does not exist");
+        }
         pointAttribute.setUpdateTime(null);
         if (pointAttributeMapper.updateById(pointAttribute) > 0) {
-            PointAttribute select = selectById(pointAttribute.getId());
+            PointAttribute select = pointAttributeMapper.selectById(pointAttribute.getId());
             pointAttribute.setName(select.getName());
             return select;
         }
-        return null;
+        throw new ServiceException("The point attribute update failed");
     }
 
     @Override
@@ -141,9 +149,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             if (StringUtils.isNotBlank(dto.getType())) {
                 queryWrapper.eq(PointAttribute::getType, dto.getType());
             }
-            if (null != dto.getDriverId()) {
-                queryWrapper.eq(PointAttribute::getDriverId, dto.getDriverId());
-            }
+            Optional.ofNullable(dto.getDriverId()).ifPresent(driverId -> {
+                queryWrapper.eq(PointAttribute::getDriverId, driverId);
+            });
         });
         return queryWrapper;
     }

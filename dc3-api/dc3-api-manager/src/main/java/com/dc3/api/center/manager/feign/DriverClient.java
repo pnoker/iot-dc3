@@ -44,7 +44,7 @@ public interface DriverClient {
     /**
      * 新增 Driver
      *
-     * @param driver
+     * @param driver Driver
      * @return Driver
      */
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public interface DriverClient {
     /**
      * 根据 ID 删除 Driver
      *
-     * @param id driverId
+     * @param id Driver Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -62,7 +62,7 @@ public interface DriverClient {
     /**
      * 修改 Driver
      *
-     * @param driver
+     * @param driver Driver
      * @return Driver
      */
     @PostMapping("/update")
@@ -71,7 +71,7 @@ public interface DriverClient {
     /**
      * 根据 ID 查询 Driver
      *
-     * @param id
+     * @param id Driver Id
      * @return Driver
      */
     @GetMapping("/id/{id}")
@@ -80,7 +80,7 @@ public interface DriverClient {
     /**
      * 根据 SERVICENAME 查询 Driver
      *
-     * @param serviceName
+     * @param serviceName Driver Service Name
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
@@ -89,8 +89,8 @@ public interface DriverClient {
     /**
      * 根据 HOST & PORT 查询 Driver
      *
-     * @param host
-     * @param port
+     * @param host Driver Host
+     * @param port Driver Port
      * @return Driver
      */
     @GetMapping("/host/{host}/port/{port}")
@@ -99,7 +99,7 @@ public interface DriverClient {
     /**
      * 分页查询 Driver
      *
-     * @param driverDto
+     * @param driverDto Driver Dto
      * @return Page<Driver>
      */
     @PostMapping("/list")
