@@ -296,7 +296,7 @@ CREATE TABLE `dc3_black_ip`  (
 -- ----------------------------
 -- Records of dc3_user
 -- ----------------------------
-INSERT INTO `dc3_user` VALUES (-1, 'pnoker', 'dc3dc3dc3', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '10e339be1130a90dc1b9ff0332abced6', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_rtmp

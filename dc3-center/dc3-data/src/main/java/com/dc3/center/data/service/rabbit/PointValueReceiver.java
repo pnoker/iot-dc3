@@ -40,6 +40,7 @@ public class PointValueReceiver {
 
     @RabbitHandler
     public void pointValueReceive(PointValue pointValue) {
+        //todo 需要调整逻辑，采取批量入库和定时入库，并存储实时数据到 redis 中
         pointValueService.add(pointValue);
     }
 }

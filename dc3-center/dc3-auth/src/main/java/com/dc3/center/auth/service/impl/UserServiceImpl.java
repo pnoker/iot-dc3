@@ -26,6 +26,7 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.dto.UserDto;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.User;
+import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(select).ifPresent(ip -> {
             throw new ServiceException("The user already exists");
         });
-        if (userMapper.insert(user) > 0) {
+        if (userMapper.insert(user.setPassword(Dc3Util.md5(user.getPassword()))) > 0) {
             return userMapper.selectById(user.getId());
         }
         throw new ServiceException("The user add failed");
@@ -145,7 +146,7 @@ public class UserServiceImpl implements UserService {
     public boolean restPassword(Long id) {
         User user = selectById(id);
         if (null != user) {
-            user.setPassword(Common.DEFAULT_PASSWORD);
+            user.setPassword(Dc3Util.md5(Common.DEFAULT_PASSWORD));
             return null != update(user);
         }
         return false;

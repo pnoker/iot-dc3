@@ -20,6 +20,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
 
+import java.util.List;
+
 /**
  * @author pnoker
  */
@@ -30,6 +32,13 @@ public interface PointValueService {
      * @param pointValue
      */
     void add(PointValue pointValue);
+
+    /**
+     * 批量新增 PointValue
+     *
+     * @param pointValues
+     */
+    void batchAdd(List<PointValue> pointValues);
 
     /**
      * 获取带分页、排序

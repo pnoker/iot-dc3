@@ -97,8 +97,8 @@ public class MongoConfig {
                 .minConnectionsPerHost(properties.getMinConnectionsPerHost()).build();
     }
 
-    @Primary
     @Bean
+    @Primary
     @ConfigurationProperties(prefix = "spring.data.mongodb")
     public MongoClientOptionProperties mongoClientOptionProperties() {
         return new MongoClientOptionProperties();
