@@ -5,11 +5,6 @@ rtmp:
 
 server:
   port: 8803
-  thread:
-    prefix: dc3-rtmp-thread-
-    core-pool-size: 4
-    maximum-pool-size: 32
-    keep-alive-time: 10
 
 spring:
   application:

@@ -20,7 +20,6 @@ import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.common.sdk.service.pool.ThreadPool;
 import com.dc3.driver.service.netty.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author pnoker
@@ -40,11 +40,11 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private NettyServer nettyServer;
     @Resource
-    private ThreadPool threadPool;
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public void initial() {
-        threadPool.execute(() -> {
+        threadPoolExecutor.execute(() -> {
             log.debug("Virtual Listening Driver Starting(::{}) incoming data listener", port);
             nettyServer.start(port);
         });

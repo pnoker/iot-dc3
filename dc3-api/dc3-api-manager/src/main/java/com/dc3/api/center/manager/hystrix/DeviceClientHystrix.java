@@ -62,11 +62,6 @@ public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
             }
 
             @Override
-            public R<Device> selectByCode(String code) {
-                return R.fail(message);
-            }
-
-            @Override
             public R<Page<Device>> list(DeviceDto deviceDto) {
                 return R.fail(message);
             }

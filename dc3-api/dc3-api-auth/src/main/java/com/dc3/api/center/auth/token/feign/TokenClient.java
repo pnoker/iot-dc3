@@ -41,17 +41,17 @@ public interface TokenClient {
     /**
      * 生成用户随机 Salt
      *
-     * @param username
-     * @return String
+     * @param username Username
+     * @return R<String>
      */
     @GetMapping("/salt")
-    R<String> randomSalt(@NotNull @RequestParam(value = "username") String username);
+    R<String> generateSalt(@NotNull @RequestParam(value = "username") String username);
 
     /**
      * 生成用户 Token 令牌
      *
      * @param user
-     * @return String
+     * @return R<String>
      */
     @PostMapping("/generate")
     R<String> generateToken(@Validated(Auth.class) @RequestBody User user);
@@ -59,9 +59,9 @@ public interface TokenClient {
     /**
      * 检测用户 Token 令牌是否有效
      *
-     * @param username
-     * @param token
-     * @return Boolean
+     * @param username Username
+     * @param token    Token
+     * @return R<Boolean>
      */
     @GetMapping("/check")
     R<Boolean> checkTokenValid(@NotNull @RequestParam(value = "username") String username, @NotNull @RequestParam(value = "token") String token);
@@ -69,8 +69,8 @@ public interface TokenClient {
     /**
      * 注销用户的Token令牌
      *
-     * @param username
-     * @return Boolean
+     * @param username Username
+     * @return R<Boolean>
      */
     @GetMapping("/cancel")
     R<Boolean> cancelToken(@NotNull @RequestParam(value = "username") String username);

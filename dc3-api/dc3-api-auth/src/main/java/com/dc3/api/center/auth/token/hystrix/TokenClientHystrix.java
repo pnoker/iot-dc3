@@ -40,7 +40,7 @@ public class TokenClientHystrix implements FallbackFactory<TokenClient> {
         return new TokenClient() {
 
             @Override
-            public R<String> randomSalt(String username) {
+            public R<String> generateSalt(String username) {
                 return R.fail(message);
             }
 

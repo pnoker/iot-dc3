@@ -61,13 +61,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     )
     public DriverAttribute add(DriverAttribute driverAttribute) {
         DriverAttribute select = selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId());
-        if (null != select) {
-            throw new ServiceException("driver attribute already exists");
-        }
+        Optional.ofNullable(select).ifPresent(d -> {
+            throw new ServiceException("The driver attribute already exists");
+        });
         if (driverAttributeMapper.insert(driverAttribute) > 0) {
             return driverAttributeMapper.selectById(driverAttribute.getId());
         }
-        return null;
+        throw new ServiceException("The driver attribute add failed");
     }
 
     @Override
@@ -80,6 +80,10 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             }
     )
     public boolean delete(Long id) {
+        DriverAttribute driverAttribute = selectById(id);
+        if (null == driverAttribute) {
+            throw new ServiceException("The driver attribute does not exist");
+        }
         return driverAttributeMapper.deleteById(id) > 0;
     }
 
@@ -95,13 +99,17 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             }
     )
     public DriverAttribute update(DriverAttribute driverAttribute) {
+        DriverAttribute temp = selectById(driverAttribute.getId());
+        if (null == temp) {
+            throw new ServiceException("The driver attribute does not exist");
+        }
         driverAttribute.setUpdateTime(null);
         if (driverAttributeMapper.updateById(driverAttribute) > 0) {
-            DriverAttribute select = selectById(driverAttribute.getId());
+            DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
             driverAttribute.setName(select.getName());
             return select;
         }
-        return null;
+        throw new ServiceException("The driver attribute update failed");
     }
 
     @Override
@@ -141,9 +149,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             if (StringUtils.isNotBlank(dto.getType())) {
                 queryWrapper.eq(DriverAttribute::getType, dto.getType());
             }
-            if (null != dto.getDriverId()) {
-                queryWrapper.eq(DriverAttribute::getDriverId, dto.getDriverId());
-            }
+            Optional.ofNullable(dto.getDriverId()).ifPresent(driverId -> queryWrapper.eq(DriverAttribute::getDriverId, driverId));
         });
         return queryWrapper;
     }

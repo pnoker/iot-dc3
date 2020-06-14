@@ -44,8 +44,8 @@ public interface DeviceClient {
     /**
      * 新增 Device
      *
-     * @param device
-     * @return Device
+     * @param device Device
+     * @return R<Device>
      */
     @PostMapping("/add")
     R<Device> add(@Validated(Insert.class) @RequestBody Device device);
@@ -53,8 +53,8 @@ public interface DeviceClient {
     /**
      * 根据 ID 删除 Device
      *
-     * @param id deviceId
-     * @return Boolean
+     * @param id Device Id
+     * @return R<Boolean>
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
@@ -62,8 +62,8 @@ public interface DeviceClient {
     /**
      * 修改 Device
      *
-     * @param device
-     * @return Device
+     * @param device Device
+     * @return R<Device>
      */
     @PostMapping("/update")
     R<Device> update(@Validated(Update.class) @RequestBody Device device);
@@ -71,26 +71,17 @@ public interface DeviceClient {
     /**
      * 根据 ID 查询 Device
      *
-     * @param id
-     * @return Device
+     * @param id Device Id
+     * @return R<Device>
      */
     @GetMapping("/id/{id}")
     R<Device> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 根据 CODE 查询 Device
-     *
-     * @param code
-     * @return Device
-     */
-    @GetMapping("/code/{code}")
-    R<Device> selectByCode(@NotNull @PathVariable(value = "code") String code);
-
-    /**
      * 分页查询 Device
      *
-     * @param deviceDto
-     * @return Page<Device>
+     * @param deviceDto Device Dto
+     * @return R<Page < Device>>
      */
     @PostMapping("/list")
     R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto);

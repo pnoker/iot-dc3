@@ -67,13 +67,13 @@ public class DriverServiceImpl implements DriverService {
     )
     public Driver add(Driver driver) {
         Driver select = selectByServiceName(driver.getName());
-        if (null != select) {
-            throw new ServiceException("driver already exists");
-        }
+        Optional.ofNullable(select).ifPresent(d -> {
+            throw new ServiceException("The driver already exists");
+        });
         if (driverMapper.insert(driver) > 0) {
             return driverMapper.selectById(driver.getId());
         }
-        return null;
+        throw new ServiceException("The driver add failed");
     }
 
     @Override
@@ -91,7 +91,12 @@ public class DriverServiceImpl implements DriverService {
         profileDto.setDriverId(id);
         Page<Profile> profilePage = profileService.list(profileDto);
         if (profilePage.getTotal() > 0) {
-            throw new ServiceException("driver already bound by the profile");
+            throw new ServiceException("The driver already bound by the profile");
+        }
+        //todo 删除driver需要把它的属性和配置也一同删除
+        Driver driver = selectById(id);
+        if (null == driver) {
+            throw new ServiceException("The driver does not exist");
         }
         return driverMapper.deleteById(id) > 0;
     }
@@ -109,13 +114,17 @@ public class DriverServiceImpl implements DriverService {
             }
     )
     public Driver update(Driver driver) {
+        Driver temp = selectById(driver.getId());
+        if (null == temp) {
+            throw new ServiceException("The driver does not exist");
+        }
         driver.setUpdateTime(null);
         if (driverMapper.updateById(driver) > 0) {
-            Driver select = selectById(driver.getId());
+            Driver select = driverMapper.selectById(driver.getId());
             driver.setServiceName(select.getServiceName());
             return select;
         }
-        return null;
+        throw new ServiceException("The driver update failed");
     }
 
     @Override
@@ -163,9 +172,7 @@ public class DriverServiceImpl implements DriverService {
             if (StringUtils.isNotBlank(dto.getHost())) {
                 queryWrapper.like(Driver::getHost, dto.getHost());
             }
-            if (null != dto.getPort()) {
-                queryWrapper.eq(Driver::getPort, dto.getPort());
-            }
+            Optional.ofNullable(dto.getPort()).ifPresent(port -> queryWrapper.eq(Driver::getPort, port));
         });
         return queryWrapper;
     }

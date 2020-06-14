@@ -42,8 +42,8 @@ public interface RtmpClient {
     /**
      * 新增 Rtmp
      *
-     * @param rtmp
-     * @return Rtmp
+     * @param rtmp Rtmp
+     * @return R<Rtmp>
      */
     @PostMapping("/add")
     R<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
@@ -52,7 +52,7 @@ public interface RtmpClient {
      * 根据 ID 删除 Rtmp
      *
      * @param id rtmpId
-     * @return Boolean
+     * @return R<Boolean>
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
@@ -60,8 +60,8 @@ public interface RtmpClient {
     /**
      * 修改 Rtmp
      *
-     * @param rtmp
-     * @return Rtmp
+     * @param rtmp Rtmp
+     * @return R<Rtmp>
      */
     @PostMapping("/update")
     R<Rtmp> update(@RequestBody Rtmp rtmp);
@@ -69,8 +69,8 @@ public interface RtmpClient {
     /**
      * 根据 ID 查询 Rtmp
      *
-     * @param id
-     * @return Rtmp
+     * @param id Rtmp Id
+     * @return R<Rtmp>
      */
     @GetMapping("/id/{id}")
     R<Rtmp> selectById(@NotNull @PathVariable(value = "id") Long id);
@@ -78,8 +78,8 @@ public interface RtmpClient {
     /**
      * 分页查询 Rtmp
      *
-     * @param rtmpDto
-     * @return Page<Rtmp>
+     * @param rtmpDto Rtmp Dto
+     * @return R<Page < Rtmp>>
      */
     @PostMapping("/list")
     R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
@@ -87,8 +87,8 @@ public interface RtmpClient {
     /**
      * 启动 Rtmp 转码任务
      *
-     * @param id
-     * @return Boolean
+     * @param id Rtmp Id
+     * @return R<Boolean>
      */
     @PostMapping("/start/{id}")
     R<Boolean> start(@NotNull @PathVariable(value = "id") Long id);
@@ -96,8 +96,8 @@ public interface RtmpClient {
     /**
      * 停止 Rtmp 转码任务
      *
-     * @param id
-     * @return Boolean
+     * @param id Rtmp Id
+     * @return R<Boolean>
      */
     @PostMapping("/stop/{id}")
     R<Boolean> stop(@NotNull @PathVariable(value = "id") Long id);

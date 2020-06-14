@@ -39,10 +39,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -316,11 +313,11 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         }
 
         Map<String, DriverAttribute> driverAttributeMap = new ConcurrentHashMap<>(16);
-        if (null != driverProperty.getDriverAttribute()) {
-            for (DriverAttribute info : driverProperty.getDriverAttribute()) {
+        Optional.ofNullable(driverProperty.getDriverAttribute()).ifPresent(driverAttributes -> {
+            for (DriverAttribute info : driverAttributes) {
                 driverAttributeMap.put(info.getName(), info);
             }
-        }
+        });
 
         for (String name : driverAttributeMap.keySet()) {
             DriverAttribute info = driverAttributeMap.get(name).setDriverId(driverContext.getDriverId());
@@ -334,7 +331,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             } else {
                 R<DriverAttribute> r = driverAttributeClient.add(info);
                 if (!r.isOk()) {
-                    log.error("the driver attribute ({}) create failed", name);
+                    log.error("the driver attribute ({}) add failed", name);
                     return false;
                 }
             }
@@ -376,11 +373,11 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         }
 
         Map<String, PointAttribute> pointAttributeMap = new ConcurrentHashMap<>(16);
-        if (null != driverProperty.getPointAttribute()) {
-            for (PointAttribute attribute : driverProperty.getPointAttribute()) {
+        Optional.ofNullable(driverProperty.getPointAttribute()).ifPresent(pointAttributes -> {
+            for (PointAttribute attribute : pointAttributes) {
                 pointAttributeMap.put(attribute.getName(), attribute);
             }
-        }
+        });
 
         for (String name : pointAttributeMap.keySet()) {
             PointAttribute attribute = pointAttributeMap.get(name).setDriverId(driverContext.getDriverId());
@@ -394,7 +391,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             } else {
                 R<PointAttribute> r = pointAttributeClient.add(attribute);
                 if (!r.isOk()) {
-                    log.error("the point attribute ({}) create failed", name);
+                    log.error("the point attribute ({}) add failed", name);
                     return false;
                 }
             }

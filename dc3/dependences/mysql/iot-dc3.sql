@@ -166,7 +166,6 @@ DROP TABLE IF EXISTS `dc3_device`;
 CREATE TABLE `dc3_device`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '设备名称',
-  `code` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '设备编码',
   `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '设备状态（离线0，在线1，维护2，故障3，失效4）',
   `profile_id` bigint(20) NULL DEFAULT NULL COMMENT '模板ID',
   `group_id` bigint(20) NULL DEFAULT NULL COMMENT '分组ID',
@@ -176,7 +175,6 @@ CREATE TABLE `dc3_device`  (
   `deleted` tinyint(4) NULL DEFAULT 0 COMMENT '逻辑删标识',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `name`(`name`) USING BTREE,
-  INDEX `code`(`code`) USING BTREE,
   INDEX `profile_id`(`profile_id`) USING BTREE,
   INDEX `group_id`(`group_id`) USING BTREE,
   CONSTRAINT `dc3_device_ibfk_1` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -298,7 +296,7 @@ CREATE TABLE `dc3_black_ip`  (
 -- ----------------------------
 -- Records of dc3_user
 -- ----------------------------
-INSERT INTO `dc3_user` VALUES (-1, 'pnoker', 'dc3dc3dc3', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+INSERT INTO `dc3_user` VALUES (-1, 'pnoker', '10e339be1130a90dc1b9ff0332abced6', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_rtmp

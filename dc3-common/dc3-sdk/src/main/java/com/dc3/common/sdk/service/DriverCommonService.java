@@ -30,7 +30,7 @@ public interface DriverCommonService {
     /**
      * 向 DeviceDriver 中添加模板
      *
-     * @param id
+     * @param id Id
      * @return
      */
     void addProfile(Long id);
@@ -38,7 +38,7 @@ public interface DriverCommonService {
     /**
      * 删除 DeviceDriver 中模板
      *
-     * @param id
+     * @param id Id
      * @return
      */
     void deleteProfile(Long id);
@@ -46,7 +46,7 @@ public interface DriverCommonService {
     /**
      * 向 DeviceDriver 中添加设备
      *
-     * @param id
+     * @param id Id
      * @return
      */
     void addDevice(Long id);
@@ -54,7 +54,7 @@ public interface DriverCommonService {
     /**
      * 删除 DeviceDriver 中设备
      *
-     * @param id
+     * @param id Id
      * @return
      */
     void deleteDevice(Long id);
@@ -62,7 +62,7 @@ public interface DriverCommonService {
     /**
      * 更新 DeviceDriver 中设备
      *
-     * @param id
+     * @param id Id
      * @return
      */
     void updateDevice(Long id);
@@ -70,7 +70,7 @@ public interface DriverCommonService {
     /**
      * 向 DeviceDriver 中添加位号
      *
-     * @param id
+     * @param id Id
      * @return
      */
     void addPoint(Long id);
@@ -78,7 +78,7 @@ public interface DriverCommonService {
     /**
      * 删除 DeviceDriver 中位号
      *
-     * @param id
+     * @param id Id
      * @param profileId
      * @return
      */
@@ -87,7 +87,7 @@ public interface DriverCommonService {
     /**
      * 更新 DeviceDriver 中添加位号
      *
-     * @param id
+     * @param id Id
      * @return
      */
     void updatePoint(Long id);
@@ -95,7 +95,7 @@ public interface DriverCommonService {
     /**
      * 向 DeviceDriver 中添加驱动配置信息
      *
-     * @param id
+     * @param id Id
      */
     void addDriverInfo(Long id);
 
@@ -110,14 +110,14 @@ public interface DriverCommonService {
     /**
      * 更新 DeviceDriver 中添加驱动配置信息
      *
-     * @param id
+     * @param id Id
      */
     void updateDriverInfo(Long id);
 
     /**
      * 向 DeviceDriver 中添加位号配置信息
      *
-     * @param id
+     * @param id Id
      */
     void addPointInfo(Long id);
 
@@ -133,7 +133,7 @@ public interface DriverCommonService {
     /**
      * 更新 DeviceDriver 中添加位号配置信息
      *
-     * @param id
+     * @param id Id
      */
     void updatePointInfo(Long id);
 

@@ -28,16 +28,16 @@ public interface RtmpService extends Service<Rtmp, RtmpDto> {
     /**
      * 启动
      *
-     * @param id
-     * @return true/false
+     * @param id Id
+     * @return boolean
      */
     boolean start(Long id);
 
     /**
      * 停止
      *
-     * @param id
-     * @return true/false
+     * @param id Id
+     * @return boolean
      */
     boolean stop(Long id);
 }

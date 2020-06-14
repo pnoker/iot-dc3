@@ -28,19 +28,11 @@ import com.dc3.common.model.Device;
 public interface DeviceService extends Service<Device, DeviceDto> {
 
     /**
-     * 根据设备 CODE 查询
-     *
-     * @param code
-     * @return
-     */
-    Device selectByCode(String code);
-
-    /**
      * 根据设备 NAME 和分组 ID 查询
      *
-     * @param groupId
-     * @param name
-     * @return
+     * @param groupId 设备分组ID
+     * @param name    设备名称
+     * @return Device
      */
     Device selectDeviceByNameAndGroup(long groupId, String name);
 
