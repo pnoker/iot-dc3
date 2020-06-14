@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
+        <!-- dc3 Common Core -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-core</artifactId>
+        </dependency>
+
         <!-- dc3 Api -->
         <dependency>
             <groupId>com.dc3</groupId>

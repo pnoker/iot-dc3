@@ -51,6 +51,16 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
+    public void batchAdd(List<PointValue> pointValues) {
+        pointValues.stream().map(pointValue -> {
+            long createTime = System.currentTimeMillis();
+            long interval = createTime - pointValue.getOriginTime();
+            return pointValue.setCreateTime(createTime).setInterval(interval);
+        });
+        mongoTemplate.insert(pointValues, PointValue.class);
+    }
+
+    @Override
     public Page<PointValue> list(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
         Optional.ofNullable(pointValueDto).ifPresent(dto -> {
@@ -74,9 +84,19 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     /**
+     * 查询 One
+     *
+     * @param criteriaDefinition CriteriaDefinition
+     * @return
+     */
+    private PointValue oneQuery(CriteriaDefinition criteriaDefinition) {
+        return mongoTemplate.findOne(desc(criteriaDefinition), PointValue.class);
+    }
+
+    /**
      * 分页&排序&查询
      *
-     * @param criteriaDefinition
+     * @param criteriaDefinition CriteriaDefinition
      * @param pages
      * @return
      */
@@ -90,19 +110,9 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     /**
-     * 查询 One
-     *
-     * @param criteriaDefinition
-     * @return
-     */
-    private PointValue oneQuery(CriteriaDefinition criteriaDefinition) {
-        return mongoTemplate.findOne(desc(criteriaDefinition), PointValue.class);
-    }
-
-    /**
      * 排序
      *
-     * @param criteriaDefinition
+     * @param criteriaDefinition CriteriaDefinition
      * @return
      */
     private Query desc(CriteriaDefinition criteriaDefinition) {
@@ -114,8 +124,8 @@ public class PointValueServiceImpl implements PointValueService {
     /**
      * 分页
      *
-     * @param query
-     * @param pages
+     * @param query Query
+     * @param pages Pages
      * @return
      */
     private Query page(Query query, Pages pages) {
