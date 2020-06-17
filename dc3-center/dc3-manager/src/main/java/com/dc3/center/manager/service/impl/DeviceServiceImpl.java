@@ -152,7 +152,6 @@ public class DeviceServiceImpl implements DeviceService {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Device::getName, dto.getName());
             }
-            Optional.ofNullable(dto.getStatus()).ifPresent(status -> queryWrapper.eq(Device::getStatus, status));
             Optional.ofNullable(dto.getProfileId()).ifPresent(profileId -> queryWrapper.eq(Device::getProfileId, profileId));
             Optional.ofNullable(dto.getGroupId()).ifPresent(groupId -> queryWrapper.eq(Device::getGroupId, groupId));
         });

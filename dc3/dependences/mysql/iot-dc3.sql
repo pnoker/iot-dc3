@@ -166,7 +166,6 @@ DROP TABLE IF EXISTS `dc3_device`;
 CREATE TABLE `dc3_device`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '设备名称',
-  `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '设备状态（离线0，在线1，维护2，故障3，失效4）',
   `profile_id` bigint(20) NULL DEFAULT NULL COMMENT '模板ID',
   `group_id` bigint(20) NULL DEFAULT NULL COMMENT '分组ID',
   `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',

@@ -41,7 +41,7 @@ public class RouteConfig {
     /**
      * 根据 HostAddress 进行限流
      *
-     * @return
+     * @return KeyResolver
      */
     @Bean
     public KeyResolver hostKeyResolver() {
@@ -51,7 +51,7 @@ public class RouteConfig {
     /**
      * Redis 令牌桶 限流
      *
-     * @return
+     * @return RedisRateLimiter
      */
     @Bean
     RedisRateLimiter redisRateLimiter() {
@@ -61,8 +61,8 @@ public class RouteConfig {
     /**
      * 自定义 RouteLocator
      *
-     * @param builder
-     * @return
+     * @param builder RouteLocatorBuilder
+     * @return RouteLocator
      */
     @Bean
     public RouteLocator gatewayRouteLocator(RouteLocatorBuilder builder) {
