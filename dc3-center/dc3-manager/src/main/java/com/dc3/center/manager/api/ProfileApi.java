@@ -18,6 +18,7 @@ package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.ProfileClient;
+import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>模板 Client 接口实现
@@ -40,6 +42,8 @@ import javax.annotation.Resource;
 public class ProfileApi implements ProfileClient {
     @Resource
     private ProfileService profileService;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     public R<Profile> add(Profile profile) {
@@ -100,6 +104,24 @@ public class ProfileApi implements ProfileClient {
             return R.fail(e.getMessage());
         }
         return R.fail();
+    }
+
+    @Override
+    public R<Boolean> notifyDriverAddProfile(@NotNull Long id) {
+        try {
+            return notifyService.notifyDriverAddProfile(id) ? R.ok() : R.fail();
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public R<Boolean> notifyDriverDeleteProfile(@NotNull Long id) {
+        try {
+            return notifyService.notifyDriverDeleteProfile(id) ? R.ok() : R.fail();
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
     }
 
 }

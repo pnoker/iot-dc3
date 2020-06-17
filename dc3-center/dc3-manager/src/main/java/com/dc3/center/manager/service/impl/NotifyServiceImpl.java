@@ -54,9 +54,9 @@ public class NotifyServiceImpl implements NotifyService {
     private DeviceService deviceService;
 
     @Override
-    public void notifyDriverAddProfile(Long profileId) {
+    public boolean notifyDriverAddProfile(Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Profile.ADD).setId(profileId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -64,12 +64,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver add profile failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverDeleteProfile(Long profileId) {
+    public boolean notifyDriverDeleteProfile(Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Profile.DELETE).setId(profileId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -77,12 +78,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver delete profile failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverAddDevice(Long deviceId, Long profileId) {
+    public boolean notifyDriverAddDevice(Long deviceId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Device.ADD).setId(deviceId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -90,12 +92,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver add device failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverDeleteDevice(Long deviceId, Long profileId) {
+    public boolean notifyDriverDeleteDevice(Long deviceId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Device.DELETE).setId(deviceId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -103,12 +106,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver delete device failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverUpdateDevice(Long deviceId, Long profileId) {
+    public boolean notifyDriverUpdateDevice(Long deviceId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Device.UPDATE).setId(deviceId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -116,12 +120,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver update device failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverAddPoint(Long pointId, Long profileId) {
+    public boolean notifyDriverAddPoint(Long pointId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Point.ADD).setId(pointId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -129,12 +134,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver add point failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverDeletePoint(Long pointId, Long profileId) {
+    public boolean notifyDriverDeletePoint(Long pointId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Point.DELETE).setId(pointId).setParentId(profileId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -142,12 +148,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver delete point failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverUpdatePoint(Long pointId, Long profileId) {
+    public boolean notifyDriverUpdatePoint(Long pointId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.Point.UPDATE).setId(pointId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -155,12 +162,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver update point failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverAddDriverInfo(Long driverInfoId, Long profileId) {
+    public boolean notifyDriverAddDriverInfo(Long driverInfoId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.DriverInfo.ADD).setId(driverInfoId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -168,12 +176,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver add driver info failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverDeleteDriverInfo(Long driverInfoId, Long attributeId, Long profileId) {
+    public boolean notifyDriverDeleteDriverInfo(Long driverInfoId, Long attributeId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.DriverInfo.DELETE).setParentId(profileId).setAttributeId(attributeId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -181,12 +190,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver delete driver info failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverUpdateDriverInfo(Long driverInfoId, Long profileId) {
+    public boolean notifyDriverUpdateDriverInfo(Long driverInfoId, Long profileId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getProfileDriver(profileId);
+            Driver driver = getDriverByProfileId(profileId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.ADD).setId(driverInfoId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -194,12 +204,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver update driver info failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverAddPointInfo(Long pointInfoId, Long deviceId) {
+    public boolean notifyDriverAddPointInfo(Long pointInfoId, Long deviceId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getDeviceDriver(deviceId);
+            Driver driver = getDriverByDeviceId(deviceId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.ADD).setId(pointInfoId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -207,12 +218,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver add point info failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverDeletePointInfo(Long pointId, Long attributeId, Long deviceId) {
+    public boolean notifyDriverDeletePointInfo(Long pointId, Long attributeId, Long deviceId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getDeviceDriver(deviceId);
+            Driver driver = getDriverByDeviceId(deviceId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.DELETE).setId(pointId).setParentId(deviceId).setAttributeId(attributeId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -220,12 +232,13 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver delete point info failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     @Override
-    public void notifyDriverUpdatePointInfo(Long pointInfoId, Long deviceId) {
+    public boolean notifyDriverUpdatePointInfo(Long pointInfoId, Long deviceId) {
         scheduledThreadPoolExecutor.schedule(() -> {
-            Driver driver = getDeviceDriver(deviceId);
+            Driver driver = getDriverByDeviceId(deviceId);
             DriverOperation operation = new DriverOperation().setCommand(Operation.PointInfo.UPDATE).setId(pointInfoId);
             try {
                 restTemplate.postForObject(String.format("http://%s/driver/memory", driver.getServiceName().toUpperCase()), operation, R.class);
@@ -233,6 +246,7 @@ public class NotifyServiceImpl implements NotifyService {
                 log.warn("notification driver update point info failed {}", e.getMessage());
             }
         }, 1, TimeUnit.SECONDS);
+        return false;
     }
 
     /**
@@ -241,7 +255,7 @@ public class NotifyServiceImpl implements NotifyService {
      * @param deviceId
      * @return
      */
-    public Driver getDeviceDriver(Long deviceId) {
+    public Driver getDriverByDeviceId(Long deviceId) {
         Device device = deviceService.selectById(deviceId);
         if (null != device) {
             Profile profile = profileService.selectById(device.getProfileId());
@@ -258,7 +272,7 @@ public class NotifyServiceImpl implements NotifyService {
      * @param profileId
      * @return
      */
-    public Driver getProfileDriver(Long profileId) {
+    public Driver getDriverByProfileId(Long profileId) {
         Profile profile = profileService.selectById(profileId);
         if (null != profile) {
             return driverService.selectById(profile.getDriverId());

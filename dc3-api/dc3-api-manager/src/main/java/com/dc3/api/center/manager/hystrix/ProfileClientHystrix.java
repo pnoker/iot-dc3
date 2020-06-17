@@ -66,6 +66,16 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
                 return R.fail(message);
             }
 
+            @Override
+            public R<Boolean> notifyDriverAddProfile(Long id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Boolean> notifyDriverDeleteProfile(Long id) {
+                return R.fail(message);
+            }
+
         };
     }
 }
