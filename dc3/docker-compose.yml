@@ -33,6 +33,20 @@ services:
         aliases:
           - dc3-portainer
 
+  jenkins:
+    image:  jenkins
+    restart: always
+    container_name: jenkins
+    hostname: jenkins
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins:/var/jenkins_home
+    networks:
+      dc3net:
+        aliases:
+          - dc3-jenkins
+
   gateway:
     build:
       context: ../dc3-gateway/
@@ -364,6 +378,7 @@ services:
 
 volumes:
   portainer:
+  jenkins:
   mysql:
   redis:
   mongo_config:
