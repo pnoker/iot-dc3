@@ -18,6 +18,7 @@ package com.dc3.gateway.config;
 
 import com.dc3.api.center.auth.blackIp.feign.BlackIpClient;
 import com.dc3.common.bean.R;
+import com.dc3.gateway.hystrix.GatewayHystrix;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.jackson.JacksonDecoder;
@@ -28,7 +29,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.reactive.function.server.RequestPredicates;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
@@ -40,6 +45,12 @@ import java.util.Objects;
 @Slf4j
 @Configuration
 public class GatewayConfig {
+    private final GatewayHystrix gatewayHystrix;
+
+    public GatewayConfig(GatewayHystrix gatewayHystrix) {
+        this.gatewayHystrix = gatewayHystrix;
+    }
+
     @Resource
     private BlackIpClient blackIpClient;
 
@@ -51,6 +62,11 @@ public class GatewayConfig {
     @Bean
     public Decoder decoder() {
         return new JacksonDecoder();
+    }
+
+    @Bean
+    public RouterFunction routerFunction() {
+        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), gatewayHystrix);
     }
 
     @Bean
@@ -71,6 +87,7 @@ public class GatewayConfig {
             return chain.filter(exchange).then().then(Mono.fromRunnable(() -> {
                 //调用请求之后统计时间
                 Long endTime = System.currentTimeMillis();
+
                 log.info("Remote Ip: {}; Request url: {}; Response code: {}; Time: {}ms", remoteIp, request.getURI().getRawPath(), exchange.getResponse().getStatusCode(), (endTime - startTime));
             }));
         };
