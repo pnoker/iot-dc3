@@ -16,7 +16,6 @@
 
 package com.dc3.gateway.config;
 
-import com.dc3.gateway.hystrix.GatewayHystrix;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
@@ -25,10 +24,6 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.server.RequestPredicates;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -42,11 +37,6 @@ import java.util.Objects;
 @Order(10)
 @Configuration
 public class RouteConfig {
-    private final GatewayHystrix gatewayHystrix;
-
-    public RouteConfig(GatewayHystrix gatewayHystrix) {
-        this.gatewayHystrix = gatewayHystrix;
-    }
 
     /**
      * 根据 HostAddress 进行限流
@@ -77,6 +67,14 @@ public class RouteConfig {
     @Bean
     public RouteLocator gatewayRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
+                .route("token_salt",
+                        r -> r.path("/api/v3/token/salt")
+                                .filters(
+                                        f -> f.setPath("/auth/token/salt")
+                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
+                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                ).uri("lb://dc3-auth")
+                )
                 .route("generate_token",
                         r -> r.path("/api/v3/token/generate")
                                 .filters(
@@ -93,14 +91,6 @@ public class RouteConfig {
                                                 .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
                 )
-                .route("user_salt",
-                        r -> r.path("/api/v3/salt")
-                                .filters(
-                                        f -> f.setPath("/auth/token/salt")
-                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
-                                ).uri("lb://dc3-auth")
-                )
                 .route("register_user",
                         r -> r.path("/api/v3/register")
                                 .filters(
@@ -112,8 +102,5 @@ public class RouteConfig {
                 .build();
     }
 
-    @Bean
-    public RouterFunction routerFunction() {
-        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), gatewayHystrix);
-    }
+
 }

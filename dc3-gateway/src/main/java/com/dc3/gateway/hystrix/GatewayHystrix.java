@@ -41,10 +41,10 @@ public class GatewayHystrix implements HandlerFunction<ServerResponse> {
     @Override
     public Mono<ServerResponse> handle(ServerRequest serverRequest) {
         Optional<Object> originalUris = serverRequest.attribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
-        originalUris.ifPresent(originalUri -> log.error("request:{} , service hystrix", originalUri));
+        originalUris.ifPresent(originalUri -> log.error("Request Url:{} , Service Hystrix", originalUri));
         return ServerResponse
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .contentType(MediaType.TEXT_PLAIN)
-                .body(BodyInserters.fromValue("no available server for this request"));
+                .body(BodyInserters.fromValue("No available server for this request"));
     }
 }
