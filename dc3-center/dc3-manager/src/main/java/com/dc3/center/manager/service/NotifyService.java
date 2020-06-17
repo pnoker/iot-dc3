@@ -28,14 +28,14 @@ public interface NotifyService {
      *
      * @param profileId
      */
-    void notifyDriverAddProfile(Long profileId);
+    boolean notifyDriverAddProfile(Long profileId);
 
     /**
      * 通知驱动 删除模板
      *
      * @param profileId
      */
-    void notifyDriverDeleteProfile(Long profileId);
+    boolean notifyDriverDeleteProfile(Long profileId);
 
     /**
      * 通知驱动 新增设备
@@ -43,7 +43,7 @@ public interface NotifyService {
      * @param deviceId
      * @param profileId
      */
-    void notifyDriverAddDevice(Long deviceId, Long profileId);
+    boolean notifyDriverAddDevice(Long deviceId, Long profileId);
 
     /**
      * 通知驱动 删除设备
@@ -51,7 +51,7 @@ public interface NotifyService {
      * @param deviceId
      * @param profileId
      */
-    void notifyDriverDeleteDevice(Long deviceId, Long profileId);
+    boolean notifyDriverDeleteDevice(Long deviceId, Long profileId);
 
     /**
      * 通知驱动 修改设备
@@ -59,7 +59,7 @@ public interface NotifyService {
      * @param deviceId
      * @param profileId
      */
-    void notifyDriverUpdateDevice(Long deviceId, Long profileId);
+    boolean notifyDriverUpdateDevice(Long deviceId, Long profileId);
 
     /**
      * 通知驱动 新增位号
@@ -67,7 +67,7 @@ public interface NotifyService {
      * @param pointId
      * @param profileId
      */
-    void notifyDriverAddPoint(Long pointId, Long profileId);
+    boolean notifyDriverAddPoint(Long pointId, Long profileId);
 
     /**
      * 通知驱动 删除位号
@@ -75,7 +75,7 @@ public interface NotifyService {
      * @param pointId
      * @param profileId
      */
-    void notifyDriverDeletePoint(Long pointId, Long profileId);
+    boolean notifyDriverDeletePoint(Long pointId, Long profileId);
 
     /**
      * 通知驱动 修改位号
@@ -83,7 +83,7 @@ public interface NotifyService {
      * @param pointId
      * @param profileId
      */
-    void notifyDriverUpdatePoint(Long pointId, Long profileId);
+    boolean notifyDriverUpdatePoint(Long pointId, Long profileId);
 
     /**
      * 通知驱动 新增驱动配置
@@ -91,7 +91,7 @@ public interface NotifyService {
      * @param driverInfoId
      * @param profileId
      */
-    void notifyDriverAddDriverInfo(Long driverInfoId, Long profileId);
+    boolean notifyDriverAddDriverInfo(Long driverInfoId, Long profileId);
 
     /**
      * 通知驱动 删除驱动配置
@@ -100,7 +100,7 @@ public interface NotifyService {
      * @param attributeId
      * @param profileId
      */
-    void notifyDriverDeleteDriverInfo(Long driverInfoId, Long attributeId, Long profileId);
+    boolean notifyDriverDeleteDriverInfo(Long driverInfoId, Long attributeId, Long profileId);
 
     /**
      * 通知驱动 更新驱动配置
@@ -108,7 +108,7 @@ public interface NotifyService {
      * @param driverInfoId
      * @param profileId
      */
-    void notifyDriverUpdateDriverInfo(Long driverInfoId, Long profileId);
+    boolean notifyDriverUpdateDriverInfo(Long driverInfoId, Long profileId);
 
     /**
      * 通知驱动 新增位号配置
@@ -116,7 +116,7 @@ public interface NotifyService {
      * @param pointInfoId
      * @param deviceId
      */
-    void notifyDriverAddPointInfo(Long pointInfoId, Long deviceId);
+    boolean notifyDriverAddPointInfo(Long pointInfoId, Long deviceId);
 
     /**
      * 通知驱动 删除位号配置
@@ -125,7 +125,7 @@ public interface NotifyService {
      * @param attributeId
      * @param deviceId
      */
-    void notifyDriverDeletePointInfo(Long pointId, Long attributeId, Long deviceId);
+    boolean notifyDriverDeletePointInfo(Long pointId, Long attributeId, Long deviceId);
 
     /**
      * 通知驱动 更新位号配置
@@ -133,5 +133,5 @@ public interface NotifyService {
      * @param pointInfoId
      * @param deviceId
      */
-    void notifyDriverUpdatePointInfo(Long pointInfoId, Long deviceId);
+    boolean notifyDriverUpdatePointInfo(Long pointInfoId, Long deviceId);
 }
