@@ -61,10 +61,10 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     /**
      * 创建调度任务
      *
-     * @param group
-     * @param name
-     * @param corn
-     * @param jobClass
+     * @param group    group
+     * @param name     name
+     * @param corn     corn
+     * @param jobClass class
      */
     @SneakyThrows
     public void createJob(String group, String name, String corn, Class<? extends Job> jobClass) {

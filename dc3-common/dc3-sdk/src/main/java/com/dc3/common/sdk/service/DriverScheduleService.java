@@ -25,7 +25,7 @@ public interface DriverScheduleService {
     /**
      * 初始化调度任务
      *
-     * @param scheduleProperty
+     * @param scheduleProperty ScheduleProperty
      */
     void initial(ScheduleProperty scheduleProperty);
 }
