@@ -38,7 +38,6 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     private Scheduler scheduler;
 
     @Override
-    @SneakyThrows
     public void initial(ScheduleProperty scheduleProperty) {
         Optional.ofNullable(scheduleProperty).ifPresent(property -> {
             if (property.getRead().getEnable()) {
@@ -48,8 +47,12 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
                 createJob("CustomGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
             if (property.getRead().getEnable() || property.getCustom().getEnable()) {
-                if (!scheduler.isShutdown()) {
-                    scheduler.start();
+                try {
+                    if (!scheduler.isShutdown()) {
+                        scheduler.start();
+                    }
+                } catch (SchedulerException e) {
+                    log.error(e.getMessage(), e);
                 }
             }
         });
@@ -58,10 +61,10 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     /**
      * 创建调度任务
      *
-     * @param group
-     * @param name
-     * @param corn
-     * @param jobClass
+     * @param group    group
+     * @param name     name
+     * @param corn     corn
+     * @param jobClass class
      */
     @SneakyThrows
     public void createJob(String group, String name, String corn, Class<? extends Job> jobClass) {
