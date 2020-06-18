@@ -30,6 +30,12 @@
 
     <dependencies>
 
+        <!-- Spring RabbitMq -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
         <!-- dc3 Api -->
         <dependency>
             <groupId>com.dc3</groupId>
