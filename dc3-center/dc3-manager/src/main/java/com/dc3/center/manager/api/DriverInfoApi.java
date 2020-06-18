@@ -19,8 +19,10 @@ package com.dc3.center.manager.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.DriverInfoClient;
 import com.dc3.center.manager.service.DriverInfoService;
+import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
+import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.DriverInfoDto;
 import com.dc3.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +40,18 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_DRIVER_INFO_URL_PREFIX)
 public class DriverInfoApi implements DriverInfoClient {
+
     @Resource
     private DriverInfoService driverInfoService;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     public R<DriverInfo> add(DriverInfo driverInfo) {
         try {
             DriverInfo add = driverInfoService.add(driverInfo);
             if (null != add) {
+                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.ADD);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -57,10 +63,15 @@ public class DriverInfoApi implements DriverInfoClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return driverInfoService.delete(id) ? R.ok() : R.fail();
+            DriverInfo driverInfo = driverInfoService.selectById(id);
+            if (driverInfoService.delete(id)) {
+                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.DELETE);
+                return R.ok();
+            }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
+        return R.fail();
     }
 
     @Override
@@ -68,6 +79,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo update = driverInfoService.update(driverInfo);
             if (null != update) {
+                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.UPDATE);
                 return R.ok(update);
             }
         } catch (Exception e) {
