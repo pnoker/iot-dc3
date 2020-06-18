@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.service.DeviceService;
-import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
@@ -46,10 +45,10 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class DeviceServiceImpl implements DeviceService {
+
     @Resource
     private DeviceMapper deviceMapper;
-    @Resource
-    private NotifyService notifyService;
+
 
     @Override
     @Caching(
@@ -68,7 +67,6 @@ public class DeviceServiceImpl implements DeviceService {
             throw new ServiceException("The device already exists in the group");
         });
         if (deviceMapper.insert(device) > 0) {
-            notifyService.notifyDriverAddDevice(device.getId(), device.getProfileId());
             return deviceMapper.selectById(device.getId());
         }
         throw new ServiceException("The device add failed");
@@ -88,11 +86,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == device) {
             throw new ServiceException("The device does not exist");
         }
-        boolean delete = deviceMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverDeleteDevice(device.getId(), device.getProfileId());
-        }
-        return delete;
+        return deviceMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -115,7 +109,6 @@ public class DeviceServiceImpl implements DeviceService {
         if (deviceMapper.updateById(device) > 0) {
             Device select = deviceMapper.selectById(device.getId());
             device.setGroupId(select.getGroupId()).setName(select.getName());
-            notifyService.notifyDriverUpdateDevice(device.getId(), device.getProfileId());
             return select;
         }
         throw new ServiceException("The device update failed");
