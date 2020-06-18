@@ -17,10 +17,12 @@
 package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.manager.service.PointService;
 import com.dc3.api.center.manager.feign.PointClient;
+import com.dc3.center.manager.service.NotifyService;
+import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
+import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +40,18 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_POINT_URL_PREFIX)
 public class PointApi implements PointClient {
+
     @Resource
     private PointService pointService;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     public R<Point> add(Point point) {
         try {
             Point add = pointService.add(point);
             if (null != add) {
+                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.ADD);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -57,10 +63,15 @@ public class PointApi implements PointClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return pointService.delete(id) ? R.ok() : R.fail();
+            Point point = pointService.selectById(id);
+            if (pointService.delete(id)) {
+                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.DELETE);
+                return R.ok();
+            }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
+        return R.fail();
     }
 
     @Override
@@ -68,6 +79,7 @@ public class PointApi implements PointClient {
         try {
             Point update = pointService.update(point);
             if (null != update) {
+                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.UPDATE);
                 return R.ok(update);
             }
         } catch (Exception e) {

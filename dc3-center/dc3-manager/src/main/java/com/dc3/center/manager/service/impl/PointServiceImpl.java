@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.PointMapper;
-import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
@@ -46,10 +45,10 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PointServiceImpl implements PointService {
+
     @Resource
     private PointMapper pointMapper;
-    @Resource
-    private NotifyService notifyService;
+
 
     @Override
     @Caching(
@@ -68,7 +67,6 @@ public class PointServiceImpl implements PointService {
             throw new ServiceException("The point already exists in the profile");
         }
         if (pointMapper.insert(point) > 0) {
-            notifyService.notifyDriverAddPoint(point.getId(), point.getProfileId());
             return pointMapper.selectById(point.getId());
         }
         throw new ServiceException("The point add failed");
@@ -88,11 +86,7 @@ public class PointServiceImpl implements PointService {
         if (null == point) {
             throw new ServiceException("The point does not exist");
         }
-        boolean delete = pointMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverDeletePoint(point.getId(), point.getProfileId());
-        }
-        return delete;
+        return pointMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -122,7 +116,6 @@ public class PointServiceImpl implements PointService {
         if (pointMapper.updateById(point) > 0) {
             Point select = pointMapper.selectById(point.getId());
             point.setName(select.getName());
-            notifyService.notifyDriverUpdatePoint(point.getId(), point.getProfileId());
             return select;
         }
         throw new ServiceException("The point update failed");
