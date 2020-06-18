@@ -38,7 +38,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,6 +52,8 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     private String serviceName;
     @Value("${server.port}")
     private int port;
+
+    private String localHost;
 
     private Map<Long, DriverAttribute> driverAttributeMap;
     private Map<Long, PointAttribute> pointAttributeMap;
@@ -89,7 +90,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     public void initial() {
         if (!register()) {
             close();
-            throw new ServiceException("driver register failed");
+            throw new ServiceException("Driver register failed");
         }
         loadData();
         driverService.initial();
@@ -104,7 +105,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             driverContext.getDriverInfoMap().put(r.getData().getId(), infoMap);
             driverContext.getProfilePointMap().put(r.getData().getId(), getPointMap(r.getData().getId()));
         } else {
-            log.error("add profile failed {}", r.getMessage());
+            log.error("Add profile failed {}", r.getMessage());
         }
     }
 
@@ -123,7 +124,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             Map<Long, Map<String, AttributeInfo>> infoMap = getDevicePointInfoMap(r.getData());
             driverContext.getDevicePointInfoMap().put(r.getData().getId(), infoMap);
         } else {
-            log.error("add device failed {}", r.getMessage());
+            log.error("Add device failed {}", r.getMessage());
         }
     }
 
@@ -146,7 +147,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             Point point = rp.getData();
             driverContext.getProfilePointMap().get(point.getProfileId()).put(point.getId(), point);
         } else {
-            log.error("add point failed {}", rp.getMessage());
+            log.error("Add point failed {}", rp.getMessage());
         }
     }
 
@@ -168,7 +169,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             DriverAttribute attribute = this.driverAttributeMap.get(info.getDriverAttributeId());
             driverContext.getDriverInfoMap().get(info.getProfileId()).put(attribute.getName(), new AttributeInfo(info.getValue(), attribute.getType()));
         } else {
-            log.error("add driver info failed {}", rd.getMessage());
+            log.error("Add driver info failed {}", rd.getMessage());
         }
     }
 
@@ -198,7 +199,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             }
             map.get(info.getPointId()).put(attribute.getName(), new AttributeInfo(info.getValue(), attribute.getType()));
         } else {
-            log.error("add point info failed {}", rp.getMessage());
+            log.error("Add point info failed {}", rp.getMessage());
         }
     }
 
@@ -215,74 +216,49 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     }
 
     /**
-     * 注册
+     * register driver
      *
-     * @return
+     * @return boolean
      */
     public boolean register() {
         if (!Dc3Util.isDriverPort(this.port)) {
-            log.error("invalid driver port,port range is 8600-8799");
+            log.error("Invalid driver port, port range is 8600-8799");
             return false;
         }
-        if (!Dc3Util.isName(driverProperty.getName()) || !Dc3Util.isName(this.serviceName) || !Dc3Util.isHost(getHost())) {
-            log.error("driver name || driver service name || driver host is invalid");
+        this.localHost = Dc3Util.localHost();
+        if (!Dc3Util.isName(driverProperty.getName()) || !Dc3Util.isName(this.serviceName) || !Dc3Util.isHost(this.localHost)) {
+            log.error("Driver Name || Driver Service Name || Driver Host is invalid");
             return false;
         }
         return registerDriver() && registerDriverAttribute() && registerPointAttribute();
     }
 
     /**
-     * 加载数据
-     */
-    public void loadData() {
-        List<Long> profileList = getProfileList(driverContext.getDriverId());
-        this.driverAttributeMap = getDriverAttributeMap(driverContext.getDriverId());
-        this.pointAttributeMap = getPointAttributeMap(driverContext.getDriverId());
-
-        driverContext.setDriverInfoMap(getDriverInfoMap(profileList));
-        loadDevice(profileList);
-        driverContext.setProfilePointMap(getProfilePointMap(profileList));
-        loadPoint(driverContext.getDeviceMap());
-    }
-
-    private void close() {
-        ((ConfigurableApplicationContext) applicationContext).close();
-    }
-
-    public String getHost() {
-        try {
-            InetAddress address = InetAddress.getLocalHost();
-            return address.getHostAddress();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
-    }
-
-    /**
-     * 注册驱动信息
+     * register driver
+     * <p>
+     * 驱动名称可以重复，但是驱动服务名称，主机IP和端口号不能重复
      *
-     * @return
+     * @return boolean
      */
     public boolean registerDriver() {
-        Driver driver = new Driver(driverProperty.getName(), this.serviceName, getHost(), this.port);
+        Driver driver = new Driver(driverProperty.getName(), this.serviceName, this.localHost, this.port);
         driver.setDescription(driverProperty.getDescription());
 
-        R<Driver> byServiceName = driverClient.selectByServiceName(driver.getServiceName());
-        if (byServiceName.isOk()) {
-            if (null != byServiceName.getData()) {
-                if (!driverProperty.getName().equals(byServiceName.getData().getName())) {
-                    log.error("the driver repeat({},{})", byServiceName.getData().getName(), byServiceName.getData().getServiceName());
+        R<Driver> rDriver = driverClient.selectByServiceName(this.serviceName);
+        if (rDriver.isOk()) {
+            if (null != rDriver.getData()) {
+                if (!driverProperty.getName().equals(rDriver.getData().getName())) {
+                    log.error("The driver conflicts with driver({}/{})", rDriver.getData().getName(), rDriver.getData().getServiceName());
                     return false;
                 }
-                driver.setId(byServiceName.getData().getId());
+                driver.setId(rDriver.getData().getId());
                 driverContext.setDriverId(driver.getId());
                 return driverClient.update(driver).isOk();
             } else {
-                R<Driver> byHostPort = driverClient.selectByHostPort(getHost(), this.port);
+                R<Driver> byHostPort = driverClient.selectByHostPort(this.localHost, this.port);
                 if (byHostPort.isOk()) {
                     if (null != byHostPort.getData()) {
-                        log.error("the port({}) is already occupied by driver({}/{})", this.port, byHostPort.getData().getName(), byHostPort.getData().getServiceName());
+                        log.error("The port({}) is already occupied by driver({}/{})", this.port, byHostPort.getData().getName(), byHostPort.getData().getServiceName());
                         return false;
                     }
                     R<Driver> r = driverClient.add(driver);
@@ -297,58 +273,56 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     }
 
     /**
-     * 注册驱动 driver 配置属性
+     * register driver attribute
+     * <p>
+     * 同步数据库和配置文件中的属性配置
      *
-     * @return
+     * @return boolean
      */
     public boolean registerDriverAttribute() {
-        Map<String, DriverAttribute> attributeMap = new ConcurrentHashMap<>(16);
+        Map<String, DriverAttribute> oldDriverAttributeMap = new ConcurrentHashMap<>(16);
         DriverAttributeDto connectInfoDto = new DriverAttributeDto();
         connectInfoDto.setPage(new Pages().setSize(-1L)).setDriverId(driverContext.getDriverId());
-        R<Page<DriverAttribute>> list = driverAttributeClient.list(connectInfoDto);
-        if (list.isOk()) {
-            for (DriverAttribute info : list.getData().getRecords()) {
-                attributeMap.put(info.getName(), info);
-            }
+        R<Page<DriverAttribute>> rDriverAttributes = driverAttributeClient.list(connectInfoDto);
+        if (rDriverAttributes.isOk()) {
+            rDriverAttributes.getData().getRecords().forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
         }
 
-        Map<String, DriverAttribute> driverAttributeMap = new ConcurrentHashMap<>(16);
+        Map<String, DriverAttribute> newDriverAttributeMap = new ConcurrentHashMap<>(16);
         Optional.ofNullable(driverProperty.getDriverAttribute()).ifPresent(driverAttributes -> {
-            for (DriverAttribute info : driverAttributes) {
-                driverAttributeMap.put(info.getName(), info);
-            }
+            driverAttributes.forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
         });
 
-        for (String name : driverAttributeMap.keySet()) {
-            DriverAttribute info = driverAttributeMap.get(name).setDriverId(driverContext.getDriverId());
-            if (attributeMap.containsKey(name)) {
-                info.setId(attributeMap.get(name).getId());
+        for (String name : newDriverAttributeMap.keySet()) {
+            DriverAttribute info = newDriverAttributeMap.get(name).setDriverId(driverContext.getDriverId());
+            if (oldDriverAttributeMap.containsKey(name)) {
+                info.setId(oldDriverAttributeMap.get(name).getId());
                 R<DriverAttribute> r = driverAttributeClient.update(info);
                 if (!r.isOk()) {
-                    log.error("the driver attribute ({}) update failed", name);
+                    log.error("The driver attribute({}) update failed", name);
                     return false;
                 }
             } else {
                 R<DriverAttribute> r = driverAttributeClient.add(info);
                 if (!r.isOk()) {
-                    log.error("the driver attribute ({}) add failed", name);
+                    log.error("The driver attribute({}) add failed", name);
                     return false;
                 }
             }
         }
 
-        for (String name : attributeMap.keySet()) {
-            if (!driverAttributeMap.containsKey(name)) {
+        for (String name : oldDriverAttributeMap.keySet()) {
+            if (!newDriverAttributeMap.containsKey(name)) {
                 DriverInfoDto driverInfoDto = new DriverInfoDto();
-                driverInfoDto.setPage(new Pages().setSize(-1L)).setDriverAttributeId(attributeMap.get(name).getId());
-                R<Page<DriverInfo>> tmp = driverInfoClient.list(driverInfoDto);
-                if (tmp.isOk() && tmp.getData().getRecords().size() > 0) {
-                    log.error("the driver attribute ({}) used by driver info", name);
+                driverInfoDto.setPage(new Pages()).setDriverAttributeId(oldDriverAttributeMap.get(name).getId());
+                R<Page<DriverInfo>> rDriverInfo = driverInfoClient.list(driverInfoDto);
+                if (rDriverInfo.isOk() && rDriverInfo.getData().getRecords().size() > 0) {
+                    log.error("The driver attribute({}) used by driver info and cannot be deleted", name);
                     return false;
                 }
-                R<Boolean> r = driverAttributeClient.delete(attributeMap.get(name).getId());
+                R<Boolean> r = driverAttributeClient.delete(oldDriverAttributeMap.get(name).getId());
                 if (!r.isOk()) {
-                    log.error("the driver attribute ({}) delete failed", name);
+                    log.error("The driver attribute({}) delete failed", name);
                     return false;
                 }
             }
@@ -357,138 +331,125 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     }
 
     /**
-     * 注册驱动 point 配置属性
+     * register point attribute
+     * <p>
+     * 同步数据库和配置文件中的属性配置
      *
-     * @return
+     * @return boolean
      */
     public boolean registerPointAttribute() {
-        Map<String, PointAttribute> attributeMap = new ConcurrentHashMap<>(16);
+        Map<String, PointAttribute> oldPointAttributeMap = new ConcurrentHashMap<>(16);
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setPage(new Pages().setSize(-1L)).setDriverId(driverContext.getDriverId());
         R<Page<PointAttribute>> list = pointAttributeClient.list(pointAttributeDto);
         if (list.isOk()) {
-            for (PointAttribute attribute : list.getData().getRecords()) {
-                attributeMap.put(attribute.getName(), attribute);
-            }
+            list.getData().getRecords().forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
         }
 
-        Map<String, PointAttribute> pointAttributeMap = new ConcurrentHashMap<>(16);
+        Map<String, PointAttribute> newPointAttributeMap = new ConcurrentHashMap<>(16);
         Optional.ofNullable(driverProperty.getPointAttribute()).ifPresent(pointAttributes -> {
-            for (PointAttribute attribute : pointAttributes) {
-                pointAttributeMap.put(attribute.getName(), attribute);
-            }
+            pointAttributes.forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
         });
 
-        for (String name : pointAttributeMap.keySet()) {
-            PointAttribute attribute = pointAttributeMap.get(name).setDriverId(driverContext.getDriverId());
-            if (attributeMap.containsKey(name)) {
-                attribute.setId(attributeMap.get(name).getId());
+        for (String name : newPointAttributeMap.keySet()) {
+            PointAttribute attribute = newPointAttributeMap.get(name).setDriverId(driverContext.getDriverId());
+            if (oldPointAttributeMap.containsKey(name)) {
+                attribute.setId(oldPointAttributeMap.get(name).getId());
                 R<PointAttribute> r = pointAttributeClient.update(attribute);
                 if (!r.isOk()) {
-                    log.error("the point attribute ({}) update failed", name);
+                    log.error("The point attribute ({}) update failed", name);
                     return false;
                 }
             } else {
                 R<PointAttribute> r = pointAttributeClient.add(attribute);
                 if (!r.isOk()) {
-                    log.error("the point attribute ({}) add failed", name);
+                    log.error("The point attribute ({}) add failed", name);
                     return false;
                 }
             }
         }
 
-        for (String name : attributeMap.keySet()) {
-            if (!pointAttributeMap.containsKey(name)) {
+        for (String name : oldPointAttributeMap.keySet()) {
+            if (!newPointAttributeMap.containsKey(name)) {
                 PointInfoDto pointInfoDto = new PointInfoDto();
-                pointInfoDto.setPage(new Pages().setSize(-1L)).setPointAttributeId(attributeMap.get(name).getId());
-                R<Page<PointInfo>> tmp = pointInfoClient.list(pointInfoDto);
-                if (tmp.isOk() && tmp.getData().getRecords().size() > 0) {
-                    log.error("the point attribute ({}) used by point info", name);
+                pointInfoDto.setPage(new Pages()).setPointAttributeId(oldPointAttributeMap.get(name).getId());
+                R<Page<PointInfo>> rPointInfo = pointInfoClient.list(pointInfoDto);
+                if (rPointInfo.isOk() && rPointInfo.getData().getRecords().size() > 0) {
+                    log.error("The point attribute({}) used by point info and cannot be deleted", name);
                     return false;
                 }
-                R<Boolean> r = pointAttributeClient.delete(attributeMap.get(name).getId());
+                R<Boolean> r = pointAttributeClient.delete(oldPointAttributeMap.get(name).getId());
                 if (!r.isOk()) {
-                    log.error("the point attribute ({}) delete failed", name);
+                    log.error("The point attribute ({}) delete failed", name);
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * load data
+     */
+    public void loadData() {
+        this.driverAttributeMap = loadDriverAttributeMap(driverContext.getDriverId());
+        this.pointAttributeMap = loadPointAttributeMap(driverContext.getDriverId());
+
+        List<Long> profileList = loadProfile(driverContext.getDriverId());
+        driverContext.setDriverInfoMap(loadDriverInfoMap(profileList));
+        loadDevice(profileList);
+        driverContext.setProfilePointMap(loadProfilePointMap(profileList));
+        loadPoint(driverContext.getDeviceMap());
     }
 
     /**
      * 获取驱动配置属性 Map
      * driverAttributeId,driverAttribute
      *
-     * @param driverId
-     * @return
+     * @param driverId Driver Id
+     * @return Map
      */
-    public Map<Long, DriverAttribute> getDriverAttributeMap(long driverId) {
-        Map<Long, DriverAttribute> infoMap = new HashMap<>(16);
-        DriverAttributeDto connectInfoDto = new DriverAttributeDto();
-        connectInfoDto.setPage(new Pages().setSize(-1L)).setDriverId(driverId);
-        R<Page<DriverAttribute>> rp = driverAttributeClient.list(connectInfoDto);
-        if (!rp.isOk()) {
+    public Map<Long, DriverAttribute> loadDriverAttributeMap(long driverId) {
+        Map<Long, DriverAttribute> driverAttributeMap = new HashMap<>(16);
+        DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
+        driverAttributeDto.setPage(new Pages().setSize(-1L)).setDriverId(driverId);
+        R<Page<DriverAttribute>> rDriverAttribute = driverAttributeClient.list(driverAttributeDto);
+        if (!rDriverAttribute.isOk()) {
             close();
-            throw new ServiceException(rp.getMessage());
+            throw new ServiceException(rDriverAttribute.getMessage());
         }
-        for (DriverAttribute attribute : rp.getData().getRecords()) {
-            infoMap.put(attribute.getId(), attribute);
-        }
-        return infoMap;
+        rDriverAttribute.getData().getRecords().forEach(driverAttribute -> driverAttributeMap.put(driverAttribute.getId(), driverAttribute));
+        return driverAttributeMap;
     }
 
     /**
      * 获取位号配置属性 Map
      * pointAttributeId,pointAttribute
      *
-     * @param driverId
-     * @return
+     * @param driverId Driver Id
+     * @return Map
      */
-    public Map<Long, PointAttribute> getPointAttributeMap(long driverId) {
-        Map<Long, PointAttribute> infoMap = new HashMap<>(16);
+    public Map<Long, PointAttribute> loadPointAttributeMap(long driverId) {
+        Map<Long, PointAttribute> pointAttributeMap = new HashMap<>(16);
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setPage(new Pages().setSize(-1L)).setDriverId(driverId);
-        R<Page<PointAttribute>> rp = pointAttributeClient.list(pointAttributeDto);
-        if (!rp.isOk()) {
+        R<Page<PointAttribute>> rPointAttribute = pointAttributeClient.list(pointAttributeDto);
+        if (!rPointAttribute.isOk()) {
             close();
-            throw new ServiceException(rp.getMessage());
+            throw new ServiceException(rPointAttribute.getMessage());
         }
-        for (PointAttribute attribute : rp.getData().getRecords()) {
-            infoMap.put(attribute.getId(), attribute);
-        }
-        return infoMap;
-    }
-
-    /**
-     * 获取模板 Id 列表
-     *
-     * @param driverId
-     * @return
-     */
-    public List<Long> getProfileList(long driverId) {
-        List<Long> profileList = new ArrayList<>();
-        ProfileDto profileDto = new ProfileDto();
-        profileDto.setPage(new Pages().setSize(-1L)).setDriverId(driverId);
-        R<Page<Profile>> rp = profileClient.list(profileDto);
-        if (!rp.isOk()) {
-            close();
-            throw new ServiceException(rp.getMessage());
-        }
-        for (Profile profile : rp.getData().getRecords()) {
-            profileList.add(profile.getId());
-        }
-        return profileList;
+        rPointAttribute.getData().getRecords().forEach(pointAttribute -> pointAttributeMap.put(pointAttribute.getId(), pointAttribute));
+        return pointAttributeMap;
     }
 
     /**
      * 获取模板驱动配置信息 Map
      * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
      *
-     * @param profileList
-     * @return
+     * @param profileList Profile Array
+     * @return Map
      */
-    public Map<Long, Map<String, AttributeInfo>> getDriverInfoMap(List<Long> profileList) {
+    public Map<Long, Map<String, AttributeInfo>> loadDriverInfoMap(List<Long> profileList) {
         Map<Long, Map<String, AttributeInfo>> driverInfoMap = new ConcurrentHashMap<>(16);
         for (Long profileId : profileList) {
             Map<String, AttributeInfo> infoMap = getProfileDriverInfoMap(profileId);
@@ -500,10 +461,43 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     }
 
     /**
+     * 获取模板位号 Map
+     * profileId(pointId,point)
+     *
+     * @param profileList Profile Array
+     * @return Map
+     */
+    public Map<Long, Map<Long, Point>> loadProfilePointMap(List<Long> profileList) {
+        Map<Long, Map<Long, Point>> pointMap = new ConcurrentHashMap<>(16);
+        for (Long profileId : profileList) {
+            pointMap.put(profileId, getPointMap(profileId));
+        }
+        return pointMap;
+    }
+
+    /**
+     * load driver profile
+     *
+     * @param driverId Driver Id
+     * @return Array
+     */
+    public List<Long> loadProfile(long driverId) {
+        List<Long> profileList = new ArrayList<>();
+        ProfileDto profileDto = new ProfileDto();
+        profileDto.setPage(new Pages().setSize(-1L)).setDriverId(driverId);
+        R<Page<Profile>> rp = profileClient.list(profileDto);
+        if (!rp.isOk()) {
+            close();
+            throw new ServiceException(rp.getMessage());
+        }
+        rp.getData().getRecords().forEach(profile -> profileList.add(profile.getId()));
+        return profileList;
+    }
+
+    /**
      * 初始化设备
      *
-     * @param profileList
-     * @return
+     * @param profileList Profile Array
      */
     public void loadDevice(List<Long> profileList) {
         driverContext.setDeviceMap(new ConcurrentHashMap<>(16));
@@ -527,8 +521,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * 初始化位号
      * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
      *
-     * @param deviceMap
-     * @return
+     * @param deviceMap Device Map
      */
     public void loadPoint(Map<Long, Device> deviceMap) {
         driverContext.setDevicePointInfoMap(new ConcurrentHashMap<>(16));
@@ -546,61 +539,10 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     }
 
     /**
-     * 获取设备位号名称 Map
-     *
-     * @param device
-     * @return
-     */
-    public Map<String, Long> getDevicePointNameMap(Device device) {
-        Map<String, Long> pointNameMap = new ConcurrentHashMap<>(16);
-        Map<Long, Point> pointMap = driverContext.getProfilePointMap().get(device.getProfileId());
-        for (Point point : pointMap.values()) {
-            pointNameMap.put(point.getName(), point.getId());
-        }
-        return pointNameMap;
-    }
-
-    /**
-     * 根据 Profile Id 获取位号 Map
-     *
-     * @param profileId
-     * @return
-     */
-    public Map<Long, Point> getPointMap(Long profileId) {
-        Map<Long, Point> pointMap = new ConcurrentHashMap<>(16);
-        PointDto pointDto = new PointDto();
-        pointDto.setPage(new Pages().setSize(-1L)).setProfileId(profileId);
-        R<Page<Point>> rp = pointClient.list(pointDto);
-        if (!rp.isOk()) {
-            close();
-            throw new ServiceException(rp.getMessage());
-        }
-        for (Point point : rp.getData().getRecords()) {
-            pointMap.put(point.getId(), point);
-        }
-        return pointMap;
-    }
-
-    /**
-     * 获取模板位号 Map
-     * profileId(pointId,point)
-     *
-     * @param profileList
-     * @return
-     */
-    public Map<Long, Map<Long, Point>> getProfilePointMap(List<Long> profileList) {
-        Map<Long, Map<Long, Point>> pointMap = new ConcurrentHashMap<>(16);
-        for (Long profileId : profileList) {
-            pointMap.put(profileId, getPointMap(profileId));
-        }
-        return pointMap;
-    }
-
-    /**
      * 获取模板驱动配置信息 Map
      *
-     * @param profileId
-     * @return
+     * @param profileId Profile Id
+     * @return Map
      */
     public Map<String, AttributeInfo> getProfileDriverInfoMap(Long profileId) {
         Map<String, AttributeInfo> attributeInfoMap = new ConcurrentHashMap<>(16);
@@ -621,8 +563,8 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     /**
      * 获取设备位号配置信息 Map
      *
-     * @param device
-     * @return
+     * @param device Device
+     * @return Map
      */
     public Map<Long, Map<String, AttributeInfo>> getDevicePointInfoMap(Device device) {
         Map<Long, Map<String, AttributeInfo>> attributeInfoMap = new ConcurrentHashMap<>(16);
@@ -648,4 +590,46 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         return attributeInfoMap;
     }
 
+    /**
+     * 获取设备位号名称 Map
+     *
+     * @param device Device
+     * @return Map
+     */
+    public Map<String, Long> getDevicePointNameMap(Device device) {
+        Map<String, Long> pointNameMap = new ConcurrentHashMap<>(16);
+        Map<Long, Point> pointMap = driverContext.getProfilePointMap().get(device.getProfileId());
+        for (Point point : pointMap.values()) {
+            pointNameMap.put(point.getName(), point.getId());
+        }
+        return pointNameMap;
+    }
+
+    /**
+     * 根据 Profile Id 获取位号 Map
+     *
+     * @param profileId Profile Id
+     * @return Map
+     */
+    public Map<Long, Point> getPointMap(Long profileId) {
+        Map<Long, Point> pointMap = new ConcurrentHashMap<>(16);
+        PointDto pointDto = new PointDto();
+        pointDto.setPage(new Pages().setSize(-1L)).setProfileId(profileId);
+        R<Page<Point>> rp = pointClient.list(pointDto);
+        if (!rp.isOk()) {
+            close();
+            throw new ServiceException(rp.getMessage());
+        }
+        for (Point point : rp.getData().getRecords()) {
+            pointMap.put(point.getId(), point);
+        }
+        return pointMap;
+    }
+
+    /**
+     * 关闭 ApplicationContext
+     */
+    private void close() {
+        ((ConfigurableApplicationContext) applicationContext).close();
+    }
 }

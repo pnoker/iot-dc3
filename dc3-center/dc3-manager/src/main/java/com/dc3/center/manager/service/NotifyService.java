@@ -24,114 +24,49 @@ package com.dc3.center.manager.service;
 public interface NotifyService {
 
     /**
-     * 通知驱动 新增模板
+     * 通知驱动 新增模板(ADD) / 删除模板(DELETE)
      *
-     * @param profileId
+     * @param profileId     Profile Id
+     * @param operationType Operation Type
      */
-    boolean notifyDriverAddProfile(Long profileId);
+    void notifyDriverProfile(Long profileId, String operationType);
 
     /**
-     * 通知驱动 删除模板
+     * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 修改设备(UPDATE)
      *
-     * @param profileId
+     * @param deviceId      Device Id
+     * @param profileId     Profile Id
+     * @param operationType Operation Type
      */
-    boolean notifyDriverDeleteProfile(Long profileId);
+    void notifyDriverDevice(Long deviceId, Long profileId, String operationType);
 
     /**
-     * 通知驱动 新增设备
-     *
-     * @param deviceId
-     * @param profileId
-     */
-    boolean notifyDriverAddDevice(Long deviceId, Long profileId);
-
-    /**
-     * 通知驱动 删除设备
-     *
-     * @param deviceId
-     * @param profileId
-     */
-    boolean notifyDriverDeleteDevice(Long deviceId, Long profileId);
-
-    /**
-     * 通知驱动 修改设备
-     *
-     * @param deviceId
-     * @param profileId
-     */
-    boolean notifyDriverUpdateDevice(Long deviceId, Long profileId);
-
-    /**
-     * 通知驱动 新增位号
+     * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 修改位号(UPDATE)
      *
      * @param pointId
-     * @param profileId
+     * @param profileId     Profile Id
+     * @param operationType Operation Type
      */
-    boolean notifyDriverAddPoint(Long pointId, Long profileId);
+    void notifyDriverPoint(Long pointId, Long profileId, String operationType);
 
     /**
-     * 通知驱动 删除位号
+     * 通知驱动 新增驱动配置(ADD) / 删除驱动配置(DELETE) / 更新驱动配置(UPDATE)
      *
-     * @param pointId
-     * @param profileId
+     * @param driverInfoId  Driver Info Id
+     * @param attributeId   Attribute Id
+     * @param profileId     Profile Id
+     * @param operationType Operation Type
      */
-    boolean notifyDriverDeletePoint(Long pointId, Long profileId);
+    void notifyDriverDriverInfo(Long driverInfoId, Long attributeId, Long profileId, String operationType);
 
     /**
-     * 通知驱动 修改位号
+     * 通知驱动 新增位号配置(ADD) / 删除位号配置(DELETE) / 更新位号配置(UPDATE)
      *
-     * @param pointId
-     * @param profileId
+     * @param pointInfoId   Point Id
+     * @param attributeId   Attribute Id
+     * @param deviceId      Device Id
+     * @param operationType Operation Type
      */
-    boolean notifyDriverUpdatePoint(Long pointId, Long profileId);
+    void notifyDriverPointInfo(Long pointInfoId, Long attributeId, Long deviceId, String operationType);
 
-    /**
-     * 通知驱动 新增驱动配置
-     *
-     * @param driverInfoId
-     * @param profileId
-     */
-    boolean notifyDriverAddDriverInfo(Long driverInfoId, Long profileId);
-
-    /**
-     * 通知驱动 删除驱动配置
-     *
-     * @param driverInfoId
-     * @param attributeId
-     * @param profileId
-     */
-    boolean notifyDriverDeleteDriverInfo(Long driverInfoId, Long attributeId, Long profileId);
-
-    /**
-     * 通知驱动 更新驱动配置
-     *
-     * @param driverInfoId
-     * @param profileId
-     */
-    boolean notifyDriverUpdateDriverInfo(Long driverInfoId, Long profileId);
-
-    /**
-     * 通知驱动 新增位号配置
-     *
-     * @param pointInfoId
-     * @param deviceId
-     */
-    boolean notifyDriverAddPointInfo(Long pointInfoId, Long deviceId);
-
-    /**
-     * 通知驱动 删除位号配置
-     *
-     * @param pointId
-     * @param attributeId
-     * @param deviceId
-     */
-    boolean notifyDriverDeletePointInfo(Long pointId, Long attributeId, Long deviceId);
-
-    /**
-     * 通知驱动 更新位号配置
-     *
-     * @param pointInfoId
-     * @param deviceId
-     */
-    boolean notifyDriverUpdatePointInfo(Long pointInfoId, Long deviceId);
 }

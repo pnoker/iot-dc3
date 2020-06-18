@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.config;
+package com.dc3.center.manager.config;
 
 import com.dc3.common.constant.Common;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -48,13 +46,8 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Queue pointValueQueue() {
-        return new Queue(Common.Rabbit.POINT_VALUE_QUEUE, false, false, true);
-    }
-
-    @Bean
-    Binding pointValueBinding() {
-        return BindingBuilder.bind(pointValueQueue()).to(exchange()).with("value.*");
+    Queue driverNotifyQueue() {
+        return new Queue(Common.Rabbit.DRIVER_NOTIFY_QUEUE, false, false, true);
     }
 
     @Bean

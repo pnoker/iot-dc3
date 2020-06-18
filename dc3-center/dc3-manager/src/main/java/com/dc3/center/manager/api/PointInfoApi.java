@@ -17,10 +17,12 @@
 package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.manager.service.PointInfoService;
 import com.dc3.api.center.manager.feign.PointInfoClient;
+import com.dc3.center.manager.service.NotifyService;
+import com.dc3.center.manager.service.PointInfoService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
+import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.PointInfoDto;
 import com.dc3.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +40,18 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_POINT_INFO_URL_PREFIX)
 public class PointInfoApi implements PointInfoClient {
+
     @Resource
     private PointInfoService pointInfoService;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     public R<PointInfo> add(PointInfo pointInfo) {
         try {
             PointInfo add = pointInfoService.add(pointInfo);
             if (null != add) {
+                notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.ADD);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -57,10 +63,15 @@ public class PointInfoApi implements PointInfoClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return pointInfoService.delete(id) ? R.ok() : R.fail();
+            PointInfo pointInfo = pointInfoService.selectById(id);
+            if (pointInfoService.delete(id)) {
+                notifyService.notifyDriverPointInfo(pointInfo.getPointId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.DELETE);
+                return R.ok();
+            }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
+        return R.fail();
     }
 
     @Override
@@ -68,6 +79,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo update = pointInfoService.update(pointInfo);
             if (null != update) {
+                notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.UPDATE);
                 return R.ok(update);
             }
         } catch (Exception e) {
