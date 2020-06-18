@@ -19,8 +19,10 @@ package com.dc3.center.manager.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.DeviceClient;
 import com.dc3.center.manager.service.DeviceService;
+import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
+import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +42,15 @@ import javax.annotation.Resource;
 public class DeviceApi implements DeviceClient {
     @Resource
     private DeviceService deviceService;
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     public R<Device> add(Device device) {
         try {
             Device add = deviceService.add(device);
             if (null != add) {
+                notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.ADD);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -57,10 +62,15 @@ public class DeviceApi implements DeviceClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return deviceService.delete(id) ? R.ok() : R.fail();
+            Device device = deviceService.selectById(id);
+            if (deviceService.delete(id)) {
+                notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.DELETE);
+                return R.ok();
+            }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
+        return R.fail();
     }
 
     @Override
@@ -68,6 +78,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device update = deviceService.update(device);
             if (null != update) {
+                notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.UPDATE);
                 return R.ok(update);
             }
         } catch (Exception e) {
