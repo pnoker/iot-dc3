@@ -14,35 +14,34 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.api;
+package com.dc3.common.sdk.service.rabbit;
 
 import com.dc3.common.bean.driver.DriverOperation;
 import com.dc3.common.constant.Common;
 import com.dc3.common.constant.Operation;
 import com.dc3.common.sdk.service.DriverCommonService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
- * 驱动 memory 操作 Rest Api
+ * 接收驱动发送过来的数据
  *
  * @author pnoker
  */
 @Slf4j
-@RestController
-@RequestMapping(Common.Service.DC3_DRIVER_URL_PREFIX)
-public class DriverMemoryApi {
+@Component
+@RabbitListener(queues = Common.Rabbit.DRIVER_NOTIFY_QUEUE)
+public class DriverNotifyService {
+
     @Resource
     private DriverCommonService driverCommonService;
 
-
-    @PostMapping("/memory")
-    public void memory(@RequestBody DriverOperation operation) {
+    @RabbitHandler
+    public void driverNotifyReceive(DriverOperation operation) {
         try {
             switch (operation.getCommand()) {
                 case Operation.Profile.ADD:
