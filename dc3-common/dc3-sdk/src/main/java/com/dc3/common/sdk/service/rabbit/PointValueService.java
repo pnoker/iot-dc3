@@ -51,7 +51,7 @@ public class PointValueService {
      */
     public void pointValueSender(PointValue pointValue) {
         log.debug("Send point value,{}", pointValue);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "key." + driverProperty.getName(), pointValue);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "value." + driverProperty.getName(), pointValue);
     }
 
     /**
