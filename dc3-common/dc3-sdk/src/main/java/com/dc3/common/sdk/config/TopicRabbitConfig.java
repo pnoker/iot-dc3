@@ -17,7 +17,6 @@
 package com.dc3.common.sdk.config;
 
 import com.dc3.common.constant.Common;
-import com.dc3.common.sdk.bean.DriverProperty;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -27,27 +26,17 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker
  */
 @Configuration
 public class TopicRabbitConfig {
-
-    @Resource
-    private DriverProperty driverProperty;
-
-    @Bean
-    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(new Jackson2JsonMessageConverter());
-        return factory;
-    }
+    @Value("${spring.application.name}")
+    private String serviceName;
 
     @Bean
     RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
@@ -57,18 +46,33 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Queue pointValueQueue() {
-        return new Queue(Common.Rabbit.POINT_VALUE_QUEUE, false, false, true);
-    }
-
-    @Bean
     TopicExchange exchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE, false, true);
     }
 
+
     @Bean
-    Binding binding() {
-        return BindingBuilder.bind(pointValueQueue()).to(exchange()).with("key." + driverProperty.getName());
+    Queue driverNotifyQueue() {
+        return new Queue(Common.Rabbit.DRIVER_NOTIFY_QUEUE, false, false, true);
+    }
+
+    @Bean
+    Queue pointValueQueue() {
+        return new Queue(Common.Rabbit.POINT_VALUE_QUEUE, false, false, true);
+    }
+
+
+    @Bean
+    Binding driverNotifyBinding() {
+        return BindingBuilder.bind(driverNotifyQueue()).to(exchange()).with("driver." + this.serviceName);
+    }
+
+    @Bean
+    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(new Jackson2JsonMessageConverter());
+        return factory;
     }
 
 }
