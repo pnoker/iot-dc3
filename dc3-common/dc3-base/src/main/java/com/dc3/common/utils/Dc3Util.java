@@ -46,6 +46,27 @@ public class Dc3Util {
         }
     };
 
+    /**
+     * 获取 md5 加密编码
+     *
+     * @param str
+     * @return
+     */
+    public static String md5(String str) {
+        MD5 md5 = MD5.create();
+        return md5.digestHex(str, Charsets.UTF_8);
+    }
+
+    /**
+     * 获取 md5 & salt 加密编码
+     *
+     * @param str
+     * @param salt
+     * @return
+     */
+    public static String md5(String str, String salt) {
+        return md5(md5(str) + salt);
+    }
 
     /**
      * 将字符串进行Base64编码
@@ -87,26 +108,20 @@ public class Dc3Util {
         return Base64.getDecoder().decode(input);
     }
 
-    /**
-     * 获取 md5 加密编码
-     *
-     * @param str
-     * @return
-     */
-    public static String md5(String str) {
-        MD5 md5 = MD5.create();
-        return md5.digestHex(str, Charsets.UTF_8);
-    }
 
     /**
-     * 获取 md5 & salt 加密编码
+     * 获取当前主机的 Local Host
      *
-     * @param str
-     * @param salt
-     * @return
+     * @return String
      */
-    public static String md5(String str, String salt) {
-        return md5(md5(str) + salt);
+    public static String localHost() {
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            return address.getHostAddress();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     /**

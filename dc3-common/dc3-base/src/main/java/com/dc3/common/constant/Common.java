@@ -62,6 +62,13 @@ public interface Common {
     }
 
     /**
+     * 驱动常量
+     */
+    interface Driver {
+        int MAX_REQUEST_SIZE = 100;
+    }
+
+    /**
      * 数据类型
      */
     interface ValueType {

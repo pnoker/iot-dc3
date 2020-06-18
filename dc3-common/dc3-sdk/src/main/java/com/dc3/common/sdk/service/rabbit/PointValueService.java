@@ -36,52 +36,54 @@ import java.util.List;
 @Slf4j
 @Service
 public class PointValueService {
-    @Resource
-    private DriverProperty driverProperty;
+
     @Resource
     private DriverContext driverContext;
+    @Resource
+    private DriverProperty driverProperty;
     @Resource
     private RabbitTemplate rabbitTemplate;
 
     /**
-     * 将位号原始值进行处理和转换
-     *
-     * @param deviceId
-     * @param pointId
-     * @param rawValue
-     * @return
-     */
-    public PointValue convertValue(Long deviceId, Long pointId, String rawValue) {
-        return new PointValue(deviceId, pointId, rawValue, processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId)));
-    }
-
-    /**
      * 发送位号值到消息组件
      *
-     * @param pointValue
+     * @param pointValue PointValue
      */
     public void pointValueSender(PointValue pointValue) {
-        log.debug("send point value,{}", pointValue);
+        log.debug("Send point value,{}", pointValue);
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "key." + driverProperty.getName(), pointValue);
     }
 
     /**
      * 批量发送位号值到消息组件
      *
-     * @param pointValues
+     * @param pointValues PointValue Array
      */
     public void pointValueSender(List<PointValue> pointValues) {
-        for (PointValue pointValue : pointValues) {
-            pointValueSender(pointValue);
-        }
+        pointValues.forEach(this::pointValueSender);
     }
 
     /**
-     * 处理数值
+     * 将位号原始值进行处理和转换
      *
-     * @param value
-     * @param point point.type : string/int/double/float/long/boolean
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @param rawValue Raw Value
      * @return
+     */
+    public PointValue convertValue(Long deviceId, Long pointId, String rawValue) {
+        return new PointValue(deviceId, pointId, rawValue, processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId)));
+    }
+
+
+    /**
+     * process value
+     * <p>
+     * TODO support more data types
+     *
+     * @param value String Value
+     * @param point point.type : string/int/double/float/long/boolean
+     * @return String Value
      */
     private String processValue(String value, Point point) {
         value = value.trim();
@@ -114,7 +116,7 @@ public class PointValueService {
                 }
                 break;
             default:
-                throw new ServiceException("invalid device point value type");
+                throw new ServiceException("Invalid device point value type");
         }
         return value;
     }

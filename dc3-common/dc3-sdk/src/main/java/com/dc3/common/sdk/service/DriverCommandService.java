@@ -26,8 +26,8 @@ public interface DriverCommandService {
     /**
      * 读操作
      *
-     * @param deviceId
-     * @param pointId
+     * @param deviceId Device Id
+     * @param pointId  Point Id
      * @return
      */
     PointValue read(Long deviceId, Long pointId);
@@ -35,9 +35,9 @@ public interface DriverCommandService {
     /**
      * 写操作
      *
-     * @param deviceId
-     * @param pointId
-     * @param value
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @param value    String Value
      * @return
      */
     Boolean write(Long deviceId, Long pointId, String value);

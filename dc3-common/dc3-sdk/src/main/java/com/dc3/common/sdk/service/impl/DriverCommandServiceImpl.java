@@ -16,12 +16,12 @@
 
 package com.dc3.common.sdk.service.impl;
 
-import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.model.Device;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverCommandService;
+import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.sdk.service.rabbit.PointValueService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +36,11 @@ import javax.annotation.Resource;
 @Service
 public class DriverCommandServiceImpl implements DriverCommandService {
     @Resource
-    private PointValueService pointValueService;
-    @Resource
     private DriverContext driverContext;
     @Resource
     private DriverService driverService;
+    @Resource
+    private PointValueService pointValueService;
 
     @Override
     @SneakyThrows
