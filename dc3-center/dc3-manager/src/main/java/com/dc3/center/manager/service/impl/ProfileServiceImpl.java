@@ -20,7 +20,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.ProfileMapper;
-import com.dc3.center.manager.service.*;
+import com.dc3.center.manager.service.DeviceService;
+import com.dc3.center.manager.service.DriverService;
+import com.dc3.center.manager.service.PointService;
+import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
@@ -50,6 +53,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class ProfileServiceImpl implements ProfileService {
+
     @Resource
     private DriverService driverService;
     @Resource
@@ -58,8 +62,6 @@ public class ProfileServiceImpl implements ProfileService {
     private PointService pointService;
     @Resource
     private ProfileMapper profileMapper;
-    @Resource
-    private NotifyService notifyService;
 
     @Override
     @Caching(
@@ -82,7 +84,6 @@ public class ProfileServiceImpl implements ProfileService {
             throw new ServiceException("The profile already exists");
         }
         if (profileMapper.insert(profile) > 0) {
-            notifyService.notifyDriverAddProfile(profile.getId());
             return profileMapper.selectById(profile.getId());
         }
         throw new ServiceException("The profile add failed");
@@ -116,11 +117,7 @@ public class ProfileServiceImpl implements ProfileService {
         if (null == profile) {
             throw new ServiceException("The profile does not exist");
         }
-        boolean delete = profileMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverDeleteProfile(id);
-        }
-        return delete;
+        return profileMapper.deleteById(id) > 0;
     }
 
     @Override
