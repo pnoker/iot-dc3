@@ -30,30 +30,29 @@ import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * 采集调度任务
+ * Read Schedule Job
  *
  * @author pnoker
  */
 @Slf4j
 @Component
 public class DriverReadScheduleJob extends QuartzJobBean {
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
+
     @Resource
     private DriverContext driverContext;
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
     @Resource
     private DriverCommandService driverCommandService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getDevicePointInfoMap();
-        for (Long deviceId : pointInfoMap.keySet()) {
-            for (Long pointId : pointInfoMap.get(deviceId).keySet()) {
-                threadPoolExecutor.execute(() -> {
-                    log.debug("Execute read schedule for device({}),point({}),{}", deviceId, pointId, pointInfoMap.get(deviceId).get(pointId));
-                    driverCommandService.read(deviceId, pointId);
-                });
-            }
-        }
+        pointInfoMap.forEach((deviceId, pointMap) -> pointMap.forEach((pointId, point) -> {
+            threadPoolExecutor.execute(() -> {
+                log.debug("Execute read schedule for device({}),point({}),{}", deviceId, pointId, point);
+                driverCommandService.read(deviceId, pointId);
+            });
+        }));
     }
 }

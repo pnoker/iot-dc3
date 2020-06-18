@@ -16,7 +16,7 @@
 
 ### 读取指定设备位号值
 #driver/read
-POST http://localhost:8602/driver/read
+GET http://localhost:8602/driver/read
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
