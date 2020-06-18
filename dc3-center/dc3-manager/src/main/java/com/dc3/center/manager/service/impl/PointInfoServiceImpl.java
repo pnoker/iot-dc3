@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.PointInfoMapper;
-import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.PointInfoService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
@@ -45,10 +44,10 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PointInfoServiceImpl implements PointInfoService {
+
     @Resource
     private PointInfoMapper pointInfoMapper;
-    @Resource
-    private NotifyService notifyService;
+
 
     @Override
     @Caching(
@@ -67,7 +66,6 @@ public class PointInfoServiceImpl implements PointInfoService {
             throw new ServiceException("The point info already exists");
         }
         if (pointInfoMapper.insert(pointInfo) > 0) {
-            notifyService.notifyDriverAddPointInfo(pointInfo.getId(), pointInfo.getDeviceId());
             return pointInfoMapper.selectById(pointInfo.getId());
         }
         throw new ServiceException("The point info add failed");
@@ -87,11 +85,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         if (null == pointInfo) {
             throw new ServiceException("The point info does not exist");
         }
-        boolean delete = pointInfoMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverDeletePointInfo(pointInfo.getPointId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId());
-        }
-        return delete;
+        return pointInfoMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -117,7 +111,6 @@ public class PointInfoServiceImpl implements PointInfoService {
             throw new ServiceException("The point info already exists");
         }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
-            notifyService.notifyDriverUpdatePointInfo(pointInfo.getId(), pointInfo.getDeviceId());
             return pointInfoMapper.selectById(pointInfo.getId());
         }
         throw new ServiceException("The point info update failed");
