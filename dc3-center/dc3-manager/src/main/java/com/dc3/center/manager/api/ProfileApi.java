@@ -22,6 +22,7 @@ import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
+import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ import javax.validation.constraints.NotNull;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_PROFILE_URL_PREFIX)
 public class ProfileApi implements ProfileClient {
+
     @Resource
     private ProfileService profileService;
     @Resource
@@ -50,6 +52,7 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile add = profileService.add(profile);
             if (null != add) {
+                notifyService.notifyDriverProfile(profile.getId(), Operation.Profile.ADD);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -61,10 +64,14 @@ public class ProfileApi implements ProfileClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            return profileService.delete(id) ? R.ok() : R.fail();
+            if (profileService.delete(id)) {
+                notifyService.notifyDriverProfile(id, Operation.Profile.DELETE);
+                return R.ok();
+            }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
+        return R.fail();
     }
 
     @Override

@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DriverInfoMapper;
 import com.dc3.center.manager.service.DriverInfoService;
-import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverInfoDto;
@@ -45,10 +44,9 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class DriverInfoServiceImpl implements DriverInfoService {
+
     @Resource
     private DriverInfoMapper driverInfoMapper;
-    @Resource
-    private NotifyService notifyService;
 
     @Override
     @Caching(
@@ -67,7 +65,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             throw new ServiceException("The driver info already exists in the profile");
         });
         if (driverInfoMapper.insert(driverInfo) > 0) {
-            notifyService.notifyDriverAddDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
             return driverInfoMapper.selectById(driverInfo.getId());
         }
         throw new ServiceException("The driver info add failed");
@@ -87,11 +84,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         if (null == driverInfo) {
             throw new ServiceException("The driver info does not exist");
         }
-        boolean delete = driverInfoMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverDeleteDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
-        }
-        return delete;
+        return driverInfoMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -117,7 +110,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             throw new ServiceException("The driver info already exists");
         }
         if (driverInfoMapper.updateById(driverInfo) > 0) {
-            notifyService.notifyDriverUpdateDriverInfo(driverInfo.getId(), driverInfo.getProfileId());
             return driverInfoMapper.selectById(driverInfo.getId());
         }
         throw new ServiceException("The driver info update failed");
