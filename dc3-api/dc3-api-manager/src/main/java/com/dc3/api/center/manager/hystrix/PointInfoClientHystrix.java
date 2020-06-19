@@ -37,7 +37,7 @@ public class PointInfoClientHystrix implements FallbackFactory<PointInfoClient> 
     @Override
     public PointInfoClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
-        log.error("Hystrix:{}", message, throwable);
+        log.error("Hystrix:{}", message);
 
         return new PointInfoClient() {
 
