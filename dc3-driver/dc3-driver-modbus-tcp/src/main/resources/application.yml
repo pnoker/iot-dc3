@@ -48,4 +48,4 @@ logging:
     com.dc3.common.sdk: DEBUG
     com.dc3: DEBUG
   file:
-    name: dc3/logs/driver/listeningVirtual/${spring.application.name}.log
+    name: dc3/logs/driver/modbus/${spring.application.name}.log
