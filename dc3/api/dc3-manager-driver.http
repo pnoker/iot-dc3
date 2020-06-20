@@ -55,6 +55,27 @@ Accept: */*
 Cache-Control: no-cache
 
 
+### 查询 Driver 服务状态
+#/manager/driver/status，支持name\serverName\host模糊查询，port精准查询
+POST http://localhost:8400/manager/driver/status
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
 ### 分页查询 Driver
 #/manager/driver/list，支持name\serverName\host模糊查询，port精准查询
 POST http://localhost:8400/manager/driver/list

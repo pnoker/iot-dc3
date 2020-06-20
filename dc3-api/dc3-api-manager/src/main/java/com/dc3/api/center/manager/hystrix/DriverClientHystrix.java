@@ -25,6 +25,8 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * <p>DriverClientHystrix
  *
@@ -68,6 +70,11 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
 
             @Override
             public R<Driver> selectByHostPort(String host, Integer port) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Map<String, Boolean>> driverStatus(DriverDto driverDto) {
                 return R.fail(message);
             }
 

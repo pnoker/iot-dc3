@@ -44,8 +44,6 @@ public class PointValue implements Serializable {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long createTime;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long interval;
 
     public PointValue(Long deviceId, Long pointId, String rawValue, String value) {
         this.deviceId = deviceId;

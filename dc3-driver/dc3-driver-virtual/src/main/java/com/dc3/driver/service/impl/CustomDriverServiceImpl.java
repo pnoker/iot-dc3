@@ -18,13 +18,17 @@ package com.dc3.driver.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
+import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
-import com.dc3.common.sdk.service.DriverService;
+import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.rabbit.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 /**
@@ -32,7 +36,12 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class DriverServiceImpl implements DriverService {
+public class CustomDriverServiceImpl implements CustomDriverService {
+
+    @Resource
+    private DriverService driverService;
+    @Resource
+    private DriverContext driverContext;
 
     @Override
     public void initial() {
@@ -41,8 +50,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         log.debug("Virtual Driver Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
-        String value = String.valueOf(RandomUtil.randomDouble(100));
-        return value;
+        return String.valueOf(RandomUtil.randomDouble(100));
     }
 
     @Override
@@ -52,7 +60,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public void schedule() {
-
+        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, Common.Device.ONLINE));
     }
 
 }

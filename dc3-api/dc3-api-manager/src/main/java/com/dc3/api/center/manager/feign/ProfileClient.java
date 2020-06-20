@@ -86,21 +86,4 @@ public interface ProfileClient {
     @PostMapping("/list")
     R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto);
 
-    /**
-     * 通知 Driver 模块新增 Profile
-     *
-     * @param id Profile Id
-     * @return Boolean
-     */
-    @GetMapping("/notify/add/{id}")
-    R<Boolean> notifyDriverAddProfile(@NotNull @PathVariable(value = "id") Long id);
-
-    /**
-     * 通知 Driver 模块删除 Profile
-     *
-     * @param id Profile Id
-     * @return Boolean
-     */
-    @GetMapping("/notify/delete/{id}")
-    R<Boolean> notifyDriverDeleteProfile(@NotNull @PathVariable(value = "id") Long id);
 }

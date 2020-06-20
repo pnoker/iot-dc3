@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.service.job;
+package com.dc3.center.manager.init;
 
-import com.dc3.common.sdk.service.CustomDriverService;
-import lombok.extern.slf4j.Slf4j;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 /**
- * 自定义调度任务
+ * 初始化
  *
  * @author pnoker
  */
-@Slf4j
 @Component
-public class DriverCustomScheduleJob extends QuartzJobBean {
-    @Resource
-    private CustomDriverService customDriverService;
+@EnableFeignClients(basePackages = {
+        "com.dc3.api.center.data.*",
+})
+@ComponentScan(basePackages = {
+        "com.dc3.api.center.data",
+})
+public class ManagerInitRunner implements ApplicationRunner {
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.debug("Execute custom schedule");
-        customDriverService.schedule();
+    public void run(ApplicationArguments args) throws Exception {
     }
 }

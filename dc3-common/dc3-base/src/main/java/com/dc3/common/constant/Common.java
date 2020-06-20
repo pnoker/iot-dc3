@@ -70,9 +70,20 @@ public interface Common {
     }
 
     /**
+     * 设备常量
+     */
+    interface Device {
+        String ONLINE = "ONLINE";
+        String OFFLINE = "OFFLINE";
+        String MAINTAIN = "MAINTAIN";
+        String FAULT = "FAULT";
+    }
+
+    /**
      * 数据类型
      */
     interface ValueType {
+        String SHORT = "short";
         String INT = "int";
         String LONG = "long";
         String FLOAT = "float";
@@ -141,6 +152,8 @@ public interface Common {
         String IP = "_ip";
         String NAME = "_name";
         String CODE = "_code";
+        String STATUS = "_status";
+        String VALUE = "_value";
         String DIC = "_dic";
         String LIST = "_list";
         String SALT = "_salt";
