@@ -16,6 +16,7 @@
 
 package com.dc3.common.sdk.service.impl;
 
+import cn.hutool.core.thread.ThreadUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.*;
 import com.dc3.common.bean.Pages;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author pnoker
@@ -88,10 +90,21 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
     @Override
     public void initial() {
-        if (!register()) {
-            close();
-            throw new ServiceException("Driver register failed");
+        int times = 0;
+        boolean reRegister = true;
+        while (reRegister) {
+            if (!register()) {
+                ThreadUtil.sleep(5, TimeUnit.SECONDS);
+                times++;
+                if (times > 3) {
+                    close();
+                    throw new ServiceException("Driver registration failed");
+                }
+            } else {
+                reRegister = false;
+            }
         }
+        log.info("Driver registered successfully");
         loadData();
         driverService.initial();
         driverScheduleService.initial(driverProperty.getSchedule());
@@ -221,6 +234,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @return boolean
      */
     public boolean register() {
+        log.info("Registering {} ", driverProperty.getName());
         if (!Dc3Util.isDriverPort(this.port)) {
             log.error("Invalid driver port, port range is 8600-8799");
             return false;
