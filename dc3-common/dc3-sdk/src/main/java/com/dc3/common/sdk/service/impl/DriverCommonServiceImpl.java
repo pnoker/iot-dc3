@@ -27,9 +27,9 @@ import com.dc3.common.model.*;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.bean.DriverProperty;
+import com.dc3.common.sdk.service.CustomDriverService;
 import com.dc3.common.sdk.service.DriverCommonService;
 import com.dc3.common.sdk.service.DriverScheduleService;
-import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,7 +63,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     @Resource
     private DriverScheduleService driverScheduleService;
     @Resource
-    private DriverService driverService;
+    private CustomDriverService customDriverService;
 
     @Resource
     private ApplicationContext applicationContext;
@@ -96,7 +96,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             if (!register()) {
                 ThreadUtil.sleep(5, TimeUnit.SECONDS);
                 times++;
-                if (times > 3) {
+                if (times > 10) {
                     close();
                     throw new ServiceException("Driver registration failed");
                 }
@@ -106,7 +106,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         }
         log.info("Driver registered successfully");
         loadData();
-        driverService.initial();
+        customDriverService.initial();
         driverScheduleService.initial(driverProperty.getSchedule());
     }
 
@@ -255,7 +255,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @return boolean
      */
     public boolean registerDriver() {
-        Driver driver = new Driver(driverProperty.getName(), this.serviceName, this.localHost, this.port);
+        Driver driver = new Driver(driverProperty.getName(), this.serviceName, true, this.localHost, this.port);
         driver.setDescription(driverProperty.getDescription());
 
         R<Driver> rDriver = driverClient.selectByServiceName(this.serviceName);

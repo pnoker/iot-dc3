@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 
 /**
  * <p>模板 Client 接口实现
@@ -111,24 +110,6 @@ public class ProfileApi implements ProfileClient {
             return R.fail(e.getMessage());
         }
         return R.fail();
-    }
-
-    @Override
-    public R<Boolean> notifyDriverAddProfile(@NotNull Long id) {
-        try {
-            return notifyService.notifyDriverAddProfile(id) ? R.ok() : R.fail();
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-    }
-
-    @Override
-    public R<Boolean> notifyDriverDeleteProfile(@NotNull Long id) {
-        try {
-            return notifyService.notifyDriverDeleteProfile(id) ? R.ok() : R.fail();
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
     }
 
 }

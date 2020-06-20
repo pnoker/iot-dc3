@@ -18,7 +18,7 @@ package com.dc3.driver.service.mqtt;
 
 import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.sdk.service.rabbit.PointValueService;
+import com.dc3.common.sdk.service.rabbit.DriverService;
 import com.dc3.driver.bean.DevicePayLoad;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -44,7 +44,7 @@ import javax.annotation.Resource;
 @Configuration
 public class MqttReceiveHandler {
     @Resource
-    private PointValueService pointValueService;
+    private DriverService driverService;
 
     /**
      * 说明：
@@ -77,8 +77,8 @@ public class MqttReceiveHandler {
                     JSON.toJSONString(message.getPayload(), true)
             );
             DevicePayLoad devicePayLoad = JSON.parseObject(message.getPayload().toString(), DevicePayLoad.class);
-            PointValue pointValue = pointValueService.convertValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue());
-            pointValueService.pointValueSender(pointValue);
+            PointValue pointValue = driverService.convertValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue());
+            driverService.pointValueSender(pointValue);
         };
     }
 }

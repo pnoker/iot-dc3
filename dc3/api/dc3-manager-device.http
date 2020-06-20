@@ -52,6 +52,26 @@ Accept: */*
 Cache-Control: no-cache
 
 
+### 查询 Device 状态
+#/manager/device/status，支持name模糊查询，code\status\profileId\groupId精准查询
+POST http://localhost:8400/manager/device/status
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
 
 ### 分页查询 Device
 #/manager/device/list，支持name模糊查询，code\status\profileId\groupId精准查询
@@ -80,3 +100,5 @@ POST http://localhost:8400/manager/device/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
+
+###

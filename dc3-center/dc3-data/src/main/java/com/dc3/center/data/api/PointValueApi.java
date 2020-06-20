@@ -17,8 +17,8 @@
 package com.dc3.center.data.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.data.service.PointValueService;
 import com.dc3.api.center.data.feign.PointValueClient;
+import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
@@ -53,11 +53,34 @@ public class PointValueApi implements PointValueClient {
     }
 
     @Override
-    public R<PointValue> latest(PointValueDto pointValueDto) {
+    public R<PointValue> latest(Long deviceId, Long pointId) {
         try {
-            PointValue pointValue = pointValueService.latest(pointValueDto);
+            PointValue pointValue = pointValueService.latest(deviceId, pointId);
             if (null != pointValue) {
                 return R.ok(pointValue);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<String> status(Long deviceId) {
+        try {
+            String status = pointValueService.status(deviceId);
+            return R.ok(status, "ok");
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public R<String> realtime(Long deviceId, Long pointId) {
+        try {
+            String value = pointValueService.realtime(deviceId, pointId);
+            if (null != value) {
+                return R.ok(value, "ok");
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());
