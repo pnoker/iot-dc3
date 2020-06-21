@@ -6,7 +6,7 @@ server:
   thread:
     prefix: dc3-thread-
     core-pool-size: 4
-    maximum-pool-size: 32
+    maximum-pool-size: 64
     keep-alive-time: 10
 
 spring:
@@ -33,7 +33,7 @@ spring:
     hikari:
       pool-name: dc3-hikaricp
       max-lifetime: 1765000
-      maximum-pool-size: 32
+      maximum-pool-size: 64
       minimum-idle: 4
   data:
     mongodb:

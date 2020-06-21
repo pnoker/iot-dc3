@@ -26,6 +26,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,22 +45,32 @@ public class PointValueReceiver {
     @Resource
     private RedisUtil redisUtil;
     @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
+    @Resource
     private PointValueService pointValueService;
 
     @RabbitHandler
     public void pointValueReceive(PointValue pointValue) {
-        if (0 == pointValue.getPointId()) {
+        if (null == pointValue || null == pointValue.getDeviceId() || null == pointValue.getPointId()) {
+            log.error("Invalid data: {}", pointValue);
+            return;
+        }
+        if (pointValue.getPointId().equals(0L)) {
+            log.info("Received device({}) status({})", pointValue.getDeviceId(), pointValue.getRawValue());
             redisUtil.setKey(
                     DEVICE_STATUS_KEY_PREFIX + pointValue.getDeviceId(),
                     pointValue.getRawValue(),
-                    5,
+                    15,
                     TimeUnit.MINUTES);
         } else {
-            redisUtil.setKey(VALUE_KEY_PREFIX + pointValue.getDeviceId() + "_" + pointValue.getPointId(),
-                    pointValue.getValue(),
-                    5,
-                    TimeUnit.MINUTES);
-            pointValueService.add(pointValue);
+            threadPoolExecutor.execute(() -> {
+                log.debug("Received data: {}", pointValue);
+                redisUtil.setKey(VALUE_KEY_PREFIX + pointValue.getDeviceId() + "_" + pointValue.getPointId(),
+                        pointValue.getValue(),
+                        15,
+                        TimeUnit.MINUTES);
+                pointValueService.add(pointValue);
+            });
         }
     }
 }
