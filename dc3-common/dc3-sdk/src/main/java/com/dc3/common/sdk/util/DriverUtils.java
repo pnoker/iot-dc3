@@ -33,10 +33,10 @@ public class DriverUtils {
     /**
      * 获取 属性值
      *
-     * @param infoMap
-     * @param attribute
-     * @param <T>
-     * @return
+     * @param infoMap   Attribute Info
+     * @param attribute String Attribute Name
+     * @param <T>       T
+     * @return T
      */
     public static <T> T attribute(Map<String, AttributeInfo> infoMap, String attribute) {
         return value(infoMap.get(attribute).getType(), infoMap.get(attribute).getValue());
@@ -45,10 +45,10 @@ public class DriverUtils {
     /**
      * 通过类型转换数据
      *
-     * @param type
-     * @param value
-     * @param <T>
-     * @return
+     * @param type  String Type, short/int/long/float/double/boolean/string
+     * @param value String Value
+     * @param <T>   T
+     * @return T
      */
     public static <T> T value(String type, String value) {
         return Convert.convertByClassName(getTypeClassName(type), value);
@@ -57,8 +57,8 @@ public class DriverUtils {
     /**
      * 将byte[]转成十六进制字符串
      *
-     * @param bytes
-     * @return
+     * @param bytes Byte Array
+     * @return String
      */
     public static String bytesToHex(byte[] bytes) {
         StringBuffer sb = new StringBuffer();
@@ -75,8 +75,8 @@ public class DriverUtils {
     /**
      * 将byte[]转成Ascii码
      *
-     * @param bytes
-     * @return
+     * @param bytes Byte Array
+     * @return String
      */
     public static String bytesToAscii(byte[] bytes) {
         String asciiStr = null;
@@ -90,8 +90,8 @@ public class DriverUtils {
     /**
      * 合并byte[]
      *
-     * @param bytes
-     * @return
+     * @param bytes Byte Array
+     * @return Byte Array
      */
     public static byte[] mergerBytes(byte[]... bytes) {
         int lengthByte = 0;
@@ -110,8 +110,8 @@ public class DriverUtils {
     /**
      * 获取字节间的异或值
      *
-     * @param bytes
-     * @return
+     * @param bytes Byte Array
+     * @return Byte
      */
     public static byte xorBytes(byte[]... bytes) {
         byte xor = 0x00;
@@ -126,23 +126,26 @@ public class DriverUtils {
     /**
      * 获取基本类型 Class Name
      *
-     * @param type
-     * @return
+     * @param type String Type, short/int/long/float/double/boolean/string
+     * @return Class Name
      */
     public static String getTypeClassName(String type) {
         String className = "java.lang.String";
         switch (type.toLowerCase()) {
+            case Common.ValueType.SHORT:
+                className = "java.lang.Short";
+                break;
             case Common.ValueType.INT:
                 className = "java.lang.Integer";
                 break;
-            case Common.ValueType.DOUBLE:
-                className = "java.lang.Double";
+            case Common.ValueType.LONG:
+                className = "java.lang.Long";
                 break;
             case Common.ValueType.FLOAT:
                 className = "java.lang.Float";
                 break;
-            case Common.ValueType.LONG:
-                className = "java.lang.Long";
+            case Common.ValueType.DOUBLE:
+                className = "java.lang.Double";
                 break;
             case Common.ValueType.BOOLEAN:
                 className = "java.lang.Boolean";

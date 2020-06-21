@@ -18,7 +18,6 @@ package com.dc3.center.data.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.data.service.PointValueService;
-import com.dc3.center.data.service.rabbit.PointValueReceiver;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
@@ -35,7 +34,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author pnoker
@@ -51,7 +49,9 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public void add(PointValue pointValue) {
-        mongoTemplate.insert(pointValue.setCreateTime(System.currentTimeMillis()));
+        if (null != pointValue) {
+            mongoTemplate.insert(pointValue.setCreateTime(System.currentTimeMillis()));
+        }
     }
 
     @Override
@@ -63,22 +63,22 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     public Page<PointValue> list(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
-        Optional.ofNullable(pointValueDto).ifPresent(dto -> {
-            if (null != dto.getDeviceId()) {
-                criteria.and("deviceId").is(dto.getDeviceId());
-            }
-            if (null != dto.getPointId()) {
-                criteria.and("pointId").is(dto.getPointId());
-            }
-            if (null == dto.getPage()) {
-                dto.setPage(new Pages());
-            }
-            Pages pages = dto.getPage();
-            if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
-                criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
-            }
-
-        });
+        if (null == pointValueDto) {
+            pointValueDto = new PointValueDto();
+        }
+        if (null != pointValueDto.getDeviceId()) {
+            criteria.and("deviceId").is(pointValueDto.getDeviceId());
+        }
+        if (null != pointValueDto.getPointId()) {
+            criteria.and("pointId").is(pointValueDto.getPointId());
+        }
+        if (null == pointValueDto.getPage()) {
+            pointValueDto.setPage(new Pages());
+        }
+        Pages pages = pointValueDto.getPage();
+        if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
+            criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
+        }
         return queryPage(criteria, pointValueDto.getPage());
     }
 
@@ -92,20 +92,20 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
+    public String status(Long deviceId) {
+        String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceId;
+        String status = redisUtil.getKey(key);
+        return null != status ? status : Common.Device.OFFLINE;
+    }
+
+    @Override
     public String realtime(Long deviceId, Long pointId) {
-        String key = PointValueReceiver.VALUE_KEY_PREFIX + deviceId + "_" + pointId;
+        String key = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_" + pointId;
         String value = redisUtil.getKey(key);
         if (null == value) {
             throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
         }
         return value;
-    }
-
-    @Override
-    public String status(Long deviceId) {
-        String key = PointValueReceiver.DEVICE_STATUS_KEY_PREFIX + deviceId;
-        String status = redisUtil.getKey(key);
-        return null != status ? status : Common.Device.OFFLINE;
     }
 
     /**

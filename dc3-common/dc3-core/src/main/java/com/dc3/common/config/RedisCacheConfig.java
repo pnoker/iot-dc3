@@ -46,21 +46,17 @@ public class RedisCacheConfig {
     /**
      * 自定义缓存 Key 生成策略
      *
-     * @return
+     * @return KeyGenerator
      */
     @Bean
     public KeyGenerator firstKeyGenerator() {
-        return (target, method, params) -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append(params[0].toString());
-            return sb.toString();
-        };
+        return (target, method, params) -> params[0].toString();
     }
 
     /**
      * 自定义缓存 Key 生成策略
      *
-     * @return
+     * @return KeyGenerator
      */
     @Bean
     public KeyGenerator commonKeyGenerator() {
@@ -80,8 +76,8 @@ public class RedisCacheConfig {
     /**
      * 自定义 RedisCacheManager 类，主要是设置序列化，解决乱码问题
      *
-     * @param factory
-     * @return
+     * @param factory RedisConnectionFactory
+     * @return CacheManager
      */
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory factory) {
@@ -95,8 +91,7 @@ public class RedisCacheConfig {
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
                 .disableCachingNullValues().entryTtl(timeToLive);
-        RedisCacheManager cacheManager = RedisCacheManager.builder(factory).cacheDefaults(config).build();
-        return cacheManager;
+        return RedisCacheManager.builder(factory).cacheDefaults(config).build();
     }
 
 }

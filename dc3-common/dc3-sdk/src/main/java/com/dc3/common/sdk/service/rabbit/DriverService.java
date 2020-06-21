@@ -50,6 +50,7 @@ public class DriverService {
      */
     public void pointValueSender(PointValue pointValue) {
         if (null != pointValue) {
+            log.debug("Send :{}", pointValue);
             rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "value." + driverProperty.getName(), pointValue);
         }
     }
@@ -75,7 +76,6 @@ public class DriverService {
      * @param deviceStatus Common.Device [ONLINE, OFFLINE, MAINTAIN, FAULT]
      */
     public void deviceStatusSender(Long deviceId, String deviceStatus) {
-
         PointValue pointValue = new PointValue(deviceId, 0L, deviceStatus, null);
         pointValueSender(pointValue);
     }
@@ -86,15 +86,17 @@ public class DriverService {
      * @param deviceId Device Id
      * @param pointId  Point Id
      * @param rawValue Raw Value
-     * @return
+     * @return PointValue
      */
     public PointValue convertValue(Long deviceId, Long pointId, String rawValue) {
-        return new PointValue(
+        PointValue value = new PointValue(
                 deviceId,
                 pointId,
                 rawValue,
                 processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId))
         );
+        log.debug("Convert device({}), point({}), raw: {},to value: {}", deviceId, pointId, value.getRawValue(), value.getValue());
+        return value;
     }
 
 
