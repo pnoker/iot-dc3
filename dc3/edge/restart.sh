@@ -18,4 +18,11 @@
 
 set -e
 
-docker-compose -f docker-compose-demo.yml up -d
+# restart dc3 driver service
+systemctl restart dc3-virtual
+systemctl restart dc3-listening-virtual
+systemctl restart dc3-opcda
+systemctl restart dc3-opcua
+systemctl restart dc3-modbus
+systemctl restart dc3-mqtt
+systemctl restart dc3-plcs7
