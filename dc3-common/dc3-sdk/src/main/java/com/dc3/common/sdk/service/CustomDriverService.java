@@ -36,22 +36,22 @@ public interface CustomDriverService {
     /**
      * 读操作
      *
-     * @param driverInfo
-     * @param pointInfo
-     * @param device
-     * @param point
-     * @return
+     * @param driverInfo Driver Attribute Info
+     * @param pointInfo  Point Attribute Info
+     * @param device     Device
+     * @param point      Point
+     * @return String
      */
     String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point);
 
     /**
      * 写操作
      *
-     * @param driverInfo
-     * @param pointInfo
-     * @param device
-     * @param value
-     * @return
+     * @param driverInfo Driver Attribute Info
+     * @param pointInfo  Point Attribute Info
+     * @param device     Device
+     * @param value      Value Attribute Info
+     * @return Boolean
      */
     Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value);
 

@@ -22,8 +22,6 @@ package com.dc3.common.sdk.service;
 public interface DriverCommonService {
     /**
      * 初始化 SDK
-     *
-     * @return
      */
     void initial();
 
@@ -31,7 +29,6 @@ public interface DriverCommonService {
      * 向 DeviceDriver 中添加模板
      *
      * @param id Id
-     * @return
      */
     void addProfile(Long id);
 
@@ -39,7 +36,6 @@ public interface DriverCommonService {
      * 删除 DeviceDriver 中模板
      *
      * @param id Id
-     * @return
      */
     void deleteProfile(Long id);
 
@@ -47,7 +43,6 @@ public interface DriverCommonService {
      * 向 DeviceDriver 中添加设备
      *
      * @param id Id
-     * @return
      */
     void addDevice(Long id);
 
@@ -55,7 +50,6 @@ public interface DriverCommonService {
      * 删除 DeviceDriver 中设备
      *
      * @param id Id
-     * @return
      */
     void deleteDevice(Long id);
 
@@ -63,7 +57,6 @@ public interface DriverCommonService {
      * 更新 DeviceDriver 中设备
      *
      * @param id Id
-     * @return
      */
     void updateDevice(Long id);
 
@@ -71,16 +64,14 @@ public interface DriverCommonService {
      * 向 DeviceDriver 中添加位号
      *
      * @param id Id
-     * @return
      */
     void addPoint(Long id);
 
     /**
      * 删除 DeviceDriver 中位号
      *
-     * @param id Id
-     * @param profileId
-     * @return
+     * @param id        Id
+     * @param profileId Profile Id
      */
     void deletePoint(Long id, Long profileId);
 
@@ -88,7 +79,6 @@ public interface DriverCommonService {
      * 更新 DeviceDriver 中添加位号
      *
      * @param id Id
-     * @return
      */
     void updatePoint(Long id);
 
@@ -102,8 +92,8 @@ public interface DriverCommonService {
     /**
      * 删除 DeviceDriver 中添加驱动配置信息
      *
-     * @param attributeId
-     * @param profileId
+     * @param attributeId Attribute Id
+     * @param profileId   Profile Id
      */
     void deleteDriverInfo(Long attributeId, Long profileId);
 
@@ -124,9 +114,9 @@ public interface DriverCommonService {
     /**
      * 删除 DeviceDriver 中添加位号配置信息
      *
-     * @param pointId
-     * @param attributeId
-     * @param deviceId
+     * @param pointId     Point Id
+     * @param attributeId Attribute Id
+     * @param deviceId    Device Id
      */
     void deletePointInfo(Long pointId, Long attributeId, Long deviceId);
 

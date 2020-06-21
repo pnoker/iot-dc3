@@ -179,6 +179,9 @@ public interface Common {
         String LABEL = "label";
         String LABEL_BIND = "label_bind";
         String BLACK_IP = "black_ip";
+
+        String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
+        String DEVICE_STATUS_KEY_PREFIX = Common.Cache.DEVICE + Common.Cache.STATUS + Common.Cache.SEPARATOR;
     }
 
 }

@@ -39,9 +39,6 @@ import java.util.concurrent.TimeUnit;
 @RabbitListener(queues = Common.Rabbit.POINT_VALUE_QUEUE)
 public class PointValueReceiver {
 
-    public final static String VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
-    public final static String DEVICE_STATUS_KEY_PREFIX = Common.Cache.DEVICE + Common.Cache.STATUS + Common.Cache.SEPARATOR;
-
     @Resource
     private RedisUtil redisUtil;
     @Resource
@@ -55,20 +52,31 @@ public class PointValueReceiver {
             log.error("Invalid data: {}", pointValue);
             return;
         }
+
+        /*
+        Convention:
+        PointId = 0 indicates device status
+        PointId > 0 indicates device point data
+         */
         if (pointValue.getPointId().equals(0L)) {
             log.info("Received device({}) status({})", pointValue.getDeviceId(), pointValue.getRawValue());
+            // Save device status to redis, 15 minutes
             redisUtil.setKey(
-                    DEVICE_STATUS_KEY_PREFIX + pointValue.getDeviceId(),
+                    Common.Cache.DEVICE_STATUS_KEY_PREFIX + pointValue.getDeviceId(),
                     pointValue.getRawValue(),
                     15,
                     TimeUnit.MINUTES);
         } else {
+            // LinkedBlockingQueue ThreadPoolExecutor
             threadPoolExecutor.execute(() -> {
                 log.debug("Received data: {}", pointValue);
-                redisUtil.setKey(VALUE_KEY_PREFIX + pointValue.getDeviceId() + "_" + pointValue.getPointId(),
+                // Save device point data to redis, 15 minutes
+                redisUtil.setKey(
+                        Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + "_" + pointValue.getPointId(),
                         pointValue.getValue(),
                         15,
                         TimeUnit.MINUTES);
+                // Push device point data to MQ
                 pointValueService.add(pointValue);
             });
         }
