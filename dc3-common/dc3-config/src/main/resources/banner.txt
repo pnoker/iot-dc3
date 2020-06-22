@@ -4,4 +4,6 @@
 |  (  <_> )  |   / /_/ \  \___ /       \
 |__|\____/|__|   \____ |\___  >______  /
                       \/    \/       \/
+  https://gitee.com/pnoker/iot-dc3
+  https://github.com/pnoker/iot-dc3
 ${AnsiColor.BRIGHT_CYAN}DC3 IOT Platform V3.0 ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors
