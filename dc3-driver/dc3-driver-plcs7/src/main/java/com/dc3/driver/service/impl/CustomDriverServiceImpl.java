@@ -22,7 +22,7 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
-import com.dc3.common.sdk.service.DriverService;
+import com.dc3.common.sdk.service.CustomDriverService;
 import com.dc3.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
@@ -42,7 +42,7 @@ import static com.dc3.common.sdk.util.DriverUtils.value;
  */
 @Slf4j
 @Service
-public class DriverServiceImpl implements DriverService {
+public class CustomDriverServiceImpl implements CustomDriverService {
 
     /**
      * Plc Connector Map

@@ -25,6 +25,8 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * <p>DeviceClientHystrix
  *
@@ -58,6 +60,11 @@ public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
 
             @Override
             public R<Device> selectById(Long id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto) {
                 return R.fail(message);
             }
 

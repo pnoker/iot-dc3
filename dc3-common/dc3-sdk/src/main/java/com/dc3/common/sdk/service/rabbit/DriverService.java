@@ -19,7 +19,6 @@ package com.dc3.common.sdk.service.rabbit;
 import cn.hutool.core.convert.Convert;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
-import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.bean.DriverProperty;
@@ -35,7 +34,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class PointValueService {
+public class DriverService {
 
     @Resource
     private DriverContext driverContext;
@@ -50,8 +49,9 @@ public class PointValueService {
      * @param pointValue PointValue
      */
     public void pointValueSender(PointValue pointValue) {
-        log.debug("Send point value,{}", pointValue);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "value." + driverProperty.getName(), pointValue);
+        if (null != pointValue) {
+            rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "value." + driverProperty.getName(), pointValue);
+        }
     }
 
     /**
@@ -64,6 +64,23 @@ public class PointValueService {
     }
 
     /**
+     * 发送设备状态
+     * <p>
+     * 规范：使用 pointId=0 表示设备状态值
+     * Common.Device
+     * ONLINE, OFFLINE, MAINTAIN, FAULT
+     * 在线，离线，维护，故障
+     *
+     * @param deviceId     Device Id
+     * @param deviceStatus Common.Device [ONLINE, OFFLINE, MAINTAIN, FAULT]
+     */
+    public void deviceStatusSender(Long deviceId, String deviceStatus) {
+
+        PointValue pointValue = new PointValue(deviceId, 0L, deviceStatus, null);
+        pointValueSender(pointValue);
+    }
+
+    /**
      * 将位号原始值进行处理和转换
      *
      * @param deviceId Device Id
@@ -72,17 +89,21 @@ public class PointValueService {
      * @return
      */
     public PointValue convertValue(Long deviceId, Long pointId, String rawValue) {
-        return new PointValue(deviceId, pointId, rawValue, processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId)));
+        return new PointValue(
+                deviceId,
+                pointId,
+                rawValue,
+                processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId))
+        );
     }
 
 
     /**
      * process value
      * <p>
-     * TODO support more data types
      *
      * @param value String Value
-     * @param point point.type : string/int/double/float/long/boolean
+     * @param point point.type : string/short/int/double/float/long/boolean
      * @return String Value
      */
     private String processValue(String value, Point point) {
@@ -90,6 +111,7 @@ public class PointValueService {
         switch (point.getType()) {
             case Common.ValueType.STRING:
                 break;
+            case Common.ValueType.SHORT:
             case Common.ValueType.INT:
             case Common.ValueType.LONG:
                 try {
@@ -116,7 +138,8 @@ public class PointValueService {
                 }
                 break;
             default:
-                throw new ServiceException("Invalid device point value type");
+                log.error("Invalid device point value type({})", point.getType());
+                break;
         }
         return value;
     }

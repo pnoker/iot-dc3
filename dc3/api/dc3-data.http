@@ -14,34 +14,41 @@
 #  limitations under the License.
 #
 
-### 读取指定设备位号值
-#driver/read
-POST http://localhost:8603/driver/read
+### --------------------- Point ---------------------
+### 分页查询 Point Value
+#/data/list
+POST http://localhost:8500/data/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
-[
-  {
-    "deviceId": 1,
-    "pointId": 1
+{
+  "deviceId": "-1",
+  "pointId": "-1",
+  "page": {
+    "current": 1
   }
-]
+}
 
 
-### 写入指定设备位号值
-#driver/write
-POST http://localhost:8603/driver/write
+### 根据 Device Id 和 Point Id 查询 最新值
+#/latest/deviceId/:deviceId/pointId/:pointId
+GET http://localhost:8500/data/latest/deviceId/-1/pointId/-1
 Accept: */*
-Content-Type: application/json
 Cache-Control: no-cache
 
-[
-  {
-    "deviceId": 1,
-    "pointId": 1,
-    "value": "34"
-  }
-]
+
+### 根据 Device Id 和 Point Id 查询 最新值
+#/latest/deviceId/:deviceId
+GET http://localhost:8500/data/status/deviceId/-1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 Device Id 和 Point Id 查询 实时值
+#/realtime/deviceId/:deviceId/pointId/:pointId
+GET http://localhost:8500/data/realtime/deviceId/-1/pointId/-1
+Accept: */*
+Cache-Control: no-cache
 
 ###

@@ -18,9 +18,13 @@ package com.dc3.center.data.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.data.service.PointValueService;
+import com.dc3.center.data.service.rabbit.PointValueReceiver;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
+import com.dc3.common.constant.Common;
+import com.dc3.common.exception.ServiceException;
+import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,24 +43,20 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PointValueServiceImpl implements PointValueService {
+
+    @Resource
+    private RedisUtil redisUtil;
     @Resource
     private MongoTemplate mongoTemplate;
 
     @Override
     public void add(PointValue pointValue) {
-        long createTime = System.currentTimeMillis();
-        long interval = createTime - pointValue.getOriginTime();
-        mongoTemplate.insert(pointValue.setCreateTime(createTime).setInterval(interval));
-        log.debug("interval:{}", interval);
+        mongoTemplate.insert(pointValue.setCreateTime(System.currentTimeMillis()));
     }
 
     @Override
-    public void batchAdd(List<PointValue> pointValues) {
-        pointValues.stream().map(pointValue -> {
-            long createTime = System.currentTimeMillis();
-            long interval = createTime - pointValue.getOriginTime();
-            return pointValue.setCreateTime(createTime).setInterval(interval);
-        });
+    public void add(List<PointValue> pointValues) {
+        pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
         mongoTemplate.insert(pointValues, PointValue.class);
     }
 
@@ -64,23 +64,48 @@ public class PointValueServiceImpl implements PointValueService {
     public Page<PointValue> list(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
         Optional.ofNullable(pointValueDto).ifPresent(dto -> {
-            Optional.ofNullable(dto.getDeviceId()).ifPresent(deviceId -> criteria.and("deviceId").is(deviceId));
-            Optional.ofNullable(dto.getPointId()).ifPresent(pointId -> criteria.and("pointId").is(pointId));
-            if (dto.getPage().getStartTime() > 0 && dto.getPage().getEndTime() > 0 && dto.getPage().getStartTime() <= dto.getPage().getEndTime()) {
-                criteria.and("originTime").gte(dto.getPage().getStartTime()).lte(dto.getPage().getEndTime());
+            if (null != dto.getDeviceId()) {
+                criteria.and("deviceId").is(dto.getDeviceId());
             }
+            if (null != dto.getPointId()) {
+                criteria.and("pointId").is(dto.getPointId());
+            }
+            if (null == dto.getPage()) {
+                dto.setPage(new Pages());
+            }
+            Pages pages = dto.getPage();
+            if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
+                criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
+            }
+
         });
-        return pageQuery(criteria, pointValueDto.getPage());
+        return queryPage(criteria, pointValueDto.getPage());
+    }
+
+
+    @Override
+    public PointValue latest(Long deviceId, Long pointId) {
+        Criteria criteria = new Criteria();
+        criteria.and("deviceId").is(deviceId);
+        criteria.and("pointId").is(pointId);
+        return queryOne(criteria);
     }
 
     @Override
-    public PointValue latest(PointValueDto pointValueDto) {
-        Criteria criteria = new Criteria();
-        Optional.ofNullable(pointValueDto).ifPresent(dto -> {
-            Optional.ofNullable(dto.getDeviceId()).ifPresent(deviceId -> criteria.and("deviceId").is(deviceId));
-            Optional.ofNullable(dto.getPointId()).ifPresent(pointId -> criteria.and("pointId").is(pointId));
-        });
-        return oneQuery(criteria);
+    public String realtime(Long deviceId, Long pointId) {
+        String key = PointValueReceiver.VALUE_KEY_PREFIX + deviceId + "_" + pointId;
+        String value = redisUtil.getKey(key);
+        if (null == value) {
+            throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
+        }
+        return value;
+    }
+
+    @Override
+    public String status(Long deviceId) {
+        String key = PointValueReceiver.DEVICE_STATUS_KEY_PREFIX + deviceId;
+        String status = redisUtil.getKey(key);
+        return null != status ? status : Common.Device.OFFLINE;
     }
 
     /**
@@ -89,33 +114,31 @@ public class PointValueServiceImpl implements PointValueService {
      * @param criteriaDefinition CriteriaDefinition
      * @return
      */
-    private PointValue oneQuery(CriteriaDefinition criteriaDefinition) {
-        return mongoTemplate.findOne(desc(criteriaDefinition), PointValue.class);
+    private PointValue queryOne(CriteriaDefinition criteriaDefinition) {
+        return mongoTemplate.findOne(descQuery(criteriaDefinition), PointValue.class);
     }
 
     /**
      * 分页&排序&查询
      *
      * @param criteriaDefinition CriteriaDefinition
-     * @param pages
-     * @return
+     * @param pages              Pages
+     * @return Page<PointValue>
      */
-    private Page<PointValue> pageQuery(CriteriaDefinition criteriaDefinition, Pages pages) {
-        Query query = desc(criteriaDefinition);
+    private Page<PointValue> queryPage(CriteriaDefinition criteriaDefinition, Pages pages) {
+        Query query = descQuery(criteriaDefinition);
         long count = mongoTemplate.count(query, PointValue.class);
-        List<PointValue> pointValues = mongoTemplate.find(page(query, pages), PointValue.class);
-        Page<PointValue> page = (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count);
-        page.setRecords(pointValues);
-        return page;
+        List<PointValue> pointValues = mongoTemplate.find(pageQuery(query, pages), PointValue.class);
+        return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);
     }
 
     /**
      * 排序
      *
      * @param criteriaDefinition CriteriaDefinition
-     * @return
+     * @return Query
      */
-    private Query desc(CriteriaDefinition criteriaDefinition) {
+    private Query descQuery(CriteriaDefinition criteriaDefinition) {
         Query query = new Query(criteriaDefinition);
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
         return query;
@@ -126,12 +149,13 @@ public class PointValueServiceImpl implements PointValueService {
      *
      * @param query Query
      * @param pages Pages
-     * @return
+     * @return Query
      */
-    private Query page(Query query, Pages pages) {
+    private Query pageQuery(Query query, Pages pages) {
         int size = (int) pages.getSize();
         long page = pages.getCurrent();
         query.limit(size).skip(size * (page - 1));
         return query;
     }
+
 }

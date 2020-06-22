@@ -19,12 +19,14 @@ package com.dc3.center.data.service.rabbit;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
+import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 接收驱动发送过来的数据
@@ -35,12 +37,29 @@ import javax.annotation.Resource;
 @Component
 @RabbitListener(queues = Common.Rabbit.POINT_VALUE_QUEUE)
 public class PointValueReceiver {
+
+    public final static String VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
+    public final static String DEVICE_STATUS_KEY_PREFIX = Common.Cache.DEVICE + Common.Cache.STATUS + Common.Cache.SEPARATOR;
+
+    @Resource
+    private RedisUtil redisUtil;
     @Resource
     private PointValueService pointValueService;
 
     @RabbitHandler
     public void pointValueReceive(PointValue pointValue) {
-        //todo 需要调整逻辑，采取批量入库和定时入库，并存储实时数据到 redis 中
-        pointValueService.add(pointValue);
+        if (0 == pointValue.getPointId()) {
+            redisUtil.setKey(
+                    DEVICE_STATUS_KEY_PREFIX + pointValue.getDeviceId(),
+                    pointValue.getRawValue(),
+                    5,
+                    TimeUnit.MINUTES);
+        } else {
+            redisUtil.setKey(VALUE_KEY_PREFIX + pointValue.getDeviceId() + "_" + pointValue.getPointId(),
+                    pointValue.getValue(),
+                    5,
+                    TimeUnit.MINUTES);
+            pointValueService.add(pointValue);
+        }
     }
 }

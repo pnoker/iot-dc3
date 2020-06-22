@@ -26,6 +26,7 @@ import java.util.List;
  * @author pnoker
  */
 public interface PointValueService {
+
     /**
      * 新增 PointValue
      *
@@ -36,23 +37,41 @@ public interface PointValueService {
     /**
      * 批量新增 PointValue
      *
-     * @param pointValues
+     * @param pointValues PointValue Array
      */
-    void batchAdd(List<PointValue> pointValues);
+    void add(List<PointValue> pointValues);
 
     /**
      * 获取带分页、排序
      *
-     * @param pointValueDto
-     * @return
+     * @param pointValueDto PointValueDto
+     * @return Page<PointValue>
      */
     Page<PointValue> list(PointValueDto pointValueDto);
 
     /**
      * 获取最新的一个位号数据
      *
-     * @param pointValueDto
-     * @return
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @return PointValue
      */
-    PointValue latest(PointValueDto pointValueDto);
+    PointValue latest(Long deviceId, Long pointId);
+
+    /**
+     * 获取设备状态
+     *
+     * @param deviceId Device Id
+     * @return ONLINE, OFFLINE, MAINTAIN, FAULT
+     */
+    String status(Long deviceId);
+
+    /**
+     * 获取实时数据
+     *
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @return String Value
+     */
+    String realtime(Long deviceId, Long pointId);
 }
