@@ -21,7 +21,7 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
-import com.dc3.common.sdk.service.DriverService;
+import com.dc3.common.sdk.service.CustomDriverService;
 import com.dc3.driver.key.KeyLoader;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.
  */
 @Slf4j
 @Service
-public class DriverServiceImpl implements DriverService {
+public class CustomDriverServiceImpl implements CustomDriverService {
     /**
      * Opc Ua Client Map
      */

@@ -29,6 +29,8 @@ import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Driver;
 import com.dc3.common.model.Profile;
+import com.netflix.discovery.EurekaClient;
+import com.netflix.discovery.shared.Application;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,7 +40,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * <p>DriverService Impl
@@ -48,6 +50,9 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class DriverServiceImpl implements DriverService {
+
+    @Resource
+    private EurekaClient eurekaClient;
     @Resource
     private ProfileService profileService;
     @Resource
@@ -148,6 +153,27 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(Driver::getHost, host);
         queryWrapper.eq(Driver::getPort, port);
         return driverMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public Map<String, Boolean> driverStatus(DriverDto driverDto) {
+        Map<String, Boolean> driverStatusMap = new HashMap<>(16);
+
+        Page<Driver> driverPage = list(driverDto);
+        if (driverPage.getRecords().size() > 0) {
+            List<String> services = new ArrayList<>();
+            List<Application> applications = eurekaClient.getApplications().getRegisteredApplications();
+            applications.forEach(application -> services.add(application.getName().toLowerCase()));
+
+            driverPage.getRecords().forEach(driver -> {
+                boolean status = false;
+                if (services.contains(driver.getServiceName())) {
+                    status = true;
+                }
+                driverStatusMap.put(driver.getServiceName(), status);
+            });
+        }
+        return driverStatusMap;
     }
 
     @Override

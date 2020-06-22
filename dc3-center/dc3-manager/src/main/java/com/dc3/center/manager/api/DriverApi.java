@@ -17,8 +17,8 @@
 package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.manager.service.DriverService;
 import com.dc3.api.center.manager.feign.DriverClient;
+import com.dc3.center.manager.service.DriverService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverDto;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * <p>驱动 Client 接口实现
@@ -101,6 +102,16 @@ public class DriverApi implements DriverClient {
         try {
             Driver select = driverService.selectByHostPort(host, port);
             return R.ok(select);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public R<Map<String, Boolean>> driverStatus(DriverDto driverDto) {
+        try {
+            Map<String, Boolean> driverStatuses = driverService.driverStatus(driverDto);
+            return R.ok(driverStatuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
