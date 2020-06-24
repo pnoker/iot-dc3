@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
  * <p>MybatisPlus配置
  *
  * @author : pnoker
- * @email : pnokers@icloud.com
  */
 @Configuration
 public class MybatisPlusConfig {
