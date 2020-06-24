@@ -19,14 +19,12 @@ package com.dc3.common.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
- *
  * @author pnoker
  */
 @Slf4j
@@ -38,23 +36,24 @@ public class RedisUtil {
     /**
      * 判断 Key 是否存在
      *
-     * @param key
-     * @return
+     * @param key String key
+     * @return boolean
      */
     public boolean hasKey(String key) {
         try {
-            return redisTemplate.hasKey(key);
+            Boolean hasKey = redisTemplate.hasKey(key);
+            return null != hasKey ? hasKey : false;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return false;
         }
+        return false;
     }
 
     /**
      * 添加 Key 缓存
      *
-     * @param key
-     * @param value
+     * @param key   String key
+     * @param value Object
      */
     public void setKey(String key, Object value) {
         try {
@@ -67,10 +66,10 @@ public class RedisUtil {
     /**
      * 添加 Key 缓存,并设置失效时间
      *
-     * @param key
-     * @param value
-     * @param time
-     * @param unit
+     * @param key   String key
+     * @param value Object
+     * @param time  Time
+     * @param unit  TimeUnit
      */
     public void setKey(String key, Object value, long time, TimeUnit unit) {
         try {
@@ -83,9 +82,9 @@ public class RedisUtil {
     /**
      * 获取 Key 缓存
      *
-     * @param key
-     * @param <T>
-     * @return
+     * @param key String key
+     * @param <T> T
+     * @return T
      */
     public <T> T getKey(String key) {
         try {
@@ -93,14 +92,14 @@ public class RedisUtil {
             return (T) object;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return null;
         }
+        return null;
     }
 
     /**
      * 删除 Keys 缓存
      *
-     * @param keys
+     * @param keys Key Array
      */
     public void removeKey(String... keys) {
         if (null != keys && keys.length > 0) {
@@ -108,7 +107,7 @@ public class RedisUtil {
                 if (keys.length == 1) {
                     redisTemplate.delete(keys[0]);
                 } else {
-                    redisTemplate.delete(CollectionUtils.arrayToList(keys));
+                    redisTemplate.delete(Arrays.asList(keys));
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
@@ -119,9 +118,9 @@ public class RedisUtil {
     /**
      * 指定键值失效时间
      *
-     * @param key
-     * @param time
-     * @param unit
+     * @param key  String key
+     * @param time Time
+     * @param unit TimeUnit
      */
     public void expire(String key, long time, TimeUnit unit) {
         try {
@@ -136,16 +135,17 @@ public class RedisUtil {
     /**
      * 获取 Key 失效时间
      *
-     * @param key
-     * @param unit
-     * @return
+     * @param key  String key
+     * @param unit TimeUnit
+     * @return long
      */
     public long expire(String key, TimeUnit unit) {
         try {
-            return redisTemplate.getExpire(key, unit);
+            Long expire = redisTemplate.getExpire(key, unit);
+            return null != expire ? expire : 0L;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return 0;
         }
+        return 0L;
     }
 }
