@@ -48,23 +48,22 @@ public class KeyUtil {
      * 生成AES密钥
      *
      * @return Keys.Aes
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
     public static Keys.Aes genAesKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(Common.KEY_ALGORITHM_AES);
         keyGenerator.init(128);
         SecretKey secretKey = keyGenerator.generateKey();
-        Keys.Aes aes = new Keys().new Aes(Dc3Util.encode(secretKey.getEncoded()));
-        return aes;
+        return new Keys().new Aes(Dc3Util.encode(secretKey.getEncoded()));
     }
 
     /**
      * AES 私钥加密
      *
-     * @param str
-     * @param privateKey
-     * @return
-     * @throws Exception
+     * @param str        String
+     * @param privateKey Private Key
+     * @return Encrypt Aes
+     * @throws Exception Exception
      */
     public static String encryptAes(String str, String privateKey) throws Exception {
         //base64编码的私钥
@@ -73,17 +72,16 @@ public class KeyUtil {
         //AES加密
         Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_AES);
         cipher.init(Cipher.ENCRYPT_MODE, key);
-        String outStr = Dc3Util.encode(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
-        return outStr;
+        return Dc3Util.encode(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
     }
 
     /**
      * AES 私钥解密
      *
-     * @param str
-     * @param privateKey
-     * @return
-     * @throws Exception
+     * @param str        String
+     * @param privateKey Private Key
+     * @return Decrypt Aes
+     * @throws Exception Exception
      */
     public static String decryptAes(String str, String privateKey) throws Exception {
         //base64编码的私钥
@@ -101,7 +99,7 @@ public class KeyUtil {
      * 生成RSA密钥对
      *
      * @return Keys.Rsa
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
     public static Keys.Rsa genRsaKey() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(Common.KEY_ALGORITHM_RSA);
@@ -111,17 +109,16 @@ public class KeyUtil {
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         String publicKeyString = Dc3Util.encode(publicKey.getEncoded());
         String privateKeyString = Dc3Util.encode((privateKey.getEncoded()));
-        Keys.Rsa rsa = new Keys().new Rsa(publicKeyString, privateKeyString);
-        return rsa;
+        return new Keys().new Rsa(publicKeyString, privateKeyString);
     }
 
     /**
      * RSA 公钥加密
      *
-     * @param str
-     * @param publicKey
-     * @return
-     * @throws Exception
+     * @param str       String
+     * @param publicKey Public Key
+     * @return Encrypt Rsa
+     * @throws Exception Exception
      */
     public static String encryptRsa(String str, String publicKey) throws Exception {
         //base64编码的公钥
@@ -131,17 +128,16 @@ public class KeyUtil {
         //RSA加密
         Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_RSA);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-        String outStr = Dc3Util.encode(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
-        return outStr;
+        return Dc3Util.encode(cipher.doFinal(str.getBytes(Charsets.UTF_8)));
     }
 
     /**
      * RSA 私钥解密
      *
-     * @param str
-     * @param privateKey
-     * @return
-     * @throws Exception
+     * @param str        String
+     * @param privateKey Private Key
+     * @return Decrypt Rsa
+     * @throws Exception Exception
      */
     public static String decryptRsa(String str, String privateKey) throws Exception {
         //base64编码的私钥
@@ -159,8 +155,8 @@ public class KeyUtil {
     /**
      * 生成Token令牌
      *
-     * @param name
-     * @return
+     * @param name String
+     * @return String
      */
     public static String generateToken(String name) {
         JwtBuilder builder = Jwts.builder()
@@ -174,8 +170,8 @@ public class KeyUtil {
     /**
      * 解析Token令牌
      *
-     * @param token
-     * @return
+     * @param token String
+     * @return Claims
      */
     public static Claims parserToken(String token) {
         return Jwts.parser()

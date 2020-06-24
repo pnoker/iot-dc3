@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -49,8 +50,8 @@ public class Dc3Util {
     /**
      * 获取 md5 加密编码
      *
-     * @param str
-     * @return
+     * @param str String
+     * @return String
      */
     public static String md5(String str) {
         MD5 md5 = MD5.create();
@@ -60,9 +61,9 @@ public class Dc3Util {
     /**
      * 获取 md5 & salt 加密编码
      *
-     * @param str
-     * @param salt
-     * @return
+     * @param str  String
+     * @param salt String
+     * @return String
      */
     public static String md5(String str, String salt) {
         return md5(md5(str) + salt);
@@ -71,8 +72,8 @@ public class Dc3Util {
     /**
      * 将字符串进行Base64编码
      *
-     * @param str
-     * @return 返回字节流
+     * @param str String
+     * @return Byte Array
      */
     public static byte[] encode(String str) {
         return Base64.getEncoder().encode(str.getBytes(Charsets.UTF_8));
@@ -81,8 +82,8 @@ public class Dc3Util {
     /**
      * 将字节流进行Base64编码
      *
-     * @param bytes
-     * @return 返回字符串
+     * @param bytes Byte Array
+     * @return Byte Array
      */
     public static String encode(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
@@ -91,8 +92,8 @@ public class Dc3Util {
     /**
      * 必须配合encode使用，用于encode编码之后解码
      *
-     * @param str 字符串
-     * @return 返回字节流
+     * @param str String
+     * @return Byte Array
      */
     public static byte[] decode(String str) {
         return Base64.getDecoder().decode(str);
@@ -101,8 +102,8 @@ public class Dc3Util {
     /**
      * 必须配合encode使用，用于encode编码之后解码
      *
-     * @param input 字节流
-     * @return 返回字节流
+     * @param input Byte Array
+     * @return Byte Array
      */
     public static byte[] decode(byte[] input) {
         return Base64.getDecoder().decode(input);
@@ -125,10 +126,49 @@ public class Dc3Util {
     }
 
     /**
+     * 获取电脑 Mac 物理地址列表
+     *
+     * @return Mac Array
+     */
+    private List<String> localMacList() {
+        ArrayList<String> macList = new ArrayList<>();
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                List<InterfaceAddress> interfaceAddressList = networkInterface.getInterfaceAddresses();
+                for (InterfaceAddress interfaceAddress : interfaceAddressList) {
+                    InetAddress inetAddress = interfaceAddress.getAddress();
+                    NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
+                    if (network == null) {
+                        continue;
+                    }
+                    byte[] mac = network.getHardwareAddress();
+                    if (mac == null) {
+                        continue;
+                    }
+                    stringBuilder.delete(0, stringBuilder.length());
+                    for (int i = 0; i < mac.length; i++) {
+                        stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    }
+                    macList.add(stringBuilder.toString());
+                }
+            }
+            if (macList.size() > 0) {
+                return macList.stream().distinct().collect(Collectors.toList());
+            }
+        } catch (Exception ignored) {
+        }
+        return macList;
+    }
+
+    /**
      * 使用 yyyy-MM-dd HH:mm:ss 格式化时间
      *
-     * @param date
-     * @return
+     * @param date Date
+     * @return String
      */
     public static String formatData(Date date) {
         return simpleDateFormatThreadLocal.get().format(date);
@@ -137,9 +177,9 @@ public class Dc3Util {
     /**
      * 按小时推迟时间
      *
-     * @param amount
+     * @param amount Integer
      * @param field  Calendar field : Calendar.HOUR/MINUTE/...
-     * @return
+     * @return Date
      */
     public static Date expireTime(int amount, int field) {
         Calendar calendar = Calendar.getInstance();
@@ -151,8 +191,8 @@ public class Dc3Util {
     /**
      * 判断字符串是否为 用户名格式（2-32）
      *
-     * @param name
-     * @return
+     * @param name String
+     * @return boolean
      */
     public static boolean isName(String name) {
         String regex = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$";
@@ -162,8 +202,8 @@ public class Dc3Util {
     /**
      * 判断字符串是否为 手机号码格式
      *
-     * @param phone
-     * @return
+     * @param phone String
+     * @return boolean
      */
     public static boolean isPhone(String phone) {
         String regex = "^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$";
@@ -173,8 +213,8 @@ public class Dc3Util {
     /**
      * 判断字符串是否为 邮箱地址格式
      *
-     * @param mail
-     * @return
+     * @param mail String
+     * @return boolean
      */
     public static boolean isMail(String mail) {
         String regex = "^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$";
@@ -184,8 +224,8 @@ public class Dc3Util {
     /**
      * 判断字符串是否为 密码格式（8-16）
      *
-     * @param password
-     * @return
+     * @param password String
+     * @return boolean
      */
     public static boolean isPassword(String password) {
         String regex = "^[a-zA-Z]\\w{7,15}$";
@@ -195,8 +235,8 @@ public class Dc3Util {
     /**
      * 判断字符串是否为 Host格式
      *
-     * @param host
-     * @return
+     * @param host String
+     * @return boolean
      */
     public static boolean isHost(String host) {
         String regex = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$";
@@ -206,8 +246,8 @@ public class Dc3Util {
     /**
      * 判断字符串是否为 驱动端口格式
      *
-     * @param port
-     * @return
+     * @param port Integer
+     * @return boolean
      */
     public static boolean isDriverPort(int port) {
         String regex = "^8[6-7][0-9]{2}$";
@@ -218,7 +258,7 @@ public class Dc3Util {
      * 两层循环实现建树
      *
      * @param treeNodes 传入的树节点列表
-     * @return
+     * @return T Array
      */
     public <T extends NodeDto> List<T> buildByLoop(List<T> treeNodes, Object root) {
         List<T> trees = new ArrayList<>();
@@ -241,11 +281,11 @@ public class Dc3Util {
     /**
      * 使用递归方法建树
      *
-     * @param treeNodes
-     * @return
+     * @param treeNodes 传入的树节点列表
+     * @return T Array
      */
     public <T extends NodeDto> List<T> buildByRecursive(List<T> treeNodes, Object root) {
-        List<T> trees = new ArrayList<T>();
+        List<T> trees = new ArrayList<>();
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
                 trees.add(findChildren(treeNode, treeNodes));
@@ -257,8 +297,8 @@ public class Dc3Util {
     /**
      * 递归查找子节点
      *
-     * @param treeNodes
-     * @return
+     * @param treeNodes 传入的树节点列表
+     * @return T
      */
     public <T extends NodeDto> T findChildren(T treeNode, List<T> treeNodes) {
         for (T it : treeNodes) {
@@ -270,17 +310,6 @@ public class Dc3Util {
             }
         }
         return treeNode;
-    }
-
-    /**
-     * @return the local hostname, if possible. Failure results in "localhost".
-     */
-    public static String getHostName() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return "localhost";
-        }
     }
 
     /**
