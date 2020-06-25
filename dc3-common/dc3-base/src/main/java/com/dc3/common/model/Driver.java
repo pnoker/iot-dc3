@@ -48,9 +48,6 @@ public class Driver extends Description {
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid service name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String serviceName;
 
-    @TableField(exist = false)
-    private Boolean onLine = false;
-
     @NotBlank(message = "host can't be empty", groups = {Insert.class})
     @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$", message = "invalid host", groups = {Insert.class, Update.class})
     private String host;

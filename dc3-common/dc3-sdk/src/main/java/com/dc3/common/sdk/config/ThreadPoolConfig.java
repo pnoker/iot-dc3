@@ -69,4 +69,5 @@ public class ThreadPoolConfig {
                 (r) -> new Thread(r, "[ScheduledThreadPoolExecutor]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
                 (r, e) -> log.error("ScheduledThreadPoolExecutor Rejected"));
     }
+
 }

@@ -95,6 +95,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         boolean reRegister = true;
         while (reRegister) {
             if (!register()) {
+                log.info("Retry ...");
                 ThreadUtil.sleep(5, TimeUnit.SECONDS);
                 times++;
                 if (times > 10) {
@@ -271,7 +272,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @return boolean
      */
     public boolean registerDriver() {
-        Driver driver = new Driver(driverProperty.getName(), this.serviceName, true, this.localHost, this.port);
+        Driver driver = new Driver(driverProperty.getName(), this.serviceName, this.localHost, this.port);
         driver.setDescription(driverProperty.getDescription());
 
         R<Driver> rDriver = driverClient.selectByServiceName(this.serviceName);

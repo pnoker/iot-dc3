@@ -62,7 +62,7 @@ public class PointServiceImpl implements PointService {
             }
     )
     public Point add(Point point) {
-        Point select = selectByNameAndProfile(point.getProfileId(), point.getName());
+        Point select = selectByNameAndProfile(point.getName(), point.getProfileId());
         if (null != select) {
             throw new ServiceException("The point already exists in the profile");
         }
@@ -108,7 +108,7 @@ public class PointServiceImpl implements PointService {
         point.setUpdateTime(null);
         Point selectById = pointMapper.selectById(point.getId());
         if (!selectById.getProfileId().equals(point.getProfileId()) || !selectById.getName().equals(point.getName())) {
-            Point select = selectByNameAndProfile(point.getProfileId(), point.getName());
+            Point select = selectByNameAndProfile(point.getName(), point.getProfileId());
             if (null != select) {
                 throw new ServiceException("The point already exists");
             }
@@ -129,7 +129,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.NAME, key = "#profileId+'.'+#name", unless = "#result==null")
-    public Point selectByNameAndProfile(Long profileId, String name) {
+    public Point selectByNameAndProfile(String name, Long profileId) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         queryWrapper.eq(Point::getName, name);
         queryWrapper.eq(Point::getProfileId, profileId);

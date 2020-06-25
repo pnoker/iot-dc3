@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
-package com.dc3.center.manager.service;
+package com.dc3.common.bean.batch;
 
-import com.dc3.common.base.Service;
-import com.dc3.common.dto.DeviceDto;
-import com.dc3.common.model.Device;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
- * <p>Device Interface
- *
  * @author pnoker
  */
-public interface DeviceService extends Service<Device, DeviceDto> {
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
+public class BatchDevice implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 根据设备 NAME 和分组 ID 查询
-     *
-     * @param name    Device Name
-     * @param groupId Device Group Id
-     * @return Device
-     */
-    Device selectDeviceByNameAndGroup(String name, Long groupId);
+    private String name;
 
-    /**
-     * 查询 Device 服务状态
-     *
-     * @param deviceDto Device Dto
-     * @return Map<Long, String>
-     */
-    Map<Long, String> deviceStatus(DeviceDto deviceDto);
+    private Map<String, List<BatchInfo>> points;
 }

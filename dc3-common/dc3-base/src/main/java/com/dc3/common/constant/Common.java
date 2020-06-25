@@ -39,6 +39,16 @@ public interface Common {
     String KEY_ALGORITHM_RSA = "RSA";
 
     /**
+     * 默认上传文件的缓存位置
+     */
+    String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/";
+
+    /**
+     * 用户主目录
+     */
+    String USER_HOME_PATH = System.getProperty("user.home") + "/.dc3/";
+
+    /**
      * 时间格式化
      */
     String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -109,6 +119,7 @@ public interface Common {
          */
         String DC3_MANAGER_SERVICE_NAME = "DC3-MANAGER";
         String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
+        String DC3_MANAGER_BATCH_URL_PREFIX = "/manager/batch";
         String DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX = "/manager/driverAttribute";
         String DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX = "/manager/pointAttribute";
         String DC3_MANAGER_PROFILE_URL_PREFIX = "/manager/profile";

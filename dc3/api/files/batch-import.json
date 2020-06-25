@@ -1,0 +1,143 @@
+[
+  {
+    "serviceName": "dc3-driver-virtual",
+    "profiles": [
+      {
+        "name": "Batch-Profile-2",
+        "share": true,
+        "driverInfos": [
+          {
+            "name": "host",
+            "value": "localhost"
+          },
+          {
+            "name": "port",
+            "value": "9000"
+          }
+        ],
+        "points": [
+          {
+            "name": "Batch-Point-1",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "Batch-Point-2",
+            "type": "boolean",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "Batch-Point-3",
+            "type": "int",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "Batch-Point-4",
+            "type": "long",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "Batch-Point-5",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "Batch-Point-6",
+            "type": "double",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          }
+        ],
+        "groups": [
+          {
+            "name": "Batch-Group-2",
+            "devices": [
+              {
+                "name": "Batch-Device-1",
+                "points": {
+                  "Batch-Point-1": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-1"
+                    }
+                  ],
+                  "Batch-Point-2": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-2"
+                    }
+                  ],
+                  "Batch-Point-3": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-3"
+                    }
+                  ],
+                  "Batch-Point-4": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-4"
+                    }
+                  ],
+                  "Batch-Point-5": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-5"
+                    }
+                  ],
+                  "Batch-Point-6": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-6"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

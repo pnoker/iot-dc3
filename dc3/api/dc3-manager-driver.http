@@ -31,6 +31,16 @@ Cache-Control: no-cache
 }
 
 
+### 新增 Driver
+#/manager/driver/batchImport
+POST http://localhost:8400/manager/driver/batchImport
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+< ./file/batch-import.json
+
+
 ### 修改 Driver
 #/manager/driver/update
 POST http://localhost:8400/manager/driver/update
