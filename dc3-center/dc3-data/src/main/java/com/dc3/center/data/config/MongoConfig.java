@@ -22,12 +22,12 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.convert.*;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
@@ -46,40 +46,15 @@ import java.util.List;
 public class MongoConfig {
 
     @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory, MongoMappingContext context, BeanFactory beanFactory, MongoCustomConversions conversions) {
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
-        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
-        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        mappingConverter.setCustomConversions(conversions);
-        return mappingConverter;
+    public MongoTemplate mongoTemplate(
+            MongoClientOptionProperties properties,
+            MongoDbFactory factory,
+            MongoMappingContext context,
+            MongoCustomConversions conversions
+    ) {
+        return new MongoTemplate(mongoDbFactory(properties), mappingMongoConverter(factory, context, conversions));
     }
 
-    @Bean
-    public MongoDbFactory mongoDbFactory(MongoClientOptionProperties properties) {
-        //创建客户端参数
-        MongoClientOptions options = mongoClientOptions(properties);
-
-        //创建客户端和Factory
-        List<ServerAddress> serverAddresses = new ArrayList<>();
-        for (String address : properties.getAddress()) {
-            String[] hostAndPort = address.split(":");
-            String host = hostAndPort[0];
-            Integer port = Integer.parseInt(hostAndPort[1]);
-            ServerAddress serverAddress = new ServerAddress(host, port);
-            serverAddresses.add(serverAddress);
-        }
-
-        //创建认证客户端
-        MongoCredential mongoCredential = MongoCredential.createScramSha1Credential(properties.getUsername(),
-                properties.getAuthenticationDatabase() != null ? properties.getAuthenticationDatabase() : properties.getDatabase(),
-                properties.getPassword().toCharArray());
-
-        MongoClient mongoClient = new MongoClient(serverAddresses, mongoCredential, options);
-
-        return new SimpleMongoDbFactory(mongoClient, properties.getDatabase());
-    }
-
-    @Bean
     public MongoClientOptions mongoClientOptions(MongoClientOptionProperties properties) {
         return MongoClientOptions.builder()
                 .connectTimeout(properties.getConnectionTimeout())
@@ -92,9 +67,47 @@ public class MongoConfig {
                 .maxConnectionLifeTime(properties.getConnectionMaxLifeTime())
                 .maxWaitTime(properties.getPoolMaxWaitTime())
                 .connectionsPerHost(properties.getConnectionsPerHost())
-                .threadsAllowedToBlockForConnectionMultiplier(
-                        properties.getThreadsAllowedToBlockForConnectionMultiplier())
-                .minConnectionsPerHost(properties.getMinConnectionsPerHost()).build();
+                .threadsAllowedToBlockForConnectionMultiplier(properties.getThreadsAllowedToBlockForConnectionMultiplier())
+                .minConnectionsPerHost(properties.getMinConnectionsPerHost())
+                .build();
+    }
+
+    public MappingMongoConverter mappingMongoConverter(
+            MongoDbFactory factory,
+            MongoMappingContext context,
+            MongoCustomConversions conversions
+    ) {
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
+        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
+        mappingConverter.setCustomConversions(conversions);
+        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        return mappingConverter;
+    }
+
+    public MongoDbFactory mongoDbFactory(MongoClientOptionProperties properties) {
+        //创建客户端参数
+        MongoClientOptions options = mongoClientOptions(properties);
+
+        //创建客户端和Factory
+        List<ServerAddress> serverAddresses = new ArrayList<>();
+        for (String address : properties.getAddress()) {
+            String[] hostAndPort = address.split(":");
+            String host = hostAndPort[0];
+            int port = Integer.parseInt(hostAndPort[1]);
+            ServerAddress serverAddress = new ServerAddress(host, port);
+            serverAddresses.add(serverAddress);
+        }
+
+        //创建认证客户端
+        MongoCredential mongoCredential = MongoCredential
+                .createScramSha1Credential(
+                        properties.getUsername(),
+                        properties.getAuthenticationDatabase() != null ? properties.getAuthenticationDatabase() : properties.getDatabase(),
+                        properties.getPassword().toCharArray()
+                );
+        MongoClient mongoClient = new MongoClient(serverAddresses, mongoCredential, options);
+
+        return new SimpleMongoDbFactory(mongoClient, properties.getDatabase());
     }
 
     @Bean

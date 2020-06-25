@@ -23,6 +23,8 @@ import com.dc3.common.dto.NodeDto;
 import com.google.common.base.Charsets;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -107,61 +109,6 @@ public class Dc3Util {
      */
     public static byte[] decode(byte[] input) {
         return Base64.getDecoder().decode(input);
-    }
-
-
-    /**
-     * 获取当前主机的 Local Host
-     *
-     * @return String
-     */
-    public static String localHost() {
-        try {
-            InetAddress address = InetAddress.getLocalHost();
-            return address.getHostAddress();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
-    }
-
-    /**
-     * 获取电脑 Mac 物理地址列表
-     *
-     * @return Mac Array
-     */
-    private List<String> localMacList() {
-        ArrayList<String> macList = new ArrayList<>();
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            StringBuilder stringBuilder = new StringBuilder();
-
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = interfaces.nextElement();
-                List<InterfaceAddress> interfaceAddressList = networkInterface.getInterfaceAddresses();
-                for (InterfaceAddress interfaceAddress : interfaceAddressList) {
-                    InetAddress inetAddress = interfaceAddress.getAddress();
-                    NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
-                    if (network == null) {
-                        continue;
-                    }
-                    byte[] mac = network.getHardwareAddress();
-                    if (mac == null) {
-                        continue;
-                    }
-                    stringBuilder.delete(0, stringBuilder.length());
-                    for (int i = 0; i < mac.length; i++) {
-                        stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                    }
-                    macList.add(stringBuilder.toString());
-                }
-            }
-            if (macList.size() > 0) {
-                return macList.stream().distinct().collect(Collectors.toList());
-            }
-        } catch (Exception ignored) {
-        }
-        return macList;
     }
 
     /**
@@ -254,6 +201,30 @@ public class Dc3Util {
         return ReUtil.isMatch(regex, String.valueOf(port));
     }
 
+
+    /**
+     * InputStream 转 String
+     *
+     * @param inputStream InputStream
+     * @return String
+     */
+    public static String inputStreamToString(InputStream inputStream) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            int length = 0;
+            byte[] buff = new byte[1024];
+            while ((length = inputStream.read(buff)) > -1) {
+                stringBuilder.append(new String(buff, 0, length, Charsets.UTF_8));
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            inputStream.close();
+        }
+
+        return stringBuilder.toString();
+    }
+
     /**
      * 两层循环实现建树
      *
@@ -310,6 +281,60 @@ public class Dc3Util {
             }
         }
         return treeNode;
+    }
+
+    /**
+     * 获取当前主机的 Local Host
+     *
+     * @return String
+     */
+    public static String localHost() {
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            return address.getHostAddress();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    /**
+     * 获取电脑 Mac 物理地址列表
+     *
+     * @return Mac Array
+     */
+    private List<String> localMacList() {
+        ArrayList<String> macList = new ArrayList<>();
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                List<InterfaceAddress> interfaceAddressList = networkInterface.getInterfaceAddresses();
+                for (InterfaceAddress interfaceAddress : interfaceAddressList) {
+                    InetAddress inetAddress = interfaceAddress.getAddress();
+                    NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
+                    if (network == null) {
+                        continue;
+                    }
+                    byte[] mac = network.getHardwareAddress();
+                    if (mac == null) {
+                        continue;
+                    }
+                    stringBuilder.delete(0, stringBuilder.length());
+                    for (int i = 0; i < mac.length; i++) {
+                        stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    }
+                    macList.add(stringBuilder.toString());
+                }
+            }
+            if (macList.size() > 0) {
+                return macList.stream().distinct().collect(Collectors.toList());
+            }
+        } catch (Exception ignored) {
+        }
+        return macList;
     }
 
     /**

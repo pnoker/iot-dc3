@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
  * @author pnoker
  */
 @Configuration
-public class TopicRabbitConfig {
+public class RabbitConfig {
 
     @Bean
     RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {

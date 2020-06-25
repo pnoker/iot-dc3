@@ -68,7 +68,7 @@ public class DeviceServiceImpl implements DeviceService {
             }
     )
     public Device add(Device device) {
-        Device select = selectDeviceByNameAndGroup(device.getGroupId(), device.getName());
+        Device select = selectDeviceByNameAndGroup(device.getName(), device.getGroupId());
         Optional.ofNullable(select).ifPresent(d -> {
             throw new ServiceException("The device already exists in the group");
         });
@@ -128,7 +128,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, key = "#groupId+'.'+#name", unless = "#result==null")
-    public Device selectDeviceByNameAndGroup(long groupId, String name) {
+    public Device selectDeviceByNameAndGroup(String name, Long groupId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getGroupId, groupId);
         queryWrapper.eq(Device::getName, name);

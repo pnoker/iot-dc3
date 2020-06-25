@@ -38,9 +38,9 @@ Accept: */*
 Cache-Control: no-cache
 
 
-### 根据 Device Id 和 Point Id 查询 最新值
+### 根据 Device Id 查询 设备状态
 #/latest/deviceId/:deviceId
-GET http://localhost:8500/data/status/deviceId/-1
+GET http://localhost:8500/data/status/deviceId/1
 Accept: */*
 Cache-Control: no-cache
 

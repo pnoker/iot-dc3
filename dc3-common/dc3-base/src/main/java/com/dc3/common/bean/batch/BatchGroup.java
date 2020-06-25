@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.dc3.center.manager.service;
+package com.dc3.common.bean.batch;
 
-import com.dc3.common.base.Service;
-import com.dc3.common.dto.PointDto;
-import com.dc3.common.model.Point;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * <p>Point Interface
- *
  * @author pnoker
  */
-public interface PointService extends Service<Point, PointDto> {
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
+public class BatchGroup implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 根据位号 NAME & 模板 ID 查询
-     *
-     * @param name      Point Name
-     * @param profileId Profile Id
-     * @return
-     */
-    Point selectByNameAndProfile(String name, Long profileId);
+    private String name;
+
+    private List<BatchDevice> devices;
 }

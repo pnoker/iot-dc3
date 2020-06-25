@@ -42,8 +42,8 @@ public class GlobalExceptionAdvice {
     /**
      * Global Exception
      *
-     * @param exception
-     * @return
+     * @param exception Exception
+     * @return R
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -55,8 +55,8 @@ public class GlobalExceptionAdvice {
     /**
      * Validation Exception
      *
-     * @param exception
-     * @return
+     * @param exception MethodArgumentNotValidException
+     * @return R
      */
     @ExceptionHandler({
             BindException.class,

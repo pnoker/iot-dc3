@@ -16,33 +16,21 @@
 
 package com.dc3.center.manager.service;
 
-import com.dc3.common.base.Service;
-import com.dc3.common.dto.DeviceDto;
-import com.dc3.common.model.Device;
-
-import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
- * <p>Device Interface
+ * <p>BatchService Interface
  *
  * @author pnoker
  */
-public interface DeviceService extends Service<Device, DeviceDto> {
+public interface BatchService {
 
     /**
-     * 根据设备 NAME 和分组 ID 查询
+     * 批量导入 All, 包含：驱动->模版->驱动配置->位号->设备->位号配置
      *
-     * @param name    Device Name
-     * @param groupId Device Group Id
-     * @return Device
+     * @param multipartFile MultipartFile
+     * @return
      */
-    Device selectDeviceByNameAndGroup(String name, Long groupId);
+    Boolean batchImport(MultipartFile multipartFile);
 
-    /**
-     * 查询 Device 服务状态
-     *
-     * @param deviceDto Device Dto
-     * @return Map<Long, String>
-     */
-    Map<Long, String> deviceStatus(DeviceDto deviceDto);
 }
