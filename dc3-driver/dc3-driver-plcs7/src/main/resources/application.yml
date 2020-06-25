@@ -3,11 +3,11 @@ driver:
   description: @project.description@
   schedule:
     read:
-      enable: false
+      enable: true
       corn: '0/30 * * * * ?'
     custom:
-      enable: false
-      corn:  '0/30 * * * * ?'
+      enable: true
+      corn:  '0/5 * * * * ?'
   driver-attribute:
     - displayName: 主机
       name: host

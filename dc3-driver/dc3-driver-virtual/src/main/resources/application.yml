@@ -7,7 +7,7 @@ driver:
       corn: '0/30 * * * * ?'
     custom:
       enable: true
-      corn:  '0/30 * * * * ?'
+      corn:  '0/5 * * * * ?'
   driver-attribute:
     - displayName: 主机
       name: host
