@@ -376,6 +376,14 @@
         </repository>
     </repositories>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub DC3 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
+        </repository>
+    </distributionManagement>
+
     <pluginRepositories>
         <pluginRepository>
             <id>spring-plugin</id>
