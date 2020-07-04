@@ -22,6 +22,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author pnoker
@@ -35,7 +36,7 @@ public class BatchProfile implements Serializable {
     private String name;
     private Boolean share;
 
-    private List<BatchInfo> driverInfos;
+    private Map<String, String> driverConfig;
 
     private List<BatchPoint> points;
 

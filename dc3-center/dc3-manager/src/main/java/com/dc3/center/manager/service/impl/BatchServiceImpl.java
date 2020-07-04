@@ -108,7 +108,7 @@ public class BatchServiceImpl implements BatchService {
                     addDevice(driver, profile, batchProfile);
                 });
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
         }
@@ -118,7 +118,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * 添加 Profile
      *
-     * @param driver        Driver
+     * @param driver       Driver
      * @param batchProfile ImportProfile
      */
     private Profile addProfile(Driver driver, BatchProfile batchProfile) {
@@ -144,34 +144,34 @@ public class BatchServiceImpl implements BatchService {
     /**
      * 添加 Driver Info 列表
      *
-     * @param driver        Driver
-     * @param profile       Profile
+     * @param driver       Driver
+     * @param profile      Profile
      * @param batchProfile ImportProfile
      */
     private void addDriverInfo(Driver driver, Profile profile, BatchProfile batchProfile) {
-        List<String> dInfos = new ArrayList<>();
-        batchProfile.getDriverInfos().forEach(importInfo -> {
-            DriverAttribute driverAttribute = driverAttributeService.selectByNameAndDriverId(importInfo.getName(), driver.getId());
+        List<String> driverInfoList = new ArrayList<>();
+        batchProfile.getDriverConfig().forEach((name, value) -> {
+            DriverAttribute driverAttribute = driverAttributeService.selectByNameAndDriverId(name, driver.getId());
             if (null == driverAttribute) {
-                throw new ServiceException("Invalid driver info: " + importInfo.getName());
+                throw new ServiceException("Invalid driver info: " + name);
             }
-            if (dInfos.contains(importInfo.getName())) {
-                throw new ServiceException("Repeatedly driver info: " + importInfo.getName());
+            if (driverInfoList.contains(name)) {
+                throw new ServiceException("Repeatedly driver info: " + name);
             }
-            dInfos.add(importInfo.getName());
+            driverInfoList.add(name);
 
             DriverInfo driverInfo = driverInfoService.selectByDriverAttributeId(driverAttribute.getId(), profile.getId());
             if (null == driverInfo) {
-                driverInfo = new DriverInfo(driverAttribute.getId(), importInfo.getValue(), profile.getId());
+                driverInfo = new DriverInfo(driverAttribute.getId(), value, profile.getId());
                 driverInfo.setDescription("批量导入：新增");
                 driverInfo = driverInfoService.add(driverInfo);
                 if (null == driverInfo) {
-                    throw new ServiceException("Add driver info failed: " + importInfo.getName());
+                    throw new ServiceException("Add driver info failed: " + name);
                 }
                 notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.ADD);
             } else {
                 driverInfo.setDescription("批量导入：更新");
-                driverInfo = driverInfoService.update(driverInfo.setValue(importInfo.getValue()));
+                driverInfo = driverInfoService.update(driverInfo.setValue(value));
                 notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.UPDATE);
             }
             ThreadUtil.sleep(1, TimeUnit.SECONDS);
@@ -181,7 +181,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * 添加 Point 列表
      *
-     * @param profile       Profile
+     * @param profile      Profile
      * @param batchProfile ImportProfile
      */
     private void addPoint(Profile profile, BatchProfile batchProfile) {
@@ -231,8 +231,8 @@ public class BatchServiceImpl implements BatchService {
     /**
      * 添加 Device 列表
      *
-     * @param driver        Driver
-     * @param profile       Profile
+     * @param driver       Driver
+     * @param profile      Profile
      * @param batchProfile ImportProfile
      */
     private void addDevice(Driver driver, Profile profile, BatchProfile batchProfile) {
@@ -270,23 +270,23 @@ public class BatchServiceImpl implements BatchService {
     /**
      * 添加 Point Info 列表
      *
-     * @param driver       Driver
-     * @param profile      Profile
-     * @param device       Device
+     * @param driver      Driver
+     * @param profile     Profile
+     * @param device      Device
      * @param batchDevice ImportDevice
      */
     private void addPointInfo(Driver driver, Profile profile, Device device, BatchDevice batchDevice) {
-        batchDevice.getPoints().forEach((pointName, pointInfoList) -> {
-            List<String> pInfos = new ArrayList<>();
-            pointInfoList.forEach(importInfo -> {
-                PointAttribute pointAttribute = pointAttributeService.selectByNameAndDriverId(importInfo.getName(), driver.getId());
+        batchDevice.getPointConfig().forEach((pointName, pointConfigMap) -> {
+            List<String> pointInfoList = new ArrayList<>();
+            pointConfigMap.forEach((name, value) -> {
+                PointAttribute pointAttribute = pointAttributeService.selectByNameAndDriverId(name, driver.getId());
                 if (null == pointAttribute) {
-                    throw new ServiceException("Invalid point info: " + importInfo.getName());
+                    throw new ServiceException("Invalid point info: " + name);
                 }
-                if (pInfos.contains(importInfo.getName())) {
-                    throw new ServiceException("Repeatedly point info: " + importInfo.getName());
+                if (pointInfoList.contains(name)) {
+                    throw new ServiceException("Repeatedly point info: " + name);
                 }
-                pInfos.add(importInfo.getName());
+                pointInfoList.add(name);
 
                 Point point = pointService.selectByNameAndProfile(pointName, profile.getId());
                 if (null == point) {
@@ -296,16 +296,16 @@ public class BatchServiceImpl implements BatchService {
                 // If point info does not exist, add a new point info, otherwise point info will be updated
                 PointInfo pointInfo = pointInfoService.selectByPointAttributeId(pointAttribute.getId(), device.getId(), point.getId());
                 if (null == pointInfo) {
-                    pointInfo = new PointInfo(pointAttribute.getId(), importInfo.getValue(), device.getId(), point.getId());
+                    pointInfo = new PointInfo(pointAttribute.getId(), value, device.getId(), point.getId());
                     pointInfo.setDescription("批量导入：新增");
                     pointInfo = pointInfoService.add(pointInfo);
                     if (null == pointInfo) {
-                        throw new ServiceException("Add point info failed: " + importInfo.getName());
+                        throw new ServiceException("Add point info failed: " + name);
                     }
                     notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.ADD);
                 } else {
                     pointInfo.setDescription("批量导入：更新");
-                    pointInfo = pointInfoService.update(pointInfo.setValue(importInfo.getValue()));
+                    pointInfo = pointInfoService.update(pointInfo.setValue(value));
                     notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.UPDATE);
                 }
 
