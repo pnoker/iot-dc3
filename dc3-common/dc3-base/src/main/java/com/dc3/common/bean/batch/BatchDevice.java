@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,5 +34,5 @@ public class BatchDevice implements Serializable {
 
     private String name;
 
-    private Map<String, List<BatchInfo>> points;
+    private Map<String, Map<String, String>> pointConfig;
 }
