@@ -91,19 +91,14 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
     @Override
     public void initial() {
-        int times = 0;
-        boolean reRegister = true;
-        while (reRegister) {
-            if (!register()) {
-                log.info("Retry ...");
-                ThreadUtil.sleep(5, TimeUnit.SECONDS);
-                times++;
-                if (times > 10) {
-                    close();
-                    throw new ServiceException("Driver registration failed");
-                }
-            } else {
-                reRegister = false;
+        int times = 1;
+        while (!register()) {
+            log.info("Retry {} times...", times);
+            ThreadUtil.sleep(5, TimeUnit.SECONDS);
+            times++;
+            if (times > 10) {
+                close();
+                throw new ServiceException("Driver registration failed");
             }
         }
         log.info("Driver registered successfully");
@@ -280,8 +275,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
             if (null != rDriver.getData()) {
                 log.info("Driver already registered, updating {} ", driverProperty.getName());
                 if (!driverProperty.getName().equals(rDriver.getData().getName())) {
-                    log.error("The driver conflicts with driver({}/{})", rDriver.getData().getName(), rDriver.getData().getServiceName());
-                    return false;
+                    log.info("Change the driver({}) name to {}", rDriver.getData().getName(), driverProperty.getName());
                 }
                 driver.setId(rDriver.getData().getId());
                 driverContext.setDriverId(driver.getId());

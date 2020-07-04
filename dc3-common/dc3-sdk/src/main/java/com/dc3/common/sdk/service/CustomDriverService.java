@@ -29,31 +29,33 @@ import java.util.Map;
  */
 public interface CustomDriverService {
     /**
-     * 初始化驱动
+     * Initial Driver
      */
     void initial();
 
     /**
-     * 读操作
+     * Read Operation
      *
      * @param driverInfo Driver Attribute Info
      * @param pointInfo  Point Attribute Info
      * @param device     Device
      * @param point      Point
-     * @return String
+     * @return String Value
+     * @throws Exception Exception
      */
-    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point);
+    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception;
 
     /**
-     * 写操作
+     * Write Operation
      *
      * @param driverInfo Driver Attribute Info
      * @param pointInfo  Point Attribute Info
      * @param device     Device
      * @param value      Value Attribute Info
-     * @return Boolean
+     * @return Boolean Boolean
+     * @throws Exception Exception
      */
-    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value);
+    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception;
 
     /**
      * 驱动本身存在定时器，用于定时采集数据和下发数据，该方法为用户自定义操作，系统根据配置定时执行
