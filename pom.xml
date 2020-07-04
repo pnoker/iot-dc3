@@ -20,7 +20,7 @@
 
     <groupId>com.dc3</groupId>
     <artifactId>iot-dc3</artifactId>
-    <version>3.0</version>
+    <version>${dc3.version}</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -60,6 +60,8 @@
     </modules>
 
     <properties>
+        <dc3.version>0.0.1</dc3.version>
+
         <caffeine.version>2.8.4</caffeine.version>
         <mybatis.plus.version>3.3.2</mybatis.plus.version>
 
@@ -376,13 +378,13 @@
         </repository>
     </repositories>
 
-    <!--<distributionManagement>
+    <distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub DC3 Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
         </repository>
-    </distributionManagement>-->
+    </distributionManagement>
 
     <pluginRepositories>
         <pluginRepository>
