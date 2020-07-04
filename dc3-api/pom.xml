@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>3.0</version>
+        <version>${dc3.version}</version>
     </parent>
 
     <artifactId>dc3-api</artifactId>
@@ -34,6 +34,10 @@
         <module>dc3-api-data</module>
         <module>dc3-api-rtmp</module>
     </modules>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
 

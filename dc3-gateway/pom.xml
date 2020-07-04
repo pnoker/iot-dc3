@@ -20,13 +20,17 @@
     <parent>
         <artifactId>iot-dc3</artifactId>
         <groupId>com.dc3</groupId>
-        <version>3.0</version>
+        <version>${dc3.version}</version>
     </parent>
 
     <artifactId>dc3-gateway</artifactId>
     <packaging>jar</packaging>
 
     <description>IOT DC3 平台网关,用于限流、权限验证、服务转发、方向代理 等。</description>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
 

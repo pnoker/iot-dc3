@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>3.0</version>
+        <version>${dc3.version}</version>
     </parent>
 
     <artifactId>dc3-driver-opc-da</artifactId>
@@ -30,42 +30,12 @@
 
     <dependencies>
 
-        <!--<dependency>
-            <groupId>org.openscada.jinterop</groupId>
-            <artifactId>org.openscada.jinterop.core</artifactId>
-            <version>2.1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openscada.jinterop</groupId>
-            <artifactId>org.openscada.jinterop.deps</artifactId>
-            <version>1.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.50</version>
-        </dependency>-->
         <dependency>
             <groupId>org.jinterop</groupId>
             <artifactId>j-interop</artifactId>
             <version>2.0.4</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.openscada.utgard</groupId>
-            <artifactId>org.openscada.opc.lib</artifactId>
-            <version>1.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openscada.utgard</groupId>
-            <artifactId>org.openscada.opc.dcom</artifactId>
-            <version>1.5.0</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.kohsuke.jinterop</groupId>
-            <artifactId>j-interop</artifactId>
-            <version>2.0.5</version>
-        </dependency>-->
     </dependencies>
 
 </project>
