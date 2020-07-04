@@ -55,7 +55,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception{
         log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
         Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getType());
@@ -63,7 +63,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception{
         log.debug("Opc Da Read, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
         Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType());

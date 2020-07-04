@@ -22,7 +22,6 @@ import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.service.CustomDriverService;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIVariant;
@@ -57,28 +56,23 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     @Override
-    @SneakyThrows
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
         log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         Server server = getServer(device.getId(), driverInfo);
         try {
             Item item = getItem(server, pointInfo);
-
-            String value = readItem(item);
-            return value;
+            return readItem(item);
         } finally {
             server.dispose();
         }
     }
 
     @Override
-    @SneakyThrows
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
         log.debug("Opc Da Write, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
         Server server = getServer(device.getId(), driverInfo);
         try {
             Item item = getItem(server, pointInfo);
-
             writeItem(item, value.getType(), value.getValue());
             return true;
         } finally {

@@ -3,7 +3,7 @@
     "serviceName": "dc3-driver-virtual",
     "profiles": [
       {
-        "name": "Batch-Profile-2",
+        "name": "Virtual-Profile",
         "share": true,
         "driverInfos": [
           {
@@ -17,7 +17,7 @@
         ],
         "points": [
           {
-            "name": "Batch-Point-1",
+            "name": "Virtual-Point-1",
             "type": "string",
             "rw": 0,
             "base": 0,
@@ -29,7 +29,7 @@
             "unit": "-"
           },
           {
-            "name": "Batch-Point-2",
+            "name": "Virtual-Point-2",
             "type": "boolean",
             "rw": 0,
             "base": 0,
@@ -41,7 +41,7 @@
             "unit": "-"
           },
           {
-            "name": "Batch-Point-3",
+            "name": "Virtual-Point-3",
             "type": "int",
             "rw": 0,
             "base": 0,
@@ -53,7 +53,7 @@
             "unit": "-"
           },
           {
-            "name": "Batch-Point-4",
+            "name": "Virtual-Point-4",
             "type": "long",
             "rw": 0,
             "base": 0,
@@ -65,7 +65,7 @@
             "unit": "-"
           },
           {
-            "name": "Batch-Point-5",
+            "name": "Virtual-Point-5",
             "type": "float",
             "rw": 0,
             "base": 0,
@@ -77,7 +77,7 @@
             "unit": "-"
           },
           {
-            "name": "Batch-Point-6",
+            "name": "Virtual-Point-6",
             "type": "double",
             "rw": 0,
             "base": 0,
@@ -91,42 +91,83 @@
         ],
         "groups": [
           {
-            "name": "Batch-Group-2",
+            "name": "Virtual-Group",
             "devices": [
               {
-                "name": "Batch-Device-1",
+                "name": "Virtual-Device-1",
                 "points": {
-                  "Batch-Point-1": [
+                  "Virtual-Point-1": [
                     {
                       "name": "tag",
                       "value": "virtual-tag-1"
                     }
                   ],
-                  "Batch-Point-2": [
+                  "Virtual-Point-2": [
                     {
                       "name": "tag",
                       "value": "virtual-tag-2"
                     }
                   ],
-                  "Batch-Point-3": [
+                  "Virtual-Point-3": [
                     {
                       "name": "tag",
                       "value": "virtual-tag-3"
                     }
                   ],
-                  "Batch-Point-4": [
+                  "Virtual-Point-4": [
                     {
                       "name": "tag",
                       "value": "virtual-tag-4"
                     }
                   ],
-                  "Batch-Point-5": [
+                  "Virtual-Point-5": [
                     {
                       "name": "tag",
                       "value": "virtual-tag-5"
                     }
                   ],
-                  "Batch-Point-6": [
+                  "Virtual-Point-6": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-6"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Virtual-Device-2",
+                "points": {
+                  "Virtual-Point-1": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-1"
+                    }
+                  ],
+                  "Virtual-Point-2": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-2"
+                    }
+                  ],
+                  "Virtual-Point-3": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-3"
+                    }
+                  ],
+                  "Virtual-Point-4": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-4"
+                    }
+                  ],
+                  "Virtual-Point-5": [
+                    {
+                      "name": "tag",
+                      "value": "virtual-tag-5"
+                    }
+                  ],
+                  "Virtual-Point-6": [
                     {
                       "name": "tag",
                       "value": "virtual-tag-6"

@@ -1,0 +1,236 @@
+[
+  {
+    "serviceName": "dc3-driver-opc-ua",
+    "profiles": [
+      {
+        "name": "OpcUa-Profile",
+        "share": true,
+        "driverInfos": [
+          {
+            "name": "host",
+            "value": "localhost"
+          },
+          {
+            "name": "port",
+            "value": "53530"
+          },
+          {
+            "name": "path",
+            "value": "/OPCUA/SimulationServer"
+          }
+        ],
+        "points": [
+          {
+            "name": "OpcUa-Point-1",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-2",
+            "type": "boolean",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-3",
+            "type": "int",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-4",
+            "type": "long",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-5",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-6",
+            "type": "double",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          }
+        ],
+        "groups": [
+          {
+            "name": "OpcUa-Group",
+            "devices": [
+              {
+                "name": "OpcUa-Device-1",
+                "points": {
+                  "OpcUa-Point-1": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-1"
+                    }
+                  ],
+                  "OpcUa-Point-2": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-2"
+                    }
+                  ],
+                  "OpcUa-Point-3": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-3"
+                    }
+                  ],
+                  "OpcUa-Point-4": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-4"
+                    }
+                  ],
+                  "OpcUa-Point-5": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-5"
+                    }
+                  ],
+                  "OpcUa-Point-6": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-5"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "OpcUa-Device-2",
+                "points": {
+                  "OpcUa-Point-1": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-1"
+                    }
+                  ],
+                  "OpcUa-Point-2": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-2"
+                    }
+                  ],
+                  "OpcUa-Point-3": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-3"
+                    }
+                  ],
+                  "OpcUa-Point-4": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-4"
+                    }
+                  ],
+                  "OpcUa-Point-5": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-5"
+                    }
+                  ],
+                  "OpcUa-Point-6": [
+                    {
+                      "name": "namespace",
+                      "value": "5"
+                    },
+                    {
+                      "name": "tag",
+                      "value": "OpcUa-Point-5"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

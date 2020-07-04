@@ -376,13 +376,13 @@
         </repository>
     </repositories>
 
-    <distributionManagement>
+    <!--<distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub DC3 Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
         </repository>
-    </distributionManagement>
+    </distributionManagement>-->
 
     <pluginRepositories>
         <pluginRepository>
