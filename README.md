@@ -1,4 +1,4 @@
- :boom:  你的 `Star` 是我开发的动力！ 
+ :boom:  你的 `Star` 是我开发的动力，下载源码 `git clone https://gitee.com/pnoker/iot-dc3.git` ！ 
 
  :rocket: 非常欢迎广大兴趣爱好者的加入，第一时间 [联系作者](#5-联系作者)，`show me you code`，让我们肩并肩 :alien:！
 
@@ -63,17 +63,21 @@
 
 ### 3 项目文档
 
-> 请阅读 [`WiKi`](https://gitee.com/pnoker/iot-dc3/wikis/Home) 文档
+> 详情请阅读 [`WiKi`](https://gitee.com/pnoker/iot-dc3/wikis/Home) 文档
 
 **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
-### 4 Demo 
 
-> 请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
+
+### 4 Demo 文档
+
+> 详情请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
 
 <p align="center">
 <img src="./dc3/images/iot-dc3-web.png"><br>
 </p>
+
+
 
 ### 5 联系作者
 

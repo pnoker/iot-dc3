@@ -32,7 +32,6 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -61,15 +60,13 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     @Override
-    @SneakyThrows
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
         ModbusMaster modbusMaster = getMaster(device.getId(), driverInfo);
         return readValue(modbusMaster, pointInfo, point.getType());
     }
 
     @Override
-    @SneakyThrows
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
         ModbusMaster modbusMaster = getMaster(device.getId(), driverInfo);
         return writeValue(modbusMaster, pointInfo, value.getType(), value.getValue());
     }
