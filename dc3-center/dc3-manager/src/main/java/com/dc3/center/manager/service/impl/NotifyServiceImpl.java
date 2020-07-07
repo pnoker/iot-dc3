@@ -50,9 +50,8 @@ public class NotifyServiceImpl implements NotifyService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void notifyDriverProfile(Long profileId, String operationType) {
-        Driver driver = getDriverByProfileId(profileId);
-        DriverOperation operation = new DriverOperation().setCommand(operationType).setId(profileId);
+    public void notifyDriverProfile(Driver driver, String operationType) {
+        DriverOperation operation = new DriverOperation().setCommand(operationType).setId(driver.getId());
         notifyDriver(driver, operation);
     }
 
@@ -85,6 +84,16 @@ public class NotifyServiceImpl implements NotifyService {
         notifyDriver(driver, operation);
     }
 
+    @Override
+    public Driver getDriverByProfileId(Long profileId) {
+        Profile profile = profileService.selectById(profileId);
+        if (null != profile) {
+            return driverService.selectById(profile.getDriverId());
+        }
+        return null;
+    }
+
+
     /**
      * notify driver
      *
@@ -95,7 +104,6 @@ public class NotifyServiceImpl implements NotifyService {
         log.debug("Notify Driver {} : {}", driver.getServiceName(), operation);
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, Common.Rabbit.ROUTING_KEY_PREFIX + driver.getServiceName(), operation);
     }
-
 
     /**
      * get driver by device id
@@ -110,20 +118,6 @@ public class NotifyServiceImpl implements NotifyService {
             if (null != profile) {
                 return driverService.selectById(profile.getDriverId());
             }
-        }
-        return null;
-    }
-
-    /**
-     * get driver by profile id
-     *
-     * @param profileId Profile Id
-     * @return Driver
-     */
-    private Driver getDriverByProfileId(Long profileId) {
-        Profile profile = profileService.selectById(profileId);
-        if (null != profile) {
-            return driverService.selectById(profile.getDriverId());
         }
         return null;
     }
