@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DriverMapper;
+import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
@@ -27,6 +28,7 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.exception.ServiceException;
+import com.dc3.common.model.Device;
 import com.dc3.common.model.Driver;
 import com.dc3.common.model.Profile;
 import com.netflix.discovery.EurekaClient;
@@ -53,6 +55,10 @@ public class DriverServiceImpl implements DriverService {
 
     @Resource
     private EurekaClient eurekaClient;
+    @Resource
+    private DriverService driverService;
+    @Resource
+    private DeviceService deviceService;
     @Resource
     private ProfileService profileService;
     @Resource
@@ -153,6 +159,27 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(Driver::getHost, host);
         queryWrapper.eq(Driver::getPort, port);
         return driverMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public Driver selectByDeviceId(Long deviceId) {
+        Device device = deviceService.selectById(deviceId);
+        if (null != device) {
+            Profile profile = profileService.selectById(device.getProfileId());
+            if (null != profile) {
+                return driverService.selectById(profile.getDriverId());
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Driver selectByProfileId(Long profileId) {
+        Profile profile = profileService.selectById(profileId);
+        if (null != profile) {
+            return driverService.selectById(profile.getDriverId());
+        }
+        return null;
     }
 
     @Override

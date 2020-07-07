@@ -46,6 +46,22 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Driver selectByHostPort(String host, Integer port);
 
     /**
+     * 根据 DEVICE ID 查询
+     *
+     * @param deviceId Device Id
+     * @return Driver
+     */
+    Driver selectByDeviceId(Long deviceId);
+
+    /**
+     * 根据 PROFILE ID 查询
+     *
+     * @param profileId Profile Id
+     * @return Driver
+     */
+    Driver selectByProfileId(Long profileId);
+
+    /**
      * 查询 Driver 服务状态
      *
      * @param driverDto Driver Dto

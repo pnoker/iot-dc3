@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -135,7 +134,7 @@ public class BatchServiceImpl implements BatchService {
                 throw new ServiceException("Add profile failed: " + batchProfile.getName());
             }
 
-            notifyService.notifyDriverProfile(profile.getId(), Operation.Profile.ADD);
+            notifyService.notifyDriverProfile(driver, profile.getId(), Operation.Profile.ADD);
             ThreadUtil.sleep(1, TimeUnit.SECONDS);
         }
         return profile;
