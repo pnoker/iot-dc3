@@ -18,7 +18,7 @@ version: '3.3'
 
 services:
   portainer:
-    image:  portainer/portainer
+    image:  portainer/portainer:1.24.0
     restart: always
     container_name: portainer
     hostname: dc3-portainer
@@ -34,7 +34,7 @@ services:
           - dc3-portainer
 
   jenkins:
-    image:  jenkins
+    image:  jenkinsci/blueocean
     restart: always
     container_name: jenkins
     hostname: jenkins
@@ -42,6 +42,7 @@ services:
       - "8080:8080"
     volumes:
       - jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       dc3net:
         aliases:

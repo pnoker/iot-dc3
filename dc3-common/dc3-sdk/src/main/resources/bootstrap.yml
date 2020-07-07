@@ -6,7 +6,7 @@ server:
   thread:
     prefix: dc3-thread-
     core-pool-size: 4
-    maximum-pool-size: 64
+    maximum-pool-size: 512
     keep-alive-time: 10
 
 spring:
@@ -32,6 +32,13 @@ spring:
     port: 5672
     username: dc3
     password: dc3
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        retry:
+          enabled: true
   quartz:
     properties:
       org.quartz:

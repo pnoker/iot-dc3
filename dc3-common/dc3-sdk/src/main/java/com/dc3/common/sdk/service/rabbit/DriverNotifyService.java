@@ -17,10 +17,11 @@
 package com.dc3.common.sdk.service.rabbit;
 
 import com.dc3.common.bean.driver.DriverOperation;
-import com.dc3.common.constant.Common;
 import com.dc3.common.constant.Operation;
 import com.dc3.common.sdk.service.DriverCommonService;
+import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -34,15 +35,18 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-@RabbitListener(queues = Common.Rabbit.DRIVER_NOTIFY_QUEUE)
 public class DriverNotifyService {
 
     @Resource
     private DriverCommonService driverCommonService;
 
     @RabbitHandler
-    public void driverNotifyReceive(DriverOperation operation) {
+    @RabbitListener(queues = "#{driverNotifyQueue.name}")
+    public void driverNotifyReceive(Channel channel, Message message, DriverOperation operation) {
         try {
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+            log.debug("Notification from {}", message.getMessageProperties().getReceivedRoutingKey());
+
             switch (operation.getCommand()) {
                 case Operation.Profile.ADD:
                     driverCommonService.addProfile(operation.getId());
