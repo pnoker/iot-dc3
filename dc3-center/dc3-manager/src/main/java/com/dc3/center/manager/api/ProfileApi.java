@@ -18,6 +18,7 @@ package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.ProfileClient;
+import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.R;
@@ -43,6 +44,8 @@ import javax.annotation.Resource;
 public class ProfileApi implements ProfileClient {
 
     @Resource
+    private DriverService driverService;
+    @Resource
     private ProfileService profileService;
     @Resource
     private NotifyService notifyService;
@@ -52,8 +55,8 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile add = profileService.add(profile);
             if (null != add) {
-                Driver driver = notifyService.getDriverByProfileId(profile.getId());
-                notifyService.notifyDriverProfile(driver, Operation.Profile.ADD);
+                Driver driver = driverService.selectByProfileId(profile.getId());
+                notifyService.notifyDriverProfile(driver, profile.getId(), Operation.Profile.ADD);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -65,9 +68,9 @@ public class ProfileApi implements ProfileClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            Driver driver = notifyService.getDriverByProfileId(id);
+            Driver driver = driverService.selectByProfileId(id);
             if (profileService.delete(id)) {
-                notifyService.notifyDriverProfile(driver, Operation.Profile.DELETE);
+                notifyService.notifyDriverProfile(driver, id, Operation.Profile.DELETE);
                 return R.ok();
             }
         } catch (Exception e) {

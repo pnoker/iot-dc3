@@ -16,15 +16,11 @@
 
 package com.dc3.center.manager.service.impl;
 
-import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.NotifyService;
-import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.driver.DriverOperation;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.Device;
 import com.dc3.common.model.Driver;
-import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -43,56 +39,52 @@ public class NotifyServiceImpl implements NotifyService {
     @Resource
     private DriverService driverService;
     @Resource
-    private DeviceService deviceService;
-    @Resource
-    private ProfileService profileService;
-    @Resource
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void notifyDriverProfile(Driver driver, String operationType) {
-        DriverOperation operation = new DriverOperation().setCommand(operationType).setId(driver.getId());
-        notifyDriver(driver, operation);
+    public void notifyDriverProfile(Driver driver, Long profileId, String operationType) {
+        if (null != driver) {
+            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(profileId);
+            notifyDriver(driver, operation);
+        }
     }
 
     @Override
     public void notifyDriverDevice(Long deviceId, Long profileId, String operationType) {
-        Driver driver = getDriverByProfileId(profileId);
-        DriverOperation operation = new DriverOperation().setCommand(operationType).setId(deviceId);
-        notifyDriver(driver, operation);
+        Driver driver = driverService.selectByProfileId(profileId);
+        if (null != driver) {
+            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(deviceId);
+            notifyDriver(driver, operation);
+        }
     }
 
     @Override
     public void notifyDriverPoint(Long pointId, Long profileId, String operationType) {
-        Driver driver = getDriverByProfileId(profileId);
-        DriverOperation operation = new DriverOperation().setCommand(operationType).setId(pointId).setParentId(profileId);
-        notifyDriver(driver, operation);
+        Driver driver = driverService.selectByProfileId(profileId);
+        if (null != driver) {
+            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(pointId).setParentId(profileId);
+            notifyDriver(driver, operation);
+        }
     }
 
 
     @Override
     public void notifyDriverDriverInfo(Long driverInfoId, Long attributeId, Long profileId, String operationType) {
-        Driver driver = getDriverByProfileId(profileId);
-        DriverOperation operation = new DriverOperation().setCommand(operationType).setId(driverInfoId).setParentId(profileId).setAttributeId(attributeId);
-        notifyDriver(driver, operation);
+        Driver driver = driverService.selectByProfileId(profileId);
+        if (null != driver) {
+            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(driverInfoId).setParentId(profileId).setAttributeId(attributeId);
+            notifyDriver(driver, operation);
+        }
     }
 
     @Override
     public void notifyDriverPointInfo(Long pointInfoId, Long attributeId, Long deviceId, String operationType) {
-        Driver driver = getDriverByDeviceId(deviceId);
-        DriverOperation operation = new DriverOperation().setCommand(operationType).setId(pointInfoId).setParentId(deviceId).setAttributeId(attributeId);
-        notifyDriver(driver, operation);
-    }
-
-    @Override
-    public Driver getDriverByProfileId(Long profileId) {
-        Profile profile = profileService.selectById(profileId);
-        if (null != profile) {
-            return driverService.selectById(profile.getDriverId());
+        Driver driver = driverService.selectByDeviceId(deviceId);
+        if (null != driver) {
+            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(pointInfoId).setParentId(deviceId).setAttributeId(attributeId);
+            notifyDriver(driver, operation);
         }
-        return null;
     }
-
 
     /**
      * notify driver
@@ -105,20 +97,4 @@ public class NotifyServiceImpl implements NotifyService {
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, Common.Rabbit.ROUTING_KEY_PREFIX + driver.getServiceName(), operation);
     }
 
-    /**
-     * get driver by device id
-     *
-     * @param deviceId Device Id
-     * @return Driver
-     */
-    private Driver getDriverByDeviceId(Long deviceId) {
-        Device device = deviceService.selectById(deviceId);
-        if (null != device) {
-            Profile profile = profileService.selectById(device.getProfileId());
-            if (null != profile) {
-                return driverService.selectById(profile.getDriverId());
-            }
-        }
-        return null;
-    }
 }

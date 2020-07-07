@@ -28,10 +28,11 @@ public interface NotifyService {
     /**
      * 通知驱动 新增模板(ADD) / 删除模板(DELETE)
      *
-     * @param driver     driver
+     * @param driver        driver
+     * @param profileId     Profile Id
      * @param operationType Operation Type
      */
-    void notifyDriverProfile(Driver driver, String operationType);
+    void notifyDriverProfile(Driver driver, Long profileId, String operationType);
 
     /**
      * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 修改设备(UPDATE)
@@ -45,7 +46,7 @@ public interface NotifyService {
     /**
      * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 修改位号(UPDATE)
      *
-     * @param pointId
+     * @param pointId       Point Id
      * @param profileId     Profile Id
      * @param operationType Operation Type
      */
@@ -70,13 +71,5 @@ public interface NotifyService {
      * @param operationType Operation Type
      */
     void notifyDriverPointInfo(Long pointInfoId, Long attributeId, Long deviceId, String operationType);
-
-    /**
-     * get driver by profile id
-     *
-     * @param profileId Profile Id
-     * @return Driver
-     */
-    Driver getDriverByProfileId(Long profileId);
 
 }
