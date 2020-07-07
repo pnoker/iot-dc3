@@ -30,7 +30,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * NotifyService Impl
@@ -93,7 +92,8 @@ public class NotifyServiceImpl implements NotifyService {
      * @param operation DriverOperation
      */
     private void notifyDriver(Driver driver, DriverOperation operation) {
-        Optional.ofNullable(driver).ifPresent((dr) -> rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "driver." + dr.getServiceName(), operation));
+        log.debug("Notify Driver {} : {}", driver.getServiceName(), operation);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, Common.Rabbit.ROUTING_KEY_PREFIX + driver.getServiceName(), operation);
     }
 
 

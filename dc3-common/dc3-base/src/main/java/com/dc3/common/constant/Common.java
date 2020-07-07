@@ -67,9 +67,13 @@ public interface Common {
      * 消息常量
      */
     interface Rabbit {
-        String TOPIC_EXCHANGE = "dc3.exchange";
-        String POINT_VALUE_QUEUE = "point.value.queue";
-        String DRIVER_NOTIFY_QUEUE = "driver.notify.queue";
+        String TOPIC_EXCHANGE_NOTIFY = "dc3.exchange.driver.notify";
+        String TOPIC_EXCHANGE_VALUE = "dc3.exchange.point.value";
+
+        String QUEUE_POINT_VALUE = "dc3.queue.point.value";
+
+        String ROUTING_KEY_PREFIX = "dc3.driver.service.";
+        String QUEUE_DRIVER_NOTIFY_PREFIX = "dc3.queue.driver.notify.";
     }
 
     /**
