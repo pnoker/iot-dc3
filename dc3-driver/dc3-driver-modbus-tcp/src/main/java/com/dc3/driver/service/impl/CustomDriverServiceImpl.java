@@ -21,7 +21,9 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.rabbit.DriverService;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.code.DataType;
@@ -35,6 +37,7 @@ import com.serotonin.modbus4j.msg.WriteCoilResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +50,12 @@ import static com.dc3.common.sdk.util.DriverUtils.value;
 @Slf4j
 @Service
 public class CustomDriverServiceImpl implements CustomDriverService {
+
+    @Resource
+    private DriverService driverService;
+    @Resource
+    private DriverContext driverContext;
+
     static ModbusFactory modbusFactory;
 
     static {
@@ -73,20 +82,22 @@ public class CustomDriverServiceImpl implements CustomDriverService {
 
     @Override
     public void schedule() {
+        //TODO 上传设备状态，可自行灵活拓展
+        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, Common.Device.ONLINE));
     }
 
     /**
      * 获取 Modbus Master
      *
-     * @param deviceId
-     * @param driverInfo
-     * @return
-     * @throws ModbusInitException
+     * @param deviceId   Device Id
+     * @param driverInfo Driver Info
+     * @return ModbusMaster
+     * @throws ModbusInitException ModbusInitException
      */
     public ModbusMaster getMaster(Long deviceId, Map<String, AttributeInfo> driverInfo) throws ModbusInitException {
         log.debug("Modbus Tcp Connection Info {}", JSON.toJSONString(driverInfo));
         ModbusMaster modbusMaster = masterMap.get(deviceId);
-        if (null == modbusMaster || !modbusMaster.isConnected()) {
+        if (null == modbusMaster) {
             IpParameters params = new IpParameters();
             params.setHost(attribute(driverInfo, "host"));
             params.setPort(attribute(driverInfo, "port"));
@@ -100,14 +111,13 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     /**
      * 获取 Value
      *
-     * @param modbusMaster
-     * @param pointInfo
-     * @return
-     * @throws ModbusTransportException
-     * @throws ErrorResponseException
-     * @throws ModbusInitException
+     * @param modbusMaster ModbusMaster
+     * @param pointInfo    Point Info
+     * @return String Value
+     * @throws ModbusTransportException ModbusTransportException
+     * @throws ErrorResponseException   ErrorResponseException
      */
-    public String readValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, String type) throws ModbusTransportException, ErrorResponseException, ModbusInitException {
+    public String readValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, String type) throws ModbusTransportException, ErrorResponseException {
         int slaveId = attribute(pointInfo, "slaveId");
         int functionCode = attribute(pointInfo, "functionCode");
         int offset = attribute(pointInfo, "offset");
@@ -136,13 +146,13 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     /**
      * 写 Value
      *
-     * @param modbusMaster
-     * @param pointInfo
-     * @param type
-     * @param value
-     * @return
-     * @throws ModbusTransportException
-     * @throws ErrorResponseException
+     * @param modbusMaster ModbusMaster
+     * @param pointInfo    Point Info
+     * @param type         Value Type
+     * @param value        String Value
+     * @return Write Result
+     * @throws ModbusTransportException ModbusTransportException
+     * @throws ErrorResponseException   ErrorResponseException
      */
     public boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, String type, String value) throws ModbusTransportException, ErrorResponseException {
         int slaveId = attribute(pointInfo, "slaveId");
@@ -153,10 +163,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
                 boolean coilValue = value(type, value);
                 WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, coilValue);
                 WriteCoilResponse coilResponse = (WriteCoilResponse) modbusMaster.send(coilRequest);
-                if (coilResponse.isException()) {
-                    return false;
-                }
-                return true;
+                return !coilResponse.isException();
             case 3:
                 BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset, getValueType(type));
                 modbusMaster.setValue(locator, value(type, value));
@@ -173,14 +180,11 @@ public class CustomDriverServiceImpl implements CustomDriverService {
      * 2.大端/小端,默认是大端
      * 3.拓展其他数据类型
      *
-     * @param type
-     * @return
+     * @param type Value Type
+     * @return Modbus Data Type
      */
     public int getValueType(String type) {
         switch (type.toLowerCase()) {
-            case Common.ValueType.INT:
-            case Common.ValueType.BOOLEAN:
-                return DataType.TWO_BYTE_INT_SIGNED;
             case Common.ValueType.LONG:
                 return DataType.FOUR_BYTE_INT_SIGNED;
             case Common.ValueType.FLOAT:
@@ -188,7 +192,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
             case Common.ValueType.DOUBLE:
                 return DataType.EIGHT_BYTE_FLOAT;
             default:
-                return DataType.VARCHAR;
+                return DataType.TWO_BYTE_INT_SIGNED;
         }
     }
 
