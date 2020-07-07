@@ -21,9 +21,9 @@ import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.bean.DriverProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,10 +36,11 @@ import java.util.List;
 @Service
 public class DriverService {
 
+    @Value("${spring.application.name}")
+    private String serviceName;
+
     @Resource
     private DriverContext driverContext;
-    @Resource
-    private DriverProperty driverProperty;
     @Resource
     private RabbitTemplate rabbitTemplate;
 
@@ -50,8 +51,8 @@ public class DriverService {
      */
     public void pointValueSender(PointValue pointValue) {
         if (null != pointValue) {
-            log.debug("Send :{}", pointValue);
-            rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE, "value." + driverProperty.getName(), pointValue);
+            log.debug("Send point data: {}", pointValue);
+            rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_KEY_PREFIX + serviceName, pointValue);
         }
     }
 

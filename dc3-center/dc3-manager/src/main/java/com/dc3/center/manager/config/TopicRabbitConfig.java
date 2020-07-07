@@ -17,7 +17,8 @@
 package com.dc3.center.manager.config;
 
 import com.dc3.common.constant.Common;
-import org.springframework.amqp.core.Queue;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -30,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author pnoker
  */
+@Slf4j
 @Configuration
 public class TopicRabbitConfig {
 
@@ -37,17 +39,21 @@ public class TopicRabbitConfig {
     RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+        rabbitTemplate.setMandatory(true);
+        rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
+            log.error("Send message({}) to exchange({}), routingKey({}) failed: {}", message, exchange, routingKey, replyText);
+        });
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            if (!ack) {
+                log.error("CorrelationData({}) ack failed: {}", correlationData, cause);
+            }
+        });
         return rabbitTemplate;
     }
 
     @Bean
-    TopicExchange exchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE, false, true);
-    }
-
-    @Bean
-    Queue driverNotifyQueue() {
-        return new Queue(Common.Rabbit.DRIVER_NOTIFY_QUEUE, false, false, true);
+    TopicExchange notifyExchange() {
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY);
     }
 
     @Bean
@@ -55,6 +61,7 @@ public class TopicRabbitConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(new Jackson2JsonMessageConverter());
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         return factory;
     }
 
