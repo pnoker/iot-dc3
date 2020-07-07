@@ -6,7 +6,7 @@ server:
   thread:
     prefix: dc3-thread-
     core-pool-size: 4
-    maximum-pool-size: 64
+    maximum-pool-size: 512
     keep-alive-time: 10
 
 spring:
