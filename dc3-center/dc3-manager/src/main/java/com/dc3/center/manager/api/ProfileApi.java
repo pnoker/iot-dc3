@@ -24,6 +24,7 @@ import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.ProfileDto;
+import com.dc3.common.model.Driver;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +52,8 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile add = profileService.add(profile);
             if (null != add) {
-                notifyService.notifyDriverProfile(profile.getId(), Operation.Profile.ADD);
+                Driver driver = notifyService.getDriverByProfileId(profile.getId());
+                notifyService.notifyDriverProfile(driver, Operation.Profile.ADD);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -63,8 +65,9 @@ public class ProfileApi implements ProfileClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
+            Driver driver = notifyService.getDriverByProfileId(id);
             if (profileService.delete(id)) {
-                notifyService.notifyDriverProfile(id, Operation.Profile.DELETE);
+                notifyService.notifyDriverProfile(driver, Operation.Profile.DELETE);
                 return R.ok();
             }
         } catch (Exception e) {
