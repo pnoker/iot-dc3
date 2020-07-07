@@ -42,6 +42,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static com.dc3.common.sdk.util.DriverUtils.attribute;
@@ -148,20 +149,22 @@ public class CustomDriverServiceImpl implements CustomDriverService {
      * @throws Exception
      */
     public String readItem(Long deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo) throws Exception {
-        String value = null;
+        CompletableFuture<String> value = new CompletableFuture<>();
         OpcUaClient client = getOpcUaClient(deviceId, driverInfo);
         client.connect().get();
         int namespace = attribute(pointInfo, "namespace");
         String tag = attribute(pointInfo, "tag");
 
         NodeId nodeId = new NodeId(namespace, tag);
-        DataValue dataValue = client.readValue(0.0, TimestampsToReturn.Both, nodeId).get();
-        try {
-            value = dataValue.getValue().getValue().toString();
-        } catch (Exception e) {
-            log.error("Point ns={};s={}; does not exist", namespace, tag);
-        }
-        return value;
+        client.readValue(0.0, TimestampsToReturn.Both, nodeId).thenAccept(dataValue -> {
+            try {
+                value.complete(dataValue.getValue().getValue().toString());
+            } catch (Exception e) {
+                log.error("Point ns={};s={}; does not exist", namespace, tag);
+            }
+        });
+
+        return value.get();
     }
 
     /**
