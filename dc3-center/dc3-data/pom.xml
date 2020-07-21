@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>${dc3.version}</version>
+        <version>3.0</version>
     </parent>
 
     <artifactId>dc3-data</artifactId>

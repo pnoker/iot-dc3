@@ -16,10 +16,13 @@
 
 package com.dc3.driver.service.impl;
 
+import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.rabbit.DriverService;
 import com.dc3.driver.service.mqtt.MqttSendHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,10 @@ import static com.dc3.common.sdk.util.DriverUtils.attribute;
 @Service
 public class CustomDriverServiceImpl implements CustomDriverService {
 
+    @Resource
+    private DriverContext driverContext;
+    @Resource
+    private DriverService driverService;
     @Resource
     private MqttSendHandler mqttSendHandler;
 
@@ -62,6 +69,8 @@ public class CustomDriverServiceImpl implements CustomDriverService {
 
     @Override
     public void schedule() {
+        //TODO 上传设备状态，可自行灵活拓展
+        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, Common.Device.ONLINE));
     }
 
 }
