@@ -1,0 +1,131 @@
+[
+  {
+    "serviceName": "dc3-driver-modbus-tcp",
+    "profiles": [
+      {
+        "name": "ModbusTcp-Profile-1",
+        "share": true,
+        "driverConfig": {
+          "host": "127.0.0.1",
+          "port": "502"
+        },
+        "points": [
+          {
+            "name": "ModbusTcp-Point-1",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "ModbusTcp-Point-2",
+            "type": "boolean",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "ModbusTcp-Point-3",
+            "type": "int",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "ModbusTcp-Point-4",
+            "type": "long",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "ModbusTcp-Point-5",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "ModbusTcp-Point-6",
+            "type": "double",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          }
+        ],
+        "groups": [
+          {
+            "name": "ModbusTcp-Group-1",
+            "devices": [
+              {
+                "name": "ModbusTcp-Device-1",
+                "pointConfig": {
+                  "ModbusTcp-Point-1": {
+                    "slaveId": "1",
+                    "functionCode": "3",
+                    "offset": "1"
+                  },
+                  "ModbusTcp-Point-2": {
+                    "slaveId": "1",
+                    "functionCode": "3",
+                    "offset": "2"
+                  },
+                  "ModbusTcp-Point-3": {
+                    "slaveId": "1",
+                    "functionCode": "3",
+                    "offset": "3"
+                  },
+                  "ModbusTcp-Point-4": {
+                    "slaveId": "1",
+                    "functionCode": "3",
+                    "offset": "4"
+                  },
+                  "ModbusTcp-Point-5": {
+                    "slaveId": "1",
+                    "functionCode": "3",
+                    "offset": "5"
+                  },
+                  "ModbusTcp-Point-6": {
+                    "slaveId": "1",
+                    "functionCode": "3",
+                    "offset": "6"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

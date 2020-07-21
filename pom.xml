@@ -20,7 +20,7 @@
 
     <groupId>com.dc3</groupId>
     <artifactId>iot-dc3</artifactId>
-    <version>${dc3.version}</version>
+    <version>3.0</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -60,8 +60,6 @@
     </modules>
 
     <properties>
-        <dc3.version>1.0.0</dc3.version>
-
         <caffeine.version>2.8.4</caffeine.version>
         <mybatis.plus.version>3.3.2</mybatis.plus.version>
 
