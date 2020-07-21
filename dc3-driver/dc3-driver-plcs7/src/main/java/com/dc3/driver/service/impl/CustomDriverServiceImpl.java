@@ -22,7 +22,9 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.rabbit.DriverService;
 import com.dc3.driver.bean.Plcs7PointVariable;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
@@ -31,6 +33,7 @@ import com.github.s7connector.api.factory.S7SerializerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,6 +47,11 @@ import static com.dc3.common.sdk.util.DriverUtils.value;
 @Service
 public class CustomDriverServiceImpl implements CustomDriverService {
 
+    @Resource
+    private DriverContext driverContext;
+    @Resource
+    private DriverService driverService;
+
     /**
      * Plc Connector Map
      */
@@ -55,7 +63,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception{
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
         log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
         Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getType());
@@ -63,7 +71,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception{
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
         log.debug("Opc Da Read, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
         Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType());
@@ -73,7 +81,8 @@ public class CustomDriverServiceImpl implements CustomDriverService {
 
     @Override
     public void schedule() {
-
+        //TODO 上传设备状态，可自行灵活拓展
+        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, Common.Device.ONLINE));
     }
 
     /**

@@ -21,7 +21,9 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.rabbit.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIVariant;
@@ -31,6 +33,7 @@ import org.openscada.opc.lib.common.NotConnectedException;
 import org.openscada.opc.lib.da.*;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +48,11 @@ import static com.dc3.common.sdk.util.DriverUtils.value;
 @Slf4j
 @Service
 public class CustomDriverServiceImpl implements CustomDriverService {
+
+    @Resource
+    private DriverContext driverContext;
+    @Resource
+    private DriverService driverService;
 
     /**
      * Opc Da Server Map
@@ -82,7 +90,8 @@ public class CustomDriverServiceImpl implements CustomDriverService {
 
     @Override
     public void schedule() {
-
+        //TODO 上传设备状态，可自行灵活拓展
+        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, Common.Device.ONLINE));
     }
 
     /**
