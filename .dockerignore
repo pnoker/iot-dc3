@@ -1,0 +1,16 @@
+**/.idea
+**/*.iml
+
+**/dc3
+**/*logs
+**/*target
+
+**/.vs
+**/.vscode
+
+**/.settings
+**/.project
+
+**/*.iws
+**/*.ipr
+**/*.md

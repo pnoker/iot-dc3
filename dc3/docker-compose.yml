@@ -17,36 +17,13 @@
 version: '3.3'
 
 services:
-  portainer:
-    image:  portainer/portainer:1.24.0
+  dc3:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3:1.0.0
     restart: always
-    container_name: portainer
-    hostname: dc3-portainer
-    ports:
-      - "9000:9000"
-    command: -H unix:///var/run/docker.sock
-    volumes:
-      - portainer:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      dc3net:
-        aliases:
-          - dc3-portainer
-
-  jenkins:
-    image:  jenkinsci/blueocean
-    restart: always
-    container_name: jenkins
-    hostname: jenkins
-    ports:
-      - "8080:8080"
-    volumes:
-      - jenkins:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      dc3net:
-        aliases:
-          - dc3-jenkins
+    container_name: dc3
 
   gateway:
     build:
@@ -243,6 +220,21 @@ services:
         aliases:
           - dc3-driver-modbus-tcp
 
+  rtmp:
+    build:
+      context: ../dc3-transfer/dc3-rtmp/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-rtmp:1.0.0
+    restart: always
+    ports:
+      - 8803:8803
+    container_name: dc3-rtmp
+    hostname: dc3-rtmp
+    networks:
+      dc3net:
+        aliases:
+          - dc3-rtmp
+
   mysql:
     build:
       context: ./dependences/mysql/
@@ -334,21 +326,6 @@ services:
         aliases:
           - dc3-flink-task
 
-  rtmp:
-    build:
-      context: ../dc3-transfer/dc3-rtmp/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-rtmp:1.0.0
-    restart: always
-    ports:
-      - 8803:8803
-    container_name: dc3-rtmp
-    hostname: dc3-rtmp
-    networks:
-      dc3net:
-        aliases:
-          - dc3-rtmp
-
   jobmanager:
     image: flink:1.10
     restart: always
@@ -377,9 +354,24 @@ services:
         aliases:
           - dc3-nginx
 
+  portainer:
+    image:  portainer/portainer:1.24.0
+    restart: always
+    container_name: portainer
+    hostname: dc3-portainer
+    ports:
+      - "9000:9000"
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      dc3net:
+        aliases:
+          - dc3-portainer
+
 volumes:
   portainer:
-  jenkins:
   mysql:
   redis:
   mongo_config:
