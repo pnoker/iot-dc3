@@ -61,9 +61,9 @@ public class PointValueReceiver {
             }
 
         /*
-        Convention:
-        PointId = 0 indicates device status
-        PointId > 0 indicates device point data
+        规约:
+        PointId = 0 表明 device status
+        PointId > 0 表明 device point data
          */
             if (pointValue.getPointId().equals(0L)) {
                 log.debug("Received device({}) status({})", pointValue.getDeviceId(), pointValue.getRawValue());
@@ -84,6 +84,7 @@ public class PointValueReceiver {
                             15,
                             TimeUnit.MINUTES);
                     // Insert device point data to MongoDB
+                    // todo 可根据项目并发情况实现一个定时和批量入库逻辑
                     pointValueService.add(pointValue);
                 });
             }
