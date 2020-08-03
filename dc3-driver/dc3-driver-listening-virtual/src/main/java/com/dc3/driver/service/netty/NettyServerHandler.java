@@ -86,6 +86,9 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         Long deviceId = nettyServerHandler.driverContext.getDeviceIdByName(deviceName);
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
 
+        //TODO 简单的例子，用于存储channel，然后配合write接口实现向下发送数据
+        NettyServer.deviceChannelMap.put(deviceId, context.channel());
+
         List<PointValue> pointValues = new ArrayList<>();
         Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyServerHandler.driverContext.getDevicePointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
