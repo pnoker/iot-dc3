@@ -9,7 +9,7 @@ driver:
       enable: false
       corn: '0/30 * * * * ?'
     custom:
-      enable: false
+      enable: true
       corn:  '0/5 * * * * ?'
   point-attribute:
     - displayName: 关键字

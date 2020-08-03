@@ -25,28 +25,11 @@
 
     <name>${project.artifactId}</name>
     <url>https://github.com/pnoker/iot-dc3</url>
-    <inceptionYear>2017-2019</inceptionYear>
+    <inceptionYear>2017-2020</inceptionYear>
     <description>
         IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建，实现设备互联、管理、数据采集、代码生成、快速开发和可视化等，
-        兼容多种流行的物联网数据接入协议（Mqtt\Hart\Modbus\Wia\Rtsp\Rtmp\Siemens PLC S7...），是一整套完整的物联系统解决方案。
+        兼容多种流行的物联网数据接入协议（Mqtt\Socket\Modbus-Tcp\Rtsp\Rtmp\Siemens PLC S7\OpcUa\OpcDa...），是一整套完整的物联系统解决方案。
     </description>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <id>pnoker</id>
-            <name>pnoker</name>
-            <email>pnokers@icloud.com</email>
-            <organization>pnoker.github.io</organization>
-        </developer>
-    </developers>
 
     <modules>
         <module>dc3-gateway</module>
@@ -64,9 +47,9 @@
         <mybatis.plus.version>3.3.2</mybatis.plus.version>
 
         <spring-cloud.version>Hoxton.SR6</spring-cloud.version>
-        <spring-boot.version>2.2.8.RELEASE</spring-boot.version>
+        <spring-boot.version>2.2.9.RELEASE</spring-boot.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
-        <spring-boot-admin.version>2.2.3</spring-boot-admin.version>
+        <spring-boot-admin.version>2.2.4</spring-boot-admin.version>
 
         <java.version>1.8</java.version>
         <codecov.version>2.7</codecov.version>
@@ -362,6 +345,31 @@
         </pluginManagement>
     </build>
 
+    <developers>
+        <developer>
+            <id>pnoker</id>
+            <name>pnoker</name>
+            <email>pnokers@icloud.com</email>
+            <organization>pnoker.github.io</organization>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub DC3 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
+        </repository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>aliyun</id>
@@ -375,14 +383,6 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub DC3 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
-        </repository>
-    </distributionManagement>
 
     <pluginRepositories>
         <pluginRepository>

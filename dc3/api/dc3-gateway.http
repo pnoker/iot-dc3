@@ -14,10 +14,25 @@
 #  limitations under the License.
 #
 
-### --------------------- User ---------------------
+### --------------------- Gateway User Api ---------------------
+### 注册用户
+#/api/v3/register
+POST http://localhost:8000/api/v3/register
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "dc3",
+  "password": "dc3dc3dc3",
+  "description": "平台开发者账号"
+}
+
+
+### --------------------- Gateway Token Api---------------------
 ### 生成用户 Salt
-#/api/v3/salt
-GET http://121.89.193.248:8000/api/v3/salt
+#/api/v3/token/salt
+GET http://localhost:8000/api/v3/token/salt
 Accept: */*
 Content-Type: application/x-www-form-urlencoded
 Cache-Control: no-cache
@@ -25,7 +40,6 @@ Cache-Control: no-cache
 username=pnoker
 
 
-### --------------------- Token ---------------------
 ### 生成用户 Token 令牌
 #/api/v3/token/generate
 POST http://localhost:8000/api/v3/token/generate
@@ -35,8 +49,18 @@ Cache-Control: no-cache
 
 {
   "name": "pnoker",
-  "password": "dc3dc3dc3"
+  "password": "900eb6ba49ffd909b74b71da2a395824"
 }
+
+
+### 检测用户 Token 令牌是否有效
+#/api/v3/token/check
+GET http://localhost:8000/api/v3/token/check
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=pnoker&token=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1OTIwNTgyMTEsImV4cCI6MTU5MjA3OTgxMX0.nJ2fmItykFVqaRIbjIeqNVc4vDAOP5lPyNZtfcfNzgg
 
 
 ### 注销用户 Token 令牌
@@ -47,5 +71,246 @@ Content-Type: application/x-www-form-urlencoded
 Cache-Control: no-cache
 
 username=pnoker
+
+### --------------------- Gateway Driver Api---------------------
+### 新增 Driver
+#/manager/driver/add
+POST http://localhost:8000/api/v3/manager/driver/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "测试驱动",
+  "serviceName": "dc3-driver-test",
+  "host": "127.0.0.1",
+  "port": 8799,
+  "description": "测试驱动"
+}
+
+
+### 新增 Driver
+#/manager/driver/batchImport
+POST http://localhost:8000/api/v3/manager/driver/batchImport
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+< ./file/batch-import.json
+
+
+### 修改 Driver
+#/api/v3/manager/driver/update
+POST http://localhost:8000/api/v3/manager/driver/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "name": "测试驱动",
+  "serviceName": "dc3-driver-test",
+  "host": "127.0.0.1",
+  "port": 8799,
+  "description": "测试驱动"
+}
+
+
+### 根据 ID 查询 Driver
+#/api/v3/manager/driver/id/:id
+GET http://localhost:8000/api/v3/manager/driver/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 查询 Driver 服务状态
+#/api/v3/manager/driver/status，支持name\serverName\host模糊查询，port精准查询
+POST http://localhost:8000/api/v3/manager/driver/status
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 分页查询 Driver
+#/api/v3/manager/driver/list，支持name\serverName\host模糊查询，port精准查询
+POST http://localhost:8000/api/v3/manager/driver/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 根据 ID 删除 Driver
+#/api/v3/manager/driver/delete/:id
+POST http://localhost:8000/api/v3/manager/driver/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+
+### --------------------- Gateway Driver Attribute ---------------------
+### 新增 DriverAttribute
+#/api/v3/manager/driverAttribute/add
+POST http://localhost:8000/api/v3/manager/driverAttribute/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "displayName": "测试IP",
+  "name": "ip",
+  "type": "string",
+  "value": "localhost",
+  "driverId": -1,
+  "description": "测试驱动属性"
+}
+
+
+### 修改 DriverAttribute
+#/api/v3/manager/driverAttribute/update
+POST http://localhost:8000/api/v3/manager/driverAttribute/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "displayName": "测试IP",
+  "name": "ip",
+  "type": "string",
+  "value": "localhost",
+  "driverId": -1,
+  "description": "测试驱动属性"
+}
+
+
+### 根据 ID 查询 DriverAttribute
+#/api/v3/manager/driverAttribute/id/:id
+GET http://localhost:8000/api/v3/manager/driverAttribute/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+
+### 分页查询 DriverAttribute
+#/api/v3/manager/driverAttribute/list，支持displayName模糊查询，name\type\driverId精准查询
+POST http://localhost:8000/api/v3/manager/driverAttribute/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "displayName": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 根据 ID 删除 DriverAttribute
+#/api/v3/manager/driverAttribute/delete/:id
+POST http://localhost:8000/api/v3/manager/driverAttribute/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+
+### --------------------- Gateway Driver Info ---------------------
+### 新增 DriverInfo
+#/api/v3/manager/driverInfo/add
+POST http://localhost:8000/api/v3/manager/driverInfo/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "driverAttributeId": 1,
+  "value": "localhost",
+  "profileId": -1,
+  "description": "测试驱动配置"
+}
+
+
+### 修改 DriverInfo
+#/api/v3/manager/driverInfo/update
+POST http://localhost:8000/api/v3/manager/driverInfo/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "driverAttributeId": 1,
+  "value": "localhost",
+  "profileId": -1,
+  "description": "测试驱动配置"
+}
+
+
+### 根据 ID 查询 DriverInfo
+#/api/v3/manager/driverInfo/id/:id
+GET http://localhost:8000/api/v3/manager/driverInfo/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+
+### 分页查询 DriverInfo
+#/api/v3/manager/driverInfo/list，支持driverAttributeId\profileId精准查询
+POST http://localhost:8000/api/v3/manager/driverInfo/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 根据 ID 删除 DriverInfo
+#/api/v3/manager/driverInfo/delete/:id
+POST http://localhost:8000/api/v3/manager/driverInfo/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
 
 ###

@@ -30,6 +30,23 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
+        # manager
+        - id: manager_route
+          uri: lb://dc3-manager
+          predicates:
+            - Path=/api/v3/manager/**
+          filters:
+            - StripPrefix=2
+            #- AuthenticFilter
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
         # rtmp
         - id: rtmp_route
           uri: lb://dc3-rtmp
