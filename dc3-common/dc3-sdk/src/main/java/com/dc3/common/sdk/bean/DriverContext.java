@@ -69,8 +69,8 @@ public class DriverContext {
     /**
      * 获取设备
      *
-     * @param deviceId
-     * @return
+     * @param deviceId Device ID
+     * @return Device
      */
     public Device getDevice(Long deviceId) {
         Device device = deviceMap.get(deviceId);
@@ -83,8 +83,8 @@ public class DriverContext {
     /**
      * 通过 Device Name 获取设备 ID
      *
-     * @param deviceName
-     * @return
+     * @param deviceName Device Name
+     * @return Device ID
      */
     public Long getDeviceIdByName(String deviceName) {
         Long deviceId = deviceNameMap.get(deviceName);
@@ -97,9 +97,9 @@ public class DriverContext {
     /**
      * 获取设备位号
      *
-     * @param deviceId
-     * @param pointId
-     * @return
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @return Point
      */
     public Point getDevicePoint(Long deviceId, Long pointId) {
         Map<Long, Point> map = profilePointMap.get(getDevice(deviceId).getProfileId());
@@ -116,9 +116,9 @@ public class DriverContext {
     /**
      * 通过 Device ID & Point Name 获取位号 ID
      *
-     * @param deviceId
-     * @param pointName
-     * @return
+     * @param deviceId  Device ID
+     * @param pointName Point Name
+     * @return Device Point ID
      */
     public Long getDevicePointIdByName(Long deviceId, String pointName) {
         Map<String, Long> map = devicePointNameMap.get(deviceId);
@@ -135,23 +135,19 @@ public class DriverContext {
     /**
      * 获取 驱动信息
      *
-     * @param profileId
-     * @return
+     * @param profileId Profile ID
+     * @return Map<String, AttributeInfo>
      */
     public Map<String, AttributeInfo> getProfileDriverInfo(Long profileId) {
-        Map<String, AttributeInfo> infoMap = driverInfoMap.get(profileId);
-        if (null == infoMap) {
-            throw new ServiceException("profile(" + profileId + ") driver info does not exist");
-        }
-        return infoMap;
+        return driverInfoMap.get(profileId);
     }
 
     /**
      * 通过 Device Id & Point Id 获取设备位号配置信息
      *
-     * @param deviceId
-     * @param pointId
-     * @return
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @return Map<String, AttributeInfo>
      */
     public Map<String, AttributeInfo> getDevicePointInfo(Long deviceId, Long pointId) {
         Map<Long, Map<String, AttributeInfo>> tmpMap = devicePointInfoMap.get(deviceId);
