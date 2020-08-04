@@ -1,7 +1,8 @@
 server:
   undertow:
-    io-threads: 2
-    worker-threads: 20
+    threads:
+      io: 2
+      worker: 20
     buffer-size: 512
   thread:
     prefix: dc3-thread-
@@ -72,12 +73,22 @@ feign:
       enabled: true
     response:
       enabled: true
-      useGzipDecoder: true
+      use-gzip-decoder: true
 
 hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enable: true
+        isolation:
+          thread:
+            timeout-in-milliseconds: 5000
   threadpool:
     default:
-      coreSize: 20
+      core-size: 20
+      max-queue-size: 100
+      queue-size-rejection-threshold: 80
 
 eureka:
   instance:

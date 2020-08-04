@@ -14,8 +14,8 @@
     <logger name="org.springframework.cloud.stream" level="WARN"/>
     <logger name="org.springframework.integration" level="WARN"/>
     <logger name="org.springframework.scheduling" level="WARN"/>
+    <logger name="org.springframework.data" level="ERROR"/>
     <logger name="org.springframework.amqp" level="WARN"/>
-    <logger name="org.springframework.data" level="WARN"/>
     <logger name="org.springframework.web" level="WARN"/>
     <logger name="org.mybatis.spring" level="ERROR"/>
     <logger name="org.mongodb.driver" level="WARN"/>
@@ -28,6 +28,7 @@
     <logger name="io.undertow" level="ERROR"/>
     <logger name="com.netflix" level="ERROR"/>
     <logger name="org.quartz" level="WARN"/>
+    <logger name="org.jboss" level="ERROR"/>
     <logger name="org.xnio" level="WARN"/>
 
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>

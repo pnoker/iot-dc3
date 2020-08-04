@@ -15,10 +15,6 @@ spring:
   cache:
     redis:
       time-to-live: 60S
-  data:
-    mongodb:
-      address:
-        - dc3-mongo:27017
 
 logging:
   level:
