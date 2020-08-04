@@ -71,7 +71,15 @@
 
 ### 4 Demo 文档
 
-> 详情请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/2.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2150201) 文档
+> 入门：一睹为快，快速启动一个，Demo Application ！
+>
+> 详情请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/1.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2472351) 文档
+>
+> ```
+> git clone https://github.com/pnoker/iot-dc3.git
+> cd iot-dc3/dc3
+> docker-compose -f docker-compose-demo.yml up -d
+> ```
 
 <p align="center">
 <img src="./dc3/images/iot-dc3-web.png"><br>
