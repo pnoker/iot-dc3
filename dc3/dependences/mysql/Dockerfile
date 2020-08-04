@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM mysql:8.0
+FROM mysql:5.7
 MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV MYSQL_ROOT_PASSWORD dc3

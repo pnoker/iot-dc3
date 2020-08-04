@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM maven:3.6-jdk-8 AS build
+FROM maven:3.6-jdk-11 AS build
 MAINTAINER pnoker <pnokers.icloud.com>
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -24,4 +24,6 @@ WORKDIR /dc3
 
 COPY ./ ./
 
-RUN mvn clean -U package
+RUN mvn -s ./dc3/dependences/maven/settings.xml clean -U package
+
+RUN ping dc3.site

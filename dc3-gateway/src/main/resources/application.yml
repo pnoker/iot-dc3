@@ -37,7 +37,24 @@ spring:
             - Path=/api/v3/manager/**
           filters:
             - StripPrefix=2
-            #- AuthenticFilter
+            - AuthenticFilter
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        # data
+        - id: data_route
+          uri: lb://dc3-data
+          predicates:
+            - Path=/api/v3/data/**
+          filters:
+            - StripPrefix=2
+            - AuthenticFilter
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@hostKeyResolver}'
@@ -53,6 +70,7 @@ spring:
           predicates:
             - Path=/api/v3/rtmp/**
           filters:
+            - StripPrefix=2
             - AuthenticFilter
             - name: RequestRateLimiter
               args:
