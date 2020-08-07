@@ -80,10 +80,7 @@
 > cd iot-dc3/dc3
 > docker-compose -f docker-compose-demo.yml up -d
 > ```
-
-<p align="center">
-<img src="./dc3/images/iot-dc3-web.png"><br>
-</p>
+> ![iot-dc3-architecture](dc3/images/iot-dc3-web.png)
 
 
 
