@@ -37,7 +37,7 @@ spring:
             - Path=/api/v3/manager/**
           filters:
             - StripPrefix=2
-            - AuthenticFilter
+            - Authentic
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@hostKeyResolver}'
@@ -54,7 +54,7 @@ spring:
             - Path=/api/v3/data/**
           filters:
             - StripPrefix=2
-            - AuthenticFilter
+            - Authentic
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@hostKeyResolver}'
@@ -71,7 +71,7 @@ spring:
             - Path=/api/v3/rtmp/**
           filters:
             - StripPrefix=2
-            - AuthenticFilter
+            - Authentic
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@hostKeyResolver}'
