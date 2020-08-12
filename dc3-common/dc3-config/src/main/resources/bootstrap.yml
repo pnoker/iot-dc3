@@ -60,6 +60,7 @@ spring:
     type: redis
     cache-names: dc3-cache
   rabbitmq:
+    virtual-host: dc3
     host: dc3-rabbitmq
     port: 5672
     username: dc3

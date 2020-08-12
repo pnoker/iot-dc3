@@ -76,7 +76,7 @@
 > 详情请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/1.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2472351) 文档
 >
 > ```
-> git clone https://github.com/pnoker/iot-dc3.git
+> git clone https://gitee.com/pnoker/iot-dc3.git
 > cd iot-dc3/dc3
 > docker-compose -f docker-compose-demo.yml up -d
 > ```

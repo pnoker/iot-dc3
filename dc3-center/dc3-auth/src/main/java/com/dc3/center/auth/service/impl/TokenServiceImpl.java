@@ -63,12 +63,10 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String generateToken(User user) {
         UserLimit userLimit = checkUserLimit(user.getName());
-        Optional.ofNullable(userLimit).ifPresent(limit -> {
-            if (limit.getTimes() > 3) {
-                updateUserLimit(user.getName());
-                throw new ServiceException("请求受限，请在 " + Dc3Util.formatData(limit.getExpireTime()) + " 之后重试");
-            }
-        });
+        if (null != userLimit && userLimit.getTimes() > 5) {
+            updateUserLimit(user.getName());
+            throw new ServiceException("Access restricted，Please try again after " + Dc3Util.formatData(userLimit.getExpireTime()));
+        }
         User select = userService.selectByName(user.getName());
         if (null != select) {
             String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + user.getName();
@@ -82,7 +80,7 @@ public class TokenServiceImpl implements TokenService {
             }
         }
         updateUserLimit(user.getName());
-        throw new ServiceException("用户名和密码不匹配");
+        throw new ServiceException("Invalid username or password");
     }
 
     @Override
@@ -127,7 +125,9 @@ public class TokenServiceImpl implements TokenService {
         String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
         UserLimit limit = (UserLimit) Optional.ofNullable(redisUtil.getKey(redisKey)).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
-        if (limit.getTimes() > 3) {
+        if (limit.getTimes() > 10) {
+            limit.setExpireTime(Dc3Util.expireTime(Common.Cache.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
+        } else if (limit.getTimes() > 3) {
             amount = (limit.getTimes() - 3) * Common.Cache.TOKEN_CACHE_TIMEOUT;
             limit.setExpireTime(Dc3Util.expireTime(amount, Calendar.MINUTE));
         }

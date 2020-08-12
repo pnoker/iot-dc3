@@ -111,6 +111,12 @@ public interface Common {
      */
     interface Service {
         /**
+         * dc3-gateway 服务
+         */
+        String DC3_GATEWAY_AUTH_USER ="X-Auth-User";
+        String DC3_GATEWAY_AUTH_TOKEN ="X-Auth-Token";
+
+        /**
          * dc3-auth 服务
          */
         String DC3_AUTH_SERVICE_NAME = "DC3-AUTH";
