@@ -63,9 +63,9 @@ public class UserServiceImpl implements UserService {
     )
     public User add(User user) {
         User select = selectByName(user.getName());
-        Optional.ofNullable(select).ifPresent(ip -> {
+        if (null != select) {
             throw new ServiceException("The user already exists");
-        });
+        }
         if (userMapper.insert(user.setPassword(Dc3Util.md5(user.getPassword()))) > 0) {
             return userMapper.selectById(user.getId());
         }
