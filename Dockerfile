@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM maven:3.6-jdk-11 AS build
+FROM maven:3.6-jdk-8 AS build
 MAINTAINER pnoker <pnokers.icloud.com>
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \

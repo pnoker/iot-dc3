@@ -29,6 +29,7 @@ spring:
         caffeine:
           spec: initialCapacity=10,maximumSize=500,expireAfterAccess=600s
   rabbitmq:
+    virtual-host: dc3
     host: dc3-rabbitmq
     port: 5672
     username: dc3
