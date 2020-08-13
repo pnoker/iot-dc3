@@ -18,6 +18,7 @@ package com.dc3.transfer.rtmp.bean;
 
 import cn.hutool.core.util.RuntimeUtil;
 import com.dc3.common.model.Rtmp;
+import com.dc3.transfer.rtmp.init.TranscodeRunner;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -33,8 +34,6 @@ import java.util.Optional;
 @Data
 @Slf4j
 public class Transcode {
-    public static String ffmpeg;
-
     private Long id;
     private volatile boolean run;
     private String command;
@@ -44,7 +43,7 @@ public class Transcode {
         this.id = rtmp.getId();
         this.run = false;
         this.command = rtmp.getCommand()
-                .replace("{exe}", ffmpeg)
+                .replace("{exe}", TranscodeRunner.ffmpeg)
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
     }
