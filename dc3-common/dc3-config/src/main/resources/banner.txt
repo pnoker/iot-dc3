@@ -8,3 +8,10 @@ https://dc3.site
 https://gitee.com/pnoker/iot-dc3
 https://github.com/pnoker/iot-dc3
 ${AnsiColor.BRIGHT_CYAN}DC3 IOT Platform V1.0.0 ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors
+
+2020.08.18 更新说明:
+1.调整为支持单点存储和结构化存储
+2.修复批量导入bug（驱动配置为空，位号不更新）
+3.rabbitmq添加vhost=dc3配置
+4.设备添加新字段 multi （需要更新mysql数据库脚本）
+
