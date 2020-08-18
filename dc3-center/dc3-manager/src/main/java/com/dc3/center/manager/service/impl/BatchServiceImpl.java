@@ -135,7 +135,7 @@ public class BatchServiceImpl implements BatchService {
             }
 
             notifyService.notifyDriverProfile(driver, profile.getId(), Operation.Profile.ADD);
-            ThreadUtil.sleep(1, TimeUnit.SECONDS);
+            ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
         }
         return profile;
     }
@@ -149,6 +149,9 @@ public class BatchServiceImpl implements BatchService {
      */
     private void addDriverInfo(Driver driver, Profile profile, BatchProfile batchProfile) {
         List<String> driverInfoList = new ArrayList<>();
+        if (null == batchProfile.getDriverConfig()) {
+            return;
+        }
         batchProfile.getDriverConfig().forEach((name, value) -> {
             DriverAttribute driverAttribute = driverAttributeService.selectByNameAndDriverId(name, driver.getId());
             if (null == driverAttribute) {
@@ -173,7 +176,7 @@ public class BatchServiceImpl implements BatchService {
                 driverInfo = driverInfoService.update(driverInfo.setValue(value));
                 notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.UPDATE);
             }
-            ThreadUtil.sleep(1, TimeUnit.SECONDS);
+            ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
         });
     }
 
@@ -221,9 +224,10 @@ public class BatchServiceImpl implements BatchService {
                         .setUnit(importPoint.getUnit());
                 point.setDescription("批量导入：更新");
                 pointService.update(point);
+                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.UPDATE);
             }
 
-            ThreadUtil.sleep(1, TimeUnit.SECONDS);
+            ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
         });
     }
 
@@ -257,7 +261,7 @@ public class BatchServiceImpl implements BatchService {
                         throw new ServiceException("Add device failed: " + batchDevice.getName());
                     }
                     notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.ADD);
-                    ThreadUtil.sleep(1, TimeUnit.SECONDS);
+                    ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
                 }
 
                 // Add Point Info
@@ -308,7 +312,7 @@ public class BatchServiceImpl implements BatchService {
                     notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.UPDATE);
                 }
 
-                ThreadUtil.sleep(1, TimeUnit.SECONDS);
+                ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
             });
         });
     }
