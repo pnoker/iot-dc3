@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 接收驱动发送过来的数据
@@ -39,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-public class PointValueReceiver {
+public class MultiplePointValueReceiver {
 
     @Resource
     private RedisUtil redisUtil;
@@ -49,45 +48,30 @@ public class PointValueReceiver {
     private PointValueService pointValueService;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{pointValueQueue.name}")
+    @RabbitListener(queues = "#{multiPointValueQueue.name}")
     public void pointValueReceive(Channel channel, Message message, PointValue pointValue) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Point data from {}", message.getMessageProperties().getReceivedRoutingKey());
+            log.debug("Multi point data from {}", message.getMessageProperties().getReceivedRoutingKey());
 
-            if (null == pointValue || null == pointValue.getDeviceId() || null == pointValue.getPointId()) {
-                log.error("Invalid data: {}", pointValue);
+            if (null == pointValue || null == pointValue.getDeviceId() || null == pointValue.getChildren()) {
+                log.error("Invalid multi point data: {}", pointValue);
                 return;
             }
 
-        /*
-        规约:
-        PointId = 0 表明 device status
-        PointId > 0 表明 device point data
-         */
-            if (pointValue.getPointId().equals(0L)) {
-                log.debug("Received device({}) status({})", pointValue.getDeviceId(), pointValue.getRawValue());
-                // Save device status to redis, 15 minutes
+            threadPoolExecutor.execute(() -> {
+                log.debug("Received multi point data: {}", pointValue);
+                // Save device point data to redis, 15 minutes
                 redisUtil.setKey(
-                        Common.Cache.DEVICE_STATUS_KEY_PREFIX + pointValue.getDeviceId(),
-                        pointValue.getRawValue(),
-                        15,
-                        TimeUnit.MINUTES);
-            } else {
-                // LinkedBlockingQueue ThreadPoolExecutor
-                threadPoolExecutor.execute(() -> {
-                    log.debug("Received point data: {}", pointValue);
-                    // Save device point data to redis, 15 minutes
-                    redisUtil.setKey(
-                            Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + "_" + pointValue.getPointId(),
-                            pointValue.getValue(),
-                            15,
-                            TimeUnit.MINUTES);
-                    // Insert device point data to MongoDB
-                    // todo 可根据项目并发情况实现一个定时和批量入库逻辑
-                    pointValueService.add(pointValue);
-                });
-            }
+                        Common.Cache.REAL_TIME_VALUES_KEY_PREFIX + pointValue.getDeviceId(),
+                        pointValue.getChildren(),
+                        pointValue.getTimeOut(),
+                        pointValue.getTimeUnit()
+                );
+                // Insert device point data to MongoDB
+                // TODO 可根据项目并发情况实现一个定时和批量入库逻辑
+                pointValueService.addPointValue(pointValue.setMulti(true));
+            });
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

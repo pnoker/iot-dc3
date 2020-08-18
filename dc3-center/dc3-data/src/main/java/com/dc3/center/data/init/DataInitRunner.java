@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.dc3.gateway;
+package com.dc3.center.data.init;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 /**
- * 平台网关服务入口
- *
  * @author pnoker
  */
-@EnableCaching
-@SpringCloudApplication
-public class GatewayApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+@Component
+@EnableFeignClients(basePackages = {
+        "com.dc3.api.center.manager.*"
+})
+@ComponentScan(basePackages = {
+        "com.dc3.api.center.manager",
+        "com.dc3.api.center.date"
+})
+public class DataInitRunner implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
     }
 }

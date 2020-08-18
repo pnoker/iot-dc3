@@ -52,20 +52,46 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange valueExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE);
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, true);
     }
 
     @Bean
-    Queue pointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_VALUE);
+    Queue deviceStatusQueue() {
+        return new Queue(Common.Rabbit.QUEUE_DEVICE_STATUS, true, false, true);
     }
 
     @Bean
-    Binding pointValueBinding() {
+    Binding deviceStatusBinding() {
         return BindingBuilder
-                .bind(pointValueQueue())
+                .bind(deviceStatusQueue())
                 .to(valueExchange())
-                .with(Common.Rabbit.ROUTING_KEY_PREFIX + "*");
+                .with(Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + "*");
+    }
+
+    @Bean
+    Queue singlePointValueQueue() {
+        return new Queue(Common.Rabbit.QUEUE_POINT_SINGLE_VALUE, true, false, true);
+    }
+
+    @Bean
+    Binding singlePointValueBinding() {
+        return BindingBuilder
+                .bind(singlePointValueQueue())
+                .to(valueExchange())
+                .with(Common.Rabbit.ROUTING_SINGLE_VALUE_PREFIX + "*");
+    }
+
+    @Bean
+    Queue multiPointValueQueue() {
+        return new Queue(Common.Rabbit.QUEUE_POINT_MULTI_VALUE, true, false, true);
+    }
+
+    @Bean
+    Binding multiPointValueBinding() {
+        return BindingBuilder
+                .bind(multiPointValueQueue())
+                .to(valueExchange())
+                .with(Common.Rabbit.ROUTING_MULTI_VALUE_PREFIX + "*");
     }
 
     @Bean

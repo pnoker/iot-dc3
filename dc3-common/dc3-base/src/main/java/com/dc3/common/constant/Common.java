@@ -70,10 +70,15 @@ public interface Common {
         String TOPIC_EXCHANGE_NOTIFY = "dc3.exchange.driver.notify";
         String TOPIC_EXCHANGE_VALUE = "dc3.exchange.point.value";
 
-        String QUEUE_POINT_VALUE = "dc3.queue.point.value";
-
-        String ROUTING_KEY_PREFIX = "dc3.driver.service.";
         String QUEUE_DRIVER_NOTIFY_PREFIX = "dc3.queue.driver.notify.";
+        String QUEUE_DEVICE_STATUS = "dc3.queue.device.status";
+        String QUEUE_POINT_SINGLE_VALUE = "dc3.queue.point.single.value";
+        String QUEUE_POINT_MULTI_VALUE = "dc3.queue.point.multi.value";
+
+        String ROUTING_DEVICE_NOTIFY_PREFIX = "dc3.routing.device.notify.";
+        String ROUTING_DEVICE_STATUS_PREFIX = "dc3.routing.device.status.";
+        String ROUTING_SINGLE_VALUE_PREFIX = "dc3.routing.single.value.";
+        String ROUTING_MULTI_VALUE_PREFIX = "dc3.routing.multi.value.";
     }
 
     /**
@@ -97,6 +102,8 @@ public interface Common {
      * 数据类型
      */
     interface ValueType {
+        String HEX = "hex";
+        String BYTE = "byte";
         String SHORT = "short";
         String INT = "int";
         String LONG = "long";
@@ -113,8 +120,8 @@ public interface Common {
         /**
          * dc3-gateway 服务
          */
-        String DC3_GATEWAY_AUTH_USER ="X-Auth-User";
-        String DC3_GATEWAY_AUTH_TOKEN ="X-Auth-Token";
+        String DC3_GATEWAY_AUTH_USER = "X-Auth-User";
+        String DC3_GATEWAY_AUTH_TOKEN = "X-Auth-Token";
 
         /**
          * dc3-auth 服务
@@ -175,6 +182,7 @@ public interface Common {
         String CODE = "_code";
         String STATUS = "_status";
         String VALUE = "_value";
+        String VALUES = "_values";
         String DIC = "_dic";
         String LIST = "_list";
         String SALT = "_salt";
@@ -202,6 +210,7 @@ public interface Common {
         String BLACK_IP = "black_ip";
 
         String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
+        String REAL_TIME_VALUES_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUES + Common.Cache.SEPARATOR;
         String DEVICE_STATUS_KEY_PREFIX = Common.Cache.DEVICE + Common.Cache.STATUS + Common.Cache.SEPARATOR;
     }
 
