@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.init;
+package com.dc3.center.data.init;
 
-import com.dc3.common.sdk.service.DriverCommonService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 /**
- * Driver SDK Initial
- *
  * @author pnoker
  */
 @Component
@@ -36,15 +31,11 @@ import javax.annotation.Resource;
 })
 @ComponentScan(basePackages = {
         "com.dc3.api.center.manager",
-        "com.dc3.common.sdk"
+        "com.dc3.api.center.date"
 })
-public class DriverInitRunner implements ApplicationRunner {
-
-    @Resource
-    private DriverCommonService driverCommonService;
+public class DataInitRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        driverCommonService.initial();
     }
 }

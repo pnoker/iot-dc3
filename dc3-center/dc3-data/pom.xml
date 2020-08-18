@@ -51,6 +51,10 @@
         <!-- dc3 Api -->
         <dependency>
             <groupId>com.dc3</groupId>
+            <artifactId>dc3-api-manager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.dc3</groupId>
             <artifactId>dc3-api-data</artifactId>
         </dependency>
 
