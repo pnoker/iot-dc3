@@ -1,0 +1,246 @@
+[
+  {
+    "serviceName": "dc3-driver-water-188b",
+    "profiles": [
+      {
+        "name": "水表188B协议位号模版",
+        "share": true,
+        "points": [
+          {
+            "name": "数据标识",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计量单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "反向累计量单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "瞬时流量单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "水压单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计水量",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "剩余金额",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "状态",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "充值识别码",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "反向累计流量",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "瞬时流量",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "水压",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          }
+        ],
+        "groups": [
+          {
+            "name": "水表",
+            "devices": [
+              {
+                "name": "03221018200673",
+                "pointConfig": {
+                  "数据标识": {
+                    "start": 15,
+                    "length": 2,
+                    "type": "hex"
+                  },
+                  "正向累计量单位": {
+                    "start": 17,
+                    "length": 1,
+                    "type": "hex"
+                  },
+                  "反向累计量单位": {
+                    "start": 18,
+                    "length": 1,
+                    "type": "hex"
+                  },
+                  "瞬时流量单位": {
+                    "start": 19,
+                    "length": 1,
+                    "type": "hex"
+                  },
+                  "水压单位": {
+                    "start": 20,
+                    "length": 1,
+                    "type": "hex"
+                  },
+                  "正向累计水量": {
+                    "start": 21,
+                    "length": 4,
+                    "type": "int"
+                  },
+                  "剩余金额": {
+                    "start": 25,
+                    "length": 4,
+                    "type": "int"
+                  },
+                  "状态": {
+                    "start": 29,
+                    "length": 4,
+                    "type": "hex"
+                  },
+                  "充值识别码": {
+                    "start": 33,
+                    "length": 1,
+                    "type": "hex"
+                  },
+                  "反向累计流量": {
+                    "start": 34,
+                    "length": 4,
+                    "type": "int"
+                  },
+                  "瞬时流量": {
+                    "start": 38,
+                    "length": 3,
+                    "type": "int"
+                  },
+                  "水压": {
+                    "start": 41,
+                    "length": 2,
+                    "type": "short"
+                  },
+                  "正向累计流量": {
+                    "start": 43,
+                    "length": 4,
+                    "type": "int"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
