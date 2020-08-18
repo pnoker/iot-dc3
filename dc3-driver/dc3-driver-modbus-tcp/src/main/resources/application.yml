@@ -37,7 +37,7 @@ driver:
       description: 偏移量
 
 server:
-  port: 8702
+  port: 8604
 
 spring:
   application:

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 数据 FeignClient
@@ -37,25 +38,6 @@ import javax.validation.constraints.NotNull;
  */
 @FeignClient(path = Common.Service.DC3_DATA_URL_PREFIX, name = Common.Service.DC3_DATA_SERVICE_NAME, fallbackFactory = PointValueClientHystrix.class)
 public interface PointValueClient {
-
-    /**
-     * 分页查询 PointValue
-     *
-     * @param pointValueDto
-     * @return Page<PointValue>
-     */
-    @PostMapping("/list")
-    R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto);
-
-    /**
-     * 查询最新 PointValue
-     *
-     * @param deviceId Device Id
-     * @param pointId  Point Id
-     * @return PointValue
-     */
-    @GetMapping("/latest/deviceId/{deviceId}/pointId/{pointId}")
-    R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
 
     /**
      * 获取设备状态
@@ -71,10 +53,46 @@ public interface PointValueClient {
      * 获取实时值，读 Redis
      *
      * @param deviceId Device Id
+     * @return String Value
+     */
+    @GetMapping("/realtime/deviceId/{deviceId}")
+    R<List<PointValue>> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+
+    /**
+     * 获取实时值，读 Redis
+     *
+     * @param deviceId Device Id
      * @param pointId  Point Id
      * @return String Value
      */
     @GetMapping("/realtime/deviceId/{deviceId}/pointId/{pointId}")
-    R<String> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+    R<PointValue> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
 
+    /**
+     * 查询最新 PointValue
+     *
+     * @param deviceId Device Id
+     * @return PointValue
+     */
+    @GetMapping("/latest/deviceId/{deviceId}")
+    R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+
+    /**
+     * 查询最新 PointValue
+     *
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @return PointValue
+     */
+    @GetMapping("/latest/deviceId/{deviceId}/pointId/{pointId}")
+    R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+
+    /**
+     * 分页查询 PointValue
+     *
+     * @param pointValueDto PointValueDto
+     * @return Page<PointValue>
+     */
+    @PostMapping("/list")
+    R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto);
 }

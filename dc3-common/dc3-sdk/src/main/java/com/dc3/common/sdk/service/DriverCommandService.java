@@ -30,7 +30,15 @@ public interface DriverCommandService {
      * @param pointId  Point Id
      * @return PointValue
      */
-    PointValue read(Long deviceId, Long pointId);
+    PointValue singleRead(Long deviceId, Long pointId);
+
+    /**
+     * 读操作
+     *
+     * @param deviceId Device Id
+     * @return PointValue
+     */
+    PointValue multiRead(Long deviceId);
 
     /**
      * 写操作
