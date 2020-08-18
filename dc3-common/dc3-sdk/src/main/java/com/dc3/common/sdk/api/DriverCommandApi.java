@@ -44,6 +44,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(Common.Service.DC3_DRIVER_URL_PREFIX)
 public class DriverCommandApi {
+
     @Resource
     private DriverCommandService driverCommandService;
 
@@ -61,7 +62,7 @@ public class DriverCommandApi {
                 return R.fail("point request size are limited to " + Common.Driver.MAX_REQUEST_SIZE);
             }
             cmdParameters.forEach(cmdParameter -> {
-                PointValue pointValue = driverCommandService.read(cmdParameter.getDeviceId(), cmdParameter.getPointId());
+                PointValue pointValue = driverCommandService.singleRead(cmdParameter.getDeviceId(), cmdParameter.getPointId());
                 Optional.ofNullable(pointValue).ifPresent(pointValues::add);
             });
         } catch (Exception e) {
