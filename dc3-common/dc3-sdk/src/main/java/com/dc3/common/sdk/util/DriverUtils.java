@@ -96,6 +96,47 @@ public class DriverUtils {
     }
 
     /**
+     * byte数组到int的转换(大端)
+     *
+     * @param bytes Byte Array
+     * @return Integer
+     */
+    public static int bytesToInt(byte[] bytes) {
+        byte[] temp = new byte[4];
+        int length = bytes.length;
+        System.arraycopy(bytes, 0, temp, 0, length);
+        for (int i = length; i < 4; i++) {
+            temp[i] = 0x00;
+        }
+        int int1 = temp[3] & 0xff;
+        int int2 = (temp[2] & 0xff) << 8;
+        int int3 = (temp[1] & 0xff) << 16;
+        int int4 = (temp[0] & 0xff) << 24;
+
+        return int1 | int2 | int3 | int4;
+    }
+
+    /**
+     * byte数组到int的转换(小端)
+     *
+     * @param bytes Byte Array
+     * @return Integer
+     */
+    public static int bytesToIntLE(byte[] bytes) {
+        byte[] temp = new byte[4];
+        int length = bytes.length;
+        System.arraycopy(bytes, 0, temp, 0, length);
+        for (int i = length; i < 4; i++) {
+            temp[i] = 0x00;
+        }
+        int int1 = temp[0] & 0xff;
+        int int2 = (temp[1] & 0xff) << 8;
+        int int3 = (temp[2] & 0xff) << 16;
+        int int4 = (temp[3] & 0xff) << 24;
+        return int1 | int2 | int3 | int4;
+    }
+
+    /**
      * 将byte[]转成Ascii码
      *
      * @param bytes Byte Array
