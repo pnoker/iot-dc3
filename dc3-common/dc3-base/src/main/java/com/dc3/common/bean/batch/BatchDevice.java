@@ -34,5 +34,8 @@ public class BatchDevice implements Serializable {
 
     private String name;
 
+    /**
+     * 仅当share为false的时候生效
+     */
     private Map<String, Map<String, String>> pointConfig;
 }
