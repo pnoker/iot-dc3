@@ -22,6 +22,7 @@ import com.dc3.common.sdk.bean.AttributeInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.Map;
 
 /**
@@ -52,6 +53,28 @@ public class DriverUtils {
      */
     public static <T> T value(String type, String value) {
         return Convert.convertByClassName(getTypeClassName(type), value);
+    }
+
+    /**
+     * Base 64 解码
+     *
+     * @param content string
+     * @return string
+     */
+    public static String base64Encode(String content) {
+        byte[] bytes = content.getBytes();
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * Base 64 编码
+     *
+     * @param content string
+     * @return string
+     */
+    public static String base64Decode(String content) {
+        byte[] bytes = content.getBytes();
+        return new String(Base64.getDecoder().decode(bytes));
     }
 
     /**
