@@ -57,7 +57,7 @@ public class PointValue implements Serializable {
     @JsonIgnore
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
-    private Boolean multi = false;
+    private Boolean multi;
     private Long originTime;
     private Long createTime;
 
