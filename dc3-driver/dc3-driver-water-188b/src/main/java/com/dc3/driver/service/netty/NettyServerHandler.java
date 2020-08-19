@@ -112,16 +112,20 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      *
      * @return PointValue
      */
-    private void customDecode(int start, long deviceId, long pointId, PointValue pointValue) {
+    private String customDecode(int start, String value) {
         //信号强度额外处理
         if (start == 163) {
-            String value = that.driverService.convertValue(deviceId, pointId, pointValue.getValue());
             int csq = (int) Double.parseDouble(value);
             if (csq > 0) {
                 csq -= 200;
             }
-            pointValue.setValue(String.valueOf(csq));
+            value = String.valueOf(csq);
         }
+        return value;
+    }
+
+    private int intDecode(ByteBuf byteBuf) {
+        return byteBuf.getIntLE(0);
     }
 
     @Override
@@ -171,28 +175,27 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                 value = that.driverService.convertValue(deviceId, pointId, rawValue);
                 break;
             case Common.ValueType.INT:
-                int intValue;
-                if (length != 4) {
-                    ByteBuf copy = byteBuf.copy(start, length);
-                    int i = length;
-                    while (i < 4) {
-                        copy.writeBytes(new byte[]{0x00});
-                        i++;
-                    }
-                    intValue = copy.getIntLE(0);
-                } else {
-                    intValue = byteBuf.getIntLE(start);
-                }
+                int intValue = intDecode(byteBuf.copy(start, length));
+//                if (length != 4) {
+//                    ByteBuf copy = byteBuf.copy(start, length);
+//                    int i = length;
+//                    while (i < 4) {
+//                        copy.writeBytes(new byte[]{0x00});
+//                        i++;
+//                    }
+//                    intValue = copy.getIntLE(0);
+//                } else {
+//                    intValue = byteBuf.getIntLE(start);
+//                }
                 rawValue = String.valueOf(intValue);
                 value = that.driverService.convertValue(deviceId, pointId, rawValue);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + type.toLowerCase());
         }
-        PointValue pointValue = new PointValue(pointId, rawValue, value);
-        customDecode(start, deviceId, pointId, pointValue);
-        log.info("DecodePointValue: hex({}),rawValue({}),convertValue({})", ByteBufUtil.hexDump(byteBuf, start, length).toUpperCase(), pointValue.getRawValue(), pointValue.getValue());
-        return pointValue;
+        value = customDecode(start, value);
+        log.info("DecodePointValue: hex({}),rawValue({}),convertValue({})", ByteBufUtil.hexDump(byteBuf, start, length).toUpperCase(), rawValue, value);
+        return new PointValue(pointId, rawValue, value);
     }
 
 }
