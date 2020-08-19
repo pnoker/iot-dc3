@@ -108,6 +108,42 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     private DriverContext driverContext;
 
     /**
+     * 解析 Point Value 数据
+     *
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @param infoMap  Point Info Map
+     * @param byteBuf  ByteBuf
+     * @return PointValue
+     */
+    private PointValue pointValueDecode(long deviceId, long pointId, Map<String, AttributeInfo> infoMap, ByteBuf byteBuf) {
+        String type = DriverUtils.value(infoMap.get("type").getType(), infoMap.get("type").getValue());
+        int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
+        int length = DriverUtils.value(infoMap.get("length").getType(), infoMap.get("length").getValue());
+
+        String rawValue, value;
+        switch (type.toLowerCase()) {
+            case Common.ValueType.HEX:
+                rawValue = ByteBufUtil.hexDump(byteBuf.retainedSlice(start, length)).toUpperCase();
+                value = that.driverService.convertValue(deviceId, pointId, rawValue);
+                break;
+            case Common.ValueType.SHORT:
+                rawValue = String.valueOf(byteBuf.getShortLE(start));
+                value = that.driverService.convertValue(deviceId, pointId, rawValue);
+                break;
+            case Common.ValueType.INT:
+                rawValue = String.valueOf(DriverUtils.bytesToIntLE(ByteBufUtil.getBytes(byteBuf, start, length)));
+                value = that.driverService.convertValue(deviceId, pointId, rawValue);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + type.toLowerCase());
+        }
+        value = customDecode(start, value);
+        log.info("DecodePointValue: hex({}),rawValue({}),convertValue({})", ByteBufUtil.hexDump(byteBuf, start, length).toUpperCase(), rawValue, value);
+        return new PointValue(pointId, rawValue, value);
+    }
+
+    /**
      * 自定义报文解析，用于处理特殊位号数据
      *
      * @return PointValue
@@ -122,10 +158,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             value = String.valueOf(csq);
         }
         return value;
-    }
-
-    private int intDecode(ByteBuf byteBuf) {
-        return byteBuf.getIntLE(0);
     }
 
     @Override
@@ -146,7 +178,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         List<PointValue> pointValues = new ArrayList<>();
         Map<Long, Map<String, AttributeInfo>> pointInfoMap = that.driverContext.getDevicePointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
-            PointValue pointValue = decodePointValue(deviceId, pointId, pointInfoMap.get(pointId), byteBuf);
+            PointValue pointValue = pointValueDecode(deviceId, pointId, pointInfoMap.get(pointId), byteBuf);
             pointValues.add(pointValue);
         }
         PointValue pointValue = new PointValue(deviceId, pointValues, 1, TimeUnit.HOURS);
@@ -157,45 +189,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
         log.error(throwable.getMessage());
         context.close();
-    }
-
-    private PointValue decodePointValue(long deviceId, long pointId, Map<String, AttributeInfo> infoMap, ByteBuf byteBuf) {
-        String type = DriverUtils.value(infoMap.get("type").getType(), infoMap.get("type").getValue());
-        int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
-        int length = DriverUtils.value(infoMap.get("length").getType(), infoMap.get("length").getValue());
-
-        String rawValue, value;
-        switch (type.toLowerCase()) {
-            case Common.ValueType.HEX:
-                rawValue = ByteBufUtil.hexDump(byteBuf.retainedSlice(start, length)).toUpperCase();
-                value = that.driverService.convertValue(deviceId, pointId, rawValue);
-                break;
-            case Common.ValueType.SHORT:
-                rawValue = String.valueOf(byteBuf.getShortLE(start));
-                value = that.driverService.convertValue(deviceId, pointId, rawValue);
-                break;
-            case Common.ValueType.INT:
-                int intValue = intDecode(byteBuf.copy(start, length));
-//                if (length != 4) {
-//                    ByteBuf copy = byteBuf.copy(start, length);
-//                    int i = length;
-//                    while (i < 4) {
-//                        copy.writeBytes(new byte[]{0x00});
-//                        i++;
-//                    }
-//                    intValue = copy.getIntLE(0);
-//                } else {
-//                    intValue = byteBuf.getIntLE(start);
-//                }
-                rawValue = String.valueOf(intValue);
-                value = that.driverService.convertValue(deviceId, pointId, rawValue);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + type.toLowerCase());
-        }
-        value = customDecode(start, value);
-        log.info("DecodePointValue: hex({}),rawValue({}),convertValue({})", ByteBufUtil.hexDump(byteBuf, start, length).toUpperCase(), rawValue, value);
-        return new PointValue(pointId, rawValue, value);
     }
 
 }
