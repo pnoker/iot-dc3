@@ -36,7 +36,6 @@
         <module>dc3-driver-opc-ua</module>
         <module>dc3-driver-mqtt</module>
         <module>dc3-driver-modbus-tcp</module>
-        <module>dc3-driver-water-188b</module>
     </modules>
 
     <properties>
