@@ -89,7 +89,7 @@ public class DriverContext {
     public Long getDeviceIdByName(String deviceName) {
         Long deviceId = deviceNameMap.get(deviceName);
         if (null == deviceId) {
-            throw new ServiceException("device(" + deviceName + ") does not exist");
+            throw new ServiceException("Device(" + deviceName + ") does not exist");
         }
         return deviceId;
     }
