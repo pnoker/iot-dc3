@@ -2,7 +2,7 @@ driver:
   name: Water188BUdpDriver
   description: @project.description@
   custom:
-    socket:
+    udp:
       port: 9271
   schedule:
     read:
