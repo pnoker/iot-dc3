@@ -1,9 +1,9 @@
 [
   {
-    "serviceName": "dc3-driver-water-188b",
+    "serviceName": "dc3-driver-water-188b-udp",
     "profiles": [
       {
-        "name": "水表188B协议位号模版",
+        "name": "Water188B_UDP_Profile",
         "share": true,
         "points": [
           {
