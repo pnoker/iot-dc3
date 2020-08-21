@@ -1,5 +1,5 @@
 driver:
-  name: Water188BDriver
+  name: Water188BTcpDriver
   description: @project.description@
   custom:
     socket:
@@ -40,4 +40,4 @@ logging:
     com.dc3.common.sdk: DEBUG
     com.dc3: DEBUG
   file:
-    name: dc3/logs/driver/water/188b/${spring.application.name}.log
+    name: dc3/logs/driver/water/188b/tcp/${spring.application.name}.log
