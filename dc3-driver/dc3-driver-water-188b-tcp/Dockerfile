@@ -26,6 +26,7 @@ WORKDIR /dc3-driver/dc3-driver-water-188b-tcp
 
 ADD ./target/dc3-driver-water-188b-tcp.jar ./
 
-EXPOSE 8700
+EXPOSE 8702
+EXPOSE 9270
 
 CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-water-188b-tcp.jar
