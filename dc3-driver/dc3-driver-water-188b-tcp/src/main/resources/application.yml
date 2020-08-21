@@ -2,7 +2,7 @@ driver:
   name: Water188BTcpDriver
   description: @project.description@
   custom:
-    socket:
+    tcp:
       port: 9270
   schedule:
     read:

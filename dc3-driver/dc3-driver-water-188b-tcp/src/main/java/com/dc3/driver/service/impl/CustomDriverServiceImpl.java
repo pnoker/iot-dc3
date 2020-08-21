@@ -20,7 +20,7 @@ import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.service.CustomDriverService;
-import com.dc3.driver.service.netty.NettyServer;
+import com.dc3.driver.service.netty.NettyTcpServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,19 +36,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Service
 public class CustomDriverServiceImpl implements CustomDriverService {
 
-    @Value("${driver.custom.socket.port}")
+    @Value("${driver.custom.tcp.port}")
     private Integer port;
 
     @Resource
-    private NettyServer nettyServer;
+    private NettyTcpServer nettyTcpServer;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public void initial() {
         threadPoolExecutor.execute(() -> {
-            log.debug("Water 188B Driver Starting(::{}) incoming data listener", port);
-            nettyServer.start(port);
+            log.debug("Water 188B Tcp Driver Starting(::{}) incoming data listener", port);
+            nettyTcpServer.start(port);
         });
     }
 

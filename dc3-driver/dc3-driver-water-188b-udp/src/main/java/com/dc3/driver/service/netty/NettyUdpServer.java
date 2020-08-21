@@ -33,7 +33,7 @@ import java.net.InetSocketAddress;
  * @author pnoker
  */
 @Component
-public class NettyServer {
+public class NettyUdpServer {
 
     @SneakyThrows
     public void start(int port) {
@@ -46,7 +46,7 @@ public class NettyServer {
                     .handler(new ChannelInitializer<Channel>() {
                         @Override
                         protected void initChannel(Channel channel) {
-                            channel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyServerHandler());
+                            channel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyUdpServerHandler());
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();

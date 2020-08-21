@@ -92,10 +92,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-public class NettyServerHandler extends ChannelInboundHandlerAdapter {
+public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     private static final String START_TAG = "fefefe";
 
-    private static NettyServerHandler that;
+    private static NettyTcpServerHandler that;
 
     @PostConstruct
     public void init() {

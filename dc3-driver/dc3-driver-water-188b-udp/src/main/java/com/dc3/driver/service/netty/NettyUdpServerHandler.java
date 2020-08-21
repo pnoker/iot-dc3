@@ -25,9 +25,9 @@ import com.dc3.common.sdk.service.rabbit.DriverService;
 import com.dc3.common.sdk.util.DriverUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.socket.DatagramPacket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -91,11 +91,10 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-@ChannelHandler.Sharable
-public class NettyServerHandler extends ChannelInboundHandlerAdapter {
+public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     private static final String START_TAG = "fefefe";
 
-    private static NettyServerHandler that;
+    private static NettyUdpServerHandler that;
 
     @PostConstruct
     public void init() {
@@ -161,13 +160,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext context) {
-        log.debug("Water 188B Driver Listener({}) accept clint({})", context.channel().localAddress(), context.channel().remoteAddress());
-    }
-
-    @Override
-    public void channelRead(ChannelHandlerContext context, Object msg) {
-        ByteBuf byteBuf = (ByteBuf) msg;
+    protected void channelRead0(ChannelHandlerContext context, DatagramPacket msg) {
+        ByteBuf byteBuf = msg.content();
         if (!START_TAG.equals(ByteBufUtil.hexDump(byteBuf, 0, 3))) {
             throw new ServiceException("Start Tag Invalid");
         }
@@ -190,5 +184,4 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         log.error(throwable.getMessage());
         context.close();
     }
-
 }
