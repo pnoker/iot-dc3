@@ -26,6 +26,6 @@ WORKDIR /dc3-driver/dc3-driver-modbus-tcp
 
 ADD ./target/dc3-driver-modbus-tcp.jar ./
 
-EXPOSE 8702
+EXPOSE 8604
 
 CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-modbus-tcp.jar
