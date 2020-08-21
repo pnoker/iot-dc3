@@ -20,12 +20,12 @@ MAINTAINER pnoker <pnokers.icloud.com>
 ENV JAVA_OPS -server -Xms128m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-driver/dc3-driver-b188
+    && mkdir -p /dc3-driver/dc3-driver-water-188b
 
-WORKDIR /dc3-driver/dc3-driver-b188
+WORKDIR /dc3-driver/dc3-driver-water-188b
 
-ADD ./target/dc3-driver-b188.jar ./
+ADD ./target/dc3-driver-water-188b.jar ./
 
 EXPOSE 8700
 
-CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-b188.jar
+CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-water-188b.jar

@@ -25,10 +25,10 @@ import org.springframework.cloud.client.SpringCloudApplication;
  */
 @EnableCaching
 @SpringCloudApplication
-public class Water188BDriverApplication {
+public class Water188BUdpDriverApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Water188BDriverApplication.class, args);
+        SpringApplication.run(Water188BUdpDriverApplication.class, args);
     }
 
 }

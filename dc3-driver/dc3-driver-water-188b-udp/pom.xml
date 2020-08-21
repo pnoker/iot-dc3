@@ -23,10 +23,10 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>dc3-driver-water-188b</artifactId>
+    <artifactId>dc3-driver-water-188b-udp</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 188B协议驱动。</description>
+    <description>IOT DC3 平台 188B UDP协议驱动。</description>
 
     <properties>
         <netty.version>4.1.46.Final</netty.version>
