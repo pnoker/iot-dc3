@@ -69,20 +69,8 @@ public class BatchServiceImpl implements BatchService {
 
     @Override
     @Transactional
-    public Boolean batchImport(MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
-            throw new ServiceException("Import file is empty");
-        }
+    public Boolean batchImport(List<BatchDriver> batchDrivers) {
         try {
-            // Convert json file to ImportAll object
-            List<BatchDriver> batchDrivers = JSON.parseArray(
-                    Dc3Util.inputStreamToString(multipartFile.getInputStream()),
-                    BatchDriver.class
-            );
-            if (null == batchDrivers) {
-                throw new ServiceException("Import file is blank");
-            }
-
             batchDrivers.forEach(batchDriver -> {
                 if (StringUtils.isBlank(batchDriver.getServiceName())) {
                     throw new ServiceException("Driver service name is blank");

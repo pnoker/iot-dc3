@@ -23,6 +23,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,11 @@ public class NettyTcpServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
-                            socketChannel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyTcpServerHandler());
+                            socketChannel.pipeline().addLast(
+                                    new WriteTimeoutHandler(30),
+                                    new ReadTimeoutHandler(30),
+                                    new NettyTcpServerHandler()
+                            );
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();
