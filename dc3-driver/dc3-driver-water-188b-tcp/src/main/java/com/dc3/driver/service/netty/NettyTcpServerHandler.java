@@ -16,6 +16,9 @@
 
 package com.dc3.driver.service.netty;
 
+import com.alibaba.fastjson.JSON;
+import com.dc3.common.bean.batch.BatchDevice;
+import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
@@ -23,6 +26,7 @@ import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.rabbit.DriverService;
 import com.dc3.common.sdk.util.DriverUtils;
+import com.dc3.common.utils.Dc3Util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandler;
@@ -33,6 +37,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -95,17 +101,86 @@ import java.util.concurrent.TimeUnit;
 public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     private static final String START_TAG = "fefefe";
 
-    private static NettyTcpServerHandler that;
+    private static NettyTcpServerHandler nettyTcpServerHandler;
 
     @PostConstruct
     public void init() {
-        that = this;
+        nettyTcpServerHandler = this;
     }
 
     @Resource
     private DriverService driverService;
     @Resource
     private DriverContext driverContext;
+
+    @Override
+    public void channelActive(ChannelHandlerContext context) {
+        log.debug("Water 188B Driver Listener({}) accept clint({})", context.channel().localAddress(), context.channel().remoteAddress());
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext context, Object msg) {
+        ByteBuf byteBuf = (ByteBuf) msg;
+        decode(context, byteBuf);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
+        log.error(throwable.getMessage(), throwable);
+        context.close();
+    }
+
+    /**
+     * 自注册设备
+     *
+     * @param deviceName
+     * @throws IOException
+     */
+    private void autoRegister(String deviceName) throws IOException {
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("import/batch-import-188b-tcp-template.json");
+        if (null == inputStream) {
+            inputStream = this.getClass().getResourceAsStream("import/batch-import-188b-tcp-template.json");
+        }
+        List<BatchDriver> batchDrivers = JSON.parseArray(
+                Dc3Util.inputStreamToString(inputStream),
+                BatchDriver.class
+        );
+        BatchDevice batchDevice = new BatchDevice();
+        batchDevice.setName(deviceName);
+        batchDrivers.get(0).getProfiles().get(0).getGroups().get(0).getDevices().add(batchDevice);
+        nettyTcpServerHandler.driverService.batchImportBatchDriver(batchDrivers);
+    }
+
+    public void decode(ChannelHandlerContext context, ByteBuf byteBuf) {
+        if (!START_TAG.equals(ByteBufUtil.hexDump(byteBuf, 0, 3))) {
+            throw new ServiceException("Start Tag Invalid");
+        }
+        String deviceName = ByteBufUtil.hexDump(byteBuf, 5, 7);
+        log.info("Receive Device({})[{}] Bytes -> {}", deviceName, context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf).toUpperCase());
+
+        List<PointValue> pointValues = new ArrayList<>();
+        Long deviceId;
+        try {
+            deviceId = nettyTcpServerHandler.driverContext.getDeviceIdByName(deviceName);
+        } catch (Exception ignored) {
+            log.info("Auto register device : {}", deviceName);
+            try {
+                autoRegister(deviceName);
+            } catch (IOException e) {
+                log.error("Auto register device({}) error {}", deviceName, e.getMessage(), e);
+                return;
+            }
+            deviceId = nettyTcpServerHandler.driverContext.getDeviceIdByName(deviceName);
+        }
+
+        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyTcpServerHandler.driverContext.getDevicePointInfoMap().get(deviceId);
+        for (Long pointId : pointInfoMap.keySet()) {
+            PointValue pointValue = pointValueDecode(deviceId, pointId, pointInfoMap.get(pointId), byteBuf);
+            pointValues.add(pointValue);
+        }
+        PointValue pointValue = new PointValue(deviceId, pointValues, 1, TimeUnit.HOURS);
+        nettyTcpServerHandler.driverService.multiPointValueSender(pointValue);
+    }
 
     /**
      * 解析 Point Value 数据
@@ -116,7 +191,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
      * @param byteBuf  ByteBuf
      * @return PointValue
      */
-    private PointValue pointValueDecode(long deviceId, long pointId, Map<String, AttributeInfo> infoMap, ByteBuf byteBuf) {
+    public PointValue pointValueDecode(long deviceId, long pointId, Map<String, AttributeInfo> infoMap, ByteBuf byteBuf) {
         String type = DriverUtils.value(infoMap.get("type").getType(), infoMap.get("type").getValue());
         int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
         int length = DriverUtils.value(infoMap.get("length").getType(), infoMap.get("length").getValue());
@@ -125,15 +200,15 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
         switch (type.toLowerCase()) {
             case Common.ValueType.HEX:
                 rawValue = ByteBufUtil.hexDump(byteBuf.retainedSlice(start, length)).toUpperCase();
-                value = that.driverService.convertValue(deviceId, pointId, rawValue);
+                value = nettyTcpServerHandler.driverService.convertValue(deviceId, pointId, rawValue);
                 break;
             case Common.ValueType.SHORT:
                 rawValue = String.valueOf(byteBuf.getShortLE(start));
-                value = that.driverService.convertValue(deviceId, pointId, rawValue);
+                value = nettyTcpServerHandler.driverService.convertValue(deviceId, pointId, rawValue);
                 break;
             case Common.ValueType.INT:
                 rawValue = String.valueOf(DriverUtils.bytesToIntLE(ByteBufUtil.getBytes(byteBuf, start, length)));
-                value = that.driverService.convertValue(deviceId, pointId, rawValue);
+                value = nettyTcpServerHandler.driverService.convertValue(deviceId, pointId, rawValue);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + type.toLowerCase());
@@ -148,7 +223,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
      *
      * @return PointValue
      */
-    private String customDecode(int start, String value) {
+    public String customDecode(int start, String value) {
         //信号强度额外处理
         if (start == 163) {
             int csq = (int) Double.parseDouble(value);
@@ -158,37 +233,6 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
             value = String.valueOf(csq);
         }
         return value;
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext context) {
-        log.debug("Water 188B Driver Listener({}) accept clint({})", context.channel().localAddress(), context.channel().remoteAddress());
-    }
-
-    @Override
-    public void channelRead(ChannelHandlerContext context, Object msg) {
-        ByteBuf byteBuf = (ByteBuf) msg;
-        if (!START_TAG.equals(ByteBufUtil.hexDump(byteBuf, 0, 3))) {
-            throw new ServiceException("Start Tag Invalid");
-        }
-        String deviceName = ByteBufUtil.hexDump(byteBuf, 5, 7);
-        log.info("Receive Device({})[{}] Bytes -> {}", deviceName, context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf).toUpperCase());
-
-        List<PointValue> pointValues = new ArrayList<>();
-        Long deviceId = that.driverContext.getDeviceIdByName(deviceName);
-        Map<Long, Map<String, AttributeInfo>> pointInfoMap = that.driverContext.getDevicePointInfoMap().get(deviceId);
-        for (Long pointId : pointInfoMap.keySet()) {
-            PointValue pointValue = pointValueDecode(deviceId, pointId, pointInfoMap.get(pointId), byteBuf);
-            pointValues.add(pointValue);
-        }
-        PointValue pointValue = new PointValue(deviceId, pointValues, 1, TimeUnit.HOURS);
-        that.driverService.multiPointValueSender(pointValue);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.error(throwable.getMessage());
-        context.close();
     }
 
 }

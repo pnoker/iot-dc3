@@ -17,6 +17,9 @@
 package com.dc3.common.sdk.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
+import com.dc3.api.center.manager.feign.BatchClient;
+import com.dc3.common.bean.R;
+import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.bean.driver.DeviceStatus;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
@@ -45,6 +48,20 @@ public class DriverService {
     private DriverContext driverContext;
     @Resource
     private RabbitTemplate rabbitTemplate;
+    @Resource
+    private BatchClient batchClient;
+
+    /**
+     * 批量导入
+     * 可通过解析配置文件实现
+     *
+     * @param batchDrivers List<BatchDriver>
+     * @return boolean
+     */
+    public boolean batchImportBatchDriver(List<BatchDriver> batchDrivers) {
+        R<Boolean> batchDriver = batchClient.batchImportBatchDriver(batchDrivers);
+        return batchDriver.isOk();
+    }
 
     /**
      * 发送设备状态
