@@ -16,7 +16,6 @@
 
 package com.dc3.center.manager.service.impl;
 
-import cn.hutool.core.thread.ThreadUtil;
 import com.alibaba.fastjson.JSON;
 import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.batch.BatchDriver;
@@ -37,7 +36,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>BatchService Impl
@@ -71,20 +69,8 @@ public class BatchServiceImpl implements BatchService {
 
     @Override
     @Transactional
-    public Boolean batchImport(MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
-            throw new ServiceException("Import file is empty");
-        }
+    public Boolean batchImport(List<BatchDriver> batchDrivers) {
         try {
-            // Convert json file to ImportAll object
-            List<BatchDriver> batchDrivers = JSON.parseArray(
-                    Dc3Util.inputStreamToString(multipartFile.getInputStream()),
-                    BatchDriver.class
-            );
-            if (null == batchDrivers) {
-                throw new ServiceException("Import file is blank");
-            }
-
             batchDrivers.forEach(batchDriver -> {
                 if (StringUtils.isBlank(batchDriver.getServiceName())) {
                     throw new ServiceException("Driver service name is blank");
@@ -137,7 +123,6 @@ public class BatchServiceImpl implements BatchService {
             }
 
             notifyService.notifyDriverProfile(driver, profile.getId(), Operation.Profile.ADD);
-            ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
         }
         return profile;
     }
@@ -178,7 +163,6 @@ public class BatchServiceImpl implements BatchService {
                 driverInfo = driverInfoService.update(driverInfo.setValue(value));
                 notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.UPDATE);
             }
-            ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
         });
     }
 
@@ -228,8 +212,6 @@ public class BatchServiceImpl implements BatchService {
                 pointService.update(point);
                 notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.UPDATE);
             }
-
-            ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
         });
     }
 
@@ -263,7 +245,6 @@ public class BatchServiceImpl implements BatchService {
                         throw new ServiceException("Add device failed: " + batchDevice.getName());
                     }
                     notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.ADD);
-                    ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
                 }
 
                 // Add Point Info
@@ -317,8 +298,6 @@ public class BatchServiceImpl implements BatchService {
                     pointInfo = pointInfoService.update(pointInfo.setValue(value));
                     notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.UPDATE);
                 }
-
-                ThreadUtil.sleep(500, TimeUnit.MILLISECONDS);
             });
         });
     }
