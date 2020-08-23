@@ -7,7 +7,7 @@ server:
   thread:
     prefix: dc3-thread-
     core-pool-size: 4
-    maximum-pool-size: 512
+    maximum-pool-size: 1024
     keep-alive-time: 10
 
 spring:
@@ -95,7 +95,7 @@ management:
 
 feign:
   hystrix:
-    enabled: true
+    enabled: false
   httpclient:
     enabled: false
   okhttp:
@@ -103,7 +103,6 @@ feign:
   compression:
     request:
       enabled: true
-      mime-types: application/json
     response:
       enabled: true
       use-gzip-decoder: true
@@ -112,16 +111,12 @@ hystrix:
   command:
     default:
       execution:
-        timeout:
-          enable: true
         isolation:
           thread:
-            timeout-in-milliseconds: 5000
+            timeoutInMilliseconds: 30000
   threadpool:
     default:
-      core-size: 20
-      max-queue-size: 100
-      queue-size-rejection-threshold: 80
+      coreSize: 1024
 
 eureka:
   instance:

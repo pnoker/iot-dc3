@@ -18,10 +18,13 @@ package com.dc3.api.center.manager.hystrix;
 
 import com.dc3.api.center.manager.feign.BatchClient;
 import com.dc3.common.bean.R;
+import com.dc3.common.bean.batch.BatchDriver;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * <p>ImportClientHystrix
@@ -40,7 +43,12 @@ public class BatchClientHystrix implements FallbackFactory<BatchClient> {
         return new BatchClient() {
 
             @Override
-            public R<Boolean> batchImport(MultipartFile multipartFile) {
+            public R<Boolean> batchImportFile(MultipartFile multipartFile) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Boolean> batchImportBatchDriver(List<BatchDriver> batchDrivers) {
                 return R.fail(message);
             }
 
