@@ -1,0 +1,43 @@
+driver:
+  name: Water188BTcpDriver
+  description: @project.description@
+  custom:
+    tcp:
+      port: 9270
+  schedule:
+    read:
+      enable: false
+      corn: '0/30 * * * * ?'
+    custom:
+      enable: false
+      corn:  '0/5 * * * * ?'
+  point-attribute:
+    - displayName: 起始字节
+      name: start
+      type: int
+      value: 0
+      description: 起始字节，包含该字节
+    - displayName: 长度
+      name: length
+      type: int
+      value: 8
+      description: 字节长度
+    - displayName: 类型
+      name: type
+      type: string
+      value: int
+      description: 解析类型，short、int、long、float、double、boolean、string
+
+server:
+  port: 8702
+
+spring:
+  application:
+    name: @project.artifactId@
+
+logging:
+  level:
+    com.dc3.common.sdk: DEBUG
+    com.dc3: DEBUG
+  file:
+    name: dc3/logs/driver/water/188b/tcp/${spring.application.name}.log
