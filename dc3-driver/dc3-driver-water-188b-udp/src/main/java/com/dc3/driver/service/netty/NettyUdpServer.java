@@ -23,7 +23,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -49,7 +48,6 @@ public class NettyUdpServer {
                         protected void initChannel(Channel channel) {
                             channel.pipeline().addLast(
                                     new WriteTimeoutHandler(30),
-                                    new ReadTimeoutHandler(30),
                                     new NettyUdpServerHandler()
                             );
                         }
