@@ -1,0 +1,650 @@
+[
+  {
+    "serviceName": "dc3-driver-water-188b-tcp",
+    "profiles": [
+      {
+        "name": "Water_188B_Tcp_Profile",
+        "share": true,
+        "points": [
+          {
+            "name": "数据标识",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计量单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "反向累计量单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "瞬时流量单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "水压单位",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计水量",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "剩余金额",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "状态",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "充值识别码",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "反向累计流量",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "瞬时流量",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "水压",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-0点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-1点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-2点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-3点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-4点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-5点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-6点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-7点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-8点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-9点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-10点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-11点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-12点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-13点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-14点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-15点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-16点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-17点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-18点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-19点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-20点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-21点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-22点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "正向累计流量-23点",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 0.001,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "信号强度",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "accrue": false,
+            "format": "%.3f",
+            "unit": "-"
+          }
+        ],
+        "pointConfig": {
+          "数据标识": {
+            "start": 15,
+            "length": 2,
+            "type": "hex"
+          },
+          "正向累计量单位": {
+            "start": 17,
+            "length": 1,
+            "type": "hex"
+          },
+          "反向累计量单位": {
+            "start": 18,
+            "length": 1,
+            "type": "hex"
+          },
+          "瞬时流量单位": {
+            "start": 19,
+            "length": 1,
+            "type": "hex"
+          },
+          "水压单位": {
+            "start": 20,
+            "length": 1,
+            "type": "hex"
+          },
+          "正向累计水量": {
+            "start": 21,
+            "length": 4,
+            "type": "int"
+          },
+          "剩余金额": {
+            "start": 25,
+            "length": 4,
+            "type": "int"
+          },
+          "状态": {
+            "start": 29,
+            "length": 4,
+            "type": "hex"
+          },
+          "充值识别码": {
+            "start": 33,
+            "length": 1,
+            "type": "hex"
+          },
+          "反向累计流量": {
+            "start": 34,
+            "length": 4,
+            "type": "int"
+          },
+          "瞬时流量": {
+            "start": 38,
+            "length": 3,
+            "type": "int"
+          },
+          "水压": {
+            "start": 41,
+            "length": 2,
+            "type": "short"
+          },
+          "正向累计流量-0点": {
+            "start": 43,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-1点": {
+            "start": 48,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-2点": {
+            "start": 53,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-3点": {
+            "start": 58,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-4点": {
+            "start": 63,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-5点": {
+            "start": 68,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-6点": {
+            "start": 73,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-7点": {
+            "start": 78,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-8点": {
+            "start": 83,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-9点": {
+            "start": 88,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-10点": {
+            "start": 93,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-11点": {
+            "start": 98,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-12点": {
+            "start": 103,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-13点": {
+            "start": 108,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-14点": {
+            "start": 113,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-15点": {
+            "start": 118,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-16点": {
+            "start": 123,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-17点": {
+            "start": 128,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-18点": {
+            "start": 133,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-19点": {
+            "start": 138,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-20点": {
+            "start": 143,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-21点": {
+            "start": 148,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-22点": {
+            "start": 153,
+            "length": 4,
+            "type": "int"
+          },
+          "正向累计流量-23点": {
+            "start": 158,
+            "length": 4,
+            "type": "int"
+          },
+          "信号强度": {
+            "start": 163,
+            "length": 2,
+            "type": "short"
+          }
+        },
+        "groups": [
+          {
+            "name": "Water_188B_Tcp_Group",
+            "devices": []
+          }
+        ]
+      }
+    ]
+  }
+]
