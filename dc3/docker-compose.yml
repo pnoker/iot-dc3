@@ -33,6 +33,8 @@ services:
       - 8000:8000
     container_name: dc3-gateway
     hostname: dc3-gateway
+    volumes:
+      - logs:/dc3-gateway/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -48,6 +50,8 @@ services:
       - 8100:8100
     container_name: dc3-register
     hostname: dc3-register
+    volumes:
+      - logs:/dc3-center/dc3-register/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -63,6 +67,8 @@ services:
       - 8200:8200
     container_name: dc3-monitor
     hostname: dc3-monitor
+    volumes:
+      - logs:/dc3-center/dc3-monitor/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -78,6 +84,8 @@ services:
       - 8300:8300
     container_name: dc3-auth
     hostname: dc3-auth
+    volumes:
+      - logs:/dc3-center/dc3-auth/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -93,6 +101,8 @@ services:
       - 8400:8400
     container_name: dc3-manager
     hostname: dc3-manager
+    volumes:
+      - logs:/dc3-center/dc3-manager/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -108,6 +118,8 @@ services:
       - 8500:8500
     container_name: dc3-data
     hostname: dc3-data
+    volumes:
+      - logs:/dc3-center/dc3-data/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -123,6 +135,8 @@ services:
       - 8600:8600
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
+    volumes:
+      - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -138,6 +152,8 @@ services:
       - 8601:8601
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
+    volumes:
+      - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -153,6 +169,8 @@ services:
       - 8602:8602
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
+    volumes:
+      - logs:/dc3-driver/dc3-driver-opc-da/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -168,6 +186,8 @@ services:
       - 8603:8603
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
+    volumes:
+      - logs:/dc3-driver/dc3-driver-opc-ua/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -183,6 +203,8 @@ services:
       - 8700:8700
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
+    volumes:
+      - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -198,6 +220,8 @@ services:
       - 8701:8701
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
     networks:
       dc3net:
         aliases:
@@ -210,13 +234,51 @@ services:
     image: pnoker/dc3-driver-modbus-tcp:1.0.0
     restart: always
     ports:
-      - 8702:8702
+      - 8604:8604
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
     networks:
       dc3net:
         aliases:
           - dc3-driver-modbus-tcp
+
+  188b-tcp:
+    build:
+      context: ../dc3-driver/dc3-driver-water-188b-tcp/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-water-188b-tcp:1.0.0
+    restart: always
+    ports:
+      - 8702:8702
+      - 9270:9270
+    container_name: dc3-driver-water-188b-tcp
+    hostname: dc3-driver-water-188b-tcp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-water-188b-tcp/dc3/logs
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-water-188b-tcp
+
+  188b-udp:
+    build:
+      context: ../dc3-driver/dc3-driver-water-188b-udp/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-water-188b-udp:1.0.0
+    restart: always
+    ports:
+      - 8703:8703
+      - 9271:9271
+    container_name: dc3-driver-water-188b-udp
+    hostname: dc3-driver-water-188b-udp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-water-188b-udp/dc3/logs
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-water-188b-udp
 
   rtmp:
     build:
@@ -353,7 +415,7 @@ services:
           - dc3-nginx
 
   portainer:
-    image:  portainer/portainer:1.24.0
+    image:  portainer/portainer:1.24.1
     restart: always
     container_name: portainer
     hostname: dc3-portainer
@@ -369,12 +431,13 @@ services:
           - dc3-portainer
 
 volumes:
-  portainer:
+  logs:
   mysql:
-  redis:
   mongo_config:
   mongo_db:
+  redis:
   rabbitmq:
+  portainer:
 
 networks:
   dc3net:
