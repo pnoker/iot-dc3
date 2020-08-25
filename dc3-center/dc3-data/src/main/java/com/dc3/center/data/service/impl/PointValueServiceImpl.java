@@ -89,8 +89,12 @@ public class PointValueServiceImpl implements PointValueService {
         criteria.and("deviceId").is(deviceId);
         if (r.getData().getMulti()) {
             criteria.and("multi").is(true);
-        }
-        if (null != pointId) {
+            if (null != pointId) {
+                criteria.and("children").elemMatch(
+                        (new Criteria()).and("pointId").is(pointId)
+                );
+            }
+        } else if (null != pointId) {
             criteria.and("pointId").is(pointId);
         }
 
@@ -124,11 +128,20 @@ public class PointValueServiceImpl implements PointValueService {
             if (r.isOk()) {
                 if (r.getData().getMulti()) {
                     criteria.and("multi").is(true);
+                    if (null != pointValueDto.getPointId()) {
+                        criteria.and("children").elemMatch(
+                                (new Criteria()).and("pointId").is(pointValueDto.getPointId())
+                        );
+                    }
+                } else if (null != pointValueDto.getPointId()) {
+                    criteria.and("pointId").is(pointValueDto.getPointId());
                 }
             }
-        }
-        if (null != pointValueDto.getPointId()) {
-            criteria.and("pointId").is(pointValueDto.getPointId());
+        } else if (null != pointValueDto.getPointId()) {
+            criteria.orOperator(
+                    (new Criteria()).and("pointId").is(pointValueDto.getPointId()),
+                    (new Criteria()).and("children").elemMatch((new Criteria()).and("pointId").is(pointValueDto.getPointId()))
+            );
         }
 
         if (null == pointValueDto.getPage()) {
@@ -148,13 +161,16 @@ public class PointValueServiceImpl implements PointValueService {
         long count = mongoTemplate.count(query, PointValue.class);
         List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class);
 
-        Long id = 0L;
+
+        long id = 0L;
         for (PointValue pointValue1 : pointValues) {
             pointValue1.setId(id);
             id++;
-            for (PointValue pointValue2 : pointValue1.getChildren()) {
-                pointValue2.setId(id);
-                id++;
+            if (null != pointValue1.getChildren()) {
+                for (PointValue pointValue2 : pointValue1.getChildren()) {
+                    pointValue2.setId(id);
+                    id++;
+                }
             }
         }
         return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);

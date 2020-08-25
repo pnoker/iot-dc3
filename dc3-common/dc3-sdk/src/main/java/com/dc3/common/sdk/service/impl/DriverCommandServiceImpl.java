@@ -39,12 +39,12 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @Resource
     private DriverContext driverContext;
     @Resource
-    private CustomDriverService customDriverService;
-    @Resource
     private DriverService driverService;
+    @Resource
+    private CustomDriverService customDriverService;
 
     @Override
-    public PointValue singleRead(Long deviceId, Long pointId) {
+    public PointValue read(Long deviceId, Long pointId) {
         Device device = driverContext.getDevice(deviceId);
         try {
             String rawValue = customDriverService.read(
@@ -61,11 +61,6 @@ public class DriverCommandServiceImpl implements DriverCommandService {
             log.error("DriverCommandServiceImpl.read{}", e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
-    }
-
-    @Override
-    public PointValue multiRead(Long deviceId) {
-        return null;
     }
 
     @Override
