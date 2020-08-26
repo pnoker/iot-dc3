@@ -147,6 +147,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
         );
         BatchDevice batchDevice = new BatchDevice();
         batchDevice.setName(deviceName);
+        batchDevice.setMulti(true);
         batchDrivers.get(0).getProfiles().get(0).getGroups().get(0).getDevices().add(batchDevice);
         nettyTcpServerHandler.driverService.batchImportBatchDriver(batchDrivers);
     }

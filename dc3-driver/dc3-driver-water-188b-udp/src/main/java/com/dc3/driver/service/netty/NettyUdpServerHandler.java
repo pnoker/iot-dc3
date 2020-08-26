@@ -141,6 +141,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
         );
         BatchDevice batchDevice = new BatchDevice();
         batchDevice.setName(deviceName);
+        batchDevice.setMulti(true);
         batchDrivers.get(0).getProfiles().get(0).getGroups().get(0).getDevices().add(batchDevice);
         nettyUdpServerHandler.driverService.batchImportBatchDriver(batchDrivers);
     }
