@@ -16,7 +16,6 @@
 
 package com.dc3.center.manager.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.bean.batch.BatchGroup;
@@ -25,12 +24,10 @@ import com.dc3.common.bean.batch.BatchProfile;
 import com.dc3.common.constant.Operation;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
-import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -239,6 +236,9 @@ public class BatchServiceImpl implements BatchService {
                 Device device = deviceService.selectDeviceByNameAndGroup(batchDevice.getName(), finalGroup.getId());
                 if (null == device) {
                     device = new Device(batchDevice.getName(), profile.getId(), finalGroup.getId());
+                    if (batchDevice.getMulti()) {
+                        device.setMulti(true);
+                    }
                     device.setDescription("批量导入：新增");
                     device = deviceService.add(device);
                     if (null == device) {
