@@ -156,7 +156,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
         if (!START_TAG.equals(ByteBufUtil.hexDump(byteBuf, 0, 3))) {
             throw new ServiceException("Start Tag Invalid");
         }
-        String deviceName = ByteBufUtil.hexDump(byteBuf, 5, 7);
+        String deviceName = ByteBufUtil.hexDump(DriverUtils.byteReverse(ByteBufUtil.getBytes(byteBuf, 5, 5)));
         log.info("Receive Device({})[{}] Bytes -> {}", deviceName, context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf).toUpperCase());
 
         List<PointValue> pointValues = new ArrayList<>();
