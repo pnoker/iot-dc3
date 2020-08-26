@@ -147,6 +147,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
         );
         BatchDevice batchDevice = new BatchDevice();
         batchDevice.setName(deviceName);
+        batchDevice.setMulti(true);
         batchDrivers.get(0).getProfiles().get(0).getGroups().get(0).getDevices().add(batchDevice);
         nettyTcpServerHandler.driverService.batchImportBatchDriver(batchDrivers);
     }
@@ -155,7 +156,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
         if (!START_TAG.equals(ByteBufUtil.hexDump(byteBuf, 0, 3))) {
             throw new ServiceException("Start Tag Invalid");
         }
-        String deviceName = ByteBufUtil.hexDump(byteBuf, 5, 7);
+        String deviceName = ByteBufUtil.hexDump(DriverUtils.byteReverse(ByteBufUtil.getBytes(byteBuf, 5, 5)));
         log.info("Receive Device({})[{}] Bytes -> {}", deviceName, context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf).toUpperCase());
 
         List<PointValue> pointValues = new ArrayList<>();

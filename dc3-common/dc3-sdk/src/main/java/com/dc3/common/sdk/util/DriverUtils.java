@@ -152,6 +152,21 @@ public class DriverUtils {
     }
 
     /**
+     * 将byte[]颠倒
+     *
+     * @param bytes Byte Array
+     * @return Byte Array
+     */
+    public static byte[] byteReverse(byte[] bytes) {
+        int length = bytes.length;
+        byte[] reverse = new byte[length];
+        for (int i = 0; i < length; i++) {
+            reverse[length - 1 - i] = bytes[i];
+        }
+        return reverse;
+    }
+
+    /**
      * 合并byte[]
      *
      * @param bytes Byte Array
