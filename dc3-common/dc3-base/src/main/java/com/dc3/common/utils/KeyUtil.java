@@ -162,7 +162,7 @@ public class KeyUtil {
         JwtBuilder builder = Jwts.builder()
                 .setId(name)
                 .setIssuedAt(new Date())
-                .setExpiration(Dc3Util.expireTime(6, Calendar.HOUR))
+                .setExpiration(Dc3Util.expireTime(12, Calendar.HOUR))
                 .signWith(SignatureAlgorithm.HS256, Common.KEY);
         return builder.compact();
     }

@@ -169,7 +169,7 @@ public interface Common {
         /**
          * token 在 redis 中的失效时间
          */
-        int TOKEN_CACHE_TIMEOUT = 5;
+        int TOKEN_CACHE_TIMEOUT = 12;
 
         /**
          * 分隔符

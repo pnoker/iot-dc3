@@ -47,9 +47,22 @@ public class GlobalExceptionAdvice {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public R exception(Exception exception) {
-        log.error("Global Exception:{}", exception.getMessage(), exception);
+    public R globalException(Exception exception) {
+        log.error("Global Exception Handler: {}", exception.getMessage(), exception);
         return R.fail(exception.getMessage());
+    }
+
+    /**
+     * UnAuthorized Exception
+     *
+     * @param unAuthorizedException UnAuthorizedException
+     * @return R
+     */
+    @ExceptionHandler(UnAuthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public R unAuthorizedException(UnAuthorizedException unAuthorizedException) {
+        log.warn("UnAuthorized Exception Handler: {}", unAuthorizedException.getMessage(), unAuthorizedException);
+        return R.fail(unAuthorizedException.getMessage());
     }
 
     /**
@@ -62,11 +75,12 @@ public class GlobalExceptionAdvice {
             BindException.class,
             MethodArgumentNotValidException.class
     })
-    public R bodyValidExceptionHandler(MethodArgumentNotValidException exception) {
+    @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
+    public R methodArgumentNotValidException(MethodArgumentNotValidException exception) {
         HashMap<String, String> map = new HashMap<>(16);
         List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
         errorList.forEach(error -> {
-            log.warn("Method Argument Not Valid Exception:{}({})", error.getField(), error.getDefaultMessage());
+            log.warn("Method Argument Not Valid Exception Handler: {}({})", error.getField(), error.getDefaultMessage());
             map.put(error.getField(), error.getDefaultMessage());
         });
         return R.fail(JSON.toJSONString(map));
