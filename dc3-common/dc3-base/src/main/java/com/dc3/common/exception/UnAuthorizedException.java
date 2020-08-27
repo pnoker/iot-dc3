@@ -17,12 +17,12 @@
 package com.dc3.common.exception;
 
 /**
- * 自定义服务 异常
+ * 自定义未授权 异常
  *
  * @author pnoker
  */
-public class ServiceException extends RuntimeException {
-    public ServiceException(String message) {
+public class UnAuthorizedException extends RuntimeException {
+    public UnAuthorizedException(String message) {
         super(message);
     }
 }
