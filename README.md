@@ -16,7 +16,7 @@
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
 
-------
+~~------
 
 
 
@@ -57,13 +57,13 @@
 
 ![iot-dc3-architecture](dc3/images/iot-dc3-architecture2.jpg)
 
-[`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign) 等微服务模块。
+[`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign) 等微服务模块。~~
 
 
 
 ### 3 项目文档
 
-> 详情请阅读 [`WiKi`](https://gitee.com/pnoker/iot-dc3/wikis/Home) 文档
+> 详情请阅读 [`项目文档`](https://doc.dc3.site) 文档
 
 **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
@@ -86,9 +86,9 @@
 
 ### 5 联系作者
 
-:whale2: 邮箱:pnokers@icloud.com
+:whale2: 邮箱: pnokers@icloud.com
 
-:speech_balloon: 如果感兴趣可以加入`DC3` 微信技术交流群，开源免费（微信：18304071393，请备注：DC3微信技术交流群）
+:speech_balloon: 如果感兴趣可以加入`DC3` 微信技术交流群，开源免费（微信: 18304071393，请备注: DC3微信技术交流群）
 
 **:mega: 非常欢迎**
 

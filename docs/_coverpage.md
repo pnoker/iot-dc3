@@ -11,4 +11,4 @@
 
 [Gitee](https://gitee.com/pnoker/iot-dc3/)
 [GitHub](https://github.com/pnoker/iot-dc3/)
-[Getting Started](#1 DC3 架构设计)
+[Getting Started](home.md)
