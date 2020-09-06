@@ -31,7 +31,7 @@ driver:
       id: dc3-mqtt-client
     default:
       topic: dc3-mqtt-topic
-      qos: 2
+      qos: 1
       receive:
         enable: true
     keep-alive: 5
