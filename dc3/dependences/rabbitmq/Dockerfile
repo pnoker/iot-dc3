@@ -17,9 +17,8 @@
 FROM rabbitmq:3.8-alpine
 MAINTAINER pnoker <pnokers.icloud.com>
 
-ENV RABBITMQ_DEFAULT_VHOST dc3
-ENV RABBITMQ_DEFAULT_USER dc3
-ENV RABBITMQ_DEFAULT_PASS dc3
+COPY ./rabbitmq.conf /etc/rabbitmq/rabbitmq.conf
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && rabbitmq-plugins enable rabbitmq_management rabbitmq_mqtt rabbitmq_stomp
+
