@@ -8,13 +8,42 @@
 >
 >
 > 其中：MySQL、MongoDB、Redis、RabbitMQ 用户名密码均为：`dc3`
+>
+> MySQL、MongoDB、Redis、RabbitMQ 用户名密码的配置均在：dc3-common/dc3-config/src/main/resources/bootstrap.yml
+
+
+---
+
+### Docker Desktop
+
+> 开发环境: 推荐安装 Docker Desktop
+
+- Mac : [Docker Desktop For Mac](https://download.docker.com/mac/edge/Docker.dmg)
+
+- Windows : [Docker Desktop For Windows](https://download.docker.com/win/edge/Docker%20Desktop%20Installer.exe)
+
+> 生产环境: 推荐在宿主机上安装 Docker 服务
+
+- 推荐 Centos : [Install Docker Engine on CentOS](https://docs.docker.com/engine/install/centos/)
+
+- Ubuntu : [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+
+- Debian : [Install Docker Engine on Debian](https://docs.docker.com/engine/install/debian/)
+
+
+### Java
+
+- Java JDK 1.8 [Java SE Development Kit 8 Downloads](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
+
+
+### Maven
+
+- Maven 3.6 [Installing Apache Maven](http://maven.apache.org/install.html)
 
 
 ### MySQL
 
-#### Docker 上启动 MySQL 服务
-
-> (推荐在 **开发** 环境使用 Docker 启动该服务)
+> 开发环境: 推荐使用 Docker 启动该服务
 
 ```bash
 cd iot-dc3/dc3
@@ -29,54 +58,15 @@ docker-compose up -d mysql
 docker-compose stop mysql
 ```
 
-#### Centos 上启动 MySQL 服务
+> 生产环境: 推荐在宿主机上安装 MySQL 服务
 
-> (推荐在 **生产** 环境使用 Centos 部署该服务)
+导入 iot-dc3 数据库脚本文件, dc3/dependences/mysql/iot-dc3.sql ,使用 Navicat 之类的软件即可
 
-##### 1.安装 MySQL
-```bash
-wget -i -c http://dev.mysql.com/get/mysql57-community-release-el7-10.noarch.rpm
-yum -y install mysql57-community-release-el7-10.noarch.rpm
-yum -y install mysql-community-server
-```
-
-##### 2.启动
-```bash
-systemctl enable mysqld.service
-systemctl start mysqld.service
-```
-
-##### 3.查看初始化密码
-```bash
-grep 'temporary password' /var/log/mysqld.log
-```
-
-##### 4.登陆 MySQL
-```bash
-mysql -uroot -p
-#输入上述初始密码
-
-#'new password'请替换成你想要设置的密码
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'new password';
-```
-
-##### 5.创建新的用户名和密码为 `dc3`
-
-```bash
-create user 'dc3'@'%' identified by 'dc3';
-grant privileges on dc3.* to 'dc3'@'%';
-flush privileges;
-exit
-```
-
-##### 6.导入 iot-dc3 数据库脚本文件, dc3/dependences/mysql/iot-dc3.sql ,使用 Navicat 之类的软件即可。
 
 
 ### MongoDB
 
-#### Docker 上启动 MongoDB 服务
-
-> (推荐在 **开发** 环境使用 Docker 启动该服务)
+> 开发环境: 推荐使用 Docker 启动该服务
 
 ```bash
 cd iot-dc3/dc3
@@ -91,16 +81,15 @@ docker-compose up -d mongo
 docker-compose stop mongo
 ```
 
-#### Centos 上启动 MongoDB 服务
+> 生产环境: 推荐在宿主机上安装 MongoDB 服务
 
+导入 iot-dc3.js 数据库脚本文件, dc3/dependences/mongo/iot-dc3.js ,使用 Navicat 之类的软件即可
 
 
 
 ### Redis
 
-#### Docker 上启动 Redis 服务
-
-> (推荐在 **开发** 环境使用 Docker 启动该服务)
+> 开发环境: 推荐使用 Docker 启动该服务
 
 ```bash
 cd iot-dc3/dc3
@@ -115,16 +104,15 @@ docker-compose up -d redis
 docker-compose stop redis
 ```
 
-#### Centos 上启动 Redis 服务
+> 生产环境: 推荐在宿主机上安装 MongoDB 服务
 
+Reids 配置文件在 dc3/dependences/redis/redis.conf
 
 
 
 ### RabbitMQ
 
-#### Docker 上启动 RabbitMQ 服务
-
-> (推荐在 **开发** 环境使用 Docker 启动该服务)
+> 开发环境: 推荐使用 Docker 启动该服务
 
 ```bash
 cd iot-dc3/dc3
@@ -139,4 +127,6 @@ docker-compose up -d rabbitmq
 docker-compose stop rabbitmq
 ```
 
-#### Centos 上启动 RabbitMQ 服务
+> 生产环境: 推荐在宿主机上安装 MongoDB 服务
+
+RabbitMQ 配置文件在 dc3/dependences/rabbitmq/rabbitmq.conf
