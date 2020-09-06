@@ -10,13 +10,6 @@
 
  - 遇到任何问题，请提交  [issue](https://gitee.com/pnoker/iot-dc3/issues) ，标明遇到的问题、开发环境和如何复现，作者每周会进行定期处理；
  - 提出新想法和设计方案。
- 
-## 🍦 请博主吃根雪糕
-
-如果你觉得项目对你有帮助,可以请博主吃根雪糕
-
-
-<img src="./images/wechat-cn.jpg" width="25%" alt="Wechat">
 
 ## 🚀 联系作者  
 

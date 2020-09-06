@@ -3,6 +3,8 @@
   - [快速开始](quick-start.md)
 - 开发
   - [环境配置](environment.md)
+  - [IDE中启动](idea-start.md)
+  - [Demo Web UI](web-ui.md)
 - 驱动
   - [OpcDa](opc-da.md)
   - [OpcUa](opc-us.md)
