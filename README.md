@@ -41,12 +41,13 @@
  * [x] 容错：没有单点故障弱,集群中的每个节点是相同的；
  * [x] 健壮和高效：单一服务器节点可以处理甚至数百成千上万的设备根据用例；
  * [x] 可定制：添加新的设备协议,并注册到服务中心；
- * [x] 跨平台：使用`Java`环境可异地、分布式多平台部署；
+ * [x] 跨平台：使用 `Java` 环境可异地、分布式多平台部署；
+ * [x] 自主可控：私有云、公有云、边缘部署；
  * [ ] 完善性：设备快速接入、注册、权限校验；
  * [ ] 安全：数据加密传输；
  * [ ] 多租户：命名空间，多租户化；
- * [ ] 云原生；
- * [x] Docker：容器化。
+ * [ ] 云原生：Kubernetes；
+ * [x] 容器化：Docker。
 
 
 
@@ -63,7 +64,7 @@
 
 ### 3 项目文档
 
-> 详情请阅读 [`WiKi`](https://gitee.com/pnoker/iot-dc3/wikis/Home) 文档
+> 详情请阅读 [`IOT DC3 Wiki`](https://doc.dc3.site) 文档
 
 **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
@@ -73,7 +74,7 @@
 
 > 入门：一睹为快，快速启动一个，Demo Application ！
 >
-> 详情请阅读 [`Demo`](https://gitee.com/pnoker/iot-dc3/wikis/1.1%20%E5%90%AF%E5%8A%A8Demo%E6%BC%94%E7%A4%BA?sort_id=2472351) 文档
+> 详情请阅读 [`快速开始 Demo`](https://doc.dc3.site/#/quick-start?id=%e4%b8%80%e7%9d%b9%e4%b8%ba%e5%bf%ab) 文档
 >
 > ```
 > git clone https://gitee.com/pnoker/iot-dc3.git
@@ -135,4 +136,4 @@
 
 #### 6.3 项目文档？
 
-> 目前项目文档主要以 `Gitee` 的  [`WiKi`](https://gitee.com/pnoker/iot-dc3/wikis/Home) 为主，部署或者二次开发过程中遇到问题可以提交 [issue](https://gitee.com/pnoker/iot-dc3/issues) 或者 在交流群 中进行提问。
+> 目前项目文档主要以 `Gitee` 的  [`IOT DC3 Wiki`](https://doc.dc3.site) 为主，部署或者二次开发过程中遇到问题可以提交 [issue](https://gitee.com/pnoker/iot-dc3/issues) 或者 在交流群 中进行提问。
