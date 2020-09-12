@@ -3,7 +3,7 @@
     "serviceName": "dc3-driver-water-188b-udp",
     "profiles": [
       {
-        "name": "Water188B_Udp_Profile",
+        "name": "Water-188B-Udp-Profile",
         "share": true,
         "points": [
           {
@@ -640,18 +640,10 @@
         },
         "groups": [
           {
-            "name": "Water_Udp_Group",
+            "name": "Water-188B-Udp-Group",
             "devices": [
               {
                 "name": "06020107200636",
-                "multi": true
-              },
-              {
-                "name": "03221018200673",
-                "multi": true
-              },
-              {
-                "name": "09451018200637",
                 "multi": true
               }
             ]

@@ -3,15 +3,15 @@
     "serviceName": "dc3-driver-modbus-tcp",
     "profiles": [
       {
-        "name": "ModbusTcp-Profile-1",
-        "share": true,
+        "name": "Modbus-Tcp-Profile",
+        "share": false,
         "driverConfig": {
           "host": "127.0.0.1",
           "port": "502"
         },
         "points": [
           {
-            "name": "ModbusTcp-Point-1",
+            "name": "Modbus-Tcp-Point-String",
             "type": "string",
             "rw": 0,
             "base": 0,
@@ -23,7 +23,7 @@
             "unit": "-"
           },
           {
-            "name": "ModbusTcp-Point-2",
+            "name": "Modbus-Tcp-Point-Boolean",
             "type": "boolean",
             "rw": 0,
             "base": 0,
@@ -35,7 +35,7 @@
             "unit": "-"
           },
           {
-            "name": "ModbusTcp-Point-3",
+            "name": "Modbus-Tcp-Point-Int",
             "type": "int",
             "rw": 0,
             "base": 0,
@@ -47,7 +47,7 @@
             "unit": "-"
           },
           {
-            "name": "ModbusTcp-Point-4",
+            "name": "Modbus-Tcp-Point-Long",
             "type": "long",
             "rw": 0,
             "base": 0,
@@ -59,7 +59,7 @@
             "unit": "-"
           },
           {
-            "name": "ModbusTcp-Point-5",
+            "name": "Modbus-Tcp-Point-Float",
             "type": "float",
             "rw": 0,
             "base": 0,
@@ -71,7 +71,7 @@
             "unit": "-"
           },
           {
-            "name": "ModbusTcp-Point-6",
+            "name": "Modbus-Tcp-Point-Double",
             "type": "double",
             "rw": 0,
             "base": 0,
@@ -85,37 +85,38 @@
         ],
         "groups": [
           {
-            "name": "ModbusTcp-Group-1",
+            "name": "Modbus-Tcp-Group",
             "devices": [
               {
-                "name": "ModbusTcp-Device-1",
+                "name": "Modbus-Tcp-Device",
+                "multi": false,
                 "pointConfig": {
-                  "ModbusTcp-Point-1": {
+                  "Modbus-Tcp-Point-String": {
                     "slaveId": "1",
                     "functionCode": "3",
                     "offset": "1"
                   },
-                  "ModbusTcp-Point-2": {
+                  "Modbus-Tcp-Point-Boolean": {
                     "slaveId": "1",
                     "functionCode": "3",
                     "offset": "2"
                   },
-                  "ModbusTcp-Point-3": {
+                  "Modbus-Tcp-Point-Int": {
                     "slaveId": "1",
                     "functionCode": "3",
                     "offset": "3"
                   },
-                  "ModbusTcp-Point-4": {
+                  "Modbus-Tcp-Point-Long": {
                     "slaveId": "1",
                     "functionCode": "3",
                     "offset": "4"
                   },
-                  "ModbusTcp-Point-5": {
+                  "Modbus-Tcp-Point-Float": {
                     "slaveId": "1",
                     "functionCode": "3",
                     "offset": "5"
                   },
-                  "ModbusTcp-Point-6": {
+                  "Modbus-Tcp-Point-Double": {
                     "slaveId": "1",
                     "functionCode": "3",
                     "offset": "6"
