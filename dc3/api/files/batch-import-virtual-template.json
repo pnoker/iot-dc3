@@ -3,15 +3,15 @@
     "serviceName": "dc3-driver-virtual",
     "profiles": [
       {
-        "name": "Virtual-Profile-1",
-        "share": true,
+        "name": "Virtual-Profile",
+        "share": false,
         "driverConfig": {
           "host": "localhost",
           "port": "9000"
         },
         "points": [
           {
-            "name": "Virtual-Point-1",
+            "name": "Virtual-Point-String",
             "type": "string",
             "rw": 0,
             "base": 0,
@@ -23,7 +23,7 @@
             "unit": "-"
           },
           {
-            "name": "Virtual-Point-2",
+            "name": "Virtual-Point-Boolean",
             "type": "boolean",
             "rw": 0,
             "base": 0,
@@ -35,7 +35,7 @@
             "unit": "-"
           },
           {
-            "name": "Virtual-Point-3",
+            "name": "Virtual-Point-Int",
             "type": "int",
             "rw": 0,
             "base": 0,
@@ -47,7 +47,7 @@
             "unit": "-"
           },
           {
-            "name": "Virtual-Point-4",
+            "name": "Virtual-Point-Long",
             "type": "long",
             "rw": 0,
             "base": 0,
@@ -59,7 +59,7 @@
             "unit": "-"
           },
           {
-            "name": "Virtual-Point-5",
+            "name": "Virtual-Point-Float",
             "type": "float",
             "rw": 0,
             "base": 0,
@@ -71,7 +71,7 @@
             "unit": "-"
           },
           {
-            "name": "Virtual-Point-6",
+            "name": "Virtual-Point-Double",
             "type": "double",
             "rw": 0,
             "base": 0,
@@ -85,51 +85,29 @@
         ],
         "groups": [
           {
-            "name": "Virtual-Group-1",
+            "name": "Virtual-Group",
             "devices": [
               {
-                "name": "Virtual-Device-1",
+                "name": "Virtual-Device",
+                "multi": false,
                 "pointConfig": {
-                  "Virtual-Point-1": {
-                    "tag": "Virtual-Device-1"
+                  "Virtual-Point-String": {
+                    "tag": "tag-string"
                   },
-                  "Virtual-Point-2": {
-                    "tag": "Virtual-Device-2"
+                  "Virtual-Point-Boolean": {
+                    "tag": "tag-boolean"
                   },
-                  "Virtual-Point-3": {
-                    "tag": "Virtual-Device-3"
+                  "Virtual-Point-Int": {
+                    "tag": "tag-int"
                   },
-                  "Virtual-Point-4": {
-                    "tag": "Virtual-Device-4"
+                  "Virtual-Point-Long": {
+                    "tag": "tag-long"
                   },
-                  "Virtual-Point-5": {
-                    "tag": "Virtual-Device-5"
+                  "Virtual-Point-Float": {
+                    "tag": "tag-float"
                   },
-                  "Virtual-Point-6": {
-                    "tag": "Virtual-Device-6"
-                  }
-                }
-              },
-              {
-                "name": "Virtual-Device-2",
-                "pointConfig": {
-                  "Virtual-Point-1": {
-                    "tag": "Virtual-Device-1"
-                  },
-                  "Virtual-Point-2": {
-                    "tag": "Virtual-Device-2"
-                  },
-                  "Virtual-Point-3": {
-                    "tag": "Virtual-Device-3"
-                  },
-                  "Virtual-Point-4": {
-                    "tag": "Virtual-Device-4"
-                  },
-                  "Virtual-Point-5": {
-                    "tag": "Virtual-Device-5"
-                  },
-                  "Virtual-Point-6": {
-                    "tag": "Virtual-Device-6"
+                  "Virtual-Point-Double": {
+                    "tag": "tag-double"
                   }
                 }
               }

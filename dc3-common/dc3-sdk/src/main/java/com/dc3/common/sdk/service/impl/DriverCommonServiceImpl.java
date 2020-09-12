@@ -91,6 +91,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
     @Override
     public void initial() {
+        long start = System.currentTimeMillis();
         int times = 1;
         while (!register()) {
             log.info("Retry {} times...", times);
@@ -105,6 +106,8 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         loadData();
         customDriverService.initial();
         driverScheduleService.initial(driverProperty.getSchedule());
+        long end = System.currentTimeMillis();
+        log.info("Initialization takes {} seconds", (end - start) / 1000);
     }
 
     @Override
