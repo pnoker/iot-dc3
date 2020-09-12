@@ -25,5 +25,3 @@ WORKDIR /dc3
 COPY ./ ./
 
 RUN mvn -s ./dc3/dependences/maven/settings.xml clean -U package
-
-RUN ping dc3.site
