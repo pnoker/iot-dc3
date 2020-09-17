@@ -68,7 +68,7 @@ docker-compose up -d mysql redis mongo rabbitmq register monitor auth
 
 务必使用Maven方式导入项目
 
- ![import-dc3](images/import-dc3.gif)
+ ![import-dc3](./images/idea/import-dc3.gif)
 
 
 ### 启动 Manager & Data 服务
@@ -84,7 +84,7 @@ docker-compose up -d mysql redis mongo rabbitmq register monitor auth
  
  注意：在启动 `dc3-manager` 、 `dc3-data` 的时候由于开启了 `ASPECTJ` ，所以需要配置 `-javaagent:dc3/lib/aspectjweaver-1.9.5.jar`
 
-![](images/aspectj.png)
+![](./images/idea/aspectj.png)
 
 
 ### 启动待开发的 驱动 程序

@@ -125,6 +125,8 @@ eureka:
     prefer-ip-address: true
     status-page-url-path: /actuator/info
     health-check-url-path: /actuator/health
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 15
   client:
     region: dc3
     availability-zones:

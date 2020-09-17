@@ -3,8 +3,8 @@
   - [快速开始](quick-start.md)
 - 开发
   - [环境配置](environment.md)
-  - [IDE中启动](idea-start.md)
-  - [Demo Web UI](web-ui.md)
+  - [后端服务](idea-start.md)
+  - [前端服务](web-ui.md#构建-demo-web-ui)
 - 驱动
   - [OpcDa](opc-da.md)
   - [OpcUa](opc-us.md)
@@ -14,4 +14,4 @@
   - [Tcp-Server](tcp-server.md)
   - [Udp-Server](udp-server.md)
   - [Serial](serial.md)
-- [支持项目](donate.md)
+- [关于项目](about.md)
