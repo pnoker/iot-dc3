@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="images/logo.png" width="400"><br>
+    <img src="./images/dc3/logo-blue.png" width="400"><br>
     <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gray' alt='star'></a>
     <a href="https://travis-ci.org/pnoker/iot-dc3"><img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master"></a>
     <a href="https://codecov.io/gh/pnoker/iot-dc3"><img src="https://codecov.io/gh/pnoker/iot-dc3/branch/master/graph/badge.svg"></a><br>
@@ -10,14 +10,12 @@
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
 
-
 ------
-
 
 
 ### DC3 架构设计
 
- ![iot-dc3-architecture](images/architecture1.jpg)
+ ![iot-dc3-architecture](images/dc3/architecture1.jpg)
 
 #### DC3 模块划分，四层架构
 
@@ -28,7 +26,7 @@
 
 #### DC3 驱动、测点、设备分层
 
-![](images/device-model.png)
+![](images/dc3/device-model.png)
 
 #### DC3 功能设计，定位目标
 
@@ -50,7 +48,7 @@
 `DC3` 平台是基于 `Spring Cloud` 架构开发的,是一系列松耦合、开源的微服务集合。
 微服务集合由4个微服务层和两个增强的基础系统服务组成,提供从物理域数据采集到信息域数据处理等一系列的服务。
 
-![iot-dc3-architecture](images/architecture2.jpg)
+![iot-dc3-architecture](images/dc3/architecture2.jpg)
 
 [`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign) 等微服务模块。
 

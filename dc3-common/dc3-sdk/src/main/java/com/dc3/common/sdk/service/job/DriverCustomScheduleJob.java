@@ -38,7 +38,6 @@ public class DriverCustomScheduleJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.debug("Execute custom schedule");
         customDriverService.schedule();
     }
 }

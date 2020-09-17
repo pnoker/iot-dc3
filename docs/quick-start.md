@@ -20,7 +20,7 @@ docker-compose -f docker-compose-demo.yml down
 > 该 Demo 将在 Docker 中启动 MySQL、Redis、MongoDB、RabbitMQ、DC3-Register、DC3-Manager、DC3-Auth、DC3-Data、DC3-Driver-Virtual、DC3-Web 服务。
 
 
-![web](images/web/web.png)
+![web](./images/dc3/web.png)
 
 ### 登陆
 

@@ -90,8 +90,15 @@ hystrix:
 eureka:
   instance:
     prefer-ip-address: true
+    status-page-url-path: /actuator/info
     health-check-url-path: /actuator/health
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 15
   client:
+    region: dc3
+    availability-zones:
+      dc3: defaultZone
+    prefer-same-zone-eureka: true
     registry-fetch-interval-seconds: 5
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/

@@ -17,5 +17,5 @@
 
 :speech_balloon: 如果感兴趣可以加入 `IOT DC3` 微信技术交流群，开源免费（微信: 18304071393，请备注: DC3微信技术交流群）
 
-<img src="./images/wechat.jpg" width="25%" alt="Wechat">
+<img src="./images/wechat/wechat.jpg" width="25%" alt="Wechat">
 
