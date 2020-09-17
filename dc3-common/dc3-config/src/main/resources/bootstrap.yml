@@ -119,10 +119,17 @@ hystrix:
       coreSize: 1024
 
 eureka:
+  environment: dc3
+  data-center: https://gitee.com/pnoker
   instance:
     prefer-ip-address: true
+    status-page-url-path: /actuator/info
     health-check-url-path: /actuator/health
   client:
+    region: dc3
+    availability-zones:
+      dc3: defaultZone
+    prefer-same-zone-eureka: true
     registry-fetch-interval-seconds: 5
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/
