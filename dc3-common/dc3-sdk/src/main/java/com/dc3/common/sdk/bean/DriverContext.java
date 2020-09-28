@@ -19,18 +19,18 @@ package com.dc3.common.sdk.bean;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import lombok.Getter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author pnoker
  */
+@Data
 @Slf4j
-@Getter
 @Component
 public class DriverContext {
 
@@ -39,32 +39,32 @@ public class DriverContext {
     /**
      * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
      */
-    private volatile Map<Long, Map<String, AttributeInfo>> driverInfoMap = new HashMap<>(16);
+    private Map<Long, Map<String, AttributeInfo>> driverInfoMap = new ConcurrentHashMap<>(16);
 
     /**
      * deviceId,device
      */
-    private volatile Map<Long, Device> deviceMap = new HashMap<>(16);
+    private Map<Long, Device> deviceMap = new ConcurrentHashMap<>(16);
 
     /**
      * deviceName,deviceId
      */
-    private volatile Map<String, Long> deviceNameMap = new HashMap<>(16);
+    private Map<String, Long> deviceNameMap = new ConcurrentHashMap<>(16);
 
     /**
      * profileId,(pointId,point)
      */
-    private volatile Map<Long, Map<Long, Point>> profilePointMap = new HashMap<>(16);
+    private Map<Long, Map<Long, Point>> profilePointMap = new ConcurrentHashMap<>(16);
 
     /**
      * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
      */
-    private volatile Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap = new HashMap<>(16);
+    private Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap = new ConcurrentHashMap<>(16);
 
     /**
      * deviceId(pointName,pointId)
      */
-    private volatile Map<Long, Map<String, Long>> devicePointNameMap = new HashMap<>(16);
+    private Map<Long, Map<String, Long>> devicePointNameMap = new ConcurrentHashMap<>(16);
 
     /**
      * 获取设备
@@ -159,33 +159,5 @@ public class DriverContext {
             throw new ServiceException("Point(" + pointId + ") info does not exist");
         }
         return infoMap;
-    }
-
-    public synchronized void setDriverId(long driverId) {
-        this.driverId = driverId;
-    }
-
-    public synchronized void setDriverInfoMap(Map<Long, Map<String, AttributeInfo>> driverInfoMap) {
-        this.driverInfoMap = driverInfoMap;
-    }
-
-    public synchronized void setDeviceMap(Map<Long, Device> deviceMap) {
-        this.deviceMap = deviceMap;
-    }
-
-    public synchronized void setDeviceNameMap(Map<String, Long> deviceNameMap) {
-        this.deviceNameMap = deviceNameMap;
-    }
-
-    public synchronized void setProfilePointMap(Map<Long, Map<Long, Point>> profilePointMap) {
-        this.profilePointMap = profilePointMap;
-    }
-
-    public synchronized void setDevicePointInfoMap(Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap) {
-        this.devicePointInfoMap = devicePointInfoMap;
-    }
-
-    public synchronized void setDevicePointNameMap(Map<Long, Map<String, Long>> devicePointNameMap) {
-        this.devicePointNameMap = devicePointNameMap;
     }
 }

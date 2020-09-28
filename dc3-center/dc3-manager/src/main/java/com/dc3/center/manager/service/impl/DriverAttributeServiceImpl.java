@@ -130,9 +130,10 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<DriverAttribute> list(DriverAttributeDto driverAttributeDto) {
-        if (!Optional.ofNullable(driverAttributeDto.getPage()).isPresent()) {
+        if (null == driverAttributeDto.getPage()) {
             driverAttributeDto.setPage(new Pages());
         }
+
         return driverAttributeMapper.selectPage(driverAttributeDto.getPage().convert(), fuzzyQuery(driverAttributeDto));
     }
 
