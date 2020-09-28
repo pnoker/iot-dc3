@@ -55,16 +55,6 @@ public class GatewayConfig {
     }
 
     @Bean
-    public Encoder encoder() {
-        return new JacksonEncoder();
-    }
-
-    @Bean
-    public Decoder decoder() {
-        return new JacksonDecoder();
-    }
-
-    @Bean
     public RouterFunction<ServerResponse> routerFunction() {
         return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), gatewayHystrix);
     }

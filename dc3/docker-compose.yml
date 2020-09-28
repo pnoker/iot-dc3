@@ -402,13 +402,13 @@ services:
         aliases:
           - dc3-flink-job
 
-  nginx:
+  nginx-rtmp:
     image: pnoker/alpine-nginx:rtmp
     restart: always
     ports:
       - 1935:1935
-    container_name: dc3-nginx
-    hostname: dc3-nginx
+    container_name: dc3-nginx-rtmp
+    hostname: dc3-nginx-rtmp
     networks:
       dc3net:
         aliases:
