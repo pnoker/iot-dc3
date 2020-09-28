@@ -31,7 +31,7 @@ public class Keys {
      */
     @Data
     @AllArgsConstructor
-    public class Aes {
+    public static class Aes {
         private String privateKey;
     }
 
@@ -40,7 +40,7 @@ public class Keys {
      */
     @Data
     @AllArgsConstructor
-    public class Rsa {
+    public static class Rsa {
         private String publicKey;
         private String privateKey;
     }

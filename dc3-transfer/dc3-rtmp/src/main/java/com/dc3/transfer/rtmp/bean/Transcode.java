@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
@@ -52,7 +53,7 @@ public class Transcode {
         run = true;
         process = RuntimeUtil.exec(command);
         InputStream inputStream = process.getErrorStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         String line;
         try {
             while (StringUtils.isNotEmpty((line = reader.readLine())) && run) {
