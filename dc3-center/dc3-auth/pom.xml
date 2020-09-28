@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>1.0.1</version>
+        <version>1.1.0</version>
     </parent>
 
     <artifactId>dc3-auth</artifactId>
