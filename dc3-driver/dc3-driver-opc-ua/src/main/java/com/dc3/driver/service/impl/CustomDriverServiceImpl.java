@@ -61,11 +61,6 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     @Resource
     private DriverContext driverContext;
 
-
-    /**
-     * Opc Ua Client Map
-     */
-    private static Map<Long, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
     private static KeyLoader keyLoader;
 
     static {
@@ -82,6 +77,12 @@ public class CustomDriverServiceImpl implements CustomDriverService {
             log.error(e.getMessage(), e);
         }
     }
+
+    /**
+     * Opc Ua Client Map
+     */
+    private static Map<Long, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
+
 
     @Override
     public void initial() {
@@ -124,28 +125,33 @@ public class CustomDriverServiceImpl implements CustomDriverService {
      * @throws UaException UaException
      */
     private OpcUaClient getOpcUaClient(Long deviceId, Map<String, AttributeInfo> driverInfo) throws UaException {
-        log.debug("Opc Ua Connection Info {}", JSON.toJSONString(driverInfo));
+        log.debug("Opc Ua Client Info: {}", JSON.toJSONString(driverInfo));
         OpcUaClient opcUaClient = clientMap.get(deviceId);
         if (null == opcUaClient) {
-            opcUaClient = OpcUaClient.create(
-                    String.format("opc.tcp://%s:%s%s",
-                            attribute(driverInfo, "host"),
-                            attribute(driverInfo, "port"),
-                            attribute(driverInfo, "path")
-                    ),
-                    endpoints -> endpoints
-                            .stream()
-                            .findFirst(),
-                    configBuilder -> configBuilder
-                            .setApplicationName(LocalizedText.english("DC3 Opc Ua Client"))
-                            .setApplicationUri("urn:dc3:opc:ua:client")
-                            .setCertificate(keyLoader.getClientCertificate())
-                            .setKeyPair(keyLoader.getClientKeyPair())
-                            .setIdentityProvider(new AnonymousProvider())
-                            .setRequestTimeout(uint(5000))
-                            .build()
-            );
-            clientMap.put(deviceId, opcUaClient);
+            try {
+                opcUaClient = OpcUaClient.create(
+                        String.format("opc.tcp://%s:%s%s",
+                                attribute(driverInfo, "host"),
+                                attribute(driverInfo, "port"),
+                                attribute(driverInfo, "path")
+                        ),
+                        endpoints -> endpoints
+                                .stream()
+                                .findFirst(),
+                        configBuilder -> configBuilder
+                                .setApplicationName(LocalizedText.english("DC3 Opc Ua Client"))
+                                .setApplicationUri("urn:dc3:opc:ua:client")
+                                .setCertificate(keyLoader.getClientCertificate())
+                                .setKeyPair(keyLoader.getClientKeyPair())
+                                .setIdentityProvider(new AnonymousProvider())
+                                .setRequestTimeout(uint(5000))
+                                .build()
+                );
+                clientMap.put(deviceId, opcUaClient);
+            } catch (UaException e) {
+                clientMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
+                throw new UaException(e);
+            }
         }
         return opcUaClient;
     }
@@ -174,13 +180,12 @@ public class CustomDriverServiceImpl implements CustomDriverService {
                 try {
                     value.complete(dataValue.getValue().getValue().toString());
                 } catch (Exception e) {
-                    log.error("Opc Ua point(ns={};s={}) does not exist", namespace, tag);
+                    log.error("Opc Ua Point(ns={};s={}) does not exist", namespace, tag);
                 }
             });
             return value.get();
-        } catch (UaException | InterruptedException | ExecutionException e) {
-            log.error("Opc Ua Read Item Error:{}", e.getMessage(), e);
-            clientMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
+        } catch (InterruptedException | ExecutionException | UaException e) {
+            log.error("Opc Ua Point Read Error: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -196,40 +201,45 @@ public class CustomDriverServiceImpl implements CustomDriverService {
      * @throws ExecutionException   ExecutionException
      * @throws InterruptedException InterruptedException
      */
-    private void writeItem(Long deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo values) throws UaException, ExecutionException, InterruptedException {
-        OpcUaClient client = getOpcUaClient(deviceId, driverInfo);
-        client.connect().get();
+    private void writeItem(Long deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo values) {
+        OpcUaClient client;
+        try {
+            int namespace = attribute(pointInfo, "namespace");
+            String tag = attribute(pointInfo, "tag"), type = values.getType(), value = values.getValue();
+            NodeId nodeId = new NodeId(namespace, tag);
 
-        int namespace = attribute(pointInfo, "namespace");
-        String tag = attribute(pointInfo, "tag"), type = values.getType(), value = values.getValue();
-        NodeId nodeId = new NodeId(namespace, tag);
+            client = getOpcUaClient(deviceId, driverInfo);
+            client.connect().get();
 
-        switch (type.toLowerCase()) {
-            case Common.ValueType.INT:
-                int intValue = value(type, value);
-                client.writeValue(nodeId, new DataValue(new Variant(intValue)));
-                break;
-            case Common.ValueType.LONG:
-                long longValue = value(type, value);
-                client.writeValue(nodeId, new DataValue(new Variant(longValue)));
-                break;
-            case Common.ValueType.FLOAT:
-                float floatValue = value(type, value);
-                client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
-                break;
-            case Common.ValueType.DOUBLE:
-                double doubleValue = value(type, value);
-                client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
-                break;
-            case Common.ValueType.BOOLEAN:
-                boolean booleanValue = value(type, value);
-                client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
-                break;
-            case Common.ValueType.STRING:
-                client.writeValue(nodeId, new DataValue(new Variant(value)));
-                break;
-            default:
-                break;
+            switch (type.toLowerCase()) {
+                case Common.ValueType.INT:
+                    int intValue = value(type, value);
+                    client.writeValue(nodeId, new DataValue(new Variant(intValue)));
+                    break;
+                case Common.ValueType.LONG:
+                    long longValue = value(type, value);
+                    client.writeValue(nodeId, new DataValue(new Variant(longValue)));
+                    break;
+                case Common.ValueType.FLOAT:
+                    float floatValue = value(type, value);
+                    client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
+                    break;
+                case Common.ValueType.DOUBLE:
+                    double doubleValue = value(type, value);
+                    client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
+                    break;
+                case Common.ValueType.BOOLEAN:
+                    boolean booleanValue = value(type, value);
+                    client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
+                    break;
+                case Common.ValueType.STRING:
+                    client.writeValue(nodeId, new DataValue(new Variant(value)));
+                    break;
+                default:
+                    break;
+            }
+        } catch (InterruptedException | ExecutionException | UaException e) {
+            log.error("Opc Ua Point Write Error: {}", e.getMessage(), e);
         }
     }
 
