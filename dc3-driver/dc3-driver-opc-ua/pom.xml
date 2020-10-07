@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
     </parent>
 
     <artifactId>dc3-driver-opc-ua</artifactId>
