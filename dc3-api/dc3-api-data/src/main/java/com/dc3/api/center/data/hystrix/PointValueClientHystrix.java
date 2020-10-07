@@ -45,6 +45,11 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
         return new PointValueClient() {
 
             @Override
+            public R<Boolean> correct(@NotNull String serviceName) {
+                return R.fail(message);
+            }
+
+            @Override
             public R<String> status(Long deviceId) {
                 return R.fail(message);
             }

@@ -28,6 +28,14 @@ import java.util.List;
 public interface PointValueService {
 
     /**
+     * 数据纠正
+     *
+     * @param serviceName Driver Service Name
+     * @return Boolean
+     */
+    Boolean correct(String serviceName);
+
+    /**
      * 获取设备状态
      *
      * @param deviceId Device Id
