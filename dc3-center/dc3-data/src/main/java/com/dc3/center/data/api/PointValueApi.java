@@ -43,6 +43,15 @@ public class PointValueApi implements PointValueClient {
     private PointValueService pointValueService;
 
     @Override
+    public R<Boolean> correct(String serviceName) {
+        try {
+            return pointValueService.correct(serviceName) ? R.ok() : R.fail();
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
     public R<String> status(Long deviceId) {
         try {
             String status = pointValueService.status(deviceId);

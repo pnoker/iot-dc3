@@ -65,4 +65,11 @@ GET http://localhost:8500/data/realtime/deviceId/1/pointId/1
 Accept: */*
 Cache-Control: no-cache
 
+
+### 数据纠正
+#/correct/serviceName/:serviceName
+GET http://localhost:8500/data/correct/serviceName/dc3-driver-water-188b
+Accept: */*
+Cache-Control: no-cache
+
 ###

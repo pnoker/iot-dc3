@@ -22,8 +22,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
 import java.util.List;
@@ -43,6 +45,12 @@ public class PointValue implements Serializable {
 
     @Transient
     private Long id;
+
+    /**
+     * MongoDB Object Id
+     */
+    @MongoId
+    private ObjectId objectId;
 
     /**
      * 设备ID，同MySQl中等 设备ID 一致

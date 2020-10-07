@@ -22,10 +22,12 @@ import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
+import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.rabbit.DriverService;
 import com.dc3.common.sdk.util.DriverUtils;
+import com.dc3.common.utils.ArithmeticUtil;
 import com.dc3.common.utils.Dc3Util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -39,7 +41,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -174,6 +178,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
             pointValues.add(pointValue);
         }
         PointValue pointValue = new PointValue(deviceId, pointValues, 1, TimeUnit.HOURS);
+        preProcess(deviceId, pointValue);
         nettyUdpServerHandler.driverService.multiPointValueSender(pointValue);
     }
 
@@ -228,6 +233,48 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
             value = String.valueOf(csq);
         }
         return value;
+    }
+
+    /**
+     * 累计流量数据预处理
+     *
+     * @param pointValue
+     */
+    public void preProcess(Long deviceId, PointValue pointValue) {
+        //name:value
+        Map<Integer, String> valueMap = new HashMap<>();
+        //id:name
+        Map<Long, Integer> idMap = new HashMap<>();
+        Map<Long, Point> pointMap = driverContext.getProfilePointMap().get(driverContext.getDevice(deviceId).getProfileId());
+
+        pointValue.getChildren().forEach((p) -> {
+            Point point = pointMap.get(p.getPointId());
+            if (point.getName().contains("正向累计流量-")) {
+                Integer name = Integer.parseInt(point.getName().replace("正向累计流量-", "").replace("点", ""));
+                idMap.put(p.getPointId(), name);
+                valueMap.put(name, p.getValue());
+            }
+        });
+
+        pointValue.getChildren().forEach((p) -> {
+            BigDecimal subtract;
+            Integer name = idMap.get(p.getPointId());
+            if (null != name) {
+                if (name == 0) {
+                    subtract = ArithmeticUtil.subtract(valueMap.get(name), valueMap.get(23));
+                } else {
+                    subtract = ArithmeticUtil.subtract(valueMap.get(name), valueMap.get(name - 1));
+                }
+
+                if (null != subtract && subtract.doubleValue() >= 0) {
+                    p.setCustomValue(subtract);
+                }
+
+                if (null == p.getCustomValue()) {
+                    p.setCustomValue("-");
+                }
+            }
+        });
     }
 
 }

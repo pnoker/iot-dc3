@@ -40,6 +40,14 @@ import java.util.List;
 public interface PointValueClient {
 
     /**
+     * 数据纠正
+     *
+     * @param serviceName Driver Service Name
+     */
+    @GetMapping("/correct/serviceName/{serviceName}")
+    R<Boolean> correct(@NotNull @PathVariable(value = "serviceName") String serviceName);
+
+    /**
      * 获取设备状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
