@@ -14,7 +14,7 @@
 
 ---
 
-### Docker Desktop
+### Docker
 
 > 开发环境: 推荐安装 Docker Desktop
 

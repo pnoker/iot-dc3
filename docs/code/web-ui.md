@@ -32,5 +32,6 @@ docker-compose up -d
 
 ### 访问 Demo Web UI
 
-- 如果是在本地启动的，直接访问 [http://localhost:8080](http://localhost:8080) 即可进入登陆页面
+- 如果是在本地启动的，直接访问 [http://localhost:8080](http://localhost:8080) 即可进入登陆页面，在idea开发模式，请使用该方式启动 Demo Web Ui ！
+
 - 如果是在 `docker` 中启动的，那么就访问 [https://localhost](https://localhost) 即可进入登陆页面，点击登陆即可，⚠️请注意是 `https` 哈！

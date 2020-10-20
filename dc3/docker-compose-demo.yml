@@ -93,6 +93,9 @@ services:
     restart: always
     container_name: dc3-data
     hostname: dc3-data
+    links:
+      - dc3-mongo:dc3-mongo
+      - dc3-manager:dc3-manager
     networks:
       demo_net:
         aliases:
@@ -103,6 +106,9 @@ services:
     restart: always
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
+    links:
+      - dc3-rabbitmq:dc3-rabbitmq
+      - dc3-manager:dc3-manager
     networks:
       demo_net:
         aliases:
@@ -115,6 +121,10 @@ services:
       - 443:443
     container_name: dc3-web
     hostname: dc3-web
+    links:
+      - dc3-auth:dc3-auth
+      - dc3-manager:dc3-manager
+      - dc3-data:dc3-data
     networks:
       demo_net:
         aliases:

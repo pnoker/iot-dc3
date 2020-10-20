@@ -1,0 +1,101 @@
+#
+#  Copyright 2018-2020 Pnoker. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+### 新增 Rtmp
+#/transfer/rtmp/add
+POST http://localhost:8803/transfer/rtmp/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "测试模板",
+  "share": false,
+  "driverId": -1,
+  "description": "测试模板"
+}
+
+
+### 修改 Rtmp
+#/transfer/rtmp/update
+POST http://localhost:8803/transfer/rtmp/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "name": "测试模板",
+  "share": false,
+  "driverId": -1,
+  "description": "测试模板"
+}
+
+
+### 根据 ID 查询 Rtmp
+#/transfer/rtmp/id/:id
+GET http://localhost:8803/transfer/rtmp/id/-1
+Accept: */*
+Cache-Control: no-cache
+
+
+
+### 分页查询 Rtmp
+#/transfer/rtmp/list，支持name模糊查询，share\driverId精准查询
+POST http://localhost:8803/transfer/rtmp/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 根据 ID 删除 Rtmp
+#/transfer/rtmp/delete/:id
+POST http://localhost:8803/transfer/rtmp/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+
+
+### 根据 ID 启动 Rtmp
+#/transfer/rtmp/start/:id
+POST http://localhost:8803/transfer/rtmp/start/-2
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+
+### 根据 ID 停止 Rtmp
+#/transfer/rtmp/stop/:id
+POST http://localhost:8803/transfer/rtmp/stop/-2
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+###
