@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-version: '3.3'
+version: '3'
 
 services:
 
@@ -112,7 +112,6 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-web:demo
     restart: always
     ports:
-      - 80:80
       - 443:443
     container_name: dc3-web
     hostname: dc3-web
