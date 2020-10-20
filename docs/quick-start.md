@@ -3,6 +3,8 @@
 > **前提：** 必须保证安装了 `docker` 和 `docker-compose`
 >
 > **配置要求：** 至少需要给docker分配：2核 CPU 以及 4G 以上的运行内存
+>
+> Demo 仅对外暴露 443 一个端口，且不可修改为其他端口，如需特殊化，请使用开发环境启动
 
 15 分钟，快速启动一个，Demo Application ！
 
@@ -23,6 +25,8 @@ docker-compose -f docker-compose-demo.yml down
 ![web](./images/dc3/web.png)
 
 ### 登陆
+
+> 根据机器的性能情况，启动时间有所不同，请务必耐心等待。
 
 执行完之后，**需要等待一会，等服务都启动起来了**，访问 [https://localhost](https://localhost) 即可进入登陆页面，点击登陆即可，⚠️请注意是 **https** 哈，如图：
 
