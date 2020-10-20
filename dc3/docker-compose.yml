@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-version: '3.3'
+version: '3'
 
 services:
   dc3:
@@ -371,14 +371,14 @@ services:
     image: flink:1.10
     restart: always
     expose:
-      - "6121"
-      - "6122"
+      - 6121
+      - 6122
     depends_on:
       - jobmanager
     container_name: dc3-flink-task
     command: taskmanager
     links:
-      - "jobmanager:jobmanager"
+      - jobmanager:jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
     networks:
@@ -390,9 +390,9 @@ services:
     image: flink:1.10
     restart: always
     expose:
-      - "6123"
+      - 6123
     ports:
-      - "8081:8081"
+      - 8081:8081
     container_name: dc3-flink-job
     command: jobmanager
     environment:
@@ -415,12 +415,12 @@ services:
           - dc3-nginx
 
   portainer:
-    image:  portainer/portainer:1.24.1
+    image:  portainer/portainer:alpine
     restart: always
     container_name: portainer
     hostname: dc3-portainer
     ports:
-      - "9000:9000"
+      - 9000:9000
     command: -H unix:///var/run/docker.sock
     volumes:
       - portainer:/data
