@@ -263,6 +263,26 @@ public class Dc3Util {
     }
 
     /**
+     * Destroy Process With Command
+     *
+     * @param process Process
+     * @param cmd     Exit Command
+     */
+    public static void destroyProcessWithCmd(Process process, String cmd) {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+        try {
+            if (!cmd.equals("")) {
+                writer.write(cmd);
+                writer.flush();
+                writer.close();
+            }
+            process.destroyForcibly();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
      * 两层循环实现建树
      *
      * @param treeNodes 传入的树节点列表

@@ -16,6 +16,7 @@
 
 package com.dc3.transfer.rtmp.service.impl;
 
+import cn.hutool.core.util.RuntimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +36,11 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -154,16 +160,68 @@ public class RtmpServiceImpl implements RtmpService {
         if (null == select) {
             throw new ServiceException("The rtmp task does not exist");
         }
+
         Transcode transcode = transcodeMap.get(id);
-        if (Optional.ofNullable(transcode).isPresent()) {
-            if (transcode.isRun()) {
-                throw new ServiceException("The rtmp task is running");
-            }
-        } else {
+        if (null == transcode) {
             transcode = new Transcode(select);
             transcodeMap.put(transcode.getId(), transcode);
         }
-        threadPoolExecutor.execute(() -> transcodeMap.get(id).start());
+
+        if (transcode.isRun()) {
+            throw new ServiceException("The rtmp task is running");
+        }
+
+        // 设置转码任务状态
+        transcode.setRun(true);
+        transcode.setProcess(RuntimeUtil.exec(transcode.getCommand()));
+
+        // 打印常规输出
+        threadPoolExecutor.execute(() -> {
+            Transcode temp = transcodeMap.get(id);
+            InputStream inputStream = temp.getProcess().getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            String line;
+            try {
+                while (StringUtils.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
+                    log.debug(line);
+                }
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        // 打印错误输出
+        threadPoolExecutor.execute(() -> {
+            Transcode temp = transcodeMap.get(id);
+            InputStream inputStream = temp.getProcess().getErrorStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            String line;
+            try {
+                while (StringUtils.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
+                    log.error(line);
+                    line = line.toLowerCase();
+                    if (line.contains("fail") || line.contains("error")) {
+                        temp.quit();
+                    }
+                }
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+
         if (rtmpMapper.updateById(select.setRun(true)) > 0) {
             return true;
         }
@@ -182,9 +240,9 @@ public class RtmpServiceImpl implements RtmpService {
         Rtmp select = rtmpMapper.selectById(id);
         if (null != select) {
             Transcode transcode = transcodeMap.get(id);
-            if (Optional.ofNullable(transcode).isPresent()) {
+            if (null != transcode) {
                 if (transcode.isRun()) {
-                    transcode.stop();
+                    transcode.quit();
                     if (rtmpMapper.updateById(select.setRun(false)) > 0) {
                         return true;
                     }

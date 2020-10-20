@@ -403,7 +403,7 @@ services:
           - dc3-flink-job
 
   nginx-rtmp:
-    image: pnoker/alpine-nginx:rtmp_1.18.0
+    image: pnoker/alpine-nginx:rtmp
     restart: always
     ports:
       - 1935:1935
