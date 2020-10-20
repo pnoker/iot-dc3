@@ -10,7 +10,7 @@
 
 
 
-![](../images/dc3/driver/opc-ua-1.png)
+![](../images/dc3/driver/opc/ua/opc-ua-1.png)
 
 ### 配置文件
 
@@ -102,19 +102,19 @@
 #### 1. 启动依赖服务
 
 - 参考Idea开发环境启动 dc3-mysql、dc3-mongo、dc3-redis、dc3-rabbitmq、dc3-register、dc3-manager、dc3-data、dc3-auth、dc3-web
-- 启动启动 dc3-driver-opc-ua
+- 启动 dc3-driver-opc-ua
 
 
 
 #### 2. 启动 Opc Ua 调试工具
 
- 打开 Prosys OPC UA Simulation Server 软件
+ 安装并启动 Prosys OPC UA Simulation Server 软件
 
 下载链接：[百度云盘 Prosys OPC UA Simulation Server](https://pan.baidu.com/s/1vKcyTWQi0gihjLPluFIvKQ)
 
 验证码：`5ffs`
 
-![](../images/dc3/driver/opc-ua-2.png)
+![](../images/dc3/driver/opc/ua/opc-ua-2.png)
 
 
 
@@ -122,7 +122,7 @@
 
 切换到 ''**驱动**" 菜单，当前 `Opc Ua` 启动启动成功，并处于 **在线** 状态
 
-![](../images/dc3/driver/opc-ua-3.png)
+![](../images/dc3/driver/opc/ua/opc-ua-3.png)
 
 
 
@@ -130,7 +130,7 @@
 
 切换到 ''**驱动属性**" 菜单，当前 驱动属性 列表如下
 
-![](../images/dc3/driver/opc-ua-4.png)
+![](../images/dc3/driver/opc/ua/opc-ua-4.png)
 
 
 
@@ -138,7 +138,7 @@
 
 切换到 “**位号属性**” 菜单，当前 位号属性 列表如下
 
-![](../images/dc3/driver/opc-ua-5.png)
+![](../images/dc3/driver/opc/ua/opc-ua-5.png)
 
 
 
@@ -146,9 +146,9 @@
 
 切换到 “**模板**” 菜单，新建一个 `私有` 的 `OpcUaProfile` 模板，如下
 
-![](../images/dc3/driver/opc-ua-6.png)
+![](../images/dc3/driver/opc/ua/opc-ua-6.png)
 
-![](../images/dc3/driver/opc-ua-7.png)
+![](../images/dc3/driver/opc/ua/opc-ua-7.png)
 
 
 
@@ -158,19 +158,19 @@
 
 - **主机** 属性值为：`localhost`，以 `Prosys OPC UA Simulation Server` 启动为主
 
-![](../images/dc3/driver/opc-ua-8.png)
+![](../images/dc3/driver/opc/ua/opc-ua-8.png)
 
 - **端口** 属性值为：`53530`，以 `Prosys OPC UA Simulation Server` 启动为主
 
-![](../images/dc3/driver/opc-ua-9.png)
+![](../images/dc3/driver/opc/ua/opc-ua-9.png)
 
 -  **路径** 属性值为：`/OPCUA/SimulationServer`，以 `Prosys OPC UA Simulation Server` 启动为主
 
-![](../images/dc3/driver/opc-ua-10.png)
+![](../images/dc3/driver/opc/ua/opc-ua-10.png)
 
 - 以上的 主机、端口和路径均配置完之后，列表如下
 
-![](../images/dc3/driver/opc-ua-11.png)
+![](../images/dc3/driver/opc/ua/opc-ua-11.png)
 
 
 
@@ -180,7 +180,7 @@
 
 > 同时也需要在 Prosys OPC UA Simulation Server 软件中新建一个位号，并进行证书授权（第11,13步骤）
 
-![](../images/dc3/driver/opc-ua-12.png)
+![](../images/dc3/driver/opc/ua/opc-ua-12.png)
 
 
 
@@ -188,7 +188,7 @@
 
 切换到 “**分组**” 菜单，新建一个设备分组，如下
 
-![](../images/dc3/driver/opc-ua-13.png)
+![](../images/dc3/driver/opc/ua/opc-ua-13.png)
 
 
 
@@ -196,7 +196,7 @@
 
 切换到 “**设备**” 菜单，在刚刚新建的分组下，新建一个设备，如下
 
-![](../images/dc3/driver/opc-ua-14.png)
+![](../images/dc3/driver/opc/ua/opc-ua-14.png)
 
 
 
@@ -206,11 +206,11 @@
 
 - 切换到 “**Simulation**” 菜单，点击右下的 "+" 新建一个模拟点位，类型选择随机，名称添加 `string-tag`，最后点击 "**Create**"，即可
 
-![](../images/dc3/driver/opc-ua-15.png)
+![](../images/dc3/driver/opc/ua/opc-ua-15.png)
 
 - 切换到 “**Address Space**” 菜单，即可查看点位的详细信息，包括：命名空间和点位名称
 
-![](../images/dc3/driver/opc-ua-16.png)
+![](../images/dc3/driver/opc/ua/opc-ua-16.png)
 
 
 
@@ -220,24 +220,24 @@
 
 - **命名空间**：第11步骤中的 `ns` 值
 
-![](../images/dc3/driver/opc-ua-17.png)
+![](../images/dc3/driver/opc/ua/opc-ua-17.png)
 
 - **位号**：第11步骤中的 `s` 值
 
-![](../images/dc3/driver/opc-ua-18.png)
+![](../images/dc3/driver/opc/ua/opc-ua-18.png)
 
 - 以上的 命名空间和位号均配置完之后，列表如下
 
-![](../images/dc3/driver/opc-ua-19.png)
+![](../images/dc3/driver/opc/ua/opc-ua-19.png)
 
 #### 13. 在Prosys OPC UA Simulation Server中授权证书
 
 切换到 “**Certificates**” 菜单，如图所示进行授权 “**Trust**”
 
-![](../images/dc3/driver/opc-ua-20.png)
+![](../images/dc3/driver/opc/ua/opc-ua-20.png)
 
 #### 14. 数据
 
 切换到 “数据” 菜单，30秒左右会采集一个值
 
-![](../images/dc3/driver/opc-ua-21.png)
+![](../images/dc3/driver/opc/ua/opc-ua-21.png)

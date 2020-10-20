@@ -1,6 +1,6 @@
 ![logo](./images/dc3/logo-green.png)
 
-# IOT DC3 <small>1.0.0</small>
+# IOT DC3 <small>1.1.0</small>
 
 > DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。
 >

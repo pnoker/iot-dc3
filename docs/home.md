@@ -1,7 +1,8 @@
 <p align="center">
-    <img src="./images/dc3/logo-blue.png" width="400"><br>
-    <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gray' alt='star'></a>
-    <a href="https://travis-ci.org/pnoker/iot-dc3"><img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master"></a><br>
+	<img src="./docs/images/dc3/logo-blue.png" width="400"><br>
+  <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'></img></a>
+	<a href='https://gitee.com/pnoker/iot-dc3/members'><img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'></img></a>
+	<br>
 	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
 	<a><img src="https://img.shields.io/badge/Spring Boot-2.3.2.RELEASE-blue.svg"></a>
 	<a><img src="https://img.shields.io/badge/Spring Cloud-Hoxton.SR8-blue.svg"></a>

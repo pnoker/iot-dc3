@@ -1,4 +1,4 @@
-:rocket: 项目文档请阅读 [`IOT DC3 Wiki`](https://doc.dc3.site) ！
+ :rocket: 项目文档请阅读 [`IOT DC3 Wiki`](https://doc.dc3.site) ！
 
  :boom:  你的 `Star` 是我开发的动力，下载源码 `git clone https://gitee.com/pnoker/iot-dc3.git` ！ 
 
@@ -29,11 +29,7 @@
  * [x] 驱动层：用于提供标准或者私有协议连接物理设备的 `SDK`，负责南向设备的数据采集和指令控制，基于 `SDK` 可实现驱动的快速开发；
  * [x] 数据层：负责设备数据的收集和入库，并提供数据管理接口服务；
  * [x] 管理层：用于提供微服务注册中心、设备指令接口、设备注册与关联配对、数据管理中心，是所有微服务交互的核心部分，负责各类配置数据的管理，并对外提供接口服务；
- * [ ] 应用层：用于提供数据开放、任务调度、报警与消息通知、日志管理等，具备对接第三方平台能力。
-
-#### DC3 驱动、测点、设备分层
-
-![](./docs/images/dc3/device-model.png)
+ * [ ] 应用层(开发中...)：用于提供数据开放、任务调度、报警与消息通知、日志管理等，具备对接第三方平台能力。
 
 #### DC3 功能设计，定位目标
 
@@ -43,10 +39,10 @@
  * [x] 可定制：添加新的设备协议,并注册到服务中心；
  * [x] 跨平台：使用 `Java` 环境可异地、分布式多平台部署；
  * [x] 自主可控：私有云、公有云、边缘部署；
- * [ ] 完善性：设备快速接入、注册、权限校验；
- * [ ] 安全：数据加密传输；
- * [ ] 多租户：命名空间，多租户化；
- * [x] 云原生：Kubernetes；
+ * [X] 完善性：设备快速接入、注册、权限校验；
+ * [ ] 安全(开发中...)：数据加密传输；
+ * [ ] 多租户(开发中...)：命名空间，多租户化；
+ * [X] 云原生：Kubernetes；
  * [x] 容器化：Docker。
 
 
@@ -65,41 +61,17 @@
 ### 3 项目文档
 
 > 详情请阅读 [`IOT DC3 Wiki`](https://doc.dc3.site) 文档
-
-**其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
-
-
-
-### 4 Demo 文档
+>
+> **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
 > **入门：一睹为快，快速启动一个，Demo Application ！**
 >
-> 详情请阅读 [`快速开始`](https://doc.dc3.site/#/quick-start?id=%e4%b8%80%e7%9d%b9%e4%b8%ba%e5%bf%ab) 文档
->
-
-```
-git clone https://gitee.com/pnoker/iot-dc3.git
-cd iot-dc3/dc3
-docker-compose -f docker-compose-demo.yml up -d
-```
-
-![iot-dc3-architecture](./docs/images/dc3/web-zip.png)
+> 请阅读 [`快速开始`](https://doc.dc3.site/#/quick-start?id=%e4%b8%80%e7%9d%b9%e4%b8%ba%e5%bf%ab) 文档
 
 
+### 4 大家关心的问题
 
-### 5 联系作者
-
-:whale2: 商业合作邮箱:pnokers@icloud.com
-
-:speech_balloon: 如果感兴趣可以加入`DC3` 微信技术交流群，开源免费（微信：18304071393，请备注：DC3微信技术交流群）
-
-:lollipop: 感谢: `lombok`、`netty`、`spring boot`、`spring cloud`、`s7connector` 、 `modbus4j`、`jinterop`、`eclipse.milo` 等提供的工具以及源码。
-
-
-
-### 6 大家关心的问题
-
-#### 6.1 DC3 项目情况
+#### 4.1 DC3 项目情况
 
 - **开发进度**
 
@@ -121,7 +93,7 @@ docker-compose -f docker-compose-demo.yml up -d
 
 
 
-#### 6.2 项目目前支持的协议有哪些？
+#### 4.2 项目目前支持的协议有哪些？
 
 已完成的协议驱动：`rtmp`、`plcs7`、`socket`（`client`模式、`server`模式）、`mqtt`、`opcda`、`opcua`、`modbus-tcp` 。
 
@@ -129,6 +101,6 @@ docker-compose -f docker-compose-demo.yml up -d
 
 
 
-#### 6.3 项目文档？
+#### 4.3 项目文档？
 
 目前项目文档主要以 `Gitee` 的  [`IOT DC3 Wiki`](https://doc.dc3.site) 为主，部署或者二次开发过程中遇到问题可以提交 [issue](https://gitee.com/pnoker/iot-dc3/issues) 或者 在交流群 中进行提问。
