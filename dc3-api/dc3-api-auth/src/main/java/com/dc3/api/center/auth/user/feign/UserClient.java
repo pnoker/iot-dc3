@@ -77,7 +77,7 @@ public interface UserClient {
      * @param id User Id
      * @return Boolean
      */
-    @PostMapping("/rest/{id}")
+    @PostMapping("/reset/{id}")
     R<Boolean> restPassword(@NotNull @PathVariable(value = "id") Long id);
 
     /**

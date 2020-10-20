@@ -1,19 +1,21 @@
- :rocket: 项目文档请阅读 [`IOT DC3 Wiki`](https://doc.dc3.site) ！
+:rocket: 项目文档请阅读 [`IOT DC3 Wiki`](https://doc.dc3.site) ！
 
  :boom:  你的 `Star` 是我开发的动力，下载源码 `git clone https://gitee.com/pnoker/iot-dc3.git` ！ 
 
  :seedling: 为了便于你的二次开发和理解，`DC3` 开源了 `Demo Web UI` ， https://gitee.com/pnoker/dc3-web
 
 <p align="center">
-    <img src="./docs/images/dc3/logo-blue.png" width="400"><br>
-    <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gray' alt='star'></a>
-    <a href="https://travis-ci.org/pnoker/iot-dc3"><img src="https://travis-ci.org/pnoker/iot-dc3.svg?branch=master"></a><br>
+	<img src="./docs/images/dc3/logo-blue.png" width="400"><br>
+  <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'></img></a>
+	<a href='https://gitee.com/pnoker/iot-dc3/members'><img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'></img></a>
+	<br>
 	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
 	<a><img src="https://img.shields.io/badge/Spring Boot-2.3.2.RELEASE-blue.svg"></a>
 	<a><img src="https://img.shields.io/badge/Spring Cloud-Hoxton.SR8-blue.svg"></a>
 	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
+
 
 ------
 
@@ -44,7 +46,7 @@
  * [ ] 完善性：设备快速接入、注册、权限校验；
  * [ ] 安全：数据加密传输；
  * [ ] 多租户：命名空间，多租户化；
- * [ ] 云原生：Kubernetes；
+ * [x] 云原生：Kubernetes；
  * [x] 容器化：Docker。
 
 
