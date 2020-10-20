@@ -69,10 +69,10 @@ public class TranscodeRunner implements ApplicationRunner {
             log.error("{} does not exist,Please fill absolute path!", ffmpeg);
             System.exit(1);
         }
-        list().forEach(rtmp -> rtmpService.start(rtmp.getId()));
+        authStartList().forEach(rtmp -> rtmpService.start(rtmp.getId()));
     }
 
-    public List<Rtmp> list() {
+    public List<Rtmp> authStartList() {
         Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages().setSize(-1L)));
         return Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>());
     }

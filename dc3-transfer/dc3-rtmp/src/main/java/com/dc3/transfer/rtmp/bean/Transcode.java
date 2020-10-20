@@ -16,16 +16,13 @@
 
 package com.dc3.transfer.rtmp.bean;
 
-import cn.hutool.core.util.RuntimeUtil;
 import com.dc3.common.model.Rtmp;
+import com.dc3.common.utils.Dc3Util;
 import com.dc3.transfer.rtmp.init.TranscodeRunner;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Command 指令执行任务信息类
@@ -36,9 +33,10 @@ import java.util.Optional;
 @Slf4j
 public class Transcode {
     private Long id;
-    private volatile boolean run;
+    private boolean run;
     private String command;
     private Process process;
+    public final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public Transcode(Rtmp rtmp) {
         this.id = rtmp.getId();
@@ -49,44 +47,24 @@ public class Transcode {
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
     }
 
-    public void start() {
-        run = true;
-        process = RuntimeUtil.exec(command);
-        InputStream inputStream = process.getErrorStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        String line;
-        try {
-            while (StringUtils.isNotEmpty((line = reader.readLine())) && run) {
-                log.error(line);
-                line = line.toLowerCase();
-                if (line.contains("fail") || line.contains("error")) {
-                    stop();
-                }
-            }
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
+    public boolean isRun() {
+        boolean result;
+        this.lock.readLock().lock();
+        result = run;
+        this.lock.readLock().unlock();
+        return result;
     }
 
-    public void stop() {
-        run = false;
-        Optional.ofNullable(process).ifPresent(process -> {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-            try {
-                writer.write("q");
-                writer.flush();
-                writer.close();
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-            process.destroyForcibly();
-        });
+    public void setRun(boolean run) {
+        this.lock.writeLock().lock();
+        this.run = run;
+        this.lock.writeLock().unlock();
+    }
+
+    public void quit() {
+        Dc3Util.destroyProcessWithCmd(process, "q");
+        process = null;
+        setRun(false);
     }
 
 }
