@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="./docs/images/dc3/logo-blue.png" width="400"><br>
+	<img src="./images/dc3/logo-blue.png" width="400"><br>
   <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'></img></a>
 	<a href='https://gitee.com/pnoker/iot-dc3/members'><img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'></img></a>
 	<br>
