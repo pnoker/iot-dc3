@@ -17,13 +17,12 @@
 package com.dc3.api.center.manager.hystrix;
 
 import com.dc3.api.center.manager.feign.DictionaryClient;
-import com.dc3.common.bean.R;
 import com.dc3.common.bean.Dictionary;
+import com.dc3.common.bean.R;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -68,12 +67,12 @@ public class DictionaryClientHystrix implements FallbackFactory<DictionaryClient
             }
 
             @Override
-            public R<List<Dictionary>> deviceDictionary(@NotNull String parent) {
+            public R<List<Dictionary>> deviceDictionary(String parent) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> pointDictionary(@NotNull String parent) {
+            public R<List<Dictionary>> pointDictionary(String parent) {
                 return R.fail(message);
             }
         };

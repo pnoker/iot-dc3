@@ -25,7 +25,6 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -45,7 +44,7 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
         return new PointValueClient() {
 
             @Override
-            public R<Boolean> correct(@NotNull String serviceName) {
+            public R<Boolean> correct(String serviceName) {
                 return R.fail(message);
             }
 
@@ -55,7 +54,7 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
             }
 
             @Override
-            public R<List<PointValue>> realtime(@NotNull Long deviceId) {
+            public R<List<PointValue>> realtime(Long deviceId) {
                 return R.fail(message);
             }
 
@@ -65,7 +64,7 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
             }
 
             @Override
-            public R<PointValue> latest(@NotNull Long deviceId) {
+            public R<PointValue> latest(Long deviceId) {
                 return R.fail(message);
             }
 

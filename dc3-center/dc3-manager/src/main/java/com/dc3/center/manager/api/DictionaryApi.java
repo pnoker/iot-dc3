@@ -18,15 +18,14 @@ package com.dc3.center.manager.api;
 
 import com.dc3.api.center.manager.feign.DictionaryClient;
 import com.dc3.center.manager.service.DictionaryService;
+import com.dc3.common.bean.Dictionary;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.bean.Dictionary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -105,7 +104,7 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> deviceDictionary(@NotNull String parent) {
+    public R<List<Dictionary>> deviceDictionary(String parent) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.deviceDictionary(parent);
             if (null != dictionaryList) {
@@ -118,7 +117,7 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> pointDictionary(@NotNull String parent) {
+    public R<List<Dictionary>> pointDictionary(String parent) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.pointDictionary(parent);
             if (null != dictionaryList) {

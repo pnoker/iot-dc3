@@ -21,4 +21,3 @@ COPY ./rabbitmq.conf /etc/rabbitmq/rabbitmq.conf
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && rabbitmq-plugins enable rabbitmq_management rabbitmq_mqtt rabbitmq_stomp
-
