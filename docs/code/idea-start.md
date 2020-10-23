@@ -58,7 +58,7 @@ Linux：`/etc/hosts`
 
 ```bash
 cd iot-dc3
-mvn -s dc3/dependences/maven/settings.xml clean -U package
+mvn -s dc3/dependencies/maven/settings.xml clean -U package
 cd dc3
 docker-compose build mysql redis mongo rabbitmq register monitor auth
 docker-compose up -d mysql redis mongo rabbitmq register monitor auth

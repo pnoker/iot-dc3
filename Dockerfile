@@ -24,4 +24,4 @@ WORKDIR /dc3
 
 COPY ./ ./
 
-RUN mvn -s ./dc3/dependences/maven/settings.xml clean -U package
+RUN mvn -s ./dc3/dependencies/maven/settings.xml clean -U package

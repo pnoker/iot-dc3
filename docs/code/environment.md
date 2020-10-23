@@ -2,7 +2,7 @@
 
 > **⚠️请注意；⚠️请注意；⚠️请注意：**
 >
-> 由于是开发模式，数据库和消息组件均采用容器模式启动，如果是实际项目中请勿使用docker部署数据库和消息组件服务（MySQL、MongoDB、Redis、RabbitMQ）,配置文件在dc3/dependences下，可手动自行配置。
+> 由于是开发模式，数据库和消息组件均采用容器模式启动，如果是实际项目中请勿使用docker部署数据库和消息组件服务（MySQL、MongoDB、Redis、RabbitMQ）,配置文件在dc3/dependencies下，可手动自行配置。
 >
 > MySQL、MongoDB、Redis、RabbitMQ的用户名密码均为dc3，如果想修改用户名密码可以全文搜索，并进行统一修改。
 >
@@ -60,7 +60,7 @@ docker-compose stop mysql
 
 > 生产环境: 推荐在宿主机上安装 MySQL 服务
 
-导入 iot-dc3 数据库脚本文件, dc3/dependences/mysql/iot-dc3.sql ,使用 Navicat 之类的软件即可
+导入 iot-dc3 数据库脚本文件, dc3/dependencies/mysql/iot-dc3.sql ,使用 Navicat 之类的软件即可
 
 
 
@@ -83,7 +83,7 @@ docker-compose stop mongo
 
 > 生产环境: 推荐在宿主机上安装 MongoDB 服务
 
-导入 iot-dc3.js 数据库脚本文件, dc3/dependences/mongo/iot-dc3.js ,使用 Navicat 之类的软件即可
+导入 iot-dc3.js 数据库脚本文件, dc3/dependencies/mongo/iot-dc3.js ,使用 Navicat 之类的软件即可
 
 
 
@@ -106,7 +106,7 @@ docker-compose stop redis
 
 > 生产环境: 推荐在宿主机上安装 MongoDB 服务
 
-Reids 配置文件在 dc3/dependences/redis/redis.conf
+Reids 配置文件在 dc3/dependencies/redis/redis.conf
 
 
 
@@ -129,4 +129,4 @@ docker-compose stop rabbitmq
 
 > 生产环境: 推荐在宿主机上安装 MongoDB 服务
 
-RabbitMQ 配置文件在 dc3/dependences/rabbitmq/rabbitmq.conf
+RabbitMQ 配置文件在 dc3/dependencies/rabbitmq/rabbitmq.conf
