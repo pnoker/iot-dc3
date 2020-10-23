@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -62,7 +61,7 @@ public class PointValueApi implements PointValueClient {
     }
 
     @Override
-    public R<List<PointValue>> realtime(@NotNull Long deviceId) {
+    public R<List<PointValue>> realtime(Long deviceId) {
         try {
             List<PointValue> pointValues = pointValueService.realtime(deviceId);
             if (null != pointValues) {
