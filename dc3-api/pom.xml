@@ -32,6 +32,7 @@
         <module>dc3-api-auth</module>
         <module>dc3-api-manager</module>
         <module>dc3-api-data</module>
+        <module>dc3-api-event</module>
         <module>dc3-api-rtmp</module>
     </modules>
 

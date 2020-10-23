@@ -244,42 +244,6 @@ services:
         aliases:
           - dc3-driver-modbus-tcp
 
-  188b-tcp:
-    build:
-      context: ../dc3-driver/dc3-driver-water-188b-tcp/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-water-188b-tcp:1.0.0
-    restart: always
-    ports:
-      - 8702:8702
-      - 9270:9270
-    container_name: dc3-driver-water-188b-tcp
-    hostname: dc3-driver-water-188b-tcp
-    volumes:
-      - logs:/dc3-driver/dc3-driver-water-188b-tcp/dc3/logs
-    networks:
-      dc3net:
-        aliases:
-          - dc3-driver-water-188b-tcp
-
-  188b-udp:
-    build:
-      context: ../dc3-driver/dc3-driver-water-188b-udp/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-water-188b-udp:1.0.0
-    restart: always
-    ports:
-      - 8703:8703
-      - 9271:9271
-    container_name: dc3-driver-water-188b-udp
-    hostname: dc3-driver-water-188b-udp
-    volumes:
-      - logs:/dc3-driver/dc3-driver-water-188b-udp/dc3/logs
-    networks:
-      dc3net:
-        aliases:
-          - dc3-driver-water-188b-udp
-
   rtmp:
     build:
       context: ../dc3-transfer/dc3-rtmp/
@@ -297,7 +261,7 @@ services:
 
   mysql:
     build:
-      context: ./dependences/mysql/
+      context: ./dependencies/mysql/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-mysql:1.0.0
     restart: always
@@ -314,7 +278,7 @@ services:
 
   mongo:
     build:
-      context: ./dependences/mongo/
+      context: ./dependencies/mongo/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-mongo:1.0.0
     restart: always
@@ -332,7 +296,7 @@ services:
 
   redis:
     build:
-      context: ./dependences/redis/
+      context: ./dependencies/redis/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-redis:1.0.0
     restart: always
@@ -349,7 +313,7 @@ services:
 
   rabbitmq:
     build:
-      context: ./dependences/rabbitmq/
+      context: ./dependencies/rabbitmq/
       dockerfile: ./Dockerfile
     image: pnoker/dc3-rabbitmq:1.0.0
     restart: always
