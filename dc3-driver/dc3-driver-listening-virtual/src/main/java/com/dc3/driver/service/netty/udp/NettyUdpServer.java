@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.dc3.driver.service.netty;
+package com.dc3.driver.service.netty.udp;
 
-import io.netty.bootstrap.ServerBootstrap;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -34,23 +33,22 @@ import java.net.InetSocketAddress;
  * @author pnoker
  */
 @Component
-public class NettyTcpServer {
+public class NettyUdpServer {
 
     @SneakyThrows
     public void start(int port) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
+            Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
-                    .channel(NioServerSocketChannel.class)
+                    .channel(NioDatagramChannel.class)
                     .localAddress(new InetSocketAddress(port))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                    .handler(new ChannelInitializer<Channel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) {
-                            socketChannel.pipeline().addLast(
+                        protected void initChannel(Channel channel) {
+                            channel.pipeline().addLast(
                                     new WriteTimeoutHandler(30),
-                                    new ReadTimeoutHandler(30),
-                                    new NettyTcpServerHandler()
+                                    new NettyUdpServerHandler()
                             );
                         }
                     });

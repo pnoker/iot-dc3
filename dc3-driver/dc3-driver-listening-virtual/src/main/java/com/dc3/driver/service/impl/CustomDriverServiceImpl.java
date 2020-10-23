@@ -23,7 +23,8 @@ import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
 import com.dc3.common.sdk.service.rabbit.DriverService;
-import com.dc3.driver.service.netty.NettyServer;
+import com.dc3.driver.service.netty.tcp.NettyTcpServer;
+import com.dc3.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,11 +42,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Service
 public class CustomDriverServiceImpl implements CustomDriverService {
 
-    @Value("${driver.custom.socket.port}")
-    private Integer port;
+    @Value("${driver.custom.tcp.port}")
+    private Integer tcpPort;
+    @Value("${driver.custom.udp.port}")
+    private Integer udpPort;
 
     @Resource
-    private NettyServer nettyServer;
+    private NettyTcpServer nettyTcpServer;
+    @Resource
+    private NettyUdpServer nettyUdpServer;
     @Resource
     private DriverContext driverContext;
     @Resource
@@ -56,8 +61,12 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     @Override
     public void initial() {
         threadPoolExecutor.execute(() -> {
-            log.debug("Virtual Listening Driver Starting(::{}) incoming data listener", port);
-            nettyServer.start(port);
+            log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
+            nettyTcpServer.start(tcpPort);
+        });
+        threadPoolExecutor.execute(() -> {
+            log.debug("Virtual Listening Driver Starting(UDP::{}) incoming data listener", udpPort);
+            nettyUdpServer.start(udpPort);
         });
     }
 
@@ -71,7 +80,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
         Long deviceId = device.getId();
 
         // TODO 获取设备的Channel，并向下发送数据
-        Channel channel = NettyServer.deviceChannelMap.get(deviceId);
+        Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
         if (null != channel) {
             channel.writeAndFlush(value.getValue().getBytes(StandardCharsets.UTF_8));
         }
