@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dc3.driver.service.netty;
+package com.dc3.driver.service.netty.tcp;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author pnoker
  */
 @Component
-public class NettyServer {
+public class NettyTcpServer {
     /**
      * DeviceId:Channel
      * 用于存放设备的 Netty Context Channel
@@ -54,7 +54,7 @@ public class NettyServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
-                            socketChannel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyServerHandler());
+                            socketChannel.pipeline().addLast(new WriteTimeoutHandler(30), new NettyTcpServerHandler());
                         }
                     });
             ChannelFuture future = bootstrap.bind().sync();

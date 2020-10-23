@@ -2,8 +2,10 @@ driver:
   name: ListeningVirtualDriver
   description: @project.description@
   custom:
-    socket:
+    tcp:
       port: 6270
+    upd:
+      port: 6271
   schedule:
     read:
       enable: false
