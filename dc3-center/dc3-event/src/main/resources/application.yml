@@ -1,0 +1,23 @@
+server:
+  port: 8800
+
+spring:
+  application:
+    name: @project.artifactId@
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+  redis:
+    database: 3
+  cache:
+    redis:
+      time-to-live: 60S
+
+logging:
+  level:
+    com.dc3: DEBUG
+  file:
+    name: dc3/logs/center/${spring.application.name}.log
