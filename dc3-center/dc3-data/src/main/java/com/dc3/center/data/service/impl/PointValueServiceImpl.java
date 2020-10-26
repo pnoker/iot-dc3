@@ -24,6 +24,7 @@ import com.dc3.api.center.manager.feign.ProfileClient;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
+import com.dc3.common.bean.driver.DeviceEvent;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
 import com.dc3.common.constant.Common;
@@ -180,7 +181,7 @@ public class PointValueServiceImpl implements PointValueService {
     public String status(Long deviceId) {
         String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceId;
         String status = redisUtil.getKey(key);
-        return null != status ? status : Common.Device.OFFLINE;
+        return null != status ? status : Common.Device.Status.OFFLINE;
     }
 
     @Override
@@ -226,6 +227,13 @@ public class PointValueServiceImpl implements PointValueService {
         Query query = new Query(criteria);
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
         return mongoTemplate.findOne(query, PointValue.class);
+    }
+
+    @Override
+    public void addDeviceEvent(DeviceEvent deviceEvent) {
+        if (null != deviceEvent) {
+            mongoTemplate.insert(deviceEvent);
+        }
     }
 
     @Override

@@ -54,6 +54,21 @@ public class TopicRabbitConfig {
     }
 
     @Bean
+    TopicExchange eventExchange() {
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, true);
+    }
+
+    @Bean
+    Queue eventQueue() {
+        return new Queue(Common.Rabbit.QUEUE_EVENT, true, false, true);
+    }
+
+    @Bean
+    Queue deviceStatusQueue() {
+        return new Queue(Common.Rabbit.QUEUE_DEVICE_STATUS, true, false, true);
+    }
+
+    @Bean
     TopicExchange notifyExchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, true, true);
     }
@@ -74,11 +89,6 @@ public class TopicRabbitConfig {
     @Bean
     TopicExchange valueExchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, true);
-    }
-
-    @Bean
-    Queue deviceStatusQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DEVICE_STATUS, true, false, true);
     }
 
     @Bean

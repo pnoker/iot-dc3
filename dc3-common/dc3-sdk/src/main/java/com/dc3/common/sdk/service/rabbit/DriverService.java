@@ -20,9 +20,11 @@ import cn.hutool.core.convert.Convert;
 import com.dc3.api.center.manager.feign.BatchClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.batch.BatchDriver;
+import com.dc3.common.bean.driver.DeviceEvent;
 import com.dc3.common.bean.driver.DeviceStatus;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
+import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.DriverContext;
 import lombok.extern.slf4j.Slf4j;
@@ -63,10 +65,39 @@ public class DriverService {
         return batchDriver.isOk();
     }
 
+    public void deviceEventSender(Long deviceId, String type, String content) {
+        DeviceEvent deviceEvent = new DeviceEvent(deviceId, type, content);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_EVENT_PREFIX + serviceName, deviceEvent);
+    }
+
     /**
-     * 发送设备状态
-     * <p>
-     * 规范：使用 pointId=0 表示设备状态值
+     * 发送设备状态，同时设置实时数据超时时间
+     * 设备状态值
+     * Common.Device
+     * ONLINE, OFFLINE, MAINTAIN, FAULT
+     * 在线，离线，维护，故障
+     *
+     * @param deviceStatus Device Status
+     */
+    public void deviceStatusSender(DeviceStatus deviceStatus) {
+        if (null == deviceStatus.getDeviceId() || null == deviceStatus.getStatus()) {
+            throw new ServiceException("Device Id or Status is null");
+        }
+        if (!Common.Device.Status.OFFLINE.equals(deviceStatus.getStatus())
+                && !Common.Device.Status.ONLINE.equals(deviceStatus.getStatus())
+                && !Common.Device.Status.FAULT.equals(deviceStatus.getStatus())
+                && !Common.Device.Status.MAINTAIN.equals(deviceStatus.getStatus())) {
+            throw new ServiceException("Invalid Device Status " + deviceStatus.getStatus());
+        }
+        if (null == deviceStatus.getOriginTime()) {
+            deviceStatus.setOriginTime(System.currentTimeMillis());
+        }
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
+    }
+
+    /**
+     * 发送设备状态，同时设置实时数据超时时间
+     * 设备状态值
      * Common.Device
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      * 在线，离线，维护，故障
@@ -76,13 +107,12 @@ public class DriverService {
      */
     public void deviceStatusSender(Long deviceId, String status) {
         DeviceStatus deviceStatus = new DeviceStatus(deviceId, status);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
     }
 
     /**
      * 发送设备状态，同时设置实时数据超时时间
-     * <p>
-     * 规范：使用 pointId=0 表示设备状态值
+     * 设备状态值
      * Common.Device
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      * 在线，离线，维护，故障
@@ -95,7 +125,7 @@ public class DriverService {
     public void deviceStatusSender(Long deviceId, String status, int timeOut, TimeUnit timeUnit) {
         DeviceStatus deviceStatus = new DeviceStatus(deviceId, status);
         deviceStatus.setTimeOut(timeOut).setTimeUnit(timeUnit);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
     }
 
     /**

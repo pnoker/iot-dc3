@@ -141,7 +141,7 @@ public class DeviceServiceImpl implements DeviceService {
         Page<Device> devicePage = list(deviceDto);
         if (devicePage.getRecords().size() > 0) {
             devicePage.getRecords().forEach(device -> {
-                String status = Common.Device.OFFLINE;
+                String status = Common.Device.Status.OFFLINE;
                 R<String> rStatus = pointValueClient.status(device.getId());
                 if (rStatus.isOk()) {
                     status = rStatus.getData();
