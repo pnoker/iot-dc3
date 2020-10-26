@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
+db = db.getSiblingDB('admin');
+if (!db.getUser("dc3")) {
+    db.createUser({
+        user: "dc3",
+        pwd: "dc3",
+        roles: [{
+            role: "readWrite",
+            db: "admin"
+        }]
+    });
+}
+
 db = db.getSiblingDB('dc3');
 
 if (!db.getUser("dc3")) {
@@ -24,15 +36,17 @@ if (!db.getUser("dc3")) {
             role: "readWrite",
             db: "dc3"
         }]
-    })
+    });
 }
 
-if (!db.getCollection("pointValue")) {
-    db.createCollection("pointValue");
-    db.pointValue.createIndex({
-        "deviceId": 1,
-        "pointId": 1
-    }, {unique: false});
+if (db.createCollection("pointValue")) {
+    db.pointValue.ensureIndex({"deviceId": 1}, {name: "point_value_device_id_index", unique: false, background: true});
+    db.pointValue.ensureIndex({"pointId": 1}, {name: "point_value_point_id_index", unique: false, background: true});
+    db.pointValue.ensureIndex({"originTime": -1}, {name: "point_value_create_time_index", unique: false, background: true});
 }
 
-
+if (db.createCollection("deviceEvent")) {
+    db.deviceEvent.ensureIndex({"deviceId": 1}, {name: "device_event_device_id_index", unique: false, background: true});
+    db.deviceEvent.ensureIndex({"pointId": 1}, {name: "device_event_point_id_index", unique: false, background: true});
+    db.deviceEvent.ensureIndex({"originTime": -1}, {name: "device_event_create_time_index", unique: false, background: true});
+}

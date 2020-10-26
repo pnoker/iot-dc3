@@ -33,7 +33,15 @@ import java.io.Serializable;
 public class DeviceEvent implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 设备ID，同MySQl中等 设备ID 一致
+     */
     private Long deviceId;
+
+    /**
+     * 位号ID，同MySQl中等 位号ID 一致
+     */
+    private Long pointId;
 
     /**
      * Device Event
@@ -43,11 +51,19 @@ public class DeviceEvent implements Serializable {
     private String type;
 
     private Boolean confirm = false;
-    private String content;
+    private Object content;
     private Long originTime;
 
-    public DeviceEvent(Long deviceId, String type, String content) {
+    public DeviceEvent(Long deviceId, String type, Object content) {
         this.deviceId = deviceId;
+        this.type = type;
+        this.content = content;
+        this.originTime = System.currentTimeMillis();
+    }
+
+    public DeviceEvent(Long deviceId, Long pointId, String type, Object content) {
+        this.deviceId = deviceId;
+        this.pointId = pointId;
         this.type = type;
         this.content = content;
         this.originTime = System.currentTimeMillis();
