@@ -70,6 +70,11 @@ public class DriverService {
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_EVENT_PREFIX + serviceName, deviceEvent);
     }
 
+    public void deviceEventSender(Long deviceId, Long pointId, String type, String content) {
+        DeviceEvent deviceEvent = new DeviceEvent(deviceId, pointId, type, content);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_EVENT_PREFIX + serviceName, deviceEvent);
+    }
+
     /**
      * 发送设备状态，同时设置实时数据超时时间
      * 设备状态值

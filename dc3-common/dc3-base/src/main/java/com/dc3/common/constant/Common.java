@@ -110,7 +110,14 @@ public interface Common {
          * 设备事件
          */
         interface Event {
+            /**
+             * 用于记录设备上下线、故障、维修等事件类型
+             */
             String STATUS = "STATUS";
+
+            /**
+             * 用于记录设备位号值超出上下限、类型错误、不满足位号处理条件等事件类型
+             */
             String LIMIT = "LIMIT";
         }
     }
