@@ -67,14 +67,17 @@ public interface Common {
      * 消息常量
      */
     interface Rabbit {
+        String TOPIC_EXCHANGE_EVENT = "dc3.exchange.event";
         String TOPIC_EXCHANGE_NOTIFY = "dc3.exchange.driver.notify";
         String TOPIC_EXCHANGE_VALUE = "dc3.exchange.point.value";
 
+        String QUEUE_EVENT = "dc3.queue.event";
         String QUEUE_DRIVER_NOTIFY_PREFIX = "dc3.queue.driver.notify.";
         String QUEUE_DEVICE_STATUS = "dc3.queue.device.status";
         String QUEUE_POINT_SINGLE_VALUE = "dc3.queue.point.single.value";
         String QUEUE_POINT_MULTI_VALUE = "dc3.queue.point.multi.value";
 
+        String ROUTING_EVENT_PREFIX = "dc3.routing.event.";
         String ROUTING_DEVICE_NOTIFY_PREFIX = "dc3.routing.device.notify.";
         String ROUTING_DEVICE_STATUS_PREFIX = "dc3.routing.device.status.";
         String ROUTING_SINGLE_VALUE_PREFIX = "dc3.routing.single.value.";
@@ -92,10 +95,24 @@ public interface Common {
      * 设备常量
      */
     interface Device {
-        String ONLINE = "ONLINE";
-        String OFFLINE = "OFFLINE";
-        String MAINTAIN = "MAINTAIN";
-        String FAULT = "FAULT";
+
+        /**
+         * 设备状态
+         */
+        interface Status {
+            String ONLINE = "ONLINE";
+            String OFFLINE = "OFFLINE";
+            String MAINTAIN = "MAINTAIN";
+            String FAULT = "FAULT";
+        }
+
+        /**
+         * 设备事件
+         */
+        interface Event {
+            String STATUS = "STATUS";
+            String LIMIT = "LIMIT";
+        }
     }
 
     /**

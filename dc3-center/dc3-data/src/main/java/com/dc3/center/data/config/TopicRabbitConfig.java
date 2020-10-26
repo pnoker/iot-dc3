@@ -51,8 +51,21 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    TopicExchange valueExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, true);
+    TopicExchange eventExchange() {
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, true);
+    }
+
+    @Bean
+    Queue eventQueue() {
+        return new Queue(Common.Rabbit.QUEUE_EVENT, true, false, true);
+    }
+
+    @Bean
+    Binding eventBinding() {
+        return BindingBuilder
+                .bind(eventQueue())
+                .to(eventExchange())
+                .with(Common.Rabbit.ROUTING_EVENT_PREFIX + "*");
     }
 
     @Bean
@@ -64,8 +77,13 @@ public class TopicRabbitConfig {
     Binding deviceStatusBinding() {
         return BindingBuilder
                 .bind(deviceStatusQueue())
-                .to(valueExchange())
+                .to(eventExchange())
                 .with(Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + "*");
+    }
+
+    @Bean
+    TopicExchange valueExchange() {
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, true);
     }
 
     @Bean
