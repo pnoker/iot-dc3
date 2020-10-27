@@ -21,7 +21,7 @@ import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.rabbit.DriverService;
+import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.sdk.util.DriverUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;

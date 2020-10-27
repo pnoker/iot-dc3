@@ -16,11 +16,14 @@
 
 package com.dc3.center.data.init;
 
+import com.dc3.center.data.service.ScheduleService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @author pnoker
@@ -34,8 +37,11 @@ import org.springframework.stereotype.Component;
         "com.dc3.api.center.date"
 })
 public class DataInitRunner implements ApplicationRunner {
+    @Resource
+    private ScheduleService scheduleService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        scheduleService.initial();
     }
 }

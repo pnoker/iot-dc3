@@ -22,7 +22,7 @@ import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
-import com.dc3.common.sdk.service.rabbit.DriverService;
+import com.dc3.common.sdk.service.DriverService;
 import com.dc3.driver.service.netty.tcp.NettyTcpServer;
 import com.dc3.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
