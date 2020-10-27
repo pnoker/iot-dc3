@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
+        <!-- Quartz -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
         <!-- dc3 Common Core -->
         <dependency>
             <groupId>com.dc3</groupId>

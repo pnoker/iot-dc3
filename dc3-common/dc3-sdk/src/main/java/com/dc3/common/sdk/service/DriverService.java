@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.service.rabbit;
+package com.dc3.common.sdk.service;
 
-import cn.hutool.core.convert.Convert;
 import com.dc3.api.center.manager.feign.BatchClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.batch.BatchDriver;
@@ -25,8 +24,8 @@ import com.dc3.common.bean.driver.DeviceStatus;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
-import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.util.DriverUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,11 +64,40 @@ public class DriverService {
         return batchDriver.isOk();
     }
 
+    /**
+     * 将位号原始值进行处理和转换
+     *
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @param rawValue Raw Value
+     * @return PointValue
+     */
+    public String convertValue(Long deviceId, Long pointId, String rawValue) {
+        String value = DriverUtils.processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId));
+        log.debug("Convert device({}), point({}), raw: {},to value: {}", deviceId, pointId, rawValue, value);
+        return value;
+    }
+
+    /**
+     * 发送设备事件
+     *
+     * @param deviceId Device Id
+     * @param type     Event Type, STATUS、LIMIT
+     * @param content  Event Content
+     */
     public void deviceEventSender(Long deviceId, String type, String content) {
         DeviceEvent deviceEvent = new DeviceEvent(deviceId, type, content);
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_EVENT_PREFIX + serviceName, deviceEvent);
     }
 
+    /**
+     * 发送设备事件
+     *
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @param type     Event Type, STATUS、LIMIT
+     * @param content  Event Content
+     */
     public void deviceEventSender(Long deviceId, Long pointId, String type, String content) {
         DeviceEvent deviceEvent = new DeviceEvent(deviceId, pointId, type, content);
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_EVENT_PREFIX + serviceName, deviceEvent);
@@ -175,58 +203,4 @@ public class DriverService {
         pointValues.forEach(this::multiPointValueSender);
     }
 
-    /**
-     * 将位号原始值进行处理和转换
-     *
-     * @param deviceId Device Id
-     * @param pointId  Point Id
-     * @param rawValue Raw Value
-     * @return PointValue
-     */
-    public String convertValue(Long deviceId, Long pointId, String rawValue) {
-        String value = processValue(rawValue, driverContext.getDevicePoint(deviceId, pointId));
-        log.debug("Convert device({}), point({}), raw: {},to value: {}", deviceId, pointId, rawValue, value);
-        return value;
-    }
-
-
-    /**
-     * process value
-     * <p>
-     *
-     * @param value String Value
-     * @param point point.type : string/short/int/double/float/long/boolean
-     * @return String Value
-     */
-    private String processValue(String value, Point point) {
-        value = value.trim();
-        switch (point.getType()) {
-            case Common.ValueType.STRING:
-                break;
-            case Common.ValueType.BYTE:
-            case Common.ValueType.SHORT:
-            case Common.ValueType.INT:
-            case Common.ValueType.LONG:
-            case Common.ValueType.DOUBLE:
-            case Common.ValueType.FLOAT:
-                try {
-                    value = String.format(point.getFormat(),
-                            (Convert.convert(Double.class, value) + point.getBase()) * point.getMultiple());
-                } catch (Exception e) {
-                    log.warn(e.getMessage());
-                }
-                break;
-            case Common.ValueType.BOOLEAN:
-                try {
-                    value = String.valueOf(Boolean.parseBoolean(value));
-                } catch (Exception e) {
-                    log.warn(e.getMessage());
-                }
-                break;
-            default:
-                log.error("Invalid device point value type({})", point.getType());
-                break;
-        }
-        return value;
-    }
 }

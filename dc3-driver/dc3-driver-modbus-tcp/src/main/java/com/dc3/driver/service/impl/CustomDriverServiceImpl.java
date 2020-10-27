@@ -23,7 +23,7 @@ import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
-import com.dc3.common.sdk.service.rabbit.DriverService;
+import com.dc3.common.sdk.service.DriverService;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.code.DataType;

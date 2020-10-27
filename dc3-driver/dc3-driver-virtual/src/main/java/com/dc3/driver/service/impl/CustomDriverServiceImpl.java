@@ -24,7 +24,7 @@ import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
-import com.dc3.common.sdk.service.rabbit.DriverService;
+import com.dc3.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
