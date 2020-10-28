@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author pnoker
@@ -72,7 +73,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, Common.Device.Status.ONLINE));
+        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, Common.Device.Status.ONLINE, 25, TimeUnit.SECONDS));
     }
 
 }
