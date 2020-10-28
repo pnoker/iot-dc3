@@ -39,34 +39,34 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Slf4j
 @Component
-public class SinglePointValueReceiver {
+public class PointValueReceiver {
 
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
     @Resource
     private PointValueService pointValueService;
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{singlePointValueQueue.name}")
+    @RabbitListener(queues = "#{pointValueQueue.name}")
     public void pointValueReceive(Channel channel, Message message, PointValue pointValue) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (null == pointValue || null == pointValue.getDeviceId() || null == pointValue.getPointId()) {
-                log.error("Invalid single point data: {}", pointValue);
+            if (null == pointValue || null == pointValue.getDeviceId()) {
+                log.error("Invalid point data: {}", pointValue);
                 return;
             }
             PointValueScheduleJob.valueCount.getAndIncrement();
-            log.debug("Single point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
+            log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
 
             if (PointValueScheduleJob.valueSpeed.get() < 100) {
                 threadPoolExecutor.execute(() -> {
                     // Save point value to Redis & MongoDB
-                    pointValueService.addPointValue(pointValue.setMulti(false));
+                    pointValueService.addPointValue(pointValue);
                 });
             } else {
                 // Save point value to schedule
                 PointValueScheduleJob.valueLock.writeLock().lock();
-                PointValueScheduleJob.pointValues.add(pointValue.setMulti(false));
+                PointValueScheduleJob.pointValues.add(pointValue);
                 PointValueScheduleJob.valueLock.writeLock().unlock();
             }
         } catch (IOException e) {

@@ -33,10 +33,11 @@ import javax.annotation.Resource;
         "com.dc3.api.center.manager.*"
 })
 @ComponentScan(basePackages = {
-        "com.dc3.api.center.manager",
-        "com.dc3.api.center.date"
+        "com.dc3.api.center.date",
+        "com.dc3.api.center.manager"
 })
 public class DataInitRunner implements ApplicationRunner {
+
     @Resource
     private ScheduleService scheduleService;
 

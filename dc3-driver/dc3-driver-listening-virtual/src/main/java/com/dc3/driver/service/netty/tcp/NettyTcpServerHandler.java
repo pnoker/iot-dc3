@@ -138,7 +138,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         }
-        nettyTcpServerHandler.driverService.singlePointValueSender(pointValues);
+        nettyTcpServerHandler.driverService.pointValueSender(pointValues);
     }
 
     @Override

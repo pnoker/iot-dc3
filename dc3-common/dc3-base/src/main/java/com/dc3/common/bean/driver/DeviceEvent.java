@@ -16,22 +16,40 @@
 
 package com.dc3.common.bean.driver;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author pnoker
  */
 @Data
+@Document
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeviceEvent implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    @Transient
+    private Long id;
+
+    /**
+     * MongoDB Object Id
+     */
+    @MongoId
+    private ObjectId objectId;
 
     /**
      * 设备ID，同MySQl中等 设备ID 一致
@@ -52,6 +70,15 @@ public class DeviceEvent implements Serializable {
 
     private Boolean confirm = false;
     private Object content;
+
+    @Transient
+    @JsonIgnore
+    private int timeOut = 15;
+
+    @Transient
+    @JsonIgnore
+    private TimeUnit timeUnit = TimeUnit.MINUTES;
+
     private Long originTime;
 
     public DeviceEvent(Long deviceId, String type, Object content) {
@@ -61,11 +88,30 @@ public class DeviceEvent implements Serializable {
         this.originTime = System.currentTimeMillis();
     }
 
+    public DeviceEvent(Long deviceId, String type, Object content, int timeOut, TimeUnit timeUnit) {
+        this.deviceId = deviceId;
+        this.type = type;
+        this.content = content;
+        this.timeOut = timeOut;
+        this.timeUnit = timeUnit;
+        this.originTime = System.currentTimeMillis();
+    }
+
     public DeviceEvent(Long deviceId, Long pointId, String type, Object content) {
         this.deviceId = deviceId;
         this.pointId = pointId;
         this.type = type;
         this.content = content;
+        this.originTime = System.currentTimeMillis();
+    }
+
+    public DeviceEvent(Long deviceId, Long pointId, String type, Object content, int timeOut, TimeUnit timeUnit) {
+        this.deviceId = deviceId;
+        this.pointId = pointId;
+        this.type = type;
+        this.content = content;
+        this.timeOut = timeOut;
+        this.timeUnit = timeUnit;
         this.originTime = System.currentTimeMillis();
     }
 }

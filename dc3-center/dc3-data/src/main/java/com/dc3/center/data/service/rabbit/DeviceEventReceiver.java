@@ -18,6 +18,8 @@ package com.dc3.center.data.service.rabbit;
 
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.driver.DeviceEvent;
+import com.dc3.common.constant.Common;
+import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -39,22 +41,32 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class DeviceEventReceiver {
 
     @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
+    private RedisUtil redisUtil;
     @Resource
     private PointValueService pointValueService;
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{eventQueue.name}")
-    public void pointValueReceive(Channel channel, Message message, DeviceEvent deviceEvent) {
+    @RabbitListener(queues = "#{deviceEventQueue.name}")
+    public void deviceEventReceive(Channel channel, Message message, DeviceEvent deviceEvent) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Device Event from {}", message.getMessageProperties().getReceivedRoutingKey());
-
-            if (null == deviceEvent || null == deviceEvent.getDeviceId() || null == deviceEvent.getType()) {
-                log.error("Invalid device event: {}", deviceEvent);
+            if (null == deviceEvent || null == deviceEvent.getDeviceId()) {
+                log.error("Invalid device status: {}", deviceEvent);
                 return;
             }
+            log.debug("Device event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
 
+            // Save device status to Redis
+            if (Common.Device.Event.STATUS.equals(deviceEvent.getType())) {
+                redisUtil.setKey(
+                        Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
+                        deviceEvent.getContent(),
+                        deviceEvent.getTimeOut(),
+                        deviceEvent.getTimeUnit()
+                );
+            }
             threadPoolExecutor.execute(() -> {
                 // Insert device point data to MongoDB
                 // TODO 可根据项目并发情况实现一个定时和批量入库逻辑

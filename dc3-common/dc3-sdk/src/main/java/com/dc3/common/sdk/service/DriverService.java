@@ -20,10 +20,8 @@ import com.dc3.api.center.manager.feign.BatchClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.bean.driver.DeviceEvent;
-import com.dc3.common.bean.driver.DeviceStatus;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
-import com.dc3.common.exception.ServiceException;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.util.DriverUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -81,13 +79,22 @@ public class DriverService {
     /**
      * 发送设备事件
      *
+     * @param deviceEvent Device Event
+     */
+    public void deviceEventSender(DeviceEvent deviceEvent) {
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName, deviceEvent);
+    }
+
+    /**
+     * 发送设备事件
+     *
      * @param deviceId Device Id
      * @param type     Event Type, STATUS、LIMIT
      * @param content  Event Content
      */
     public void deviceEventSender(Long deviceId, String type, String content) {
         DeviceEvent deviceEvent = new DeviceEvent(deviceId, type, content);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_EVENT_PREFIX + serviceName, deviceEvent);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName, deviceEvent);
     }
 
     /**
@@ -100,32 +107,7 @@ public class DriverService {
      */
     public void deviceEventSender(Long deviceId, Long pointId, String type, String content) {
         DeviceEvent deviceEvent = new DeviceEvent(deviceId, pointId, type, content);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_EVENT_PREFIX + serviceName, deviceEvent);
-    }
-
-    /**
-     * 发送设备状态，同时设置实时数据超时时间
-     * 设备状态值
-     * Common.Device
-     * ONLINE, OFFLINE, MAINTAIN, FAULT
-     * 在线，离线，维护，故障
-     *
-     * @param deviceStatus Device Status
-     */
-    public void deviceStatusSender(DeviceStatus deviceStatus) {
-        if (null == deviceStatus.getDeviceId() || null == deviceStatus.getStatus()) {
-            throw new ServiceException("Device Id or Status is null");
-        }
-        if (!Common.Device.Status.OFFLINE.equals(deviceStatus.getStatus())
-                && !Common.Device.Status.ONLINE.equals(deviceStatus.getStatus())
-                && !Common.Device.Status.FAULT.equals(deviceStatus.getStatus())
-                && !Common.Device.Status.MAINTAIN.equals(deviceStatus.getStatus())) {
-            throw new ServiceException("Invalid Device Status " + deviceStatus.getStatus());
-        }
-        if (null == deviceStatus.getOriginTime()) {
-            deviceStatus.setOriginTime(System.currentTimeMillis());
-        }
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName, deviceEvent);
     }
 
     /**
@@ -139,8 +121,7 @@ public class DriverService {
      * @param status   Common.Device [ONLINE, OFFLINE, MAINTAIN, FAULT]
      */
     public void deviceStatusSender(Long deviceId, String status) {
-        DeviceStatus deviceStatus = new DeviceStatus(deviceId, status);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
+        deviceEventSender(deviceId, Common.Device.Event.STATUS, status);
     }
 
     /**
@@ -156,51 +137,28 @@ public class DriverService {
      * @param timeUnit 超时时间单位 java.util.concurrent.TimeUnit
      */
     public void deviceStatusSender(Long deviceId, String status, int timeOut, TimeUnit timeUnit) {
-        DeviceStatus deviceStatus = new DeviceStatus(deviceId, status);
-        deviceStatus.setTimeOut(timeOut).setTimeUnit(timeUnit);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + serviceName, deviceStatus);
+        deviceEventSender(new DeviceEvent(deviceId, Common.Device.Event.STATUS, status, timeOut, timeUnit));
     }
 
     /**
-     * 发送位号值到消息组件，单点存储
+     * 发送位号值到消息组件
      *
      * @param pointValue PointValue
      */
-    public void singlePointValueSender(PointValue pointValue) {
+    public void pointValueSender(PointValue pointValue) {
         if (null != pointValue) {
             log.debug("Send single point data: {}", pointValue);
-            rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_SINGLE_VALUE_PREFIX + serviceName, pointValue);
+            rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + serviceName, pointValue);
         }
     }
 
     /**
-     * 批量发送位号值到消息组件，单点存储
+     * 批量发送位号值到消息组件
      *
      * @param pointValues PointValue Array
      */
-    public void singlePointValueSender(List<PointValue> pointValues) {
-        pointValues.forEach(this::singlePointValueSender);
-    }
-
-    /**
-     * 发送位号值到消息组件，结构化存储
-     *
-     * @param pointValue MultiplePointValue
-     */
-    public void multiPointValueSender(PointValue pointValue) {
-        if (null != pointValue) {
-            log.debug("Send multiple point data: {}", pointValue);
-            rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_MULTI_VALUE_PREFIX + serviceName, pointValue);
-        }
-    }
-
-    /**
-     * 批量发送位号值到消息组件，结构化存储
-     *
-     * @param pointValues PointValue Array
-     */
-    public void multiPointValueSender(List<PointValue> pointValues) {
-        pointValues.forEach(this::multiPointValueSender);
+    public void pointValueSender(List<PointValue> pointValues) {
+        pointValues.forEach(this::pointValueSender);
     }
 
 }

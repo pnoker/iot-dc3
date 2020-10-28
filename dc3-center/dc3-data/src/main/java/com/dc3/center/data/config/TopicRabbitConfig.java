@@ -56,29 +56,16 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Queue eventQueue() {
-        return new Queue(Common.Rabbit.QUEUE_EVENT, true, false, false);
-    }
-
-    @Bean
-    Binding eventBinding() {
-        return BindingBuilder
-                .bind(eventQueue())
-                .to(eventExchange())
-                .with(Common.Rabbit.ROUTING_EVENT_PREFIX + "*");
-    }
-
-    @Bean
-    Queue deviceStatusQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DEVICE_STATUS, true, false, false);
+    Queue deviceEventQueue() {
+        return new Queue(Common.Rabbit.QUEUE_DEVICE_EVENT, true, false, false);
     }
 
     @Bean
     Binding deviceStatusBinding() {
         return BindingBuilder
-                .bind(deviceStatusQueue())
+                .bind(deviceEventQueue())
                 .to(eventExchange())
-                .with(Common.Rabbit.ROUTING_DEVICE_STATUS_PREFIX + "*");
+                .with(Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + "*");
     }
 
     @Bean
@@ -87,29 +74,16 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Queue singlePointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_SINGLE_VALUE, true, false, false);
+    Queue pointValueQueue() {
+        return new Queue(Common.Rabbit.QUEUE_POINT_VALUE, true, false, false);
     }
 
     @Bean
     Binding singlePointValueBinding() {
         return BindingBuilder
-                .bind(singlePointValueQueue())
+                .bind(pointValueQueue())
                 .to(valueExchange())
-                .with(Common.Rabbit.ROUTING_SINGLE_VALUE_PREFIX + "*");
-    }
-
-    @Bean
-    Queue multiPointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_MULTI_VALUE, true, false, false);
-    }
-
-    @Bean
-    Binding multiPointValueBinding() {
-        return BindingBuilder
-                .bind(multiPointValueQueue())
-                .to(valueExchange())
-                .with(Common.Rabbit.ROUTING_MULTI_VALUE_PREFIX + "*");
+                .with(Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + "*");
     }
 
     @Bean
