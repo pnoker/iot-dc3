@@ -79,7 +79,7 @@ public class MqttReceiveHandler {
             DevicePayLoad devicePayLoad = JSON.parseObject(message.getPayload().toString(), DevicePayLoad.class);
             PointValue pointValue = new PointValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue(),
                     driverService.convertValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue()));
-            driverService.singlePointValueSender(pointValue);
+            driverService.pointValueSender(pointValue);
         };
     }
 }

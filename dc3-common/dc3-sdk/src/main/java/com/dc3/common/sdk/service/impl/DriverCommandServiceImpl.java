@@ -55,7 +55,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
             );
 
             PointValue pointValue = new PointValue(deviceId, pointId, rawValue, driverService.convertValue(deviceId, pointId, rawValue));
-            driverService.singlePointValueSender(pointValue);
+            driverService.pointValueSender(pointValue);
             return pointValue;
         } catch (Exception e) {
             log.error("DriverCommandServiceImpl.read{}", e.getMessage(), e);

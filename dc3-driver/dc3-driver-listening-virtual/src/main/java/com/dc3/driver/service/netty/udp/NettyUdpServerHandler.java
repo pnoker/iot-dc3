@@ -130,7 +130,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
                 }
             }
         }
-        nettyUdpServerHandler.driverService.singlePointValueSender(pointValues);
+        nettyUdpServerHandler.driverService.pointValueSender(pointValues);
     }
 
     @Override

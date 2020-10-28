@@ -37,7 +37,7 @@ public class PointValueScheduleJob extends QuartzJobBean {
         long speed = valueCount.getAndSet(0);
         valueSpeed.set(speed);
         if (speed > 0) {
-            log.debug("Point Value Receiver Speed: {} /s", speed);
+            log.debug("Point value receiver speed: {} /s", speed);
         }
 
         // Save point value array to Redis & MongoDB

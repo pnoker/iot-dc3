@@ -20,7 +20,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public void initial() {
-        createJob("ScheduleGroup", "PointValueScheduleJob", "0/1 * * * * ?", PointValueScheduleJob.class);
+        createScheduleJob("ScheduleGroup", "PointValueScheduleJob", "0/1 * * * * ?", PointValueScheduleJob.class);
         try {
             if (!scheduler.isShutdown()) {
                 scheduler.start();
@@ -31,7 +31,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     /**
-     * 创建调度任务
+     * Create schedule job
      *
      * @param group    group
      * @param name     name
@@ -39,7 +39,7 @@ public class ScheduleServiceImpl implements ScheduleService {
      * @param jobClass class
      */
     @SneakyThrows
-    public void createJob(String group, String name, String corn, Class<? extends Job> jobClass) {
+    public void createScheduleJob(String group, String name, String corn, Class<? extends Job> jobClass) {
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)

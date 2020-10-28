@@ -59,13 +59,8 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Queue eventQueue() {
-        return new Queue(Common.Rabbit.QUEUE_EVENT, true, false, false);
-    }
-
-    @Bean
-    Queue deviceStatusQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DEVICE_STATUS, true, false, false);
+    Queue deviceEventQueue() {
+        return new Queue(Common.Rabbit.QUEUE_DEVICE_EVENT, true, false, false);
     }
 
     @Bean
@@ -92,13 +87,8 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Queue singlePointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_SINGLE_VALUE, true, false, false);
-    }
-
-    @Bean
-    Queue multiplePointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_MULTI_VALUE, true, false, false);
+    Queue pointValueQueue() {
+        return new Queue(Common.Rabbit.QUEUE_POINT_VALUE, true, false, false);
     }
 
     @Bean
