@@ -72,11 +72,9 @@ public class DeviceEvent implements Serializable {
     private Object content;
 
     @Transient
-    @JsonIgnore
     private int timeOut = 15;
 
     @Transient
-    @JsonIgnore
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     private Long originTime;

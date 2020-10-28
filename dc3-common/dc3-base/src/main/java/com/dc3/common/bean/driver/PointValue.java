@@ -16,7 +16,6 @@
 
 package com.dc3.common.bean.driver;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -80,11 +79,9 @@ public class PointValue implements Serializable {
     private List<PointValue> children;
 
     @Transient
-    @JsonIgnore
     private int timeOut = 15;
 
     @Transient
-    @JsonIgnore
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     private Boolean multi;
