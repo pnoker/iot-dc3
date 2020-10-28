@@ -34,8 +34,11 @@ public class PointValueScheduleJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         // Statistical point value receive rate
-        valueSpeed.set(valueCount.getAndSet(0));
-        log.debug("Point Value Receiver Speed: {} /s", valueSpeed.get());
+        long speed = valueCount.getAndSet(0);
+        valueSpeed.set(speed);
+        if (speed > 0) {
+            log.debug("Point Value Receiver Speed: {} /s", speed);
+        }
 
         // Save point value array to Redis & MongoDB
         threadPoolExecutor.execute(() -> {

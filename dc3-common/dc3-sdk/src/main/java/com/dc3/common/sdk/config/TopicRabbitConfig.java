@@ -55,22 +55,22 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange eventExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, true);
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
     }
 
     @Bean
     Queue eventQueue() {
-        return new Queue(Common.Rabbit.QUEUE_EVENT, true, false, true);
+        return new Queue(Common.Rabbit.QUEUE_EVENT, true, false, false);
     }
 
     @Bean
     Queue deviceStatusQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DEVICE_STATUS, true, false, true);
+        return new Queue(Common.Rabbit.QUEUE_DEVICE_STATUS, true, false, false);
     }
 
     @Bean
     TopicExchange notifyExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, true, true);
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, true, false);
     }
 
     @Bean
@@ -88,17 +88,17 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange valueExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, true);
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, false);
     }
 
     @Bean
     Queue singlePointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_SINGLE_VALUE, true, false, true);
+        return new Queue(Common.Rabbit.QUEUE_POINT_SINGLE_VALUE, true, false, false);
     }
 
     @Bean
     Queue multiplePointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_MULTI_VALUE, true, false, true);
+        return new Queue(Common.Rabbit.QUEUE_POINT_MULTI_VALUE, true, false, false);
     }
 
     @Bean
