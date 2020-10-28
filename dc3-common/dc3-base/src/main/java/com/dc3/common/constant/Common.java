@@ -203,6 +203,16 @@ public interface Common {
         int TOKEN_CACHE_TIMEOUT = 12;
 
         /**
+         * 点
+         */
+        String DOT = ".";
+
+        /**
+         * 星号
+         */
+        String ASTERISK = "*";
+
+        /**
          * 分隔符
          */
         String SEPARATOR = "::";

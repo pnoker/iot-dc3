@@ -52,6 +52,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author pnoker
@@ -64,6 +65,8 @@ public class PointValueServiceImpl implements PointValueService {
     private RedisUtil redisUtil;
     @Resource
     private MongoTemplate mongoTemplate;
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Resource
     private DeviceClient deviceClient;
@@ -239,14 +242,20 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     public void addPointValue(PointValue pointValue) {
         if (null != pointValue) {
-            mongoTemplate.insert(pointValue.setCreateTime(System.currentTimeMillis()));
+            savePointValueToRedis(pointValue.setCreateTime(System.currentTimeMillis()));
+            mongoTemplate.insert(pointValue);
         }
     }
 
     @Override
     public void addPointValues(List<PointValue> pointValues) {
-        pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
-        mongoTemplate.insert(pointValues, PointValue.class);
+        if (null != pointValues) {
+            if (pointValues.size() > 0) {
+                pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
+                savePointValuesToRedis(pointValues);
+                mongoTemplate.insert(pointValues, PointValue.class);
+            }
+        }
     }
 
     @Override
@@ -286,14 +295,14 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         Query query = new Query(criteria);
+        long count = mongoTemplate.count(query, PointValue.class);
+
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
         int size = (int) pages.getSize();
         long page = pages.getCurrent();
         query.limit(size).skip(size * (page - 1));
 
-        long count = mongoTemplate.count(query, PointValue.class);
         List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class);
-
 
         long id = 0L;
         for (PointValue pointValue1 : pointValues) {
@@ -307,6 +316,42 @@ public class PointValueServiceImpl implements PointValueService {
             }
         }
         return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);
+    }
+
+    /**
+     * Save point value to redis
+     *
+     * @param pointValue Point Value
+     */
+    private void savePointValueToRedis(final PointValue pointValue) {
+        threadPoolExecutor.execute(() -> {
+            String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
+            // Save point value to Redis
+            redisUtil.setKey(
+                    Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey,
+                    pointValue,
+                    pointValue.getTimeOut(),
+                    pointValue.getTimeUnit()
+            );
+        });
+    }
+
+    /**
+     * Save point value to redis
+     *
+     * @param pointValues Point Value Array
+     */
+    private void savePointValuesToRedis(final List<PointValue> pointValues) {
+        threadPoolExecutor.execute(() -> pointValues.forEach(pointValue -> {
+            String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
+            // Save point value to Redis
+            redisUtil.setKey(
+                    Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey,
+                    pointValue,
+                    pointValue.getTimeOut(),
+                    pointValue.getTimeUnit()
+            );
+        }));
     }
 
 }

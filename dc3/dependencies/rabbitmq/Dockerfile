@@ -20,4 +20,5 @@ MAINTAINER pnoker <pnokers.icloud.com>
 COPY ./rabbitmq.conf /etc/rabbitmq/rabbitmq.conf
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && rabbitmq-plugins enable rabbitmq_management rabbitmq_mqtt rabbitmq_stomp
+    && rm -f /etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf \
+    && rabbitmq-plugins enable --offline rabbitmq_management rabbitmq_mqtt rabbitmq_stomp
