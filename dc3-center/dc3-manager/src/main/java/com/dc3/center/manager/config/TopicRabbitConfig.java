@@ -53,7 +53,7 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange notifyExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, true, true);
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, true, false);
     }
 
     @Bean
