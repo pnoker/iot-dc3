@@ -17,9 +17,8 @@
 package com.dc3.center.data.service.rabbit;
 
 import com.dc3.center.data.service.PointValueService;
+import com.dc3.center.data.service.job.PointValueScheduleJob;
 import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.constant.Common;
-import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -41,8 +40,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class MultiplePointValueReceiver {
 
     @Resource
-    private RedisUtil redisUtil;
-    @Resource
     private ThreadPoolExecutor threadPoolExecutor;
     @Resource
     private PointValueService pointValueService;
@@ -52,26 +49,23 @@ public class MultiplePointValueReceiver {
     public void pointValueReceive(Channel channel, Message message, PointValue pointValue) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Multi point data from {}", message.getMessageProperties().getReceivedRoutingKey());
-
             if (null == pointValue || null == pointValue.getDeviceId() || null == pointValue.getChildren()) {
                 log.error("Invalid multi point data: {}", pointValue);
                 return;
             }
+            log.debug("Multi point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
 
-            threadPoolExecutor.execute(() -> {
-                log.debug("Received multi point data: {}", pointValue);
-                // Save device point data to redis, 15 minutes
-                redisUtil.setKey(
-                        Common.Cache.REAL_TIME_VALUES_KEY_PREFIX + pointValue.getDeviceId(),
-                        pointValue.getChildren(),
-                        pointValue.getTimeOut(),
-                        pointValue.getTimeUnit()
-                );
-                // Insert device point data to MongoDB
-                // TODO 可根据项目并发情况实现一个定时和批量入库逻辑
-                pointValueService.addPointValue(pointValue.setMulti(true));
-            });
+            if (PointValueScheduleJob.valueSpeed.get() < 100) {
+                threadPoolExecutor.execute(() -> {
+                    // Save point value to Redis & MongoDB
+                    pointValueService.addPointValue(pointValue.setMulti(true));
+                });
+            } else {
+                // Save point value to schedule
+                PointValueScheduleJob.valueLock.writeLock().lock();
+                PointValueScheduleJob.pointValues.add(pointValue.setMulti(true));
+                PointValueScheduleJob.valueLock.writeLock().unlock();
+            }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

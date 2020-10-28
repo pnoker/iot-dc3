@@ -17,9 +17,8 @@
 package com.dc3.center.data.service.rabbit;
 
 import com.dc3.center.data.service.PointValueService;
+import com.dc3.center.data.service.job.PointValueScheduleJob;
 import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.constant.Common;
-import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -33,6 +32,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 接收驱动发送过来的数据
+ * <p>
+ * 200万条SinglePointValue会产生：60M的索引数据以及400M的数据
  *
  * @author pnoker
  */
@@ -40,8 +41,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Component
 public class SinglePointValueReceiver {
 
-    @Resource
-    private RedisUtil redisUtil;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
     @Resource
@@ -52,26 +51,24 @@ public class SinglePointValueReceiver {
     public void pointValueReceive(Channel channel, Message message, PointValue pointValue) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Single point data from {}", message.getMessageProperties().getReceivedRoutingKey());
-
             if (null == pointValue || null == pointValue.getDeviceId() || null == pointValue.getPointId()) {
                 log.error("Invalid single point data: {}", pointValue);
                 return;
             }
+            PointValueScheduleJob.valueCount.getAndIncrement();
+            log.debug("Single point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
 
-            threadPoolExecutor.execute(() -> {
-                log.debug("Received single point data: {}", pointValue);
-                // Save device point data to redis, 15 minutes
-                redisUtil.setKey(
-                        Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + "_" + pointValue.getPointId(),
-                        pointValue,
-                        pointValue.getTimeOut(),
-                        pointValue.getTimeUnit()
-                );
-                // Insert device point data to MongoDB
-                // TODO 可根据项目并发情况实现一个定时和批量入库逻辑
-                pointValueService.addPointValue(pointValue.setMulti(false));
-            });
+            if (PointValueScheduleJob.valueSpeed.get() < 100) {
+                threadPoolExecutor.execute(() -> {
+                    // Save point value to Redis & MongoDB
+                    pointValueService.addPointValue(pointValue.setMulti(false));
+                });
+            } else {
+                // Save point value to schedule
+                PointValueScheduleJob.valueLock.writeLock().lock();
+                PointValueScheduleJob.pointValues.add(pointValue.setMulti(false));
+                PointValueScheduleJob.valueLock.writeLock().unlock();
+            }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
