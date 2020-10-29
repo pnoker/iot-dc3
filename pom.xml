@@ -207,12 +207,6 @@
             </dependency>
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-api-event</artifactId>
-                <version>${project.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.dc3</groupId>
                 <artifactId>dc3-api-rtmp</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
