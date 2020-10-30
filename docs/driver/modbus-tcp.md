@@ -177,6 +177,8 @@
 
 > 同时也需要在 Modbus Slave 软件中设置一下
 
+![](../images/dc3/driver/modbus/modbus-tcp-20.png)
+![](../images/dc3/driver/modbus/modbus-tcp-21.png)
 ![](../images/dc3/driver/modbus/modbus-tcp-11.png)
 
 ![](../images/dc3/driver/modbus/modbus-tcp-12.png)
