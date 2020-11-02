@@ -3,7 +3,7 @@ driver:
   description: @project.description@
   schedule:
     read:
-      enable: true
+      enable: false
       corn: '0/30 * * * * ?'
     custom:
       enable: true

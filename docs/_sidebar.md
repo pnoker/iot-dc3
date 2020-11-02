@@ -6,10 +6,20 @@
   - [后端服务](code/idea-start.md)
   - [前端服务](code/web-ui.md#构建-demo-web-ui)
 - 驱动
+  - [Mqtt](driver/mqtt.md)
   - [DC3 Opc Da](driver/opc-da.md)
   - [DC3 Opc Ua](driver/opc-ua.md)
   - [DC3 Modbus Tcp](driver/modbus-tcp.md)
   - 持续更新...
+- 错误
+  - [Mongo 启动失败](error/mongo-error.md)
 - 知识
-  - [Docker Compose](docker/docker-compose.md)
+  - [Centos 创建用户](tip/centos-create-user.md)
+  - [Docker Compose](tip/docker-compose.md)
+  - [FFmpeg](tip/ffmpeg.md)
+  - [Http Code](tip/http-code.md)
+  - [Nginx 代理](tip/nginx-prefix.md)
+  - [Nginx Rtmp](tip/nginx-rtmp.md)
+  - [Nohup](tip/nohup.md)
+  - [String.format()](tip/string-format.md)
 - [关于项目](about.md)
