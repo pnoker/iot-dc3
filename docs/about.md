@@ -2,6 +2,8 @@
 
 <p align="center">
     <img src="./images/dc3/gitee/1000-start.jpg" width="30%" alt="GiteeStart">
+<br>
+    <img src="./images/dc3/gitee/gvp.jpg" width="70%" alt="GiteeGVP">
 <p/>
 
 
