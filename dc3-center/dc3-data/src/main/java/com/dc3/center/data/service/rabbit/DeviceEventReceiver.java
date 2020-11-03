@@ -16,7 +16,7 @@
 
 package com.dc3.center.data.service.rabbit;
 
-import com.dc3.center.data.service.PointValueService;
+import com.dc3.center.data.service.DeviceEventService;
 import com.dc3.common.bean.driver.DeviceEvent;
 import com.dc3.common.constant.Common;
 import com.dc3.common.utils.RedisUtil;
@@ -43,7 +43,7 @@ public class DeviceEventReceiver {
     @Resource
     private RedisUtil redisUtil;
     @Resource
-    private PointValueService pointValueService;
+    private DeviceEventService deviceEventService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
@@ -77,7 +77,7 @@ public class DeviceEventReceiver {
             // Save device status to MongoDB
             if (saveToMongo) {
                 threadPoolExecutor.execute(() -> {
-                    pointValueService.addDeviceEvent(deviceEvent);
+                    deviceEventService.addDeviceEvent(deviceEvent);
                 });
             }
         } catch (IOException e) {

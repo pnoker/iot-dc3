@@ -17,7 +17,6 @@
 package com.dc3.center.data.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.common.bean.driver.DeviceEvent;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.bean.driver.PointValueDto;
 
@@ -35,14 +34,6 @@ public interface PointValueService {
      * @return Boolean
      */
     Boolean correct(String serviceName);
-
-    /**
-     * 获取设备状态
-     *
-     * @param deviceId Device Id
-     * @return ONLINE, OFFLINE, MAINTAIN, FAULT
-     */
-    String status(Long deviceId);
 
     /**
      * 获取实时数据
@@ -69,13 +60,6 @@ public interface PointValueService {
      * @return PointValue
      */
     PointValue latest(Long deviceId, Long pointId);
-
-    /**
-     * 新增 DeviceEvent
-     *
-     * @param deviceEvent DeviceEvent
-     */
-    void addDeviceEvent(DeviceEvent deviceEvent);
 
     /**
      * 新增 PointValue

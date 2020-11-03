@@ -19,6 +19,7 @@ package com.dc3.center.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc3.api.center.data.feign.DeviceEventClient;
 import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.service.DeviceService;
@@ -54,6 +55,8 @@ public class DeviceServiceImpl implements DeviceService {
     private DeviceMapper deviceMapper;
     @Resource
     private PointValueClient pointValueClient;
+    @Resource
+    private DeviceEventClient deviceEventClient;
 
 
     @Override
@@ -142,7 +145,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (devicePage.getRecords().size() > 0) {
             devicePage.getRecords().forEach(device -> {
                 String status = Common.Device.Status.OFFLINE;
-                R<String> rStatus = pointValueClient.status(device.getId());
+                R<String> rStatus = deviceEventClient.status(device.getId());
                 if (rStatus.isOk()) {
                     status = rStatus.getData();
                 }
