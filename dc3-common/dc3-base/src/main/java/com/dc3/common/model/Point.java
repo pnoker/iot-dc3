@@ -16,6 +16,8 @@
 
 package com.dc3.common.model;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import lombok.*;
@@ -44,10 +46,16 @@ public class Point extends Description {
 
     private String type;
     private Short rw;
+
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Float base;
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Float minimum;
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Float maximum;
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Float multiple;
+
     private Boolean accrue;
     private String format;
     private String unit;

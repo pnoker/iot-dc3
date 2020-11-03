@@ -118,6 +118,11 @@ public interface Common {
              * 用于记录设备位号值超出上下限、类型错误、不满足位号处理条件等事件类型
              */
             String LIMIT = "LIMIT";
+
+            /**
+             * 用于记录错误事件类型
+             */
+            String ERROR = "ERROR";
         }
     }
 

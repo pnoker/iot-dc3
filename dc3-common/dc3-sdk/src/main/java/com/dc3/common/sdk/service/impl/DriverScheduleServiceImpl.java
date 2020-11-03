@@ -41,10 +41,10 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     public void initial(ScheduleProperty scheduleProperty) {
         Optional.ofNullable(scheduleProperty).ifPresent(property -> {
             if (property.getRead().getEnable()) {
-                createJob("ReadGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
+                createScheduleJob("ReadGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
             }
             if (property.getCustom().getEnable()) {
-                createJob("CustomGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
+                createScheduleJob("CustomGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
             if (property.getRead().getEnable() || property.getCustom().getEnable()) {
                 try {
@@ -67,7 +67,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
      * @param jobClass class
      */
     @SneakyThrows
-    public void createJob(String group, String name, String corn, Class<? extends Job> jobClass) {
+    public void createScheduleJob(String group, String name, String corn, Class<? extends Job> jobClass) {
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)
