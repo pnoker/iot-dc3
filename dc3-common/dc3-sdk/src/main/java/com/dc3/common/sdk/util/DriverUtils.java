@@ -58,46 +58,6 @@ public class DriverUtils {
     }
 
     /**
-     * process value
-     * <p>
-     *
-     * @param value String Value
-     * @param point point.type : string/short/int/double/float/long/boolean
-     * @return String Value
-     */
-    public static String processValue(String value, Point point) {
-        value = value.trim();
-        switch (point.getType()) {
-            case Common.ValueType.STRING:
-                break;
-            case Common.ValueType.BYTE:
-            case Common.ValueType.SHORT:
-            case Common.ValueType.INT:
-            case Common.ValueType.LONG:
-            case Common.ValueType.DOUBLE:
-            case Common.ValueType.FLOAT:
-                try {
-                    value = String.format(point.getFormat(),
-                            (Convert.convert(Double.class, value) + point.getBase()) * point.getMultiple());
-                } catch (Exception e) {
-                    log.warn(e.getMessage());
-                }
-                break;
-            case Common.ValueType.BOOLEAN:
-                try {
-                    value = String.valueOf(Boolean.parseBoolean(value));
-                } catch (Exception e) {
-                    log.warn(e.getMessage());
-                }
-                break;
-            default:
-                log.error("Invalid device point value type({})", point.getType());
-                break;
-        }
-        return value;
-    }
-
-    /**
      * Base 64 解码
      *
      * @param content string

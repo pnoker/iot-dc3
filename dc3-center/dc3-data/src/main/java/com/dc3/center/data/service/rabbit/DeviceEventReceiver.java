@@ -58,8 +58,14 @@ public class DeviceEventReceiver {
             }
             log.debug("Device event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
 
+            boolean saveToMongo = true;
+
             // Save device status to Redis
             if (Common.Device.Event.STATUS.equals(deviceEvent.getType())) {
+                String oldStatus = redisUtil.getKey(Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId());
+                if (oldStatus.equals(deviceEvent.getContent())) {
+                    saveToMongo = false;
+                }
                 redisUtil.setKey(
                         Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
                         deviceEvent.getContent(),
@@ -67,11 +73,13 @@ public class DeviceEventReceiver {
                         deviceEvent.getTimeUnit()
                 );
             }
-            threadPoolExecutor.execute(() -> {
-                // Insert device point data to MongoDB
-                // TODO 可根据项目并发情况实现一个定时和批量入库逻辑
-                pointValueService.addDeviceEvent(deviceEvent);
-            });
+
+            // Save device status to MongoDB
+            if (saveToMongo) {
+                threadPoolExecutor.execute(() -> {
+                    pointValueService.addDeviceEvent(deviceEvent);
+                });
+            }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
