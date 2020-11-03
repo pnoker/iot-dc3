@@ -35,7 +35,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_DATA_URL_PREFIX)
+@RequestMapping(Common.Service.DC3_DATA_POINT_VALUE_URL_PREFIX)
 public class PointValueApi implements PointValueClient {
 
     @Resource
@@ -45,16 +45,6 @@ public class PointValueApi implements PointValueClient {
     public R<Boolean> correct(String serviceName) {
         try {
             return pointValueService.correct(serviceName) ? R.ok() : R.fail();
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-    }
-
-    @Override
-    public R<String> status(Long deviceId) {
-        try {
-            String status = pointValueService.status(deviceId);
-            return R.ok(status, "ok");
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

@@ -186,14 +186,13 @@ public interface Common {
          * dc3-data 服务
          */
         String DC3_DATA_SERVICE_NAME = "DC3-DATA";
-        String DC3_DATA_URL_PREFIX = "/data";
-        String DC3_DRIVER_URL_PREFIX = "/driver";
+        String DC3_DATA_POINT_VALUE_URL_PREFIX = "/data/pointValue";
+        String DC3_DATA_DEVICE_EVENT_URL_PREFIX = "/data/deviceEvent";
 
         /**
-         * dc3-event 服务
+         * dc3-driver-sdk 服务
          */
-        String DC3_EVENT_SERVICE_NAME = "DC3-EVENT";
-        String DC3_EVENT_URL_PREFIX = "/event";
+        String DC3_DRIVER_URL_PREFIX = "/driver";
 
     }
 

@@ -17,59 +17,37 @@
 package com.dc3.api.center.data.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.data.feign.PointValueClient;
+import com.dc3.api.center.data.feign.DeviceEventClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.bean.driver.PointValueDto;
+import com.dc3.common.bean.driver.DeviceEvent;
+import com.dc3.common.bean.driver.DeviceEventDto;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
- * PointValueClientHystrix
+ * DeviceEventClientHystrix
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class PointValueClientHystrix implements FallbackFactory<PointValueClient> {
+public class DeviceEventClientHystrix implements FallbackFactory<DeviceEventClient> {
 
     @Override
-    public PointValueClient create(Throwable throwable) {
+    public DeviceEventClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-DATA" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
-        return new PointValueClient() {
+        return new DeviceEventClient() {
 
             @Override
-            public R<Boolean> correct(String serviceName) {
+            public R<String> status(Long deviceId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<PointValue>> realtime(Long deviceId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<PointValue> realtime(Long deviceId, Long pointId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<PointValue> latest(Long deviceId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<PointValue> latest(Long deviceId, Long pointId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Page<PointValue>> list(PointValueDto pointValueDto) {
+            public R<Page<DeviceEvent>> list(DeviceEventDto deviceEventDto) {
                 return R.fail(message);
             }
 

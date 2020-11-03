@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_DATA_URL_PREFIX, name = Common.Service.DC3_DATA_SERVICE_NAME, fallbackFactory = PointValueClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_DATA_POINT_VALUE_URL_PREFIX, name = Common.Service.DC3_DATA_SERVICE_NAME, fallbackFactory = PointValueClientHystrix.class)
 public interface PointValueClient {
 
     /**
@@ -46,16 +46,6 @@ public interface PointValueClient {
      */
     @GetMapping("/correct/serviceName/{serviceName}")
     R<Boolean> correct(@NotNull @PathVariable(value = "serviceName") String serviceName);
-
-    /**
-     * 获取设备状态
-     * ONLINE, OFFLINE, MAINTAIN, FAULT
-     *
-     * @param deviceId Device Id
-     * @return String
-     */
-    @GetMapping("/status/deviceId/{deviceId}")
-    R<String> status(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
      * 获取实时值，读 Redis
