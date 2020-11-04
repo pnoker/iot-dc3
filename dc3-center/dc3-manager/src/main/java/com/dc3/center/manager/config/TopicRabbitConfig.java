@@ -16,10 +16,8 @@
 
 package com.dc3.center.manager.config;
 
-import com.dc3.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AcknowledgeMode;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -49,11 +47,6 @@ public class TopicRabbitConfig {
             }
         });
         return rabbitTemplate;
-    }
-
-    @Bean
-    TopicExchange notifyExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, true, false);
     }
 
     @Bean

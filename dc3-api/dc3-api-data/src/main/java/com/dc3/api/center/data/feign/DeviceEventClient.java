@@ -46,7 +46,7 @@ public interface DeviceEventClient {
      * @return String
      */
     @GetMapping("/status/deviceId/{deviceId}")
-    R<String> status(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<String> deviceStatus(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
      * 分页查询 DeviceEvent

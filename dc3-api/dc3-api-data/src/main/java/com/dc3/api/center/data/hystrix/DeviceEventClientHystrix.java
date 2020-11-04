@@ -42,7 +42,7 @@ public class DeviceEventClientHystrix implements FallbackFactory<DeviceEventClie
         return new DeviceEventClient() {
 
             @Override
-            public R<String> status(Long deviceId) {
+            public R<String> deviceStatus(Long deviceId) {
                 return R.fail(message);
             }
 

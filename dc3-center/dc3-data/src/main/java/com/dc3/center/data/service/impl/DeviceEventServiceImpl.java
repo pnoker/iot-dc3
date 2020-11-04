@@ -20,11 +20,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.DeviceClient;
 import com.dc3.center.data.service.DeviceEventService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.bean.R;
 import com.dc3.common.bean.driver.DeviceEvent;
 import com.dc3.common.bean.driver.DeviceEventDto;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.Device;
 import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -52,7 +50,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     private DeviceClient deviceClient;
 
     @Override
-    public String status(Long deviceId) {
+    public String deviceStatus(Long deviceId) {
         String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceId;
         String status = redisUtil.getKey(key);
         return null != status ? status : Common.Device.Status.OFFLINE;
@@ -61,7 +59,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     @Override
     public void addDeviceEvent(DeviceEvent deviceEvent) {
         if (null != deviceEvent) {
-            mongoTemplate.insert(deviceEvent.setCreateTime(System.currentTimeMillis()));
+            mongoTemplate.insert(deviceEvent);
         }
     }
 
@@ -69,7 +67,6 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     public void addDeviceEvents(List<DeviceEvent> deviceEvents) {
         if (null != deviceEvents) {
             if (deviceEvents.size() > 0) {
-                deviceEvents.forEach(deviceEvent -> deviceEvent.setCreateTime(System.currentTimeMillis()));
                 mongoTemplate.insert(deviceEvents, DeviceEvent.class);
             }
         }
@@ -83,30 +80,12 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         }
         if (null != deviceEventDto.getDeviceId()) {
             criteria.and("deviceId").is(deviceEventDto.getDeviceId());
-            R<Device> r = deviceClient.selectById(deviceEventDto.getDeviceId());
-            if (r.isOk()) {
-                if (r.getData().getMulti()) {
-                    criteria.and("multi").is(true);
-                    if (null != deviceEventDto.getPointId()) {
-                        criteria.and("children").elemMatch(
-                                (new Criteria()).and("pointId").is(deviceEventDto.getPointId())
-                        );
-                    }
-                } else if (null != deviceEventDto.getPointId()) {
-                    criteria.and("pointId").is(deviceEventDto.getPointId());
-                }
-            }
-        } else if (null != deviceEventDto.getPointId()) {
-            criteria.orOperator(
-                    (new Criteria()).and("pointId").is(deviceEventDto.getPointId()),
-                    (new Criteria()).and("children").elemMatch((new Criteria()).and("pointId").is(deviceEventDto.getPointId()))
-            );
+        }
+        if (null != deviceEventDto.getPointId()) {
+            criteria.and("pointId").is(deviceEventDto.getPointId());
         }
 
-        if (null == deviceEventDto.getPage()) {
-            deviceEventDto.setPage(new Pages());
-        }
-        Pages pages = deviceEventDto.getPage();
+        Pages pages = null == deviceEventDto.getPage() ? new Pages() : deviceEventDto.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
         }
@@ -121,17 +100,6 @@ public class DeviceEventServiceImpl implements DeviceEventService {
 
         List<DeviceEvent> deviceEvents = mongoTemplate.find(query, DeviceEvent.class);
 
-        long id = 0L;
-        for (DeviceEvent deviceEvent1 : deviceEvents) {
-            deviceEvent1.setId(id);
-            id++;
-            if (null != deviceEvent1.getChildren()) {
-                for (DeviceEvent deviceEvent2 : deviceEvent1.getChildren()) {
-                    deviceEvent2.setId(id);
-                    id++;
-                }
-            }
-        }
         return (new Page<DeviceEvent>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(deviceEvents);
     }
 
