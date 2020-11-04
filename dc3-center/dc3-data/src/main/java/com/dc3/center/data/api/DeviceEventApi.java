@@ -41,9 +41,9 @@ public class DeviceEventApi implements DeviceEventClient {
     private DeviceEventService deviceEventService;
 
     @Override
-    public R<String> status(Long deviceId) {
+    public R<String> deviceStatus(Long deviceId) {
         try {
-            String status = deviceEventService.status(deviceId);
+            String status = deviceEventService.deviceStatus(deviceId);
             return R.ok(status, "ok");
         } catch (Exception e) {
             return R.fail(e.getMessage());

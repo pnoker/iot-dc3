@@ -51,6 +51,15 @@ public class TopicRabbitConfig {
     }
 
     @Bean
+    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(new Jackson2JsonMessageConverter());
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        return factory;
+    }
+
+    @Bean
     TopicExchange eventExchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
     }
@@ -79,20 +88,11 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Binding singlePointValueBinding() {
+    Binding pointValueBinding() {
         return BindingBuilder
                 .bind(pointValueQueue())
                 .to(valueExchange())
                 .with(Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + "*");
-    }
-
-    @Bean
-    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(new Jackson2JsonMessageConverter());
-        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-        return factory;
     }
 
 }

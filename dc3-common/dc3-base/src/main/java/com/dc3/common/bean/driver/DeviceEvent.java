@@ -16,7 +16,6 @@
 
 package com.dc3.common.bean.driver;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +27,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,14 +41,11 @@ import java.util.concurrent.TimeUnit;
 public class DeviceEvent implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Transient
-    private Long id;
-
     /**
      * MongoDB Object Id
      */
     @MongoId
-    private ObjectId objectId;
+    private ObjectId id;
 
     /**
      * 设备ID，同MySQl中等 设备ID 一致
@@ -65,14 +60,12 @@ public class DeviceEvent implements Serializable {
     /**
      * Device Event
      * <p>
-     * STATUS、LIMIT
+     * STATUS、LIMIT、ERROR
      */
     private String type;
 
     private Boolean confirm = false;
     private Object content;
-
-    private List<DeviceEvent> children;
 
     @Transient
     private int timeOut = 15;
@@ -80,9 +73,8 @@ public class DeviceEvent implements Serializable {
     @Transient
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
-    private Boolean multi;
     private Long originTime;
-    private Long createTime;
+    private Long confirmTime;
 
     public DeviceEvent(Long deviceId, String type, Object content) {
         this.deviceId = deviceId;

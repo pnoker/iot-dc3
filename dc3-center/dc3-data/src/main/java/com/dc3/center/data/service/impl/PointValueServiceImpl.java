@@ -271,10 +271,7 @@ public class PointValueServiceImpl implements PointValueService {
             );
         }
 
-        if (null == pointValueDto.getPage()) {
-            pointValueDto.setPage(new Pages());
-        }
-        Pages pages = pointValueDto.getPage();
+        Pages pages = null == pointValueDto.getPage() ? new Pages() : pointValueDto.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
         }

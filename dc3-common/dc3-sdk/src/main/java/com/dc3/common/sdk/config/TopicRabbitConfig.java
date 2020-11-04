@@ -54,13 +54,12 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    TopicExchange eventExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
-    }
-
-    @Bean
-    Queue deviceEventQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DEVICE_EVENT, true, false, false);
+    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(new Jackson2JsonMessageConverter());
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        return factory;
     }
 
     @Bean
@@ -79,25 +78,6 @@ public class TopicRabbitConfig {
                 .bind(driverNotifyQueue())
                 .to(notifyExchange())
                 .with(Common.Rabbit.ROUTING_DEVICE_NOTIFY_PREFIX + this.serviceName);
-    }
-
-    @Bean
-    TopicExchange valueExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, false);
-    }
-
-    @Bean
-    Queue pointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_VALUE, true, false, false);
-    }
-
-    @Bean
-    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(new Jackson2JsonMessageConverter());
-        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-        return factory;
     }
 
 }

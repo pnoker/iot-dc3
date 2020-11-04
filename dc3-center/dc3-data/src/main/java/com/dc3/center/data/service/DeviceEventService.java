@@ -19,7 +19,6 @@ package com.dc3.center.data.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.common.bean.driver.DeviceEvent;
 import com.dc3.common.bean.driver.DeviceEventDto;
-import com.dc3.common.bean.driver.DeviceEvent;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ public interface DeviceEventService {
      * @param deviceId Device Id
      * @return ONLINE, OFFLINE, MAINTAIN, FAULT
      */
-    String status(Long deviceId);
+    String deviceStatus(Long deviceId);
 
     /**
      * 新增 DeviceEvent
@@ -49,7 +48,7 @@ public interface DeviceEventService {
      * @param deviceEvents DeviceEvent Array
      */
     void addDeviceEvents(List<DeviceEvent> deviceEvents);
-    
+
     /**
      * 获取带分页、排序
      *

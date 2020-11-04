@@ -110,7 +110,12 @@ public interface Common {
          */
         interface Event {
             /**
-             * 用于记录设备上下线、故障、维修等事件类型
+             * 用于记录设备心跳，记录设备在线或者离线的消息
+             */
+            String HEARTBEAT = "HEARTBEAT";
+
+            /**
+             * 用于记录设备上线、下线、超时等状态事件类型
              */
             String STATUS = "STATUS";
 

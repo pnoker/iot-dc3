@@ -53,32 +53,22 @@ public class DeviceEventReceiver {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             if (null == deviceEvent || null == deviceEvent.getDeviceId()) {
-                log.error("Invalid device status: {}", deviceEvent);
+                log.error("Invalid device event: {}", deviceEvent);
                 return;
             }
             log.debug("Device event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
 
-            boolean saveToMongo = true;
-
-            // Save device status to Redis
-            if (Common.Device.Event.STATUS.equals(deviceEvent.getType())) {
-                String oldStatus = redisUtil.getKey(Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId());
-                if (oldStatus.equals(deviceEvent.getContent())) {
-                    saveToMongo = false;
-                }
+            if (Common.Device.Event.HEARTBEAT.equals(deviceEvent.getType())) {
+                // Save device heartbeat to Redis
                 redisUtil.setKey(
                         Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
                         deviceEvent.getContent(),
                         deviceEvent.getTimeOut(),
                         deviceEvent.getTimeUnit()
                 );
-            }
-
-            // Save device status to MongoDB
-            if (saveToMongo) {
-                threadPoolExecutor.execute(() -> {
-                    deviceEventService.addDeviceEvent(deviceEvent);
-                });
+            } else {
+                // Save device event to MongoDB
+                threadPoolExecutor.execute(() -> deviceEventService.addDeviceEvent(deviceEvent));
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
