@@ -145,9 +145,12 @@ public class DeviceServiceImpl implements DeviceService {
         if (devicePage.getRecords().size() > 0) {
             devicePage.getRecords().forEach(device -> {
                 String status = Common.Device.Status.OFFLINE;
-                R<String> rStatus = deviceEventClient.deviceStatus(device.getId());
-                if (rStatus.isOk()) {
-                    status = rStatus.getData();
+                try {
+                    R<String> rStatus = deviceEventClient.deviceStatus(device.getId());
+                    if (rStatus.isOk()) {
+                        status = rStatus.getData();
+                    }
+                } catch (Exception ignored) {
                 }
                 deviceStatusMap.put(device.getId(), status);
             });
