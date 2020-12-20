@@ -72,9 +72,9 @@ public class PointValue implements Serializable {
     private String rawValue;
 
     /**
-     * 自定义值，用户定义
+     * 计算值
      */
-    private Object customValue;
+    private Object calculateValue;
 
     private List<PointValue> children;
 

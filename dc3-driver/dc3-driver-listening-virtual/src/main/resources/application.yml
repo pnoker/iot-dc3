@@ -4,7 +4,7 @@ driver:
   custom:
     tcp:
       port: 6270
-    upd:
+    udp:
       port: 6271
   schedule:
     read:

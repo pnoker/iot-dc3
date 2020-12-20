@@ -9,6 +9,8 @@ ffmpeg -ss 00:00:30 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split
 ffmpeg -f concat -i list.txt -c copy concat.mp4
 ```
 
+
+
 ## 其他常见指令
 
 ```bash

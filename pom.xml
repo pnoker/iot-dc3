@@ -43,22 +43,23 @@
     </modules>
 
     <properties>
-        <caffeine.version>2.8.4</caffeine.version>
-        <mybatis.plus.version>3.3.2</mybatis.plus.version>
+        <caffeine.version>2.8.8</caffeine.version>
+        <mybatis.plus.version>3.4.1</mybatis.plus.version>
 
-        <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
-        <spring-boot.version>2.3.2.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
+        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
-        <spring-boot-admin.version>2.2.4</spring-boot-admin.version>
+        <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
 
         <java.version>1.8</java.version>
         <codecov.version>2.7</codecov.version>
         <findbugs.version>3.0.5</findbugs.version>
         <maven.jar.plugin>3.2.0</maven.jar.plugin>
-        <maven.resource.plugin>3.1.0</maven.resource.plugin>
-        <maven.dependency.plugin>3.1.1</maven.dependency.plugin>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
+        <maven.resource.plugin>3.1.0</maven.resource.plugin>
+        <maven.dependency.plugin>3.1.2</maven.dependency.plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -272,7 +273,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>${maven.compiler.plugin}</version>
                     <configuration>
                         <target>${maven.compiler.target}</target>
                         <source>${maven.compiler.source}</source>

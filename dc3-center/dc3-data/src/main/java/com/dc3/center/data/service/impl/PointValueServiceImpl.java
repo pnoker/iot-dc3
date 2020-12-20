@@ -148,13 +148,13 @@ public class PointValueServiceImpl implements PointValueService {
                                         subtract = ArithmeticUtil.subtract(pointValueMap.get(id).getValue(), pointValueMap.get(id - 1).getValue());
                                     }
 
-                                    pointValue.setCustomValue(null);
+                                    pointValue.setCalculateValue(null);
                                     if (null != subtract && subtract.doubleValue() >= 0) {
-                                        pointValue.setCustomValue(subtract);
+                                        pointValue.setCalculateValue(subtract);
                                     }
 
-                                    if (null == pointValue.getCustomValue() && (id > 49L && id < 74L)) {
-                                        pointValue.setCustomValue("-");
+                                    if (null == pointValue.getCalculateValue() && (id > 49L && id < 74L)) {
+                                        pointValue.setCalculateValue("-");
                                     }
                                 }
 

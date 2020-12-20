@@ -2,6 +2,8 @@
 >
 > 关于 IOT DC3 的管理平台，还在规划和开发阶段，后期开源。
 
+
+
 ### 构建 Demo Web UI
 
 ```bash
@@ -12,6 +14,8 @@ cd dc3-web
 npm install -g cnpm --registry=https://registry.npm.taobao.org
 cnpm install
 ```
+
+
 
 ### 启动 Demo Web UI
 
@@ -29,6 +33,8 @@ docker-compose build
 # docker run 
 docker-compose up -d
 ```
+
+
 
 ### 访问 Demo Web UI
 
