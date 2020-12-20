@@ -8,10 +8,17 @@
 
 
 
+### 检测是否安装 docker compose
+
+```bash
+docker-compose version
+```
+
+
+
 ### 安装
 
 > 这里以按照 `1.27.4` 版本为例，最新版本可以在 [https://github.com/docker/compose/releases](https://github.com/docker/compose/releases) 查询到。
-
 
 ```bash
 # 该步骤将 docker-compose 可执行文件下载到目标机器的 /usr/local/bin/docker-compose 位置；
@@ -23,6 +30,13 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 # 查看 docker-compose 版本，检查是否安装成功
 docker-compose -v
+```
+
+**或者**
+
+
+```bash
+pip install docker-compose
 ```
 
 
