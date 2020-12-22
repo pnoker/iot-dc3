@@ -11,8 +11,6 @@
 **前提：** 必须保证至少需要给docker分配：2核 CPU 以及 4G 以上的运行内存
 
 
----
-
 
 ### Hosts配置
 
@@ -43,6 +41,7 @@ Linux：`/etc/hosts`
 ```
 
 
+
 ### 安装 & 启动必要依赖
 
  **说明：** 该步骤会安装 & 启动依赖服务：
@@ -64,11 +63,14 @@ docker-compose build mysql redis mongo rabbitmq register monitor auth
 docker-compose up -d mysql redis mongo rabbitmq register monitor auth
 ```
 
+
+
 ### 导入项目到 Idea IDE 中
 
 务必使用Maven方式导入项目
 
  ![import-dc3](../images/idea/import-dc3.gif)
+
 
 
 ### 启动 Manager & Data 服务
@@ -81,10 +83,11 @@ docker-compose up -d mysql redis mongo rabbitmq register monitor auth
 
  `dc3-data`：dc3-center/dc3-data/src/main/java/com/dc3/center/data/DataApplication.java
 
- 
+
  注意：在启动 `dc3-manager` 、 `dc3-data` 的时候由于开启了 `ASPECTJ` ，所以需要配置 `-javaagent:dc3/lib/aspectjweaver-1.9.5.jar`
 
 ![](../images/idea/aspectj.png)
+
 
 
 ### 启动待开发的 驱动 程序

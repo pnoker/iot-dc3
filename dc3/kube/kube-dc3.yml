@@ -1,0 +1,625 @@
+#
+#  Copyright 2018-2020 Pnoker. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    dc3.version: develop
+  name: kube-dc3
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dc3net
+  namespace: kube-dc3
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              dc3.network/dc3net: "true"
+  podSelector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    k8s-app: kube-dc3
+  name: kube-dc3-certs
+  namespace: kube-dc3
+type: Opaque
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dc3-ingress
+  namespace: kube-dc3
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /dc3/register
+            backend:
+              serviceName: dc3-register
+              servicePort: 8100
+          - path: /dc3/monitor
+            backend:
+              serviceName: dc3-monitor
+              servicePort: 8200
+          - path: /dc3
+            backend:
+              serviceName: dc3-web
+              servicePort: 80
+          - path: /dc3/gateway
+            backend:
+              serviceName: dc3-monitor
+              servicePort: 8000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-register
+  name: dc3-register
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "8100"
+      port: 8100
+      targetPort: 8100
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-register
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-monitor
+  name: dc3-monitor
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "8200"
+      port: 8200
+      targetPort: 8200
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-monitor
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-web
+  name: dc3-web
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+    - name: "443"
+      port: 443
+      targetPort: 443
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-web
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-gateway
+  name: dc3-gateway
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-gateway
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-auth
+  name: dc3-auth
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "8300"
+      port: 8300
+      targetPort: 8300
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-auth
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-manager
+  name: dc3-manager
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "8400"
+      port: 8400
+      targetPort: 8400
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-manager
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-data
+  name: dc3-data
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "8500"
+      port: 8500
+      targetPort: 8500
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-mysql
+  name: dc3-mysql
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-mysql
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-redis
+  name: dc3-redis
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-redis
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-rabbitmq
+  name: dc3-rabbitmq
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "5672"
+      port: 5672
+      targetPort: 5672
+    - name: "1883"
+      port: 1883
+      targetPort: 1883
+    - name: "61613"
+      port: 61613
+      targetPort: 61613
+    - name: "15672"
+      port: 15672
+      targetPort: 15672
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-rabbitmq
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    dc3.service: dc3-mongo
+  name: dc3-mongo
+  namespace: kube-dc3
+spec:
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+  selector:
+    dc3.version: develop
+    dc3.network/dc3net: "true"
+    dc3.service: dc3-mongo
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-register
+  name: dc3-register
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-register
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-register
+    spec:
+      containers:
+        - image: pnoker/dc3-register:1.0.0
+          name: dc3-register
+          ports:
+            - containerPort: 8100
+      hostname: dc3-register
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-monitor
+  name: dc3-monitor
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-monitor
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-monitor
+    spec:
+      containers:
+        - image: pnoker/dc3-monitor:1.0.0
+          name: dc3-monitor
+          ports:
+            - containerPort: 8200
+      hostname: dc3-monitor
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-web
+  name: dc3-web
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-web
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-web
+    spec:
+      containers:
+        - image: pnoker/dc3-web:1.0.0
+          name: dc3-web
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+      hostname: dc3-web
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-gateway
+  name: dc3-gateway
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-gateway
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-gateway
+    spec:
+      containers:
+        - image: pnoker/dc3-gateway:1.0.0
+          name: dc3-gateway
+          ports:
+            - containerPort: 8000
+      hostname: dc3-gateway
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-auth
+  name: dc3-auth
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-auth
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-auth
+    spec:
+      containers:
+        - image: pnoker/dc3-auth:1.0.0
+          name: dc3-auth
+          ports:
+            - containerPort: 8300
+      hostname: dc3-auth
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-manager
+  name: dc3-manager
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-manager
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-manager
+    spec:
+      containers:
+        - image: pnoker/dc3-manager:1.0.0
+          name: dc3-manager
+          ports:
+            - containerPort: 8400
+      hostname: dc3-manager
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-data
+  name: dc3-data
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-data
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-data
+    spec:
+      containers:
+        - image: pnoker/dc3-data:1.0.0
+          name: dc3-data
+          ports:
+            - containerPort: 8500
+      hostname: dc3-data
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-mysql
+  name: dc3-mysql
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-mysql
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-mysql
+    spec:
+      containers:
+        - image: pnoker/dc3-mysql:1.0.0
+          name: dc3-mysql
+          ports:
+            - containerPort: 3306
+      hostname: dc3-mysql
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-redis
+  name: dc3-redis
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-redis
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-redis
+    spec:
+      containers:
+        - image: pnoker/dc3-redis:1.0.0
+          name: dc3-redis
+          ports:
+            - containerPort: 6379
+      hostname: dc3-redis
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-rabbitmq
+  name: dc3-rabbitmq
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-rabbitmq
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-rabbitmq
+    spec:
+      containers:
+        - image: pnoker/dc3-rabbitmq:1.0.0
+          name: dc3-rabbitmq
+          ports:
+            - containerPort: 5672
+            - containerPort: 1883
+            - containerPort: 61613
+            - containerPort: 15672
+      hostname: dc3-rabbitmq
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dc3.service: dc3-mongo
+  name: dc3-mongo
+  namespace: kube-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dc3.version: develop
+      dc3.network/dc3net: "true"
+      dc3.service: dc3-mongo
+  template:
+    metadata:
+      labels:
+        dc3.version: develop
+        dc3.network/dc3net: "true"
+        dc3.service: dc3-mongo
+    spec:
+      containers:
+        - image: pnoker/dc3-mongo:1.0.0
+          name: dc3-mongo
+          ports:
+            - containerPort: 27017
+      hostname: dc3-mongo
+      restartPolicy: Always

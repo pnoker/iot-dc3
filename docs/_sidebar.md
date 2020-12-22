@@ -15,6 +15,9 @@
   - [Mongo 启动失败](error/mongo-error.md)
 - 知识
   - [Centos 创建用户](tip/centos-create-user.md)
+  - [Centos 安装桌面环境](tip/centos-install-gnome.md)
+  - [Centos 安装KVM](tip/centos-install-kvm.md)
+  - [Centos 安装Pip](tip/centos-install-pip.md)
   - [Docker Compose](tip/docker-compose.md)
   - [FFmpeg](tip/ffmpeg.md)
   - [Http Code](tip/http-code.md)

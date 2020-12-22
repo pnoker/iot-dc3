@@ -12,9 +12,8 @@
 > MySQL、MongoDB、Redis、RabbitMQ 用户名密码的配置均在：dc3-common/dc3-config/src/main/resources/bootstrap.yml
 
 
----
 
-### Docker
+### 安装 Docker
 
 > 开发环境: 推荐安装 Docker Desktop
 
@@ -31,17 +30,17 @@
 - Debian : [Install Docker Engine on Debian](https://docs.docker.com/engine/install/debian/)
 
 
-### Java
+### 安装 Java
 
 - Java JDK 1.8 [Java SE Development Kit 8 Downloads](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
 
 
-### Maven
+### 安装 Maven
 
 - Maven 3.6 [Installing Apache Maven](http://maven.apache.org/install.html)
 
 
-### MySQL
+### 安装 MySQL
 
 > 开发环境: 推荐使用 Docker 启动该服务
 
@@ -64,7 +63,7 @@ docker-compose stop mysql
 
 
 
-### MongoDB
+### 安装 MongoDB
 
 > 开发环境: 推荐使用 Docker 启动该服务
 
@@ -87,7 +86,7 @@ docker-compose stop mongo
 
 
 
-### Redis
+### 安装 Redis
 
 > 开发环境: 推荐使用 Docker 启动该服务
 
@@ -110,7 +109,7 @@ Reids 配置文件在 dc3/dependencies/redis/redis.conf
 
 
 
-### RabbitMQ
+### 安装 RabbitMQ
 
 > 开发环境: 推荐使用 Docker 启动该服务
 
