@@ -145,3 +145,85 @@ ifup ens3
 
 ### 常见指令
 
+KVM虚拟机的管理主要是通过virsh命令对虚拟机进行管理
+
+帮助文档
+```bash
+[root@localhost ~]# virsh --help
+```
+
+查看虚拟机状态
+```bash
+[root@localhost ~]# virsh list --all
+ Id    名称                         状态
+----------------------------------------------------
+ 4     win2k8r2                       running
+```
+关机
+```bash
+[root@localhost ~]# virsh shutdown win2k8r2
+```
+强制关闭电源
+```bash
+[root@localhost ~]# virsh destroy win2k8r2
+```
+通过配置文件创建虚拟机
+```bash
+[root@localhost ~]# virsh create /etc/libvirt/qemu/win2k8r2.xml
+```
+设置虚拟机开机自启
+```bash
+[root@localhost ~]# virsh autostart win2k8r2
+[root@localhost ~]# ll /etc/libvirt/qemu/autostart/
+总用量 0
+lrwxrwxrwx 1 root root 30 1月  24 13:06 win2k8r2.xml -> /etc/libvirt/qemu/win2k8r2.xml
+```
+到处虚拟机配置文件
+```bash
+[root@localhost ~]# virsh dumpxml win2k8r2 > /etc/libvirt/qemu/win2k8r2_bak.xml
+```
+删除虚拟机（该命令只删除配置文件，并不删除磁盘文件）
+```bash
+[root@localhost ~]# virsh undefine win2k8r2
+```
+通过导出备份的配置文件恢复原KVM虚拟机的定义，并重新定义虚拟机。
+```bash
+[root@localhost ~]# mv /etc/libvirt/qemu/win2k8r2_bak.xml /etc/libvirt/qemu/win2k8r2.xml
+[root@localhost ~]# virsh define /etc/libvirt/qemu/win2k8r2.xml
+```
+编辑配置文件
+```bash
+[root@localhost ~]# virsh edit win2k8r2
+```
+挂起
+```bash
+[root@localhost ~]# virsh suspend win2k8r2
+```
+恢复
+```bash
+[root@localhost ~]# virsh resume win2k8r2
+```
+创建存储卷
+```bash
+[root@localhost ~]# qemu-img create -f qcow2 /data/kvmstorage/centos7.qcow2 20G
+Formatting '/data/kvmstorage/centos7.qcow2', fmt=qcow2 size=21474836480 encryption=off cluster_size=65536 lazy_refcounts=off 
+[root@localhost ~]# ll //data/kvmstorage
+总用量 7437168
+-rw-r--r-- 1 root root      197120 1月  24 13:21 centos7.qcow2
+-rw------- 1 qemu qemu 42956488704 1月  24 13:21 win2k8r2.qcow2
+```
+生成虚拟机
+```bash
+[root@localhost ~]# virt-install --virt-type kvm --name centos --ram 1024 \
+  --disk /data/kvmstorage/centos7.qcow2,format=qcow2 \
+  --network bridge=br0 \
+  --graphics vnc,listen=0.0.0.0 --noautoconsole \
+  --os-type=linux --os-variant=rhel7 \
+  --location=/data/iso/CentOS-7-x86_64-Minimal-1804.iso
+
+[root@localhost ~]# virsh list --all
+ Id    名称                         状态
+----------------------------------------------------
+ 5     win2k8r2                       running
+ 7     centos                         running
+```
