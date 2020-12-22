@@ -10,8 +10,6 @@
 
 
 
-![](../images/dc3/driver/modbus/modbus-tcp-1.png)
-
 ### 配置文件
 
 > **位置**：iot-dc3\dc3-driver\dc3-driver-modbus-tcp\src\main\resources\application.yml

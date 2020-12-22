@@ -12,8 +12,6 @@
 
 
 
-![](../images/dc3/driver/opc/da/opc-da-1.png)
-
 ### 配置文件
 
 > **位置**：iot-dc3\dc3-driver\dc3-driver-opc-da\src\main\resources\application.yml

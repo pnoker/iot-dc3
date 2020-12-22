@@ -1,34 +1,92 @@
-## 剪切&合并视频
+### 视频剪切
+
+> - `-ss`  开始时间
+> - `-t`  持续时间
+
+
+
+> 1.截取从 `00:00:00` 开始的 30 秒视频
 
 ```bash
-//截取从头开始的30s
 ffmpeg -ss 00:00:00 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split.mp4
-//截取从30s开始的30s
+```
+> 2.截取从 `00:00:30` 开始的 30 秒视频
+```bash
 ffmpeg -ss 00:00:30 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split1.mp4
-//进行视频的合并
+```
+
+
+
+### 视频合并
+
+> 视频合并，其中 list.txt 是待合并的视频列表，使用换行进行分隔
+
+```bash
 ffmpeg -f concat -i list.txt -c copy concat.mp4
 ```
 
 
 
-## 其他常见指令
+### 视频转码
+
+> - `-i`  后面是输入文件名
+>
+> - `-vcodec`  后面是编码格式，h264 最佳
 
 ```bash
-// 去掉视频中的音频
-ffmpeg -i input.mp4 -vcodec copy -an output.mp4
-// -an: 去掉音频；-vcodec:视频选项，一般后面加copy表示拷贝
+ffmpeg -i out.ogv -vcodec h264 out.mp4
+```
 
-// 提取视频中的音频
+
+
+### 视频添加水印
+
+> main_w-overlay_w-10 视频的宽度-水印的宽度-水印边距；
+
+```bash
+ffmpeg -i input.mp4 -i logo.jpg -filter_complex [0:v][1:v]overlay=main_w-overlay_w-10:main_h-overlay_h-10[out] -map [out] -map 0:a -codec:a copy output.mp4
+```
+
+
+
+### 提取视频中的音频
+
+> - `-vn`  去掉视频
+>
+> - `-acodec`  音频选项， 一般后面加 `copy` 表示拷贝
+
+```bash
 ffmpeg -i input.mp4 -acodec copy -vn output.mp3
-// -vn: 去掉视频；-acodec: 音频选项， 一般后面加copy表示拷贝
+```
 
-// 音视频合成
+
+
+### 音视频合成
+
+> -y 覆盖输出文件
+
+```bash
 ffmpeg -y –i input.mp4 –i input.mp3 –vcodec copy –acodec copy output.mp4
-// -y 覆盖输出文件
+```
 
-//剪切视频
-ffmpeg -ss 0:1:30 -t 0:0:20 -i input.mp4 -vcodec copy -acodec copy output.mp4
-// -ss 开始时间; -t 持续时间
+
+
+### 去掉视频中的音频
+
+> - `-an`  去掉音频
+>
+> - `-vcodec`  视频选项，一般后面加 `copy` 表示拷贝
+
+```bash
+ffmpeg -i input.mp4 -vcodec copy -an output.mp4
+```
+
+
+
+
+### 其他
+
+```bash
 
 // 视频截图
 ffmpeg –i test.mp4 –f image2 -t 0.001 -s 320x240 image-%3d.jpg
@@ -66,9 +124,4 @@ ffmpeg -i input.mp3 -filter:a atempo=2.0 output.mp3
 
 //音视频同时变速，但是音视频为互倒关系
 ffmpeg -i input.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output.mp4
-
-
-// 视频添加水印
-ffmpeg -i input.mp4 -i logo.jpg -filter_complex [0:v][1:v]overlay=main_w-overlay_w-10:main_h-overlay_h-10[out] -map [out] -map 0:a -codec:a copy output.mp4
-// main_w-overlay_w-10 视频的宽度-水印的宽度-水印边距；
 ```
