@@ -11,9 +11,8 @@
     <title>DC3 Register Center</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-
+    <link rel="icon" href="eureka/images/favicon.ico">
     <link rel="stylesheet" href="eureka/css/wro.css">
-
 </head>
 
 <body id="one">

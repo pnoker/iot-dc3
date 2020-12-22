@@ -12,6 +12,8 @@ logging:
     name: dc3/logs/center/${spring.application.name}.log
 
 eureka:
+  dashboard:
+    path: ${EUREKA_DASHBOARD_PATH:/}
   instance:
     hostname: dc3-register
   client:

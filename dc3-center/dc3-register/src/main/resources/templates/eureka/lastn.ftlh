@@ -6,7 +6,12 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 <head>
   <base href="<@spring.url basePath/>">
-  <title>Eureka - Last N events</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>DC3 Register Center - Last N events</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <link rel="icon" href="eureka/images/favicon.ico">
   <link rel="stylesheet" type="text/css" href="eureka/css/wro.css">
 </head>
 <body id="three">

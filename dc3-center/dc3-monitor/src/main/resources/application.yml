@@ -6,11 +6,13 @@ spring:
     name: @project.artifactId@
   boot:
     admin:
+      context-path: ${MONITOR_CONTEXT_PATH:/}
       ui:
         title: DC3 Monitor Center
-        favicon: images/icon/favicon.ico
-        favicon-danger: images/icon/favicon-danger.ico
-        brand: <img src="images/logo/dc3-logo.png"><span>DC3 Monitor Center</span>
+        public-url: ${MONITOR_PUBLIC_URL:/}
+        favicon: /monitor/images/icon/favicon.ico
+        favicon-danger: /monitor/images/icon/favicon-danger.ico
+        brand: <img src="/monitor/images/logo/dc3-logo.png"><span>DC3 Monitor Center</span>
 
 logging:
   level:
