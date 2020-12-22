@@ -1,10 +1,13 @@
 ## 剪切&合并视频
 
+> - `-ss`  开始时间
+>
+> - `-t`  持续时间
+
 ```bash
-//截取从头开始的30s
 ffmpeg -ss 00:00:00 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split.mp4
-//截取从30s开始的30s
 ffmpeg -ss 00:00:30 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split1.mp4
+
 //进行视频的合并
 ffmpeg -f concat -i list.txt -c copy concat.mp4
 ```

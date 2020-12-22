@@ -1,4 +1,4 @@
-### 1.安装 VNC Server
+### 安装 VNC Server
 
 > ```bash
 > yum install tigervnc-server
@@ -6,11 +6,11 @@
 
 
 
-### 2.配置 VNC Server 实例
+### 配置 VNC Server 实例
 
 
 
-### 2.1 root 用户
+### root 用户
 
 > ```bash
 > cp /lib/systemd/system/vncserver@.service /etc/systemd/system/vncserver@:1.service
@@ -33,7 +33,7 @@
 
 
 
-### 2.2 其他用户，例如：pnoker
+### 其他用户，例如：pnoker
 
 > ```bash
 > cp /lib/systemd/system/vncserver@.service /etc/systemd/system/vncserver@:2.service
@@ -58,7 +58,7 @@
 
 
 
-### 3.设置 VNC 密码
+### 设置 VNC 密码
 
 > ```bash
 > vncpasswd    #root用户实例的vnc密码
@@ -70,7 +70,7 @@
 
 
 
-### 4.启动服务
+### 启动服务
 
 > ```bash
 > systemctl daemon-reload
@@ -84,7 +84,7 @@
 
 
 
-## 5.防火墙设置
+## 防火墙设置
 
 > ```bash
 > firewall-cmd --zone=public --add-port=5901/tcp
@@ -94,7 +94,7 @@
 
 
 
-## 6.远程连接
+## 远程连接
 
 在其他电脑上安装 VNV Viewer 然后通过 主机地址，用户名，密码即可远程改Centos7系统。
 
