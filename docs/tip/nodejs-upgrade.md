@@ -9,6 +9,8 @@ rm -rf /usr/local/bin/npm /usr/local/share/man/man1/node.1 /usr/local/lib/dtrace
 yum install npm
 ```
 
+
+
 ## 升级nodejs
 
 ```bash
@@ -25,6 +27,8 @@ n
 node -v
 npm -v
 ```
+
+
 
 ## 解决切换失败问题
 

@@ -5,6 +5,8 @@
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
 * [VLC media player](https://www.videolan.org/)
 
+
+
 ## 依赖
 
 安装依赖库
@@ -12,7 +14,9 @@
 ```bash
 sudo apt-get update
 sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev
-``` 
+```
+
+
 
 ## 编译
 
@@ -23,6 +27,8 @@ sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev
 make
 sudo make install
 ```
+
+
 
 ## Nginx 配置文件参考
 
