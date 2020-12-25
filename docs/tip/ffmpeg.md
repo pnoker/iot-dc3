@@ -87,20 +87,9 @@ ffmpeg -i input.mp4 -vcodec copy -an output.mp4
 ### 其他
 
 ```bash
-
-// 视频截图
-ffmpeg –i test.mp4 –f image2 -t 0.001 -s 320x240 image-%3d.jpg
-// -s 设置分辨率; -f 强迫采用格式fmt;
-
 // 视频分解为图片
 ffmpeg –i test.mp4 –r 1 –f image2 image-%3d.jpg
 // -r 指定截屏频率
-
-// 将图片合成视频
-ffmpeg -f image2 -i image%d.jpg output.mp4
-
-//视频拼接
-ffmpeg -f concat -i filelist.txt -c copy output.mp4
 
 // 将视频转为gif
 ffmpeg -i input.mp4 -ss 0:0:30 -t 10 -s 320x240 -pix_fmt rgb24 output.gif
@@ -124,4 +113,11 @@ ffmpeg -i input.mp3 -filter:a atempo=2.0 output.mp3
 
 //音视频同时变速，但是音视频为互倒关系
 ffmpeg -i input.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output.mp4
+
+// 视频截图
+ffmpeg –i test.mp4 –f image2 -t 0.001 -s 320x240 image-%3d.jpg
+// -s 设置分辨率; -f 强迫采用格式fmt;
+
+// 将图片合成视频
+ffmpeg -f image2 -i image%d.jpg output.mp4
 ```

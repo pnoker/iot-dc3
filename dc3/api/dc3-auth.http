@@ -116,6 +116,8 @@ username=pnoker
 
 ### 生成用户 Token 令牌
 #/auth/token/generate
+# pnoker/10e339be1130a90dc1b9ff0332abced6
+# Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6"+"verfdkkq")
 POST http://localhost:8300/auth/token/generate
 Accept: */*
 Content-Type: application/json
@@ -123,7 +125,7 @@ Cache-Control: no-cache
 
 {
   "name": "pnoker",
-  "password": "900eb6ba49ffd909b74b71da2a395824"
+  "password": "a7e77f9e8eb23326c13526d576f6ddea"
 }
 
 
@@ -134,7 +136,7 @@ Accept: */*
 Content-Type: application/x-www-form-urlencoded
 Cache-Control: no-cache
 
-username=pnoker&token=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJwbm9rZXIiLCJpYXQiOjE1OTIwNTgyMTEsImV4cCI6MTU5MjA3OTgxMX0.nJ2fmItykFVqaRIbjIeqNVc4vDAOP5lPyNZtfcfNzgg
+username=pnoker&salt=55j0122u9v5gthhp&token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwbm9rZXIiLCJpc3MiOiJwbm9rZXIvZGMzIiwiaWF0IjoxNjA4ODAyMjIzLCJleHAiOjE2MDg4NDU0MjN9.8tfdKHZHUXpJqIPUzx_YuyHPXFpOgWbCd2tShu2qRKw
 
 
 ### 注销用户 Token 令牌

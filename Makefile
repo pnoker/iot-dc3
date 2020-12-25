@@ -15,14 +15,42 @@
 #
 
 Default:
-    @echo "make build: mvn package & docker-compose build"
-    @echo "make clean: mvn clean"
+    echo "make dev-dc3: mvn mvn clean package & docker-compose build & docker-compose up"
+    echo "make deploy-dc3: mvn mvn clean package deploy"
+    echo "make package-dc3: mvn clean package"
+    echo "make clean: mvn clean"
 
-.PHONY: build clean
+.PHONY: build clean-dc3
 
-build:
-	mvn package
-	cd ./dc3
-	docker-compose build
-clean:
-	mvn clean
+dev-dc3:
+	cd dc3/bin \
+	&& chmod +x mvn-clean.sh \
+	&& chmod +x mvn-package.sh \
+	&& ./mvn-clean.sh \
+	&& ./mvn-package.sh \
+	&& cd dev \
+	&& chmod +x docker-compose-build.sh \
+	&& chmod +x docker-compose-up.sh \
+	&& ./docker-compose-build.sh \
+	&& ./docker-compose-up.sh \
+
+deploy-dc3:
+	cd dc3/bin \
+	&& chmod +x mvn-clean.sh \
+	&& chmod +x mvn-package.sh \
+	&& chmod +x mvn-deploy.sh \
+	&& ./mvn-clean.sh \
+	&& ./mvn-package.sh \
+	&& ./mvn-deploy.sh
+
+package-dc3:
+	cd dc3/bin \
+	&& chmod +x mvn-clean.sh \
+	&& chmod +x mvn-package.sh \
+	&& ./mvn-clean.sh \
+	&& ./mvn-package.sh
+
+clean-dc3:
+	cd dc3/bin \
+	&& chmod +x mvn-clean.sh \
+	&& ./mvn-clean.sh
