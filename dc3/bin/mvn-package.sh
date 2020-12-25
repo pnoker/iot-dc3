@@ -19,4 +19,4 @@
 set -e
 
 cd ../../
-mvn clean -U
+mvn package

@@ -19,4 +19,4 @@
 set -e
 
 cd ../../
-mvn clean -U
+docker-compose build mysql redis mongo rabbitmq register auth
