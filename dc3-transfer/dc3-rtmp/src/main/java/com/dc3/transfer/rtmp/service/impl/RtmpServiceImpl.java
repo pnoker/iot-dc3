@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -95,7 +94,7 @@ public class RtmpServiceImpl implements RtmpService {
         Rtmp select = selectById(id);
         if (null != select) {
             Transcode transcode = transcodeMap.get(id);
-            if (Optional.ofNullable(transcode).isPresent()) {
+            if (null != transcode) {
                 if (transcode.isRun()) {
                     throw new ServiceException("The rmp task is running");
                 }
@@ -123,7 +122,7 @@ public class RtmpServiceImpl implements RtmpService {
             throw new ServiceException("The rtmp task does not exist");
         }
         Transcode transcode = transcodeMap.get(rtmp.getId());
-        if (Optional.ofNullable(transcode).isPresent()) {
+        if (null != transcode) {
             if (transcode.isRun()) {
                 throw new ServiceException("The rtmp task is running");
             }
@@ -257,12 +256,14 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public LambdaQueryWrapper<Rtmp> fuzzyQuery(RtmpDto rtmpDto) {
         LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
-        Optional.ofNullable(rtmpDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Rtmp::getName, dto.getName());
+        if (null != rtmpDto) {
+            if (StringUtils.isNotBlank(rtmpDto.getName())) {
+                queryWrapper.like(Rtmp::getName, rtmpDto.getName());
             }
-            Optional.ofNullable(dto.getAutoStart()).ifPresent(autoStart -> queryWrapper.eq(Rtmp::getAutoStart, dto.getAutoStart()));
-        });
+            if (null != rtmpDto.getAutoStart()) {
+                queryWrapper.eq(Rtmp::getAutoStart, rtmpDto.getAutoStart());
+            }
+        }
         return queryWrapper;
     }
 

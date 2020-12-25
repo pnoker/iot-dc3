@@ -35,8 +35,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import static com.dc3.common.sdk.util.DriverUtils.attribute;
@@ -57,7 +57,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     /**
      * Opc Da Server Map
      */
-    private volatile Map<Long, Server> serverMap = new HashMap<>(64);
+    private final Map<Long, Server> serverMap = new ConcurrentHashMap<>(64);
 
     @Override
     public void initial() {
@@ -188,41 +188,47 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     /**
-     * 修改 Opc Da 位号值
+     * Write Opc Da Item
      *
-     * @param item
-     * @param type
-     * @param value
-     * @throws JIException
+     * @param item  OpcDa Item
+     * @param type  Value Type
+     * @param value String Value
+     * @throws JIException OpcDa JIException
      */
     private void writeItem(Item item, String type, String value) throws JIException {
+        int writeResult = 0;
         switch (type.toLowerCase()) {
+            case Common.ValueType.SHORT:
+                short shortValue = value(type, value);
+                writeResult = item.write(new JIVariant(shortValue, false));
+                break;
             case Common.ValueType.INT:
                 int intValue = value(type, value);
-                item.write(new JIVariant(intValue, false));
+                writeResult = item.write(new JIVariant(intValue, false));
                 break;
             case Common.ValueType.LONG:
                 long longValue = value(type, value);
-                item.write(new JIVariant(longValue, false));
+                writeResult = item.write(new JIVariant(longValue, false));
                 break;
             case Common.ValueType.FLOAT:
                 float floatValue = value(type, value);
-                item.write(new JIVariant(floatValue, false));
+                writeResult = item.write(new JIVariant(floatValue, false));
                 break;
             case Common.ValueType.DOUBLE:
                 double doubleValue = value(type, value);
-                item.write(new JIVariant(doubleValue, false));
+                writeResult = item.write(new JIVariant(doubleValue, false));
                 break;
             case Common.ValueType.BOOLEAN:
                 boolean booleanValue = value(type, value);
-                item.write(new JIVariant(booleanValue, false));
+                writeResult = item.write(new JIVariant(booleanValue, false));
                 break;
             case Common.ValueType.STRING:
-                item.write(new JIVariant(value, false));
+                writeResult = item.write(new JIVariant(value, false));
                 break;
             default:
                 break;
         }
+        log.debug("OpcDa write item result code: {}", writeResult);
     }
 
 }

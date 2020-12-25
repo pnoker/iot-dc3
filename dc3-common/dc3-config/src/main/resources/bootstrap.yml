@@ -40,7 +40,7 @@ spring:
     mongodb:
       host: ${MONGO_HOST:dc3-mongo}
       port: ${MONGO_PORT:27017}
-      database: dc3
+      database: ${MONGO_DATABASE:dc3}
       auth-type: ${MONGO_AUTH_TYPE:password}
       username: ${MONGO_USERNAME:dc3}
       password: ${MONGO_PASSWORD:dc3}
@@ -92,6 +92,12 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+logging:
+  file:
+    max-history: 30
+    total-size-cap: 2GB
+    clean-history-on-start: true
+
 management:
   endpoints:
     web:
@@ -131,6 +137,7 @@ eureka:
   data-center: https://gitee.com/pnoker
   instance:
     prefer-ip-address: true
+    hostname: @project.artifactId@
     status-page-url-path: /actuator/info
     health-check-url-path: /actuator/health
     lease-renewal-interval-in-seconds: 10
@@ -142,4 +149,4 @@ eureka:
     prefer-same-zone-eureka: true
     registry-fetch-interval-seconds: 5
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${EUREKA_HOST:dc3-register}:${EUREKA_PORT:8100}/eureka/
