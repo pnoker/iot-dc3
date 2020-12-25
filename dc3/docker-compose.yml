@@ -31,6 +31,11 @@ services:
     restart: always
     ports:
       - 8000:8000
+    environment:
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -48,6 +53,12 @@ services:
     restart: always
     ports:
       - 8100:8100
+    environment:
+      - EUREKA_DASHBOARD_PATH=/
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-register
     hostname: dc3-register
     volumes:
@@ -65,6 +76,13 @@ services:
     restart: always
     ports:
       - 8200:8200
+    environment:
+      - MONITOR_CONTEXT_PATH=/
+      - MONITOR_PUBLIC_URL=/
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-monitor
     hostname: dc3-monitor
     volumes:
@@ -82,6 +100,19 @@ services:
     restart: always
     ports:
       - 8300:8300
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=dc3
+      - REDIS_HOST=dc3-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=dc3
+      - CACHE_REDIS_TIME_TO_LIVE=6H
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-auth
     hostname: dc3-auth
     volumes:
@@ -99,6 +130,24 @@ services:
     restart: always
     ports:
       - 8400:8400
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=dc3
+      - REDIS_HOST=dc3-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=dc3
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - CACHE_REDIS_TIME_TO_LIVE=6H
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-manager
     hostname: dc3-manager
     volumes:
@@ -116,6 +165,30 @@ services:
     restart: always
     ports:
       - 8500:8500
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=dc3
+      - REDIS_HOST=dc3-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=dc3
+      - MONGO_HOST=dc3-mongo
+      - MONGO_PORT=27017
+      - MONGO_DATABASE=dc3
+      - MONGO_AUTH_TYPE=password
+      - MONGO_USERNAME=dc3
+      - MONGO_PASSWORD=dc3
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - CACHE_REDIS_TIME_TO_LIVE=6H
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-data
     hostname: dc3-data
     volumes:
@@ -133,6 +206,16 @@ services:
     restart: always
     ports:
       - 8600:8600
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:
@@ -150,6 +233,16 @@ services:
     restart: always
     ports:
       - 8601:8601
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -167,6 +260,16 @@ services:
     restart: always
     ports:
       - 8602:8602
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -184,6 +287,16 @@ services:
     restart: always
     ports:
       - 8603:8603
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -201,6 +314,16 @@ services:
     restart: always
     ports:
       - 8700:8700
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -218,6 +341,16 @@ services:
     restart: always
     ports:
       - 8701:8701
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -235,6 +368,16 @@ services:
     restart: always
     ports:
       - 8604:8604
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -252,6 +395,19 @@ services:
     restart: always
     ports:
       - 8803:8803
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=dc3
+      - REDIS_HOST=dc3-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=dc3
+      - CACHE_REDIS_TIME_TO_LIVE=6H
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-rtmp
     hostname: dc3-rtmp
     networks:
@@ -267,6 +423,8 @@ services:
     restart: always
     ports:
       - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=dc3
     container_name: dc3-mysql
     hostname: dc3-mysql
     volumes:
@@ -379,7 +537,7 @@ services:
           - dc3-nginx
 
   portainer:
-    image:  portainer/portainer:alpine
+    image: portainer/portainer:alpine
     restart: always
     container_name: portainer
     hostname: dc3-portainer

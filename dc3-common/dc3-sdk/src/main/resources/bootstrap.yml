@@ -19,8 +19,8 @@ spring:
     add-mappings: false
   security:
     user:
-      name: dc3
-      password: dc3
+      name: ${SECURITY_USER_NAME:dc3}
+      password: ${SECURITY_USER_PASSWORD:dc3}
   cloud:
     loadbalancer:
       ribbon:
@@ -29,11 +29,11 @@ spring:
         caffeine:
           spec: initialCapacity=10,maximumSize=500,expireAfterAccess=600s
   rabbitmq:
-    virtual-host: dc3
-    host: dc3-rabbitmq
-    port: 5672
-    username: dc3
-    password: dc3
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:dc3}
+    password: ${RABBITMQ_PASSWORD:dc3}
     publisher-confirm-type: correlated
     publisher-returns: true
     listener:
@@ -52,6 +52,12 @@ spring:
           class: org.quartz.simpl.SimpleThreadPool
           threadPriority: 5
           threadCount: 50
+
+logging:
+  file:
+    max-history: 30
+    total-size-cap: 2GB
+    clean-history-on-start: true
 
 management:
   endpoints:
@@ -101,4 +107,4 @@ eureka:
     prefer-same-zone-eureka: true
     registry-fetch-interval-seconds: 5
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@dc3-register:8100/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${EUREKA_HOST:dc3-register}:${EUREKA_PORT:8100}/eureka/

@@ -14,8 +14,6 @@ logging:
 eureka:
   dashboard:
     path: ${EUREKA_DASHBOARD_PATH:/}
-  instance:
-    hostname: dc3-register
   client:
     register-with-eureka: false
     fetch-registry: false

@@ -45,7 +45,6 @@ spring:
 
 logging:
   level:
-    com.dc3.common.sdk: DEBUG
     com.dc3: DEBUG
   file:
     name: dc3/logs/driver/opcua/${spring.application.name}.log

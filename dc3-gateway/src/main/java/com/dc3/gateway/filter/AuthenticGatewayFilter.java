@@ -57,6 +57,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
         try {
             R<Boolean> tokenValid = authenticGatewayFilter.tokenClient.checkTokenValid(
                     GatewayUtil.getRequestHeader(request, Common.Service.DC3_GATEWAY_AUTH_USER),
+                    GatewayUtil.getRequestHeader(request, Common.Service.DC3_GATEWAY_AUTH_SALT),
                     GatewayUtil.getRequestHeader(request, Common.Service.DC3_GATEWAY_AUTH_TOKEN)
             );
             if (tokenValid.isOk()) {

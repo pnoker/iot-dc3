@@ -19,7 +19,7 @@ spring:
     database: 2
   cache:
     redis:
-      time-to-live: 60S
+      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:60S}
 
 logging:
   level:

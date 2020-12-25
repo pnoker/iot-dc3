@@ -319,7 +319,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     /**
-     * Save point value to redis
+     * Save point value array to redis
      *
      * @param pointValues Point Value Array
      */
