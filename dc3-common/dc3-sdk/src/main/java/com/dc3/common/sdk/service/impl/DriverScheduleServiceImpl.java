@@ -20,6 +20,7 @@ import com.dc3.common.sdk.bean.ScheduleProperty;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import com.dc3.common.sdk.service.job.DriverCustomScheduleJob;
 import com.dc3.common.sdk.service.job.DriverReadScheduleJob;
+import com.dc3.common.sdk.service.job.DriverStatusScheduleJob;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -46,14 +47,15 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             if (property.getCustom().getEnable()) {
                 createScheduleJob("CustomGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
-            if (property.getRead().getEnable() || property.getCustom().getEnable()) {
-                try {
-                    if (!scheduler.isShutdown()) {
-                        scheduler.start();
-                    }
-                } catch (SchedulerException e) {
-                    log.error(e.getMessage(), e);
+
+            createScheduleJob("EventGroup", "StatusScheduleJob", "0/5 * * * * ?", DriverStatusScheduleJob.class);
+
+            try {
+                if (!scheduler.isShutdown()) {
+                    scheduler.start();
                 }
+            } catch (SchedulerException e) {
+                log.error(e.getMessage(), e);
             }
         });
     }

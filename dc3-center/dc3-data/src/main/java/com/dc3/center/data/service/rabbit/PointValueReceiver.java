@@ -58,6 +58,7 @@ public class PointValueReceiver {
             PointValueScheduleJob.valueCount.getAndIncrement();
             log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
 
+            // Judge whether to process data in batch according to the data transmission speed
             if (PointValueScheduleJob.valueSpeed.get() < 100) {
                 threadPoolExecutor.execute(() -> {
                     // Save point value to Redis & MongoDB

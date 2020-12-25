@@ -92,8 +92,6 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
     @Override
     public void initial() {
-        long start = System.currentTimeMillis();
-
         // Register driver to dc3-manager, If it fails, try again 10 times
         int times = 1;
         while (!register()) {
@@ -116,10 +114,6 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
         // Initialize driver schedule service
         driverScheduleService.initial(driverProperty.getSchedule());
-
-        // Time consuming statistics
-        long end = System.currentTimeMillis();
-        log.info("Initialization takes {} seconds", (end - start) / 1000);
     }
 
     @Override

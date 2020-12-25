@@ -16,8 +16,9 @@
 
 package com.dc3.center.manager.config;
 
+import com.dc3.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AcknowledgeMode;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -56,6 +57,24 @@ public class TopicRabbitConfig {
         factory.setMessageConverter(new Jackson2JsonMessageConverter());
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         return factory;
+    }
+
+    @Bean
+    TopicExchange driverEventExchange() {
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
+    }
+
+    @Bean
+    Queue driverEventQueue() {
+        return new Queue(Common.Rabbit.QUEUE_DRIVER_EVENT, true, false, false);
+    }
+
+    @Bean
+    Binding driverEventBinding() {
+        return BindingBuilder
+                .bind(driverEventQueue())
+                .to(driverEventExchange())
+                .with(Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + "*");
     }
 
 }

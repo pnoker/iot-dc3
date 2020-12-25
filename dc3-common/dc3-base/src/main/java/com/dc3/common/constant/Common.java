@@ -67,15 +67,19 @@ public interface Common {
      * 消息常量
      */
     interface Rabbit {
+        // Status
+
         // Event
         String TOPIC_EXCHANGE_EVENT = "dc3.exchange.event";
+        String ROUTING_DRIVER_EVENT_PREFIX = "dc3.routing.event.driver.";
+        String QUEUE_DRIVER_EVENT = "dc3.queue.event.driver";
         String ROUTING_DEVICE_EVENT_PREFIX = "dc3.routing.event.device.";
         String QUEUE_DEVICE_EVENT = "dc3.queue.event.device";
 
-        // Notify
-        String TOPIC_EXCHANGE_NOTIFY = "dc3.exchange.notify";
-        String ROUTING_DEVICE_NOTIFY_PREFIX = "dc3.routing.notify.driver.";
-        String QUEUE_DRIVER_NOTIFY_PREFIX = "dc3.queue.notify.driver.";
+        // Configuration
+        String TOPIC_EXCHANGE_CONFIGURATION = "dc3.exchange.configuration";
+        String ROUTING_DRIVER_CONFIGURATION_PREFIX = "dc3.routing.configuration.driver.";
+        String QUEUE_DRIVER_CONFIGURATION_PREFIX = "dc3.queue.configuration.driver.";
 
         // Value
         String TOPIC_EXCHANGE_VALUE = "dc3.exchange.value";
@@ -88,6 +92,26 @@ public interface Common {
      */
     interface Driver {
         int MAX_REQUEST_SIZE = 100;
+
+        /**
+         * 设备状态
+         */
+        interface Status {
+            String ONLINE = "ONLINE";
+            String OFFLINE = "OFFLINE";
+            String MAINTAIN = "MAINTAIN";
+            String FAULT = "FAULT";
+        }
+
+        /**
+         * 驱动事件
+         */
+        interface Event {
+            /**
+             * 用于记录驱动心跳，记录驱动在线或者离线的消息
+             */
+            String HEARTBEAT = "HEARTBEAT";
+        }
     }
 
     /**
@@ -266,6 +290,7 @@ public interface Common {
 
         String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
         String REAL_TIME_VALUES_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUES + Common.Cache.SEPARATOR;
+        String DRIVER_STATUS_KEY_PREFIX = Common.Cache.DRIVER + Common.Cache.STATUS + Common.Cache.SEPARATOR;
         String DEVICE_STATUS_KEY_PREFIX = Common.Cache.DEVICE + Common.Cache.STATUS + Common.Cache.SEPARATOR;
     }
 

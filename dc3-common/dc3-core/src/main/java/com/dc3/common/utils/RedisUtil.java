@@ -16,11 +16,13 @@
 
 package com.dc3.common.utils;
 
+import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -86,10 +88,10 @@ public class RedisUtil {
      * @param <T> T
      * @return T
      */
-    public <T> T getKey(String key) {
+    public <T> T getKey(String key, Type type) {
         try {
             Object object = redisTemplate.opsForValue().get(key);
-            return (T) object;
+            return Convert.convert(type, object);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

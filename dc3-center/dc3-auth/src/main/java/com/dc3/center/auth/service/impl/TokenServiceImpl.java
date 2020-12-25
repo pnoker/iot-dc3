@@ -56,7 +56,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String generateSalt(String username) {
         String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + username;
-        String salt = redisUtil.getKey(redisSaltKey);
+        String salt = redisUtil.getKey(redisSaltKey, String.class);
         if (StringUtils.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
             redisUtil.setKey(redisSaltKey, salt, Common.Cache.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
@@ -74,7 +74,7 @@ public class TokenServiceImpl implements TokenService {
         User select = userService.selectByName(user.getName());
         if (null != select) {
             String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + user.getName();
-            String salt = redisUtil.getKey(redisSaltKey);
+            String salt = redisUtil.getKey(redisSaltKey, String.class);
             if (StringUtils.isNotBlank(salt)) {
                 if (Dc3Util.md5(select.getPassword() + salt).equals(user.getPassword())) {
                     String token = KeyUtil.generateToken(user.getName(), salt);
@@ -89,7 +89,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public TokenValid checkTokenValid(String username, String salt, String token) {
-        String redisToken = redisUtil.getKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username);
+        String redisToken = redisUtil.getKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username, String.class);
         if (StringUtils.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
@@ -115,7 +115,7 @@ public class TokenServiceImpl implements TokenService {
      */
     private UserLimit checkUserLimit(String username) {
         String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
-        return redisUtil.getKey(redisKey);
+        return redisUtil.getKey(redisKey, String.class);
     }
 
     /**
@@ -127,7 +127,7 @@ public class TokenServiceImpl implements TokenService {
     private void updateUserLimit(String username) {
         int amount = 1;
         String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
-        UserLimit limit = (UserLimit) Optional.ofNullable(redisUtil.getKey(redisKey)).orElse(new UserLimit(0, new Date()));
+        UserLimit limit = (UserLimit) Optional.ofNullable(redisUtil.getKey(redisKey, String.class)).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
         if (limit.getTimes() > 10) {
             limit.setExpireTime(Dc3Util.expireTime(Common.Cache.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));

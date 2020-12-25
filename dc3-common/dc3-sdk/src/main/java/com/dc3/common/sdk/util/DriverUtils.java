@@ -18,7 +18,6 @@ package com.dc3.common.sdk.util;
 
 import cn.hutool.core.convert.Convert;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import lombok.extern.slf4j.Slf4j;
 

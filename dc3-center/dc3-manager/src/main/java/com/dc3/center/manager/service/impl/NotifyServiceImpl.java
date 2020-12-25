@@ -94,7 +94,7 @@ public class NotifyServiceImpl implements NotifyService {
      */
     private void notifyDriver(Driver driver, DriverOperation operation) {
         log.debug("Notify Driver {} : {}", driver.getServiceName(), operation);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, Common.Rabbit.ROUTING_DEVICE_NOTIFY_PREFIX + driver.getServiceName(), operation);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION, Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + driver.getServiceName(), operation);
     }
 
 }

@@ -52,7 +52,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     @Override
     public String deviceStatus(Long deviceId) {
         String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceId;
-        String status = redisUtil.getKey(key);
+        String status = redisUtil.getKey(key, String.class);
         return null != status ? status : Common.Device.Status.OFFLINE;
     }
 

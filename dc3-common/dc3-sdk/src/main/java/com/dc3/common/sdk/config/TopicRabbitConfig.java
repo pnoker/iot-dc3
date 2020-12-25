@@ -63,21 +63,21 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    TopicExchange notifyExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_NOTIFY, true, false);
+    TopicExchange configurationExchange() {
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION, true, false);
     }
 
     @Bean
-    Queue driverNotifyQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DRIVER_NOTIFY_PREFIX + this.serviceName, false, false, true);
+    Queue driverConfigurationQueue() {
+        return new Queue(Common.Rabbit.QUEUE_DRIVER_CONFIGURATION_PREFIX + this.serviceName, false, false, true);
     }
 
     @Bean
-    Binding driverNotifyBinding() {
+    Binding driverConfigurationBinding() {
         return BindingBuilder
-                .bind(driverNotifyQueue())
-                .to(notifyExchange())
-                .with(Common.Rabbit.ROUTING_DEVICE_NOTIFY_PREFIX + this.serviceName);
+                .bind(driverConfigurationQueue())
+                .to(configurationExchange())
+                .with(Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + this.serviceName);
     }
 
 }
