@@ -17,6 +17,7 @@
 package com.dc3.center.auth.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.dc3.center.auth.bean.TokenValid;
 import com.dc3.center.auth.bean.UserLimit;
 import com.dc3.center.auth.service.TokenService;
 import com.dc3.center.auth.service.UserService;
@@ -26,6 +27,8 @@ import com.dc3.common.model.User;
 import com.dc3.common.utils.Dc3Util;
 import com.dc3.common.utils.KeyUtil;
 import com.dc3.common.utils.RedisUtil;
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +43,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author pnoker
  */
+@Slf4j
 @Service
 public class TokenServiceImpl implements TokenService {
 
@@ -54,8 +58,8 @@ public class TokenServiceImpl implements TokenService {
         String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + username;
         String salt = redisUtil.getKey(redisSaltKey);
         if (StringUtils.isBlank(salt)) {
-            salt = RandomUtil.randomString(8);
-            redisUtil.setKey(redisSaltKey, salt, Common.Cache.TOKEN_CACHE_TIMEOUT, TimeUnit.MINUTES);
+            salt = RandomUtil.randomString(16);
+            redisUtil.setKey(redisSaltKey, salt, Common.Cache.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
         }
         return salt;
     }
@@ -73,27 +77,27 @@ public class TokenServiceImpl implements TokenService {
             String salt = redisUtil.getKey(redisSaltKey);
             if (StringUtils.isNotBlank(salt)) {
                 if (Dc3Util.md5(select.getPassword() + salt).equals(user.getPassword())) {
-                    String token = KeyUtil.generateToken(user.getName());
+                    String token = KeyUtil.generateToken(user.getName(), salt);
                     redisUtil.setKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + user.getName(), token, Common.Cache.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
                     return token;
                 }
             }
         }
         updateUserLimit(user.getName());
-        throw new ServiceException("Invalid username or password");
+        throw new ServiceException("Invalid username、password、salt");
     }
 
     @Override
-    public boolean checkTokenValid(String username, String token) {
+    public TokenValid checkTokenValid(String username, String salt, String token) {
         String redisToken = redisUtil.getKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username);
         if (StringUtils.isBlank(redisToken) || !redisToken.equals(token)) {
-            return false;
+            return new TokenValid(false, null);
         }
         try {
-            KeyUtil.parserToken(token);
-            return true;
+            Claims claims = KeyUtil.parserToken(username, salt, token);
+            return new TokenValid(true, claims.getExpiration());
         } catch (Exception e) {
-            return false;
+            return new TokenValid(false, null);
         }
     }
 

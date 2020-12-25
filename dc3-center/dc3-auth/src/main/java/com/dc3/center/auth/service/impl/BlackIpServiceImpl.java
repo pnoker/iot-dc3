@@ -35,7 +35,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * 用户服务接口实现类
@@ -61,9 +60,9 @@ public class BlackIpServiceImpl implements BlackIpService {
     )
     public BlackIp add(BlackIp blackIp) {
         BlackIp select = selectByIp(blackIp.getIp());
-        Optional.ofNullable(select).ifPresent(ip -> {
+        if (null != select) {
             throw new ServiceException("The ip already exists in the blacklist");
-        });
+        }
         if (blackIpMapper.insert(blackIp) > 0) {
             return blackIpMapper.selectById(blackIp.getId());
         }
@@ -123,7 +122,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<BlackIp> list(BlackIpDto blackIpDto) {
-        if (!Optional.ofNullable(blackIpDto.getPage()).isPresent()) {
+        if (null == blackIpDto.getPage()) {
             blackIpDto.setPage(new Pages());
         }
         return blackIpMapper.selectPage(blackIpDto.getPage().convert(), fuzzyQuery(blackIpDto));
@@ -141,11 +140,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpDto blackIpDto) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
-        Optional.ofNullable(blackIpDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getIp())) {
-                queryWrapper.like(BlackIp::getIp, dto.getIp());
+        if (null != blackIpDto) {
+            if (StringUtils.isNotBlank(blackIpDto.getIp())) {
+                queryWrapper.like(BlackIp::getIp, blackIpDto.getIp());
             }
-        });
+        }
         return queryWrapper;
     }
 

@@ -154,6 +154,7 @@ public interface Common {
          * dc3-gateway 服务
          */
         String DC3_GATEWAY_AUTH_USER = "X-Auth-User";
+        String DC3_GATEWAY_AUTH_SALT = "X-Auth-Salt";
         String DC3_GATEWAY_AUTH_TOKEN = "X-Auth-Token";
 
         /**
@@ -205,6 +206,11 @@ public interface Common {
      * 缓存Key
      */
     interface Cache {
+        /**
+         * salt 在 redis 中的失效时间
+         */
+        int SALT_CACHE_TIMEOUT = 5;
+
         /**
          * token 在 redis 中的失效时间
          */

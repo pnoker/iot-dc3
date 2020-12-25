@@ -17,11 +17,13 @@
 package com.dc3.center.auth.api;
 
 import com.dc3.api.center.auth.token.feign.TokenClient;
+import com.dc3.center.auth.bean.TokenValid;
 import com.dc3.center.auth.service.TokenService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.UnAuthorizedException;
 import com.dc3.common.model.User;
+import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,21 +45,22 @@ public class TokenApi implements TokenClient {
     @Override
     public R<String> generateSalt(String username) {
         String salt = tokenService.generateSalt(username);
-        return null != salt ? R.ok(salt, "ok") : R.fail();
+        return null != salt ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }
 
     @Override
     public R<String> generateToken(User user) {
         String token = tokenService.generateToken(user);
-        return null != token ? R.ok(token, "ok") : R.fail();
+        return null != token ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
     }
 
     @Override
-    public R<Boolean> checkTokenValid(String username, String token) {
-        if (tokenService.checkTokenValid(username, token)) {
-            return R.ok();
+    public R<Boolean> checkTokenValid(String username, String salt, String token) {
+        TokenValid tokenValid = tokenService.checkTokenValid(username, salt, token);
+        if (tokenValid.isValid()) {
+            return R.ok("The token will expire in " + Dc3Util.formatData(tokenValid.getExpireTime()));
         }
-        throw new UnAuthorizedException("Check Token Not Valid");
+        throw new UnAuthorizedException("Token invalid");
     }
 
     @Override

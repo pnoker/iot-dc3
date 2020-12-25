@@ -60,11 +60,12 @@ public interface TokenClient {
      * 检测用户 Token 令牌是否有效
      *
      * @param username Username
+     * @param salt     Salt
      * @param token    Token
      * @return R<Boolean>
      */
     @GetMapping("/check")
-    R<Boolean> checkTokenValid(@NotNull @RequestParam(value = "username") String username, @NotNull @RequestParam(value = "token") String token);
+    R<Boolean> checkTokenValid(@NotNull @RequestParam(value = "username") String username, @NotNull @RequestParam(value = "salt") String salt, @NotNull @RequestParam(value = "token") String token);
 
     /**
      * 注销用户的Token令牌
