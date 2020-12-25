@@ -50,7 +50,7 @@ public class TokenClientHystrix implements FallbackFactory<TokenClient> {
             }
 
             @Override
-            public R<Boolean> checkTokenValid(String username, String token) {
+            public R<Boolean> checkTokenValid(String username, String salt, String token) {
                 return R.fail(message);
             }
 

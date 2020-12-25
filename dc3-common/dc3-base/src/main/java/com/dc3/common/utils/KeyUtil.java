@@ -155,27 +155,32 @@ public class KeyUtil {
     /**
      * 生成Token令牌
      *
-     * @param name String
+     * @param username String
      * @return String
      */
-    public static String generateToken(String name) {
+    public static String generateToken(String username, String salt) {
         JwtBuilder builder = Jwts.builder()
-                .setId(name)
+                .setSubject(username)
+                .setIssuer(Common.KEY)
                 .setIssuedAt(new Date())
-                .setExpiration(Dc3Util.expireTime(12, Calendar.HOUR))
-                .signWith(SignatureAlgorithm.HS256, Common.KEY);
+                .signWith(SignatureAlgorithm.HS256, salt)
+                .setExpiration(Dc3Util.expireTime(12, Calendar.HOUR));
         return builder.compact();
     }
 
     /**
      * 解析Token令牌
      *
-     * @param token String
+     * @param username String
+     * @param salt     String
+     * @param token    String
      * @return Claims
      */
-    public static Claims parserToken(String token) {
+    public static Claims parserToken(String username, String salt, String token) {
         return Jwts.parser()
-                .setSigningKey(Common.KEY)
+                .requireSubject(username)
+                .requireIssuer(Common.KEY)
+                .setSigningKey(salt)
                 .parseClaimsJws(token)
                 .getBody();
     }

@@ -16,6 +16,7 @@
 
 package com.dc3.center.auth.service;
 
+import com.dc3.center.auth.bean.TokenValid;
 import com.dc3.common.model.User;
 
 /**
@@ -25,34 +26,34 @@ import com.dc3.common.model.User;
  */
 public interface TokenService {
     /**
-     * 生成用户的随机 salt，5分钟失效
+     * 生成用户的随机 salt
      *
-     * @param username
-     * @return
+     * @param username Username
+     * @return String
      */
     String generateSalt(String username);
 
     /**
-     * 生成用户的Token令牌，5小时失效
+     * 生成用户的Token令牌
      *
-     * @param user
-     * @return
+     * @param user Username
+     * @return String
      */
     String generateToken(User user);
 
     /**
      * 校验用户的Token令牌是否有效
      *
-     * @param username
-     * @param token
-     * @return
+     * @param username Username
+     * @param token    Token
+     * @return TokenValid
      */
-    boolean checkTokenValid(String username, String token);
+    TokenValid checkTokenValid(String username, String salt, String token);
 
     /**
      * 注销用户的Token令牌
      *
-     * @param username
+     * @param username Username
      */
     boolean cancelToken(String username);
 }
