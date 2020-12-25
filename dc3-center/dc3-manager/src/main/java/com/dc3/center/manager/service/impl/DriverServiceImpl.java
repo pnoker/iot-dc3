@@ -31,8 +31,7 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Driver;
 import com.dc3.common.model.Profile;
-import com.netflix.discovery.EurekaClient;
-import com.netflix.discovery.shared.Application;
+import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -42,7 +41,9 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * <p>DriverService Impl
@@ -54,7 +55,7 @@ import java.util.*;
 public class DriverServiceImpl implements DriverService {
 
     @Resource
-    private EurekaClient eurekaClient;
+    private RedisUtil redisUtil;
     @Resource
     private DriverService driverService;
     @Resource
@@ -188,15 +189,12 @@ public class DriverServiceImpl implements DriverService {
 
         Page<Driver> driverPage = list(driverDto);
         if (driverPage.getRecords().size() > 0) {
-            List<String> services = new ArrayList<>();
-            List<Application> applications = eurekaClient.getApplications().getRegisteredApplications();
-            applications.forEach(application -> services.add(application.getName().toLowerCase()));
 
             driverPage.getRecords().forEach(driver -> {
-                boolean status = false;
-                if (services.contains(driver.getServiceName())) {
-                    status = true;
-                }
+                String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
+                String value = redisUtil.getKey(key, String.class);
+                value = null != value ? value : Common.Driver.Status.OFFLINE;
+                boolean status = value.equals(Common.Driver.Status.ONLINE);
                 driverStatusMap.put(driver.getServiceName(), status);
             });
         }

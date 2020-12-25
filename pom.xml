@@ -20,7 +20,7 @@
 
     <groupId>com.dc3</groupId>
     <artifactId>iot-dc3</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -64,55 +64,12 @@
     </properties>
 
     <dependencies>
-
         <!-- Spring Configuration-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
+            <scope>compile</scope>
             <optional>true</optional>
-        </dependency>
-
-        <!-- Spring Aop -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
-        </dependency>
-
-        <!-- Eureka -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
-        <!-- Hystrix -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-        </dependency>
-
-        <!-- Actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <!-- Admin -->
-        <dependency>
-            <groupId>de.codecentric</groupId>
-            <artifactId>spring-boot-admin-starter-client</artifactId>
-        </dependency>
-
-        <!-- Caffeine Cache -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
-        </dependency>
-
-        <!-- Apache Pool2 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
         </dependency>
 
         <!-- Lombok -->
@@ -139,7 +96,6 @@
 
     <dependencyManagement>
         <dependencies>
-
             <!-- Spring Cloud 依赖 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -213,7 +169,7 @@
                 <scope>compile</scope>
             </dependency>
 
-            <!-- dc3 Driver  -->
+            <!-- dc3 Driver Sdk  -->
             <dependency>
                 <groupId>com.dc3</groupId>
                 <artifactId>dc3-sdk</artifactId>
@@ -224,7 +180,7 @@
             <!-- dc3 Common -->
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-core</artifactId>
+                <artifactId>dc3-base</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
@@ -236,7 +192,7 @@
             </dependency>
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-base</artifactId>
+                <artifactId>dc3-core</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.service.rabbit;
+package com.dc3.center.manager.service.rabbit;
 
-import com.dc3.center.data.service.DeviceEventService;
-import com.dc3.common.bean.driver.DeviceEvent;
+import com.dc3.common.bean.driver.DriverEvent;
 import com.dc3.common.constant.Common;
 import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -32,45 +32,41 @@ import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * 接收驱动发送过来的设备事件数据
- * 其中包括：设备心跳事件、在线、离线、故障等其他事件
+ * 接收驱动发送过来的驱动事件数据
+ * 其中包括：驱动心跳事件、在线、离线、故障等其他事件
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class DeviceEventReceiver {
+public class DriverEventReceiver {
 
     @Resource
     private RedisUtil redisUtil;
     @Resource
-    private DeviceEventService deviceEventService;
-    @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{deviceEventQueue.name}")
-    public void deviceEventReceive(Channel channel, Message message, DeviceEvent deviceEvent) {
+    @RabbitListener(queues = "#{driverEventQueue.name}")
+    public void driverEventReceive(Channel channel, Message message, DriverEvent driverEvent) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (null == deviceEvent || null == deviceEvent.getDeviceId()) {
-                log.error("Invalid device event: {}", deviceEvent);
+            if (null == driverEvent || StringUtils.isEmpty(driverEvent.getServiceName())) {
+                log.error("Invalid driver event: {}", driverEvent);
                 return;
             }
-            log.debug("Device event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
+            log.debug("Device event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
 
-            if (Common.Device.Event.HEARTBEAT.equals(deviceEvent.getType())) {
-                // Save device heartbeat to Redis
+            if (Common.Driver.Event.HEARTBEAT.equals(driverEvent.getType())) {
+                // Save driver heartbeat to Redis
                 redisUtil.setKey(
-                        Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
-                        deviceEvent.getContent(),
-                        deviceEvent.getTimeOut(),
-                        deviceEvent.getTimeUnit()
+                        Common.Cache.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
+                        driverEvent.getContent(),
+                        driverEvent.getTimeOut(),
+                        driverEvent.getTimeUnit()
                 );
-            } else {
-                // Save device event to MongoDB
-                threadPoolExecutor.execute(() -> deviceEventService.addDeviceEvent(deviceEvent));
             }
+
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

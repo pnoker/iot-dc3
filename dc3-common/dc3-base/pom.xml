@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-common</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
     </parent>
 
     <artifactId>dc3-base</artifactId>
@@ -36,6 +36,17 @@
     </properties>
 
     <dependencies>
+        <!-- Spring Web -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <!-- Spring Data MongoDB -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+        </dependency>
 
         <!-- Mybatis Plus -->
         <dependency>
@@ -87,12 +98,6 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
-        </dependency>
-
-        <!-- Spring Data MongoDB -->
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
         </dependency>
 
     </dependencies>

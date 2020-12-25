@@ -182,7 +182,7 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     public List<PointValue> realtime(Long deviceId) {
         String key = Common.Cache.REAL_TIME_VALUES_KEY_PREFIX + deviceId;
-        List<PointValue> pointValues = redisUtil.getKey(key);
+        List<PointValue> pointValues = redisUtil.getKey(key, List.class);
         if (null == pointValues) {
             throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
         }
@@ -192,7 +192,7 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     public PointValue realtime(Long deviceId, Long pointId) {
         String key = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_" + pointId;
-        PointValue pointValue = redisUtil.getKey(key);
+        PointValue pointValue = redisUtil.getKey(key, PointValue.class);
         if (null == pointValue) {
             throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
         }

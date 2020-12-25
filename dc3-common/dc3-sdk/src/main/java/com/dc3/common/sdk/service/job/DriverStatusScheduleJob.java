@@ -16,41 +16,36 @@
 
 package com.dc3.common.sdk.service.job;
 
-import com.dc3.common.sdk.bean.AttributeInfo;
-import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.DriverCommandService;
+import com.dc3.common.bean.driver.DriverEvent;
+import com.dc3.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Read Schedule Job
+ * 自定义调度任务
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class DriverReadScheduleJob extends QuartzJobBean {
+public class DriverStatusScheduleJob extends QuartzJobBean {
 
+    @Value("${spring.application.name}")
+    private String serviceName;
     @Resource
-    private DriverContext driverContext;
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
-    @Resource
-    private DriverCommandService driverCommandService;
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getDevicePointInfoMap();
-        pointInfoMap.forEach((deviceId, pointMap) -> pointMap.forEach((pointId, point) -> threadPoolExecutor.execute(() -> {
-            log.debug("Execute read schedule for device({}),point({}),{}", deviceId, pointId, point);
-            driverCommandService.read(deviceId, pointId);
-        })));
+        DriverEvent driverEvent = new DriverEvent(serviceName, Common.Driver.Event.HEARTBEAT, Common.Driver.Status.ONLINE, 10, TimeUnit.SECONDS);
+        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName, driverEvent);
     }
 }

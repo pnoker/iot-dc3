@@ -41,7 +41,7 @@ public class DriverNotifyService {
     private DriverCommonService driverCommonService;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{driverNotifyQueue.name}")
+    @RabbitListener(queues = "#{driverConfigurationQueue.name}")
     public void driverNotifyReceive(Channel channel, Message message, DriverOperation operation) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);

@@ -46,7 +46,7 @@ public class Dc3Util {
     /**
      * SimpleDateFormat ThreadLocal 保证线程安全
      */
-    private static ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
+    private static final ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected synchronized SimpleDateFormat initialValue() {
             return new SimpleDateFormat(Common.DATE_FORMAT);

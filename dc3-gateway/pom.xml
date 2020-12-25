@@ -20,7 +20,7 @@
     <parent>
         <artifactId>iot-dc3</artifactId>
         <groupId>com.dc3</groupId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
     </parent>
 
     <artifactId>dc3-gateway</artifactId>
@@ -33,17 +33,10 @@
     </properties>
 
     <dependencies>
-
         <!-- Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
-        </dependency>
-
-        <!-- Redis Reactive -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
         <!-- Thymeleaf -->
