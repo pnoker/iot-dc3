@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM redis:6.0-alpine
+FROM registry.cn-beijing.aliyuncs.com/dc3/redis:6.0-alpine
 MAINTAINER pnoker <pnokers.icloud.com>
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
