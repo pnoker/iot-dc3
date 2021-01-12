@@ -14,7 +14,7 @@ set -e
 
 JAR_FILE="dc3-driver-plcs7.jar"
 BASE_DIR="/home/pi/iot-dc3/dc3-driver/dc3-driver-plcs7/target"
-JAVA_OPS="-server -Xms128m -Xmx512m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m"
+JAVA_OPS="-server -Xms128m -Xmx1024m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m"
 
 start()
 {
