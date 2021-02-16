@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM rabbitmq:3.8-alpine
+FROM registry.cn-beijing.aliyuncs.com/dc3/rabbitmq:3.8-alpine
 MAINTAINER pnoker <pnokers.icloud.com>
 
 COPY ./rabbitmq.conf /etc/rabbitmq/rabbitmq.conf

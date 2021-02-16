@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM mongo:4.0-xenial
+FROM registry.cn-beijing.aliyuncs.com/dc3/mongo:4.0-xenial
 MAINTAINER pnoker <pnokers.icloud.com>
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \

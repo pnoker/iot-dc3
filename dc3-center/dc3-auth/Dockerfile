@@ -14,10 +14,10 @@
 #  limitations under the License.
 #
 
-FROM pnoker/alpine-java:1.8.251
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:1.8.251
 MAINTAINER pnoker <pnokers.icloud.com>
 
-ENV JAVA_OPS -server -javaagent:/usr/local/java/lib/aspectjweaver.jar -Xms128m -Xmx512m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+ENV JAVA_OPS -server -javaagent:/usr/local/java/lib/aspectjweaver.jar -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-center/dc3-auth \
