@@ -71,10 +71,13 @@ public class DeviceServiceImpl implements DeviceService {
             }
     )
     public Device add(Device device) {
-        Device select = selectDeviceByNameAndGroup(device.getName(), device.getGroupId());
-        Optional.ofNullable(select).ifPresent(d -> {
-            throw new ServiceException("The device already exists in the group");
-        });
+        try {
+            if (null != selectDeviceByNameAndGroup(device.getName(), device.getGroupId())) {
+                throw new ServiceException("The device already exists in the group");
+            }
+        } catch (Exception ignore) {
+        }
+
         if (deviceMapper.insert(device) > 0) {
             return deviceMapper.selectById(device.getId());
         }
@@ -126,7 +129,11 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Device selectById(Long id) {
-        return deviceMapper.selectById(id);
+        Device device = deviceMapper.selectById(id);
+        if (null == device) {
+            throw new ServiceException("The device does not exist");
+        }
+        return device;
     }
 
     @Override
@@ -135,7 +142,11 @@ public class DeviceServiceImpl implements DeviceService {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getGroupId, groupId);
         queryWrapper.eq(Device::getName, name);
-        return deviceMapper.selectOne(queryWrapper);
+        Device device = deviceMapper.selectOne(queryWrapper);
+        if (null == device) {
+            throw new ServiceException("The device does not exist");
+        }
+        return device;
     }
 
     @Override

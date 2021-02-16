@@ -65,10 +65,13 @@ public class LabelServiceImpl implements LabelService {
             }
     )
     public Label add(Label label) {
-        Label select = selectByName(label.getName());
-        Optional.ofNullable(select).ifPresent(l -> {
-            throw new ServiceException("The label already exists");
-        });
+        try {
+            if (null != selectByName(label.getName())) {
+                throw new ServiceException("The label already exists");
+            }
+        } catch (Exception ignore) {
+        }
+
         if (labelMapper.insert(label) > 0) {
             return labelMapper.selectById(label.getId());
         }
@@ -126,7 +129,11 @@ public class LabelServiceImpl implements LabelService {
     @Override
     @Cacheable(value = Common.Cache.LABEL + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Label selectById(Long id) {
-        return labelMapper.selectById(id);
+        Label label = labelMapper.selectById(id);
+        if (null == label) {
+            throw new ServiceException("The label does not exist");
+        }
+        return label;
     }
 
     @Override
@@ -134,7 +141,11 @@ public class LabelServiceImpl implements LabelService {
     public Label selectByName(String name) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         queryWrapper.eq(Label::getName, name);
-        return labelMapper.selectOne(queryWrapper);
+        Label label = labelMapper.selectOne(queryWrapper);
+        if (null == label) {
+            throw new ServiceException("The label does not exist");
+        }
+        return label;
     }
 
     @Override

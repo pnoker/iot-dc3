@@ -34,8 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 /**
  * Dc3 平台自定义工具类集合
  *
@@ -412,7 +410,7 @@ public class Dc3Util {
      * @return the addresses and hostnames that were resolved from {@code address}.
      */
     public static Set<String> getHostNames(String address, boolean includeLoopback) {
-        Set<String> hostNames = newHashSet();
+        Set<String> hostNames = new HashSet<>(16);
 
         try {
             InetAddress inetAddress = InetAddress.getByName(address);

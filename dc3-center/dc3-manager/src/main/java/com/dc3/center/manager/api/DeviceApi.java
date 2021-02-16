@@ -22,7 +22,6 @@ import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device add = deviceService.add(device);
             if (null != add) {
-                notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.ADD);
+                notifyService.notifyDriverDevice(Common.Driver.Device.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -64,8 +63,8 @@ public class DeviceApi implements DeviceClient {
     public R<Boolean> delete(Long id) {
         try {
             Device device = deviceService.selectById(id);
-            if (deviceService.delete(id)) {
-                notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.DELETE);
+            if (null != device && deviceService.delete(id)) {
+                notifyService.notifyDriverDevice(Common.Driver.Device.DELETE, device);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -79,7 +78,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device update = deviceService.update(device);
             if (null != update) {
-                notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.UPDATE);
+                notifyService.notifyDriverDevice(Common.Driver.Device.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

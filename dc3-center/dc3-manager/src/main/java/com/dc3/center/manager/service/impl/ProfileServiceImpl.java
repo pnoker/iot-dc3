@@ -31,7 +31,6 @@ import com.dc3.common.dto.PointDto;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
-import com.dc3.common.model.Driver;
 import com.dc3.common.model.Point;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -75,14 +74,16 @@ public class ProfileServiceImpl implements ProfileService {
             }
     )
     public Profile add(Profile profile) {
-        Driver driver = driverService.selectById(profile.getDriverId());
-        if (null == driver) {
-            throw new ServiceException("The driver does not exist");
+        try {
+            if (null != selectByName(profile.getName())) {
+                throw new ServiceException("The profile already exists");
+            }
+        } catch (Exception ignore) {
         }
-        Profile select = selectByName(profile.getName());
-        if (null != select) {
-            throw new ServiceException("The profile already exists");
-        }
+
+        // Check if the driver exists
+        driverService.selectById(profile.getDriverId());
+
         if (profileMapper.insert(profile) > 0) {
             return profileMapper.selectById(profile.getId());
         }
@@ -148,7 +149,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Profile selectById(Long id) {
-        return profileMapper.selectById(id);
+        Profile profile = profileMapper.selectById(id);
+        if (null == profile) {
+            throw new ServiceException("The profile does not exist");
+        }
+        return profile;
     }
 
     @Override
@@ -156,7 +161,11 @@ public class ProfileServiceImpl implements ProfileService {
     public Profile selectByName(String name) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getName, name);
-        return profileMapper.selectOne(queryWrapper);
+        Profile profile = profileMapper.selectOne(queryWrapper);
+        if (null == profile) {
+            throw new ServiceException("The profile does not exist");
+        }
+        return profile;
     }
 
     @Override

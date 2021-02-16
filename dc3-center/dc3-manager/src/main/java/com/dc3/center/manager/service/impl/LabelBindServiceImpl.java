@@ -102,7 +102,11 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     @Cacheable(value = Common.Cache.LABEL_BIND + Common.Cache.ID, key = "#id", unless = "#result==null")
     public LabelBind selectById(Long id) {
-        return labelBindMapper.selectById(id);
+        LabelBind labelBind = labelBindMapper.selectById(id);
+        if (null == labelBind) {
+            throw new ServiceException("The label bind does not exist");
+        }
+        return labelBind;
     }
 
     @Override

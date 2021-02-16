@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.service;
+package com.dc3.api.center.config;
+
+import feign.Logger;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * <p>Driver Schedule Service</p>
- * <p>
+ * OpenFeign 配置
  *
  * @author pnoker
  */
-public interface DriverScheduleService {
-    void initial();
+@Configuration
+public class OpenFeignConfig {
+
+    @Bean
+    Logger.Level feignLevel() {
+        return Logger.Level.FULL;
+    }
 }

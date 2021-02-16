@@ -16,7 +16,7 @@
 
 package com.dc3.common.sdk.service.impl;
 
-import com.dc3.common.sdk.bean.ScheduleProperty;
+import com.dc3.common.sdk.bean.DriverProperty;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import com.dc3.common.sdk.service.job.DriverCustomScheduleJob;
 import com.dc3.common.sdk.service.job.DriverReadScheduleJob;
@@ -24,6 +24,7 @@ import com.dc3.common.sdk.service.job.DriverStatusScheduleJob;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -34,21 +35,28 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@EnableConfigurationProperties({DriverProperty.class})
 public class DriverScheduleServiceImpl implements DriverScheduleService {
     @Resource
     private Scheduler scheduler;
+    @Resource
+    private DriverProperty driverProperty;
 
     @Override
-    public void initial(ScheduleProperty scheduleProperty) {
-        Optional.ofNullable(scheduleProperty).ifPresent(property -> {
+    public void initial() {
+        Optional.ofNullable(driverProperty.getSchedule()).ifPresent(property -> {
+            // driver read
             if (property.getRead().getEnable()) {
-                createScheduleJob("ReadGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
-            }
-            if (property.getCustom().getEnable()) {
-                createScheduleJob("CustomGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
+                createScheduleJob("DriverScheduleGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
             }
 
-            createScheduleJob("EventGroup", "StatusScheduleJob", "0/5 * * * * ?", DriverStatusScheduleJob.class);
+            // driver custom schedule
+            if (property.getCustom().getEnable()) {
+                createScheduleJob("DriverScheduleGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
+            }
+
+            // driver heartbeat
+            createScheduleJob("DriverScheduleGroup", "StatusScheduleJob", "0/5 * * * * ?", DriverStatusScheduleJob.class);
 
             try {
                 if (!scheduler.isShutdown()) {

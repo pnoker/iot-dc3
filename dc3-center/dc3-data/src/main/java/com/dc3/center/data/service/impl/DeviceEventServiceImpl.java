@@ -17,7 +17,6 @@
 package com.dc3.center.data.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.manager.feign.DeviceClient;
 import com.dc3.center.data.service.DeviceEventService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.driver.DeviceEvent;
@@ -45,9 +44,6 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     private RedisUtil redisUtil;
     @Resource
     private MongoTemplate mongoTemplate;
-
-    @Resource
-    private DeviceClient deviceClient;
 
     @Override
     public String deviceStatus(Long deviceId) {

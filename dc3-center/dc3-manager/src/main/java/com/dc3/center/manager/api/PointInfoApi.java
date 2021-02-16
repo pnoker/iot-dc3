@@ -22,7 +22,6 @@ import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.PointInfoService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.PointInfoDto;
 import com.dc3.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo add = pointInfoService.add(pointInfo);
             if (null != add) {
-                notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.ADD);
+                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, pointInfo);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -64,8 +63,8 @@ public class PointInfoApi implements PointInfoClient {
     public R<Boolean> delete(Long id) {
         try {
             PointInfo pointInfo = pointInfoService.selectById(id);
-            if (pointInfoService.delete(id)) {
-                notifyService.notifyDriverPointInfo(pointInfo.getPointId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.DELETE);
+            if (null != pointInfo && pointInfoService.delete(id)) {
+                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.DELETE, pointInfo);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -79,7 +78,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo update = pointInfoService.update(pointInfo);
             if (null != update) {
-                notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.UPDATE);
+                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.UPDATE, pointInfo);
                 return R.ok(update);
             }
         } catch (Exception e) {

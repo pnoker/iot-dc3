@@ -22,7 +22,6 @@ import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class PointApi implements PointClient {
         try {
             Point add = pointService.add(point);
             if (null != add) {
-                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.ADD);
+                notifyService.notifyDriverPoint(Common.Driver.Point.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -64,8 +63,8 @@ public class PointApi implements PointClient {
     public R<Boolean> delete(Long id) {
         try {
             Point point = pointService.selectById(id);
-            if (pointService.delete(id)) {
-                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.DELETE);
+            if (null != point && pointService.delete(id)) {
+                notifyService.notifyDriverPoint(Common.Driver.Point.DELETE, point);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -79,7 +78,7 @@ public class PointApi implements PointClient {
         try {
             Point update = pointService.update(point);
             if (null != update) {
-                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.UPDATE);
+                notifyService.notifyDriverPoint(Common.Driver.Point.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {
