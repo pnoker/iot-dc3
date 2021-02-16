@@ -18,9 +18,9 @@ package com.dc3.center.manager.service.impl;
 
 import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.NotifyService;
-import com.dc3.common.bean.driver.DriverOperation;
+import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.Driver;
+import com.dc3.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -42,46 +42,47 @@ public class NotifyServiceImpl implements NotifyService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void notifyDriverProfile(Driver driver, Long profileId, String operationType) {
+    public void notifyDriverProfile(String command, Profile profile) {
+        Driver driver = driverService.selectByProfileId(profile.getId());
         if (null != driver) {
-            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(profileId);
+            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.PROFILE).setCommand(command).setContent(profile);
             notifyDriver(driver, operation);
         }
     }
 
     @Override
-    public void notifyDriverDevice(Long deviceId, Long profileId, String operationType) {
-        Driver driver = driverService.selectByProfileId(profileId);
+    public void notifyDriverDevice(String command, Device device) {
+        Driver driver = driverService.selectByProfileId(device.getProfileId());
         if (null != driver) {
-            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(deviceId);
+            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DEVICE).setCommand(command).setContent(device);
             notifyDriver(driver, operation);
         }
     }
 
     @Override
-    public void notifyDriverPoint(Long pointId, Long profileId, String operationType) {
-        Driver driver = driverService.selectByProfileId(profileId);
+    public void notifyDriverPoint(String command, Point point) {
+        Driver driver = driverService.selectByProfileId(point.getProfileId());
         if (null != driver) {
-            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(pointId).setParentId(profileId);
+            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.POINT).setCommand(command).setContent(point);
             notifyDriver(driver, operation);
         }
     }
 
 
     @Override
-    public void notifyDriverDriverInfo(Long driverInfoId, Long attributeId, Long profileId, String operationType) {
-        Driver driver = driverService.selectByProfileId(profileId);
+    public void notifyDriverDriverInfo(String command, DriverInfo driverInfo) {
+        Driver driver = driverService.selectByProfileId(driverInfo.getProfileId());
         if (null != driver) {
-            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(driverInfoId).setParentId(profileId).setAttributeId(attributeId);
+            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DRIVER_INFO).setCommand(command).setContent(driverInfo);
             notifyDriver(driver, operation);
         }
     }
 
     @Override
-    public void notifyDriverPointInfo(Long pointInfoId, Long attributeId, Long deviceId, String operationType) {
-        Driver driver = driverService.selectByDeviceId(deviceId);
+    public void notifyDriverPointInfo(String command, PointInfo pointInfo) {
+        Driver driver = driverService.selectByDeviceId(pointInfo.getDeviceId());
         if (null != driver) {
-            DriverOperation operation = new DriverOperation().setCommand(operationType).setId(pointInfoId).setParentId(deviceId).setAttributeId(attributeId);
+            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.POINT_INFO).setCommand(command).setContent(pointInfo);
             notifyDriver(driver, operation);
         }
     }
@@ -92,7 +93,7 @@ public class NotifyServiceImpl implements NotifyService {
      * @param driver    Driver
      * @param operation DriverOperation
      */
-    private void notifyDriver(Driver driver, DriverOperation operation) {
+    private void notifyDriver(Driver driver, DriverConfiguration operation) {
         log.debug("Notify Driver {} : {}", driver.getServiceName(), operation);
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION, Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + driver.getServiceName(), operation);
     }

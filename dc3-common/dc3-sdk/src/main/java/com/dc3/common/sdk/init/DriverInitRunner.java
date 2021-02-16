@@ -16,7 +16,9 @@
 
 package com.dc3.common.sdk.init;
 
-import com.dc3.common.sdk.service.DriverCommonService;
+import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverConfigurationService;
+import com.dc3.common.sdk.service.DriverScheduleService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -41,10 +43,21 @@ import javax.annotation.Resource;
 public class DriverInitRunner implements ApplicationRunner {
 
     @Resource
-    private DriverCommonService driverCommonService;
+    private DriverConfigurationService driverConfigurationService;
+    @Resource
+    private CustomDriverService customDriverService;
+    @Resource
+    private DriverScheduleService driverScheduleService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        driverCommonService.initial();
+        // Initialize driver configuration
+        driverConfigurationService.initial();
+
+        // Initialize custom driver service
+        customDriverService.initial();
+
+        // Initialize driver schedule service
+        driverScheduleService.initial();
     }
 }

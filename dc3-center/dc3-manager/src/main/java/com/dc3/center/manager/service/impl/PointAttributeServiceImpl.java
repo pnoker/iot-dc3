@@ -60,10 +60,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             }
     )
     public PointAttribute add(PointAttribute pointAttribute) {
-        PointAttribute select = selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId());
-        Optional.ofNullable(select).ifPresent(s -> {
-            throw new ServiceException("The point attribute already exists");
-        });
+        try {
+            if (null != selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId())) {
+                throw new ServiceException("The point attribute already exists");
+            }
+        } catch (Exception ignore) {
+        }
+
         if (pointAttributeMapper.insert(pointAttribute) > 0) {
             return pointAttributeMapper.selectById(pointAttribute.getId());
         }
@@ -115,7 +118,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#id", unless = "#result==null")
     public PointAttribute selectById(Long id) {
-        return pointAttributeMapper.selectById(id);
+        PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
+        if (null == pointAttribute) {
+            throw new ServiceException("The point attribute does not exist");
+        }
+        return pointAttribute;
     }
 
     @Override
@@ -124,7 +131,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         queryWrapper.eq(PointAttribute::getName, name);
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
-        return pointAttributeMapper.selectOne(queryWrapper);
+        PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
+        if (null == pointAttribute) {
+            throw new ServiceException("The point attribute does not exist");
+        }
+        return pointAttribute;
     }
 
     @Override

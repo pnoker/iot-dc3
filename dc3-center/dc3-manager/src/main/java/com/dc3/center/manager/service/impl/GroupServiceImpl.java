@@ -65,10 +65,13 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public Group add(Group group) {
-        Group select = selectByName(group.getName());
-        Optional.ofNullable(select).ifPresent(g -> {
-            throw new ServiceException("The device group already exists");
-        });
+        try {
+            if (null != selectByName(group.getName())) {
+                throw new ServiceException("The device group already exists");
+            }
+        } catch (Exception ignore) {
+        }
+
         if (groupMapper.insert(group) > 0) {
             return groupMapper.selectById(group.getId());
         }
@@ -126,7 +129,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Cacheable(value = Common.Cache.GROUP + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Group selectById(Long id) {
-        return groupMapper.selectById(id);
+        Group group = groupMapper.selectById(id);
+        if (null == group) {
+            throw new ServiceException("The group does not exist");
+        }
+        return group;
     }
 
     @Override
@@ -134,7 +141,11 @@ public class GroupServiceImpl implements GroupService {
     public Group selectByName(String name) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         queryWrapper.eq(Group::getName, name);
-        return groupMapper.selectOne(queryWrapper);
+        Group group = groupMapper.selectOne(queryWrapper);
+        if (null == group) {
+            throw new ServiceException("The group does not exist");
+        }
+        return group;
     }
 
     @Override

@@ -60,10 +60,13 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo add(DriverInfo driverInfo) {
-        DriverInfo select = selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
-        Optional.ofNullable(select).ifPresent(d -> {
-            throw new ServiceException("The driver info already exists in the profile");
-        });
+        try {
+            if (null != selectByDriverAttributeId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId())) {
+                throw new ServiceException("The driver info already exists in the profile");
+            }
+        } catch (Exception ignore) {
+        }
+
         if (driverInfoMapper.insert(driverInfo) > 0) {
             return driverInfoMapper.selectById(driverInfo.getId());
         }
@@ -118,7 +121,11 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#id", unless = "#result==null")
     public DriverInfo selectById(Long id) {
-        return driverInfoMapper.selectById(id);
+        DriverInfo driverInfo = driverInfoMapper.selectById(id);
+        if (null == driverInfo) {
+            throw new ServiceException("The driver info does not exist");
+        }
+        return driverInfo;
     }
 
     @Override
@@ -127,7 +134,11 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
         queryWrapper.eq(DriverInfo::getDriverAttributeId, driverAttributeId);
         queryWrapper.eq(DriverInfo::getProfileId, profileId);
-        return driverInfoMapper.selectOne(queryWrapper);
+        DriverInfo driverInfo = driverInfoMapper.selectOne(queryWrapper);
+        if (null == driverInfo) {
+            throw new ServiceException("The driver info does not exist");
+        }
+        return driverInfo;
     }
 
     @Override

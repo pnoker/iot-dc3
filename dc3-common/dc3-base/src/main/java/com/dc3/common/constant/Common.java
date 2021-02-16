@@ -29,6 +29,11 @@ public interface Common {
     String KEY = "pnoker/dc3";
 
     /**
+     * 默认密码
+     */
+    String DEFAULT_PASSWORD = "dc3dc3dc3";
+
+    /**
      * 对称加密算法
      */
     String KEY_ALGORITHM_AES = "AES";
@@ -39,14 +44,9 @@ public interface Common {
     String KEY_ALGORITHM_RSA = "RSA";
 
     /**
-     * 默认上传文件的缓存位置
+     * 时区
      */
-    String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/";
-
-    /**
-     * 用户主目录
-     */
-    String USER_HOME_PATH = System.getProperty("user.home") + "/.dc3/";
+    String TIMEZONE = "GMT+8";
 
     /**
      * 时间格式化
@@ -54,21 +54,19 @@ public interface Common {
     String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /**
-     * 时区
+     * 用户主目录
      */
-    String TIMEZONE = "GMT+8";
+    String USER_HOME_PATH = System.getProperty("user.home") + "/.dc3/";
 
     /**
-     * 默认密码
+     * 默认上传文件的缓存位置
      */
-    String DEFAULT_PASSWORD = "dc3dc3dc3";
+    String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/";
 
     /**
      * 消息常量
      */
     interface Rabbit {
-        // Status
-
         // Event
         String TOPIC_EXCHANGE_EVENT = "dc3.exchange.event";
         String ROUTING_DRIVER_EVENT_PREFIX = "dc3.routing.event.driver.";
@@ -108,9 +106,47 @@ public interface Common {
          */
         interface Event {
             /**
-             * 用于记录驱动心跳，记录驱动在线或者离线的消息
+             * 驱动心跳事件
              */
             String HEARTBEAT = "HEARTBEAT";
+        }
+
+        interface Type {
+            String PROFILE = "profile";
+            String DEVICE = "device";
+            String POINT = "point";
+            String DRIVER_INFO = "driver_info";
+            String POINT_INFO = "point_info";
+        }
+
+        interface Profile {
+            String ADD = "add_profile";
+            String DELETE = "delete_profile";
+            String UPDATE = "update_profile";
+        }
+
+        interface Device {
+            String ADD = "add_device";
+            String DELETE = "delete_device";
+            String UPDATE = "update_device";
+        }
+
+        interface Point {
+            String ADD = "add_point";
+            String DELETE = "delete_point";
+            String UPDATE = "update_point";
+        }
+
+        interface DriverInfo {
+            String ADD = "add_driver_info";
+            String DELETE = "delete_driver_info";
+            String UPDATE = "update_driver_info";
+        }
+
+        interface PointInfo {
+            String ADD = "add_point_info";
+            String DELETE = "delete_point_info";
+            String UPDATE = "update_point_info";
         }
     }
 
@@ -134,12 +170,12 @@ public interface Common {
          */
         interface Event {
             /**
-             * 用于记录设备心跳，记录设备在线或者离线的消息
+             * 设备心跳事件
              */
             String HEARTBEAT = "HEARTBEAT";
 
             /**
-             * 用于记录设备上线、下线、超时等状态事件类型
+             * 设备状态事件
              */
             String STATUS = "STATUS";
 

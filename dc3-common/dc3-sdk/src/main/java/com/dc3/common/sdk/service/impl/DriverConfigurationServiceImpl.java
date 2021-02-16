@@ -27,9 +27,7 @@ import com.dc3.common.model.*;
 import com.dc3.common.sdk.bean.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.bean.DriverProperty;
-import com.dc3.common.sdk.service.CustomDriverService;
-import com.dc3.common.sdk.service.DriverCommonService;
-import com.dc3.common.sdk.service.DriverScheduleService;
+import com.dc3.common.sdk.service.DriverConfigurationService;
 import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @EnableConfigurationProperties({DriverProperty.class})
-public class DriverCommonServiceImpl implements DriverCommonService {
+public class DriverConfigurationServiceImpl implements DriverConfigurationService {
 
     @Value("${server.port}")
     private int port;
@@ -60,11 +58,6 @@ public class DriverCommonServiceImpl implements DriverCommonService {
 
     private Map<Long, PointAttribute> pointAttributeMap;
     private Map<Long, DriverAttribute> driverAttributeMap;
-
-    @Resource
-    private CustomDriverService customDriverService;
-    @Resource
-    private DriverScheduleService driverScheduleService;
 
     @Resource
     private DriverContext driverContext;
@@ -104,70 +97,43 @@ public class DriverCommonServiceImpl implements DriverCommonService {
                 close();
             }
         }
-        log.info("Driver registered successfully");
-
         // Load profile, point, device, driver info, point info to context
         loadData();
-
-        // Initialize custom driver service
-        customDriverService.initial();
-
-        // Initialize driver schedule service
-        driverScheduleService.initial(driverProperty.getSchedule());
     }
 
     @Override
-    public void addProfile(Long id) {
-        R<Profile> r = profileClient.selectById(id);
-        if (!r.isOk()) {
-            log.error("Add profile failed {}", r.getMessage());
-            throw new ServiceException(r.getMessage());
-        }
+    public void upsertProfile(Profile profile) {
+        // Add profile driver info to context
+        driverContext.getProfileDriverInfoMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
 
-        Map<String, AttributeInfo> infoMap = getDriverInfoMap(r.getData().getId());
-        if (null != infoMap) {
-            // Add profile driver info to context
-            driverContext.getDriverInfoMap().put(r.getData().getId(), infoMap);
-        }
+        // Add profile point to context
+        driverContext.getProfilePointMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
 
-        Map<Long, Point> pointMap = getPointMap(r.getData().getId());
-        if (null != pointMap) {
-            // Add profile point to context
-            driverContext.getProfilePointMap().put(r.getData().getId(), pointMap);
-        }
-
-        log.info("Add profile {}, driverInfo {}, profilePoint {}", r.getData(), infoMap, pointMap);
-
+        log.info("Upsert profile {}", profile);
     }
 
     @Override
     public void deleteProfile(Long id) {
-        log.info("Delete profile {}, driverInfo {}, profilePoint {}", id, driverContext.getDriverInfoMap().get(id), driverContext.getProfilePointMap().get(id));
+        log.info("Delete profile {}, driverInfo {}, profilePoint {}", id, driverContext.getProfileDriverInfoMap().get(id), driverContext.getProfilePointMap().get(id));
 
-        driverContext.getDriverInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        driverContext.getProfileDriverInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
         driverContext.getProfilePointMap().entrySet().removeIf(next -> next.getKey().equals(id));
     }
 
     @Override
-    public void addDevice(Long id) {
-        R<Device> r = deviceClient.selectById(id);
-        if (!r.isOk()) {
-            log.error("Add device failed {}", r.getMessage());
-            throw new ServiceException(r.getMessage());
-        }
-
+    public void upsertDevice(Device device) {
         // Add device to context
-        driverContext.getDeviceMap().put(r.getData().getId(), r.getData());
+        driverContext.getDeviceMap().put(device.getId(), device);
         // Add device name to context
-        driverContext.getDeviceNameMap().put(r.getData().getName(), r.getData().getId());
+        driverContext.getDeviceNameMap().put(device.getName(), device.getId());
 
-        Map<Long, Map<String, AttributeInfo>> infoMap = getPointInfoMap(r.getData());
-        if (null != infoMap) {
-            // Add driver point info to context
-            driverContext.getDevicePointInfoMap().put(r.getData().getId(), infoMap);
+        Map<Long, Map<String, AttributeInfo>> devicePointInfoMap = getDevicePointInfoMap(device);
+        if (null != devicePointInfoMap) {
+            // Add the device point info to context
+            driverContext.getDevicePointInfoMap().put(device.getId(), devicePointInfoMap);
         }
 
-        log.info("Add device {}, devicePointInfo {}", r.getData(), infoMap);
+        log.info("Upsert device {}, devicePointInfo {}", device, devicePointInfoMap);
     }
 
     @Override
@@ -180,100 +146,98 @@ public class DriverCommonServiceImpl implements DriverCommonService {
     }
 
     @Override
-    public void updateDevice(Long id) {
-        addDevice(id);
-    }
-
-    @Override
-    public void addPoint(Long pointId) {
-        R<Point> r = pointClient.selectById(pointId);
-        if (!r.isOk()) {
-            log.error("Add point failed {}", r.getMessage());
-            throw new ServiceException(r.getMessage());
-        }
-
-        Point point = r.getData();
-
-        // Add point to context
-        driverContext.getProfilePointMap().get(point.getProfileId()).put(point.getId(), point);
-
-        log.info("Add point {}", point);
+    public void upsertPoint(Point point) {
+        // Upsert point to profile point map context
+        log.info("Upsert point {}", point);
+        driverContext.getProfilePointMap().computeIfAbsent(point.getProfileId(), k -> new HashMap<>(16))
+                .put(point.getId(), point);
     }
 
     @Override
     public void deletePoint(Long pointId, Long profileId) {
-        log.info("Delete point {}", driverContext.getProfilePointMap().get(profileId).get(pointId));
-
-        driverContext.getProfilePointMap().get(profileId).entrySet().removeIf(next -> next.getKey().equals(pointId));
+        // Delete point from profile point map context
+        driverContext.getProfilePointMap().computeIfPresent(profileId, (k, v) -> {
+            v.entrySet().removeIf(next -> {
+                boolean equals = next.getKey().equals(pointId);
+                if (equals) {
+                    log.info("Delete point {}", next.getValue());
+                }
+                return equals;
+            });
+            return v;
+        });
     }
 
     @Override
-    public void updatePoint(Long id) {
-        addPoint(id);
-    }
-
-    @Override
-    public void addDriverInfo(Long id) {
-        R<DriverInfo> r = driverInfoClient.selectById(id);
-        if (!r.isOk()) {
-            log.error("Add driver info failed {}", r.getMessage());
-            throw new ServiceException(r.getMessage());
+    public void upsertDriverInfo(DriverInfo driverInfo) {
+        // Add driver info to driver info map context
+        DriverAttribute attribute = this.driverAttributeMap.get(driverInfo.getDriverAttributeId());
+        if (null != attribute) {
+            log.info("Upsert driver info {}", driverInfo);
+            driverContext.getProfileDriverInfoMap().computeIfAbsent(driverInfo.getProfileId(), k -> new HashMap<>(16))
+                    .put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
         }
-
-        DriverInfo info = r.getData();
-        DriverAttribute attribute = this.driverAttributeMap.get(info.getDriverAttributeId());
-
-        // Add driver info to context
-        driverContext.getDriverInfoMap().get(info.getProfileId()).put(attribute.getName(), new AttributeInfo(info.getValue(), attribute.getType()));
-
-        log.info("Add driver info {}", info);
     }
 
     @Override
     public void deleteDriverInfo(Long attributeId, Long profileId) {
-        String attributeName = this.driverAttributeMap.get(attributeId).getName();
-        log.info("Delete driver info {}", driverContext.getDriverInfoMap().get(profileId).get(attributeName));
+        DriverAttribute attribute = this.driverAttributeMap.get(attributeId);
+        if (null != attribute) {
+            String attributeName = attribute.getName();
 
-        driverContext.getDriverInfoMap().get(profileId).entrySet().removeIf(next -> next.getKey().equals(attributeName));
-    }
-
-    @Override
-    public void updateDriverInfo(Long id) {
-        addDriverInfo(id);
-    }
-
-    @Override
-    public void addPointInfo(Long id) {
-        R<PointInfo> r = pointInfoClient.selectById(id);
-        if (!r.isOk()) {
-            log.error("Add point info failed {}", r.getMessage());
-            throw new ServiceException(r.getMessage());
+            // Delete driver info from driver info map context
+            driverContext.getProfileDriverInfoMap().computeIfPresent(profileId, (k, v) -> {
+                v.entrySet().removeIf(next -> {
+                    boolean equals = next.getKey().equals(attributeName);
+                    if (equals) {
+                        log.info("Delete driver info {}", next.getValue());
+                    }
+                    return equals;
+                });
+                return v;
+            });
         }
+    }
 
-        PointInfo info = r.getData();
-        PointAttribute attribute = this.pointAttributeMap.get(info.getPointAttributeId());
-
-        // Add point info to context
-        driverContext.getDevicePointInfoMap().computeIfAbsent(info.getDeviceId(), k -> new HashMap<>(16));
-        Map<Long, Map<String, AttributeInfo>> map = driverContext.getDevicePointInfoMap().get(info.getDeviceId());
-        map.computeIfAbsent(info.getPointId(), k -> new HashMap<>(16));
-        map.get(info.getPointId()).put(attribute.getName(), new AttributeInfo(info.getValue(), attribute.getType()));
-
-        log.info("Add point info {}", info);
+    @Override
+    public void upsertPointInfo(PointInfo pointInfo) {
+        // Add the point info to the device point info map context
+        PointAttribute attribute = this.pointAttributeMap.get(pointInfo.getPointAttributeId());
+        if (null != attribute) {
+            log.info("Upsert point info {}", pointInfo);
+            driverContext.getDevicePointInfoMap().computeIfAbsent(pointInfo.getDeviceId(), k -> new HashMap<>(16))
+                    .computeIfAbsent(pointInfo.getPointId(), k -> new HashMap<>(16))
+                    .put(attribute.getName(), new AttributeInfo(pointInfo.getValue(), attribute.getType()));
+        }
     }
 
     @Override
     public void deletePointInfo(Long pointId, Long attributeId, Long deviceId) {
-        String attributeName = this.pointAttributeMap.get(attributeId).getName();
-        log.info("Delete point info {}", driverContext.getDevicePointInfoMap().get(deviceId).get(pointId).get(attributeName));
+        PointAttribute attribute = this.pointAttributeMap.get(attributeId);
+        if (null != attribute) {
+            String attributeName = attribute.getName();
 
-        driverContext.getDevicePointInfoMap().get(deviceId).get(pointId).entrySet().removeIf(next -> next.getKey().equals(attributeName));
-        driverContext.getDevicePointInfoMap().get(deviceId).entrySet().removeIf(next -> next.getValue().size() < 1);
-    }
+            // Delete the point info from the device info map context
+            driverContext.getDevicePointInfoMap().computeIfPresent(deviceId, (k1, v1) -> {
+                v1.computeIfPresent(pointId, (k2, v2) -> {
+                    v2.entrySet().removeIf(next -> {
+                        boolean equals = next.getKey().equals(attributeName);
+                        if (equals) {
+                            log.info("Delete point info {}", next.getValue());
+                        }
+                        return equals;
+                    });
+                    return v2;
+                });
+                return v1;
+            });
 
-    @Override
-    public void updatePointInfo(Long id) {
-        addPointInfo(id);
+            // If the point attribute is null, delete the point info from the device info map context
+            driverContext.getDevicePointInfoMap().computeIfPresent(deviceId, (k, v) -> {
+                v.entrySet().removeIf(next -> next.getValue().size() < 1);
+                return v;
+            });
+        }
     }
 
     /**
@@ -307,32 +271,27 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         driver.setDescription(driverProperty.getDescription());
 
         R<Driver> rDriver = driverClient.selectByServiceName(this.serviceName);
-        if (rDriver.isOk()) {
-            if (null != rDriver.getData()) {
-                log.info("Driver already registered, updating {} ", driverProperty.getName());
-                if (!driverProperty.getName().equals(rDriver.getData().getName())) {
-                    log.info("Change the driver({}) name to {}", rDriver.getData().getName(), driverProperty.getName());
-                }
-                driver.setId(rDriver.getData().getId());
-                driverContext.setDriverId(driver.getId());
-                return driverClient.update(driver).isOk();
-            } else {
-                log.info("Driver does not registered, adding {} ", driverProperty.getName());
-                R<Driver> byHostPort = driverClient.selectByHostPort(this.localHost, this.port);
-                if (byHostPort.isOk()) {
-                    if (null != byHostPort.getData()) {
-                        log.error("The port({}) is already occupied by driver({}/{})", this.port, byHostPort.getData().getName(), byHostPort.getData().getServiceName());
-                        return false;
-                    }
-                    R<Driver> r = driverClient.add(driver);
-                    if (r.isOk()) {
-                        driverContext.setDriverId(r.getData().getId());
-                    }
-                    return r.isOk();
-                }
+        if (rDriver.isOk() && null != rDriver.getData()) {
+            log.info("Driver already registered, updating {} ", driverProperty.getName());
+            if (!driverProperty.getName().equals(rDriver.getData().getName())) {
+                log.info("Change the driver({}) name to {}", rDriver.getData().getName(), driverProperty.getName());
             }
+            driver.setId(rDriver.getData().getId());
+            driverContext.setDriverId(driver.getId());
+            return driverClient.update(driver).isOk();
+        } else {
+            log.info("Driver does not registered, adding {} ", driverProperty.getName());
+            R<Driver> byHostPort = driverClient.selectByHostPort(this.localHost, this.port);
+            if (byHostPort.isOk() && null != byHostPort.getData()) {
+                log.error("The port({}) is already occupied by driver({}/{})", this.port, byHostPort.getData().getName(), byHostPort.getData().getServiceName());
+                return false;
+            }
+            R<Driver> r = driverClient.add(driver);
+            if (r.isOk()) {
+                driverContext.setDriverId(r.getData().getId());
+            }
+            return r.isOk();
         }
-        return false;
     }
 
     /**
@@ -465,7 +424,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         this.pointAttributeMap = loadPointAttributeMap(driverContext.getDriverId());
 
         List<Long> profileList = loadProfile(driverContext.getDriverId());
-        driverContext.setDriverInfoMap(loadDriverInfoMap(profileList));
+        driverContext.setProfileDriverInfoMap(loadDriverInfoMap(profileList));
         loadDevice(profileList);
         driverContext.setProfilePointMap(loadProfilePointMap(profileList));
         loadDevicePointMap(driverContext.getDeviceMap());
@@ -603,7 +562,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
         driverContext.setDevicePointInfoMap(new HashMap<>(16));
         driverContext.setDevicePointNameMap(new HashMap<>(16));
         for (Device device : deviceMap.values()) {
-            Map<Long, Map<String, AttributeInfo>> infoMap = getPointInfoMap(device);
+            Map<Long, Map<String, AttributeInfo>> infoMap = getDevicePointInfoMap(device);
             if (infoMap.size() > 0) {
                 driverContext.getDevicePointInfoMap().put(device.getId(), infoMap);
             }
@@ -646,7 +605,7 @@ public class DriverCommonServiceImpl implements DriverCommonService {
      * @param device Device
      * @return Map
      */
-    public Map<Long, Map<String, AttributeInfo>> getPointInfoMap(Device device) {
+    public Map<Long, Map<String, AttributeInfo>> getDevicePointInfoMap(Device device) {
         Map<Long, Map<String, AttributeInfo>> attributeInfoMap = new HashMap<>(16);
 
         Map<Long, Point> pointMap = driverContext.getProfilePointMap().get(device.getProfileId());

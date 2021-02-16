@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 接收驱动发送过来的驱动事件数据
@@ -43,8 +42,6 @@ public class DriverEventReceiver {
 
     @Resource
     private RedisUtil redisUtil;
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverEventQueue.name}")
@@ -52,10 +49,10 @@ public class DriverEventReceiver {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             if (null == driverEvent || StringUtils.isEmpty(driverEvent.getServiceName())) {
-                log.error("Invalid driver event: {}", driverEvent);
+                log.error("Invalid driver event");
                 return;
             }
-            log.debug("Device event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
+            log.debug("Driver event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
 
             if (Common.Driver.Event.HEARTBEAT.equals(driverEvent.getType())) {
                 // Save driver heartbeat to Redis

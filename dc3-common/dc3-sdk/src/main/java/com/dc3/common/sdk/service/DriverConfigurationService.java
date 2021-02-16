@@ -16,10 +16,12 @@
 
 package com.dc3.common.sdk.service;
 
+import com.dc3.common.model.*;
+
 /**
  * @author pnoker
  */
-public interface DriverCommonService {
+public interface DriverConfigurationService {
     /**
      * 初始化 SDK
      */
@@ -28,9 +30,9 @@ public interface DriverCommonService {
     /**
      * 向 DeviceDriver 中添加模板
      *
-     * @param id Id
+     * @param profile Profile
      */
-    void addProfile(Long id);
+    void upsertProfile(Profile profile);
 
     /**
      * 删除 DeviceDriver 中模板
@@ -42,9 +44,9 @@ public interface DriverCommonService {
     /**
      * 向 DeviceDriver 中添加设备
      *
-     * @param id Id
+     * @param device Device
      */
-    void addDevice(Long id);
+    void upsertDevice(Device device);
 
     /**
      * 删除 DeviceDriver 中设备
@@ -54,18 +56,11 @@ public interface DriverCommonService {
     void deleteDevice(Long id);
 
     /**
-     * 更新 DeviceDriver 中设备
-     *
-     * @param id Id
-     */
-    void updateDevice(Long id);
-
-    /**
      * 向 DeviceDriver 中添加位号
      *
-     * @param id Id
+     * @param point Point
      */
-    void addPoint(Long id);
+    void upsertPoint(Point point);
 
     /**
      * 删除 DeviceDriver 中位号
@@ -76,18 +71,11 @@ public interface DriverCommonService {
     void deletePoint(Long id, Long profileId);
 
     /**
-     * 更新 DeviceDriver 中添加位号
-     *
-     * @param id Id
-     */
-    void updatePoint(Long id);
-
-    /**
      * 向 DeviceDriver 中添加驱动配置信息
      *
-     * @param id Id
+     * @param driverInfo DriverInfo
      */
-    void addDriverInfo(Long id);
+    void upsertDriverInfo(DriverInfo driverInfo);
 
     /**
      * 删除 DeviceDriver 中添加驱动配置信息
@@ -98,18 +86,11 @@ public interface DriverCommonService {
     void deleteDriverInfo(Long attributeId, Long profileId);
 
     /**
-     * 更新 DeviceDriver 中添加驱动配置信息
-     *
-     * @param id Id
-     */
-    void updateDriverInfo(Long id);
-
-    /**
      * 向 DeviceDriver 中添加位号配置信息
      *
-     * @param id Id
+     * @param pointInfo PointInfo
      */
-    void addPointInfo(Long id);
+    void upsertPointInfo(PointInfo pointInfo);
 
     /**
      * 删除 DeviceDriver 中添加位号配置信息
@@ -119,12 +100,5 @@ public interface DriverCommonService {
      * @param deviceId    Device Id
      */
     void deletePointInfo(Long pointId, Long attributeId, Long deviceId);
-
-    /**
-     * 更新 DeviceDriver 中添加位号配置信息
-     *
-     * @param id Id
-     */
-    void updatePointInfo(Long id);
 
 }

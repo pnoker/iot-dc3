@@ -23,7 +23,14 @@ import com.dc3.common.sdk.bean.AttributeInfo;
 import java.util.Map;
 
 /**
- * 驱动接口，用于驱动接口实现
+ * <p>自定义驱动接口，开发的自定义驱动需要实现 read 和 write 接口，可以参考以提供的驱动模块写法</p>
+ *
+ * <ol>
+ * <li>{@link CustomDriverService#initial} 初始化操作，需要根据不同的驱动实现该功能</li>
+ * <li>{@link CustomDriverService#read} 读操作，需要根据不同的驱动实现该功能</li>
+ * <li>{@link CustomDriverService#write} 写操作，需要根据不同的驱动实现该功能</li>
+ * <li>{@link CustomDriverService#schedule} 调度操作，需要根据不同的驱动实现该功能</li>
+ * </ol>
  *
  * @author pnoker
  */
@@ -58,7 +65,7 @@ public interface CustomDriverService {
     Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception;
 
     /**
-     * 驱动本身存在定时器，用于定时采集数据和下发数据，该方法为用户自定义操作，系统根据配置定时执行
+     * Schedule Operation
      */
     void schedule();
 }

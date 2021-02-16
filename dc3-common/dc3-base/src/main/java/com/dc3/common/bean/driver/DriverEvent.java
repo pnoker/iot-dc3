@@ -41,7 +41,6 @@ public class DriverEvent implements Serializable {
 
     private String serviceName;
     private String type;
-    private Boolean confirm = false;
     private Object content;
 
     @Transient
@@ -51,7 +50,6 @@ public class DriverEvent implements Serializable {
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     private Long originTime;
-    private Long confirmTime;
 
     public DriverEvent(String serviceName, String type, Object content) {
         this.serviceName = serviceName;

@@ -60,10 +60,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             }
     )
     public DriverAttribute add(DriverAttribute driverAttribute) {
-        DriverAttribute select = selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId());
-        Optional.ofNullable(select).ifPresent(d -> {
-            throw new ServiceException("The driver attribute already exists");
-        });
+        try {
+            if (null != selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId())) {
+                throw new ServiceException("The driver attribute already exists");
+            }
+        } catch (Exception ignore) {
+        }
+
         if (driverAttributeMapper.insert(driverAttribute) > 0) {
             return driverAttributeMapper.selectById(driverAttribute.getId());
         }
@@ -115,7 +118,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.ID, key = "#id", unless = "#result==null")
     public DriverAttribute selectById(Long id) {
-        return driverAttributeMapper.selectById(id);
+        DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
+        if (null == driverAttribute) {
+            throw new ServiceException("The driver attribute does not exist");
+        }
+        return driverAttribute;
     }
 
     @Override
@@ -124,7 +131,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         queryWrapper.eq(DriverAttribute::getName, name);
         queryWrapper.eq(DriverAttribute::getDriverId, driverId);
-        return driverAttributeMapper.selectOne(queryWrapper);
+        DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
+        if (null == driverAttribute) {
+            throw new ServiceException("The driver attribute does not exist");
+        }
+        return driverAttribute;
     }
 
     @Override

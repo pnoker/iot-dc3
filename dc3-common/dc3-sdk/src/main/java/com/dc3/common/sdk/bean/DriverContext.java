@@ -39,7 +39,12 @@ public class DriverContext {
     /**
      * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
      */
-    private Map<Long, Map<String, AttributeInfo>> driverInfoMap = new ConcurrentHashMap<>(16);
+    private Map<Long, Map<String, AttributeInfo>> profileDriverInfoMap = new ConcurrentHashMap<>(16);
+
+    /**
+     * profileId,(pointId,point)
+     */
+    private Map<Long, Map<Long, Point>> profilePointMap = new ConcurrentHashMap<>(16);
 
     /**
      * deviceId,device
@@ -50,11 +55,6 @@ public class DriverContext {
      * deviceName,deviceId
      */
     private Map<String, Long> deviceNameMap = new ConcurrentHashMap<>(16);
-
-    /**
-     * profileId,(pointId,point)
-     */
-    private Map<Long, Map<Long, Point>> profilePointMap = new ConcurrentHashMap<>(16);
 
     /**
      * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
@@ -139,7 +139,7 @@ public class DriverContext {
      * @return Map<String, AttributeInfo>
      */
     public Map<String, AttributeInfo> getProfileDriverInfo(Long profileId) {
-        return driverInfoMap.get(profileId);
+        return profileDriverInfoMap.get(profileId);
     }
 
     /**

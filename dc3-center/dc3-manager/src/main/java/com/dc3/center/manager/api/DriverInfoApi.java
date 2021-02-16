@@ -22,7 +22,6 @@ import com.dc3.center.manager.service.DriverInfoService;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.DriverInfoDto;
 import com.dc3.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo add = driverInfoService.add(driverInfo);
             if (null != add) {
-                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.ADD);
+                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -64,8 +63,8 @@ public class DriverInfoApi implements DriverInfoClient {
     public R<Boolean> delete(Long id) {
         try {
             DriverInfo driverInfo = driverInfoService.selectById(id);
-            if (driverInfoService.delete(id)) {
-                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.DELETE);
+            if (null != driverInfo && driverInfoService.delete(id)) {
+                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.DELETE, driverInfo);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -79,7 +78,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo update = driverInfoService.update(driverInfo);
             if (null != update) {
-                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.UPDATE);
+                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.UPDATE, driverInfo);
                 return R.ok(update);
             }
         } catch (Exception e) {

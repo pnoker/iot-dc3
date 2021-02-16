@@ -78,10 +78,13 @@ public class DriverServiceImpl implements DriverService {
             }
     )
     public Driver add(Driver driver) {
-        Driver select = selectByServiceName(driver.getName());
-        Optional.ofNullable(select).ifPresent(d -> {
-            throw new ServiceException("The driver already exists");
-        });
+        try {
+            if (null != selectByServiceName(driver.getName())) {
+                throw new ServiceException("The driver already exists");
+            }
+        } catch (Exception ignore) {
+        }
+
         if (driverMapper.insert(driver) > 0) {
             return driverMapper.selectById(driver.getId());
         }
@@ -142,7 +145,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Driver selectById(Long id) {
-        return driverMapper.selectById(id);
+        Driver driver = driverMapper.selectById(id);
+        if (null == driver) {
+            throw new ServiceException("The driver does not exist");
+        }
+        return driver;
     }
 
     @Override
@@ -150,7 +157,11 @@ public class DriverServiceImpl implements DriverService {
     public Driver selectByServiceName(String serviceName) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getServiceName, serviceName);
-        return driverMapper.selectOne(queryWrapper);
+        Driver driver = driverMapper.selectOne(queryWrapper);
+        if (null == driver) {
+            throw new ServiceException("The driver does not exist");
+        }
+        return driver;
     }
 
     @Override
@@ -159,7 +170,11 @@ public class DriverServiceImpl implements DriverService {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getHost, host);
         queryWrapper.eq(Driver::getPort, port);
-        return driverMapper.selectOne(queryWrapper);
+        Driver driver = driverMapper.selectOne(queryWrapper);
+        if (null == driver) {
+            throw new ServiceException("The driver does not exist");
+        }
+        return driver;
     }
 
     @Override
@@ -168,19 +183,27 @@ public class DriverServiceImpl implements DriverService {
         if (null != device) {
             Profile profile = profileService.selectById(device.getProfileId());
             if (null != profile) {
-                return driverService.selectById(profile.getDriverId());
+                Driver driver = driverService.selectById(profile.getDriverId());
+                if (null == driver) {
+                    throw new ServiceException("The driver does not exist");
+                }
+                return driver;
             }
         }
-        return null;
+        throw new ServiceException("The driver does not exist");
     }
 
     @Override
     public Driver selectByProfileId(Long profileId) {
         Profile profile = profileService.selectById(profileId);
         if (null != profile) {
-            return driverService.selectById(profile.getDriverId());
+            Driver driver = driverService.selectById(profile.getDriverId());
+            if (null == driver) {
+                throw new ServiceException("The driver does not exist");
+            }
+            return driver;
         }
-        return null;
+        throw new ServiceException("The driver does not exist");
     }
 
     @Override

@@ -18,14 +18,11 @@ package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.ProfileClient;
-import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.constant.Operation;
 import com.dc3.common.dto.ProfileDto;
-import com.dc3.common.model.Driver;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,8 +41,6 @@ import javax.annotation.Resource;
 public class ProfileApi implements ProfileClient {
 
     @Resource
-    private DriverService driverService;
-    @Resource
     private ProfileService profileService;
     @Resource
     private NotifyService notifyService;
@@ -55,8 +50,7 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile add = profileService.add(profile);
             if (null != add) {
-                Driver driver = driverService.selectByProfileId(profile.getId());
-                notifyService.notifyDriverProfile(driver, profile.getId(), Operation.Profile.ADD);
+                notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -68,9 +62,9 @@ public class ProfileApi implements ProfileClient {
     @Override
     public R<Boolean> delete(Long id) {
         try {
-            Driver driver = driverService.selectByProfileId(id);
-            if (profileService.delete(id)) {
-                notifyService.notifyDriverProfile(driver, id, Operation.Profile.DELETE);
+            Profile profile = profileService.selectById(id);
+            if (null != profile && profileService.delete(id)) {
+                notifyService.notifyDriverProfile(Common.Driver.Profile.DELETE, profile);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -84,6 +78,7 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile update = profileService.update(profile);
             if (null != update) {
+                notifyService.notifyDriverProfile(Common.Driver.Profile.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

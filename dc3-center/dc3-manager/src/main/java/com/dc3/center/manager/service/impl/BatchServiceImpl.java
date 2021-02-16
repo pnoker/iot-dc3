@@ -21,7 +21,7 @@ import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.bean.batch.BatchGroup;
 import com.dc3.common.bean.batch.BatchPoint;
 import com.dc3.common.bean.batch.BatchProfile;
-import com.dc3.common.constant.Operation;
+import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -119,7 +119,7 @@ public class BatchServiceImpl implements BatchService {
                 throw new ServiceException("Add profile failed: " + batchProfile.getName());
             }
 
-            notifyService.notifyDriverProfile(driver, profile.getId(), Operation.Profile.ADD);
+            notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
         }
         return profile;
     }
@@ -154,11 +154,11 @@ public class BatchServiceImpl implements BatchService {
                 if (null == driverInfo) {
                     throw new ServiceException("Add driver info failed: " + name);
                 }
-                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.ADD);
+                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.ADD, driverInfo);
             } else {
                 driverInfo.setDescription("批量导入：更新");
                 driverInfo = driverInfoService.update(driverInfo.setValue(value));
-                notifyService.notifyDriverDriverInfo(driverInfo.getId(), driverInfo.getDriverAttributeId(), driverInfo.getProfileId(), Operation.DriverInfo.UPDATE);
+                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.UPDATE, driverInfo);
             }
         });
     }
@@ -192,7 +192,7 @@ public class BatchServiceImpl implements BatchService {
                 if (null == point) {
                     throw new ServiceException("Add point failed: " + importPoint.getName());
                 }
-                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.ADD);
+                notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point);
             } else {
                 point
                         .setName(importPoint.getName())
@@ -207,7 +207,7 @@ public class BatchServiceImpl implements BatchService {
                         .setUnit(importPoint.getUnit());
                 point.setDescription("批量导入：更新");
                 pointService.update(point);
-                notifyService.notifyDriverPoint(point.getId(), point.getProfileId(), Operation.Point.UPDATE);
+                notifyService.notifyDriverPoint(Common.Driver.Point.UPDATE, point);
             }
         });
     }
@@ -244,7 +244,7 @@ public class BatchServiceImpl implements BatchService {
                     if (null == device) {
                         throw new ServiceException("Add device failed: " + batchDevice.getName());
                     }
-                    notifyService.notifyDriverDevice(device.getId(), device.getProfileId(), Operation.Device.ADD);
+                    notifyService.notifyDriverDevice(Common.Driver.Device.ADD, device);
                 }
 
                 // Add Point Info
@@ -292,11 +292,11 @@ public class BatchServiceImpl implements BatchService {
                     if (null == pointInfo) {
                         throw new ServiceException("Add point info failed: " + name);
                     }
-                    notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.ADD);
+                    notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, pointInfo);
                 } else {
                     pointInfo.setDescription("批量导入：更新");
                     pointInfo = pointInfoService.update(pointInfo.setValue(value));
-                    notifyService.notifyDriverPointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), Operation.PointInfo.UPDATE);
+                    notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.UPDATE, pointInfo);
                 }
             });
         });

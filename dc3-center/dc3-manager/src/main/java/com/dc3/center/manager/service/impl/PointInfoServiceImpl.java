@@ -61,10 +61,13 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo add(PointInfo pointInfo) {
-        PointInfo select = selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
-        if (null != select) {
-            throw new ServiceException("The point info already exists");
+        try {
+            if (null != selectByPointAttributeId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId())) {
+                throw new ServiceException("The point info already exists");
+            }
+        } catch (Exception ignore) {
         }
+
         if (pointInfoMapper.insert(pointInfo) > 0) {
             return pointInfoMapper.selectById(pointInfo.getId());
         }
@@ -119,7 +122,11 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Override
     @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#id", unless = "#result==null")
     public PointInfo selectById(Long id) {
-        return pointInfoMapper.selectById(id);
+        PointInfo pointInfo = pointInfoMapper.selectById(id);
+        if (null == pointInfo) {
+            throw new ServiceException("The point info does not exist");
+        }
+        return pointInfo;
     }
 
     @Override
@@ -129,7 +136,11 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
         queryWrapper.eq(PointInfo::getPointId, pointId);
-        return pointInfoMapper.selectOne(queryWrapper);
+        PointInfo pointInfo = pointInfoMapper.selectOne(queryWrapper);
+        if (null == pointInfo) {
+            throw new ServiceException("The point info does not exist");
+        }
+        return pointInfo;
     }
 
     @Override

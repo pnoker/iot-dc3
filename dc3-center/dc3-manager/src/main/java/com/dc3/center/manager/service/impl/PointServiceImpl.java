@@ -62,10 +62,13 @@ public class PointServiceImpl implements PointService {
             }
     )
     public Point add(Point point) {
-        Point select = selectByNameAndProfile(point.getName(), point.getProfileId());
-        if (null != select) {
-            throw new ServiceException("The point already exists in the profile");
+        try {
+            if (null != selectByNameAndProfile(point.getName(), point.getProfileId())) {
+                throw new ServiceException("The point already exists in the profile");
+            }
+        } catch (Exception ignore) {
         }
+
         if (pointMapper.insert(point) > 0) {
             return pointMapper.selectById(point.getId());
         }
@@ -124,7 +127,11 @@ public class PointServiceImpl implements PointService {
     @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.ID, key = "#id", unless = "#result==null")
     public Point selectById(Long id) {
-        return pointMapper.selectById(id);
+        Point point = pointMapper.selectById(id);
+        if (null == point) {
+            throw new ServiceException("The point does not exist");
+        }
+        return point;
     }
 
     @Override
@@ -133,7 +140,11 @@ public class PointServiceImpl implements PointService {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         queryWrapper.eq(Point::getName, name);
         queryWrapper.eq(Point::getProfileId, profileId);
-        return pointMapper.selectOne(queryWrapper);
+        Point point = pointMapper.selectOne(queryWrapper);
+        if (null == point) {
+            throw new ServiceException("The point does not exist");
+        }
+        return point;
     }
 
     @Override
