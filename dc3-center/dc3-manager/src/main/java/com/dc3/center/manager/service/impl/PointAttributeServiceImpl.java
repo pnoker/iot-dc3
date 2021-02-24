@@ -24,6 +24,7 @@ import com.dc3.center.manager.service.PointAttributeService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointAttributeDto;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -56,15 +58,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public PointAttribute add(PointAttribute pointAttribute) {
-        try {
-            if (null != selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId())) {
-                throw new ServiceException("The point attribute already exists");
-            }
-        } catch (Exception ignore) {
+        if (null != selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId())) {
+            throw new ServiceException("The point attribute already exists");
         }
 
         if (pointAttributeMapper.insert(pointAttribute) > 0) {
@@ -79,6 +79,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -98,6 +99,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -136,6 +138,18 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             throw new ServiceException("The point attribute does not exist");
         }
         return pointAttribute;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
+    public List<PointAttribute> selectByDriverId(Long driverId) {
+        LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
+        queryWrapper.eq(PointAttribute::getDriverId, driverId);
+        List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(queryWrapper);
+        if (null == pointAttributes || pointAttributes.size() < 1) {
+            throw new NotFoundException("The point attributes does not exist");
+        }
+        return pointAttributes;
     }
 
     @Override

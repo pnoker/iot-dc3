@@ -19,7 +19,7 @@ package com.dc3.driver.service.netty.udp;
 import cn.hutool.core.util.CharsetUtil;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.model.Point;
-import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.sdk.util.DriverUtils;
@@ -78,13 +78,13 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
         ByteBuf byteBuf = msg.content();
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
-        Long deviceId = nettyUdpServerHandler.driverContext.getDeviceIdByName(deviceName);
+        Long deviceId = nettyUdpServerHandler.driverContext.getDeviceIdByDeviceName(deviceName);
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
 
-        List<PointValue> pointValues = new ArrayList<>();
+        List<PointValue> pointValues = new ArrayList<>(16);
         Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyUdpServerHandler.driverContext.getDevicePointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
-            Point point = nettyUdpServerHandler.driverContext.getDevicePoint(deviceId, pointId);
+            Point point = nettyUdpServerHandler.driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);
             int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
             int end = DriverUtils.value(infoMap.get("end").getType(), infoMap.get("end").getValue());

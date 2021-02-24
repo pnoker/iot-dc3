@@ -20,13 +20,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.data.feign.DeviceEventClient;
-import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.service.DeviceService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,8 +55,6 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private DeviceMapper deviceMapper;
     @Resource
-    private PointValueClient pointValueClient;
-    @Resource
     private DeviceEventClient deviceEventClient;
 
 
@@ -67,15 +66,13 @@ public class DeviceServiceImpl implements DeviceService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Device add(Device device) {
-        try {
-            if (null != selectDeviceByNameAndGroup(device.getName(), device.getGroupId())) {
-                throw new ServiceException("The device already exists in the group");
-            }
-        } catch (Exception ignore) {
+        if (null != selectDeviceByNameAndGroupId(device.getName(), device.getGroupId())) {
+            throw new ServiceException("The device already exists in the group");
         }
 
         if (deviceMapper.insert(device) > 0) {
@@ -89,6 +86,7 @@ public class DeviceServiceImpl implements DeviceService {
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -109,6 +107,7 @@ public class DeviceServiceImpl implements DeviceService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -138,7 +137,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, key = "#groupId+'.'+#name", unless = "#result==null")
-    public Device selectDeviceByNameAndGroup(String name, Long groupId) {
+    public Device selectDeviceByNameAndGroupId(String name, Long groupId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getGroupId, groupId);
         queryWrapper.eq(Device::getName, name);
@@ -147,6 +146,18 @@ public class DeviceServiceImpl implements DeviceService {
             throw new ServiceException("The device does not exist");
         }
         return device;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
+    public List<Device> selectDeviceByProfileId(Long profileId) {
+        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
+        queryWrapper.eq(Device::getProfileId, profileId);
+        List<Device> devices = deviceMapper.selectList(queryWrapper);
+        if (null == devices || devices.size() < 1) {
+            throw new NotFoundException("The devices does not exist");
+        }
+        return devices;
     }
 
     @Override

@@ -287,7 +287,7 @@ public class Dc3Util {
      * @return T Array
      */
     public <T extends NodeDto> List<T> buildByLoop(List<T> treeNodes, Object root) {
-        List<T> trees = new ArrayList<>();
+        List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
                 trees.add(treeNode);
@@ -295,7 +295,7 @@ public class Dc3Util {
             for (T it : treeNodes) {
                 if (it.getParentId() == treeNode.getId()) {
                     if (treeNode.getChildren() == null) {
-                        treeNode.setChildren(new ArrayList<>());
+                        treeNode.setChildren(new ArrayList<>(16));
                     }
                     treeNode.add(it);
                 }
@@ -311,7 +311,7 @@ public class Dc3Util {
      * @return T Array
      */
     public <T extends NodeDto> List<T> buildByRecursive(List<T> treeNodes, Object root) {
-        List<T> trees = new ArrayList<>();
+        List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
                 trees.add(findChildren(treeNode, treeNodes));
@@ -330,7 +330,7 @@ public class Dc3Util {
         for (T it : treeNodes) {
             if (treeNode.getId() == it.getParentId()) {
                 if (treeNode.getChildren() == null) {
-                    treeNode.setChildren(new ArrayList<>());
+                    treeNode.setChildren(new ArrayList<>(16));
                 }
                 treeNode.add(findChildren(it, treeNodes));
             }
@@ -359,7 +359,7 @@ public class Dc3Util {
      * @return Mac Array
      */
     private List<String> localMacList() {
-        ArrayList<String> macList = new ArrayList<>();
+        ArrayList<String> macList = new ArrayList<>(16);
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             StringBuilder stringBuilder = new StringBuilder();

@@ -18,7 +18,7 @@ package com.dc3.common.sdk.service;
 
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.bean.driver.AttributeInfo;
 
 import java.util.Map;
 

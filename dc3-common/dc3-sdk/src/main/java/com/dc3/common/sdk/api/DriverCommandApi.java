@@ -56,7 +56,7 @@ public class DriverCommandApi {
      */
     @PostMapping("/read")
     public R<List<PointValue>> readPoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters) {
-        List<PointValue> pointValues = new ArrayList<>();
+        List<PointValue> pointValues = new ArrayList<>(16);
         try {
             if (cmdParameters.size() > Common.Driver.MAX_REQUEST_SIZE) {
                 return R.fail("point request size are limited to " + Common.Driver.MAX_REQUEST_SIZE);

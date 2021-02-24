@@ -106,9 +106,14 @@ public interface Common {
          */
         interface Event {
             /**
+             * 驱动元数据同步事件
+             */
+            String SYNC = "sync_driver_metadata";
+
+            /**
              * 驱动心跳事件
              */
-            String HEARTBEAT = "HEARTBEAT";
+            String HEARTBEAT = "heartbeat";
         }
 
         interface Type {
@@ -117,6 +122,7 @@ public interface Common {
             String POINT = "point";
             String DRIVER_INFO = "driver_info";
             String POINT_INFO = "point_info";
+            String METADATA = "driver_metadata";
         }
 
         interface Profile {
@@ -147,6 +153,11 @@ public interface Common {
             String ADD = "add_point_info";
             String DELETE = "delete_point_info";
             String UPDATE = "update_point_info";
+        }
+
+        interface Metadata {
+            String INIT = "init_driver_metadata";
+            String SYNC = "sync_driver_metadata";
         }
     }
 
@@ -305,6 +316,11 @@ public interface Common {
         String LIMIT = "_limit";
         String SERVICE_NAME = "_service_name";
         String HOST_PORT = "_host_port";
+        String DRIVER_ID = "_driver_id";
+        String DEVICE_ID = "_device_id";
+        String POINT_ID = "_point_id";
+        String PROFILE_ID = "_profile_id";
+        String ATTRIBUTE_ID = "_attribute_id";
         String DRIVER_INFO_ID = "_driver_info_id";
         String POINT_INFO_ID = "_point_info_id";
         String GROUP_NAME = "_group_name";

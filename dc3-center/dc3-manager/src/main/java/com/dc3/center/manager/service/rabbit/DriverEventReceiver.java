@@ -16,7 +16,10 @@
 
 package com.dc3.center.manager.service.rabbit;
 
+import cn.hutool.core.convert.Convert;
+import com.dc3.center.manager.service.DriverService;
 import com.dc3.common.bean.driver.DriverEvent;
+import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
 import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
@@ -42,6 +45,8 @@ public class DriverEventReceiver {
 
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private DriverService driverService;
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverEventQueue.name}")
@@ -52,9 +57,9 @@ public class DriverEventReceiver {
                 log.error("Invalid driver event");
                 return;
             }
-            log.debug("Driver event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
 
             if (Common.Driver.Event.HEARTBEAT.equals(driverEvent.getType())) {
+                log.debug("Driver heartbeat event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
                 // Save driver heartbeat to Redis
                 redisUtil.setKey(
                         Common.Cache.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
@@ -62,6 +67,11 @@ public class DriverEventReceiver {
                         driverEvent.getTimeOut(),
                         driverEvent.getTimeUnit()
                 );
+            }
+
+            if (Common.Driver.Event.SYNC.equals(driverEvent.getType())) {
+                log.info("Driver sync driver metadata event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
+                driverService.syncDriverMetadata(Convert.convert(DriverRegister.class, driverEvent.getContent()));
             }
 
         } catch (IOException e) {

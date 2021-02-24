@@ -65,11 +65,8 @@ public class LabelServiceImpl implements LabelService {
             }
     )
     public Label add(Label label) {
-        try {
-            if (null != selectByName(label.getName())) {
-                throw new ServiceException("The label already exists");
-            }
-        } catch (Exception ignore) {
+        if (null != selectByName(label.getName())) {
+            throw new ServiceException("The label already exists");
         }
 
         if (labelMapper.insert(label) > 0) {

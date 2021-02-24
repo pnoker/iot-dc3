@@ -78,7 +78,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo update = driverInfoService.update(driverInfo);
             if (null != update) {
-                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.UPDATE, driverInfo);
+                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

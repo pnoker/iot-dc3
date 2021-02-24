@@ -20,7 +20,7 @@ import com.alibaba.fastjson.JSON;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.CustomDriverService;
 import com.dc3.common.sdk.service.DriverService;

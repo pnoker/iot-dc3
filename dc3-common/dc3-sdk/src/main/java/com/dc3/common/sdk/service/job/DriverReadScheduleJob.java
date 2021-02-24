@@ -16,7 +16,7 @@
 
 package com.dc3.common.sdk.service.job;
 
-import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverCommandService;
 import lombok.extern.slf4j.Slf4j;

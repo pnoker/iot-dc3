@@ -55,5 +55,5 @@ public class Dictionary {
     private String type;
 
     @TableField(exist = false)
-    private List<Dictionary> children = new ArrayList<>();
+    private List<Dictionary> children = new ArrayList<>(16);
 }
