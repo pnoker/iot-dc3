@@ -56,7 +56,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DIC, key = "'dirver_dic'", unless = "#result==null")
     public List<Dictionary> driverDictionary() {
-        List<Dictionary> dictionaryList = new ArrayList<>();
+        List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         List<Driver> driverList = driverMapper.selectList(queryWrapper);
         for (Driver driver : driverList) {
@@ -71,7 +71,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<Dictionary> driverAttributeDictionary() {
         List<Dictionary> driverDictionaryList = driverDictionary();
         for (Dictionary driverDictionary : driverDictionaryList) {
-            List<Dictionary> driverAttributeDictionaryList = new ArrayList<>();
+            List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
             LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
             queryWrapper.eq(DriverAttribute::getDriverId, driverDictionary.getValue());
             List<DriverAttribute> driverAttributeList = driverAttributeMapper.selectList(queryWrapper);
@@ -91,7 +91,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<Dictionary> pointAttributeDictionary() {
         List<Dictionary> driverDictionaryList = driverDictionary();
         for (Dictionary driverDictionary : driverDictionaryList) {
-            List<Dictionary> driverAttributeDictionaryList = new ArrayList<>();
+            List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
             LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
             queryWrapper.eq(PointAttribute::getDriverId, driverDictionary.getValue());
             List<PointAttribute> pointAttributeList = pointAttributeMapper.selectList(queryWrapper);
@@ -111,7 +111,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<Dictionary> profileDictionary() {
         List<Dictionary> driverDictionaryList = driverDictionary();
         for (Dictionary driverDictionary : driverDictionaryList) {
-            List<Dictionary> profileDictionaryList = new ArrayList<>();
+            List<Dictionary> profileDictionaryList = new ArrayList<>(16);
             LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
             queryWrapper.eq(Profile::getDriverId, driverDictionary.getValue());
             List<Profile> profileList = profileMapper.selectList(queryWrapper);
@@ -129,7 +129,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     @Cacheable(value = Common.Cache.GROUP + Common.Cache.DIC, key = "'group_dic'", unless = "#result==null")
     public List<Dictionary> groupDictionary() {
-        List<Dictionary> dictionaryList = new ArrayList<>();
+        List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         List<Group> groupList = groupMapper.selectList(queryWrapper);
         for (Group group : groupList) {
@@ -142,12 +142,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DIC, key = "'device_dic.'+#parent", unless = "#result==null")
     public List<Dictionary> deviceDictionary(String parent) {
-        List<Dictionary> dictionaryList = new ArrayList<>();
+        List<Dictionary> dictionaryList = new ArrayList<>(16);
         switch (parent) {
             case "group":
                 List<Dictionary> groupDictionaryList = groupDictionary();
                 for (Dictionary groupDictionary : groupDictionaryList) {
-                    List<Dictionary> deviceDictionaryList = new ArrayList<>();
+                    List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
                     queryWrapper.eq(Device::getGroupId, groupDictionary.getValue());
                     List<Device> deviceList = deviceMapper.selectList(queryWrapper);
@@ -165,7 +165,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                 List<Dictionary> driverDictionaryList = profileDictionary();
                 for (Dictionary driverDictionary : driverDictionaryList) {
                     for (Dictionary profileDictionary : driverDictionary.getChildren()) {
-                        List<Dictionary> deviceDictionaryList = new ArrayList<>();
+                        List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
                         queryWrapper.eq(Device::getProfileId, profileDictionary.getValue());
                         List<Device> deviceList = deviceMapper.selectList(queryWrapper);
@@ -181,11 +181,11 @@ public class DictionaryServiceImpl implements DictionaryService {
                 dictionaryList = driverDictionaryList;
                 break;
             case "profile":
-                List<Dictionary> profileDictionaryList = new ArrayList<>();
+                List<Dictionary> profileDictionaryList = new ArrayList<>(16);
                 List<Profile> profileList = profileMapper.selectList(Wrappers.<Profile>query().lambda());
                 for (Profile profile : profileList) {
                     Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profile.getId());
-                    List<Dictionary> deviceDictionaryList = new ArrayList<>();
+                    List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
                     queryWrapper.eq(Device::getProfileId, profileDictionary.getValue());
                     List<Device> deviceList = deviceMapper.selectList(queryWrapper);
@@ -209,14 +209,14 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.DIC, key = "'point_dic.'+#parent", unless = "#result==null")
     public List<Dictionary> pointDictionary(String parent) {
-        List<Dictionary> dictionaryList = new ArrayList<>();
+        List<Dictionary> dictionaryList = new ArrayList<>(16);
         switch (parent) {
             case "profile":
-                List<Dictionary> profileDictionaryList = new ArrayList<>();
+                List<Dictionary> profileDictionaryList = new ArrayList<>(16);
                 List<Profile> profileList = profileMapper.selectList(Wrappers.<Profile>query().lambda());
                 for (Profile profile : profileList) {
                     Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profile.getId());
-                    List<Dictionary> pointDictionaryList = new ArrayList<>();
+                    List<Dictionary> pointDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
                     queryWrapper.eq(Point::getProfileId, profile.getId());
                     List<Point> pointList = pointMapper.selectList(queryWrapper);
@@ -232,11 +232,11 @@ public class DictionaryServiceImpl implements DictionaryService {
                 dictionaryList = profileDictionaryList;
                 break;
             case "device":
-                List<Dictionary> deviceDictionaryList = new ArrayList<>();
+                List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                 List<Device> deviceList = deviceMapper.selectList(Wrappers.<Device>query().lambda());
                 for (Device device : deviceList) {
                     Dictionary deviceDictionary = new Dictionary().setLabel(device.getName()).setValue(device.getId());
-                    List<Dictionary> pointDictionaryList = new ArrayList<>();
+                    List<Dictionary> pointDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
                     queryWrapper.eq(Point::getProfileId, device.getProfileId());
                     List<Point> pointList = pointMapper.selectList(queryWrapper);

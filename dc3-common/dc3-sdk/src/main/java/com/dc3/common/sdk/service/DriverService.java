@@ -56,7 +56,7 @@ public class DriverService {
      */
     public String convertValue(Long deviceId, Long pointId, String rawValue) {
         String value;
-        Point point = driverContext.getDevicePoint(deviceId, pointId);
+        Point point = driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
         switch (point.getType()) {
             case Common.ValueType.STRING:
                 value = rawValue;

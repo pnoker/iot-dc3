@@ -43,12 +43,17 @@ public class BatchClientHystrix implements FallbackFactory<BatchClient> {
         return new BatchClient() {
 
             @Override
-            public R<Boolean> batchImportFile(MultipartFile multipartFile) {
+            public R<Boolean> batchImport(MultipartFile multipartFile) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> batchImportBatchDriver(List<BatchDriver> batchDrivers) {
+            public R<Boolean> batchImport(List<BatchDriver> batchDrivers) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<BatchDriver> batchExport(String serviceName) {
                 return R.fail(message);
             }
 

@@ -50,7 +50,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo add = pointInfoService.add(pointInfo);
             if (null != add) {
-                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, pointInfo);
+                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo update = pointInfoService.update(pointInfo);
             if (null != update) {
-                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.UPDATE, pointInfo);
+                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

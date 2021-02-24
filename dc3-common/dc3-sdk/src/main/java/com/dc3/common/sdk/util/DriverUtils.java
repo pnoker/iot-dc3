@@ -18,7 +18,7 @@ package com.dc3.common.sdk.util;
 
 import cn.hutool.core.convert.Convert;
 import com.dc3.common.constant.Common;
-import com.dc3.common.sdk.bean.AttributeInfo;
+import com.dc3.common.bean.driver.AttributeInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;

@@ -17,6 +17,7 @@
 package com.dc3.center.manager.service;
 
 import com.dc3.common.bean.batch.BatchDriver;
+import com.dc3.common.bean.driver.DriverMetadata;
 
 import java.util.List;
 
@@ -28,11 +29,26 @@ import java.util.List;
 public interface BatchService {
 
     /**
-     * 批量导入 All, 包含：驱动->模版->驱动配置->位号->设备->位号配置
+     * 批量导入, 包含：驱动->模版->驱动配置->位号->设备->位号配置
      *
      * @param batchDrivers List<BatchDriver>
-     * @return
      */
-    Boolean batchImport(List<BatchDriver> batchDrivers);
+    void batchImport(List<BatchDriver> batchDrivers);
+
+    /**
+     * 批量导出, 包含：驱动->模版->驱动配置->位号->设备->位号配置
+     *
+     * @param serviceName 驱动服务名称
+     * @return BatchDriver
+     */
+    BatchDriver batchExport(String serviceName);
+
+    /**
+     * 导出驱动元数据，包含：驱动配置、模版、设备、位号配置
+     *
+     * @param serviceName 驱动服务名称
+     * @return DriverMetadata
+     */
+    DriverMetadata exportDriverMetadata(String serviceName);
 
 }

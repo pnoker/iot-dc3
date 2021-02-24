@@ -20,18 +20,37 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.DriverInfoDto;
 import com.dc3.common.model.DriverInfo;
 
+import java.util.List;
+
 /**
  * <p>DriverInfo Interface
  *
  * @author pnoker
  */
 public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
+
     /**
-     * 根据模板属性配置 ID & 模板 ID 查询
+     * 根据模板属性配置 ID 和 模板 ID 查询
      *
-     * @param driverAttributeId
-     * @param profileId
-     * @return
+     * @param driverAttributeId Driver Attribute Id
+     * @param profileId         Profile Id
+     * @return DriverInfo
      */
-    DriverInfo selectByDriverAttributeId(Long driverAttributeId, Long profileId);
+    DriverInfo selectByAttributeIdAndProfileId(Long driverAttributeId, Long profileId);
+
+    /**
+     * 根据模板属性配置 ID 查询
+     *
+     * @param driverAttributeId Driver Attribute Id
+     * @return DriverInfo Array
+     */
+    List<DriverInfo> selectByAttributeId(Long driverAttributeId);
+
+    /**
+     * 根据模板 ID 查询
+     *
+     * @param profileId Profile Id
+     * @return DriverInfo Array
+     */
+    List<DriverInfo> selectByProfileId(Long profileId);
 }

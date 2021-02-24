@@ -20,6 +20,8 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
 
+import java.util.List;
+
 /**
  * <p>Point Interface
  *
@@ -32,7 +34,15 @@ public interface PointService extends Service<Point, PointDto> {
      *
      * @param name      Point Name
      * @param profileId Profile Id
-     * @return
+     * @return Point
      */
-    Point selectByNameAndProfile(String name, Long profileId);
+    Point selectByNameAndProfileId(String name, Long profileId);
+
+    /**
+     * 根据 模板 ID 查询
+     *
+     * @param profileId Profile Id
+     * @return Point Array
+     */
+    List<Point> selectByProfileId(Long profileId);
 }

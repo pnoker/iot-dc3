@@ -21,11 +21,10 @@ import com.dc3.common.bean.R;
 import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.constant.Common;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -37,21 +36,30 @@ import java.util.List;
 public interface BatchClient {
 
     /**
-     * 批量导入 All, 包含：驱动->模版->驱动配置->位号->设备->位号配置
+     * 批量导入，包含：驱动->模版->驱动配置->位号->设备->位号配置
      *
      * @param multipartFile MultipartFile
      * @return Boolean
      */
     @PostMapping("/import")
-    R<Boolean> batchImportFile(@RequestParam(value = "file") MultipartFile multipartFile);
+    R<Boolean> batchImport(@RequestParam(value = "file") MultipartFile multipartFile);
 
     /**
-     * 批量导入 All, 包含：驱动->模版->驱动配置->位号->设备->位号配置
+     * 批量导入，包含：驱动->模版->驱动配置->位号->设备->位号配置
      *
      * @param batchDrivers List<BatchDriver>
      * @return Boolean
      */
     @PostMapping("/import/batchDriver")
-    R<Boolean> batchImportBatchDriver(@RequestBody List<BatchDriver> batchDrivers);
+    R<Boolean> batchImport(@RequestBody List<BatchDriver> batchDrivers);
+
+    /**
+     * 批量导出，包含：驱动->模版->驱动配置->位号->设备->位号配置
+     *
+     * @param serviceName 驱动服务名称
+     * @return BatchDriver
+     */
+    @GetMapping("/export/{serviceName}")
+    R<BatchDriver> batchExport(@NotNull @PathVariable(value = "serviceName") String serviceName);
 
 }

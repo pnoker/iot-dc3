@@ -20,6 +20,8 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.PointAttributeDto;
 import com.dc3.common.model.PointAttribute;
 
+import java.util.List;
+
 /**
  * <p>PointAttribute Interface
  *
@@ -27,11 +29,19 @@ import com.dc3.common.model.PointAttribute;
  */
 public interface PointAttributeService extends Service<PointAttribute, PointAttributeDto> {
     /**
-     * 根据位号配置属性 NAME 查询
+     * 根据位号配置属性 NAME 和 驱动 ID 查询
      *
      * @param name
      * @param driverId
-     * @return
+     * @return PointAttribute
      */
     PointAttribute selectByNameAndDriverId(String name, Long driverId);
+
+    /**
+     * 根据驱动 ID 查询
+     *
+     * @param driverId
+     * @return PointAttribute Array
+     */
+    List<PointAttribute> selectByDriverId(Long driverId);
 }

@@ -16,12 +16,13 @@
 
 package com.dc3.common.sdk.service;
 
+import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.model.*;
 
 /**
  * @author pnoker
  */
-public interface DriverConfigurationService {
+public interface DriverMetadataService {
     /**
      * 初始化 SDK
      */
@@ -100,5 +101,12 @@ public interface DriverConfigurationService {
      * @param deviceId    Device Id
      */
     void deletePointInfo(Long pointId, Long attributeId, Long deviceId);
+
+    /**
+     * 同步驱动元数据
+     *
+     * @param driverMetadata DriverMetadata
+     */
+    void syncDriverMetadata(DriverMetadata driverMetadata);
 
 }

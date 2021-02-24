@@ -14,33 +14,26 @@
  * limitations under the License.
  */
 
-package com.dc3.center.manager.service;
+package com.dc3.common.bean.driver;
 
-import com.dc3.common.base.Service;
-import com.dc3.common.dto.ProfileDto;
-import com.dc3.common.model.Profile;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
- * <p>Profile Interface
+ * 属性配置
  *
  * @author pnoker
  */
-public interface ProfileService extends Service<Profile, ProfileDto> {
+@Data
+@AllArgsConstructor
+public class AttributeInfo {
     /**
-     * 根据模板 NAME 查询
-     *
-     * @param name
-     * @return Profile
+     * 值，string，需要通过type确定真实的数据类型
      */
-    Profile selectByName(String name);
+    private String value;
 
     /**
-     * 根据驱动 ID 查询
-     *
-     * @param driverId driver id
-     * @return Profile Array
+     * 类型，value type，用于确定value的真实类型
      */
-    List<Profile> selectByDriverId(Long driverId);
+    private String type;
 }

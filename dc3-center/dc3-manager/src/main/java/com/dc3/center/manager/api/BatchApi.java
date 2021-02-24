@@ -16,6 +16,7 @@
 
 package com.dc3.center.manager.api;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.dc3.api.center.manager.feign.BatchClient;
 import com.dc3.center.manager.service.BatchService;
@@ -46,12 +47,12 @@ public class BatchApi implements BatchClient {
 
 
     @Override
-    public R<Boolean> batchImportFile(MultipartFile multipartFile) {
+    public R<Boolean> batchImport(MultipartFile multipartFile) {
         try {
             if (multipartFile.isEmpty()) {
                 throw new ServiceException("Import file is empty");
             }
-            // Convert json file to ImportAll object
+            // Convert json file to BatchDriver Array
             List<BatchDriver> batchDrivers = JSON.parseArray(
                     Dc3Util.inputStreamToString(multipartFile.getInputStream()),
                     BatchDriver.class
@@ -59,22 +60,40 @@ public class BatchApi implements BatchClient {
             if (null == batchDrivers) {
                 throw new ServiceException("Import file is blank");
             }
-            return batchService.batchImport(batchDrivers) ? R.ok() : R.fail();
+            batchService.batchImport(batchDrivers);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     @Override
-    public R<Boolean> batchImportBatchDriver(List<BatchDriver> batchDrivers) {
+    public R<Boolean> batchImport(List<BatchDriver> batchDrivers) {
         try {
             if (null == batchDrivers) {
                 throw new ServiceException("Import file is blank");
             }
-            return batchService.batchImport(batchDrivers) ? R.ok() : R.fail();
+            batchService.batchImport(batchDrivers);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
+    }
+
+    @Override
+    public R<BatchDriver> batchExport(String serviceName) {
+        try {
+            if (StrUtil.hasBlank(serviceName)) {
+                throw new ServiceException("Export driver service name is blank");
+            }
+            BatchDriver batchDriver = batchService.batchExport(serviceName);
+            if (null != batchDriver) {
+                return R.ok(batchDriver);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
     }
 
 }

@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean.batch;
+package com.dc3.common.bean.driver;
 
+import com.dc3.common.model.Device;
+import com.dc3.common.model.DriverAttribute;
+import com.dc3.common.model.Point;
+import com.dc3.common.model.PointAttribute;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,20 +30,24 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
+ * Driver Metadata
+ *
  * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class BatchDevice implements Serializable {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class DriverMetadata implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String name;
-    private Boolean multi;
-
-    /**
-     * 仅当share为false的时候生效
-     */
-    private Map<String, Map<String, String>> pointConfig;
+    private Map<Long, DriverAttribute> driverAttributeMap;
+    private Map<Long, PointAttribute> pointAttributeMap;
+    private Map<Long, Map<String, AttributeInfo>> profileDriverInfoMap;
+    private Map<Long, Device> deviceMap;
+    private Map<String, Long> deviceNameMap;
+    private Map<Long, Map<Long, Point>> profilePointMap;
+    private Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap;
+    private Map<Long, Map<String, Long>> devicePointNameMap;
 }

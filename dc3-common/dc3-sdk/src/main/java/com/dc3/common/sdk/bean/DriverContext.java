@@ -16,9 +16,13 @@
 
 package com.dc3.common.sdk.bean;
 
+import com.dc3.common.bean.driver.AttributeInfo;
+import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
+import com.dc3.common.model.DriverAttribute;
 import com.dc3.common.model.Point;
+import com.dc3.common.model.PointAttribute;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,10 +38,27 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DriverContext {
 
-    private volatile long driverId;
+    /**
+     * 驱动 ID 注册成功之后返回
+     */
+    private volatile Long driverId;
+
+    private Map<Long, PointAttribute> pointAttributeMap;
+    private Map<Long, DriverAttribute> driverAttributeMap;
 
     /**
-     * profileId(driverAttribute.name,(drverInfo.value,driverAttribute.type))
+     * 驱动状态
+     * <ul>
+     * <li>ONLINE</li>
+     * <li>OFFLINE</li>
+     * <li>MAINTAIN</li>
+     * <li>FAULT</li>
+     * </ul>
+     */
+    private volatile String driverStatus = Common.Driver.Status.ONLINE;
+
+    /**
+     * profileId(driverAttribute.name,(driverInfo.value,driverAttribute.type))
      */
     private Map<Long, Map<String, AttributeInfo>> profileDriverInfoMap = new ConcurrentHashMap<>(16);
 
@@ -67,12 +88,12 @@ public class DriverContext {
     private Map<Long, Map<String, Long>> devicePointNameMap = new ConcurrentHashMap<>(16);
 
     /**
-     * 获取设备
+     * 通过 Device ID 获取设备
      *
      * @param deviceId Device ID
      * @return Device
      */
-    public Device getDevice(Long deviceId) {
+    public Device getDeviceByDeviceId(Long deviceId) {
         Device device = deviceMap.get(deviceId);
         if (null == device) {
             throw new ServiceException("Device(" + deviceId + ") does not exist");
@@ -86,7 +107,7 @@ public class DriverContext {
      * @param deviceName Device Name
      * @return Device ID
      */
-    public Long getDeviceIdByName(String deviceName) {
+    public Long getDeviceIdByDeviceName(String deviceName) {
         Long deviceId = deviceNameMap.get(deviceName);
         if (null == deviceId) {
             throw new ServiceException("Device(" + deviceName + ") does not exist");
@@ -95,14 +116,14 @@ public class DriverContext {
     }
 
     /**
-     * 获取设备位号
+     * 通过 Device ID & Point ID 获取设备位号
      *
      * @param deviceId Device ID
      * @param pointId  Point ID
      * @return Point
      */
-    public Point getDevicePoint(Long deviceId, Long pointId) {
-        Map<Long, Point> map = profilePointMap.get(getDevice(deviceId).getProfileId());
+    public Point getDevicePointByDeviceIdAndPointId(Long deviceId, Long pointId) {
+        Map<Long, Point> map = profilePointMap.get(getDeviceByDeviceId(deviceId).getProfileId());
         if (null == map) {
             throw new ServiceException("Device(" + deviceId + ") profile does not exist");
         }
@@ -120,7 +141,7 @@ public class DriverContext {
      * @param pointName Point Name
      * @return Device Point ID
      */
-    public Long getDevicePointIdByName(Long deviceId, String pointName) {
+    public Long getDevicePointIdByDeviceIdAndPointName(Long deviceId, String pointName) {
         Map<String, Long> map = devicePointNameMap.get(deviceId);
         if (null == map) {
             throw new ServiceException("Device(" + deviceId + ") does not exist");
@@ -138,7 +159,7 @@ public class DriverContext {
      * @param profileId Profile ID
      * @return Map<String, AttributeInfo>
      */
-    public Map<String, AttributeInfo> getProfileDriverInfo(Long profileId) {
+    public Map<String, AttributeInfo> getProfileDriverInfoByProfileId(Long profileId) {
         return profileDriverInfoMap.get(profileId);
     }
 
@@ -149,7 +170,7 @@ public class DriverContext {
      * @param pointId  Point ID
      * @return Map<String, AttributeInfo>
      */
-    public Map<String, AttributeInfo> getDevicePointInfo(Long deviceId, Long pointId) {
+    public Map<String, AttributeInfo> getDevicePointInfoByDeviceIdAndPointId(Long deviceId, Long pointId) {
         Map<Long, Map<String, AttributeInfo>> tmpMap = devicePointInfoMap.get(deviceId);
         if (null == tmpMap) {
             throw new ServiceException("Device(" + deviceId + ") does not exist");

@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-package com.dc3.common.dto;
+package com.dc3.common.bean.driver;
 
+import com.dc3.common.model.Driver;
+import com.dc3.common.model.DriverAttribute;
+import com.dc3.common.model.PointAttribute;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- *
  * @author pnoker
  */
 @Data
-public class NodeDto implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class DriverRegister implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected int id;
-    protected int parentId;
-    protected List<NodeDto> children = new ArrayList<>(16);
+    private Driver driver;
+    private List<DriverAttribute> driverAttributes;
+    private List<PointAttribute> pointAttributes;
 
-    public void add(NodeDto node) {
-        children.add(node);
-    }
 }

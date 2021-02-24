@@ -17,6 +17,7 @@
 package com.dc3.center.manager.service;
 
 import com.dc3.common.base.Service;
+import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.model.Driver;
 
@@ -68,4 +69,11 @@ public interface DriverService extends Service<Driver, DriverDto> {
      * @return Map<String, Boolean>
      */
     Map<String, Boolean> driverStatus(DriverDto driverDto);
+
+    /**
+     * 驱动元数据同步
+     *
+     * @param driverRegister DriverRegister
+     */
+    void syncDriverMetadata(DriverRegister driverRegister);
 }

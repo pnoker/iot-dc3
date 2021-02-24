@@ -35,6 +35,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -58,15 +59,13 @@ public class PointServiceImpl implements PointService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Point add(Point point) {
-        try {
-            if (null != selectByNameAndProfile(point.getName(), point.getProfileId())) {
-                throw new ServiceException("The point already exists in the profile");
-            }
-        } catch (Exception ignore) {
+        if (null != selectByNameAndProfileId(point.getName(), point.getProfileId())) {
+            throw new ServiceException("The point already exists in the profile");
         }
 
         if (pointMapper.insert(point) > 0) {
@@ -81,6 +80,7 @@ public class PointServiceImpl implements PointService {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -100,6 +100,7 @@ public class PointServiceImpl implements PointService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -111,7 +112,7 @@ public class PointServiceImpl implements PointService {
         point.setUpdateTime(null);
         Point selectById = pointMapper.selectById(point.getId());
         if (!selectById.getProfileId().equals(point.getProfileId()) || !selectById.getName().equals(point.getName())) {
-            Point select = selectByNameAndProfile(point.getName(), point.getProfileId());
+            Point select = selectByNameAndProfileId(point.getName(), point.getProfileId());
             if (null != select) {
                 throw new ServiceException("The point already exists");
             }
@@ -136,7 +137,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.NAME, key = "#profileId+'.'+#name", unless = "#result==null")
-    public Point selectByNameAndProfile(String name, Long profileId) {
+    public Point selectByNameAndProfileId(String name, Long profileId) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         queryWrapper.eq(Point::getName, name);
         queryWrapper.eq(Point::getProfileId, profileId);
@@ -145,6 +146,18 @@ public class PointServiceImpl implements PointService {
             throw new ServiceException("The point does not exist");
         }
         return point;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
+    public List<Point> selectByProfileId(Long profileId) {
+        LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
+        queryWrapper.eq(Point::getProfileId, profileId);
+        List<Point> points = pointMapper.selectList(queryWrapper);
+        if (null == points) {
+            throw new ServiceException("The points does not exist");
+        }
+        return points;
     }
 
     @Override

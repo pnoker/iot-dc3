@@ -20,6 +20,7 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,7 +37,15 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      * @param groupId Device Group Id
      * @return Device
      */
-    Device selectDeviceByNameAndGroup(String name, Long groupId);
+    Device selectDeviceByNameAndGroupId(String name, Long groupId);
+
+    /**
+     * 根据模版 ID 查询
+     *
+     * @param profileId Profile Id
+     * @return Device Array
+     */
+    List<Device> selectDeviceByProfileId(Long profileId);
 
     /**
      * 查询 Device 服务状态

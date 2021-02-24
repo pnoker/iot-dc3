@@ -24,6 +24,7 @@ import com.dc3.center.manager.service.DriverAttributeService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverAttributeDto;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -56,15 +58,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public DriverAttribute add(DriverAttribute driverAttribute) {
-        try {
-            if (null != selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId())) {
-                throw new ServiceException("The driver attribute already exists");
-            }
-        } catch (Exception ignore) {
+        if (null != selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId())) {
+            throw new ServiceException("The driver attribute already exists");
         }
 
         if (driverAttributeMapper.insert(driverAttribute) > 0) {
@@ -79,6 +79,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -98,6 +99,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -136,6 +138,18 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             throw new ServiceException("The driver attribute does not exist");
         }
         return driverAttribute;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
+    public List<DriverAttribute> selectByDriverId(Long driverId) {
+        LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
+        queryWrapper.eq(DriverAttribute::getDriverId, driverId);
+        List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(queryWrapper);
+        if (null == driverAttributes || driverAttributes.size() < 1) {
+            throw new NotFoundException("The driver attributes does not exist");
+        }
+        return driverAttributes;
     }
 
     @Override

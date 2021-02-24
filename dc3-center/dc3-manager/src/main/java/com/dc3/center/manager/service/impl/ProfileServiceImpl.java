@@ -29,6 +29,7 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.dto.ProfileDto;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
@@ -42,6 +43,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -70,15 +72,13 @@ public class ProfileServiceImpl implements ProfileService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Profile add(Profile profile) {
-        try {
-            if (null != selectByName(profile.getName())) {
-                throw new ServiceException("The profile already exists");
-            }
-        } catch (Exception ignore) {
+        if (null != selectByName(profile.getName())) {
+            throw new ServiceException("The profile already exists");
         }
 
         // Check if the driver exists
@@ -97,6 +97,7 @@ public class ProfileServiceImpl implements ProfileService {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -129,6 +130,7 @@ public class ProfileServiceImpl implements ProfileService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -166,6 +168,18 @@ public class ProfileServiceImpl implements ProfileService {
             throw new ServiceException("The profile does not exist");
         }
         return profile;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
+    public List<Profile> selectByDriverId(Long driverId) {
+        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
+        queryWrapper.eq(Profile::getDriverId, driverId);
+        List<Profile> profiles = profileMapper.selectList(queryWrapper);
+        if (null == profiles || profiles.size() < 1) {
+            throw new NotFoundException("The profiles does not exist");
+        }
+        return profiles;
     }
 
     @Override

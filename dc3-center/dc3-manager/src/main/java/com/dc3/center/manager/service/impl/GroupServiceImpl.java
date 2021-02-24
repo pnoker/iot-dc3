@@ -65,11 +65,8 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public Group add(Group group) {
-        try {
-            if (null != selectByName(group.getName())) {
-                throw new ServiceException("The device group already exists");
-            }
-        } catch (Exception ignore) {
+        if (null != selectByName(group.getName())) {
+            throw new ServiceException("The device group already exists");
         }
 
         if (groupMapper.insert(group) > 0) {

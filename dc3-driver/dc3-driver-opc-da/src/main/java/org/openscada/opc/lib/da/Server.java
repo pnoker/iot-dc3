@@ -67,7 +67,7 @@ public class Server {
 
     private ErrorMessageResolver errorMessageResolver;
 
-    private final Map<Integer, Group> groups = new HashMap<>();
+    private final Map<Integer, Group> groups = new HashMap<>(16);
 
     private final List<ServerConnectionStateListener> stateListeners = new CopyOnWriteArrayList<>();
 

@@ -18,6 +18,7 @@ package com.dc3.common.sdk.service.job;
 
 import com.dc3.common.bean.driver.DriverEvent;
 import com.dc3.common.constant.Common;
+import com.dc3.common.sdk.bean.DriverContext;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -41,11 +42,13 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
     @Value("${spring.application.name}")
     private String serviceName;
     @Resource
+    private DriverContext driverContext;
+    @Resource
     private RabbitTemplate rabbitTemplate;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        DriverEvent driverEvent = new DriverEvent(serviceName, Common.Driver.Event.HEARTBEAT, Common.Driver.Status.ONLINE, 10, TimeUnit.SECONDS);
+        DriverEvent driverEvent = new DriverEvent(serviceName, Common.Driver.Event.HEARTBEAT, driverContext.getDriverStatus(), 10, TimeUnit.SECONDS);
         rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName, driverEvent);
     }
 }
