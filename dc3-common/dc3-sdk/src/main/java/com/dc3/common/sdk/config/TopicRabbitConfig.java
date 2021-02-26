@@ -69,7 +69,7 @@ public class TopicRabbitConfig {
 
     @Bean
     Queue driverConfigurationQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DRIVER_CONFIGURATION_PREFIX + this.serviceName, false, false, true);
+        return new Queue(Common.Rabbit.QUEUE_DRIVER_CONFIGURATION_PREFIX + this.serviceName, false, false, false);
     }
 
     @Bean

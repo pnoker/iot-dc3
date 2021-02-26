@@ -70,7 +70,7 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    Binding deviceStatusBinding() {
+    Binding deviceEventBinding() {
         return BindingBuilder
                 .bind(deviceEventQueue())
                 .to(eventExchange())

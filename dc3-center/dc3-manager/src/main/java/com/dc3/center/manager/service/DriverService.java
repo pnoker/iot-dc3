@@ -75,5 +75,5 @@ public interface DriverService extends Service<Driver, DriverDto> {
      *
      * @param driverRegister DriverRegister
      */
-    void syncDriverMetadata(DriverRegister driverRegister);
+    void driverRegister(DriverRegister driverRegister);
 }

@@ -17,18 +17,16 @@
 package com.dc3.common.sdk.bean;
 
 import com.dc3.common.bean.driver.AttributeInfo;
+import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
-import com.dc3.common.model.DriverAttribute;
 import com.dc3.common.model.Point;
-import com.dc3.common.model.PointAttribute;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author pnoker
@@ -39,66 +37,32 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DriverContext {
 
     /**
-     * 驱动 ID 注册成功之后返回
+     * 驱动 ID ，当且仅当驱动注册成功之后由 Manager 返回
      */
-    private volatile Long driverId;
-
-    private Map<Long, PointAttribute> pointAttributeMap;
-    private Map<Long, DriverAttribute> driverAttributeMap;
+    private Long driverId;
 
     /**
-     * 驱动状态
-     * <ul>
-     * <li>ONLINE</li>
-     * <li>OFFLINE</li>
-     * <li>MAINTAIN</li>
-     * <li>FAULT</li>
-     * </ul>
+     * 驱动 元数据，当且仅当驱动注册成功之后由 Manager 返回
      */
-    private volatile String driverStatus = Common.Driver.Status.ONLINE;
+    private DriverMetadata driverMetadata;
 
     /**
-     * profileId(driverAttribute.name,(driverInfo.value,driverAttribute.type))
+     * 驱动 状态，默认为 未注册 状态
      */
-    private Map<Long, Map<String, AttributeInfo>> profileDriverInfoMap = new ConcurrentHashMap<>(16);
+    private String driverStatus = Common.Driver.Status.UNREGISTERED;
+
+    public synchronized void setDriverStatus(String driverStatus) {
+        this.driverStatus = driverStatus;
+    }
 
     /**
-     * profileId,(pointId,point)
-     */
-    private Map<Long, Map<Long, Point>> profilePointMap = new ConcurrentHashMap<>(16);
-
-    /**
-     * deviceId,device
-     */
-    private Map<Long, Device> deviceMap = new ConcurrentHashMap<>(16);
-
-    /**
-     * deviceName,deviceId
-     */
-    private Map<String, Long> deviceNameMap = new ConcurrentHashMap<>(16);
-
-    /**
-     * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
-     */
-    private Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap = new ConcurrentHashMap<>(16);
-
-    /**
-     * deviceId(pointName,pointId)
-     */
-    private Map<Long, Map<String, Long>> devicePointNameMap = new ConcurrentHashMap<>(16);
-
-    /**
-     * 通过 Device ID 获取设备
+     * 通过模版 ID 获取驱动配置信息
      *
-     * @param deviceId Device ID
-     * @return Device
+     * @param profileId Profile ID
+     * @return Map<String, AttributeInfo>
      */
-    public Device getDeviceByDeviceId(Long deviceId) {
-        Device device = deviceMap.get(deviceId);
-        if (null == device) {
-            throw new ServiceException("Device(" + deviceId + ") does not exist");
-        }
-        return device;
+    public Map<String, AttributeInfo> getProfileDriverInfoByProfileId(Long profileId) {
+        return this.driverMetadata.getProfileDriverInfoMap().get(profileId);
     }
 
     /**
@@ -108,7 +72,7 @@ public class DriverContext {
      * @return Device ID
      */
     public Long getDeviceIdByDeviceName(String deviceName) {
-        Long deviceId = deviceNameMap.get(deviceName);
+        Long deviceId = driverMetadata.getDeviceNameMap().get(deviceName);
         if (null == deviceId) {
             throw new ServiceException("Device(" + deviceName + ") does not exist");
         }
@@ -116,14 +80,28 @@ public class DriverContext {
     }
 
     /**
-     * 通过 Device ID & Point ID 获取设备位号
+     * 通过设备 ID 获取设备
+     *
+     * @param deviceId Device ID
+     * @return Device
+     */
+    public Device getDeviceByDeviceId(Long deviceId) {
+        Device device = this.driverMetadata.getDeviceMap().get(deviceId);
+        if (null == device) {
+            throw new ServiceException("Device(" + deviceId + ") does not exist");
+        }
+        return device;
+    }
+
+    /**
+     * 通过 Device ID & Point ID 获取位号
      *
      * @param deviceId Device ID
      * @param pointId  Point ID
      * @return Point
      */
     public Point getDevicePointByDeviceIdAndPointId(Long deviceId, Long pointId) {
-        Map<Long, Point> map = profilePointMap.get(getDeviceByDeviceId(deviceId).getProfileId());
+        Map<Long, Point> map = driverMetadata.getProfilePointMap().get(getDeviceByDeviceId(deviceId).getProfileId());
         if (null == map) {
             throw new ServiceException("Device(" + deviceId + ") profile does not exist");
         }
@@ -142,7 +120,7 @@ public class DriverContext {
      * @return Device Point ID
      */
     public Long getDevicePointIdByDeviceIdAndPointName(Long deviceId, String pointName) {
-        Map<String, Long> map = devicePointNameMap.get(deviceId);
+        Map<String, Long> map = driverMetadata.getDevicePointNameMap().get(deviceId);
         if (null == map) {
             throw new ServiceException("Device(" + deviceId + ") does not exist");
         }
@@ -154,24 +132,14 @@ public class DriverContext {
     }
 
     /**
-     * 获取 驱动信息
-     *
-     * @param profileId Profile ID
-     * @return Map<String, AttributeInfo>
-     */
-    public Map<String, AttributeInfo> getProfileDriverInfoByProfileId(Long profileId) {
-        return profileDriverInfoMap.get(profileId);
-    }
-
-    /**
-     * 通过 Device Id & Point Id 获取设备位号配置信息
+     * 通过 Device Id & Point Id 获取位号配置信息
      *
      * @param deviceId Device ID
      * @param pointId  Point ID
      * @return Map<String, AttributeInfo>
      */
     public Map<String, AttributeInfo> getDevicePointInfoByDeviceIdAndPointId(Long deviceId, Long pointId) {
-        Map<Long, Map<String, AttributeInfo>> tmpMap = devicePointInfoMap.get(deviceId);
+        Map<Long, Map<String, AttributeInfo>> tmpMap = driverMetadata.getDevicePointInfoMap().get(deviceId);
         if (null == tmpMap) {
             throw new ServiceException("Device(" + deviceId + ") does not exist");
         }

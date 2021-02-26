@@ -60,7 +60,7 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    TopicExchange driverEventExchange() {
+    TopicExchange eventExchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
     }
 
@@ -73,7 +73,7 @@ public class TopicRabbitConfig {
     Binding driverEventBinding() {
         return BindingBuilder
                 .bind(driverEventQueue())
-                .to(driverEventExchange())
+                .to(eventExchange())
                 .with(Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + "*");
     }
 

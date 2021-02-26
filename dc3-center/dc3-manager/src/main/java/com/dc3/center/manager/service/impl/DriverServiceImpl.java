@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DriverMapper;
 import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverDto;
@@ -33,7 +32,6 @@ import com.dc3.common.model.*;
 import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -75,8 +73,6 @@ public class DriverServiceImpl implements DriverService {
     private ProfileService profileService;
     @Resource
     private DriverMapper driverMapper;
-    @Resource
-    private RabbitTemplate rabbitTemplate;
 
     @Override
     @Caching(
@@ -235,16 +231,17 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void syncDriverMetadata(DriverRegister driverRegister) {
+    public void driverRegister(DriverRegister driverRegister) {
         // register driver
         Driver driver = driverRegister.getDriver();
+        log.info("Register driver {}", driver);
         try {
             Driver byServiceName = driverService.selectByServiceName(driver.getServiceName());
-            log.info("Driver already registered, updating {} ", driver);
+            log.debug("Driver already registered, updating {} ", driver);
             driver.setId(byServiceName.getId());
             driver = driverService.update(driver);
         } catch (NotFoundException notFoundException1) {
-            log.info("Driver does not registered, adding {} ", driver);
+            log.debug("Driver does not registered, adding {} ", driver);
             try {
                 Driver byHostPort = driverService.selectByHostPort(driver.getHost(), driver.getPort());
                 throw new ServiceException("The port(" + driver.getPort() + ") is already occupied by driver(" + byHostPort.getName() + "/" + byHostPort.getServiceName() + ")");
@@ -270,10 +267,10 @@ public class DriverServiceImpl implements DriverService {
             DriverAttribute info = newDriverAttributeMap.get(name).setDriverId(driver.getId());
             if (oldDriverAttributeMap.containsKey(name)) {
                 info.setId(oldDriverAttributeMap.get(name).getId());
-                log.info("Driver attribute registered, updating: {}", info);
+                log.debug("Driver attribute registered, updating: {}", info);
                 driverAttributeService.update(info);
             } else {
-                log.info("Driver attribute does not registered, adding: {}", info);
+                log.debug("Driver attribute does not registered, adding: {}", info);
                 driverAttributeService.add(info);
             }
         }
@@ -284,7 +281,7 @@ public class DriverServiceImpl implements DriverService {
                     driverInfoService.selectByAttributeId(oldDriverAttributeMap.get(name).getId());
                     throw new ServiceException("The driver attribute(" + name + ") used by driver info and cannot be deleted");
                 } catch (NotFoundException notFoundException) {
-                    log.info("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
+                    log.debug("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
                     driverAttributeService.delete(oldDriverAttributeMap.get(name).getId());
                 }
             }
@@ -307,10 +304,10 @@ public class DriverServiceImpl implements DriverService {
             PointAttribute attribute = newPointAttributeMap.get(name).setDriverId(driver.getId());
             if (oldPointAttributeMap.containsKey(name)) {
                 attribute.setId(oldPointAttributeMap.get(name).getId());
-                log.info("Point attribute registered, updating: {}", attribute);
+                log.debug("Point attribute registered, updating: {}", attribute);
                 pointAttributeService.update(attribute);
             } else {
-                log.info("Point attribute registered, adding: {}", attribute);
+                log.debug("Point attribute registered, adding: {}", attribute);
                 pointAttributeService.add(attribute);
             }
         }
@@ -321,23 +318,11 @@ public class DriverServiceImpl implements DriverService {
                     pointInfoService.selectByAttributeId(oldPointAttributeMap.get(name).getId());
                     throw new ServiceException("The point attribute(" + name + ") used by point info and cannot be deleted");
                 } catch (NotFoundException notFoundException1) {
-                    log.info("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));
+                    log.debug("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));
                     pointAttributeService.delete(oldPointAttributeMap.get(name).getId());
                 }
             }
         }
-
-        DriverConfiguration driverConfiguration = new DriverConfiguration(
-                Common.Driver.Type.METADATA,
-                Common.Driver.Metadata.INIT,
-                batchService.exportDriverMetadata(driver.getServiceName())
-        );
-
-        rabbitTemplate.convertAndSend(
-                Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION,
-                Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + driver.getServiceName(),
-                driverConfiguration
-        );
     }
 
     @Override

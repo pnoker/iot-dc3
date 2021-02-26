@@ -26,6 +26,8 @@ import com.dc3.common.sdk.bean.DriverContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,6 +47,8 @@ public class DriverService {
     private DriverContext driverContext;
     @Resource
     private RabbitTemplate rabbitTemplate;
+    @Resource
+    private ApplicationContext applicationContext;
 
     /**
      * 将位号原始值进行处理和转换
@@ -73,12 +77,12 @@ public class DriverService {
                     double temp = (Convert.convert(Double.class, rawValue.trim()) + base) * multiple;
                     if (null != point.getMinimum() && temp < point.getMinimum()) {
                         log.info("Device({}) point({}) value({}) is lower than lower limit({})", deviceId, pointId, temp, point.getMinimum());
-                        deviceEventSender(deviceId, pointId, Common.Device.Event.LIMIT,
+                        deviceEventSender(deviceId, pointId, Common.Device.Event.OVER_LOWER_LIMIT,
                                 String.format("Value(%s) is lower than lower limit %s", temp, point.getMinimum()));
                     }
                     if (null != point.getMaximum() && temp > point.getMaximum()) {
                         log.info("Device({}) point({}) value({}) is greater than upper limit({})", deviceId, pointId, temp, point.getMaximum());
-                        deviceEventSender(deviceId, pointId, Common.Device.Event.LIMIT,
+                        deviceEventSender(deviceId, pointId, Common.Device.Event.OVER_UPPER_LIMIT,
                                 String.format("Value(%s) is greater than upper limit %s", temp, point.getMaximum()));
                     }
                     value = String.format(point.getFormat(), temp);
@@ -152,6 +156,14 @@ public class DriverService {
      */
     public void pointValueSender(List<PointValue> pointValues) {
         pointValues.forEach(this::pointValueSender);
+    }
+
+    /**
+     * Close ApplicationContext
+     */
+    public void close() {
+        ((ConfigurableApplicationContext) applicationContext).close();
+        System.exit(1);
     }
 
 }

@@ -23,6 +23,7 @@ import com.dc3.common.model.*;
  * @author pnoker
  */
 public interface DriverMetadataService {
+
     /**
      * 初始化 SDK
      */
@@ -101,12 +102,4 @@ public interface DriverMetadataService {
      * @param deviceId    Device Id
      */
     void deletePointInfo(Long pointId, Long attributeId, Long deviceId);
-
-    /**
-     * 同步驱动元数据
-     *
-     * @param driverMetadata DriverMetadata
-     */
-    void syncDriverMetadata(DriverMetadata driverMetadata);
-
 }

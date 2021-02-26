@@ -17,8 +17,11 @@
 package com.dc3.center.manager.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
+import com.dc3.center.manager.service.BatchService;
 import com.dc3.center.manager.service.DriverService;
+import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverEvent;
+import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
 import com.dc3.common.utils.RedisUtil;
@@ -28,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -46,7 +50,11 @@ public class DriverEventReceiver {
     @Resource
     private RedisUtil redisUtil;
     @Resource
+    private BatchService batchService;
+    @Resource
     private DriverService driverService;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverEventQueue.name}")
@@ -57,9 +65,50 @@ public class DriverEventReceiver {
                 log.error("Invalid driver event");
                 return;
             }
+            log.debug("Driver {} event, From: {}, Event: {}", driverEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(),driverEvent);
+
+            if (Common.Driver.Event.CHECK_MANAGER_VALID.equals(driverEvent.getType())) {
+                String back = Common.Driver.Status.REGISTERING;
+                try {
+                    DriverRegister driverRegister = Convert.convert(DriverRegister.class, driverEvent.getContent());
+                    driverService.driverRegister(driverRegister);
+                } catch (Exception e) {
+                    back = e.getMessage();
+                }
+
+                rabbitTemplate.convertAndSend(
+                        Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION,
+                        Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + driverEvent.getServiceName(),
+                        new DriverConfiguration(
+                                Common.Driver.Type.DRIVER,
+                                Common.Driver.CHECK_MANAGER_VALID_BACK,
+                                back
+                        )
+                );
+            }
+
+            if (Common.Driver.Event.SYNC_DRIVER_METADATA.equals(driverEvent.getType())) {
+                String back = Common.Driver.Status.ONLINE;
+                DriverMetadata driverMetadata = null;
+                try {
+                    driverMetadata = batchService.batchDriverMetadata(driverEvent.getServiceName());
+                } catch (Exception e) {
+                    back = e.getMessage();
+                }
+
+                rabbitTemplate.convertAndSend(
+                        Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION,
+                        Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + driverEvent.getServiceName(),
+                        new DriverConfiguration(
+                                Common.Driver.Type.DRIVER,
+                                Common.Driver.SYNC_DRIVER_METADATA_BACK,
+                                driverMetadata,
+                                back
+                        )
+                );
+            }
 
             if (Common.Driver.Event.HEARTBEAT.equals(driverEvent.getType())) {
-                log.debug("Driver heartbeat event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
                 // Save driver heartbeat to Redis
                 redisUtil.setKey(
                         Common.Cache.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
@@ -68,12 +117,6 @@ public class DriverEventReceiver {
                         driverEvent.getTimeUnit()
                 );
             }
-
-            if (Common.Driver.Event.SYNC.equals(driverEvent.getType())) {
-                log.info("Driver sync driver metadata event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
-                driverService.syncDriverMetadata(Convert.convert(DriverRegister.class, driverEvent.getContent()));
-            }
-
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

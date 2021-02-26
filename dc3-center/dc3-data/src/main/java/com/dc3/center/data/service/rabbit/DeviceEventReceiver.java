@@ -32,8 +32,7 @@ import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * 接收驱动发送过来的设备事件数据
- * 其中包括：设备心跳事件、在线、离线、故障等其他事件
+ * 接收驱动发送过来的设备事件
  *
  * @author pnoker
  */
@@ -57,7 +56,7 @@ public class DeviceEventReceiver {
                 log.error("Invalid device event: {}", deviceEvent);
                 return;
             }
-            log.debug("Device event, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
+            log.debug("Device {} event, From: {}, Event: {}", deviceEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
 
             if (Common.Device.Event.HEARTBEAT.equals(deviceEvent.getType())) {
                 // Save device heartbeat to Redis

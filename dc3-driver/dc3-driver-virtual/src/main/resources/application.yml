@@ -4,10 +4,10 @@ driver:
   schedule:
     read:
       enable: true
-      corn: '0/5 * * * * ?'
+      corn: '0/1 * * * * ?'
     custom:
       enable: true
-      corn:  '0/5 * * * * ?'
+      corn: '0/5 * * * * ?'
   driver-attribute:
     - displayName: 主机
       name: host
@@ -36,5 +36,8 @@ spring:
 logging:
   level:
     com.dc3: DEBUG
+    com.dc3.common.sdk.service: INFO
+    com.dc3.common.sdk.service.job: INFO
+    com.dc3.common.sdk.service.rabbit: INFO
   file:
     name: dc3/logs/driver/virtual/${spring.application.name}.log
