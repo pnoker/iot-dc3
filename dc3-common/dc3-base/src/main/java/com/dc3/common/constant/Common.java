@@ -90,14 +90,18 @@ public interface Common {
      */
     interface Driver {
         int MAX_REQUEST_SIZE = 100;
+        String CHECK_MANAGER_VALID_BACK = "register_driver";
+        String SYNC_DRIVER_METADATA_BACK = "sync_driver_metadata";
 
         /**
          * 设备状态
          */
         interface Status {
+            String REGISTERING = "REGISTERING";
+            String UNREGISTERED = "UNREGISTERED";
+
             String ONLINE = "ONLINE";
             String OFFLINE = "OFFLINE";
-            String MAINTAIN = "MAINTAIN";
             String FAULT = "FAULT";
         }
 
@@ -105,10 +109,12 @@ public interface Common {
          * 驱动事件
          */
         interface Event {
+            String CHECK_MANAGER_VALID = "check_manager";
+
             /**
              * 驱动元数据同步事件
              */
-            String SYNC = "sync_driver_metadata";
+            String SYNC_DRIVER_METADATA = "sync_driver_metadata";
 
             /**
              * 驱动心跳事件
@@ -117,12 +123,12 @@ public interface Common {
         }
 
         interface Type {
+            String DRIVER = "driver";
             String PROFILE = "profile";
             String DEVICE = "device";
             String POINT = "point";
             String DRIVER_INFO = "driver_info";
             String POINT_INFO = "point_info";
-            String METADATA = "driver_metadata";
         }
 
         interface Profile {
@@ -154,11 +160,6 @@ public interface Common {
             String DELETE = "delete_point_info";
             String UPDATE = "update_point_info";
         }
-
-        interface Metadata {
-            String INIT = "init_driver_metadata";
-            String SYNC = "sync_driver_metadata";
-        }
     }
 
     /**
@@ -183,22 +184,22 @@ public interface Common {
             /**
              * 设备心跳事件
              */
-            String HEARTBEAT = "HEARTBEAT";
+            String HEARTBEAT = "heartbeat";
 
             /**
-             * 设备状态事件
+             * 超出上限事件
              */
-            String STATUS = "STATUS";
+            String OVER_UPPER_LIMIT = "over_upper_limit";
 
             /**
-             * 用于记录设备位号值超出上下限、类型错误、不满足位号处理条件等事件类型
+             * 超出下限事件
              */
-            String LIMIT = "LIMIT";
+            String OVER_LOWER_LIMIT = "over_lower_limit";
 
             /**
              * 用于记录错误事件类型
              */
-            String ERROR = "ERROR";
+            String ERROR = "error";
         }
     }
 

@@ -20,7 +20,7 @@
     <parent>
         <artifactId>iot-dc3</artifactId>
         <groupId>com.dc3</groupId>
-        <version>1.2.1</version>
+        <version>1.2.2.SR</version>
     </parent>
 
     <artifactId>dc3-gateway</artifactId>

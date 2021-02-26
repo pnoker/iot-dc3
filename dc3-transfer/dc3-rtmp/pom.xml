@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-transfer</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.2.SR</version>
     </parent>
 
     <artifactId>dc3-rtmp</artifactId>

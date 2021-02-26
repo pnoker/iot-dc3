@@ -90,7 +90,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
         List<PointValue> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyTcpServerHandler.driverContext.getDevicePointInfoMap().get(deviceId);
+        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyTcpServerHandler.driverContext.getDriverMetadata().getDevicePointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
             Point point = nettyTcpServerHandler.driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);

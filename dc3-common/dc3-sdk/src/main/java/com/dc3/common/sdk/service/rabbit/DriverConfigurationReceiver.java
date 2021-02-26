@@ -22,7 +22,9 @@ import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.*;
+import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverMetadataService;
+import com.dc3.common.sdk.service.DriverService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -43,19 +45,55 @@ import javax.annotation.Resource;
 public class DriverConfigurationReceiver {
 
     @Resource
+    private DriverContext driverContext;
+    @Resource
+    private DriverService driverService;
+    @Resource
     private DriverMetadataService driverMetadataService;
+
+    /**
+     * 配置 driver
+     *
+     * @param command             操作类型
+     * @param driverConfiguration DriverConfiguration
+     */
+    private void configurationDriver(String command, DriverConfiguration driverConfiguration) {
+        if (Common.Driver.CHECK_MANAGER_VALID_BACK.equals(command)) {
+            String back = Convert.convert(String.class, driverConfiguration.getContent());
+            if (Common.Driver.Status.REGISTERING.equals(back)) {
+                driverContext.setDriverStatus(back);
+            } else {
+                log.error("Driver registration failed, {}", back);
+                driverService.close();
+            }
+        }
+
+        if (Common.Driver.SYNC_DRIVER_METADATA_BACK.equals(command)) {
+            if (null == driverConfiguration.getContent()) {
+                log.error("Driver registration failed, {}", driverConfiguration.getMessage());
+                driverService.close();
+            }
+            DriverMetadata driverMetadata = Convert.convert(DriverMetadata.class, driverConfiguration.getContent());
+            driverContext.setDriverMetadata(driverMetadata);
+            driverContext.setDriverStatus(driverConfiguration.getMessage());
+            log.debug("Driver registration is successful, synchronize driver metadata \n{}", JSON.toJSONString(driverMetadata, true));
+        }
+    }
 
     /**
      * 配置 driver profile，增删改
      *
-     * @param command 操作类型
-     * @param profile Profile
+     * @param command             操作类型
+     * @param driverConfiguration DriverConfiguration
      */
-    private void configurationProfile(String command, Profile profile) {
+    private void configurationProfile(String command, DriverConfiguration driverConfiguration) {
+        Profile profile = Convert.convert(Profile.class, driverConfiguration.getContent());
         if (Common.Driver.Profile.ADD.equals(command) || Common.Driver.Profile.UPDATE.equals(command)) {
+            log.debug("Upsert profile \n{}", JSON.toJSONString(profile, true));
             driverMetadataService.upsertProfile(profile);
         }
         if (Common.Driver.Profile.DELETE.equals(command)) {
+            log.debug("Delete profile {}", profile.getName());
             driverMetadataService.deleteProfile(profile.getId());
         }
     }
@@ -63,14 +101,17 @@ public class DriverConfigurationReceiver {
     /**
      * 配置 driver device，增删改
      *
-     * @param command 操作类型
-     * @param device  Device
+     * @param command             操作类型
+     * @param driverConfiguration DriverConfiguration
      */
-    private void configurationDevice(String command, Device device) {
+    private void configurationDevice(String command, DriverConfiguration driverConfiguration) {
+        Device device = Convert.convert(Device.class, driverConfiguration.getContent());
         if (Common.Driver.Device.ADD.equals(command) || Common.Driver.Device.UPDATE.equals(command)) {
+            log.debug("Upsert device \n{}", JSON.toJSONString(device, true));
             driverMetadataService.upsertDevice(device);
         }
         if (Common.Driver.Device.DELETE.equals(command)) {
+            log.debug("Delete device {}", device.getName());
             driverMetadataService.deleteDevice(device.getId());
         }
     }
@@ -78,14 +119,17 @@ public class DriverConfigurationReceiver {
     /**
      * 配置 driver point，增删改
      *
-     * @param command 操作类型
-     * @param point   Point
+     * @param command             操作类型
+     * @param driverConfiguration DriverConfiguration
      */
-    private void configurationPoint(String command, Point point) {
+    private void configurationPoint(String command, DriverConfiguration driverConfiguration) {
+        Point point = Convert.convert(Point.class, driverConfiguration.getContent());
         if (Common.Driver.Point.ADD.equals(command) || Common.Driver.Point.UPDATE.equals(command)) {
+            log.debug("Upsert point \n{}", JSON.toJSONString(point, true));
             driverMetadataService.upsertPoint(point);
         }
         if (Common.Driver.Point.DELETE.equals(command)) {
+            log.debug("Delete point {}", point.getName());
             driverMetadataService.deletePoint(point.getId(), point.getProfileId());
         }
     }
@@ -93,14 +137,17 @@ public class DriverConfigurationReceiver {
     /**
      * 配置 driver info，增删改
      *
-     * @param command    操作类型
-     * @param driverInfo DriverInfo
+     * @param command             操作类型
+     * @param driverConfiguration DriverConfiguration
      */
-    private void configurationDriverInfo(String command, DriverInfo driverInfo) {
+    private void configurationDriverInfo(String command, DriverConfiguration driverConfiguration) {
+        DriverInfo driverInfo = Convert.convert(DriverInfo.class, driverConfiguration.getContent());
         if (Common.Driver.DriverInfo.ADD.equals(command) || Common.Driver.DriverInfo.UPDATE.equals(command)) {
+            log.debug("Upsert driver info \n{}", JSON.toJSONString(driverInfo, true));
             driverMetadataService.upsertDriverInfo(driverInfo);
         }
         if (Common.Driver.DriverInfo.DELETE.equals(command)) {
+            log.debug("Delete driver info {}", driverInfo);
             driverMetadataService.deleteDriverInfo(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
         }
     }
@@ -108,22 +155,18 @@ public class DriverConfigurationReceiver {
     /**
      * 配置 driver point info，增删改
      *
-     * @param command   操作类型
-     * @param pointInfo PointInfo
+     * @param command             操作类型
+     * @param driverConfiguration DriverConfiguration
      */
-    private void configurationPointInfo(String command, PointInfo pointInfo) {
+    private void configurationPointInfo(String command, DriverConfiguration driverConfiguration) {
+        PointInfo pointInfo = Convert.convert(PointInfo.class, driverConfiguration.getContent());
         if (Common.Driver.PointInfo.ADD.equals(command) || Common.Driver.PointInfo.UPDATE.equals(command)) {
+            log.debug("Upsert point info \n{}", JSON.toJSONString(pointInfo, true));
             driverMetadataService.upsertPointInfo(pointInfo);
         }
         if (Common.Driver.PointInfo.DELETE.equals(command)) {
+            log.debug("Delete point info {}", pointInfo);
             driverMetadataService.deletePointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getPointId());
-        }
-    }
-
-    private void configurationDriverMetadata(String command, DriverMetadata driverMetadata) {
-        if (Common.Driver.Metadata.INIT.equals(command)) {
-            log.info("Initialize driver metadata \n{}", JSON.toJSONString(driverMetadata, true));
-            driverMetadataService.syncDriverMetadata(driverMetadata);
         }
     }
 
@@ -140,26 +183,27 @@ public class DriverConfigurationReceiver {
                 log.error("Invalid driver configuration");
                 return;
             }
-            log.debug("Configuration from {}", message.getMessageProperties().getReceivedRoutingKey());
+            log.debug("Driver Configuration from {}", message.getMessageProperties().getReceivedRoutingKey());
 
+            if (Common.Driver.Type.DRIVER.equals(driverConfiguration.getType())) {
+                configurationDriver(driverConfiguration.getCommand(), driverConfiguration);
+            }
             if (Common.Driver.Type.PROFILE.equals(driverConfiguration.getType())) {
-                configurationProfile(driverConfiguration.getCommand(), Convert.convert(Profile.class, driverConfiguration.getContent()));
+                configurationProfile(driverConfiguration.getCommand(), driverConfiguration);
             }
             if (Common.Driver.Type.DEVICE.equals(driverConfiguration.getType())) {
-                configurationDevice(driverConfiguration.getCommand(), Convert.convert(Device.class, driverConfiguration.getContent()));
+                configurationDevice(driverConfiguration.getCommand(), driverConfiguration);
             }
             if (Common.Driver.Type.POINT.equals(driverConfiguration.getType())) {
-                configurationPoint(driverConfiguration.getCommand(), Convert.convert(Point.class, driverConfiguration.getContent()));
+                configurationPoint(driverConfiguration.getCommand(), driverConfiguration);
             }
             if (Common.Driver.Type.DRIVER_INFO.equals(driverConfiguration.getType())) {
-                configurationDriverInfo(driverConfiguration.getCommand(), Convert.convert(DriverInfo.class, driverConfiguration.getContent()));
+                configurationDriverInfo(driverConfiguration.getCommand(), driverConfiguration);
             }
             if (Common.Driver.Type.POINT_INFO.equals(driverConfiguration.getType())) {
-                configurationPointInfo(driverConfiguration.getCommand(), Convert.convert(PointInfo.class, driverConfiguration.getContent()));
+                configurationPointInfo(driverConfiguration.getCommand(), driverConfiguration);
             }
-            if (Common.Driver.Type.METADATA.equals(driverConfiguration.getType())) {
-                configurationDriverMetadata(driverConfiguration.getCommand(), Convert.convert(DriverMetadata.class, driverConfiguration.getContent()));
-            }
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

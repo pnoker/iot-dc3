@@ -82,7 +82,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
 
         List<PointValue> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyUdpServerHandler.driverContext.getDevicePointInfoMap().get(deviceId);
+        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyUdpServerHandler.driverContext.getDriverMetadata().getDevicePointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
             Point point = nettyUdpServerHandler.driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);

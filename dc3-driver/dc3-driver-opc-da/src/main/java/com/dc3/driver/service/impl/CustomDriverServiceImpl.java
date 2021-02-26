@@ -102,7 +102,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE));
     }
 
     /**
