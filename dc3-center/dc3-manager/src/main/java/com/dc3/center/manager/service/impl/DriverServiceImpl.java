@@ -25,7 +25,7 @@ import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverDto;
-import com.dc3.common.dto.ProfileDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
@@ -56,13 +56,9 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private RedisUtil redisUtil;
     @Resource
-    private DriverService driverService;
-    @Resource
     private DriverAttributeService driverAttributeService;
     @Resource
     private DriverInfoService driverInfoService;
-    @Resource
-    private BatchService batchService;
     @Resource
     private PointAttributeService pointAttributeService;
     @Resource
@@ -82,25 +78,30 @@ public class DriverServiceImpl implements DriverService {
                     @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.host+'.'+#driver.port", condition = "#result!=null")
             },
             evict = {
+                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Driver add(Driver driver) {
-        if (null != selectByServiceName(driver.getName())) {
-            throw new ServiceException("The driver already exists");
+        try {
+            selectByServiceName(driver.getName());
+            throw new DuplicateException("The driver already exists");
+        } catch (NotFoundException notFoundException) {
+            if (driverMapper.insert(driver) > 0) {
+                return driverMapper.selectById(driver.getId());
+            }
+            throw new ServiceException("The driver add failed");
         }
-
-        if (driverMapper.insert(driver) > 0) {
-            return driverMapper.selectById(driver.getId());
-        }
-        throw new ServiceException("The driver add failed");
     }
 
     @Override
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=true"),
+                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=true"),
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
@@ -108,18 +109,14 @@ public class DriverServiceImpl implements DriverService {
             }
     )
     public boolean delete(Long id) {
-        ProfileDto profileDto = new ProfileDto();
-        profileDto.setDriverId(id);
-        Page<Profile> profilePage = profileService.list(profileDto);
-        if (profilePage.getTotal() > 0) {
+        try {
+            profileService.selectByDriverId(id);
             throw new ServiceException("The driver already bound by the profile");
+        } catch (NotFoundException notFoundException1) {
+            selectById(id);
+            //TODO 需要删除驱动下所有的模板，设备，位号
+            return driverMapper.deleteById(id) > 0;
         }
-        //todo 删除driver需要把它的属性和配置也一同删除
-        Driver driver = selectById(id);
-        if (null == driver) {
-            throw new ServiceException("The driver does not exist");
-        }
-        return driverMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -130,19 +127,18 @@ public class DriverServiceImpl implements DriverService {
                     @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.host+'.'+#driver.port", condition = "#result!=null")
             },
             evict = {
+                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Driver update(Driver driver) {
-        Driver temp = selectById(driver.getId());
-        if (null == temp) {
-            throw new ServiceException("The driver does not exist");
-        }
+        selectById(driver.getId());
         driver.setUpdateTime(null);
         if (driverMapper.updateById(driver) > 0) {
             Driver select = driverMapper.selectById(driver.getId());
-            driver.setServiceName(select.getServiceName());
+            driver.setServiceName(select.getServiceName()).setHost(select.getHost()).setPort(select.getPort());
             return select;
         }
         throw new ServiceException("The driver update failed");
@@ -153,17 +149,32 @@ public class DriverServiceImpl implements DriverService {
     public Driver selectById(Long id) {
         Driver driver = driverMapper.selectById(id);
         if (null == driver) {
-            throw new ServiceException("The driver does not exist");
+            throw new NotFoundException("The driver does not exist");
         }
         return driver;
     }
 
     @Override
+    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, key = "#deviceId", unless = "#result==null")
+    public Driver selectByDeviceId(Long deviceId) {
+        Device device = deviceService.selectById(deviceId);
+        Profile profile = profileService.selectById(device.getProfileId());
+        return selectById(profile.getDriverId());
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
+    public Driver selectByProfileId(Long profileId) {
+        Profile profile = profileService.selectById(profileId);
+        return selectById(profile.getDriverId());
+    }
+
+    @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, key = "#serviceName", unless = "#result==null")
     public Driver selectByServiceName(String serviceName) {
-        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.eq(Driver::getServiceName, serviceName);
-        Driver driver = driverMapper.selectOne(queryWrapper);
+        DriverDto driverDto = new DriverDto();
+        driverDto.setServiceName(serviceName);
+        Driver driver = driverMapper.selectOne(fuzzyQuery(driverDto));
         if (null == driver) {
             throw new NotFoundException("The driver does not exist");
         }
@@ -173,50 +184,22 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#host+'.'+#port", unless = "#result==null")
     public Driver selectByHostPort(String host, Integer port) {
-        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.eq(Driver::getHost, host);
-        queryWrapper.eq(Driver::getPort, port);
-        Driver driver = driverMapper.selectOne(queryWrapper);
+        DriverDto driverDto = new DriverDto();
+        driverDto.setHost(host);
+        driverDto.setPort(port);
+        Driver driver = driverMapper.selectOne(fuzzyQuery(driverDto));
         if (null == driver) {
             throw new NotFoundException("The driver does not exist");
         }
         return driver;
     }
 
-    @Override
-    public Driver selectByDeviceId(Long deviceId) {
-        Device device = deviceService.selectById(deviceId);
-        if (null != device) {
-            Profile profile = profileService.selectById(device.getProfileId());
-            if (null != profile) {
-                Driver driver = driverService.selectById(profile.getDriverId());
-                if (null == driver) {
-                    throw new ServiceException("The driver does not exist");
-                }
-                return driver;
-            }
-        }
-        throw new ServiceException("The driver does not exist");
-    }
-
-    @Override
-    public Driver selectByProfileId(Long profileId) {
-        Profile profile = profileService.selectById(profileId);
-        if (null != profile) {
-            Driver driver = driverService.selectById(profile.getDriverId());
-            if (null == driver) {
-                throw new ServiceException("The driver does not exist");
-            }
-            return driver;
-        }
-        throw new ServiceException("The driver does not exist");
-    }
-
+    //TODO 合并到list中
     @Override
     public Map<String, Boolean> driverStatus(DriverDto driverDto) {
         Map<String, Boolean> driverStatusMap = new HashMap<>(16);
 
-        Page<Driver> driverPage = driverService.list(driverDto);
+        Page<Driver> driverPage = list(driverDto);
         if (driverPage.getRecords().size() > 0) {
             driverPage.getRecords().forEach(driver -> {
                 String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
@@ -236,17 +219,17 @@ public class DriverServiceImpl implements DriverService {
         Driver driver = driverRegister.getDriver();
         log.info("Register driver {}", driver);
         try {
-            Driver byServiceName = driverService.selectByServiceName(driver.getServiceName());
+            Driver byServiceName = selectByServiceName(driver.getServiceName());
             log.debug("Driver already registered, updating {} ", driver);
             driver.setId(byServiceName.getId());
-            driver = driverService.update(driver);
+            driver = update(driver);
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", driver);
             try {
-                Driver byHostPort = driverService.selectByHostPort(driver.getHost(), driver.getPort());
+                Driver byHostPort = selectByHostPort(driver.getHost(), driver.getPort());
                 throw new ServiceException("The port(" + driver.getPort() + ") is already occupied by driver(" + byHostPort.getName() + "/" + byHostPort.getServiceName() + ")");
             } catch (NotFoundException notFoundException2) {
-                driver = driverService.add(driver);
+                driver = add(driver);
             }
         }
 
@@ -328,7 +311,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Driver> list(DriverDto driverDto) {
-        if (!Optional.ofNullable(driverDto.getPage()).isPresent()) {
+        if (null == driverDto.getPage()) {
             driverDto.setPage(new Pages());
         }
         return driverMapper.selectPage(driverDto.getPage().convert(), fuzzyQuery(driverDto));
@@ -338,16 +321,18 @@ public class DriverServiceImpl implements DriverService {
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         Optional.ofNullable(driverDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Driver::getName, dto.getName());
-            }
             if (StringUtils.isNotBlank(dto.getServiceName())) {
                 queryWrapper.like(Driver::getServiceName, dto.getServiceName());
+            }
+            if (StringUtils.isNotBlank(dto.getName())) {
+                queryWrapper.like(Driver::getName, dto.getName());
             }
             if (StringUtils.isNotBlank(dto.getHost())) {
                 queryWrapper.like(Driver::getHost, dto.getHost());
             }
-            Optional.ofNullable(dto.getPort()).ifPresent(port -> queryWrapper.eq(Driver::getPort, port));
+            if (null != dto.getPort()) {
+                queryWrapper.eq(Driver::getPort, dto.getPort());
+            }
         });
         return queryWrapper;
     }

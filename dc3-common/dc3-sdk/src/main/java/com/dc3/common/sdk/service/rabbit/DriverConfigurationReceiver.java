@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.constant.Common;
+import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverMetadataService;
@@ -58,25 +59,28 @@ public class DriverConfigurationReceiver {
      * @param driverConfiguration DriverConfiguration
      */
     private void configurationDriver(String command, DriverConfiguration driverConfiguration) {
-        if (Common.Driver.CHECK_MANAGER_VALID_BACK.equals(command)) {
-            String back = Convert.convert(String.class, driverConfiguration.getContent());
-            if (Common.Driver.Status.REGISTERING.equals(back)) {
-                driverContext.setDriverStatus(back);
+        if (Common.Driver.Event.REGISTER_HANDSHAKE_BACK.equals(command)) {
+            if (Common.Response.OK.equals(driverConfiguration.getResponse())) {
+                driverContext.setDriverStatus(Common.Driver.Status.REGISTERING);
             } else {
-                log.error("Driver registration failed, {}", back);
-                driverService.close();
+                throw new ServiceException("The driver initialization failed, Please check whether dc3-manager are started normally");
             }
         }
 
-        if (Common.Driver.SYNC_DRIVER_METADATA_BACK.equals(command)) {
-            if (null == driverConfiguration.getContent()) {
-                log.error("Driver registration failed, {}", driverConfiguration.getMessage());
-                driverService.close();
+        if (Common.Driver.Event.DRIVER_REGISTER_BACK.equals(command)) {
+            if (Common.Response.OK.equals(driverConfiguration.getResponse())) {
+                driverContext.setDriverStatus(Common.Driver.Status.ONLINE);
+            } else {
+                throw new ServiceException("Driver registration failed, " + driverConfiguration.getResponse());
             }
-            DriverMetadata driverMetadata = Convert.convert(DriverMetadata.class, driverConfiguration.getContent());
-            driverContext.setDriverMetadata(driverMetadata);
-            driverContext.setDriverStatus(driverConfiguration.getMessage());
-            log.debug("Driver registration is successful, synchronize driver metadata \n{}", JSON.toJSONString(driverMetadata, true));
+        }
+
+        if (Common.Driver.Event.SYNC_DRIVER_METADATA_BACK.equals(command)) {
+            if (Common.Response.OK.equals(driverConfiguration.getResponse())) {
+                driverContext.setDriverMetadata(Convert.convert(DriverMetadata.class, driverConfiguration.getContent()));
+            } else {
+                throw new ServiceException("Driver registration failed, " + driverConfiguration.getResponse());
+            }
         }
     }
 
@@ -178,7 +182,6 @@ public class DriverConfigurationReceiver {
             if (null == driverConfiguration
                     || StringUtils.isEmpty(driverConfiguration.getType())
                     || StringUtils.isEmpty(driverConfiguration.getCommand())
-                    || null == driverConfiguration.getContent()
             ) {
                 log.error("Invalid driver configuration");
                 return;

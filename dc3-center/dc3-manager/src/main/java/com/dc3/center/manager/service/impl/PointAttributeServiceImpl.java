@@ -24,6 +24,7 @@ import com.dc3.center.manager.service.PointAttributeService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointAttributeDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.PointAttribute;
@@ -54,7 +55,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#pointAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME, key = "#pointAttribute.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -63,31 +64,29 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             }
     )
     public PointAttribute add(PointAttribute pointAttribute) {
-        if (null != selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId())) {
-            throw new ServiceException("The point attribute already exists");
+        try {
+            selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId());
+            throw new DuplicateException("The point attribute already exists");
+        } catch (NotFoundException notFoundException) {
+            if (pointAttributeMapper.insert(pointAttribute) > 0) {
+                return pointAttributeMapper.selectById(pointAttribute.getId());
+            }
+            throw new ServiceException("The point attribute add failed");
         }
-
-        if (pointAttributeMapper.insert(pointAttribute) > 0) {
-            return pointAttributeMapper.selectById(pointAttribute.getId());
-        }
-        throw new ServiceException("The point attribute add failed");
     }
 
     @Override
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
-        PointAttribute pointAttribute = selectById(id);
-        if (null == pointAttribute) {
-            throw new ServiceException("The point attribute does not exist");
-        }
+        selectById(id);
         return pointAttributeMapper.deleteById(id) > 0;
     }
 
@@ -95,7 +94,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#pointAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME, key = "#pointAttribute.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -104,14 +103,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             }
     )
     public PointAttribute update(PointAttribute pointAttribute) {
-        PointAttribute temp = selectById(pointAttribute.getId());
-        if (null == temp) {
-            throw new ServiceException("The point attribute does not exist");
-        }
+        selectById(pointAttribute.getId());
         pointAttribute.setUpdateTime(null);
         if (pointAttributeMapper.updateById(pointAttribute) > 0) {
             PointAttribute select = pointAttributeMapper.selectById(pointAttribute.getId());
-            pointAttribute.setName(select.getName());
+            pointAttribute.setName(select.getName()).setDriverId(select.getDriverId());
             return select;
         }
         throw new ServiceException("The point attribute update failed");
@@ -122,20 +118,20 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public PointAttribute selectById(Long id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
         if (null == pointAttribute) {
-            throw new ServiceException("The point attribute does not exist");
+            throw new NotFoundException("The point attribute does not exist");
         }
         return pointAttribute;
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
+    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
     public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
-        LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        queryWrapper.eq(PointAttribute::getName, name);
-        queryWrapper.eq(PointAttribute::getDriverId, driverId);
-        PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
+        PointAttributeDto pointAttributeDto = new PointAttributeDto();
+        pointAttributeDto.setName(name);
+        pointAttributeDto.setDriverId(driverId);
+        PointAttribute pointAttribute = pointAttributeMapper.selectOne(fuzzyQuery(pointAttributeDto));
         if (null == pointAttribute) {
-            throw new ServiceException("The point attribute does not exist");
+            throw new NotFoundException("The point attribute does not exist");
         }
         return pointAttribute;
     }
@@ -143,9 +139,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
     public List<PointAttribute> selectByDriverId(Long driverId) {
-        LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        queryWrapper.eq(PointAttribute::getDriverId, driverId);
-        List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(queryWrapper);
+        PointAttributeDto pointAttributeDto = new PointAttributeDto();
+        pointAttributeDto.setDriverId(driverId);
+        List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributeDto));
         if (null == pointAttributes || pointAttributes.size() < 1) {
             throw new NotFoundException("The point attributes does not exist");
         }

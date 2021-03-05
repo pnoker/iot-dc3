@@ -24,6 +24,8 @@ import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointDto;
+import com.dc3.common.exception.DuplicateException;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +57,7 @@ public class PointServiceImpl implements PointService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT + Common.Cache.ID, key = "#point.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT + Common.Cache.NAME, key = "#point.name+'.'+#point.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#point.name+'.'+#point.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -64,31 +66,29 @@ public class PointServiceImpl implements PointService {
             }
     )
     public Point add(Point point) {
-        if (null != selectByNameAndProfileId(point.getName(), point.getProfileId())) {
+        try {
+            selectByNameAndProfileId(point.getName(), point.getProfileId());
             throw new ServiceException("The point already exists in the profile");
+        } catch (NotFoundException notFoundException) {
+            if (pointMapper.insert(point) > 0) {
+                return pointMapper.selectById(point.getId());
+            }
+            throw new ServiceException("The point add failed");
         }
-
-        if (pointMapper.insert(point) > 0) {
-            return pointMapper.selectById(point.getId());
-        }
-        throw new ServiceException("The point add failed");
     }
 
     @Override
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
-        Point point = selectById(id);
-        if (null == point) {
-            throw new ServiceException("The point does not exist");
-        }
+        selectById(id);
         return pointMapper.deleteById(id) > 0;
     }
 
@@ -96,7 +96,7 @@ public class PointServiceImpl implements PointService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT + Common.Cache.ID, key = "#point.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT + Common.Cache.NAME, key = "#point.profileId+'.'+#point.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#point.name+'.'+#point.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -105,21 +105,18 @@ public class PointServiceImpl implements PointService {
             }
     )
     public Point update(Point point) {
-        Point temp = selectById(point.getId());
-        if (null == temp) {
-            throw new ServiceException("The point does not exist");
-        }
+        Point old = selectById(point.getId());
         point.setUpdateTime(null);
-        Point selectById = pointMapper.selectById(point.getId());
-        if (!selectById.getProfileId().equals(point.getProfileId()) || !selectById.getName().equals(point.getName())) {
-            Point select = selectByNameAndProfileId(point.getName(), point.getProfileId());
-            if (null != select) {
-                throw new ServiceException("The point already exists");
+        if (!old.getProfileId().equals(point.getProfileId()) || !old.getName().equals(point.getName())) {
+            try {
+                selectByNameAndProfileId(point.getName(), point.getProfileId());
+                throw new DuplicateException("The point already exists");
+            } catch (NotFoundException ignored) {
             }
         }
         if (pointMapper.updateById(point) > 0) {
             Point select = pointMapper.selectById(point.getId());
-            point.setName(select.getName());
+            point.setName(select.getName()).setProfileId(select.getProfileId());
             return select;
         }
         throw new ServiceException("The point update failed");
@@ -130,20 +127,20 @@ public class PointServiceImpl implements PointService {
     public Point selectById(Long id) {
         Point point = pointMapper.selectById(id);
         if (null == point) {
-            throw new ServiceException("The point does not exist");
+            throw new NotFoundException("The point does not exist");
         }
         return point;
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.NAME, key = "#profileId+'.'+#name", unless = "#result==null")
+    @Cacheable(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#name+'.'+#profileId", unless = "#result==null")
     public Point selectByNameAndProfileId(String name, Long profileId) {
-        LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        queryWrapper.eq(Point::getName, name);
-        queryWrapper.eq(Point::getProfileId, profileId);
-        Point point = pointMapper.selectOne(queryWrapper);
+        PointDto pointDto = new PointDto();
+        pointDto.setName(name);
+        pointDto.setProfileId(profileId);
+        Point point = pointMapper.selectOne(fuzzyQuery(pointDto));
         if (null == point) {
-            throw new ServiceException("The point does not exist");
+            throw new NotFoundException("The point does not exist");
         }
         return point;
     }
@@ -151,11 +148,11 @@ public class PointServiceImpl implements PointService {
     @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
     public List<Point> selectByProfileId(Long profileId) {
-        LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        queryWrapper.eq(Point::getProfileId, profileId);
-        List<Point> points = pointMapper.selectList(queryWrapper);
-        if (null == points) {
-            throw new ServiceException("The points does not exist");
+        PointDto pointDto = new PointDto();
+        pointDto.setProfileId(profileId);
+        List<Point> points = pointMapper.selectList(fuzzyQuery(pointDto));
+        if (null == points || points.size() < 1) {
+            throw new NotFoundException("The points does not exist");
         }
         return points;
     }

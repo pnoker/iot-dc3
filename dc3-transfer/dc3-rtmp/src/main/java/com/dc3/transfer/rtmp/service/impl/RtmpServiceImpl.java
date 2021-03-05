@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.RtmpDto;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Rtmp;
 import com.dc3.transfer.rtmp.bean.Transcode;
@@ -102,7 +103,7 @@ public class RtmpServiceImpl implements RtmpService {
             }
             return rtmpMapper.deleteById(id) > 0;
         }
-        throw new ServiceException("The rtmp task does not exist");
+        throw new NotFoundException("The rtmp task does not exist");
     }
 
     @Override
@@ -119,7 +120,7 @@ public class RtmpServiceImpl implements RtmpService {
         rtmp.setUpdateTime(null);
         Rtmp select = selectById(rtmp.getId());
         if (null == select) {
-            throw new ServiceException("The rtmp task does not exist");
+            throw new NotFoundException("The rtmp task does not exist");
         }
         Transcode transcode = transcodeMap.get(rtmp.getId());
         if (null != transcode) {
@@ -157,7 +158,7 @@ public class RtmpServiceImpl implements RtmpService {
     public boolean start(Long id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null == select) {
-            throw new ServiceException("The rtmp task does not exist");
+            throw new NotFoundException("The rtmp task does not exist");
         }
 
         Transcode transcode = transcodeMap.get(id);
@@ -250,7 +251,7 @@ public class RtmpServiceImpl implements RtmpService {
             }
             throw new ServiceException("The rtmp task is stopped");
         }
-        throw new ServiceException("The rtmp task does not exist");
+        throw new NotFoundException("The rtmp task does not exist");
     }
 
     @Override

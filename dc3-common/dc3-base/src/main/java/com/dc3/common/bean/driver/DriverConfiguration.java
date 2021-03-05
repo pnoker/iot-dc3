@@ -36,11 +36,5 @@ public class DriverConfiguration implements Serializable {
     private String type;
     private String command;
     private Object content;
-    private String message;
-
-    public DriverConfiguration(String type, String command, Object content) {
-        this.type = type;
-        this.command = command;
-        this.content = content;
-    }
+    private String response;
 }

@@ -24,6 +24,7 @@ import com.dc3.center.manager.service.DriverAttributeService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverAttributeDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DriverAttribute;
@@ -63,14 +64,15 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             }
     )
     public DriverAttribute add(DriverAttribute driverAttribute) {
-        if (null != selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId())) {
-            throw new ServiceException("The driver attribute already exists");
+        try {
+            selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId());
+            throw new DuplicateException("The driver attribute already exists");
+        } catch (NotFoundException notFoundException) {
+            if (driverAttributeMapper.insert(driverAttribute) > 0) {
+                return driverAttributeMapper.selectById(driverAttribute.getId());
+            }
+            throw new ServiceException("The driver attribute add failed");
         }
-
-        if (driverAttributeMapper.insert(driverAttribute) > 0) {
-            return driverAttributeMapper.selectById(driverAttribute.getId());
-        }
-        throw new ServiceException("The driver attribute add failed");
     }
 
     @Override
@@ -84,10 +86,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             }
     )
     public boolean delete(Long id) {
-        DriverAttribute driverAttribute = selectById(id);
-        if (null == driverAttribute) {
-            throw new ServiceException("The driver attribute does not exist");
-        }
+        selectById(id);
         return driverAttributeMapper.deleteById(id) > 0;
     }
 
@@ -104,10 +103,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             }
     )
     public DriverAttribute update(DriverAttribute driverAttribute) {
-        DriverAttribute temp = selectById(driverAttribute.getId());
-        if (null == temp) {
-            throw new ServiceException("The driver attribute does not exist");
-        }
+        selectById(driverAttribute.getId());
         driverAttribute.setUpdateTime(null);
         if (driverAttributeMapper.updateById(driverAttribute) > 0) {
             DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
@@ -122,7 +118,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public DriverAttribute selectById(Long id) {
         DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
         if (null == driverAttribute) {
-            throw new ServiceException("The driver attribute does not exist");
+            throw new NotFoundException("The driver attribute does not exist");
         }
         return driverAttribute;
     }
@@ -130,12 +126,12 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public DriverAttribute selectByNameAndDriverId(String name, Long driverId) {
-        LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        queryWrapper.eq(DriverAttribute::getName, name);
-        queryWrapper.eq(DriverAttribute::getDriverId, driverId);
-        DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
+        DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
+        driverAttributeDto.setName(name);
+        driverAttributeDto.setDriverId(driverId);
+        DriverAttribute driverAttribute = driverAttributeMapper.selectOne(fuzzyQuery(driverAttributeDto));
         if (null == driverAttribute) {
-            throw new ServiceException("The driver attribute does not exist");
+            throw new NotFoundException("The driver attribute does not exist");
         }
         return driverAttribute;
     }
@@ -143,9 +139,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
     public List<DriverAttribute> selectByDriverId(Long driverId) {
-        LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        queryWrapper.eq(DriverAttribute::getDriverId, driverId);
-        List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(queryWrapper);
+        DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
+        driverAttributeDto.setDriverId(driverId);
+        List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributeDto));
         if (null == driverAttributes || driverAttributes.size() < 1) {
             throw new NotFoundException("The driver attributes does not exist");
         }
@@ -158,7 +154,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (null == driverAttributeDto.getPage()) {
             driverAttributeDto.setPage(new Pages());
         }
-
         return driverAttributeMapper.selectPage(driverAttributeDto.getPage().convert(), fuzzyQuery(driverAttributeDto));
     }
 
@@ -166,16 +161,18 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         Optional.ofNullable(driverAttributeDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getDisplayName())) {
-                queryWrapper.like(DriverAttribute::getDisplayName, dto.getDisplayName());
-            }
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.eq(DriverAttribute::getName, dto.getName());
+            }
+            if (StringUtils.isNotBlank(dto.getDisplayName())) {
+                queryWrapper.like(DriverAttribute::getDisplayName, dto.getDisplayName());
             }
             if (StringUtils.isNotBlank(dto.getType())) {
                 queryWrapper.eq(DriverAttribute::getType, dto.getType());
             }
-            Optional.ofNullable(dto.getDriverId()).ifPresent(driverId -> queryWrapper.eq(DriverAttribute::getDriverId, driverId));
+            if (null != dto.getDriverId()) {
+                queryWrapper.eq(DriverAttribute::getDriverId, dto.getDriverId());
+            }
         });
         return queryWrapper;
     }

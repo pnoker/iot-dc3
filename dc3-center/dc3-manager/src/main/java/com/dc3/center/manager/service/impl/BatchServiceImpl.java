@@ -116,37 +116,52 @@ public class BatchServiceImpl implements BatchService {
 
     @Override
     public DriverMetadata batchDriverMetadata(String serviceName) {
-        Driver driver = driverService.selectByServiceName(serviceName);
-        List<Profile> profiles = profileService.selectByDriverId(driver.getId());
-        List<Long> profileList = profiles.stream().map(Description::getId).collect(Collectors.toList());
+        DriverMetadata driverMetadata = new DriverMetadata();
+        try {
+            Driver driver = driverService.selectByServiceName(serviceName);
+            Map<Long, DriverAttribute> driverAttributeMap = getDriverAttributeMap(driver.getId());
+            driverMetadata.setDriverAttributeMap(driverAttributeMap);
 
-        Map<Long, DriverAttribute> driverAttributeMap = getDriverAttributeMap(driver.getId());
-        Map<Long, PointAttribute> pointAttributeMap = getPointAttributeMap(driver.getId());
-        Map<Long, Map<String, AttributeInfo>> profileDriverInfoMap = getProfileDriverInfoMap(profileList, driverAttributeMap);
-        Map<Long, Device> deviceMap = new ConcurrentHashMap<>(16);
-        Map<String, Long> deviceNameMap = new ConcurrentHashMap<>(16);
-        Map<Long, Map<Long, Point>> profilePointMap = getProfilePointMap(profileList);
-        Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap = new ConcurrentHashMap<>(16);
-        Map<Long, Map<String, Long>> devicePointNameMap = new ConcurrentHashMap<>(16);
+            Map<Long, PointAttribute> pointAttributeMap = getPointAttributeMap(driver.getId());
+            driverMetadata.setPointAttributeMap(pointAttributeMap);
 
-        profileList.forEach(profileId -> deviceService.selectDeviceByProfileId(profileId)
-                .forEach(device -> {
-                    deviceMap.put(device.getId(), device);
-                    deviceNameMap.put(device.getName(), device.getId());
-                }));
+            List<Profile> profiles = profileService.selectByDriverId(driver.getId());
+            List<Long> profileList = profiles.stream().map(Description::getId).collect(Collectors.toList());
 
-        deviceMap.values().forEach(device -> {
-            Map<Long, Map<String, AttributeInfo>> infoMap = getDevicePointInfoMap(device, profilePointMap, pointAttributeMap);
-            if (infoMap.size() > 0) {
-                devicePointInfoMap.put(device.getId(), infoMap);
-            }
-            Map<String, Long> nameMap = getPointNameMap(device.getProfileId());
-            if (nameMap.size() > 0) {
-                devicePointNameMap.put(device.getId(), nameMap);
-            }
-        });
+            Map<Long, Map<String, AttributeInfo>> profileDriverInfoMap = getProfileDriverInfoMap(profileList, driverAttributeMap);
+            driverMetadata.setProfileDriverInfoMap(profileDriverInfoMap);
 
-        return new DriverMetadata(driverAttributeMap, pointAttributeMap, profileDriverInfoMap, deviceMap, deviceNameMap, profilePointMap, devicePointInfoMap, devicePointNameMap);
+            Map<Long, Device> deviceMap = new ConcurrentHashMap<>(16);
+            Map<String, Long> deviceNameMap = new ConcurrentHashMap<>(16);
+            profileList.forEach(profileId -> deviceService.selectDeviceByProfileId(profileId)
+                    .forEach(device -> {
+                        deviceMap.put(device.getId(), device);
+                        deviceNameMap.put(device.getName(), device.getId());
+                    }));
+            driverMetadata.setDeviceMap(deviceMap);
+            driverMetadata.setDeviceNameMap(deviceNameMap);
+
+            Map<Long, Map<Long, Point>> profilePointMap = getProfilePointMap(profileList);
+            driverMetadata.setProfilePointMap(profilePointMap);
+
+            Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap = new ConcurrentHashMap<>(16);
+            Map<Long, Map<String, Long>> devicePointNameMap = new ConcurrentHashMap<>(16);
+            deviceMap.values().forEach(device -> {
+                Map<Long, Map<String, AttributeInfo>> infoMap = getDevicePointInfoMap(device, profilePointMap, pointAttributeMap);
+                if (infoMap.size() > 0) {
+                    devicePointInfoMap.put(device.getId(), infoMap);
+                }
+                Map<String, Long> nameMap = getPointNameMap(device.getProfileId());
+                if (nameMap.size() > 0) {
+                    devicePointNameMap.put(device.getId(), nameMap);
+                }
+            });
+            driverMetadata.setDevicePointInfoMap(devicePointInfoMap);
+            driverMetadata.setDevicePointNameMap(devicePointNameMap);
+            return driverMetadata;
+        } catch (NotFoundException ignored) {
+        }
+        return driverMetadata;
     }
 
     /**
@@ -519,7 +534,11 @@ public class BatchServiceImpl implements BatchService {
      */
     public Map<Long, DriverAttribute> getDriverAttributeMap(long driverId) {
         Map<Long, DriverAttribute> driverAttributeMap = new ConcurrentHashMap<>(16);
-        driverAttributeService.selectByDriverId(driverId).forEach(driverAttribute -> driverAttributeMap.put(driverAttribute.getId(), driverAttribute));
+        try {
+            List<DriverAttribute> driverAttributes = driverAttributeService.selectByDriverId(driverId);
+            driverAttributes.forEach(driverAttribute -> driverAttributeMap.put(driverAttribute.getId(), driverAttribute));
+        } catch (NotFoundException ignored) {
+        }
         return driverAttributeMap;
     }
 
@@ -531,7 +550,11 @@ public class BatchServiceImpl implements BatchService {
      */
     public Map<Long, PointAttribute> getPointAttributeMap(long driverId) {
         Map<Long, PointAttribute> pointAttributeMap = new ConcurrentHashMap<>(16);
-        pointAttributeService.selectByDriverId(driverId).forEach(pointAttribute -> pointAttributeMap.put(pointAttribute.getId(), pointAttribute));
+        try {
+            List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(driverId);
+            pointAttributes.forEach(pointAttribute -> pointAttributeMap.put(pointAttribute.getId(), pointAttribute));
+        } catch (NotFoundException ignored) {
+        }
         return pointAttributeMap;
     }
 
@@ -574,11 +597,14 @@ public class BatchServiceImpl implements BatchService {
      */
     public Map<String, AttributeInfo> getDriverInfoMap(Long profileId, Map<Long, DriverAttribute> driverAttributeMap) {
         Map<String, AttributeInfo> attributeInfoMap = new ConcurrentHashMap<>(16);
-        driverInfoService.selectByProfileId(profileId)
-                .forEach(driverInfo -> {
-                    DriverAttribute attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
-                    attributeInfoMap.put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
-                });
+        try {
+            List<DriverInfo> driverInfos = driverInfoService.selectByProfileId(profileId);
+            driverInfos.forEach(driverInfo -> {
+                DriverAttribute attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
+                attributeInfoMap.put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
+            });
+        } catch (NotFoundException ignored) {
+        }
         return attributeInfoMap;
     }
 

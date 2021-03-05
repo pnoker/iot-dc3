@@ -26,6 +26,8 @@ import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.LabelBindDto;
 import com.dc3.common.dto.LabelDto;
+import com.dc3.common.exception.DuplicateException;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Label;
 import com.dc3.common.model.LabelBind;
@@ -66,7 +68,7 @@ public class LabelServiceImpl implements LabelService {
     )
     public Label add(Label label) {
         if (null != selectByName(label.getName())) {
-            throw new ServiceException("The label already exists");
+            throw new DuplicateException("The label already exists");
         }
 
         if (labelMapper.insert(label) > 0) {
@@ -93,7 +95,7 @@ public class LabelServiceImpl implements LabelService {
         }
         Label label = selectById(id);
         if (null == label) {
-            throw new ServiceException("The label does not exist");
+            throw new NotFoundException("The label does not exist");
         }
         return labelMapper.deleteById(id) > 0;
     }
@@ -112,7 +114,7 @@ public class LabelServiceImpl implements LabelService {
     public Label update(Label label) {
         Label temp = selectById(label.getId());
         if (null == temp) {
-            throw new ServiceException("The label does not exist");
+            throw new NotFoundException("The label does not exist");
         }
         label.setUpdateTime(null);
         if (labelMapper.updateById(label) > 0) {
@@ -128,7 +130,7 @@ public class LabelServiceImpl implements LabelService {
     public Label selectById(Long id) {
         Label label = labelMapper.selectById(id);
         if (null == label) {
-            throw new ServiceException("The label does not exist");
+            throw new NotFoundException("The label does not exist");
         }
         return label;
     }
@@ -140,7 +142,7 @@ public class LabelServiceImpl implements LabelService {
         queryWrapper.eq(Label::getName, name);
         Label label = labelMapper.selectOne(queryWrapper);
         if (null == label) {
-            throw new ServiceException("The label does not exist");
+            throw new NotFoundException("The label does not exist");
         }
         return label;
     }

@@ -16,13 +16,15 @@
 
 package com.dc3.common.exception;
 
+import cn.hutool.core.util.StrUtil;
+
 /**
- * 自定义未授权 异常
+ * 自定义 未授权 异常
  *
  * @author pnoker
  */
 public class UnAuthorizedException extends RuntimeException {
-    public UnAuthorizedException(String message) {
-        super(message);
+    public UnAuthorizedException(CharSequence template, Object... params) {
+        super(StrUtil.format(template, params));
     }
 }

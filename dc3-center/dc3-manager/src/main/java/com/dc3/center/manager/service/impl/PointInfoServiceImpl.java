@@ -24,6 +24,7 @@ import com.dc3.center.manager.service.PointInfoService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointInfoDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.PointInfo;
@@ -65,14 +66,15 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo add(PointInfo pointInfo) {
-        if (null != selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId())) {
-            throw new ServiceException("The point info already exists");
+        try {
+            selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
+            throw new DuplicateException("The point info already exists");
+        } catch (NotFoundException notFoundException) {
+            if (pointInfoMapper.insert(pointInfo) > 0) {
+                return pointInfoMapper.selectById(pointInfo.getId());
+            }
+            throw new ServiceException("The point info add failed");
         }
-
-        if (pointInfoMapper.insert(pointInfo) > 0) {
-            return pointInfoMapper.selectById(pointInfo.getId());
-        }
-        throw new ServiceException("The point info add failed");
     }
 
     @Override
@@ -87,10 +89,7 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public boolean delete(Long id) {
-        PointInfo pointInfo = selectById(id);
-        if (null == pointInfo) {
-            throw new ServiceException("The point info does not exist");
-        }
+        selectById(id);
         return pointInfoMapper.deleteById(id) > 0;
     }
 
@@ -108,18 +107,19 @@ public class PointInfoServiceImpl implements PointInfoService {
             }
     )
     public PointInfo update(PointInfo pointInfo) {
-        PointInfo temp = selectById(pointInfo.getId());
-        if (null == temp) {
-            throw new ServiceException("The point info does not exist");
-        }
+        PointInfo old = selectById(pointInfo.getId());
         pointInfo.setUpdateTime(null);
-        PointInfo select = selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
-        boolean update = null == select || (select.getPointAttributeId().equals(pointInfo.getPointAttributeId()) && select.getDeviceId().equals(pointInfo.getDeviceId()) && select.getPointId().equals(pointInfo.getPointId()));
-        if (!update) {
-            throw new ServiceException("The point info already exists");
+        if (!old.getPointAttributeId().equals(pointInfo.getPointAttributeId()) || !old.getDeviceId().equals(pointInfo.getDeviceId()) || !old.getPointId().equals(pointInfo.getPointId())) {
+            try {
+                selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
+                throw new DuplicateException("The point info already exists");
+            } catch (NotFoundException ignored) {
+            }
         }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
-            return pointInfoMapper.selectById(pointInfo.getId());
+            PointInfo select = pointInfoMapper.selectById(pointInfo.getId());
+            pointInfo.setPointAttributeId(select.getPointAttributeId()).setDeviceId(select.getDeviceId()).setPointId(select.getPointId());
+            return select;
         }
         throw new ServiceException("The point info update failed");
     }
@@ -129,7 +129,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     public PointInfo selectById(Long id) {
         PointInfo pointInfo = pointInfoMapper.selectById(id);
         if (null == pointInfo) {
-            throw new ServiceException("The point info does not exist");
+            throw new NotFoundException("The point info does not exist");
         }
         return pointInfo;
     }

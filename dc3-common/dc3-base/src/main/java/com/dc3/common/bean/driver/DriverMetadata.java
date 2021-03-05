@@ -23,11 +23,11 @@ import com.dc3.common.model.PointAttribute;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Driver Metadata
@@ -35,7 +35,6 @@ import java.util.Map;
  * @author pnoker
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -74,4 +73,15 @@ public class DriverMetadata implements Serializable {
      * deviceId(pointName,pointId)
      */
     private Map<Long, Map<String, Long>> devicePointNameMap;
+
+    public DriverMetadata() {
+        this.driverAttributeMap = new ConcurrentHashMap<>(16);
+        this.pointAttributeMap = new ConcurrentHashMap<>(16);
+        this.profileDriverInfoMap = new ConcurrentHashMap<>(16);
+        this.deviceMap = new ConcurrentHashMap<>(16);
+        this.deviceNameMap = new ConcurrentHashMap<>(16);
+        this.profilePointMap = new ConcurrentHashMap<>(16);
+        this.devicePointInfoMap = new ConcurrentHashMap<>(16);
+        this.devicePointNameMap = new ConcurrentHashMap<>(16);
+    }
 }

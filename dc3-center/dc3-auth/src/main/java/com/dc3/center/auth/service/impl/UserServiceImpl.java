@@ -24,6 +24,8 @@ import com.dc3.center.auth.service.UserService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.UserDto;
+import com.dc3.common.exception.DuplicateException;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.User;
 import com.dc3.common.utils.Dc3Util;
@@ -64,7 +66,7 @@ public class UserServiceImpl implements UserService {
     public User add(User user) {
         User select = selectByName(user.getName());
         if (null != select) {
-            throw new ServiceException("The user already exists");
+            throw new DuplicateException("The user already exists");
         }
         if (userMapper.insert(user.setPassword(Dc3Util.md5(user.getPassword()))) > 0) {
             return userMapper.selectById(user.getId());
@@ -84,7 +86,7 @@ public class UserServiceImpl implements UserService {
     public boolean delete(Long id) {
         User user = selectById(id);
         if (null == user) {
-            throw new ServiceException("The user does not exist");
+            throw new NotFoundException("The user does not exist");
         }
         return userMapper.deleteById(id) > 0;
     }

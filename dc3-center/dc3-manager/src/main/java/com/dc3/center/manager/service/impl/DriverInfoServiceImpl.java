@@ -24,6 +24,7 @@ import com.dc3.center.manager.service.DriverInfoService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverInfoDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DriverInfo;
@@ -64,14 +65,15 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo add(DriverInfo driverInfo) {
-        if (null != selectByAttributeIdAndProfileId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId())) {
+        try {
+            selectByAttributeIdAndProfileId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
             throw new ServiceException("The driver info already exists in the profile");
+        } catch (NotFoundException notFoundException) {
+            if (driverInfoMapper.insert(driverInfo) > 0) {
+                return driverInfoMapper.selectById(driverInfo.getId());
+            }
+            throw new ServiceException("The driver info add failed");
         }
-
-        if (driverInfoMapper.insert(driverInfo) > 0) {
-            return driverInfoMapper.selectById(driverInfo.getId());
-        }
-        throw new ServiceException("The driver info add failed");
     }
 
     @Override
@@ -86,10 +88,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public boolean delete(Long id) {
-        DriverInfo driverInfo = selectById(id);
-        if (null == driverInfo) {
-            throw new ServiceException("The driver info does not exist");
-        }
+        selectById(id);
         return driverInfoMapper.deleteById(id) > 0;
     }
 
@@ -108,17 +107,18 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     )
     public DriverInfo update(DriverInfo driverInfo) {
         DriverInfo temp = selectById(driverInfo.getId());
-        if (null == temp) {
-            throw new ServiceException("The driver info does not exist");
-        }
         driverInfo.setUpdateTime(null);
-        DriverInfo select = selectByAttributeIdAndProfileId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
-        boolean update = null == select || (select.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) && select.getProfileId().equals(driverInfo.getProfileId()));
-        if (!update) {
-            throw new ServiceException("The driver info already exists");
+        if (!temp.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) || !temp.getProfileId().equals(driverInfo.getProfileId())) {
+            try {
+                selectByAttributeIdAndProfileId(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
+                throw new DuplicateException("The driver info already exists");
+            } catch (NotFoundException ignored) {
+            }
         }
         if (driverInfoMapper.updateById(driverInfo) > 0) {
-            return driverInfoMapper.selectById(driverInfo.getId());
+            DriverInfo select = driverInfoMapper.selectById(driverInfo.getId());
+            driverInfo.setDriverAttributeId(select.getDriverAttributeId()).setProfileId(select.getProfileId());
+            return select;
         }
         throw new ServiceException("The driver info update failed");
     }
@@ -128,7 +128,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public DriverInfo selectById(Long id) {
         DriverInfo driverInfo = driverInfoMapper.selectById(id);
         if (null == driverInfo) {
-            throw new ServiceException("The driver info does not exist");
+            throw new NotFoundException("The driver info does not exist");
         }
         return driverInfo;
     }
@@ -136,12 +136,12 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverAttributeId+'.'+#profileId", unless = "#result==null")
     public DriverInfo selectByAttributeIdAndProfileId(Long driverAttributeId, Long profileId) {
-        LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        queryWrapper.eq(DriverInfo::getDriverAttributeId, driverAttributeId);
-        queryWrapper.eq(DriverInfo::getProfileId, profileId);
-        DriverInfo driverInfo = driverInfoMapper.selectOne(queryWrapper);
+        DriverInfoDto driverInfoDto = new DriverInfoDto();
+        driverInfoDto.setDriverAttributeId(driverAttributeId);
+        driverInfoDto.setProfileId(profileId);
+        DriverInfo driverInfo = driverInfoMapper.selectOne(fuzzyQuery(driverInfoDto));
         if (null == driverInfo) {
-            throw new ServiceException("The driver info does not exist");
+            throw new NotFoundException("The driver info does not exist");
         }
         return driverInfo;
     }
@@ -149,9 +149,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.LIST, key = "#driverAttributeId", unless = "#result==null")
     public List<DriverInfo> selectByAttributeId(Long driverAttributeId) {
-        LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        queryWrapper.eq(DriverInfo::getDriverAttributeId, driverAttributeId);
-        List<DriverInfo> driverInfos = driverInfoMapper.selectList(queryWrapper);
+        DriverInfoDto driverInfoDto = new DriverInfoDto();
+        driverInfoDto.setDriverAttributeId(driverAttributeId);
+        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));
         if (null == driverInfos || driverInfos.size() < 1) {
             throw new NotFoundException("The driver infos does not exist");
         }
@@ -161,9 +161,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
     public List<DriverInfo> selectByProfileId(Long profileId) {
-        LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        queryWrapper.eq(DriverInfo::getProfileId, profileId);
-        List<DriverInfo> driverInfos = driverInfoMapper.selectList(queryWrapper);
+        DriverInfoDto driverInfoDto = new DriverInfoDto();
+        driverInfoDto.setProfileId(profileId);
+        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));
         if (null == driverInfos || driverInfos.size() < 1) {
             throw new NotFoundException("The driver infos does not exist");
         }
@@ -183,10 +183,12 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
         Optional.ofNullable(driverInfoDto).ifPresent(dto -> {
-            Optional.ofNullable(dto.getDriverAttributeId()).ifPresent(driverAttributeId ->
-                    queryWrapper.eq(DriverInfo::getDriverAttributeId, driverAttributeId));
-            Optional.ofNullable(dto.getProfileId()).ifPresent(profileId ->
-                    queryWrapper.eq(DriverInfo::getProfileId, profileId));
+            if (null != dto.getDriverAttributeId()) {
+                queryWrapper.eq(DriverInfo::getDriverAttributeId, dto.getDriverAttributeId());
+            }
+            if (null != dto.getProfileId()) {
+                queryWrapper.eq(DriverInfo::getProfileId, dto.getProfileId());
+            }
         });
         return queryWrapper;
     }
