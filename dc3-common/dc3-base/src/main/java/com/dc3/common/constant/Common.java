@@ -64,6 +64,14 @@ public interface Common {
     String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/";
 
     /**
+     * 应答语
+     */
+    interface Response {
+        String OK = "ok";
+        String ERROR = "error";
+    }
+
+    /**
      * 消息常量
      */
     interface Rabbit {
@@ -90,8 +98,6 @@ public interface Common {
      */
     interface Driver {
         int MAX_REQUEST_SIZE = 100;
-        String CHECK_MANAGER_VALID_BACK = "register_driver";
-        String SYNC_DRIVER_METADATA_BACK = "sync_driver_metadata";
 
         /**
          * 设备状态
@@ -109,15 +115,26 @@ public interface Common {
          * 驱动事件
          */
         interface Event {
-            String CHECK_MANAGER_VALID = "check_manager";
+            /**
+             * 驱动注册握手事件，该事件用于校验当前 dc3-manager 是否可用
+             */
+            String REGISTER_HANDSHAKE = "register_handshake";
+            String REGISTER_HANDSHAKE_BACK = "register_handshake_back";
 
             /**
-             * 驱动元数据同步事件
+             * 驱动注册事件，该事件用于向 dc3-manager 注册驱动配置信息
+             */
+            String DRIVER_REGISTER = "driver_register";
+            String DRIVER_REGISTER_BACK = "driver_register_back";
+
+            /**
+             * 同步驱动元数据时间，该事件用于向 dc3-manager 发送驱动元数据同步请求
              */
             String SYNC_DRIVER_METADATA = "sync_driver_metadata";
+            String SYNC_DRIVER_METADATA_BACK = "sync_driver_metadata_back";
 
             /**
-             * 驱动心跳事件
+             * 驱动心跳事件，该事件用于向 dc3-manager 发送驱动的当前状态
              */
             String HEARTBEAT = "heartbeat";
         }
@@ -304,6 +321,15 @@ public interface Common {
         String SEPARATOR = "::";
 
         String ID = "_id";
+        String DRIVER_ID = "_driver_id";
+        String PROFILE_ID = "_profile_id";
+        String GROUP_ID = "_group_id";
+        String DEVICE_ID = "_device_id";
+        String POINT_ID = "_point_id";
+        String ATTRIBUTE_ID = "_attribute_id";
+        String DRIVER_INFO_ID = "_driver_info_id";
+        String POINT_INFO_ID = "_point_info_id";
+
         String IP = "_ip";
         String NAME = "_name";
         String CODE = "_code";
@@ -315,16 +341,8 @@ public interface Common {
         String SALT = "_salt";
         String TOKEN = "_token";
         String LIMIT = "_limit";
-        String SERVICE_NAME = "_service_name";
         String HOST_PORT = "_host_port";
-        String DRIVER_ID = "_driver_id";
-        String DEVICE_ID = "_device_id";
-        String POINT_ID = "_point_id";
-        String PROFILE_ID = "_profile_id";
-        String ATTRIBUTE_ID = "_attribute_id";
-        String DRIVER_INFO_ID = "_driver_info_id";
-        String POINT_INFO_ID = "_point_info_id";
-        String GROUP_NAME = "_group_name";
+        String SERVICE_NAME = "_service_name";
 
         String DRIVER = "driver";
         String DRIVER_ATTRIBUTE = "driver_attribute";

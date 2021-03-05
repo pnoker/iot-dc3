@@ -19,12 +19,12 @@ package com.dc3.common.exception;
 import cn.hutool.core.util.StrUtil;
 
 /**
- * 自定义 服务 异常
+ * 自定义 重复 异常
  *
  * @author pnoker
  */
-public class ServiceException extends RuntimeException {
-    public ServiceException(CharSequence template, Object... params) {
+public class DuplicateException extends RuntimeException {
+    public DuplicateException(CharSequence template, Object... params) {
         super(StrUtil.format(template, params));
     }
 }

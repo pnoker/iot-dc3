@@ -26,13 +26,10 @@ import com.dc3.center.manager.service.PointService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
-import com.dc3.common.dto.DeviceDto;
-import com.dc3.common.dto.PointDto;
 import com.dc3.common.dto.ProfileDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
-import com.dc3.common.model.Device;
-import com.dc3.common.model.Point;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -77,17 +74,16 @@ public class ProfileServiceImpl implements ProfileService {
             }
     )
     public Profile add(Profile profile) {
-        if (null != selectByName(profile.getName())) {
-            throw new ServiceException("The profile already exists");
+        try {
+            selectByName(profile.getName());
+            throw new DuplicateException("The profile already exists");
+        } catch (NotFoundException notFoundException) {
+            driverService.selectById(profile.getDriverId());
+            if (profileMapper.insert(profile) > 0) {
+                return profileMapper.selectById(profile.getId());
+            }
+            throw new ServiceException("The profile add failed");
         }
-
-        // Check if the driver exists
-        driverService.selectById(profile.getDriverId());
-
-        if (profileMapper.insert(profile) > 0) {
-            return profileMapper.selectById(profile.getId());
-        }
-        throw new ServiceException("The profile add failed");
     }
 
 
@@ -102,24 +98,18 @@ public class ProfileServiceImpl implements ProfileService {
             }
     )
     public boolean delete(Long id) {
-        DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setProfileId(id);
-        Page<Device> devicePage = deviceService.list(deviceDto);
-        if (devicePage.getTotal() > 0) {
+        try {
+            deviceService.selectDeviceByProfileId(id);
             throw new ServiceException("The profile already bound by the device");
+        } catch (NotFoundException notFoundException1) {
+            try {
+                pointService.selectByProfileId(id);
+                throw new ServiceException("The profile already bound by the point");
+            } catch (NotFoundException notFoundException2) {
+                selectById(id);
+                return profileMapper.deleteById(id) > 0;
+            }
         }
-
-        PointDto pointDto = new PointDto();
-        pointDto.setProfileId(id);
-        Page<Point> pointPage = pointService.list(pointDto);
-        if (pointPage.getTotal() > 0) {
-            throw new ServiceException("The profile already bound by the point");
-        }
-        Profile profile = selectById(id);
-        if (null == profile) {
-            throw new ServiceException("The profile does not exist");
-        }
-        return profileMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -135,10 +125,7 @@ public class ProfileServiceImpl implements ProfileService {
             }
     )
     public Profile update(Profile profile) {
-        Profile temp = selectById(profile.getId());
-        if (null == temp) {
-            throw new ServiceException("The profile does not exist");
-        }
+        selectById(profile.getId());
         profile.setUpdateTime(null);
         if (profileMapper.updateById(profile) > 0) {
             Profile select = profileMapper.selectById(profile.getId());
@@ -153,7 +140,7 @@ public class ProfileServiceImpl implements ProfileService {
     public Profile selectById(Long id) {
         Profile profile = profileMapper.selectById(id);
         if (null == profile) {
-            throw new ServiceException("The profile does not exist");
+            throw new NotFoundException("The profile does not exist");
         }
         return profile;
     }
@@ -161,11 +148,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public Profile selectByName(String name) {
-        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.eq(Profile::getName, name);
-        Profile profile = profileMapper.selectOne(queryWrapper);
+        ProfileDto profileDto = new ProfileDto();
+        profileDto.setName(name);
+        Profile profile = profileMapper.selectOne(fuzzyQuery(profileDto));
         if (null == profile) {
-            throw new ServiceException("The profile does not exist");
+            throw new NotFoundException("The profile does not exist");
         }
         return profile;
     }
@@ -173,9 +160,9 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
     public List<Profile> selectByDriverId(Long driverId) {
-        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.eq(Profile::getDriverId, driverId);
-        List<Profile> profiles = profileMapper.selectList(queryWrapper);
+        ProfileDto profileDto = new ProfileDto();
+        profileDto.setDriverId(driverId);
+        List<Profile> profiles = profileMapper.selectList(fuzzyQuery(profileDto));
         if (null == profiles || profiles.size() < 1) {
             throw new NotFoundException("The profiles does not exist");
         }

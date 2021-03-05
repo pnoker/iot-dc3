@@ -16,6 +16,7 @@
 
 package com.dc3.common.bean;
 
+import com.dc3.common.constant.Common;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +38,7 @@ public class R<T> implements Serializable {
     private boolean ok = false;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String message = "fail";
+    private String message = Common.Response.ERROR;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
@@ -142,7 +143,7 @@ public class R<T> implements Serializable {
      */
     private R success() {
         this.ok = true;
-        this.message = "ok";
+        this.message = Common.Response.OK;
         return this;
     }
 
@@ -165,7 +166,7 @@ public class R<T> implements Serializable {
      */
     private R failure() {
         this.ok = false;
-        this.message = "fail";
+        this.message = Common.Response.ERROR;
         return this;
     }
 

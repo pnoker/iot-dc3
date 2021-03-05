@@ -24,10 +24,10 @@ import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.GroupService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
-import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.dto.GroupDto;
+import com.dc3.common.exception.DuplicateException;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
-import com.dc3.common.model.Device;
 import com.dc3.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -65,14 +65,15 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public Group add(Group group) {
-        if (null != selectByName(group.getName())) {
-            throw new ServiceException("The device group already exists");
+        try {
+            selectByName(group.getName());
+            throw new DuplicateException("The device group already exists");
+        } catch (NotFoundException notFoundException) {
+            if (groupMapper.insert(group) > 0) {
+                return groupMapper.selectById(group.getId());
+            }
+            throw new ServiceException("The group add failed");
         }
-
-        if (groupMapper.insert(group) > 0) {
-            return groupMapper.selectById(group.getId());
-        }
-        throw new ServiceException("The group add failed");
     }
 
     @Override
@@ -85,17 +86,13 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public boolean delete(Long id) {
-        DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setGroupId(id);
-        Page<Device> devicePage = deviceService.list(deviceDto);
-        if (devicePage.getTotal() > 0) {
+        try {
+            deviceService.selectDeviceByGroupId(id);
             throw new ServiceException("The group already bound by the device");
+        } catch (NotFoundException notFoundException) {
+            selectById(id);
+            return groupMapper.deleteById(id) > 0;
         }
-        Group group = selectById(id);
-        if (null == group) {
-            throw new ServiceException("The group does not exist");
-        }
-        return groupMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -110,10 +107,7 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public Group update(Group group) {
-        Group temp = selectById(group.getId());
-        if (null == temp) {
-            throw new ServiceException("The group does not exist");
-        }
+        selectById(group.getId());
         group.setUpdateTime(null);
         if (groupMapper.updateById(group) > 0) {
             Group select = groupMapper.selectById(group.getId());
@@ -128,7 +122,7 @@ public class GroupServiceImpl implements GroupService {
     public Group selectById(Long id) {
         Group group = groupMapper.selectById(id);
         if (null == group) {
-            throw new ServiceException("The group does not exist");
+            throw new NotFoundException("The group does not exist");
         }
         return group;
     }
@@ -140,7 +134,7 @@ public class GroupServiceImpl implements GroupService {
         queryWrapper.eq(Group::getName, name);
         Group group = groupMapper.selectOne(queryWrapper);
         if (null == group) {
-            throw new ServiceException("The group does not exist");
+            throw new NotFoundException("The group does not exist");
         }
         return group;
     }

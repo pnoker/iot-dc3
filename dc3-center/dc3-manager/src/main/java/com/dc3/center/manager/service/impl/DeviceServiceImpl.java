@@ -62,40 +62,40 @@ public class DeviceServiceImpl implements DeviceService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, key = "#device.groupId+'.'+#device.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, key = "#device.name+'.'+#device.groupId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Device add(Device device) {
-        if (null != selectDeviceByNameAndGroupId(device.getName(), device.getGroupId())) {
+        try {
+            selectDeviceByNameAndGroupId(device.getName(), device.getGroupId());
             throw new ServiceException("The device already exists in the group");
+        } catch (NotFoundException notFoundException) {
+            if (deviceMapper.insert(device) > 0) {
+                return deviceMapper.selectById(device.getId());
+            }
+            throw new ServiceException("The device add failed");
         }
-
-        if (deviceMapper.insert(device) > 0) {
-            return deviceMapper.selectById(device.getId());
-        }
-        throw new ServiceException("The device add failed");
     }
 
     @Override
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
-        Device device = selectById(id);
-        if (null == device) {
-            throw new ServiceException("The device does not exist");
-        }
+        selectById(id);
         return deviceMapper.deleteById(id) > 0;
     }
 
@@ -103,23 +103,21 @@ public class DeviceServiceImpl implements DeviceService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, key = "#device.groupId+'.'+#device.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, key = "#device.name+'.'+#device.groupId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Device update(Device device) {
-        Device temp = selectById(device.getId());
-        if (null == temp) {
-            throw new ServiceException("The device does not exist");
-        }
+        selectById(device.getId());
         device.setUpdateTime(null);
         if (deviceMapper.updateById(device) > 0) {
             Device select = deviceMapper.selectById(device.getId());
-            device.setGroupId(select.getGroupId()).setName(select.getName());
+            device.setName(select.getName()).setGroupId(select.getGroupId());
             return select;
         }
         throw new ServiceException("The device update failed");
@@ -130,20 +128,20 @@ public class DeviceServiceImpl implements DeviceService {
     public Device selectById(Long id) {
         Device device = deviceMapper.selectById(id);
         if (null == device) {
-            throw new ServiceException("The device does not exist");
+            throw new NotFoundException("The device does not exist");
         }
         return device;
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.GROUP_NAME, key = "#groupId+'.'+#name", unless = "#result==null")
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, key = "#name+'.'+#groupId", unless = "#result==null")
     public Device selectDeviceByNameAndGroupId(String name, Long groupId) {
-        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.eq(Device::getGroupId, groupId);
-        queryWrapper.eq(Device::getName, name);
-        Device device = deviceMapper.selectOne(queryWrapper);
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setName(name);
+        deviceDto.setGroupId(groupId);
+        Device device = deviceMapper.selectOne(fuzzyQuery(deviceDto));
         if (null == device) {
-            throw new ServiceException("The device does not exist");
+            throw new NotFoundException("The device does not exist");
         }
         return device;
     }
@@ -151,15 +149,28 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
     public List<Device> selectDeviceByProfileId(Long profileId) {
-        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.eq(Device::getProfileId, profileId);
-        List<Device> devices = deviceMapper.selectList(queryWrapper);
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setProfileId(profileId);
+        List<Device> devices = deviceMapper.selectList(fuzzyQuery(deviceDto));
         if (null == devices || devices.size() < 1) {
             throw new NotFoundException("The devices does not exist");
         }
         return devices;
     }
 
+    @Override
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, key = "#groupId", unless = "#result==null")
+    public List<Device> selectDeviceByGroupId(Long groupId) {
+        DeviceDto deviceDto = new DeviceDto();
+        deviceDto.setGroupId(groupId);
+        List<Device> devices = deviceMapper.selectList(fuzzyQuery(deviceDto));
+        if (null == devices || devices.size() < 1) {
+            throw new NotFoundException("The devices does not exist");
+        }
+        return devices;
+    }
+
+    //TODO 合并到list中
     @Override
     public Map<Long, String> deviceStatus(DeviceDto deviceDto) {
         Map<Long, String> deviceStatusMap = new HashMap<>(16);
@@ -196,8 +207,12 @@ public class DeviceServiceImpl implements DeviceService {
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Device::getName, dto.getName());
             }
-            Optional.ofNullable(dto.getProfileId()).ifPresent(profileId -> queryWrapper.eq(Device::getProfileId, profileId));
-            Optional.ofNullable(dto.getGroupId()).ifPresent(groupId -> queryWrapper.eq(Device::getGroupId, groupId));
+            if (null != dto.getProfileId()) {
+                queryWrapper.eq(Device::getProfileId, dto.getProfileId());
+            }
+            if (null != dto.getGroupId()) {
+                queryWrapper.eq(Device::getGroupId, dto.getGroupId());
+            }
         });
         return queryWrapper;
     }

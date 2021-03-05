@@ -17,7 +17,6 @@
 package com.dc3.common.sdk.service.impl;
 
 import cn.hutool.core.thread.ThreadUtil;
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.bean.driver.DriverEvent;
 import com.dc3.common.bean.driver.DriverRegister;
@@ -59,71 +58,95 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
     @Resource
     private DriverProperty driverProperty;
     @Resource
+    private DriverService driverService;
+    @Resource
     private RabbitTemplate rabbitTemplate;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
-    @Resource
-    private DriverService driverService;
 
     @Override
     public void initial() {
         String localHost = Dc3Util.localHost();
         if (!Dc3Util.isName(driverProperty.getName()) || !Dc3Util.isName(this.serviceName) || !Dc3Util.isHost(localHost)) {
-            throw new ServiceException("Driver Name || Driver Service Name || Driver Host is invalid");
+            throw new ServiceException("The driver name, service name or host name format is invalid");
         }
-
         if (!Dc3Util.isDriverPort(this.port)) {
-            throw new ServiceException("Invalid driver port, port range is 8600-8799");
+            throw new ServiceException("The driver port is invalid, port range is 8600-8799");
         }
 
         Driver driver = new Driver(driverProperty.getName(), this.serviceName, localHost, this.port);
         driver.setDescription(driverProperty.getDescription());
-        DriverRegister driverRegister = new DriverRegister(driver, driverProperty.getDriverAttribute(), driverProperty.getPointAttribute());
-
-        // Check whether dc3-manager is valid
-        Future<String> check = threadPoolExecutor.submit(() -> {
-            rabbitTemplate.convertAndSend(
-                    Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                    Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName,
-                    new DriverEvent(serviceName, Common.Driver.Event.CHECK_MANAGER_VALID, driverRegister)
-            );
-            while (!Common.Driver.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
-                ThreadUtil.sleep(500);
-            }
-            return driverContext.getDriverStatus();
-        });
+        String routingKey = Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName;
+        log.info("The driver {}/{}　is registering...", driver.getServiceName(), driver.getName());
 
         try {
-            driverContext.setDriverStatus(check.get(15, TimeUnit.SECONDS));
+            threadPoolExecutor.submit(() -> {
+                DriverEvent handshakeEvent = new DriverEvent(
+                        serviceName,
+                        Common.Driver.Event.REGISTER_HANDSHAKE,
+                        null
+                );
+                rabbitTemplate.convertAndSend(
+                        Common.Rabbit.TOPIC_EXCHANGE_EVENT,
+                        routingKey,
+                        handshakeEvent,
+                        message -> {
+                            message.getMessageProperties().setExpiration("15000");
+                            return message;
+                        }
+                );
+
+                while (!Common.Driver.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
+                    ThreadUtil.sleep(500);
+                }
+            }).get(15, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException exception) {
-            log.error("Driver initialization failed, please check whether dc3-manager service and rabbitmq service are started normally");
-            check.cancel(true);
-            driverService.close();
+            throw new ServiceException("The driver initialization failed, Check whether dc3-manager are started normally");
         }
 
-        // Receive driver metadata from dc3-manager
-        Future<String> register = threadPoolExecutor.submit(() -> {
-            rabbitTemplate.convertAndSend(
-                    Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                    Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName,
-                    new DriverEvent(serviceName, Common.Driver.Event.SYNC_DRIVER_METADATA, driverRegister)
-            );
-            log.info("Registering driver {}\n{}", driverProperty.getName(), JSON.toJSONString(driverRegister, true));
-            log.info("Wait a moment(depends on the size of the loaded driver metadata), the driver metadata is being loaded and processed...");
-            while (!Common.Driver.Status.ONLINE.equals(driverContext.getDriverStatus())) {
-                ThreadUtil.sleep(500);
-            }
-            return driverContext.getDriverStatus();
-        });
+        DriverRegister driverRegister = new DriverRegister(
+                driver,
+                driverProperty.getDriverAttribute(),
+                driverProperty.getPointAttribute()
+        );
+        DriverEvent registerEvent = new DriverEvent(
+                serviceName,
+                Common.Driver.Event.DRIVER_REGISTER,
+                driverRegister
+        );
+        rabbitTemplate.convertAndSend(
+                Common.Rabbit.TOPIC_EXCHANGE_EVENT,
+                routingKey,
+                registerEvent,
+                message -> {
+                    message.getMessageProperties().setExpiration("15000");
+                    return message;
+                }
+        );
 
         try {
-            driverContext.setDriverStatus(register.get(5, TimeUnit.MINUTES));
-            log.info("Driver {}/{} initialization is successful", driver.getServiceName(), driver.getName());
+            driverContext.setDriverStatus(threadPoolExecutor.submit(() -> {
+                DriverEvent syncEvent = new DriverEvent(
+                        serviceName,
+                        Common.Driver.Event.SYNC_DRIVER_METADATA,
+                        driver.getServiceName()
+                );
+                rabbitTemplate.convertAndSend(
+                        Common.Rabbit.TOPIC_EXCHANGE_EVENT,
+                        routingKey,
+                        syncEvent
+                );
+
+                while (!Common.Driver.Status.ONLINE.equals(driverContext.getDriverStatus())) {
+                    ThreadUtil.sleep(500);
+                }
+                return driverContext.getDriverStatus();
+            }).get(5, TimeUnit.MINUTES));
         } catch (InterruptedException | ExecutionException | TimeoutException exception) {
-            log.error("Driver initialization failed, receiving driver metadata from dc3-manager timed out");
-            register.cancel(true);
-            driverService.close();
+            throw new ServiceException("The driver initialization failed, Sync driver metadata from dc3-manager timeout");
         }
+
+        log.info("Driver initialization is complete");
     }
 
     @Override

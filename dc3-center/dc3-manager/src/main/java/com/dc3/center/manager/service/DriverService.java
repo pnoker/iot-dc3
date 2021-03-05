@@ -71,7 +71,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Map<String, Boolean> driverStatus(DriverDto driverDto);
 
     /**
-     * 驱动元数据同步
+     * 驱动注册
      *
      * @param driverRegister DriverRegister
      */

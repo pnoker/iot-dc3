@@ -33,8 +33,8 @@ public interface DeviceService extends Service<Device, DeviceDto> {
     /**
      * 根据设备 NAME 和分组 ID 查询
      *
-     * @param name    Device Name
-     * @param groupId Device Group Id
+     * @param name    Name
+     * @param groupId Group Id
      * @return Device
      */
     Device selectDeviceByNameAndGroupId(String name, Long groupId);
@@ -46,6 +46,14 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      * @return Device Array
      */
     List<Device> selectDeviceByProfileId(Long profileId);
+
+    /**
+     * 根据分组 ID 查询
+     *
+     * @param groupId Group Id
+     * @return Device Array
+     */
+    List<Device> selectDeviceByGroupId(Long groupId);
 
     /**
      * 查询 Device 服务状态
