@@ -50,12 +50,7 @@ public class DriverReadScheduleJob extends QuartzJobBean {
         Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getDriverMetadata().getDevicePointInfoMap();
         pointInfoMap.forEach(
                 (deviceId, pointMap) -> pointMap.forEach(
-                        (pointId, point) -> threadPoolExecutor.execute(
-                                () -> {
-                                    log.debug("Execute read schedule for device({}),point({}),{}", deviceId, pointId, point);
-                                    driverCommandService.read(deviceId, pointId);
-                                }
-                        )
+                        (pointId, point) -> threadPoolExecutor.execute(() -> driverCommandService.read(deviceId, pointId))
                 )
         );
     }

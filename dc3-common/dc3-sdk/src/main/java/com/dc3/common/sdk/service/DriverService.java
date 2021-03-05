@@ -17,6 +17,8 @@
 package com.dc3.common.sdk.service;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.DeviceEvent;
 import com.dc3.common.bean.driver.PointValue;
 import com.dc3.common.constant.Common;
@@ -101,7 +103,6 @@ public class DriverService {
                 throw new ServiceException(String.format("Invalid device(%s) point(%s) value(%s) type: %s ", deviceId, pointId, rawValue, point.getType()));
         }
 
-        log.debug("Convert device({}) point({}) rawValue({}) to value({})", deviceId, pointId, rawValue, value);
         return value;
     }
 
@@ -144,7 +145,7 @@ public class DriverService {
      */
     public void pointValueSender(PointValue pointValue) {
         if (null != pointValue) {
-            log.debug("Send single point data: {}", pointValue);
+            log.debug("Send point value: {}", JSON.toJSONString(pointValue));
             rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + serviceName, pointValue);
         }
     }
@@ -160,8 +161,12 @@ public class DriverService {
 
     /**
      * Close ApplicationContext
+     *
+     * @param template Template
+     * @param params   Object Params
      */
-    public void close() {
+    public void close(CharSequence template, Object... params) {
+        log.error(StrUtil.format(template, params));
         ((ConfigurableApplicationContext) applicationContext).close();
         System.exit(1);
     }

@@ -45,6 +45,9 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
     @Override
     public void initial() {
         Optional.ofNullable(driverProperty.getSchedule()).ifPresent(property -> {
+            // driver heartbeat
+            createScheduleJob("DriverScheduleGroup", "StatusScheduleJob", "0/10 * * * * ?", DriverStatusScheduleJob.class);
+
             // driver read
             if (property.getRead().getEnable()) {
                 createScheduleJob("DriverScheduleGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
@@ -54,9 +57,6 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             if (property.getCustom().getEnable()) {
                 createScheduleJob("DriverScheduleGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
-
-            // driver heartbeat
-            createScheduleJob("DriverScheduleGroup", "StatusScheduleJob", "0/5 * * * * ?", DriverStatusScheduleJob.class);
 
             try {
                 if (!scheduler.isShutdown()) {

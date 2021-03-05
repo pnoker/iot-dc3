@@ -63,7 +63,7 @@ public class DriverEventReceiver {
             MessageProperties properties = message.getMessageProperties();
             channel.basicAck(properties.getDeliveryTag(), true);
             if (null == driverEvent || StringUtils.isEmpty(driverEvent.getServiceName())) {
-                log.error("Invalid driver event, {}, {}", properties, driverEvent);
+                log.error("Invalid driver event {}", driverEvent);
                 return;
             }
 

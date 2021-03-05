@@ -52,7 +52,7 @@ public class PointValueReceiver {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             if (null == pointValue || null == pointValue.getDeviceId()) {
-                log.error("Invalid point data: {}", pointValue);
+                log.error("Invalid point value {}", pointValue);
                 return;
             }
             PointValueScheduleJob.valueCount.getAndIncrement();
