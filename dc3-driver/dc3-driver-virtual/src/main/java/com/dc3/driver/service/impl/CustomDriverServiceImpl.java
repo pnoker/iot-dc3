@@ -51,7 +51,6 @@ public class CustomDriverServiceImpl implements CustomDriverService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        log.debug("Virtual Driver Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         return String.valueOf(RandomUtil.randomDouble(100));
     }
 

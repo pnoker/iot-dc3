@@ -16,7 +16,6 @@
 
 package com.dc3.common.sdk.service;
 
-import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.model.*;
 
 /**
@@ -42,6 +41,21 @@ public interface DriverMetadataService {
      * @param id Id
      */
     void deleteProfile(Long id);
+
+    /**
+     * 向 DeviceDriver 中添加驱动配置信息
+     *
+     * @param driverInfo DriverInfo
+     */
+    void upsertDriverInfo(DriverInfo driverInfo);
+
+    /**
+     * 删除 DeviceDriver 中添加驱动配置信息
+     *
+     * @param attributeId Attribute Id
+     * @param profileId   Profile Id
+     */
+    void deleteDriverInfo(Long attributeId, Long profileId);
 
     /**
      * 向 DeviceDriver 中添加设备
@@ -71,21 +85,6 @@ public interface DriverMetadataService {
      * @param profileId Profile Id
      */
     void deletePoint(Long id, Long profileId);
-
-    /**
-     * 向 DeviceDriver 中添加驱动配置信息
-     *
-     * @param driverInfo DriverInfo
-     */
-    void upsertDriverInfo(DriverInfo driverInfo);
-
-    /**
-     * 删除 DeviceDriver 中添加驱动配置信息
-     *
-     * @param attributeId Attribute Id
-     * @param profileId   Profile Id
-     */
-    void deleteDriverInfo(Long attributeId, Long profileId);
 
     /**
      * 向 DeviceDriver 中添加位号配置信息

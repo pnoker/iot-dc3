@@ -35,7 +35,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.concurrent.*;
 
 /**
@@ -56,9 +55,9 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
     @Resource
     private DriverContext driverContext;
     @Resource
-    private DriverProperty driverProperty;
-    @Resource
     private DriverService driverService;
+    @Resource
+    private DriverProperty driverProperty;
     @Resource
     private RabbitTemplate rabbitTemplate;
     @Resource
@@ -77,32 +76,9 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         Driver driver = new Driver(driverProperty.getName(), this.serviceName, localHost, this.port);
         driver.setDescription(driverProperty.getDescription());
         String routingKey = Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName;
-        log.info("The driver {}/{}　is registering...", driver.getServiceName(), driver.getName());
+        log.info("The driver {}/{} is initializing...", driver.getServiceName(), driver.getName());
 
-        try {
-            threadPoolExecutor.submit(() -> {
-                DriverEvent handshakeEvent = new DriverEvent(
-                        serviceName,
-                        Common.Driver.Event.REGISTER_HANDSHAKE,
-                        null
-                );
-                rabbitTemplate.convertAndSend(
-                        Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                        routingKey,
-                        handshakeEvent,
-                        message -> {
-                            message.getMessageProperties().setExpiration("15000");
-                            return message;
-                        }
-                );
-
-                while (!Common.Driver.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
-                    ThreadUtil.sleep(500);
-                }
-            }).get(15, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
-            throw new ServiceException("The driver initialization failed, Check whether dc3-manager are started normally");
-        }
+        registerHandshake(routingKey);
 
         DriverRegister driverRegister = new DriverRegister(
                 driver,
@@ -119,13 +95,149 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
                 routingKey,
                 registerEvent,
                 message -> {
-                    message.getMessageProperties().setExpiration("15000");
+                    message.getMessageProperties().setExpiration("5000");
                     return message;
                 }
         );
 
+        syncDriverMetadata(driver, routingKey);
+
+        log.info("The driver {}/{} is initialized", driver.getServiceName(), driver.getName());
+    }
+
+    @Override
+    public void upsertProfile(Profile profile) {
+        // Add profile driver info to context
+        driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
+
+        // Add profile point to context
+        driverContext.getDriverMetadata().getProfilePointMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
+    }
+
+    @Override
+    public void deleteProfile(Long id) {
+        driverContext.getDriverMetadata().getProfileDriverInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        driverContext.getDriverMetadata().getProfilePointMap().entrySet().removeIf(next -> next.getKey().equals(id));
+    }
+
+    @Override
+    public void upsertDriverInfo(DriverInfo driverInfo) {
+        // Add driver info to driver info map context
+        DriverAttribute attribute = driverContext.getDriverMetadata().getDriverAttributeMap().get(driverInfo.getDriverAttributeId());
+        if (null != attribute) {
+            driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfAbsent(driverInfo.getProfileId(), k -> new ConcurrentHashMap<>(16))
+                    .put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
+        }
+    }
+
+    @Override
+    public void deleteDriverInfo(Long attributeId, Long profileId) {
+        DriverAttribute attribute = driverContext.getDriverMetadata().getDriverAttributeMap().get(attributeId);
+        if (null != attribute) {
+            String attributeName = attribute.getName();
+
+            // Delete driver info from driver info map context
+            driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfPresent(profileId, (k, v) -> {
+                v.entrySet().removeIf(next -> next.getKey().equals(attributeName));
+                return v;
+            });
+        }
+    }
+
+    @Override
+    public void upsertDevice(Device device) {
+        // Add device to context
+        driverContext.getDriverMetadata().getDeviceMap().put(device.getId(), device);
+        // Add device name to context
+        driverContext.getDriverMetadata().getDeviceNameMap().put(device.getName(), device.getId());
+    }
+
+    @Override
+    public void deleteDevice(Long id) {
+        driverContext.getDriverMetadata().getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        driverContext.getDriverMetadata().getDeviceNameMap().entrySet().removeIf(next -> next.getValue().equals(id));
+        driverContext.getDriverMetadata().getDevicePointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
+    }
+
+    @Override
+    public void upsertPoint(Point point) {
+        // Upsert point to profile point map context
+        driverContext.getDriverMetadata().getProfilePointMap().computeIfAbsent(point.getProfileId(), k -> new ConcurrentHashMap<>(16)).put(point.getId(), point);
+    }
+
+    @Override
+    public void deletePoint(Long pointId, Long profileId) {
+        // Delete point from profile point map context
+        driverContext.getDriverMetadata().getProfilePointMap().computeIfPresent(profileId, (k, v) -> {
+            v.entrySet().removeIf(next -> next.getKey().equals(pointId));
+            return v;
+        });
+    }
+
+    @Override
+    public void upsertPointInfo(PointInfo pointInfo) {
+        // Add the point info to the device point info map context
+        PointAttribute attribute = driverContext.getDriverMetadata().getPointAttributeMap().get(pointInfo.getPointAttributeId());
+        if (null != attribute) {
+            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfAbsent(pointInfo.getDeviceId(), k -> new ConcurrentHashMap<>(16))
+                    .computeIfAbsent(pointInfo.getPointId(), k -> new ConcurrentHashMap<>(16))
+                    .put(attribute.getName(), new AttributeInfo(pointInfo.getValue(), attribute.getType()));
+        }
+    }
+
+    @Override
+    public void deletePointInfo(Long pointId, Long attributeId, Long deviceId) {
+        PointAttribute attribute = driverContext.getDriverMetadata().getPointAttributeMap().get(attributeId);
+        if (null != attribute) {
+            String attributeName = attribute.getName();
+
+            // Delete the point info from the device info map context
+            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfPresent(deviceId, (key1, value1) -> {
+                value1.computeIfPresent(pointId, (key2, value2) -> {
+                    value2.entrySet().removeIf(next -> next.getKey().equals(attributeName));
+                    return value2;
+                });
+                return value1;
+            });
+
+            // If the point attribute is null, delete the point info from the device info map context
+            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfPresent(deviceId, (key, value) -> {
+                value.entrySet().removeIf(next -> next.getValue().size() < 1);
+                return value;
+            });
+        }
+    }
+
+    private void registerHandshake(String routingKey) {
         try {
-            driverContext.setDriverStatus(threadPoolExecutor.submit(() -> {
+            threadPoolExecutor.submit(() -> {
+                DriverEvent handshakeEvent = new DriverEvent(
+                        serviceName,
+                        Common.Driver.Event.REGISTER_HANDSHAKE,
+                        null
+                );
+                rabbitTemplate.convertAndSend(
+                        Common.Rabbit.TOPIC_EXCHANGE_EVENT,
+                        routingKey,
+                        handshakeEvent,
+                        message -> {
+                            message.getMessageProperties().setExpiration("5000");
+                            return message;
+                        }
+                );
+
+                while (!Common.Driver.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
+                    ThreadUtil.sleep(500);
+                }
+            }).get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
+            driverService.close("The driver initialization failed, Check whether dc3-manager are started normally");
+        }
+    }
+
+    private void syncDriverMetadata(Driver driver, String routingKey) {
+        try {
+            threadPoolExecutor.submit(() -> {
                 DriverEvent syncEvent = new DriverEvent(
                         serviceName,
                         Common.Driver.Event.SYNC_DRIVER_METADATA,
@@ -140,145 +252,9 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
                 while (!Common.Driver.Status.ONLINE.equals(driverContext.getDriverStatus())) {
                     ThreadUtil.sleep(500);
                 }
-                return driverContext.getDriverStatus();
-            }).get(5, TimeUnit.MINUTES));
+            }).get(5, TimeUnit.MINUTES);
         } catch (InterruptedException | ExecutionException | TimeoutException exception) {
-            throw new ServiceException("The driver initialization failed, Sync driver metadata from dc3-manager timeout");
-        }
-
-        log.info("Driver initialization is complete");
-    }
-
-    @Override
-    public void upsertProfile(Profile profile) {
-        // Add profile driver info to context
-        driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
-
-        // Add profile point to context
-        driverContext.getDriverMetadata().getProfilePointMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
-
-        log.info("Upsert profile {}", profile);
-    }
-
-    @Override
-    public void deleteProfile(Long id) {
-        log.info("Delete profile {}, driverInfo {}, profilePoint {}", id, driverContext.getDriverMetadata().getProfileDriverInfoMap().get(id), driverContext.getDriverMetadata().getProfilePointMap().get(id));
-
-        driverContext.getDriverMetadata().getProfileDriverInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
-        driverContext.getDriverMetadata().getProfilePointMap().entrySet().removeIf(next -> next.getKey().equals(id));
-    }
-
-    @Override
-    public void upsertDevice(Device device) {
-        // Add device to context
-        driverContext.getDriverMetadata().getDeviceMap().put(device.getId(), device);
-        // Add device name to context
-        driverContext.getDriverMetadata().getDeviceNameMap().put(device.getName(), device.getId());
-
-        log.info("Upsert device {}", device);
-    }
-
-    @Override
-    public void deleteDevice(Long id) {
-        log.info("Delete device {}, devicePointInfo {}", driverContext.getDriverMetadata().getDeviceMap().get(id), driverContext.getDriverMetadata().getDevicePointInfoMap().get(id));
-
-        driverContext.getDriverMetadata().getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
-        driverContext.getDriverMetadata().getDeviceNameMap().entrySet().removeIf(next -> next.getValue().equals(id));
-        driverContext.getDriverMetadata().getDevicePointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
-    }
-
-    @Override
-    public void upsertPoint(Point point) {
-        // Upsert point to profile point map context
-        log.info("Upsert point {}", point);
-        driverContext.getDriverMetadata().getProfilePointMap().computeIfAbsent(point.getProfileId(), k -> new HashMap<>(16))
-                .put(point.getId(), point);
-    }
-
-    @Override
-    public void deletePoint(Long pointId, Long profileId) {
-        // Delete point from profile point map context
-        driverContext.getDriverMetadata().getProfilePointMap().computeIfPresent(profileId, (k, v) -> {
-            v.entrySet().removeIf(next -> {
-                boolean equals = next.getKey().equals(pointId);
-                if (equals) {
-                    log.info("Delete point {}", next.getValue());
-                }
-                return equals;
-            });
-            return v;
-        });
-    }
-
-    @Override
-    public void upsertDriverInfo(DriverInfo driverInfo) {
-        // Add driver info to driver info map context
-        DriverAttribute attribute = driverContext.getDriverMetadata().getDriverAttributeMap().get(driverInfo.getDriverAttributeId());
-        if (null != attribute) {
-            log.info("Upsert driver info {}", driverInfo);
-            driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfAbsent(driverInfo.getProfileId(), k -> new HashMap<>(16))
-                    .put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
-        }
-    }
-
-    @Override
-    public void deleteDriverInfo(Long attributeId, Long profileId) {
-        DriverAttribute attribute = driverContext.getDriverMetadata().getDriverAttributeMap().get(attributeId);
-        if (null != attribute) {
-            String attributeName = attribute.getName();
-
-            // Delete driver info from driver info map context
-            driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfPresent(profileId, (k, v) -> {
-                v.entrySet().removeIf(next -> {
-                    boolean equals = next.getKey().equals(attributeName);
-                    if (equals) {
-                        log.info("Delete driver info {}", next.getValue());
-                    }
-                    return equals;
-                });
-                return v;
-            });
-        }
-    }
-
-    @Override
-    public void upsertPointInfo(PointInfo pointInfo) {
-        // Add the point info to the device point info map context
-        PointAttribute attribute = driverContext.getDriverMetadata().getPointAttributeMap().get(pointInfo.getPointAttributeId());
-        if (null != attribute) {
-            log.info("Upsert point info {}", pointInfo);
-            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfAbsent(pointInfo.getDeviceId(), k -> new HashMap<>(16))
-                    .computeIfAbsent(pointInfo.getPointId(), k -> new HashMap<>(16))
-                    .put(attribute.getName(), new AttributeInfo(pointInfo.getValue(), attribute.getType()));
-        }
-    }
-
-    @Override
-    public void deletePointInfo(Long pointId, Long attributeId, Long deviceId) {
-        PointAttribute attribute = driverContext.getDriverMetadata().getPointAttributeMap().get(attributeId);
-        if (null != attribute) {
-            String attributeName = attribute.getName();
-
-            // Delete the point info from the device info map context
-            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfPresent(deviceId, (k1, v1) -> {
-                v1.computeIfPresent(pointId, (k2, v2) -> {
-                    v2.entrySet().removeIf(next -> {
-                        boolean equals = next.getKey().equals(attributeName);
-                        if (equals) {
-                            log.info("Delete point info {}", next.getValue());
-                        }
-                        return equals;
-                    });
-                    return v2;
-                });
-                return v1;
-            });
-
-            // If the point attribute is null, delete the point info from the device info map context
-            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfPresent(deviceId, (k, v) -> {
-                v.entrySet().removeIf(next -> next.getValue().size() < 1);
-                return v;
-            });
+            driverService.close("The driver initialization failed, Sync driver metadata from dc3-manager timeout");
         }
     }
 }

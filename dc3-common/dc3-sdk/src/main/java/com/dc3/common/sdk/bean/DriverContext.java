@@ -20,7 +20,6 @@ import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.NotFoundException;
-import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import lombok.Data;
@@ -45,7 +44,7 @@ public class DriverContext {
     /**
      * 驱动 元数据，当且仅当驱动注册成功之后由 Manager 返回
      */
-    private DriverMetadata driverMetadata;
+    private DriverMetadata driverMetadata = new DriverMetadata();
 
     /**
      * 驱动 状态，默认为 未注册 状态
