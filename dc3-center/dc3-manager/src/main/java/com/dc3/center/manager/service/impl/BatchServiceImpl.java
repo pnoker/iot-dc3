@@ -93,7 +93,7 @@ public class BatchServiceImpl implements BatchService {
                 importPoint(profile, batchProfile.getPoints());
 
                 // import Device Array
-                importDevice(driver, profile, batchProfile.getGroups(), profile.getShare(), batchProfile.getPointConfig());
+                importDevice(driver, profile, batchProfile.getGroups(), batchProfile.getPointConfig());
             });
         });
     }
@@ -175,17 +175,20 @@ public class BatchServiceImpl implements BatchService {
             throw new ServiceException("Profile name is blank");
         }
 
-        Profile profile = profileService.selectByName(batchProfile.getName());
-        if (null == profile) {
+        Profile profile;
+        try {
+            profile = profileService.selectByName(batchProfile.getName());
+            profile.setShare(batchProfile.getShare());
+            profile.setDescription("批量导入：更新操作");
+            profile = profileService.update(profile);
+            notifyService.notifyDriverProfile(Common.Driver.Profile.UPDATE, profile);
+        } catch (NotFoundException notFoundException) {
             profile = new Profile(batchProfile.getName(), batchProfile.getShare(), driver.getId());
             profile.setDescription("批量导入：新增操作");
             profile = profileService.add(profile);
             notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
-        } else {
-            profile.setDescription("批量导入：更新操作");
-            profile = profileService.update(profile);
-            notifyService.notifyDriverProfile(Common.Driver.Profile.UPDATE, profile);
         }
+
         return profile;
     }
 
@@ -204,24 +207,21 @@ public class BatchServiceImpl implements BatchService {
 
         driverConfig.forEach((name, value) -> {
             DriverAttribute driverAttribute = driverAttributeService.selectByNameAndDriverId(name, driver.getId());
-            if (null == driverAttribute) {
-                throw new ServiceException("Invalid driver info: " + name);
-            }
             if (driverInfoList.contains(name)) {
                 throw new ServiceException("Repeatedly driver info: " + name);
             }
             driverInfoList.add(name);
 
-            DriverInfo driverInfo = driverInfoService.selectByAttributeIdAndProfileId(driverAttribute.getId(), profile.getId());
-            if (null == driverInfo) {
-                driverInfo = new DriverInfo(driverAttribute.getId(), value, profile.getId());
-                driverInfo.setDescription("批量导入：新增操作");
-                driverInfo = driverInfoService.add(driverInfo);
-                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.ADD, driverInfo);
-            } else {
+            try {
+                DriverInfo driverInfo = driverInfoService.selectByAttributeIdAndProfileId(driverAttribute.getId(), profile.getId());
                 driverInfo.setDescription("批量导入：更新操作");
                 driverInfo = driverInfoService.update(driverInfo.setValue(value));
                 notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.UPDATE, driverInfo);
+            } catch (NotFoundException notFoundException) {
+                DriverInfo driverInfo = new DriverInfo(driverAttribute.getId(), value, profile.getId());
+                driverInfo.setDescription("批量导入：新增操作");
+                driverInfo = driverInfoService.add(driverInfo);
+                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.ADD, driverInfo);
             }
         });
     }
@@ -235,9 +235,24 @@ public class BatchServiceImpl implements BatchService {
     private void importPoint(Profile profile, List<BatchPoint> points) {
         points.forEach(importPoint -> {
             // If point does not exist, add a new point, otherwise point will be updated
-            Point point = pointService.selectByNameAndProfileId(importPoint.getName(), profile.getId());
-            if (null == point) {
-                point = new Point(
+            try {
+                Point point = pointService.selectByNameAndProfileId(importPoint.getName(), profile.getId());
+                point
+                        .setName(importPoint.getName())
+                        .setType(importPoint.getType())
+                        .setRw(importPoint.getRw())
+                        .setBase(importPoint.getBase())
+                        .setMinimum(importPoint.getMinimum())
+                        .setMaximum(importPoint.getMaximum())
+                        .setMultiple(importPoint.getMultiple())
+                        .setAccrue(importPoint.getAccrue())
+                        .setFormat(importPoint.getFormat())
+                        .setUnit(importPoint.getUnit());
+                point.setDescription("批量导入：更新操作");
+                pointService.update(point);
+                notifyService.notifyDriverPoint(Common.Driver.Point.UPDATE, point);
+            } catch (NotFoundException notFoundException) {
+                Point point = new Point(
                         importPoint.getName(),
                         importPoint.getType(),
                         importPoint.getRw(),
@@ -253,21 +268,6 @@ public class BatchServiceImpl implements BatchService {
                 point.setDescription("批量导入：新增操作");
                 point = pointService.add(point);
                 notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point);
-            } else {
-                point
-                        .setName(importPoint.getName())
-                        .setType(importPoint.getType())
-                        .setRw(importPoint.getRw())
-                        .setBase(importPoint.getBase())
-                        .setMinimum(importPoint.getMinimum())
-                        .setMaximum(importPoint.getMaximum())
-                        .setMultiple(importPoint.getMultiple())
-                        .setAccrue(importPoint.getAccrue())
-                        .setFormat(importPoint.getFormat())
-                        .setUnit(importPoint.getUnit());
-                point.setDescription("批量导入：更新操作");
-                pointService.update(point);
-                notifyService.notifyDriverPoint(Common.Driver.Point.UPDATE, point);
             }
         });
     }
@@ -279,23 +279,28 @@ public class BatchServiceImpl implements BatchService {
      * @param profile Profile
      * @param groups  Device Group
      */
-    private void importDevice(Driver driver, Profile profile, List<BatchGroup> groups, boolean share, final Map<String, Map<String, String>> pointConfig) {
+    private void importDevice(Driver driver, Profile profile, List<BatchGroup> groups, final Map<String, Map<String, String>> pointConfig) {
         groups.forEach(importGroup -> {
             // If group does not exist, add a new group
-            Group group = groupService.selectByName(importGroup.getName());
-            if (null == group) {
-                group = new Group(importGroup.getName());
-                group = groupService.add(group);
-                if (null == group) {
-                    throw new ServiceException("Add group failed: " + importGroup.getName());
-                }
+            Group groupTemp;
+            try {
+                groupTemp = groupService.selectByName(importGroup.getName());
+            } catch (NotFoundException notFoundException) {
+                groupTemp = new Group(importGroup.getName());
+                groupTemp = groupService.add(groupTemp);
             }
 
-            Group finalGroup = group;
+            final Group group = groupTemp;
             importGroup.getDevices().forEach(batchDevice -> {
-                Device device = deviceService.selectDeviceByNameAndGroupId(batchDevice.getName(), finalGroup.getId());
-                if (null == device) {
-                    device = new Device(batchDevice.getName(), profile.getId(), finalGroup.getId());
+                Device device;
+                try {
+                    device = deviceService.selectDeviceByNameAndGroupId(batchDevice.getName(), group.getId());
+                    device.setMulti(batchDevice.getMulti());
+                    device.setDescription("批量导入：更新操作");
+                    deviceService.update(device);
+                    notifyService.notifyDriverDevice(Common.Driver.Device.UPDATE, device);
+                } catch (NotFoundException notFoundException) {
+                    device = new Device(batchDevice.getName(), profile.getId(), group.getId());
                     if (batchDevice.getMulti()) {
                         device.setMulti(true);
                     }
@@ -305,7 +310,7 @@ public class BatchServiceImpl implements BatchService {
                 }
 
                 // Upsert Point Info
-                if (share) {
+                if (profile.getShare()) {
                     importPointInfo(driver, profile, device, pointConfig);
                 } else {
                     importPointInfo(driver, profile, device, batchDevice.getPointConfig());
@@ -327,30 +332,24 @@ public class BatchServiceImpl implements BatchService {
             List<String> pointInfoList = new ArrayList<>(16);
             pointConfigMap.forEach((name, value) -> {
                 PointAttribute pointAttribute = pointAttributeService.selectByNameAndDriverId(name, driver.getId());
-                if (null == pointAttribute) {
-                    throw new ServiceException("Invalid point info: " + name);
-                }
                 if (pointInfoList.contains(name)) {
                     throw new ServiceException("Repeatedly point info: " + name);
                 }
                 pointInfoList.add(name);
 
                 Point point = pointService.selectByNameAndProfileId(pointName, profile.getId());
-                if (null == point) {
-                    throw new ServiceException("Point does not exist: " + pointName);
-                }
 
                 // If point info does not exist, add a new point info, otherwise point info will be updated
-                PointInfo pointInfo = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(pointAttribute.getId(), device.getId(), point.getId());
-                if (null == pointInfo) {
-                    pointInfo = new PointInfo(pointAttribute.getId(), value, device.getId(), point.getId());
-                    pointInfo.setDescription("批量导入：新增操作");
-                    pointInfo = pointInfoService.add(pointInfo);
-                    notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, pointInfo);
-                } else {
+                try {
+                    PointInfo pointInfo = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(pointAttribute.getId(), device.getId(), point.getId());
                     pointInfo.setDescription("批量导入：更新操作");
                     pointInfo = pointInfoService.update(pointInfo.setValue(value));
                     notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.UPDATE, pointInfo);
+                } catch (NotFoundException notFoundException) {
+                    PointInfo pointInfo = new PointInfo(pointAttribute.getId(), value, device.getId(), point.getId());
+                    pointInfo.setDescription("批量导入：新增操作");
+                    pointInfo = pointInfoService.add(pointInfo);
+                    notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, pointInfo);
                 }
             });
         });

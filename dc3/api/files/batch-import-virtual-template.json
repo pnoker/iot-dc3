@@ -4,7 +4,7 @@
     "profiles": [
       {
         "name": "Virtual-Profile",
-        "share": false,
+        "share": true,
         "driverConfig": {
           "host": "localhost",
           "port": "9000"
@@ -83,33 +83,193 @@
             "unit": "-"
           }
         ],
+        "pointConfig": {
+          "Virtual-Point-String": {
+            "tag": "tag-string"
+          },
+          "Virtual-Point-Boolean": {
+            "tag": "tag-boolean"
+          },
+          "Virtual-Point-Int": {
+            "tag": "tag-int"
+          },
+          "Virtual-Point-Long": {
+            "tag": "tag-long"
+          },
+          "Virtual-Point-Float": {
+            "tag": "tag-float"
+          },
+          "Virtual-Point-Double": {
+            "tag": "tag-double"
+          }
+        },
         "groups": [
           {
             "name": "Virtual-Group",
             "devices": [
               {
-                "name": "Virtual-Device",
-                "multi": false,
-                "pointConfig": {
-                  "Virtual-Point-String": {
-                    "tag": "tag-string"
-                  },
-                  "Virtual-Point-Boolean": {
-                    "tag": "tag-boolean"
-                  },
-                  "Virtual-Point-Int": {
-                    "tag": "tag-int"
-                  },
-                  "Virtual-Point-Long": {
-                    "tag": "tag-long"
-                  },
-                  "Virtual-Point-Float": {
-                    "tag": "tag-float"
-                  },
-                  "Virtual-Point-Double": {
-                    "tag": "tag-double"
-                  }
-                }
+                "name": "Virtual-Device1",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device2",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device3",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device4",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device5",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device6",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device7",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device8",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device9",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device10",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device11",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device12",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device13",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device14",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device15",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device16",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device17",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device18",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device19",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device20",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device21",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device22",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device23",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device24",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device25",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device26",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device27",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device28",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device29",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device30",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device31",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device32",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device33",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device34",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device35",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device36",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device37",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device38",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device39",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device40",
+                "multi": false
+              },
+              {
+                "name": "Virtual-Device41",
+                "multi": false
               }
             ]
           }

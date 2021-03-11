@@ -5,6 +5,7 @@ import com.dc3.common.bean.driver.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class PointValueScheduleJob extends QuartzJobBean {
 
+    @Value("${data.point.batch.speed}")
+    private Integer batchSpeed;
+    @Value("${data.point.batch.interval}")
+    private Integer interval;
+
     @Resource
     private PointValueService pointValueService;
     @Resource
@@ -36,8 +42,9 @@ public class PointValueScheduleJob extends QuartzJobBean {
         // Statistical point value receive rate
         long speed = valueCount.getAndSet(0);
         valueSpeed.set(speed);
-        if (speed > 0) {
-            log.debug("Point value receiver speed: {} /s", speed);
+        speed /= interval;
+        if (speed >= batchSpeed) {
+            log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, pointValues.size(), interval);
         }
 
         // Save point value array to Redis & MongoDB

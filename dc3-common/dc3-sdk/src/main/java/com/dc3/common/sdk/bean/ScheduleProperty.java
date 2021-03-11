@@ -29,4 +29,5 @@ import lombok.Setter;
 public class ScheduleProperty {
     private ScheduleConfig read;
     private ScheduleConfig custom;
+    private ScheduleConfig status;
 }

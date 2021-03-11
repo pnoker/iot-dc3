@@ -76,7 +76,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         Driver driver = new Driver(driverProperty.getName(), this.serviceName, localHost, this.port);
         driver.setDescription(driverProperty.getDescription());
         String routingKey = Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName;
-        log.info("The driver {}/{} is initializing...", driver.getServiceName(), driver.getName());
+        log.info("The driver {}/{} is initializing", driver.getServiceName(), driver.getName());
 
         registerHandshake(routingKey);
 
@@ -102,7 +102,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
 
         syncDriverMetadata(driver, routingKey);
 
-        log.info("The driver {}/{} is initialized", driver.getServiceName(), driver.getName());
+        log.info("The driver {}/{} is initialized successfully", driver.getServiceName(), driver.getName());
     }
 
     @Override

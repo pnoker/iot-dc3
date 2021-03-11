@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -41,6 +42,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Component
 public class PointValueReceiver {
 
+    @Value("${data.point.batch.speed}")
+    private Integer batchSpeed;
+
     @Resource
     private PointValueService pointValueService;
     @Resource
@@ -52,14 +56,14 @@ public class PointValueReceiver {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             if (null == pointValue || null == pointValue.getDeviceId()) {
-                log.error("Invalid point value {}", pointValue);
+                log.error("Invalid point value: {}", pointValue);
                 return;
             }
             PointValueScheduleJob.valueCount.getAndIncrement();
             log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
 
             // Judge whether to process data in batch according to the data transmission speed
-            if (PointValueScheduleJob.valueSpeed.get() < 100) {
+            if (PointValueScheduleJob.valueSpeed.get() < batchSpeed) {
                 threadPoolExecutor.execute(() -> {
                     // Save point value to Redis & MongoDB
                     pointValueService.addPointValue(pointValue);

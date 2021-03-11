@@ -136,10 +136,10 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, key = "#name+'.'+#groupId", unless = "#result==null")
     public Device selectDeviceByNameAndGroupId(String name, Long groupId) {
-        DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setName(name);
-        deviceDto.setGroupId(groupId);
-        Device device = deviceMapper.selectOne(fuzzyQuery(deviceDto));
+        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
+        queryWrapper.eq(Device::getName, name);
+        queryWrapper.eq(Device::getGroupId, groupId);
+        Device device = deviceMapper.selectOne(queryWrapper);
         if (null == device) {
             throw new NotFoundException("The device does not exist");
         }
@@ -203,17 +203,17 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public LambdaQueryWrapper<Device> fuzzyQuery(DeviceDto deviceDto) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        Optional.ofNullable(deviceDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Device::getName, dto.getName());
+        if (null != deviceDto) {
+            if (StringUtils.isNotBlank(deviceDto.getName())) {
+                queryWrapper.like(Device::getName, deviceDto.getName());
             }
-            if (null != dto.getProfileId()) {
-                queryWrapper.eq(Device::getProfileId, dto.getProfileId());
+            if (null != deviceDto.getProfileId()) {
+                queryWrapper.eq(Device::getProfileId, deviceDto.getProfileId());
             }
-            if (null != dto.getGroupId()) {
-                queryWrapper.eq(Device::getGroupId, dto.getGroupId());
+            if (null != deviceDto.getGroupId()) {
+                queryWrapper.eq(Device::getGroupId, deviceDto.getGroupId());
             }
-        });
+        }
         return queryWrapper;
     }
 
