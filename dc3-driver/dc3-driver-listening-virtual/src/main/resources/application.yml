@@ -7,6 +7,9 @@ driver:
     udp:
       port: 6271
   schedule:
+    status:
+      enable: true
+      corn: '0/10 * * * * ?'
     read:
       enable: false
       corn: '0/30 * * * * ?'

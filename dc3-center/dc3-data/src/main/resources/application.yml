@@ -1,3 +1,9 @@
+data:
+  point:
+    batch:
+      speed: ${POINT_BATCH_SPEED:100}
+      interval: ${POINT_BATCH_INTERVAL:5}
+
 server:
   port: 8500
 
@@ -18,8 +24,8 @@ spring:
 
 logging:
   level:
-    com.dc3: INFO
-    com.dc3.center.data.service.job: INFO
+    com.dc3: DEBUG
+    #com.dc3.center.data.service.job: INFO
     com.dc3.center.data.service.rabbit: INFO
   file:
     name: dc3/logs/center/${spring.application.name}.log

@@ -1,14 +1,24 @@
 {
   "properties": [
     {
+      "name": "data.point.batch.speed",
+      "type": "java.lang.Integer",
+      "description": "critical value of point value batch saving speed."
+    },
+    {
+      "name": "data.point.batch.interval",
+      "type": "java.lang.Integer",
+      "description": "point value batch saving cycle."
+    },
+    {
       "name": "rtmp.ffmpeg.window",
       "type": "java.lang.String",
-      "description": "ffmpeg path."
+      "description": "ffmpeg window path."
     },
     {
       "name": "rtmp.ffmpeg.unix",
       "type": "java.lang.String",
-      "description": "ffmpeg path."
+      "description": "ffmpeg unix path."
     },
     {
       "name": "server.thread.prefix",

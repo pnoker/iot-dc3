@@ -17,7 +17,7 @@
 ### --------------------- Point ---------------------
 ### 分页查询 Point Value
 #/data/list
-POST http://localhost:8500/data/list
+POST http://localhost:8500/data/pointValue/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

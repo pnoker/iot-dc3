@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-common</artifactId>
-        <version>1.2.2.SR</version>
+        <version>1.2.3.SR</version>
     </parent>
 
     <artifactId>dc3-base</artifactId>
@@ -30,8 +30,8 @@
 
     <properties>
         <jwt.version>0.9.1</jwt.version>
-        <hutool.version>5.3.10</hutool.version>
-        <fastjson.version>1.2.73</fastjson.version>
+        <hutool.version>5.5.8</hutool.version>
+        <fastjson.version>1.2.75</fastjson.version>
     </properties>
 
     <dependencies>

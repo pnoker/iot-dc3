@@ -20,7 +20,7 @@
 
     <groupId>com.dc3</groupId>
     <artifactId>iot-dc3</artifactId>
-    <version>1.2.2.SR</version>
+    <version>1.2.3.SR</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -44,10 +44,10 @@
 
     <properties>
         <caffeine.version>2.8.8</caffeine.version>
-        <mybatis.plus.version>3.4.1</mybatis.plus.version>
+        <mybatis.plus.version>3.4.2</mybatis.plus.version>
 
         <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
-        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
+        <spring-boot.version>2.3.9.RELEASE</spring-boot.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
 

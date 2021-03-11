@@ -67,7 +67,7 @@ public class DriverEventReceiver {
                 return;
             }
 
-            log.debug("Driver event receive, {}, {}", properties, driverEvent);
+            log.debug("Driver {} event, From: {}, Received: {}", driverEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
             String routingKey = Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + driverEvent.getServiceName();
 
             switch (driverEvent.getType()) {

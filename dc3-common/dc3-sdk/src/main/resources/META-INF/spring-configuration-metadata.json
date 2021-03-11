@@ -51,6 +51,16 @@
       "description": "device point attribute list<p/><p>- displayName: attribute display name<p>- name: attribute name<p>- type: string/int/double/float/long/boolean<p>- value: default value<p>- description: description."
     },
     {
+      "name": "driver.schedule.status.enable",
+      "type": "java.lang.Boolean",
+      "description": "driver status schedule status."
+    },
+    {
+      "name": "driver.schedule.status.corn",
+      "type": "java.lang.String",
+      "description": "driver status schedule corn."
+    },
+    {
       "name": "driver.schedule.read.enable",
       "type": "java.lang.Boolean",
       "description": "driver read schedule status."

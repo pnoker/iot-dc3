@@ -5,6 +5,7 @@ import com.dc3.center.data.service.job.PointValueScheduleJob;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -15,12 +16,16 @@ import javax.annotation.Resource;
 @Slf4j
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
+
+    @Value("${data.point.batch.interval}")
+    private Integer interval;
+
     @Resource
     private Scheduler scheduler;
 
     @Override
     public void initial() {
-        createScheduleJob("ScheduleGroup", "PointValueScheduleJob", "0/1 * * * * ?", PointValueScheduleJob.class);
+        createScheduleJobWithInterval("ScheduleGroup", "PointValueScheduleJob", interval, PointValueScheduleJob.class);
         try {
             if (!scheduler.isShutdown()) {
                 scheduler.start();
@@ -35,16 +40,16 @@ public class ScheduleServiceImpl implements ScheduleService {
      *
      * @param group    group
      * @param name     name
-     * @param corn     corn
+     * @param interval interval
      * @param jobClass class
      */
     @SneakyThrows
-    public void createScheduleJob(String group, String name, String corn, Class<? extends Job> jobClass) {
+    public void createScheduleJobWithInterval(String group, String name, Integer interval, Class<? extends Job> jobClass) {
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)
                 .startAt(DateBuilder.futureDate(1, DateBuilder.IntervalUnit.SECOND))
-                .withSchedule(CronScheduleBuilder.cronSchedule(corn))
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(interval).repeatForever())
                 .startNow().build();
         scheduler.scheduleJob(jobDetail, trigger);
     }

@@ -17,6 +17,8 @@
 package com.dc3.common.sdk.service.impl;
 
 import com.dc3.common.sdk.bean.DriverProperty;
+import com.dc3.common.sdk.bean.ScheduleConfig;
+import com.dc3.common.sdk.bean.ScheduleProperty;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import com.dc3.common.sdk.service.job.DriverCustomScheduleJob;
 import com.dc3.common.sdk.service.job.DriverReadScheduleJob;
@@ -28,7 +30,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * @author pnoker
@@ -44,18 +45,19 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
 
     @Override
     public void initial() {
-        Optional.ofNullable(driverProperty.getSchedule()).ifPresent(property -> {
-            // driver heartbeat
-            createScheduleJob("DriverScheduleGroup", "StatusScheduleJob", "0/10 * * * * ?", DriverStatusScheduleJob.class);
-
-            // driver read
-            if (property.getRead().getEnable()) {
-                createScheduleJob("DriverScheduleGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
+        ScheduleProperty property = driverProperty.getSchedule();
+        if (null != property) {
+            if (null == property.getStatus()) {
+                property.setStatus(new ScheduleConfig(true, "0/5 * * * * ?"));
             }
-
-            // driver custom schedule
+            if (property.getRead().getEnable()) {
+                createScheduleJobWithCorn("DriverScheduleGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
+            }
             if (property.getCustom().getEnable()) {
-                createScheduleJob("DriverScheduleGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
+                createScheduleJobWithCorn("DriverScheduleGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
+            }
+            if (property.getStatus().getEnable()) {
+                createScheduleJobWithCorn("DriverScheduleGroup", "StatusScheduleJob", property.getStatus().getCorn(), DriverStatusScheduleJob.class);
             }
 
             try {
@@ -65,7 +67,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             } catch (SchedulerException e) {
                 log.error(e.getMessage(), e);
             }
-        });
+        }
     }
 
     /**
@@ -77,7 +79,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
      * @param jobClass class
      */
     @SneakyThrows
-    public void createScheduleJob(String group, String name, String corn, Class<? extends Job> jobClass) {
+    public void createScheduleJobWithCorn(String group, String name, String corn, Class<? extends Job> jobClass) {
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)

@@ -2,6 +2,9 @@ driver:
   name: OpcDaDriver
   description: @project.description@
   schedule:
+    status:
+      enable: true
+      corn: '0/10 * * * * ?'
     read:
       enable: true
       corn: '0/30 * * * * ?'

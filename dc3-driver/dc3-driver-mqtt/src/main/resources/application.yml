@@ -2,6 +2,9 @@ driver:
   name: MqttDriver
   description: @project.description@
   schedule:
+    status:
+      enable: true
+      corn: '0/10 * * * * ?'
     read:
       enable: false
       corn: '0/30 * * * * ?'
