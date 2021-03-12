@@ -20,9 +20,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.bean.driver.PointValueDto;
 import com.dc3.common.constant.Common;
+import com.dc3.common.dto.PointValueDto;
+import com.dc3.common.model.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,15 +40,6 @@ public class PointValueApi implements PointValueClient {
 
     @Resource
     private PointValueService pointValueService;
-
-    @Override
-    public R<Boolean> correct(String serviceName) {
-        try {
-            return pointValueService.correct(serviceName) ? R.ok() : R.fail();
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-    }
 
     @Override
     public R<List<PointValue>> realtime(Long deviceId) {

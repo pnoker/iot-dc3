@@ -16,14 +16,15 @@
 
 package com.dc3.api.center.manager.hystrix;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.manager.feign.DeviceClient;
+import com.dc3.api.center.manager.feign.StatusClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.DeviceDto;
-import com.dc3.common.model.Device;
+import com.dc3.common.dto.DriverDto;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * <p>DeviceClientHystrix
@@ -32,37 +33,22 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
+public class StatusClientHystrix implements FallbackFactory<StatusClient> {
 
     @Override
-    public DeviceClient create(Throwable throwable) {
+    public StatusClient create(Throwable throwable) {
         String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
-        return new DeviceClient() {
+        return new StatusClient() {
 
             @Override
-            public R<Device> add(Device device) {
+            public R<Map<Long, String>> driverStatus(DriverDto driverDto) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Device> update(Device device) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Device> selectById(Long id) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Page<Device>> list(DeviceDto deviceDto) {
+            public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto) {
                 return R.fail(message);
             }
 

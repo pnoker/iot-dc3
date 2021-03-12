@@ -14,48 +14,42 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.auth.token.hystrix;
+package com.dc3.api.center.manager.hystrix;
 
-import com.dc3.api.center.auth.token.feign.TokenClient;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc3.api.center.manager.feign.EventClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.model.User;
+import com.dc3.common.dto.DeviceEventDto;
+import com.dc3.common.dto.DriverEventDto;
+import com.dc3.common.model.DeviceEvent;
+import com.dc3.common.model.DriverEvent;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>TokenClientHystrix
+ * DeviceEventClientHystrix
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class TokenClientHystrix implements FallbackFactory<TokenClient> {
+public class EventClientHystrix implements FallbackFactory<EventClient> {
 
     @Override
-    public TokenClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
+    public EventClient create(Throwable throwable) {
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
-        return new TokenClient() {
+        return new EventClient() {
 
             @Override
-            public R<String> generateSalt(String username) {
+            public R<Page<DriverEvent>> driverEvent(DriverEventDto driverEventDto) {
                 return R.fail(message);
             }
 
             @Override
-            public R<String> generateToken(User user) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Boolean> checkTokenValid(String username, String salt, String token) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Boolean> cancelToken(String username) {
+            public R<Page<DeviceEvent>> deviceEvent(DeviceEventDto deviceEventDto) {
                 return R.fail(message);
             }
 

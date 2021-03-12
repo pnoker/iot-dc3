@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.auth.user.feign;
+package com.dc3.api.center.auth.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.auth.user.hystrix.UserClientHystrix;
+import com.dc3.api.center.auth.hystrix.BlackIpClientHystrix;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.dto.UserDto;
-import com.dc3.common.model.User;
+import com.dc3.common.dto.BlackIpDto;
+import com.dc3.common.model.BlackIp;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,86 +34,77 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.constraints.NotNull;
 
 /**
- * 用户 FeignClient
+ * Ip 黑名单 FeignClient
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_AUTH_USER_URL_PREFIX, name = Common.Service.DC3_AUTH_SERVICE_NAME, fallbackFactory = UserClientHystrix.class)
-public interface UserClient {
+@FeignClient(path = Common.Service.DC3_AUTH_BLACK_IP_URL_PREFIX, name = Common.Service.DC3_AUTH_SERVICE_NAME, fallbackFactory = BlackIpClientHystrix.class)
+public interface BlackIpClient {
 
     /**
-     * 新增 User
+     * 新增 BlackIp
      *
-     * @param user User
-     * @return User
+     * @param blackIp BlackIp
+     * @return BlackIp
      */
     @PostMapping("/add")
-    R<User> add(@Validated(Insert.class) @RequestBody User user);
+    R<BlackIp> add(@Validated(Insert.class) @RequestBody BlackIp blackIp);
 
     /**
-     * 根据 ID 删除 User
+     * 根据 ID 删除 BlackIp
      *
-     * @param id User Id
+     * @param id BlackIp Id
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 修改 User
+     * 修改 BlackIp
      * <p>
-     * 支  持: Enable,Password
-     * 不支持: Name
+     * 支  持: Enable
+     * 不支持: Ip
      *
-     * @param user User
-     * @return User
+     * @param blackIp BlackIp
+     * @return BlackIp
      */
     @PostMapping("/update")
-    R<User> update(@Validated(Update.class) @RequestBody User user);
+    R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp);
 
     /**
-     * 根据 ID 重置 User 密码
+     * 根据 ID 查询 BlackIp
      *
-     * @param id User Id
-     * @return Boolean
-     */
-    @PostMapping("/reset/{id}")
-    R<Boolean> restPassword(@NotNull @PathVariable(value = "id") Long id);
-
-    /**
-     * 根据 ID 查询 User
-     *
-     * @param id User Id
-     * @return User
+     * @param id BlackIp Id
+     * @return BlackIp
      */
     @GetMapping("/id/{id}")
-    R<User> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<BlackIp> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
-     * 根据 Name 查询 User
+     * 根据 Ip 查询 BlackIp
      *
-     * @param name User Name
-     * @return User
+     * @param ip Black Ip
+     * @return BlackIp
      */
-    @GetMapping("/name/{name}")
-    R<User> selectByName(@NotNull @PathVariable(value = "name") String name);
+    @GetMapping("/ip/{ip}")
+    R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip);
 
     /**
-     * 分页查询 User
+     * 分页查询 BlackIp
      *
-     * @param userDto Dto
-     * @return Page<User>
+     * @param blackIpDto Dto
+     * @return Page<BlackIp>
      */
     @PostMapping("/list")
-    R<Page<User>> list(@RequestBody(required = false) UserDto userDto);
+    R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpDto blackIpDto);
 
     /**
-     * 检测用户是否存在
+     * 检测 Ip 是否在 Ip 黑名单列表
      *
-     * @param name User Name
+     * @param ip Black Ip
      * @return Boolean
      */
-    @GetMapping("/check/{name}")
-    R<Boolean> checkUserValid(@NotNull @PathVariable(value = "name") String name);
+    @GetMapping("/check/{ip}")
+    R<Boolean> checkBlackIpValid(@NotNull @PathVariable(value = "ip") String ip);
 
 }

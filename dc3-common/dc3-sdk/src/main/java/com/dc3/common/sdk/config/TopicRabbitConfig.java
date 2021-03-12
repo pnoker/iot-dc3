@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author pnoker
  */
@@ -63,20 +66,22 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    TopicExchange configurationExchange() {
+    TopicExchange metadataExchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION, true, false);
     }
 
     @Bean
-    Queue driverConfigurationQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DRIVER_CONFIGURATION_PREFIX + this.serviceName, false, false, false);
+    Queue driverMetadataQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-message-ttl", 15000);
+        return new Queue(Common.Rabbit.QUEUE_DRIVER_CONFIGURATION_PREFIX + this.serviceName, false, false, false, arguments);
     }
 
     @Bean
-    Binding driverConfigurationBinding() {
+    Binding driverMetadataBinding() {
         return BindingBuilder
-                .bind(driverConfigurationQueue())
-                .to(configurationExchange())
+                .bind(driverMetadataQueue())
+                .to(metadataExchange())
                 .with(Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + this.serviceName);
     }
 

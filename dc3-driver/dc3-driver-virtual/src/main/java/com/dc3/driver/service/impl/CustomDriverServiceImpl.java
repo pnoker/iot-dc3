@@ -17,9 +17,8 @@
 package com.dc3.driver.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.AttributeInfo;
-import com.dc3.common.bean.driver.DeviceEvent;
+import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;

@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.service;
+package com.dc3.center.manager.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.common.bean.driver.DeviceEvent;
-import com.dc3.common.bean.driver.DeviceEventDto;
+import com.dc3.common.dto.DeviceEventDto;
+import com.dc3.common.dto.DriverEventDto;
+import com.dc3.common.model.DeviceEvent;
+import com.dc3.common.model.DriverEvent;
 
 import java.util.List;
 
 /**
  * @author pnoker
  */
-public interface DeviceEventService {
+public interface EventService {
 
     /**
-     * 获取设备状态
+     * 新增 DriverEvent
      *
-     * @param deviceId Device Id
-     * @return ONLINE, OFFLINE, MAINTAIN, FAULT
+     * @param driverEvent DriverEvent
      */
-    String deviceStatus(Long deviceId);
+    void addDriverEvent(DriverEvent driverEvent);
+
+    /**
+     * 批量新增 DriverEvent
+     *
+     * @param driverEvents DriverEvent Array
+     */
+    void addDriverEvents(List<DriverEvent> driverEvents);
 
     /**
      * 新增 DeviceEvent
@@ -50,11 +58,19 @@ public interface DeviceEventService {
     void addDeviceEvents(List<DeviceEvent> deviceEvents);
 
     /**
-     * 获取带分页、排序
+     * 获取 DriverEvent 带分页、排序
+     *
+     * @param driverEventDto DriverEventDto
+     * @return Page<DriverEvent>
+     */
+    Page<DriverEvent> driverEvent(DriverEventDto driverEventDto);
+
+    /**
+     * 获取 DeviceEvent 带分页、排序
      *
      * @param deviceEventDto DeviceEventDto
      * @return Page<DeviceEvent>
      */
-    Page<DeviceEvent> list(DeviceEventDto deviceEventDto);
+    Page<DeviceEvent> deviceEvent(DeviceEventDto deviceEventDto);
 
 }

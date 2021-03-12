@@ -17,7 +17,7 @@
 package com.dc3.driver.service.netty.udp;
 
 import cn.hutool.core.util.CharsetUtil;
-import com.dc3.common.bean.driver.PointValue;
+import com.dc3.common.model.PointValue;
 import com.dc3.common.model.Point;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;

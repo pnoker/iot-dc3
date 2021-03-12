@@ -21,7 +21,6 @@ import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Device Interface
@@ -55,11 +54,4 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      */
     List<Device> selectDeviceByGroupId(Long groupId);
 
-    /**
-     * 查询 Device 服务状态
-     *
-     * @param deviceDto Device Dto
-     * @return Map<Long, String>
-     */
-    Map<Long, String> deviceStatus(DeviceDto deviceDto);
 }

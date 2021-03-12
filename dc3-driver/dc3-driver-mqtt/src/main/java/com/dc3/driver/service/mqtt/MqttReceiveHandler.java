@@ -17,7 +17,7 @@
 package com.dc3.driver.service.mqtt;
 
 import com.alibaba.fastjson.JSON;
-import com.dc3.common.bean.driver.PointValue;
+import com.dc3.common.model.PointValue;
 import com.dc3.common.sdk.service.DriverService;
 import com.dc3.driver.bean.DevicePayLoad;
 import lombok.extern.slf4j.Slf4j;

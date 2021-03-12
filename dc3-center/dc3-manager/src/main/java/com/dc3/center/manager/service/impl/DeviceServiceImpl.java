@@ -19,11 +19,9 @@ package com.dc3.center.manager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.data.feign.DeviceEventClient;
 import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.service.DeviceService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.exception.NotFoundException;
@@ -38,9 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -54,9 +50,6 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Resource
     private DeviceMapper deviceMapper;
-    @Resource
-    private DeviceEventClient deviceEventClient;
-
 
     @Override
     @Caching(
@@ -168,27 +161,6 @@ public class DeviceServiceImpl implements DeviceService {
             throw new NotFoundException("The devices does not exist");
         }
         return devices;
-    }
-
-    //TODO 合并到list中
-    @Override
-    public Map<Long, String> deviceStatus(DeviceDto deviceDto) {
-        Map<Long, String> deviceStatusMap = new HashMap<>(16);
-        Page<Device> devicePage = list(deviceDto);
-        if (devicePage.getRecords().size() > 0) {
-            devicePage.getRecords().forEach(device -> {
-                String status = Common.Device.Status.OFFLINE;
-                try {
-                    R<String> rStatus = deviceEventClient.deviceStatus(device.getId());
-                    if (rStatus.isOk()) {
-                        status = rStatus.getData();
-                    }
-                } catch (Exception ignored) {
-                }
-                deviceStatusMap.put(device.getId(), status);
-            });
-        }
-        return deviceStatusMap;
     }
 
     @Override

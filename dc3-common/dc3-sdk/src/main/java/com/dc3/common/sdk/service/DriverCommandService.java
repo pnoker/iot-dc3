@@ -16,7 +16,7 @@
 
 package com.dc3.common.sdk.service;
 
-import com.dc3.common.bean.driver.PointValue;
+import com.dc3.common.model.PointValue;
 
 /**
  * @author pnoker

@@ -16,7 +16,7 @@
 
 package com.dc3.common.sdk.service.job;
 
-import com.dc3.common.bean.driver.DriverEvent;
+import com.dc3.common.model.DriverEvent;
 import com.dc3.common.constant.Common;
 import com.dc3.common.sdk.bean.DriverContext;
 import lombok.extern.slf4j.Slf4j;

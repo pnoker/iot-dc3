@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
-import java.util.Map;
 
 /**
  * 设备 FeignClient
@@ -77,16 +76,6 @@ public interface DeviceClient {
      */
     @GetMapping("/id/{id}")
     R<Device> selectById(@NotNull @PathVariable(value = "id") Long id);
-
-    /**
-     * 查询 Device 服务状态
-     * ONLINE, OFFLINE, MAINTAIN, FAULT
-     *
-     * @param deviceDto Device Dto
-     * @return Map<Long, String>
-     */
-    @PostMapping("/status")
-    R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto);
 
     /**
      * 分页查询 Device

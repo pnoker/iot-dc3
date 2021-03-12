@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean.driver;
+package com.dc3.common.dto;
 
 import com.dc3.common.bean.Pages;
+import com.dc3.common.model.DeviceEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,21 +36,20 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class PointValueDto implements Serializable {
+public class DriverEventDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long deviceId;
-    private Long pointId;
+    private String serviceName;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    public void convertToDo(PointValue pointValue) {
-        BeanUtils.copyProperties(this, pointValue);
+    public void convertToDo(DeviceEvent deviceEvent) {
+        BeanUtils.copyProperties(this, deviceEvent);
     }
 
-    public PointValueDto convert(PointValue pointValue) {
-        BeanUtils.copyProperties(pointValue, this);
+    public DriverEventDto convert(DeviceEvent deviceEvent) {
+        BeanUtils.copyProperties(deviceEvent, this);
         return this;
     }
 }

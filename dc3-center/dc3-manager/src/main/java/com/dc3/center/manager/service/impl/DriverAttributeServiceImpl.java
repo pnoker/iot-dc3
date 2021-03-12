@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <p>DriverAttributeService Impl
@@ -126,10 +125,10 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public DriverAttribute selectByNameAndDriverId(String name, Long driverId) {
-        DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
-        driverAttributeDto.setName(name);
-        driverAttributeDto.setDriverId(driverId);
-        DriverAttribute driverAttribute = driverAttributeMapper.selectOne(fuzzyQuery(driverAttributeDto));
+        LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
+        queryWrapper.like(DriverAttribute::getName, name);
+        queryWrapper.like(DriverAttribute::getDriverId, driverId);
+        DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
         if (null == driverAttribute) {
             throw new NotFoundException("The driver attribute does not exist");
         }
@@ -160,20 +159,20 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        Optional.ofNullable(driverAttributeDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.eq(DriverAttribute::getName, dto.getName());
+        if (null != driverAttributeDto) {
+            if (StringUtils.isNotBlank(driverAttributeDto.getName())) {
+                queryWrapper.like(DriverAttribute::getName, driverAttributeDto.getName());
             }
-            if (StringUtils.isNotBlank(dto.getDisplayName())) {
-                queryWrapper.like(DriverAttribute::getDisplayName, dto.getDisplayName());
+            if (StringUtils.isNotBlank(driverAttributeDto.getDisplayName())) {
+                queryWrapper.like(DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
             }
-            if (StringUtils.isNotBlank(dto.getType())) {
-                queryWrapper.eq(DriverAttribute::getType, dto.getType());
+            if (StringUtils.isNotBlank(driverAttributeDto.getType())) {
+                queryWrapper.eq(DriverAttribute::getType, driverAttributeDto.getType());
             }
-            if (null != dto.getDriverId()) {
-                queryWrapper.eq(DriverAttribute::getDriverId, dto.getDriverId());
+            if (null != driverAttributeDto.getDriverId()) {
+                queryWrapper.eq(DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
             }
-        });
+        }
         return queryWrapper;
     }
 

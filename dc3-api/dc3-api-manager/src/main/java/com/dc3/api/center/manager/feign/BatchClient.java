@@ -50,7 +50,7 @@ public interface BatchClient {
      * @param batchDrivers List<BatchDriver>
      * @return Boolean
      */
-    @PostMapping("/import/batchDriver")
+    @PostMapping("/import/batch_driver")
     R<Boolean> batchImport(@RequestBody List<BatchDriver> batchDrivers);
 
     /**

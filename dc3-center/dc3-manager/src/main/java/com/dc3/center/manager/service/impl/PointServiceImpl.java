@@ -135,10 +135,10 @@ public class PointServiceImpl implements PointService {
     @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#name+'.'+#profileId", unless = "#result==null")
     public Point selectByNameAndProfileId(String name, Long profileId) {
-        PointDto pointDto = new PointDto();
-        pointDto.setName(name);
-        pointDto.setProfileId(profileId);
-        Point point = pointMapper.selectOne(fuzzyQuery(pointDto));
+        LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
+        queryWrapper.like(Point::getName, name);
+        queryWrapper.eq(Point::getProfileId, profileId);
+        Point point = pointMapper.selectOne(queryWrapper);
         if (null == point) {
             throw new NotFoundException("The point does not exist");
         }

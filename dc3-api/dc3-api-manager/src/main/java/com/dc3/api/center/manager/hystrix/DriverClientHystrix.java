@@ -74,11 +74,6 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
             }
 
             @Override
-            public R<Map<String, Boolean>> driverStatus(DriverDto driverDto) {
-                return R.fail(message);
-            }
-
-            @Override
             public R<Page<Driver>> list(DriverDto driverDto) {
                 return R.fail(message);
             }

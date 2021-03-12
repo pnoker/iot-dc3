@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.service.impl;
+package com.dc3.center.manager.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.data.service.DeviceEventService;
+import com.dc3.center.manager.service.EventService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.bean.driver.DeviceEvent;
-import com.dc3.common.bean.driver.DeviceEventDto;
-import com.dc3.common.constant.Common;
+import com.dc3.common.dto.DeviceEventDto;
+import com.dc3.common.dto.DriverEventDto;
+import com.dc3.common.model.DeviceEvent;
+import com.dc3.common.model.DriverEvent;
 import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -38,7 +39,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DeviceEventServiceImpl implements DeviceEventService {
+public class EventServiceImpl implements EventService {
 
     @Resource
     private RedisUtil redisUtil;
@@ -46,10 +47,13 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public String deviceStatus(Long deviceId) {
-        String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceId;
-        String status = redisUtil.getKey(key, String.class);
-        return null != status ? status : Common.Device.Status.OFFLINE;
+    public void addDriverEvent(DriverEvent driverEvent) {
+
+    }
+
+    @Override
+    public void addDriverEvents(List<DriverEvent> driverEvents) {
+
     }
 
     @Override
@@ -69,7 +73,12 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     }
 
     @Override
-    public Page<DeviceEvent> list(DeviceEventDto deviceEventDto) {
+    public Page<DriverEvent> driverEvent(DriverEventDto driverEventDto) {
+        return null;
+    }
+
+    @Override
+    public Page<DeviceEvent> deviceEvent(DeviceEventDto deviceEventDto) {
         Criteria criteria = new Criteria();
         if (null == deviceEventDto) {
             deviceEventDto = new DeviceEventDto();

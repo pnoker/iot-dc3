@@ -16,7 +16,7 @@
 
 package com.dc3.gateway.filter;
 
-import com.dc3.api.center.auth.blackIp.feign.BlackIpClient;
+import com.dc3.api.center.auth.feign.BlackIpClient;
 import com.dc3.common.bean.R;
 import com.dc3.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;

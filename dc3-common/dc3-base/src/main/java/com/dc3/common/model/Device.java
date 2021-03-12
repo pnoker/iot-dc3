@@ -16,6 +16,7 @@
 
 package com.dc3.common.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import lombok.*;
@@ -54,7 +55,11 @@ public class Device extends Description {
     @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
 
+    @TableField(exist = false)
+    private String status;
+
     public Device(String name, Long profileId, Long groupId) {
+        super();
         this.name = name;
         this.profileId = profileId;
         this.groupId = groupId;

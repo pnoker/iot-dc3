@@ -101,8 +101,8 @@ Cache-Control: no-cache
 
 ### --------------------- Point Attribute ---------------------
 ### 新增 PointAttribute
-#/manager/pointAttribute/add
-POST http://localhost:8400/manager/pointAttribute/add
+#/manager/point_attribute/add
+POST http://localhost:8400/manager/point_attribute/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -118,8 +118,8 @@ Cache-Control: no-cache
 
 
 ### 修改 PointAttribute
-#/manager/pointAttribute/update
-POST http://localhost:8400/manager/pointAttribute/update
+#/manager/point_attribute/update
+POST http://localhost:8400/manager/point_attribute/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -136,16 +136,16 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 PointAttribute
-#/manager/pointAttribute/id/:id
-GET http://localhost:8400/manager/pointAttribute/id/1
+#/manager/point_attribute/id/:id
+GET http://localhost:8400/manager/point_attribute/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 PointAttribute
-#/manager/pointAttribute/list，支持displayName模糊查询，name\type\driverId精准查询
-POST http://localhost:8400/manager/pointAttribute/list
+#/manager/point_attribute/list，支持displayName模糊查询，name\type\driverId精准查询
+POST http://localhost:8400/manager/point_attribute/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -165,8 +165,8 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 PointAttribute
-#/manager/pointAttribute/delete/:id
-POST http://localhost:8400/manager/pointAttribute/delete/1
+#/manager/point_attribute/delete/:id
+POST http://localhost:8400/manager/point_attribute/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -174,8 +174,8 @@ Cache-Control: no-cache
 
 ### --------------------- Point Info ---------------------
 ### 新增 PointInfo
-#/manager/pointInfo/add
-POST http://localhost:8400/manager/pointInfo/add
+#/manager/point_info/add
+POST http://localhost:8400/manager/point_info/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -190,8 +190,8 @@ Cache-Control: no-cache
 
 
 ### 修改 PointInfo
-#/manager/pointInfo/update
-POST http://localhost:8400/manager/pointInfo/update
+#/manager/point_info/update
+POST http://localhost:8400/manager/point_info/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -207,16 +207,16 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 PointInfo
-#/manager/pointInfo/id/:id
-GET http://localhost:8400/manager/pointInfo/id/1
+#/manager/point_info/id/:id
+GET http://localhost:8400/manager/point_info/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 PointInfo
-#/manager/pointInfo/list，支持pointAttributeId\deviceId\pointId精准查询
-POST http://localhost:8400/manager/pointInfo/list
+#/manager/point_info/list，支持pointAttributeId\deviceId\pointId精准查询
+POST http://localhost:8400/manager/point_info/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -235,8 +235,8 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 PointInfo
-#/manager/pointInfo/delete/:id
-POST http://localhost:8400/manager/pointInfo/delete/1
+#/manager/point_info/delete/:id
+POST http://localhost:8400/manager/point_info/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

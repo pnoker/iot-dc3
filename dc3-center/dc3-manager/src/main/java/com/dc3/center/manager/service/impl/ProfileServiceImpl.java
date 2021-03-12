@@ -148,9 +148,9 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public Profile selectByName(String name) {
-        ProfileDto profileDto = new ProfileDto();
-        profileDto.setName(name);
-        Profile profile = profileMapper.selectOne(fuzzyQuery(profileDto));
+        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
+        queryWrapper.like(Profile::getName, name);
+        Profile profile = profileMapper.selectOne(queryWrapper);
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
         }

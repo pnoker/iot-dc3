@@ -21,7 +21,6 @@ import com.dc3.common.sdk.service.DriverMetadataService;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -33,11 +32,7 @@ import javax.annotation.Resource;
  * @author pnoker
  */
 @Component
-@EnableFeignClients(basePackages = {
-        "com.dc3.api.center.manager.*"
-})
 @ComponentScan(basePackages = {
-        "com.dc3.api.center.manager",
         "com.dc3.common.sdk"
 })
 public class DriverInitRunner implements ApplicationRunner {

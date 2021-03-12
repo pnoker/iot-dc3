@@ -17,7 +17,7 @@
 package com.dc3.center.auth.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.auth.blackIp.feign.BlackIpClient;
+import com.dc3.api.center.auth.feign.BlackIpClient;
 import com.dc3.center.auth.service.BlackIpService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;

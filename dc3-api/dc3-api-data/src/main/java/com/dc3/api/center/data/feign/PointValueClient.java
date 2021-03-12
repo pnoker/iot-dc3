@@ -19,9 +19,9 @@ package com.dc3.api.center.data.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.data.hystrix.PointValueClientHystrix;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.bean.driver.PointValueDto;
 import com.dc3.common.constant.Common;
+import com.dc3.common.dto.PointValueDto;
+import com.dc3.common.model.PointValue;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,20 +40,12 @@ import java.util.List;
 public interface PointValueClient {
 
     /**
-     * 数据纠正
-     *
-     * @param serviceName Driver Service Name
-     */
-    @GetMapping("/correct/serviceName/{serviceName}")
-    R<Boolean> correct(@NotNull @PathVariable(value = "serviceName") String serviceName);
-
-    /**
      * 获取实时值，读 Redis
      *
      * @param deviceId Device Id
      * @return String Value
      */
-    @GetMapping("/realtime/deviceId/{deviceId}")
+    @GetMapping("/realtime/device_id/{deviceId}")
     R<List<PointValue>> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
@@ -63,7 +55,7 @@ public interface PointValueClient {
      * @param pointId  Point Id
      * @return String Value
      */
-    @GetMapping("/realtime/deviceId/{deviceId}/pointId/{pointId}")
+    @GetMapping("/realtime/device_id/{deviceId}/point_id/{pointId}")
     R<PointValue> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
 
     /**
@@ -72,7 +64,7 @@ public interface PointValueClient {
      * @param deviceId Device Id
      * @return PointValue
      */
-    @GetMapping("/latest/deviceId/{deviceId}")
+    @GetMapping("/latest/device_id/{deviceId}")
     R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
@@ -82,7 +74,7 @@ public interface PointValueClient {
      * @param pointId  Point Id
      * @return PointValue
      */
-    @GetMapping("/latest/deviceId/{deviceId}/pointId/{pointId}")
+    @GetMapping("/latest/device_id/{deviceId}/point_id/{pointId}")
     R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
 
     /**

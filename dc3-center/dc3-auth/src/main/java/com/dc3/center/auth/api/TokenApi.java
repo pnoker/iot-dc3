@@ -16,7 +16,7 @@
 
 package com.dc3.center.auth.api;
 
-import com.dc3.api.center.auth.token.feign.TokenClient;
+import com.dc3.api.center.auth.feign.TokenClient;
 import com.dc3.center.auth.bean.TokenValid;
 import com.dc3.center.auth.service.TokenService;
 import com.dc3.common.bean.R;

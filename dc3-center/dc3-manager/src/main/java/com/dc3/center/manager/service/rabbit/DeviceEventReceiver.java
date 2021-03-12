@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.service.rabbit;
+package com.dc3.center.manager.service.rabbit;
 
-import com.dc3.center.data.service.DeviceEventService;
-import com.dc3.common.bean.driver.DeviceEvent;
+import com.dc3.center.manager.service.EventService;
 import com.dc3.common.constant.Common;
+import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class DeviceEventReceiver {
     @Resource
     private RedisUtil redisUtil;
     @Resource
-    private DeviceEventService deviceEventService;
+    private EventService eventService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
@@ -58,18 +58,20 @@ public class DeviceEventReceiver {
             }
             log.debug("Device {} event, From: {}, Event: {}", deviceEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
 
+            // Save device heartbeat to Redis
             if (Common.Device.Event.HEARTBEAT.equals(deviceEvent.getType())) {
-                // Save device heartbeat to Redis
                 redisUtil.setKey(
                         Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
                         deviceEvent.getContent(),
                         deviceEvent.getTimeOut(),
                         deviceEvent.getTimeUnit()
                 );
-            } else {
-                // Save device event to MongoDB
-                threadPoolExecutor.execute(() -> deviceEventService.addDeviceEvent(deviceEvent));
             }
+
+            // Save device event to MongoDB
+            // TODO 事件去重
+            threadPoolExecutor.execute(() -> eventService.addDeviceEvent(deviceEvent));
+
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

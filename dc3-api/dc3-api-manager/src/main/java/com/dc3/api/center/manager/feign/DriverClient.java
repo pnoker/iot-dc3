@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
-import java.util.Map;
 
 /**
  * <p>驱动 FeignClient
@@ -96,16 +95,6 @@ public interface DriverClient {
      */
     @GetMapping("/host/{host}/port/{port}")
     R<Driver> selectByHostPort(@NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port);
-
-    /**
-     * 查询 Driver 服务状态
-     * ONLINE, OFFLINE
-     *
-     * @param driverDto Driver Dto
-     * @return Map<String, Boolean>
-     */
-    @PostMapping("/status")
-    R<Map<String, Boolean>> driverStatus(@RequestBody(required = false) DriverDto driverDto);
 
     /**
      * 分页查询 Driver

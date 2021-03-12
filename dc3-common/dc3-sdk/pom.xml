@@ -100,10 +100,10 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
 
-        <!-- dc3 Api -->
+        <!-- dc3 Common Base -->
         <dependency>
             <groupId>com.dc3</groupId>
-            <artifactId>dc3-api-manager</artifactId>
+            <artifactId>dc3-base</artifactId>
         </dependency>
 
     </dependencies>

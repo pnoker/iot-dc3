@@ -126,10 +126,10 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
     public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
-        PointAttributeDto pointAttributeDto = new PointAttributeDto();
-        pointAttributeDto.setName(name);
-        pointAttributeDto.setDriverId(driverId);
-        PointAttribute pointAttribute = pointAttributeMapper.selectOne(fuzzyQuery(pointAttributeDto));
+        LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
+        queryWrapper.like(PointAttribute::getName, name);
+        queryWrapper.eq(PointAttribute::getDriverId, driverId);
+        PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
         if (null == pointAttribute) {
             throw new NotFoundException("The point attribute does not exist");
         }
@@ -160,20 +160,20 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        Optional.ofNullable(pointAttributeDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getDisplayName())) {
-                queryWrapper.like(PointAttribute::getDisplayName, dto.getDisplayName());
+        if (null != pointAttributeDto) {
+            if (StringUtils.isNotBlank(pointAttributeDto.getName())) {
+                queryWrapper.like(PointAttribute::getName, pointAttributeDto.getName());
             }
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.eq(PointAttribute::getName, dto.getName());
+            if (StringUtils.isNotBlank(pointAttributeDto.getDisplayName())) {
+                queryWrapper.like(PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
             }
-            if (StringUtils.isNotBlank(dto.getType())) {
-                queryWrapper.eq(PointAttribute::getType, dto.getType());
+            if (StringUtils.isNotBlank(pointAttributeDto.getType())) {
+                queryWrapper.eq(PointAttribute::getType, pointAttributeDto.getType());
             }
-            Optional.ofNullable(dto.getDriverId()).ifPresent(driverId -> {
+            Optional.ofNullable(pointAttributeDto.getDriverId()).ifPresent(driverId -> {
                 queryWrapper.eq(PointAttribute::getDriverId, driverId);
             });
-        });
+        }
         return queryWrapper;
     }
 
