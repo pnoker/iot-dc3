@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.auth.blackIp.hystrix;
+package com.dc3.api.center.auth.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.auth.blackIp.feign.BlackIpClient;
+import com.dc3.api.center.auth.feign.BlackIpClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.BlackIpDto;
 import com.dc3.common.model.BlackIp;

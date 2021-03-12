@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package com.dc3.center.manager.init;
+package com.dc3.center.manager.service;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
+import com.dc3.common.dto.DeviceDto;
+import com.dc3.common.dto.DriverDto;
+
+import java.util.Map;
 
 /**
- * 初始化
+ * <p>Device Interface
  *
  * @author pnoker
  */
-@Component
-@EnableFeignClients(basePackages = {
-        "com.dc3.api.center.data.*",
-})
-@ComponentScan(basePackages = {
-        "com.dc3.api.center.data",
-})
-public class ManagerInitRunner implements ApplicationRunner {
+public interface StatusService {
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-    }
+    /**
+     * 查询 Driver 服务状态
+     *
+     * @param driverDto Driver Dto
+     * @return Map<String, String>
+     */
+    Map<Long, String> driver(DriverDto driverDto);
+
+    /**
+     * 查询 Device 服务状态
+     *
+     * @param deviceDto Device Dto
+     * @return Map<Long, String>
+     */
+    Map<Long, String> device(DeviceDto deviceDto);
 }

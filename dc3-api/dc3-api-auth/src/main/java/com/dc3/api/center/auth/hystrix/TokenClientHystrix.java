@@ -14,40 +14,48 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.data.hystrix;
+package com.dc3.api.center.auth.hystrix;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.data.feign.DeviceEventClient;
+import com.dc3.api.center.auth.feign.TokenClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.DeviceEvent;
-import com.dc3.common.bean.driver.DeviceEventDto;
+import com.dc3.common.model.User;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * DeviceEventClientHystrix
+ * <p>TokenClientHystrix
  *
  * @author pnoker
  */
 @Slf4j
 @Component
-public class DeviceEventClientHystrix implements FallbackFactory<DeviceEventClient> {
+public class TokenClientHystrix implements FallbackFactory<TokenClient> {
 
     @Override
-    public DeviceEventClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-DATA" : throwable.getMessage();
+    public TokenClient create(Throwable throwable) {
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
-        return new DeviceEventClient() {
+        return new TokenClient() {
 
             @Override
-            public R<String> deviceStatus(Long deviceId) {
+            public R<String> generateSalt(String username) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<DeviceEvent>> list(DeviceEventDto deviceEventDto) {
+            public R<String> generateToken(User user) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Boolean> checkTokenValid(String username, String salt, String token) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Boolean> cancelToken(String username) {
                 return R.fail(message);
             }
 

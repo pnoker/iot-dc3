@@ -17,9 +17,9 @@
 package com.dc3.api.center.manager.feign;
 
 import com.dc3.api.center.manager.hystrix.DictionaryClientHystrix;
+import com.dc3.common.bean.Dictionary;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.bean.Dictionary;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +48,7 @@ public interface DictionaryClient {
      *
      * @return List<Dictionary>
      */
-    @GetMapping("/driverAttribute")
+    @GetMapping("/driver_attribute")
     R<List<Dictionary>> driverAttributeDictionary();
 
     /**
@@ -56,7 +56,7 @@ public interface DictionaryClient {
      *
      * @return List<Dictionary>
      */
-    @GetMapping("/pointAttribute")
+    @GetMapping("/point_attribute")
     R<List<Dictionary>> pointAttributeDictionary();
 
     /**

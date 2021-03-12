@@ -55,4 +55,15 @@ public class Driver extends Description {
     @Min(value = 8600, message = "invalid port,port range is 8600-8799", groups = {Insert.class, Update.class})
     @Max(value = 8799, message = "invalid port,port range is 8600-8799", groups = {Insert.class, Update.class})
     private Integer port;
+
+    @TableField(exist = false)
+    private String status;
+
+    public Driver(String name, String serviceName, String host, Integer port) {
+        super();
+        this.name = name;
+        this.serviceName = serviceName;
+        this.host = host;
+        this.port = port;
+    }
 }

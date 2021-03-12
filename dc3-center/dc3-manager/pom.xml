@@ -36,16 +36,16 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
+        <!-- MongoDB-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
         <!-- dc3 Manager Api -->
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-api-manager</artifactId>
-        </dependency>
-
-        <!-- dc3 Data Api -->
-        <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-api-data</artifactId>
         </dependency>
 
         <!-- dc3 Common Core -->

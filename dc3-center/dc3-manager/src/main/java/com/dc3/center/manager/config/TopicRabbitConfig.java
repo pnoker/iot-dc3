@@ -27,6 +27,9 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author pnoker
  */
@@ -66,7 +69,9 @@ public class TopicRabbitConfig {
 
     @Bean
     Queue driverEventQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DRIVER_EVENT, true, false, false);
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-message-ttl", 15000);
+        return new Queue(Common.Rabbit.QUEUE_DRIVER_EVENT, true, false, false, arguments);
     }
 
     @Bean
@@ -75,6 +80,21 @@ public class TopicRabbitConfig {
                 .bind(driverEventQueue())
                 .to(eventExchange())
                 .with(Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + "*");
+    }
+
+    @Bean
+    Queue deviceEventQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-message-ttl", 15000);
+        return new Queue(Common.Rabbit.QUEUE_DEVICE_EVENT, true, false, false, arguments);
+    }
+
+    @Bean
+    Binding deviceEventBinding() {
+        return BindingBuilder
+                .bind(deviceEventQueue())
+                .to(eventExchange())
+                .with(Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + "*");
     }
 
 }

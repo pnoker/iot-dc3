@@ -37,11 +37,6 @@ import java.util.Map;
 public class DriverContext {
 
     /**
-     * 驱动 ID ，当且仅当驱动注册成功之后由 Manager 返回
-     */
-    private Long driverId;
-
-    /**
      * 驱动 元数据，当且仅当驱动注册成功之后由 Manager 返回
      */
     private DriverMetadata driverMetadata = new DriverMetadata();

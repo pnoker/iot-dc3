@@ -17,7 +17,7 @@
 package com.dc3.common.sdk.api;
 
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.PointValue;
+import com.dc3.common.model.PointValue;
 import com.dc3.common.constant.Common;
 import com.dc3.common.sdk.bean.CmdParameter;
 import com.dc3.common.sdk.service.DriverCommandService;

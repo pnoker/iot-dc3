@@ -90,8 +90,8 @@ Cache-Control: no-cache
 
 
 ### 新增 Driver
-#/manager/driver/batchImport
-POST http://localhost:8000/api/v3/manager/driver/batchImport
+#/manager/driver/batch_import
+POST http://localhost:8000/api/v3/manager/driver/batch_import
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -175,8 +175,8 @@ Cache-Control: no-cache
 
 ### --------------------- Gateway Driver Attribute ---------------------
 ### 新增 DriverAttribute
-#/api/v3/manager/driverAttribute/add
-POST http://localhost:8000/api/v3/manager/driverAttribute/add
+#/api/v3/manager/driver_attribute/add
+POST http://localhost:8000/api/v3/manager/driver_attribute/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -192,8 +192,8 @@ Cache-Control: no-cache
 
 
 ### 修改 DriverAttribute
-#/api/v3/manager/driverAttribute/update
-POST http://localhost:8000/api/v3/manager/driverAttribute/update
+#/api/v3/manager/driver_attribute/update
+POST http://localhost:8000/api/v3/manager/driver_attribute/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -210,16 +210,16 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 DriverAttribute
-#/api/v3/manager/driverAttribute/id/:id
-GET http://localhost:8000/api/v3/manager/driverAttribute/id/1
+#/api/v3/manager/driver_attribute/id/:id
+GET http://localhost:8000/api/v3/manager/driver_attribute/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 DriverAttribute
-#/api/v3/manager/driverAttribute/list，支持displayName模糊查询，name\type\driverId精准查询
-POST http://localhost:8000/api/v3/manager/driverAttribute/list
+#/api/v3/manager/driver_attribute/list，支持displayName模糊查询，name\type\driverId精准查询
+POST http://localhost:8000/api/v3/manager/driver_attribute/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -239,8 +239,8 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 DriverAttribute
-#/api/v3/manager/driverAttribute/delete/:id
-POST http://localhost:8000/api/v3/manager/driverAttribute/delete/1
+#/api/v3/manager/driver_attribute/delete/:id
+POST http://localhost:8000/api/v3/manager/driver_attribute/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -248,8 +248,8 @@ Cache-Control: no-cache
 
 ### --------------------- Gateway Driver Info ---------------------
 ### 新增 DriverInfo
-#/api/v3/manager/driverInfo/add
-POST http://localhost:8000/api/v3/manager/driverInfo/add
+#/api/v3/manager/driver_info/add
+POST http://localhost:8000/api/v3/manager/driver_info/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -263,8 +263,8 @@ Cache-Control: no-cache
 
 
 ### 修改 DriverInfo
-#/api/v3/manager/driverInfo/update
-POST http://localhost:8000/api/v3/manager/driverInfo/update
+#/api/v3/manager/driver_info/update
+POST http://localhost:8000/api/v3/manager/driver_info/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -279,16 +279,16 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 DriverInfo
-#/api/v3/manager/driverInfo/id/:id
-GET http://localhost:8000/api/v3/manager/driverInfo/id/1
+#/api/v3/manager/driver_info/id/:id
+GET http://localhost:8000/api/v3/manager/driver_info/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 DriverInfo
-#/api/v3/manager/driverInfo/list，支持driverAttributeId\profileId精准查询
-POST http://localhost:8000/api/v3/manager/driverInfo/list
+#/api/v3/manager/driver_info/list，支持driverAttributeId\profileId精准查询
+POST http://localhost:8000/api/v3/manager/driver_info/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -307,8 +307,8 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 DriverInfo
-#/api/v3/manager/driverInfo/delete/:id
-POST http://localhost:8000/api/v3/manager/driverInfo/delete/1
+#/api/v3/manager/driver_info/delete/:id
+POST http://localhost:8000/api/v3/manager/driver_info/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

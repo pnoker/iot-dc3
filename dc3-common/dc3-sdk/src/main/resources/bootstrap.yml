@@ -68,20 +68,6 @@ management:
     health:
       show-details: ALWAYS
 
-feign:
-  hystrix:
-    enabled: false
-  httpclient:
-    enabled: false
-  okhttp:
-    enabled: true
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
-      use-gzip-decoder: true
-
 hystrix:
   command:
     default:

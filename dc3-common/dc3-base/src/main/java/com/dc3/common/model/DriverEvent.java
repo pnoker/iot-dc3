@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean.driver;
+package com.dc3.common.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DeviceEvent implements Serializable {
+public class DriverEvent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -47,20 +47,12 @@ public class DeviceEvent implements Serializable {
     @MongoId
     private ObjectId id;
 
-    /**
-     * 设备ID，同MySQl中等 设备ID 一致
-     */
-    private Long deviceId;
+    private String serviceName;
 
     /**
-     * 位号ID，同MySQl中等 位号ID 一致
-     */
-    private Long pointId;
-
-    /**
-     * Device Event
+     * Driver Event
      * <p>
-     * STATUS、LIMIT、ERROR
+     * STATUS、ERROR
      */
     private String type;
 
@@ -76,33 +68,15 @@ public class DeviceEvent implements Serializable {
     private Long originTime;
     private Long confirmTime;
 
-    public DeviceEvent(Long deviceId, String type, Object content) {
-        this.deviceId = deviceId;
+    public DriverEvent(String serviceName, String type, Object content) {
+        this.serviceName = serviceName;
         this.type = type;
         this.content = content;
         this.originTime = System.currentTimeMillis();
     }
 
-    public DeviceEvent(Long deviceId, String type, Object content, int timeOut, TimeUnit timeUnit) {
-        this.deviceId = deviceId;
-        this.type = type;
-        this.content = content;
-        this.timeOut = timeOut;
-        this.timeUnit = timeUnit;
-        this.originTime = System.currentTimeMillis();
-    }
-
-    public DeviceEvent(Long deviceId, Long pointId, String type, Object content) {
-        this.deviceId = deviceId;
-        this.pointId = pointId;
-        this.type = type;
-        this.content = content;
-        this.originTime = System.currentTimeMillis();
-    }
-
-    public DeviceEvent(Long deviceId, Long pointId, String type, Object content, int timeOut, TimeUnit timeUnit) {
-        this.deviceId = deviceId;
-        this.pointId = pointId;
+    public DriverEvent(String serviceName, String type, Object content, int timeOut, TimeUnit timeUnit) {
+        this.serviceName = serviceName;
         this.type = type;
         this.content = content;
         this.timeOut = timeOut;

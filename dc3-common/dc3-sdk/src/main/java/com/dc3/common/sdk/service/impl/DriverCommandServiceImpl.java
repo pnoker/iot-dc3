@@ -16,7 +16,7 @@
 
 package com.dc3.common.sdk.service.impl;
 
-import com.dc3.common.bean.driver.PointValue;
+import com.dc3.common.model.PointValue;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.bean.driver.AttributeInfo;

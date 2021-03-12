@@ -14,39 +14,36 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.data.feign;
+package com.dc3.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.data.hystrix.DeviceEventClientHystrix;
+import com.dc3.api.center.manager.hystrix.EventClientHystrix;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.DeviceEvent;
-import com.dc3.common.bean.driver.DeviceEventDto;
 import com.dc3.common.constant.Common;
+import com.dc3.common.dto.DeviceEventDto;
+import com.dc3.common.dto.DriverEventDto;
+import com.dc3.common.model.DeviceEvent;
+import com.dc3.common.model.DriverEvent;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 数据 FeignClient
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_DATA_DEVICE_EVENT_URL_PREFIX, name = Common.Service.DC3_DATA_SERVICE_NAME, fallbackFactory = DeviceEventClientHystrix.class)
-public interface DeviceEventClient {
+@FeignClient(path = Common.Service.DC3_MANAGER_EVENT_URL_PREFIX, name = Common.Service.DC3_DATA_SERVICE_NAME, fallbackFactory = EventClientHystrix.class)
+public interface EventClient {
 
     /**
-     * 获取设备状态
-     * ONLINE, OFFLINE, MAINTAIN, FAULT
+     * 分页查询 DriverEvent
      *
-     * @param deviceId Device Id
-     * @return String
+     * @param driverEventDto DriverEventDto
+     * @return Page<DriverEvent>
      */
-    @GetMapping("/status/deviceId/{deviceId}")
-    R<String> deviceStatus(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    @PostMapping("/driver")
+    R<Page<DriverEvent>> driverEvent(@RequestBody(required = false) DriverEventDto driverEventDto);
 
     /**
      * 分页查询 DeviceEvent
@@ -54,6 +51,6 @@ public interface DeviceEventClient {
      * @param deviceEventDto DeviceEventDto
      * @return Page<DeviceEvent>
      */
-    @PostMapping("/list")
-    R<Page<DeviceEvent>> list(@RequestBody(required = false) DeviceEventDto deviceEventDto);
+    @PostMapping("/device")
+    R<Page<DeviceEvent>> deviceEvent(@RequestBody(required = false) DeviceEventDto deviceEventDto);
 }

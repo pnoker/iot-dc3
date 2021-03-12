@@ -16,7 +16,7 @@
 
 package com.dc3.gateway.filter;
 
-import com.dc3.api.center.auth.token.feign.TokenClient;
+import com.dc3.api.center.auth.feign.TokenClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.gateway.utils.GatewayUtil;

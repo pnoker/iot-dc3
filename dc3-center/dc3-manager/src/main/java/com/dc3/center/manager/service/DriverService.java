@@ -63,14 +63,6 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Driver selectByProfileId(Long profileId);
 
     /**
-     * 查询 Driver 服务状态
-     *
-     * @param driverDto Driver Dto
-     * @return Map<String, Boolean>
-     */
-    Map<String, Boolean> driverStatus(DriverDto driverDto);
-
-    /**
      * 驱动注册
      *
      * @param driverRegister DriverRegister

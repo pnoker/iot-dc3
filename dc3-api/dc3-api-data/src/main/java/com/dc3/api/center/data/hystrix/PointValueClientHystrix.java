@@ -19,8 +19,8 @@ package com.dc3.api.center.data.hystrix;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.bean.driver.PointValueDto;
+import com.dc3.common.dto.PointValueDto;
+import com.dc3.common.model.PointValue;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,11 +42,6 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
         log.error("Hystrix:{}", message);
 
         return new PointValueClient() {
-
-            @Override
-            public R<Boolean> correct(String serviceName) {
-                return R.fail(message);
-            }
 
             @Override
             public R<List<PointValue>> realtime(Long deviceId) {

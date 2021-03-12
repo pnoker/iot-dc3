@@ -29,7 +29,6 @@ import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
-import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -54,7 +53,12 @@ import java.util.Optional;
 public class DriverServiceImpl implements DriverService {
 
     @Resource
-    private RedisUtil redisUtil;
+    private DriverMapper driverMapper;
+    @Resource
+    private ProfileService profileService;
+    @Resource
+    private DeviceService deviceService;
+
     @Resource
     private DriverAttributeService driverAttributeService;
     @Resource
@@ -63,12 +67,6 @@ public class DriverServiceImpl implements DriverService {
     private PointAttributeService pointAttributeService;
     @Resource
     private PointInfoService pointInfoService;
-    @Resource
-    private DeviceService deviceService;
-    @Resource
-    private ProfileService profileService;
-    @Resource
-    private DriverMapper driverMapper;
 
     @Override
     @Caching(
@@ -172,9 +170,9 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, key = "#serviceName", unless = "#result==null")
     public Driver selectByServiceName(String serviceName) {
-        DriverDto driverDto = new DriverDto();
-        driverDto.setServiceName(serviceName);
-        Driver driver = driverMapper.selectOne(fuzzyQuery(driverDto));
+        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
+        queryWrapper.eq(Driver::getServiceName, serviceName);
+        Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
             throw new NotFoundException("The driver does not exist");
         }
@@ -184,33 +182,14 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#host+'.'+#port", unless = "#result==null")
     public Driver selectByHostPort(String host, Integer port) {
-        DriverDto driverDto = new DriverDto();
-        driverDto.setHost(host);
-        driverDto.setPort(port);
-        Driver driver = driverMapper.selectOne(fuzzyQuery(driverDto));
+        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
+        queryWrapper.eq(Driver::getHost, host);
+        queryWrapper.eq(Driver::getPort, port);
+        Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
             throw new NotFoundException("The driver does not exist");
         }
         return driver;
-    }
-
-    //TODO 合并到list中
-    @Override
-    public Map<String, Boolean> driverStatus(DriverDto driverDto) {
-        Map<String, Boolean> driverStatusMap = new HashMap<>(16);
-
-        Page<Driver> driverPage = list(driverDto);
-        if (driverPage.getRecords().size() > 0) {
-            driverPage.getRecords().forEach(driver -> {
-                String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
-                String value = redisUtil.getKey(key, String.class);
-                value = null != value ? value : Common.Driver.Status.OFFLINE;
-                // todo driver status
-                boolean status = value.equals(Common.Driver.Status.ONLINE);
-                driverStatusMap.put(driver.getServiceName(), status);
-            });
-        }
-        return driverStatusMap;
     }
 
     @Override
@@ -321,11 +300,11 @@ public class DriverServiceImpl implements DriverService {
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         Optional.ofNullable(driverDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getServiceName())) {
-                queryWrapper.like(Driver::getServiceName, dto.getServiceName());
-            }
             if (StringUtils.isNotBlank(dto.getName())) {
                 queryWrapper.like(Driver::getName, dto.getName());
+            }
+            if (StringUtils.isNotBlank(dto.getServiceName())) {
+                queryWrapper.like(Driver::getServiceName, dto.getServiceName());
             }
             if (StringUtils.isNotBlank(dto.getHost())) {
                 queryWrapper.like(Driver::getHost, dto.getHost());

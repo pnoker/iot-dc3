@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Map;
 
 /**
  * <p>设备 Client 接口实现
@@ -98,16 +97,6 @@ public class DeviceApi implements DeviceClient {
             return R.fail(e.getMessage());
         }
         return R.fail();
-    }
-
-    @Override
-    public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto) {
-        try {
-            Map<Long, String> deviceStatuses = deviceService.deviceStatus(deviceDto);
-            return R.ok(deviceStatuses);
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
     }
 
     @Override

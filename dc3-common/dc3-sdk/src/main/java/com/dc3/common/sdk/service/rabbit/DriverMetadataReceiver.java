@@ -52,7 +52,7 @@ public class DriverMetadataReceiver {
     private DriverMetadataService driverMetadataService;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{driverConfigurationQueue.name}")
+    @RabbitListener(queues = "#{driverMetadataQueue.name}")
     public void driverConfigurationReceive(Channel channel, Message message, DriverConfiguration driverConfiguration) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);

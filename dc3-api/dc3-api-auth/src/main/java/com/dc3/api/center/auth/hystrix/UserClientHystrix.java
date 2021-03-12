@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.auth.user.hystrix;
+package com.dc3.api.center.auth.hystrix;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.auth.user.feign.UserClient;
+import com.dc3.api.center.auth.feign.UserClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.UserDto;
 import com.dc3.common.model.User;

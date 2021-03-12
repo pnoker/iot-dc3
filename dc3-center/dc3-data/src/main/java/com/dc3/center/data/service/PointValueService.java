@@ -17,8 +17,8 @@
 package com.dc3.center.data.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.common.bean.driver.PointValue;
-import com.dc3.common.bean.driver.PointValueDto;
+import com.dc3.common.dto.PointValueDto;
+import com.dc3.common.model.PointValue;
 
 import java.util.List;
 
@@ -26,14 +26,6 @@ import java.util.List;
  * @author pnoker
  */
 public interface PointValueService {
-
-    /**
-     * 数据纠正
-     *
-     * @param serviceName Driver Service Name
-     * @return Boolean
-     */
-    Boolean correct(String serviceName);
 
     /**
      * 获取实时数据

@@ -22,8 +22,8 @@ Cache-Control: no-cache
 
 
 ### 查询 PointAttribute Dictionary
-#/manager/dictionary/pointAttribute
-GET http://localhost:8400/manager/dictionary/pointAttribute
+#/manager/dictionary/point_attribute
+GET http://localhost:8400/manager/dictionary/point_attribute
 Accept: */*
 Cache-Control: no-cache
 

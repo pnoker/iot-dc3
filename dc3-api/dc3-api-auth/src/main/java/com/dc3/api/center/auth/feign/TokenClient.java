@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.dc3.api.center.auth.token.feign;
+package com.dc3.api.center.auth.feign;
 
-import com.dc3.api.center.auth.token.hystrix.TokenClientHystrix;
+import com.dc3.api.center.auth.hystrix.TokenClientHystrix;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.User;

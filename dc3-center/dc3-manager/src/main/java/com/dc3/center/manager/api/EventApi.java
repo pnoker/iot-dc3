@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.api;
+package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.data.feign.DeviceEventClient;
-import com.dc3.center.data.service.DeviceEventService;
+import com.dc3.api.center.manager.feign.EventClient;
+import com.dc3.center.manager.service.EventService;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.DeviceEvent;
-import com.dc3.common.bean.driver.DeviceEventDto;
 import com.dc3.common.constant.Common;
+import com.dc3.common.dto.DeviceEventDto;
+import com.dc3.common.dto.DriverEventDto;
+import com.dc3.common.model.DeviceEvent;
+import com.dc3.common.model.DriverEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,26 +36,29 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_DATA_DEVICE_EVENT_URL_PREFIX)
-public class DeviceEventApi implements DeviceEventClient {
+@RequestMapping(Common.Service.DC3_MANAGER_EVENT_URL_PREFIX)
+public class EventApi implements EventClient {
 
     @Resource
-    private DeviceEventService deviceEventService;
+    private EventService eventService;
 
     @Override
-    public R<String> deviceStatus(Long deviceId) {
+    public R<Page<DriverEvent>> driverEvent(DriverEventDto driverEventDto) {
         try {
-            String status = deviceEventService.deviceStatus(deviceId);
-            return R.ok(status, "ok");
+            Page<DriverEvent> page = eventService.driverEvent(driverEventDto);
+            if (null != page) {
+                return R.ok(page);
+            }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
+        return R.fail();
     }
 
     @Override
-    public R<Page<DeviceEvent>> list(DeviceEventDto deviceEventDto) {
+    public R<Page<DeviceEvent>> deviceEvent(DeviceEventDto deviceEventDto) {
         try {
-            Page<DeviceEvent> page = deviceEventService.list(deviceEventDto);
+            Page<DeviceEvent> page = eventService.deviceEvent(deviceEventDto);
             if (null != page) {
                 return R.ok(page);
             }

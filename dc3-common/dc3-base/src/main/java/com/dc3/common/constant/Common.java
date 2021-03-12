@@ -252,7 +252,7 @@ public interface Common {
         String DC3_AUTH_SERVICE_NAME = "DC3-AUTH";
         String DC3_AUTH_USER_URL_PREFIX = "/auth/user";
         String DC3_AUTH_TOKEN_URL_PREFIX = "/auth/token";
-        String DC3_AUTH_BLACK_IP_URL_PREFIX = "/auth/blackIp";
+        String DC3_AUTH_BLACK_IP_URL_PREFIX = "/auth/black_ip";
 
         /**
          * dc3-manager 服务
@@ -260,16 +260,18 @@ public interface Common {
         String DC3_MANAGER_SERVICE_NAME = "DC3-MANAGER";
         String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
         String DC3_MANAGER_BATCH_URL_PREFIX = "/manager/batch";
-        String DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX = "/manager/driverAttribute";
-        String DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX = "/manager/pointAttribute";
+        String DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX = "/manager/driver_attribute";
+        String DC3_MANAGER_POINT_ATTRIBUTE_URL_PREFIX = "/manager/point_attribute";
         String DC3_MANAGER_PROFILE_URL_PREFIX = "/manager/profile";
         String DC3_MANAGER_POINT_URL_PREFIX = "/manager/point";
         String DC3_MANAGER_GROUP_URL_PREFIX = "/manager/group";
         String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
-        String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/pointInfo";
-        String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driverInfo";
+        String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/point_info";
+        String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driver_info";
         String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
         String DC3_MANAGER_DICTIONARY_URL_PREFIX = "/manager/dictionary";
+        String DC3_MANAGER_STATUS_URL_PREFIX = "/manager/status";
+        String DC3_MANAGER_EVENT_URL_PREFIX = "/manager/event";
 
         /**
          * dc3-rtmp 服务
@@ -281,8 +283,7 @@ public interface Common {
          * dc3-data 服务
          */
         String DC3_DATA_SERVICE_NAME = "DC3-DATA";
-        String DC3_DATA_POINT_VALUE_URL_PREFIX = "/data/pointValue";
-        String DC3_DATA_DEVICE_EVENT_URL_PREFIX = "/data/deviceEvent";
+        String DC3_DATA_POINT_VALUE_URL_PREFIX = "/data/point_value";
 
         /**
          * dc3-driver-sdk 服务

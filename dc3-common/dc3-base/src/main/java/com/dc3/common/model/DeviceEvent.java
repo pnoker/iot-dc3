@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean.driver;
+package com.dc3.common.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,17 +38,14 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PointValue implements Serializable {
+public class DeviceEvent implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    @Transient
-    private Long id;
 
     /**
      * MongoDB Object Id
      */
     @MongoId
-    private ObjectId objectId;
+    private ObjectId id;
 
     /**
      * 设备ID，同MySQl中等 设备ID 一致
@@ -62,21 +58,14 @@ public class PointValue implements Serializable {
     private Long pointId;
 
     /**
-     * 处理值，进行过缩放、格式化等操作
+     * Device Event
+     * <p>
+     * STATUS、LIMIT、ERROR
      */
-    private String value;
+    private String type;
 
-    /**
-     * 原始值
-     */
-    private String rawValue;
-
-    /**
-     * 计算值
-     */
-    private Object calculateValue;
-
-    private List<PointValue> children;
+    private Boolean confirm = false;
+    private Object content;
 
     @Transient
     private int timeOut = 15;
@@ -84,43 +73,38 @@ public class PointValue implements Serializable {
     @Transient
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
-    private Boolean multi;
     private Long originTime;
-    private Long createTime;
+    private Long confirmTime;
 
-    public PointValue(Long pointId, String rawValue, String value) {
-        this.pointId = pointId;
-        this.rawValue = rawValue;
-        this.value = value;
-    }
-
-    public PointValue(Long deviceId, Long pointId, String rawValue, String value) {
+    public DeviceEvent(Long deviceId, String type, Object content) {
         this.deviceId = deviceId;
-        this.pointId = pointId;
-        this.rawValue = rawValue;
-        this.value = value;
+        this.type = type;
+        this.content = content;
         this.originTime = System.currentTimeMillis();
     }
 
-    public PointValue(Long deviceId, Long pointId, String rawValue, String value, int timeOut, TimeUnit timeUnit) {
+    public DeviceEvent(Long deviceId, String type, Object content, int timeOut, TimeUnit timeUnit) {
         this.deviceId = deviceId;
-        this.pointId = pointId;
-        this.rawValue = rawValue;
-        this.value = value;
+        this.type = type;
+        this.content = content;
         this.timeOut = timeOut;
         this.timeUnit = timeUnit;
         this.originTime = System.currentTimeMillis();
     }
 
-    public PointValue(Long deviceId, List<PointValue> children) {
+    public DeviceEvent(Long deviceId, Long pointId, String type, Object content) {
         this.deviceId = deviceId;
-        this.children = children;
+        this.pointId = pointId;
+        this.type = type;
+        this.content = content;
         this.originTime = System.currentTimeMillis();
     }
 
-    public PointValue(Long deviceId, List<PointValue> children, int timeOut, TimeUnit timeUnit) {
+    public DeviceEvent(Long deviceId, Long pointId, String type, Object content, int timeOut, TimeUnit timeUnit) {
         this.deviceId = deviceId;
-        this.children = children;
+        this.pointId = pointId;
+        this.type = type;
+        this.content = content;
         this.timeOut = timeOut;
         this.timeUnit = timeUnit;
         this.originTime = System.currentTimeMillis();

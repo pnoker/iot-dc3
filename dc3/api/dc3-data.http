@@ -17,7 +17,7 @@
 ### --------------------- Point ---------------------
 ### 分页查询 Point Value
 #/data/list
-POST http://localhost:8500/data/pointValue/list
+POST http://localhost:8500/data/point_value/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -32,43 +32,29 @@ Cache-Control: no-cache
 
 
 ### 根据 Device Id 查询 最新值
-#/latest/deviceId/:deviceId
-GET http://localhost:8500/data/latest/deviceId/1
+#/latest/device_id/:deviceId
+GET http://localhost:8500/data/point_value/latest/device_id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Device Id 和 Point Id 查询 最新值
-#/latest/deviceId/:deviceId/pointId/:pointId
-GET http://localhost:8500/data/latest/deviceId/1/pointId/1
-Accept: */*
-Cache-Control: no-cache
-
-
-### 根据 Device Id 查询 设备状态
-#/latest/deviceId/:deviceId
-GET http://localhost:8500/data/status/deviceId/1
+#/latest/device_id/:deviceId/point_id/:pointId
+GET http://localhost:8500/data/point_value/latest/device_id/1/point_id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Device Id 查询 实时值
-#/realtime/deviceId/:deviceId
-GET http://localhost:8500/data/realtime/deviceId/1
+#/realtime/device_id/:deviceId
+GET http://localhost:8500/data/point_value/realtime/device_id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Device Id 和 Point Id 查询 实时值
-#/realtime/deviceId/:deviceId/pointId/:pointId
-GET http://localhost:8500/data/realtime/deviceId/1/pointId/1
-Accept: */*
-Cache-Control: no-cache
-
-
-### 数据纠正
-#/correct/serviceName/:serviceName
-GET http://localhost:8500/data/correct/serviceName/dc3-driver-water-188b
+#/realtime/device_id/:deviceId/point_id/:pointId
+GET http://localhost:8500/data/point_value/realtime/device_id/1/point_id/1
 Accept: */*
 Cache-Control: no-cache
 

@@ -60,24 +60,6 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    TopicExchange eventExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
-    }
-
-    @Bean
-    Queue deviceEventQueue() {
-        return new Queue(Common.Rabbit.QUEUE_DEVICE_EVENT, true, false, false);
-    }
-
-    @Bean
-    Binding deviceEventBinding() {
-        return BindingBuilder
-                .bind(deviceEventQueue())
-                .to(eventExchange())
-                .with(Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + "*");
-    }
-
-    @Bean
     TopicExchange valueExchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, false);
     }
