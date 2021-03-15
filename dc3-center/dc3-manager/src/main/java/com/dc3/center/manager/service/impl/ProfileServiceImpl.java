@@ -149,7 +149,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public Profile selectByName(String name) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.like(Profile::getName, name);
+        queryWrapper.eq(Profile::getName, name);
         Profile profile = profileMapper.selectOne(queryWrapper);
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
@@ -181,17 +181,17 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public LambdaQueryWrapper<Profile> fuzzyQuery(ProfileDto profileDto) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        Optional.ofNullable(profileDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Profile::getName, dto.getName());
+        if (null != profileDto) {
+            if (StringUtils.isNotBlank(profileDto.getName())) {
+                queryWrapper.like(Profile::getName, profileDto.getName());
             }
-            if (null != dto.getShare()) {
-                queryWrapper.eq(Profile::getShare, dto.getShare());
+            if (null != profileDto.getShare()) {
+                queryWrapper.eq(Profile::getShare, profileDto.getShare());
             }
-            if (null != dto.getDriverId()) {
-                queryWrapper.eq(Profile::getDriverId, dto.getDriverId());
+            if (null != profileDto.getDriverId()) {
+                queryWrapper.eq(Profile::getDriverId, profileDto.getDriverId());
             }
-        });
+        }
         return queryWrapper;
     }
 

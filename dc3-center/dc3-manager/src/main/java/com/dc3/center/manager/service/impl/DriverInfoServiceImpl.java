@@ -55,7 +55,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.PROFILE_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -80,7 +80,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
@@ -96,7 +96,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.PROFILE_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.profileId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -134,7 +134,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.DRIVER_INFO_ID, key = "#driverAttributeId+'.'+#profileId", unless = "#result==null")
+    @Cacheable(value = Common.Cache.DRIVER_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.PROFILE_ID, key = "#driverAttributeId+'.'+#profileId", unless = "#result==null")
     public DriverInfo selectByAttributeIdAndProfileId(Long driverAttributeId, Long profileId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDriverAttributeId(driverAttributeId);
@@ -182,14 +182,14 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        Optional.ofNullable(driverInfoDto).ifPresent(dto -> {
-            if (null != dto.getDriverAttributeId()) {
-                queryWrapper.eq(DriverInfo::getDriverAttributeId, dto.getDriverAttributeId());
+        if (null != driverInfoDto) {
+            if (null != driverInfoDto.getDriverAttributeId()) {
+                queryWrapper.eq(DriverInfo::getDriverAttributeId, driverInfoDto.getDriverAttributeId());
             }
-            if (null != dto.getProfileId()) {
-                queryWrapper.eq(DriverInfo::getProfileId, dto.getProfileId());
+            if (null != driverInfoDto.getProfileId()) {
+                queryWrapper.eq(DriverInfo::getProfileId, driverInfoDto.getProfileId());
             }
-        });
+        }
         return queryWrapper;
     }
 

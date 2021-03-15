@@ -328,12 +328,9 @@ public interface Common {
         String DEVICE_ID = "_device_id";
         String POINT_ID = "_point_id";
         String ATTRIBUTE_ID = "_attribute_id";
-        String DRIVER_INFO_ID = "_driver_info_id";
-        String POINT_INFO_ID = "_point_info_id";
 
         String IP = "_ip";
         String NAME = "_name";
-        String CODE = "_code";
         String STATUS = "_status";
         String VALUE = "_value";
         String VALUES = "_values";

@@ -17,11 +17,8 @@
 package com.dc3.center.manager.service;
 
 import com.dc3.common.base.Service;
-import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.model.Driver;
-
-import java.util.Map;
 
 /**
  * <p>Driver Interface
@@ -62,10 +59,4 @@ public interface DriverService extends Service<Driver, DriverDto> {
      */
     Driver selectByProfileId(Long profileId);
 
-    /**
-     * 驱动注册
-     *
-     * @param driverRegister DriverRegister
-     */
-    void driverRegister(DriverRegister driverRegister);
 }

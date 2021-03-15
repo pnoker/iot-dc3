@@ -20,15 +20,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DriverMapper;
-import com.dc3.center.manager.service.*;
+import com.dc3.center.manager.service.DeviceService;
+import com.dc3.center.manager.service.DriverService;
+import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
-import com.dc3.common.model.*;
+import com.dc3.common.model.Device;
+import com.dc3.common.model.Driver;
+import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,10 +41,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * <p>DriverService Impl
@@ -58,15 +57,6 @@ public class DriverServiceImpl implements DriverService {
     private ProfileService profileService;
     @Resource
     private DeviceService deviceService;
-
-    @Resource
-    private DriverAttributeService driverAttributeService;
-    @Resource
-    private DriverInfoService driverInfoService;
-    @Resource
-    private PointAttributeService pointAttributeService;
-    @Resource
-    private PointInfoService pointInfoService;
 
     @Override
     @Caching(
@@ -112,7 +102,6 @@ public class DriverServiceImpl implements DriverService {
             throw new ServiceException("The driver already bound by the profile");
         } catch (NotFoundException notFoundException1) {
             selectById(id);
-            //TODO 需要删除驱动下所有的模板，设备，位号
             return driverMapper.deleteById(id) > 0;
         }
     }
@@ -193,101 +182,6 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public void driverRegister(DriverRegister driverRegister) {
-        // register driver
-        Driver driver = driverRegister.getDriver();
-        log.info("Register driver {}", driver);
-        try {
-            Driver byServiceName = selectByServiceName(driver.getServiceName());
-            log.debug("Driver already registered, updating {} ", driver);
-            driver.setId(byServiceName.getId());
-            driver = update(driver);
-        } catch (NotFoundException notFoundException1) {
-            log.debug("Driver does not registered, adding {} ", driver);
-            try {
-                Driver byHostPort = selectByHostPort(driver.getHost(), driver.getPort());
-                throw new ServiceException("The port(" + driver.getPort() + ") is already occupied by driver(" + byHostPort.getName() + "/" + byHostPort.getServiceName() + ")");
-            } catch (NotFoundException notFoundException2) {
-                driver = add(driver);
-            }
-        }
-
-        //register driver attribute
-        Map<String, DriverAttribute> newDriverAttributeMap = new HashMap<>(8);
-        if (null != driverRegister.getDriverAttributes() && driverRegister.getDriverAttributes().size() > 0) {
-            driverRegister.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
-        }
-
-        Map<String, DriverAttribute> oldDriverAttributeMap = new HashMap<>(8);
-        try {
-            List<DriverAttribute> byDriverId = driverAttributeService.selectByDriverId(driver.getId());
-            byDriverId.forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
-        } catch (NotFoundException ignored) {
-        }
-
-        for (String name : newDriverAttributeMap.keySet()) {
-            DriverAttribute info = newDriverAttributeMap.get(name).setDriverId(driver.getId());
-            if (oldDriverAttributeMap.containsKey(name)) {
-                info.setId(oldDriverAttributeMap.get(name).getId());
-                log.debug("Driver attribute registered, updating: {}", info);
-                driverAttributeService.update(info);
-            } else {
-                log.debug("Driver attribute does not registered, adding: {}", info);
-                driverAttributeService.add(info);
-            }
-        }
-
-        for (String name : oldDriverAttributeMap.keySet()) {
-            if (!newDriverAttributeMap.containsKey(name)) {
-                try {
-                    driverInfoService.selectByAttributeId(oldDriverAttributeMap.get(name).getId());
-                    throw new ServiceException("The driver attribute(" + name + ") used by driver info and cannot be deleted");
-                } catch (NotFoundException notFoundException) {
-                    log.debug("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
-                    driverAttributeService.delete(oldDriverAttributeMap.get(name).getId());
-                }
-            }
-        }
-
-        // register point attribute
-        Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);
-        if (null != driverRegister.getPointAttributes() && driverRegister.getPointAttributes().size() > 0) {
-            driverRegister.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
-        }
-
-        Map<String, PointAttribute> oldPointAttributeMap = new HashMap<>(8);
-        try {
-            List<PointAttribute> byDriverId = pointAttributeService.selectByDriverId(driver.getId());
-            byDriverId.forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
-        } catch (NotFoundException ignored) {
-        }
-
-        for (String name : newPointAttributeMap.keySet()) {
-            PointAttribute attribute = newPointAttributeMap.get(name).setDriverId(driver.getId());
-            if (oldPointAttributeMap.containsKey(name)) {
-                attribute.setId(oldPointAttributeMap.get(name).getId());
-                log.debug("Point attribute registered, updating: {}", attribute);
-                pointAttributeService.update(attribute);
-            } else {
-                log.debug("Point attribute registered, adding: {}", attribute);
-                pointAttributeService.add(attribute);
-            }
-        }
-
-        for (String name : oldPointAttributeMap.keySet()) {
-            if (!newPointAttributeMap.containsKey(name)) {
-                try {
-                    pointInfoService.selectByAttributeId(oldPointAttributeMap.get(name).getId());
-                    throw new ServiceException("The point attribute(" + name + ") used by point info and cannot be deleted");
-                } catch (NotFoundException notFoundException1) {
-                    log.debug("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));
-                    pointAttributeService.delete(oldPointAttributeMap.get(name).getId());
-                }
-            }
-        }
-    }
-
-    @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Driver> list(DriverDto driverDto) {
         if (null == driverDto.getPage()) {
@@ -299,20 +193,20 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        Optional.ofNullable(driverDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Driver::getName, dto.getName());
+        if (null != driverDto) {
+            if (StringUtils.isNotBlank(driverDto.getName())) {
+                queryWrapper.like(Driver::getName, driverDto.getName());
             }
-            if (StringUtils.isNotBlank(dto.getServiceName())) {
-                queryWrapper.like(Driver::getServiceName, dto.getServiceName());
+            if (StringUtils.isNotBlank(driverDto.getServiceName())) {
+                queryWrapper.like(Driver::getServiceName, driverDto.getServiceName());
             }
-            if (StringUtils.isNotBlank(dto.getHost())) {
-                queryWrapper.like(Driver::getHost, dto.getHost());
+            if (StringUtils.isNotBlank(driverDto.getHost())) {
+                queryWrapper.like(Driver::getHost, driverDto.getHost());
             }
-            if (null != dto.getPort()) {
-                queryWrapper.eq(Driver::getPort, dto.getPort());
+            if (null != driverDto.getPort()) {
+                queryWrapper.eq(Driver::getPort, driverDto.getPort());
             }
-        });
+        }
         return queryWrapper;
     }
 

@@ -159,14 +159,14 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public LambdaQueryWrapper<Label> fuzzyQuery(LabelDto labelDto) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        Optional.ofNullable(labelDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Label::getName, dto.getName());
+        if (null != labelDto) {
+            if (StringUtils.isNotBlank(labelDto.getName())) {
+                queryWrapper.like(Label::getName, labelDto.getName());
             }
-            if (StringUtils.isNotBlank(dto.getColor())) {
-                queryWrapper.eq(Label::getColor, dto.getColor());
+            if (StringUtils.isNotBlank(labelDto.getColor())) {
+                queryWrapper.eq(Label::getColor, labelDto.getColor());
             }
-        });
+        }
         return queryWrapper;
     }
 

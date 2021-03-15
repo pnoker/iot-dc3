@@ -151,11 +151,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public LambdaQueryWrapper<Group> fuzzyQuery(GroupDto groupDto) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        Optional.ofNullable(groupDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Group::getName, dto.getName());
+        if (null != groupDto) {
+            if (StringUtils.isNotBlank(groupDto.getName())) {
+                queryWrapper.like(Group::getName, groupDto.getName());
             }
-        });
+        }
         return queryWrapper;
     }
 

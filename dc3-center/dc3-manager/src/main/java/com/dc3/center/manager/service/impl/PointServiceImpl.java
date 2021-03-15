@@ -136,7 +136,7 @@ public class PointServiceImpl implements PointService {
     @Cacheable(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#name+'.'+#profileId", unless = "#result==null")
     public Point selectByNameAndProfileId(String name, Long profileId) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        queryWrapper.like(Point::getName, name);
+        queryWrapper.eq(Point::getName, name);
         queryWrapper.eq(Point::getProfileId, profileId);
         Point point = pointMapper.selectOne(queryWrapper);
         if (null == point) {
@@ -169,23 +169,23 @@ public class PointServiceImpl implements PointService {
     @Override
     public LambdaQueryWrapper<Point> fuzzyQuery(PointDto pointDto) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        Optional.ofNullable(pointDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(Point::getName, dto.getName());
+        if (null != pointDto) {
+            if (StringUtils.isNotBlank(pointDto.getName())) {
+                queryWrapper.like(Point::getName, pointDto.getName());
             }
-            if (StringUtils.isNotBlank(dto.getType())) {
-                queryWrapper.eq(Point::getType, dto.getType());
+            if (StringUtils.isNotBlank(pointDto.getType())) {
+                queryWrapper.eq(Point::getType, pointDto.getType());
             }
-            if (null != dto.getRw()) {
-                queryWrapper.eq(Point::getRw, dto.getRw());
+            if (null != pointDto.getRw()) {
+                queryWrapper.eq(Point::getRw, pointDto.getRw());
             }
-            if (null != dto.getAccrue()) {
-                queryWrapper.eq(Point::getAccrue, dto.getAccrue());
+            if (null != pointDto.getAccrue()) {
+                queryWrapper.eq(Point::getAccrue, pointDto.getAccrue());
             }
-            if (null != dto.getProfileId()) {
-                queryWrapper.eq(Point::getProfileId, dto.getProfileId());
+            if (null != pointDto.getProfileId()) {
+                queryWrapper.eq(Point::getProfileId, pointDto.getProfileId());
             }
-        });
+        }
         return queryWrapper;
     }
 

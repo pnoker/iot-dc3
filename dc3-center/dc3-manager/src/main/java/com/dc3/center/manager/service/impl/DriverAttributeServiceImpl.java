@@ -54,7 +54,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.ID, key = "#driverAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, key = "#driverAttribute.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#driverAttribute.name+'.'+#driverAttribute.driverId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -78,7 +78,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
@@ -93,7 +93,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.ID, key = "#driverAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, key = "#driverAttribute.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#driverAttribute.name+'.'+#driverAttribute.driverId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -106,7 +106,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         driverAttribute.setUpdateTime(null);
         if (driverAttributeMapper.updateById(driverAttribute) > 0) {
             DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
-            driverAttribute.setName(select.getName());
+            driverAttribute.setName(select.getName()).setDriverId(select.getDriverId());
             return select;
         }
         throw new ServiceException("The driver attribute update failed");
@@ -123,11 +123,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME, key = "#name", unless = "#result==null")
+    @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
     public DriverAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        queryWrapper.like(DriverAttribute::getName, name);
-        queryWrapper.like(DriverAttribute::getDriverId, driverId);
+        queryWrapper.eq(DriverAttribute::getName, name);
+        queryWrapper.eq(DriverAttribute::getDriverId, driverId);
         DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
         if (null == driverAttribute) {
             throw new NotFoundException("The driver attribute does not exist");
