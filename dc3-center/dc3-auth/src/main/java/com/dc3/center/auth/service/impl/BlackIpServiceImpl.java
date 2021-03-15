@@ -114,8 +114,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#ip", unless = "#result==null")
     public BlackIp selectByIp(String ip) {
-        LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda()
-                .eq(BlackIp::getIp, ip);
+        LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
+        queryWrapper.eq(BlackIp::getIp, ip);
         return blackIpMapper.selectOne(queryWrapper);
     }
 

@@ -18,7 +18,7 @@ package com.dc3.center.manager.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
 import com.dc3.center.manager.service.BatchService;
-import com.dc3.center.manager.service.DriverService;
+import com.dc3.center.manager.service.DriverSdkService;
 import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
@@ -52,7 +52,7 @@ public class DriverEventReceiver {
     @Resource
     private BatchService batchService;
     @Resource
-    private DriverService driverService;
+    private DriverSdkService driverSdkService;
     @Resource
     private RabbitTemplate rabbitTemplate;
 
@@ -92,7 +92,7 @@ public class DriverEventReceiver {
                             Common.Response.OK
                     );
                     try {
-                        driverService.driverRegister(Convert.convert(DriverRegister.class, driverEvent.getContent()));
+                        driverSdkService.driverRegister(Convert.convert(DriverRegister.class, driverEvent.getContent()));
                     } catch (Exception e) {
                         driverConfiguration.setResponse(e.getMessage());
                     }

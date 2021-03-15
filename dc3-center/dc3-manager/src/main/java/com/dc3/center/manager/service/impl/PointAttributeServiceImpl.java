@@ -127,7 +127,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
     public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        queryWrapper.like(PointAttribute::getName, name);
+        queryWrapper.eq(PointAttribute::getName, name);
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
         PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
         if (null == pointAttribute) {

@@ -122,17 +122,17 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindDto labelBindDto) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
-        Optional.ofNullable(labelBindDto).ifPresent(dto -> {
-            if (null != dto.getLabelId()) {
-                queryWrapper.eq(LabelBind::getLabelId, dto.getLabelId());
+        if (null != labelBindDto) {
+            if (null != labelBindDto.getLabelId()) {
+                queryWrapper.eq(LabelBind::getLabelId, labelBindDto.getLabelId());
             }
-            if (null != dto.getEntityId()) {
-                queryWrapper.eq(LabelBind::getEntityId, dto.getEntityId());
+            if (null != labelBindDto.getEntityId()) {
+                queryWrapper.eq(LabelBind::getEntityId, labelBindDto.getEntityId());
             }
-            if (StringUtils.isNotBlank(dto.getType())) {
-                queryWrapper.eq(LabelBind::getType, dto.getType());
+            if (StringUtils.isNotBlank(labelBindDto.getType())) {
+                queryWrapper.eq(LabelBind::getType, labelBindDto.getType());
             }
-        });
+        }
         return queryWrapper;
     }
 

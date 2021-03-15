@@ -121,8 +121,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(value = Common.Cache.USER + Common.Cache.NAME, key = "#name", unless = "#result==null")
     public User selectByName(String name) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda()
-                .eq(User::getName, name);
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
+        queryWrapper.eq(User::getName, name);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -157,11 +157,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public LambdaQueryWrapper<User> fuzzyQuery(UserDto userDto) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        Optional.ofNullable(userDto).ifPresent(dto -> {
-            if (StringUtils.isNotBlank(dto.getName())) {
-                queryWrapper.like(User::getName, dto.getName());
+        if (null != userDto) {
+            if (StringUtils.isNotBlank(userDto.getName())) {
+                queryWrapper.like(User::getName, userDto.getName());
             }
-        });
+        }
         return queryWrapper;
     }
 

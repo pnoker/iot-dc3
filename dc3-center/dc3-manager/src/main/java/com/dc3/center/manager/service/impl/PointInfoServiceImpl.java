@@ -56,7 +56,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -81,7 +81,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
@@ -97,7 +97,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -135,7 +135,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.POINT_INFO_ID, key = "#pointAttributeId+'.'+#deviceId+'.'+#pointId", unless = "#result==null")
+    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID, key = "#pointAttributeId+'.'+#deviceId+'.'+#pointId", unless = "#result==null")
     public PointInfo selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
@@ -185,17 +185,17 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Override
     public LambdaQueryWrapper<PointInfo> fuzzyQuery(PointInfoDto pointInfoDto) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        Optional.ofNullable(pointInfoDto).ifPresent(dto -> {
-            if (null != dto.getPointAttributeId()) {
-                queryWrapper.eq(PointInfo::getPointAttributeId, dto.getPointAttributeId());
+        if (null != pointInfoDto) {
+            if (null != pointInfoDto.getPointAttributeId()) {
+                queryWrapper.eq(PointInfo::getPointAttributeId, pointInfoDto.getPointAttributeId());
             }
-            if (null != dto.getDeviceId()) {
-                queryWrapper.eq(PointInfo::getDeviceId, dto.getDeviceId());
+            if (null != pointInfoDto.getDeviceId()) {
+                queryWrapper.eq(PointInfo::getDeviceId, pointInfoDto.getDeviceId());
             }
-            if (null != dto.getPointId()) {
-                queryWrapper.eq(PointInfo::getPointId, dto.getPointId());
+            if (null != pointInfoDto.getPointId()) {
+                queryWrapper.eq(PointInfo::getPointId, pointInfoDto.getPointId());
             }
-        });
+        }
         return queryWrapper;
     }
 
