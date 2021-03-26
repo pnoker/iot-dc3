@@ -37,6 +37,7 @@ import java.util.Map;
 @Slf4j
 @Configuration
 public class TopicRabbitConfig {
+
     @Value("${spring.application.name}")
     private String serviceName;
 

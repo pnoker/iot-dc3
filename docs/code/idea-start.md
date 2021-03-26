@@ -1,28 +1,27 @@
 ### 必要软件环境
 
+> **前提：** 务必保证至少需要给docker分配：1核 CPU 以及 4G 以上的运行内存！
+
 * JDK : `Oracle JDK 1.8` 或者 `OpenJDK8`；
 
 * Maven : 推荐使用 `Maven 3.6` ，理论来说其他版本也行；
 
 * IDE : `IntelliJ IDEA` 或者 `Eclipse`；
 
-* Docker : 需要提供 `docker` 和 `docker-compose` 指令，至少需要给 `docker` 分配 `4G` 的运行内存。
+* Docker : 需要提供 `docker` 和 `docker-compose` 指令，至少需要给 `docker` 分配 `4G` 的运行内存，如果配置国内镜像加速，下载镜像速度会快一些。
 
-**前提：** 必须保证至少需要给docker分配：2核 CPU 以及 4G 以上的运行内存
 
 
 
 ### Hosts配置
 
-**说明：** 该步骤仅在本地开发电脑上进行配置，如果部署生产环境无需配置
+>  **说明：** 该步骤 <u>仅在本地开发电脑</u> 上进行配置，如果部署生产环境无需配置
 
-hosts文件位置：
+- Windows（需要使用管理员权限）：`c:\windows\system32\drivers\etc\hosts`
 
-Windows（需要使用管理员权限）：`c:\windows\system32\drivers\etc\hosts`
+- Linux：`/etc/hosts` 
 
-Linux：`/etc/hosts`
-
-在 hosts 文件中添加以下内容：
+- 在 hosts 文件中添加以下内容，如果你在多台机器配置，可以将 `127.0.0.1` 替换成具体具体机器的 `IP`：
 
 ```bash
 # Added by DC3
@@ -42,9 +41,9 @@ Linux：`/etc/hosts`
 
 
 
-### 安装 & 启动必要依赖
+### 启动依赖服务
 
- **说明：** 该步骤会安装 & 启动依赖服务：
+> **说明：** 该步骤会启动必要的依赖服务，建议直接在 docker 中启动，简单快捷
 
  - 关系型数据库 : `MySQL`
  - 非关系型数据库 : `MongoDB`
@@ -67,7 +66,7 @@ docker-compose up -d mysql redis mongo rabbitmq register monitor auth
 
 ### 导入项目到 Idea IDE 中
 
-务必使用Maven方式导入项目
+> **说明**：务必使用Maven方式导入项目
 
  ![import-dc3](../images/idea/import-dc3.gif)
 

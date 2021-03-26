@@ -16,11 +16,13 @@
 
 package com.dc3.common.sdk.init;
 
+import com.dc3.common.sdk.bean.DriverProperty;
 import com.dc3.common.sdk.service.CustomDriverService;
 import com.dc3.common.sdk.service.DriverMetadataService;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -35,12 +37,13 @@ import javax.annotation.Resource;
 @ComponentScan(basePackages = {
         "com.dc3.common.sdk"
 })
+@EnableConfigurationProperties({DriverProperty.class})
 public class DriverInitRunner implements ApplicationRunner {
 
     @Resource
-    private DriverMetadataService driverMetadataService;
-    @Resource
     private CustomDriverService customDriverService;
+    @Resource
+    private DriverMetadataService driverMetadataService;
     @Resource
     private DriverScheduleService driverScheduleService;
 

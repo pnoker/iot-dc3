@@ -18,7 +18,6 @@ package com.dc3.common.sdk.service.impl;
 
 import cn.hutool.core.thread.ThreadUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
-import com.dc3.common.model.DriverEvent;
 import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
@@ -44,7 +43,6 @@ import java.util.concurrent.*;
  */
 @Slf4j
 @Service
-@EnableConfigurationProperties({DriverProperty.class})
 public class DriverMetadataServiceImpl implements DriverMetadataService {
 
     @Value("${server.port}")
