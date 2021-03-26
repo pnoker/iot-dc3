@@ -26,7 +26,6 @@ import com.dc3.common.sdk.service.job.DriverStatusScheduleJob;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,8 +35,8 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Service
-@EnableConfigurationProperties({DriverProperty.class})
 public class DriverScheduleServiceImpl implements DriverScheduleService {
+
     @Resource
     private Scheduler scheduler;
     @Resource

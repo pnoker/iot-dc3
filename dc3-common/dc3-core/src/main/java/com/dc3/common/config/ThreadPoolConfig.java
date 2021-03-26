@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Configuration
 @ConfigurationProperties(prefix = "server")
 public class ThreadPoolConfig {
+
     @Setter
     private ThreadProperty thread;
 
