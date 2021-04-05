@@ -29,14 +29,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @EnableFeignClients(basePackages = {
-        "com.dc3.api.center.auth.user.*",
-        "com.dc3.api.center.auth.token.*",
-        "com.dc3.api.center.auth.blackIp.*"
+        "com.dc3.api.center.auth.*",
 })
 @ComponentScan(basePackages = {
-        "com.dc3.api.center.auth.user",
-        "com.dc3.api.center.auth.token",
-        "com.dc3.api.center.auth.blackIp",
+        "com.dc3.api.center.auth.feign",
 })
 public class GatewayInitRunner implements ApplicationRunner {
 
