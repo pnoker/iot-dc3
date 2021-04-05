@@ -101,6 +101,6 @@ spring:
 
 logging:
   level:
-    com.dc3:DEBUG
+    com.dc3: DEBUG
   file:
     name: dc3/logs/${spring.application.name}.log
