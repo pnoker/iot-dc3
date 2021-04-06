@@ -66,24 +66,21 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(User user) {
-        UserLimit userLimit = checkUserLimit(user.getName());
-        if (null != userLimit && userLimit.getTimes() > 5) {
-            updateUserLimit(user.getName());
-            throw new ServiceException("Access restricted，Please try again after " + Dc3Util.formatData(userLimit.getExpireTime()));
-        }
+        checkUserLimit(user.getName());
         User select = userService.selectByName(user.getName());
         if (null != select) {
             String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + user.getName();
             String salt = redisUtil.getKey(redisSaltKey, String.class);
             if (StringUtils.isNotBlank(salt)) {
                 if (Dc3Util.md5(select.getPassword() + salt).equals(user.getPassword())) {
+                    String redisTokenKey = Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + user.getName();
                     String token = KeyUtil.generateToken(user.getName(), salt);
-                    redisUtil.setKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + user.getName(), token, Common.Cache.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+                    redisUtil.setKey(redisTokenKey, token, Common.Cache.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
                     return token;
                 }
             }
         }
-        updateUserLimit(user.getName());
+        updateUserLimit(user.getName(), true);
         throw new ServiceException("Invalid username、password、salt");
     }
 
@@ -110,31 +107,42 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 检测用户登录限制，返回该用户是否受限
      *
-     * @param username
-     * @return
+     * @param username Username
      */
-    private UserLimit checkUserLimit(String username) {
+    private void checkUserLimit(String username) {
         String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
-        return redisUtil.getKey(redisKey, String.class);
+        UserLimit limit = redisUtil.getKey(redisKey, UserLimit.class);
+        if (null != limit && limit.getTimes() >= 5) {
+            Date now = new Date();
+            long interval = limit.getExpireTime().getTime() - now.getTime();
+            if (interval > 0) {
+                limit = updateUserLimit(username, false);
+                throw new ServiceException("Access restricted，Please try again after {}", Dc3Util.formatData(limit.getExpireTime()));
+            }
+        }
     }
 
     /**
      * 更新用户登录限制
      *
-     * @param username
-     * @return
+     * @param username Username
+     * @return UserLimit
      */
-    private void updateUserLimit(String username) {
-        int amount = 1;
+    private UserLimit updateUserLimit(String username, boolean expireTime) {
+        int amount = Common.Cache.USER_LIMIT_TIMEOUT;
         String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
-        UserLimit limit = (UserLimit) Optional.ofNullable(redisUtil.getKey(redisKey, String.class)).orElse(new UserLimit(0, new Date()));
+        UserLimit limit = (UserLimit) Optional.ofNullable(redisUtil.getKey(redisKey, UserLimit.class)).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
-        if (limit.getTimes() > 10) {
-            limit.setExpireTime(Dc3Util.expireTime(Common.Cache.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
-        } else if (limit.getTimes() > 3) {
-            amount = (limit.getTimes() - 3) * Common.Cache.TOKEN_CACHE_TIMEOUT;
+        if (limit.getTimes() > 20) {
+            //TODO 拉黑IP和锁定用户操作，然后通过Gateway进行拦截
+            amount = 24 * 60;
+        } else if (limit.getTimes() > 5) {
+            amount = limit.getTimes() * Common.Cache.USER_LIMIT_TIMEOUT;
+        }
+        if (expireTime) {
             limit.setExpireTime(Dc3Util.expireTime(amount, Calendar.MINUTE));
         }
-        redisUtil.setKey(redisKey, limit, amount, TimeUnit.MINUTES);
+        redisUtil.setKey(redisKey, limit, 1, TimeUnit.DAYS);
+        return limit;
     }
 }
