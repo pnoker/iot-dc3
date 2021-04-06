@@ -46,7 +46,7 @@ public class Description implements Serializable {
     /**
      * 主键，自增ID
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotNull(message = "id can't be empty", groups = {Update.class})
     private Long id;
