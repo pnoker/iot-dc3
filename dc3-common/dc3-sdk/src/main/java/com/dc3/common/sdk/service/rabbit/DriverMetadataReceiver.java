@@ -99,13 +99,13 @@ public class DriverMetadataReceiver {
         }
 
         switch (driverConfiguration.getCommand()) {
-            case Common.Driver.Event.REGISTER_HANDSHAKE_BACK:
+            case Common.Driver.Event.DRIVER_HANDSHAKE_BACK:
                 driverContext.setDriverStatus(Common.Driver.Status.REGISTERING);
                 break;
             case Common.Driver.Event.DRIVER_REGISTER_BACK:
                 driverContext.setDriverStatus(Common.Driver.Status.ONLINE);
                 break;
-            case Common.Driver.Event.SYNC_DRIVER_METADATA_BACK:
+            case Common.Driver.Event.DRIVER_METADATA_SYNC_BACK:
                 DriverMetadata driverMetadata = Convert.convert(DriverMetadata.class, driverConfiguration.getContent());
                 driverContext.setDriverMetadata(driverMetadata);
                 break;

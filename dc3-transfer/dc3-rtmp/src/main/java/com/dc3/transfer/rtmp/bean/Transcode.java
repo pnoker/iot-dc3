@@ -19,6 +19,8 @@ package com.dc3.transfer.rtmp.bean;
 import com.dc3.common.model.Rtmp;
 import com.dc3.common.utils.Dc3Util;
 import com.dc3.transfer.rtmp.init.TranscodeRunner;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +34,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Data
 @Slf4j
 public class Transcode {
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
+
     private boolean run;
     private String command;
     private Process process;

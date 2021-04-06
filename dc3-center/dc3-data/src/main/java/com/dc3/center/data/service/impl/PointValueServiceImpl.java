@@ -162,17 +162,6 @@ public class PointValueServiceImpl implements PointValueService {
 
         List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class);
 
-        long id = 0L;
-        for (PointValue pointValue1 : pointValues) {
-            pointValue1.setId(id);
-            id++;
-            if (null != pointValue1.getChildren()) {
-                for (PointValue pointValue2 : pointValue1.getChildren()) {
-                    pointValue2.setId(id);
-                    id++;
-                }
-            }
-        }
         return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);
     }
 

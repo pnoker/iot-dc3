@@ -23,7 +23,6 @@ import com.dc3.common.dto.DeviceEventDto;
 import com.dc3.common.dto.DriverEventDto;
 import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.model.DriverEvent;
-import com.dc3.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -42,18 +41,22 @@ import java.util.List;
 public class EventServiceImpl implements EventService {
 
     @Resource
-    private RedisUtil redisUtil;
-    @Resource
     private MongoTemplate mongoTemplate;
 
     @Override
     public void addDriverEvent(DriverEvent driverEvent) {
-
+        if (null != driverEvent) {
+            mongoTemplate.insert(driverEvent);
+        }
     }
 
     @Override
     public void addDriverEvents(List<DriverEvent> driverEvents) {
-
+        if (null != driverEvents) {
+            if (driverEvents.size() > 0) {
+                mongoTemplate.insert(driverEvents, DriverEvent.class);
+            }
+        }
     }
 
     @Override

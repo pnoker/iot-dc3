@@ -18,6 +18,8 @@ package com.dc3.common.model;
 
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -52,6 +54,7 @@ public class DriverAttribute extends Description {
     private String type;
     private String value;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
     private Long driverId;
 }

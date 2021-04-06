@@ -18,6 +18,8 @@ package com.dc3.common.sdk.bean;
 
 import com.dc3.common.valid.Read;
 import com.dc3.common.valid.Write;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,9 +36,11 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class CmdParameter {
+    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "device id can't be empty", groups = {Read.class, Write.class})
     private Long deviceId;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "point id can't be empty", groups = {Read.class, Write.class})
     private Long pointId;
 

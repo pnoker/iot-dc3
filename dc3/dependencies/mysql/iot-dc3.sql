@@ -28,13 +28,14 @@ DROP TABLE IF EXISTS `dc3_driver`;
 CREATE TABLE `dc3_driver`
 (
     `id`           bigint(20)                                              NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `name`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT ' 协议名称',
+    `name`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '协议名称',
     `service_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '协议服务名称',
     `host`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '主机IP',
     `port`         int(11)                                                 NOT NULL COMMENT '端口',
     `description`  varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time`  datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time`  datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`       varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`      tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE
@@ -59,6 +60,7 @@ CREATE TABLE `dc3_driver_attribute`
     `description`  varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time`  datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time`  datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`       varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`      tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `driver_id` (`driver_id`) USING BTREE,
@@ -84,6 +86,7 @@ CREATE TABLE `dc3_point_attribute`
     `description`  varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time`  datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time`  datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`       varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`      tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `driver_id` (`driver_id`) USING BTREE,
@@ -107,6 +110,7 @@ CREATE TABLE `dc3_profile`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE,
@@ -131,6 +135,7 @@ CREATE TABLE `dc3_driver_info`
     `description`         varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time`         datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time`         datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`              varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`             tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `driver_attribute_id` (`driver_attribute_id`) USING BTREE,
@@ -164,6 +169,7 @@ CREATE TABLE `dc3_point`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `profile_id` (`profile_id`) USING BTREE,
@@ -185,6 +191,7 @@ CREATE TABLE `dc3_group`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE
@@ -208,6 +215,7 @@ CREATE TABLE `dc3_device`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE,
@@ -235,6 +243,7 @@ CREATE TABLE `dc3_point_info`
     `description`        varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time`        datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time`        datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`             varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`            tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `point_attribute_id` (`point_attribute_id`) USING BTREE,
@@ -262,6 +271,7 @@ CREATE TABLE `dc3_user`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE
@@ -288,6 +298,7 @@ CREATE TABLE `dc3_rtmp`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE
@@ -309,6 +320,7 @@ CREATE TABLE `dc3_label`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE
@@ -331,6 +343,7 @@ CREATE TABLE `dc3_label_bind`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `label_id` (`label_id`) USING BTREE,
@@ -354,6 +367,7 @@ CREATE TABLE `dc3_black_ip`
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `tenant`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `ip` (`ip`) USING BTREE
@@ -367,7 +381,7 @@ CREATE TABLE `dc3_black_ip`
 -- Records of dc3_user
 -- ----------------------------
 INSERT INTO `dc3_user`
-VALUES (-1, 'pnoker', '10e339be1130a90dc1b9ff0332abced6', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+VALUES (-1, 'pnoker', '10e339be1130a90dc1b9ff0332abced6', 1, '平台开发者账号', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 'default', 0);
 
 -- ----------------------------
 -- Records of dc3_rtmp
@@ -375,9 +389,11 @@ VALUES (-1, 'pnoker', '10e339be1130a90dc1b9ff0332abced6', 1, '平台开发者账
 INSERT INTO `dc3_rtmp`
 VALUES (-1, '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_local',
         '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2019-10-01 00:00:00',
-        '2019-10-01 00:00:00', 0);
+        '2019-10-01 00:00:00', 'default', 0);
 INSERT INTO `dc3_rtmp`
 VALUES (-2, '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_online',
-        '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+        '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '在线视频流（无限动力预告），用于测试使用', '2019-10-01 00:00:00', '2019-10-01 00:00:00',
+        'default',
+        0);
 
 SET FOREIGN_KEY_CHECKS = 1;

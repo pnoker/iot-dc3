@@ -30,7 +30,6 @@ import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -211,7 +210,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             threadPoolExecutor.submit(() -> {
                 DriverEvent handshakeEvent = new DriverEvent(
                         serviceName,
-                        Common.Driver.Event.REGISTER_HANDSHAKE,
+                        Common.Driver.Event.DRIVER_HANDSHAKE,
                         null
                 );
                 rabbitTemplate.convertAndSend(
@@ -238,7 +237,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             threadPoolExecutor.submit(() -> {
                 DriverEvent syncEvent = new DriverEvent(
                         serviceName,
-                        Common.Driver.Event.SYNC_DRIVER_METADATA,
+                        Common.Driver.Event.DRIVER_METADATA_SYNC,
                         driver.getServiceName()
                 );
                 rabbitTemplate.convertAndSend(

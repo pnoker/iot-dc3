@@ -16,6 +16,8 @@
 
 package com.dc3.driver.bean;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +31,11 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class DevicePayLoad {
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long deviceId;
+
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long pointId;
+
     private String value;
 }

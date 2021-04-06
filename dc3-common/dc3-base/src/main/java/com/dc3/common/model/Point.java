@@ -20,6 +20,8 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -60,6 +62,7 @@ public class Point extends Description {
     private String format;
     private String unit;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
     private Long profileId;
 }
