@@ -68,14 +68,14 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange metadataExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION, true, false);
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_METADATA, true, false);
     }
 
     @Bean
     Queue driverMetadataQueue() {
         Map<String, Object> arguments = new HashMap<>();
         arguments.put("x-message-ttl", 15000);
-        return new Queue(Common.Rabbit.QUEUE_DRIVER_CONFIGURATION_PREFIX + this.serviceName, false, false, false, arguments);
+        return new Queue(Common.Rabbit.QUEUE_DRIVER_METADATA_PREFIX + this.serviceName, false, false, false, arguments);
     }
 
     @Bean
@@ -83,7 +83,7 @@ public class TopicRabbitConfig {
         return BindingBuilder
                 .bind(driverMetadataQueue())
                 .to(metadataExchange())
-                .with(Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + this.serviceName);
+                .with(Common.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + this.serviceName);
     }
 
 }

@@ -82,10 +82,10 @@ public interface Common {
         String ROUTING_DEVICE_EVENT_PREFIX = "dc3.routing.event.device.";
         String QUEUE_DEVICE_EVENT = "dc3.queue.event.device";
 
-        // Configuration
-        String TOPIC_EXCHANGE_CONFIGURATION = "dc3.exchange.configuration";
-        String ROUTING_DRIVER_CONFIGURATION_PREFIX = "dc3.routing.configuration.driver.";
-        String QUEUE_DRIVER_CONFIGURATION_PREFIX = "dc3.queue.configuration.driver.";
+        // Metadata
+        String TOPIC_EXCHANGE_METADATA = "dc3.exchange.metadata";
+        String ROUTING_DRIVER_METADATA_PREFIX = "dc3.routing.metadata.driver.";
+        String QUEUE_DRIVER_METADATA_PREFIX = "dc3.queue.metadata.driver.";
 
         // Value
         String TOPIC_EXCHANGE_VALUE = "dc3.exchange.value";
@@ -118,8 +118,8 @@ public interface Common {
             /**
              * 驱动注册握手事件，该事件用于校验当前 dc3-manager 是否可用
              */
-            String REGISTER_HANDSHAKE = "register_handshake";
-            String REGISTER_HANDSHAKE_BACK = "register_handshake_back";
+            String DRIVER_HANDSHAKE = "driver_handshake";
+            String DRIVER_HANDSHAKE_BACK = "driver_handshake_back";
 
             /**
              * 驱动注册事件，该事件用于向 dc3-manager 注册驱动配置信息
@@ -130,13 +130,15 @@ public interface Common {
             /**
              * 同步驱动元数据时间，该事件用于向 dc3-manager 发送驱动元数据同步请求
              */
-            String SYNC_DRIVER_METADATA = "sync_driver_metadata";
-            String SYNC_DRIVER_METADATA_BACK = "sync_driver_metadata_back";
+            String DRIVER_METADATA_SYNC = "driver_metadata_sync";
+            String DRIVER_METADATA_SYNC_BACK = "driver_metadata_sync_back";
 
             /**
              * 驱动心跳事件，该事件用于向 dc3-manager 发送驱动的当前状态
              */
             String HEARTBEAT = "heartbeat";
+
+            String ERROR = "error";
         }
 
         interface Type {

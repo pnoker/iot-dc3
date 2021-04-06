@@ -19,6 +19,8 @@ package com.dc3.common.model;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -49,9 +51,11 @@ public class Device extends Description {
      */
     private Boolean multi;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
     private Long profileId;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
 

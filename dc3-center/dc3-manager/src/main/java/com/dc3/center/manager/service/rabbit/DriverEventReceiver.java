@@ -19,6 +19,7 @@ package com.dc3.center.manager.service.rabbit;
 import cn.hutool.core.convert.Convert;
 import com.dc3.center.manager.service.BatchService;
 import com.dc3.center.manager.service.DriverSdkService;
+import com.dc3.center.manager.service.EventService;
 import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.constant.Common;
@@ -36,6 +37,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 接收驱动发送过来的驱动事件数据
@@ -55,6 +57,10 @@ public class DriverEventReceiver {
     private DriverSdkService driverSdkService;
     @Resource
     private RabbitTemplate rabbitTemplate;
+    @Resource
+    private EventService eventService;
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverEventQueue.name}")
@@ -68,18 +74,18 @@ public class DriverEventReceiver {
             }
 
             log.debug("Driver {} event, From: {}, Received: {}", driverEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
-            String routingKey = Common.Rabbit.ROUTING_DRIVER_CONFIGURATION_PREFIX + driverEvent.getServiceName();
+            String routingKey = Common.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName();
 
             switch (driverEvent.getType()) {
-                case Common.Driver.Event.REGISTER_HANDSHAKE:
+                case Common.Driver.Event.DRIVER_HANDSHAKE:
                     DriverConfiguration driverConfiguration = new DriverConfiguration(
                             Common.Driver.Type.DRIVER,
-                            Common.Driver.Event.REGISTER_HANDSHAKE_BACK,
+                            Common.Driver.Event.DRIVER_HANDSHAKE_BACK,
                             null,
                             Common.Response.OK
                     );
                     rabbitTemplate.convertAndSend(
-                            Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION,
+                            Common.Rabbit.TOPIC_EXCHANGE_METADATA,
                             routingKey,
                             driverConfiguration
                     );
@@ -97,15 +103,15 @@ public class DriverEventReceiver {
                         driverConfiguration.setResponse(e.getMessage());
                     }
                     rabbitTemplate.convertAndSend(
-                            Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION,
+                            Common.Rabbit.TOPIC_EXCHANGE_METADATA,
                             routingKey,
                             driverConfiguration
                     );
                     break;
-                case Common.Driver.Event.SYNC_DRIVER_METADATA:
+                case Common.Driver.Event.DRIVER_METADATA_SYNC:
                     driverConfiguration = new DriverConfiguration(
                             Common.Driver.Type.DRIVER,
-                            Common.Driver.Event.SYNC_DRIVER_METADATA_BACK,
+                            Common.Driver.Event.DRIVER_METADATA_SYNC_BACK,
                             null,
                             Common.Response.OK
                     );
@@ -115,7 +121,7 @@ public class DriverEventReceiver {
                         driverConfiguration.setResponse(e.getMessage());
                     }
                     rabbitTemplate.convertAndSend(
-                            Common.Rabbit.TOPIC_EXCHANGE_CONFIGURATION,
+                            Common.Rabbit.TOPIC_EXCHANGE_METADATA,
                             routingKey,
                             driverConfiguration
                     );
@@ -128,7 +134,11 @@ public class DriverEventReceiver {
                             driverEvent.getTimeUnit()
                     );
                     break;
+                case Common.Driver.Event.ERROR:
+                    //TODO 去重
+                    threadPoolExecutor.execute(() -> eventService.addDriverEvent(driverEvent));
                 default:
+                    log.error("Invalid event type, {}", driverEvent.getType());
                     break;
             }
         } catch (IOException e) {
