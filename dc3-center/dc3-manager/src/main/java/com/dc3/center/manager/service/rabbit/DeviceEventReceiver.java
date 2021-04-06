@@ -58,20 +58,26 @@ public class DeviceEventReceiver {
             }
             log.debug("Device {} event, From: {}, Event: {}", deviceEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
 
-            // Save device heartbeat to Redis
-            if (Common.Device.Event.HEARTBEAT.equals(deviceEvent.getType())) {
-                redisUtil.setKey(
-                        Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
-                        deviceEvent.getContent(),
-                        deviceEvent.getTimeOut(),
-                        deviceEvent.getTimeUnit()
-                );
+            switch (deviceEvent.getType()) {
+                // Save device heartbeat to Redis
+                case Common.Device.Event.HEARTBEAT:
+                    redisUtil.setKey(
+                            Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
+                            deviceEvent.getContent(),
+                            deviceEvent.getTimeOut(),
+                            deviceEvent.getTimeUnit()
+                    );
+                    break;
+                case Common.Device.Event.ERROR:
+                case Common.Device.Event.OVER_UPPER_LIMIT:
+                case Common.Device.Event.OVER_LOWER_LIMIT:
+                    //TODO 去重
+                    threadPoolExecutor.execute(() -> eventService.addDeviceEvent(deviceEvent));
+                    break;
+                default:
+                    log.error("Invalid event type, {}", deviceEvent.getType());
+                    break;
             }
-
-            // Save device event to MongoDB
-            // TODO 事件去重
-            threadPoolExecutor.execute(() -> eventService.addDeviceEvent(deviceEvent));
-
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
