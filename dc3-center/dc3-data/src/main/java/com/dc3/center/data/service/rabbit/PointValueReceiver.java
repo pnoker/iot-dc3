@@ -16,6 +16,7 @@
 
 package com.dc3.center.data.service.rabbit;
 
+import com.dc3.center.data.service.DataCustomService;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.center.data.service.job.PointValueScheduleJob;
 import com.dc3.common.model.PointValue;
@@ -48,6 +49,8 @@ public class PointValueReceiver {
     @Resource
     private PointValueService pointValueService;
     @Resource
+    private DataCustomService dataCustomService;
+    @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
@@ -62,6 +65,9 @@ public class PointValueReceiver {
             PointValueScheduleJob.valueCount.getAndIncrement();
             log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
 
+            // pre handle
+            dataCustomService.preHandle(pointValue);
+
             // Judge whether to process data in batch according to the data transmission speed
             if (PointValueScheduleJob.valueSpeed.get() < batchSpeed) {
                 threadPoolExecutor.execute(() -> {
@@ -74,6 +80,9 @@ public class PointValueReceiver {
                 PointValueScheduleJob.pointValues.add(pointValue);
                 PointValueScheduleJob.valueLock.writeLock().unlock();
             }
+
+            // after handle
+            dataCustomService.afterHandle(pointValue);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

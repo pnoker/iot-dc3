@@ -28,7 +28,6 @@ import com.dc3.common.sdk.service.DriverMetadataService;
 import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -56,8 +55,6 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
     @Resource
     private DriverProperty driverProperty;
     @Resource
-    private RabbitTemplate rabbitTemplate;
-    @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
@@ -72,32 +69,19 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
 
         Driver driver = new Driver(driverProperty.getName(), this.serviceName, localHost, this.port);
         driver.setDescription(driverProperty.getDescription());
-        String routingKey = Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName;
         log.info("The driver {}/{} is initializing", driver.getServiceName(), driver.getName());
 
-        registerHandshake(routingKey);
-
-        DriverRegister driverRegister = new DriverRegister(
-                driver,
-                driverProperty.getDriverAttribute(),
-                driverProperty.getPointAttribute()
-        );
-        DriverEvent registerEvent = new DriverEvent(
+        registerHandshake();
+        driverService.driverEventSender(new DriverEvent(
                 serviceName,
                 Common.Driver.Event.DRIVER_REGISTER,
-                driverRegister
-        );
-        rabbitTemplate.convertAndSend(
-                Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                routingKey,
-                registerEvent,
-                message -> {
-                    message.getMessageProperties().setExpiration("5000");
-                    return message;
-                }
-        );
-
-        syncDriverMetadata(driver, routingKey);
+                new DriverRegister(
+                        driver,
+                        driverProperty.getDriverAttribute(),
+                        driverProperty.getPointAttribute()
+                )
+        ));
+        syncDriverMetadata(driver);
 
         log.info("The driver {}/{} is initialized successfully", driver.getServiceName(), driver.getName());
     }
@@ -205,23 +189,14 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         }
     }
 
-    private void registerHandshake(String routingKey) {
+    private void registerHandshake() {
         try {
             threadPoolExecutor.submit(() -> {
-                DriverEvent handshakeEvent = new DriverEvent(
+                driverService.driverEventSender(new DriverEvent(
                         serviceName,
                         Common.Driver.Event.DRIVER_HANDSHAKE,
                         null
-                );
-                rabbitTemplate.convertAndSend(
-                        Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                        routingKey,
-                        handshakeEvent,
-                        message -> {
-                            message.getMessageProperties().setExpiration("5000");
-                            return message;
-                        }
-                );
+                ));
 
                 while (!Common.Driver.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
                     ThreadUtil.sleep(500);
@@ -232,19 +207,14 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         }
     }
 
-    private void syncDriverMetadata(Driver driver, String routingKey) {
+    private void syncDriverMetadata(Driver driver) {
         try {
             threadPoolExecutor.submit(() -> {
-                DriverEvent syncEvent = new DriverEvent(
+                driverService.driverEventSender(new DriverEvent(
                         serviceName,
                         Common.Driver.Event.DRIVER_METADATA_SYNC,
                         driver.getServiceName()
-                );
-                rabbitTemplate.convertAndSend(
-                        Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                        routingKey,
-                        syncEvent
-                );
+                ));
 
                 while (!Common.Driver.Status.ONLINE.equals(driverContext.getDriverStatus())) {
                     ThreadUtil.sleep(500);

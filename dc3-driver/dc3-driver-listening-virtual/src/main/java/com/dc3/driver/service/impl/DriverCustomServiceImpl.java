@@ -16,46 +16,75 @@
 
 package com.dc3.driver.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
-import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
+import com.dc3.driver.service.netty.tcp.NettyTcpServer;
+import com.dc3.driver.service.netty.udp.NettyUdpServer;
+import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author pnoker
  */
 @Slf4j
 @Service
-public class CustomDriverServiceImpl implements CustomDriverService {
+public class DriverCustomServiceImpl implements DriverCustomService {
 
+    @Value("${driver.custom.tcp.port}")
+    private Integer tcpPort;
+    @Value("${driver.custom.udp.port}")
+    private Integer udpPort;
+
+    @Resource
+    private DriverContext driverContext;
     @Resource
     private DriverService driverService;
     @Resource
-    private DriverContext driverContext;
+    private NettyTcpServer nettyTcpServer;
+    @Resource
+    private NettyUdpServer nettyUdpServer;
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public void initial() {
+        threadPoolExecutor.execute(() -> {
+            log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
+            nettyTcpServer.start(tcpPort);
+        });
+        threadPoolExecutor.execute(() -> {
+            log.debug("Virtual Listening Driver Starting(UDP::{}) incoming data listener", udpPort);
+            nettyUdpServer.start(udpPort);
+        });
     }
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        return String.valueOf(RandomUtil.randomDouble(100));
+        return "nil";
     }
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        return false;
+        Long deviceId = device.getId();
+
+        // TODO 获取设备的Channel，并向下发送数据
+        Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
+        if (null != channel) {
+            channel.writeAndFlush(value.getValue().getBytes(StandardCharsets.UTF_8));
+        }
+        return true;
     }
 
     @Override
@@ -72,7 +101,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(new DeviceEvent(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE, 25, TimeUnit.SECONDS)));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE));
     }
 
 }

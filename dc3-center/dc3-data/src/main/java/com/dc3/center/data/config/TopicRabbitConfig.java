@@ -27,6 +27,9 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author pnoker
  */
@@ -66,7 +69,10 @@ public class TopicRabbitConfig {
 
     @Bean
     Queue pointValueQueue() {
-        return new Queue(Common.Rabbit.QUEUE_POINT_VALUE, true, false, false);
+        Map<String, Object> arguments = new HashMap<>();
+        // 30天： 30 * 24 * 60 * 60 * 1000 = 2592000000L
+        arguments.put("x-message-ttl", 2592000000L);
+        return new Queue(Common.Rabbit.QUEUE_POINT_VALUE, true, false, false, arguments);
     }
 
     @Bean

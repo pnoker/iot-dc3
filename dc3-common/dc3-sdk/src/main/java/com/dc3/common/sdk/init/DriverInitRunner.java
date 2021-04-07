@@ -17,7 +17,7 @@
 package com.dc3.common.sdk.init;
 
 import com.dc3.common.sdk.bean.DriverProperty;
-import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverMetadataService;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import org.springframework.boot.ApplicationArguments;
@@ -41,7 +41,7 @@ import javax.annotation.Resource;
 public class DriverInitRunner implements ApplicationRunner {
 
     @Resource
-    private CustomDriverService customDriverService;
+    private DriverCustomService driverCustomService;
     @Resource
     private DriverMetadataService driverMetadataService;
     @Resource
@@ -53,7 +53,7 @@ public class DriverInitRunner implements ApplicationRunner {
         driverMetadataService.initial();
 
         // Initialize custom driver service
-        customDriverService.initial();
+        driverCustomService.initial();
 
         // Initialize driver schedule service
         driverScheduleService.initial();

@@ -70,7 +70,8 @@ public class TopicRabbitConfig {
     @Bean
     Queue driverEventQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        arguments.put("x-message-ttl", 15000);
+        // 15秒：15 * 1000 = 15000L
+        arguments.put("x-message-ttl", 15000L);
         return new Queue(Common.Rabbit.QUEUE_DRIVER_EVENT, true, false, false, arguments);
     }
 
@@ -85,7 +86,8 @@ public class TopicRabbitConfig {
     @Bean
     Queue deviceEventQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        arguments.put("x-message-ttl", 15000);
+        // 15秒：15 * 1000 = 15000L
+        arguments.put("x-message-ttl", 15000L);
         return new Queue(Common.Rabbit.QUEUE_DEVICE_EVENT, true, false, false, arguments);
     }
 
