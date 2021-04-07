@@ -21,7 +21,7 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverCommandService;
 import com.dc3.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +41,13 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @Resource
     private DriverService driverService;
     @Resource
-    private CustomDriverService customDriverService;
+    private DriverCustomService driverCustomService;
 
     @Override
     public PointValue read(Long deviceId, Long pointId) {
         Device device = driverContext.getDeviceByDeviceId(deviceId);
         try {
-            String rawValue = customDriverService.read(
+            String rawValue = driverCustomService.read(
                     driverContext.getProfileDriverInfoByProfileId(device.getProfileId()),
                     driverContext.getDevicePointInfoByDeviceIdAndPointId(deviceId, pointId),
                     device,
@@ -67,7 +67,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     public Boolean write(Long deviceId, Long pointId, String value) {
         Device device = driverContext.getDeviceByDeviceId(deviceId);
         try {
-            return customDriverService.write(
+            return driverCustomService.write(
                     driverContext.getProfileDriverInfoByProfileId(device.getProfileId()),
                     driverContext.getDevicePointInfoByDeviceIdAndPointId(deviceId, pointId),
                     device,

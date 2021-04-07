@@ -17,8 +17,7 @@
 package com.dc3.common.sdk.service;
 
 /**
- * <p>Driver Schedule Service</p>
- * <p>
+ * Driver Schedule Service
  *
  * @author pnoker
  */

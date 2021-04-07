@@ -17,12 +17,13 @@
 package com.dc3.driver.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
+import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
 import com.dc3.driver.key.KeyLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -54,12 +55,12 @@ import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.
  */
 @Slf4j
 @Service
-public class CustomDriverServiceImpl implements CustomDriverService {
+public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
-    private DriverService driverService;
-    @Resource
     private DriverContext driverContext;
+    @Resource
+    private DriverService driverService;
 
     private static KeyLoader keyLoader;
 
@@ -69,12 +70,12 @@ public class CustomDriverServiceImpl implements CustomDriverService {
             Path securityTempDir = Paths.get(System.getProperty("java.io.tmpdir"), "security");
             Files.createDirectories(securityTempDir);
             if (!Files.exists(securityTempDir)) {
-                throw new Exception("unable to create security dir: " + securityTempDir);
+                throw new ServiceException("unable to create security dir: " + securityTempDir);
             }
 
             keyLoader = new KeyLoader().load(securityTempDir);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            e.printStackTrace();
         }
     }
 

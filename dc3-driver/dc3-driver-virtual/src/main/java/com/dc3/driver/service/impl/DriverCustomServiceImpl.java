@@ -16,35 +16,33 @@
 
 package com.dc3.driver.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
+import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.model.Point;
-import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.driver.service.mqtt.MqttSendHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
-
-import static com.dc3.common.sdk.util.DriverUtils.attribute;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author pnoker
  */
 @Slf4j
 @Service
-public class CustomDriverServiceImpl implements CustomDriverService {
+public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
     private DriverContext driverContext;
     @Resource
     private DriverService driverService;
-    @Resource
-    private MqttSendHandler mqttSendHandler;
 
     @Override
     public void initial() {
@@ -52,19 +50,12 @@ public class CustomDriverServiceImpl implements CustomDriverService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        return "nil";
+        return String.valueOf(RandomUtil.randomDouble(100));
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) throws Exception {
-        String commandTopic = attribute(pointInfo, "commandTopic"), value = values.getValue();
-        try {
-            int commandQos = attribute(pointInfo, "commandQos");
-            mqttSendHandler.sendToMqtt(commandTopic, commandQos, value);
-        } catch (Exception e) {
-            mqttSendHandler.sendToMqtt(commandTopic, value);
-        }
-        return true;
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
+        return false;
     }
 
     @Override
@@ -81,7 +72,7 @@ public class CustomDriverServiceImpl implements CustomDriverService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(new DeviceEvent(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE, 25, TimeUnit.SECONDS)));
     }
 
 }

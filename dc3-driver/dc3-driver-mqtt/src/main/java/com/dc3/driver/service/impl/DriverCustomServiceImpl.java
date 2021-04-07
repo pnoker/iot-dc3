@@ -16,58 +16,38 @@
 
 package com.dc3.driver.service.impl;
 
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.driver.service.netty.tcp.NettyTcpServer;
-import com.dc3.driver.service.netty.udp.NettyUdpServer;
-import io.netty.channel.Channel;
+import com.dc3.driver.service.mqtt.MqttSendHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
+
+import static com.dc3.common.sdk.util.DriverUtils.attribute;
 
 /**
  * @author pnoker
  */
 @Slf4j
 @Service
-public class CustomDriverServiceImpl implements CustomDriverService {
+public class DriverCustomServiceImpl implements DriverCustomService {
 
-    @Value("${driver.custom.tcp.port}")
-    private Integer tcpPort;
-    @Value("${driver.custom.udp.port}")
-    private Integer udpPort;
-
-    @Resource
-    private NettyTcpServer nettyTcpServer;
-    @Resource
-    private NettyUdpServer nettyUdpServer;
     @Resource
     private DriverContext driverContext;
     @Resource
     private DriverService driverService;
     @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
+    private MqttSendHandler mqttSendHandler;
 
     @Override
     public void initial() {
-        threadPoolExecutor.execute(() -> {
-            log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
-            nettyTcpServer.start(tcpPort);
-        });
-        threadPoolExecutor.execute(() -> {
-            log.debug("Virtual Listening Driver Starting(UDP::{}) incoming data listener", udpPort);
-            nettyUdpServer.start(udpPort);
-        });
     }
 
     @Override
@@ -76,13 +56,13 @@ public class CustomDriverServiceImpl implements CustomDriverService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        Long deviceId = device.getId();
-
-        // TODO 获取设备的Channel，并向下发送数据
-        Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
-        if (null != channel) {
-            channel.writeAndFlush(value.getValue().getBytes(StandardCharsets.UTF_8));
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) throws Exception {
+        String commandTopic = attribute(pointInfo, "commandTopic"), value = values.getValue();
+        try {
+            int commandQos = attribute(pointInfo, "commandQos");
+            mqttSendHandler.sendToMqtt(commandTopic, commandQos, value);
+        } catch (Exception e) {
+            mqttSendHandler.sendToMqtt(commandTopic, value);
         }
         return true;
     }

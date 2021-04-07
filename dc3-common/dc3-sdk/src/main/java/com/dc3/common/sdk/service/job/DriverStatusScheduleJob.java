@@ -16,13 +16,13 @@
 
 package com.dc3.common.sdk.service.job;
 
-import com.dc3.common.model.DriverEvent;
 import com.dc3.common.constant.Common;
+import com.dc3.common.model.DriverEvent;
 import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
@@ -44,11 +44,11 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
     @Resource
     private DriverContext driverContext;
     @Resource
-    private RabbitTemplate rabbitTemplate;
+    private DriverService driverService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         DriverEvent driverEvent = new DriverEvent(serviceName, Common.Driver.Event.HEARTBEAT, driverContext.getDriverStatus(), 10, TimeUnit.SECONDS);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName, driverEvent);
+        driverService.driverEventSender(driverEvent);
     }
 }

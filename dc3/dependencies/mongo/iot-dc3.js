@@ -51,6 +51,17 @@ if (db.createCollection("pointValue")) {
     });
 }
 
+if (db.createCollection("driverEvent")) {
+    db.driverEvent.ensureIndex({
+        "serviceName": 1,
+        "originTime": 1
+    }, {
+        name: "IX_driver_event",
+        unique: false,
+        background: true
+    });
+}
+
 if (db.createCollection("deviceEvent")) {
     db.deviceEvent.ensureIndex({
         "deviceId": 1,

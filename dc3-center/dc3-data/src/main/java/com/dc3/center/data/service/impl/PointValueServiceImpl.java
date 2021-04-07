@@ -18,6 +18,8 @@ package com.dc3.center.data.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.DeviceClient;
+import com.dc3.api.center.manager.feign.PointClient;
+import com.dc3.center.data.service.DataCustomService;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
@@ -25,8 +27,10 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointValueDto;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
+import com.dc3.common.model.Point;
 import com.dc3.common.model.PointValue;
 import com.dc3.common.utils.RedisUtil;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -36,6 +40,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -48,12 +54,16 @@ public class PointValueServiceImpl implements PointValueService {
     @Resource
     private RedisUtil redisUtil;
     @Resource
+    private PointClient pointClient;
+    @Resource
+    private DeviceClient deviceClient;
+    @Resource
     private MongoTemplate mongoTemplate;
+    @Resource
+    private DataCustomService dataCustomService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
-    @Resource
-    private DeviceClient deviceClient;
 
     @Override
     public List<PointValue> realtime(Long deviceId) {
@@ -103,8 +113,10 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     public void addPointValue(PointValue pointValue) {
         if (null != pointValue) {
-            savePointValueToRedis(pointValue.setCreateTime(System.currentTimeMillis()));
-            mongoTemplate.insert(pointValue);
+            pointValue.setCreateTime(System.currentTimeMillis());
+            threadPoolExecutor.execute(() -> dataCustomService.postHandle(pointValue));
+            threadPoolExecutor.execute(() -> savePointValueToMongo(pointValue));
+            threadPoolExecutor.execute(() -> savePointValueToRedis(pointValue));
         }
     }
 
@@ -112,57 +124,104 @@ public class PointValueServiceImpl implements PointValueService {
     public void addPointValues(List<PointValue> pointValues) {
         if (null != pointValues) {
             if (pointValues.size() > 0) {
-                pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
-                savePointValuesToRedis(pointValues);
-                mongoTemplate.insert(pointValues, PointValue.class);
+                Future<List<PointValue>> future = threadPoolExecutor.submit(() -> {
+                    pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
+                    return pointValues;
+                });
+
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        dataCustomService.postHandle(future.get());
+                    } catch (Exception e) {
+                        log.error("Add point values to post handle error {}", e.getMessage());
+                    }
+                });
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        savePointValuesToMongo(future.get());
+                    } catch (Exception e) {
+                        log.error("Add point values to mongo error {}", e.getMessage());
+                    }
+                });
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        savePointValuesToRedis(future.get());
+                    } catch (Exception e) {
+                        log.error("Add point values to redis error {}", e.getMessage());
+                    }
+                });
             }
         }
     }
 
     @Override
+    @SneakyThrows
     public Page<PointValue> list(PointValueDto pointValueDto) {
         Criteria criteria = new Criteria();
-        if (null == pointValueDto) {
-            pointValueDto = new PointValueDto();
-        }
+        pointValueDto = Optional.ofNullable(pointValueDto).orElse(new PointValueDto());
+
         if (null != pointValueDto.getDeviceId()) {
-            criteria.and("deviceId").is(pointValueDto.getDeviceId());
             R<Device> r = deviceClient.selectById(pointValueDto.getDeviceId());
             if (r.isOk()) {
-                if (r.getData().getMulti()) {
-                    criteria.and("multi").is(true);
+                Device device = r.getData();
+                criteria.and("deviceId").is(pointValueDto.getDeviceId());
+                if (!device.getMulti()) {
                     if (null != pointValueDto.getPointId()) {
-                        criteria.and("children").elemMatch(
-                                (new Criteria()).and("pointId").is(pointValueDto.getPointId())
-                        );
+                        criteria.and("pointId").is(pointValueDto.getPointId());
                     }
                 } else if (null != pointValueDto.getPointId()) {
-                    criteria.and("pointId").is(pointValueDto.getPointId());
+                    criteria.and("multi").is(true);
+                    if (null != pointValueDto.getPointId()) {
+                        criteria.and("children").elemMatch((new Criteria()).and("pointId").is(pointValueDto.getPointId()));
+                    }
                 }
             }
         } else if (null != pointValueDto.getPointId()) {
-            criteria.orOperator(
-                    (new Criteria()).and("pointId").is(pointValueDto.getPointId()),
-                    (new Criteria()).and("children").elemMatch((new Criteria()).and("pointId").is(pointValueDto.getPointId()))
-            );
+            R<Point> r = pointClient.selectById(pointValueDto.getPointId());
+            if (r.isOk()) {
+                criteria.orOperator(
+                        (new Criteria()).and("pointId").is(pointValueDto.getPointId()),
+                        (new Criteria()).and("children").elemMatch((new Criteria()).and("pointId").is(pointValueDto.getPointId()))
+                );
+            }
         }
 
-        Pages pages = null == pointValueDto.getPage() ? new Pages() : pointValueDto.getPage();
+        Pages pages = Optional.ofNullable(pointValueDto.getPage()).orElse(new Pages());
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
         }
 
-        Query query = new Query(criteria);
-        long count = mongoTemplate.count(query, PointValue.class);
+        Future<Long> count = threadPoolExecutor.submit(() -> {
+            Query query = new Query(criteria);
+            return mongoTemplate.count(query, PointValue.class);
+        });
 
-        query.with(Sort.by(Sort.Direction.DESC, "originTime"));
-        int size = (int) pages.getSize();
-        long page = pages.getCurrent();
-        query.limit(size).skip(size * (page - 1));
+        Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
+            Query query = new Query(criteria);
+            query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
+            query.with(Sort.by(Sort.Direction.DESC, "originTime"));
+            return mongoTemplate.find(query, PointValue.class);
+        });
 
-        List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class);
+        return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count.get()).setRecords(pointValues.get());
+    }
 
-        return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);
+    /**
+     * Save point value to mongo
+     *
+     * @param pointValue Point Value
+     */
+    private void savePointValueToMongo(final PointValue pointValue) {
+        mongoTemplate.insert(pointValue);
+    }
+
+    /**
+     * Save point value array to mongo
+     *
+     * @param pointValues Point Value Array
+     */
+    private void savePointValuesToMongo(final List<PointValue> pointValues) {
+        mongoTemplate.insert(pointValues, PointValue.class);
     }
 
     /**
@@ -171,16 +230,13 @@ public class PointValueServiceImpl implements PointValueService {
      * @param pointValue Point Value
      */
     private void savePointValueToRedis(final PointValue pointValue) {
-        threadPoolExecutor.execute(() -> {
-            String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
-            // Save point value to Redis
-            redisUtil.setKey(
-                    Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey,
-                    pointValue,
-                    pointValue.getTimeOut(),
-                    pointValue.getTimeUnit()
-            );
-        });
+        String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
+        redisUtil.setKey(
+                Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey,
+                pointValue,
+                pointValue.getTimeOut(),
+                pointValue.getTimeUnit()
+        );
     }
 
     /**
@@ -189,16 +245,7 @@ public class PointValueServiceImpl implements PointValueService {
      * @param pointValues Point Value Array
      */
     private void savePointValuesToRedis(final List<PointValue> pointValues) {
-        threadPoolExecutor.execute(() -> pointValues.forEach(pointValue -> {
-            String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
-            // Save point value to Redis
-            redisUtil.setKey(
-                    Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey,
-                    pointValue,
-                    pointValue.getTimeOut(),
-                    pointValue.getTimeUnit()
-            );
-        }));
+        pointValues.forEach(this::savePointValueToRedis);
     }
 
 }

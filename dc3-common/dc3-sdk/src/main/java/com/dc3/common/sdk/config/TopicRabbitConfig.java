@@ -74,7 +74,8 @@ public class TopicRabbitConfig {
     @Bean
     Queue driverMetadataQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        arguments.put("x-message-ttl", 15000);
+        // 15秒：15 * 1000 = 15000L
+        arguments.put("x-message-ttl", 15000L);
         return new Queue(Common.Rabbit.QUEUE_DRIVER_METADATA_PREFIX + this.serviceName, false, false, false, arguments);
     }
 

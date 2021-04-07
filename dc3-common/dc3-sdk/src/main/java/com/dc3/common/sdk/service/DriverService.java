@@ -16,41 +16,16 @@
 
 package com.dc3.common.sdk.service;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.model.DeviceEvent;
+import com.dc3.common.model.DriverEvent;
 import com.dc3.common.model.PointValue;
-import com.dc3.common.constant.Common;
-import com.dc3.common.exception.ServiceException;
-import com.dc3.common.model.Point;
-import com.dc3.common.sdk.bean.DriverContext;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * @author pnoker
  */
-@Slf4j
-@Service
-public class DriverService {
-
-    @Value("${spring.application.name}")
-    private String serviceName;
-
-    @Resource
-    private DriverContext driverContext;
-    @Resource
-    private RabbitTemplate rabbitTemplate;
-    @Resource
-    private ApplicationContext applicationContext;
+public interface DriverService {
 
     /**
      * 将位号原始值进行处理和转换
@@ -60,60 +35,21 @@ public class DriverService {
      * @param rawValue Raw Value
      * @return PointValue
      */
-    public String convertValue(Long deviceId, Long pointId, String rawValue) {
-        String value;
-        Point point = driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
-        switch (point.getType()) {
-            case Common.ValueType.STRING:
-                value = rawValue;
-                break;
-            case Common.ValueType.BYTE:
-            case Common.ValueType.SHORT:
-            case Common.ValueType.INT:
-            case Common.ValueType.LONG:
-            case Common.ValueType.DOUBLE:
-            case Common.ValueType.FLOAT:
-                try {
-                    float base = null != point.getBase() ? point.getBase() : 0;
-                    float multiple = null != point.getMultiple() ? point.getMultiple() : 1;
-                    double temp = (Convert.convert(Double.class, rawValue.trim()) + base) * multiple;
-                    if (null != point.getMinimum() && temp < point.getMinimum()) {
-                        log.info("Device({}) point({}) value({}) is lower than lower limit({})", deviceId, pointId, temp, point.getMinimum());
-                        deviceEventSender(deviceId, pointId, Common.Device.Event.OVER_LOWER_LIMIT,
-                                String.format("Value(%s) is lower than lower limit %s", temp, point.getMinimum()));
-                    }
-                    if (null != point.getMaximum() && temp > point.getMaximum()) {
-                        log.info("Device({}) point({}) value({}) is greater than upper limit({})", deviceId, pointId, temp, point.getMaximum());
-                        deviceEventSender(deviceId, pointId, Common.Device.Event.OVER_UPPER_LIMIT,
-                                String.format("Value(%s) is greater than upper limit %s", temp, point.getMaximum()));
-                    }
-                    value = String.format(point.getFormat(), temp);
-                } catch (Exception e) {
-                    throw new ServiceException(String.format("Invalid device(%s) point(%s) value(%s), error: %s", deviceId, pointId, rawValue, e.getMessage()));
-                }
-                break;
-            case Common.ValueType.BOOLEAN:
-                try {
-                    value = String.valueOf(Boolean.parseBoolean(rawValue.trim()));
-                } catch (Exception e) {
-                    throw new ServiceException(String.format("Invalid device(%s) point(%s) value(%s), error: %s", deviceId, pointId, rawValue, e.getMessage()));
-                }
-                break;
-            default:
-                throw new ServiceException(String.format("Invalid device(%s) point(%s) value(%s) type: %s ", deviceId, pointId, rawValue, point.getType()));
-        }
+    String convertValue(Long deviceId, Long pointId, String rawValue);
 
-        return value;
-    }
+    /**
+     * 发送驱动事件
+     *
+     * @param driverEvent Driver Event
+     */
+    void driverEventSender(DriverEvent driverEvent);
 
     /**
      * 发送设备事件
      *
      * @param deviceEvent Device Event
      */
-    public void deviceEventSender(DeviceEvent deviceEvent) {
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_EVENT, Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName, deviceEvent);
-    }
+    void deviceEventSender(DeviceEvent deviceEvent);
 
     /**
      * 发送设备事件
@@ -122,9 +58,7 @@ public class DriverService {
      * @param type     Event Type, STATUS、LIMIT
      * @param content  Event Content
      */
-    public void deviceEventSender(Long deviceId, String type, String content) {
-        deviceEventSender(new DeviceEvent(deviceId, type, content));
-    }
+    void deviceEventSender(Long deviceId, String type, String content);
 
     /**
      * 发送设备事件
@@ -134,30 +68,21 @@ public class DriverService {
      * @param type     Event Type, STATUS、LIMIT
      * @param content  Event Content
      */
-    public void deviceEventSender(Long deviceId, Long pointId, String type, String content) {
-        deviceEventSender(new DeviceEvent(deviceId, pointId, type, content));
-    }
+    void deviceEventSender(Long deviceId, Long pointId, String type, String content);
 
     /**
      * 发送位号值到消息组件
      *
      * @param pointValue PointValue
      */
-    public void pointValueSender(PointValue pointValue) {
-        if (null != pointValue) {
-            log.debug("Send point value: {}", JSON.toJSONString(pointValue));
-            rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_VALUE, Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + serviceName, pointValue);
-        }
-    }
+    void pointValueSender(PointValue pointValue);
 
     /**
      * 批量发送位号值到消息组件
      *
      * @param pointValues PointValue Array
      */
-    public void pointValueSender(List<PointValue> pointValues) {
-        pointValues.forEach(this::pointValueSender);
-    }
+    void pointValueSender(List<PointValue> pointValues);
 
     /**
      * Close ApplicationContext
@@ -165,10 +90,6 @@ public class DriverService {
      * @param template Template
      * @param params   Object Params
      */
-    public void close(CharSequence template, Object... params) {
-        log.error(StrUtil.format(template, params));
-        ((ConfigurableApplicationContext) applicationContext).close();
-        System.exit(1);
-    }
+    void close(CharSequence template, Object... params);
 
 }

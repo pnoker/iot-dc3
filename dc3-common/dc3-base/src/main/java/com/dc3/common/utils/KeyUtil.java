@@ -164,7 +164,7 @@ public class KeyUtil {
                 .setIssuer(Common.KEY)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, salt)
-                .setExpiration(Dc3Util.expireTime(12, Calendar.HOUR));
+                .setExpiration(Dc3Util.expireTime(Common.Cache.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
         return builder.compact();
     }
 

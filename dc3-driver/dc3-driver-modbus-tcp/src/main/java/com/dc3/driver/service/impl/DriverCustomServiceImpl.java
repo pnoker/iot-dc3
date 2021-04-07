@@ -17,12 +17,12 @@
 package com.dc3.driver.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.CustomDriverService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
@@ -49,12 +49,12 @@ import static com.dc3.common.sdk.util.DriverUtils.value;
  */
 @Slf4j
 @Service
-public class CustomDriverServiceImpl implements CustomDriverService {
+public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
-    private DriverService driverService;
-    @Resource
     private DriverContext driverContext;
+    @Resource
+    private DriverService driverService;
 
     static ModbusFactory modbusFactory;
 
