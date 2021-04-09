@@ -489,6 +489,29 @@ services:
         aliases:
           - dc3-rabbitmq
 
+  emqx:
+    build:
+      context: ./dependencies/emqx/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-emqx:1.0.0
+    restart: always
+    ports:
+      - 1884:1884
+      - 18084:18084
+    environment:
+      - EMQX_LOADED_PLUGINS=emqx_recon,emqx_retainer,emqx_management,emqx_dashboard,emqx_auth_username
+    container_name: dc3-emqx
+    hostname: dc3-emqx
+    volumes:
+      - emqx_etc:/opt/emqx/etc
+      - emqx_lib:/opt/emqx/lib
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+    networks:
+      dc3net:
+        aliases:
+          - dc3-emqx
+
   flink:
     image: flink:1.10
     restart: always
@@ -559,6 +582,10 @@ volumes:
   mongo_db:
   redis:
   rabbitmq:
+  emqx_etc:
+  emqx_lib:
+  emqx_data:
+  emqx_log:
   portainer:
 
 networks:

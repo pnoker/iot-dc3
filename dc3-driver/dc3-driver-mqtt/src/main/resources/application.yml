@@ -26,6 +26,8 @@ driver:
     username: dc3
     password: dc3
     url: tcp://dc3-rabbitmq:1883
+    #也可以连接到其他的mqtt服务器，例如：emqx，你可以在docker-compose.yml中找到，并启动它
+    #url: tcp://dc3-emqx:1884
     qos:
       - 0
     topics:

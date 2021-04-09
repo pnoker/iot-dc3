@@ -1,6 +1,6 @@
 rtmp:
   ffmpeg:
-    window: D:/Documents/FFmpeg/bin/ffmpeg.exe
+    window: D:/Program Files/FFmpeg/bin/ffmpeg.exe
     unix: /usr/local/bin/ffmpeg
 
 server:
