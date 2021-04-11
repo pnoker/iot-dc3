@@ -1,5 +1,5 @@
 #
-#  Copyright 2018-2020 Pnoker. All Rights Reserved.
+#  Copyright 2016-2021 Pnoker. All Rights Reserved.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
 #  limitations under the License.
 #
 
-Default:
-    echo "make dev-dc3: mvn mvn clean package & docker-compose build & docker-compose up"
-    echo "make deploy-dc3: mvn mvn clean package deploy"
-    echo "make package-dc3: mvn clean package"
-    echo "make clean: mvn clean"
+# tip:
+# make -f ./Makefile dev
+# make -f ./Makefile deploy
+# make -f ./Makefile package
+# make -f ./Makefile clean
 
-.PHONY: build clean-dc3
+.PHONY: build clean
 
-dev-dc3:
-	cd dc3/bin \
+dev:
+	&& cd dc3/bin \
 	&& chmod +x mvn-clean.sh \
 	&& chmod +x mvn-package.sh \
 	&& ./mvn-clean.sh \
@@ -34,7 +34,7 @@ dev-dc3:
 	&& ./docker-compose-build.sh \
 	&& ./docker-compose-up.sh \
 
-deploy-dc3:
+deploy:
 	cd dc3/bin \
 	&& chmod +x mvn-clean.sh \
 	&& chmod +x mvn-package.sh \
@@ -43,14 +43,14 @@ deploy-dc3:
 	&& ./mvn-package.sh \
 	&& ./mvn-deploy.sh
 
-package-dc3:
+package:
 	cd dc3/bin \
 	&& chmod +x mvn-clean.sh \
 	&& chmod +x mvn-package.sh \
 	&& ./mvn-clean.sh \
 	&& ./mvn-package.sh
 
-clean-dc3:
+clean:
 	cd dc3/bin \
 	&& chmod +x mvn-clean.sh \
 	&& ./mvn-clean.sh
