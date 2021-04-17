@@ -35,6 +35,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 @Slf4j
 @Component
 public class GatewayHystrix implements HandlerFunction<ServerResponse> {
+
     @Override
     public Mono<ServerResponse> handle(ServerRequest serverRequest) {
         Optional<Object> originalUris = serverRequest.attribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);

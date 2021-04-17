@@ -55,14 +55,14 @@ public interface PointValueService {
      *
      * @param pointValue PointValue
      */
-    void addPointValue(PointValue pointValue);
+    void savePointValue(PointValue pointValue);
 
     /**
      * 批量新增 PointValue
      *
      * @param pointValues PointValue Array
      */
-    void addPointValues(List<PointValue> pointValues);
+    void savePointValues(List<PointValue> pointValues);
 
     /**
      * 获取带分页、排序

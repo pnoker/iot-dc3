@@ -18,8 +18,8 @@ import com.dc3.api.center.auth.feign.UserClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.UserDto;
 import com.dc3.common.model.User;
-import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**

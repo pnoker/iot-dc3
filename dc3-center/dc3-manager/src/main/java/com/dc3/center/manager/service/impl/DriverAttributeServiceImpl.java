@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,7 +27,6 @@ import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -157,13 +157,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         if (null != driverAttributeDto) {
-            if (StringUtils.isNotBlank(driverAttributeDto.getName())) {
+            if (StrUtil.isNotBlank(driverAttributeDto.getName())) {
                 queryWrapper.like(DriverAttribute::getName, driverAttributeDto.getName());
             }
-            if (StringUtils.isNotBlank(driverAttributeDto.getDisplayName())) {
+            if (StrUtil.isNotBlank(driverAttributeDto.getDisplayName())) {
                 queryWrapper.like(DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
             }
-            if (StringUtils.isNotBlank(driverAttributeDto.getType())) {
+            if (StrUtil.isNotBlank(driverAttributeDto.getType())) {
                 queryWrapper.eq(DriverAttribute::getType, driverAttributeDto.getType());
             }
             if (null != driverAttributeDto.getDriverId()) {

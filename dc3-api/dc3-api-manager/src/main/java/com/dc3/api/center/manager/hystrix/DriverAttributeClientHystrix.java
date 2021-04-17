@@ -18,7 +18,7 @@ import com.dc3.api.center.manager.feign.DriverAttributeClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.DriverAttributeDto;
 import com.dc3.common.model.DriverAttribute;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

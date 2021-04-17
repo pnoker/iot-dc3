@@ -14,6 +14,7 @@
 package com.dc3.common.sdk.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverMetadata;
@@ -28,7 +29,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 
@@ -53,7 +53,7 @@ public class DriverMetadataReceiver {
     public void driverConfigurationReceive(Channel channel, Message message, DriverConfiguration driverConfiguration) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (null == driverConfiguration || StringUtils.isEmpty(driverConfiguration.getType()) || StringUtils.isEmpty(driverConfiguration.getCommand())) {
+            if (null == driverConfiguration || StrUtil.isEmpty(driverConfiguration.getType()) || StrUtil.isEmpty(driverConfiguration.getCommand())) {
                 log.error("Invalid driver configuration {}", driverConfiguration);
                 return;
             }

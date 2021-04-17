@@ -64,7 +64,7 @@ public class PointValueScheduleJob extends QuartzJobBean {
         threadPoolExecutor.execute(() -> {
             valueLock.writeLock().lock();
             if (pointValues.size() > 0) {
-                pointValueService.addPointValues(pointValues);
+                pointValueService.savePointValues(pointValues);
                 pointValues = new LinkedList<>();
             }
             valueLock.writeLock().unlock();

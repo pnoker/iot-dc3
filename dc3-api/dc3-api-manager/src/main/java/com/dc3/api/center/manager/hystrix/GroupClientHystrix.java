@@ -18,7 +18,7 @@ import com.dc3.api.center.manager.feign.GroupClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.GroupDto;
 import com.dc3.common.model.Group;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

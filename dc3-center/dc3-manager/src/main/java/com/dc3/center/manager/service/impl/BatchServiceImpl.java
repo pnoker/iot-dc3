@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.batch.*;
 import com.dc3.common.bean.driver.AttributeInfo;
@@ -22,7 +23,6 @@ import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +70,7 @@ public class BatchServiceImpl implements BatchService {
     @Transactional
     public void batchImport(List<BatchDriver> batchDrivers) {
         batchDrivers.forEach(batchDriver -> {
-            if (StringUtils.isBlank(batchDriver.getServiceName())) {
+            if (StrUtil.isBlank(batchDriver.getServiceName())) {
                 throw new ServiceException("Driver service name is blank");
             }
             Driver driver = driverService.selectByServiceName(batchDriver.getServiceName());
@@ -168,7 +168,7 @@ public class BatchServiceImpl implements BatchService {
      * @param batchProfile BatchProfile
      */
     private Profile importProfile(Driver driver, BatchProfile batchProfile) {
-        if (StringUtils.isBlank(batchProfile.getName())) {
+        if (StrUtil.isBlank(batchProfile.getName())) {
             throw new ServiceException("Profile name is blank");
         }
 

@@ -18,9 +18,11 @@ import com.dc3.api.center.manager.feign.PointClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * <p>PointClientHystrix
@@ -55,6 +57,11 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
 
             @Override
             public R<Point> selectById(Long id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<Point>> selectByDeviceId(Long deviceId) {
                 return R.fail(message);
             }
 

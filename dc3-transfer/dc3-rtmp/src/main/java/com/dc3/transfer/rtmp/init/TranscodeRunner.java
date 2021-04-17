@@ -14,6 +14,7 @@
 package com.dc3.transfer.rtmp.init;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.dto.RtmpDto;
@@ -21,7 +22,6 @@ import com.dc3.common.model.Rtmp;
 import com.dc3.transfer.rtmp.service.RtmpService;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -58,7 +58,7 @@ public class TranscodeRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        if (StringUtils.isBlank(ffmpeg)) {
+        if (StrUtil.isBlank(ffmpeg)) {
             log.error("FFmpeg path is null,Please fill absolute path!");
             System.exit(1);
         }

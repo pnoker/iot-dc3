@@ -14,6 +14,7 @@
 package com.dc3.transfer.rtmp.service.impl;
 
 import cn.hutool.core.util.RuntimeUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,7 +27,6 @@ import com.dc3.transfer.rtmp.bean.Transcode;
 import com.dc3.transfer.rtmp.mapper.RtmpMapper;
 import com.dc3.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -179,7 +179,7 @@ public class RtmpServiceImpl implements RtmpService {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line;
             try {
-                while (StringUtils.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
+                while (StrUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
                     log.debug(line);
                 }
             } catch (IOException e) {
@@ -200,7 +200,7 @@ public class RtmpServiceImpl implements RtmpService {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line;
             try {
-                while (StringUtils.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
+                while (StrUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
                     log.error(line);
                     line = line.toLowerCase();
                     if (line.contains("fail") || line.contains("error")) {
@@ -255,7 +255,7 @@ public class RtmpServiceImpl implements RtmpService {
     public LambdaQueryWrapper<Rtmp> fuzzyQuery(RtmpDto rtmpDto) {
         LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
         if (null != rtmpDto) {
-            if (StringUtils.isNotBlank(rtmpDto.getName())) {
+            if (StrUtil.isNotBlank(rtmpDto.getName())) {
                 queryWrapper.like(Rtmp::getName, rtmpDto.getName());
             }
             if (null != rtmpDto.getAutoStart()) {

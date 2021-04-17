@@ -89,7 +89,7 @@ Cache-Control: no-cache
 }
 
 
-### 新增 Driver
+### 批量新增 Driver
 #/manager/driver/batch_import
 POST http://localhost:8000/api/v3/manager/driver/batch_import
 Accept: */*

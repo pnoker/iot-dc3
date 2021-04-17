@@ -31,7 +31,6 @@ import java.util.Objects;
  * @author pnoker
  */
 @Slf4j
-@Order(10)
 @Configuration
 public class RouteConfig {
 
@@ -69,7 +68,7 @@ public class RouteConfig {
                                 .filters(
                                         f -> f.setPath("/auth/token/salt")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
                 )
                 .route("generate_token",
@@ -77,7 +76,7 @@ public class RouteConfig {
                                 .filters(
                                         f -> f.setPath("/auth/token/generate")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
                 )
                 .route("check_token",
@@ -85,7 +84,7 @@ public class RouteConfig {
                                 .filters(
                                         f -> f.setPath("/auth/token/check")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
                 )
                 .route("cancel_token",
@@ -93,7 +92,7 @@ public class RouteConfig {
                                 .filters(
                                         f -> f.setPath("/auth/token/cancel")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
                 )
                 .route("register_user",
@@ -101,7 +100,7 @@ public class RouteConfig {
                                 .filters(
                                         f -> f.setPath("/auth/user/add")
                                                 .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .hystrix(h -> h.setName("default").setFallbackUri("forward:/fallback"))
+                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
                                 ).uri("lb://dc3-auth")
                 )
                 .build();

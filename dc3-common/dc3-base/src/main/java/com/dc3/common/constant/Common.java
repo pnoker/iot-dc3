@@ -362,7 +362,6 @@ public interface Common {
         String BLACK_IP = "black_ip";
 
         String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
-        String REAL_TIME_VALUES_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUES + Common.Cache.SEPARATOR;
         String DRIVER_STATUS_KEY_PREFIX = Common.Cache.DRIVER + Common.Cache.STATUS + Common.Cache.SEPARATOR;
         String DEVICE_STATUS_KEY_PREFIX = Common.Cache.DEVICE + Common.Cache.STATUS + Common.Cache.SEPARATOR;
     }

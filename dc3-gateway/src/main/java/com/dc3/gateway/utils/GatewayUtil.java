@@ -13,8 +13,8 @@
 
 package com.dc3.gateway.utils;
 
+import cn.hutool.core.util.StrUtil;
 import com.dc3.common.exception.ServiceException;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 import java.util.Objects;
@@ -56,9 +56,20 @@ public class GatewayUtil {
      */
     public static String getRequestHeader(ServerHttpRequest request, String key) {
         String header = request.getHeaders().getFirst(key);
-        if (!StringUtils.isNotBlank(header)) {
+        if (!StrUtil.isNotBlank(header)) {
             throw new ServiceException("Invalid request header of " + key);
         }
         return header;
+    }
+
+    /**
+     * 获取 Request Tenant
+     *
+     * @param request ServerHttpRequest
+     * @return 租户
+     */
+    public static String getTenant(ServerHttpRequest request) {
+        String path = request.getURI().getPath();
+        return path;
     }
 }

@@ -42,4 +42,12 @@ public interface PointService extends Service<Point, PointDto> {
      * @return Point Array
      */
     List<Point> selectByProfileId(Long profileId);
+
+    /**
+     * 根据 设备 ID 查询
+     *
+     * @param deviceId Device Id
+     * @return Point Array
+     */
+    List<Point> selectByDeviceId(Long deviceId);
 }

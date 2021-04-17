@@ -69,7 +69,7 @@ public class PointValueReceiver {
             if (PointValueScheduleJob.valueSpeed.get() < batchSpeed) {
                 threadPoolExecutor.execute(() -> {
                     // Save point value to Redis & MongoDB
-                    pointValueService.addPointValue(pointValue);
+                    pointValueService.savePointValue(pointValue);
                 });
             } else {
                 // Save point value to schedule

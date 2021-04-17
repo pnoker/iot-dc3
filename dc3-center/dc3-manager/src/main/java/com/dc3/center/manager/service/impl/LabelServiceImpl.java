@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -29,7 +30,6 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Label;
 import com.dc3.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -157,10 +157,10 @@ public class LabelServiceImpl implements LabelService {
     public LambdaQueryWrapper<Label> fuzzyQuery(LabelDto labelDto) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         if (null != labelDto) {
-            if (StringUtils.isNotBlank(labelDto.getName())) {
+            if (StrUtil.isNotBlank(labelDto.getName())) {
                 queryWrapper.like(Label::getName, labelDto.getName());
             }
-            if (StringUtils.isNotBlank(labelDto.getColor())) {
+            if (StrUtil.isNotBlank(labelDto.getColor())) {
                 queryWrapper.eq(Label::getColor, labelDto.getColor());
             }
         }

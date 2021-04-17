@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -30,7 +31,6 @@ import com.dc3.common.model.Device;
 import com.dc3.common.model.Driver;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -191,13 +191,13 @@ public class DriverServiceImpl implements DriverService {
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         if (null != driverDto) {
-            if (StringUtils.isNotBlank(driverDto.getName())) {
+            if (StrUtil.isNotBlank(driverDto.getName())) {
                 queryWrapper.like(Driver::getName, driverDto.getName());
             }
-            if (StringUtils.isNotBlank(driverDto.getServiceName())) {
+            if (StrUtil.isNotBlank(driverDto.getServiceName())) {
                 queryWrapper.like(Driver::getServiceName, driverDto.getServiceName());
             }
-            if (StringUtils.isNotBlank(driverDto.getHost())) {
+            if (StrUtil.isNotBlank(driverDto.getHost())) {
                 queryWrapper.like(Driver::getHost, driverDto.getHost());
             }
             if (null != driverDto.getPort()) {

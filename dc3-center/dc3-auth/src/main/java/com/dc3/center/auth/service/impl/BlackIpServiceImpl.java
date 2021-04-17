@@ -13,6 +13,7 @@
 
 package com.dc3.center.auth.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -24,7 +25,6 @@ import com.dc3.common.dto.BlackIpDto;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.BlackIp;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -138,7 +138,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpDto blackIpDto) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         if (null != blackIpDto) {
-            if (StringUtils.isNotBlank(blackIpDto.getIp())) {
+            if (StrUtil.isNotBlank(blackIpDto.getIp())) {
                 queryWrapper.like(BlackIp::getIp, blackIpDto.getIp());
             }
         }

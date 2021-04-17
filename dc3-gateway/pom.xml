@@ -20,7 +20,7 @@
     <parent>
         <artifactId>iot-dc3</artifactId>
         <groupId>com.dc3</groupId>
-        <version>1.2.3.SR</version>
+        <version>1.3.0.SR</version>
     </parent>
 
     <artifactId>dc3-gateway</artifactId>
@@ -33,6 +33,22 @@
     </properties>
 
     <dependencies>
+        <!-- Undertow Web 容器 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-netty</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-undertow</artifactId>
+        </dependency>
+
         <!-- Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -51,10 +67,10 @@
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
-        <!-- dc3 Api -->
+        <!-- Resilience4j reactive -->
         <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-api-auth</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
 
         <!-- dc3 Common Config -->
@@ -63,6 +79,17 @@
             <artifactId>dc3-config</artifactId>
         </dependency>
 
+        <!-- dc3 Api -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-api-auth</artifactId>
+        </dependency>
+
+        <!-- dc3 Common Base -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-base</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
         "com.dc3.api.center.auth.*",
 })
 @ComponentScan(basePackages = {
-        "com.dc3.api.center.auth.feign",
+        "com.dc3.api.center.auth",
 })
 public class GatewayInitRunner implements ApplicationRunner {
 

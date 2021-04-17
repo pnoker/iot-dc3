@@ -150,21 +150,21 @@ username=pnoker
 
 ### --------------------- BlackIp ---------------------
 ### 新增 BlackIp
-#/auth/blackIp/add
-POST http://localhost:8300/auth/blackIp/add
+#/auth/black_ip/add
+POST http://localhost:8300/auth/black_ip/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "ip": "192.168.0.1",
+  "ip": "127.0.0.1",
   "description": "测试黑名单Ip"
 }
 
 
 ### 修改 BlackIp
-#/auth/blackIp/update
-POST http://localhost:8300/auth/blackIp/update
+#/auth/black_ip/update
+POST http://localhost:8300/auth/black_ip/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -178,22 +178,22 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 BlackIp
-#/auth/blackIp/id/:id
-GET http://localhost:8300/auth/blackIp/id/1
+#/auth/black_ip/id/:id
+GET http://localhost:8300/auth/black_ip/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Ip 查询 BlackIp
 #/auth/user/ip/:ip
-GET http://localhost:8300/auth/blackIp/ip/192.168.0.1
+GET http://localhost:8300/auth/black_ip/ip/127.0.0.1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 分页查询 BlackIp
-#/auth/blackIp/list，支持ip模糊查询
-POST http://localhost:8300/auth/blackIp/list
+#/auth/black_ip/list，支持ip模糊查询
+POST http://localhost:8300/auth/black_ip/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -214,15 +214,15 @@ Cache-Control: no-cache
 
 
 ### 检测BlackIp是否存在
-#/auth/blackIp/check/:ip
-GET http://localhost:8300/auth/blackIp/check/192.168.0.1
+#/auth/black_ip/check/:ip
+GET http://localhost:8300/auth/black_ip/check/192.168.0.1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 ID 删除 BlackIp
-#/auth/blackIp/delete/:id
-POST http://localhost:8300/auth/blackIp/delete/3
+#/auth/black_ip/delete/:id
+POST http://localhost:8300/auth/black_ip/delete/1383257757074976769
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

@@ -15,13 +15,6 @@ spring:
     user:
       name: ${SECURITY_USER_NAME:dc3}
       password: ${SECURITY_USER_PASSWORD:dc3}
-  cloud:
-    loadbalancer:
-      ribbon:
-        enabled: false
-      cache:
-        caffeine:
-          spec: initialCapacity=10,maximumSize=500,expireAfterAccess=600s
   transaction:
     rollback-on-commit-failure: true
   datasource:
@@ -93,10 +86,11 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 logging:
-  file:
-    max-history: 30
-    total-size-cap: 2GB
-    clean-history-on-start: true
+  logback:
+    rollingpolicy:
+      max-history: 30
+      total-size-cap: 2GB
+      clean-history-on-start: true
 
 management:
   endpoints:
@@ -108,8 +102,6 @@ management:
       show-details: ALWAYS
 
 feign:
-  hystrix:
-    enabled: false
   httpclient:
     enabled: false
   okhttp:
@@ -121,20 +113,7 @@ feign:
       enabled: true
       use-gzip-decoder: true
 
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 30000
-  threadpool:
-    default:
-      coreSize: 1024
-
 eureka:
-  environment: dc3
-  data-center: https://gitee.com/pnoker
   instance:
     prefer-ip-address: true
     hostname: @project.artifactId@
@@ -150,3 +129,5 @@ eureka:
     registry-fetch-interval-seconds: 5
     service-url:
       defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${EUREKA_HOST:dc3-register}:${EUREKA_PORT:8100}/eureka/
+
+

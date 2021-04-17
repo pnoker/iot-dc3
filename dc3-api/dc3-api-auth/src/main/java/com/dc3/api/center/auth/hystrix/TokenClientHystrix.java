@@ -16,7 +16,7 @@ package com.dc3.api.center.auth.hystrix;
 import com.dc3.api.center.auth.feign.TokenClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.model.User;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
