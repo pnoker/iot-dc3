@@ -18,7 +18,7 @@ import com.dc3.api.center.manager.feign.DeviceClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,7 +28,6 @@ import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -149,7 +149,7 @@ public class GroupServiceImpl implements GroupService {
     public LambdaQueryWrapper<Group> fuzzyQuery(GroupDto groupDto) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         if (null != groupDto) {
-            if (StringUtils.isNotBlank(groupDto.getName())) {
+            if (StrUtil.isNotBlank(groupDto.getName())) {
                 queryWrapper.like(Group::getName, groupDto.getName());
             }
         }

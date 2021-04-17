@@ -19,8 +19,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,10 +86,27 @@ public class RedisUtil {
      * @param <T> T
      * @return T
      */
-    public <T> T getKey(String key, Type type) {
+    public <T> T getKey(String key, Class<T> type) {
         try {
             Object object = redisTemplate.opsForValue().get(key);
             return Convert.convert(type, object);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    /**
+     * 获取 Keys 缓存
+     *
+     * @param keys String key array
+     * @param <T>  T
+     * @return T Array
+     */
+    public <T> List<T> getKeys(List<String> keys, Class<T> type) {
+        try {
+            List<Object> objects = redisTemplate.opsForValue().multiGet(keys);
+            return Convert.toList(type, objects);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

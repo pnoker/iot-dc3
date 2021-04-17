@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,7 +27,6 @@ import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -158,13 +158,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         if (null != pointAttributeDto) {
-            if (StringUtils.isNotBlank(pointAttributeDto.getName())) {
+            if (StrUtil.isNotBlank(pointAttributeDto.getName())) {
                 queryWrapper.like(PointAttribute::getName, pointAttributeDto.getName());
             }
-            if (StringUtils.isNotBlank(pointAttributeDto.getDisplayName())) {
+            if (StrUtil.isNotBlank(pointAttributeDto.getDisplayName())) {
                 queryWrapper.like(PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
             }
-            if (StringUtils.isNotBlank(pointAttributeDto.getType())) {
+            if (StrUtil.isNotBlank(pointAttributeDto.getType())) {
                 queryWrapper.eq(PointAttribute::getType, pointAttributeDto.getType());
             }
             Optional.ofNullable(pointAttributeDto.getDriverId()).ifPresent(driverId -> {

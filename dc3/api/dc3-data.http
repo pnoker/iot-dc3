@@ -47,7 +47,7 @@ Cache-Control: no-cache
 
 ### 根据 Device Id 查询 实时值
 #/realtime/device_id/:deviceId
-GET http://localhost:8500/data/point_value/realtime/device_id/1
+GET http://localhost:8500/data/point_value/realtime/device_id/1379432247010025473
 Accept: */*
 Cache-Control: no-cache
 

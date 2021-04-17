@@ -18,7 +18,7 @@ import com.dc3.api.center.manager.feign.ProfileClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.model.Profile;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

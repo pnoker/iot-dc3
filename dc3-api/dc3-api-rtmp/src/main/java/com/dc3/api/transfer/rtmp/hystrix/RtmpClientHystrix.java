@@ -18,7 +18,7 @@ import com.dc3.api.transfer.rtmp.feign.RtmpClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.model.Rtmp;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

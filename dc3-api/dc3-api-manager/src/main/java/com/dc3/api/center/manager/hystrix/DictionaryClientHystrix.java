@@ -16,7 +16,7 @@ package com.dc3.api.center.manager.hystrix;
 import com.dc3.api.center.manager.feign.DictionaryClient;
 import com.dc3.common.bean.Dictionary;
 import com.dc3.common.bean.R;
-import feign.hystrix.FallbackFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

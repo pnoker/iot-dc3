@@ -13,6 +13,7 @@
 
 package com.dc3.center.auth.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,7 +28,6 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.User;
 import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
     public LambdaQueryWrapper<User> fuzzyQuery(UserDto userDto) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         if (null != userDto) {
-            if (StringUtils.isNotBlank(userDto.getName())) {
+            if (StrUtil.isNotBlank(userDto.getName())) {
                 queryWrapper.like(User::getName, userDto.getName());
             }
         }

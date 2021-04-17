@@ -43,7 +43,7 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
+            - name: CircuitBreaker
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
@@ -60,7 +60,7 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
+            - name: CircuitBreaker
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
@@ -77,7 +77,7 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
+            - name: CircuitBreaker
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
@@ -94,7 +94,7 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: Hystrix
+            - name: CircuitBreaker
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'

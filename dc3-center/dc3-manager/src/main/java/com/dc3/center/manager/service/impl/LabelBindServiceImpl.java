@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -25,7 +26,6 @@ import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -126,7 +126,7 @@ public class LabelBindServiceImpl implements LabelBindService {
             if (null != labelBindDto.getEntityId()) {
                 queryWrapper.eq(LabelBind::getEntityId, labelBindDto.getEntityId());
             }
-            if (StringUtils.isNotBlank(labelBindDto.getType())) {
+            if (StrUtil.isNotBlank(labelBindDto.getType())) {
                 queryWrapper.eq(LabelBind::getType, labelBindDto.getType());
             }
         }

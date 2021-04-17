@@ -13,10 +13,12 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.PointMapper;
+import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
@@ -24,9 +26,9 @@ import com.dc3.common.dto.PointDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
+import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -48,6 +50,8 @@ public class PointServiceImpl implements PointService {
 
     @Resource
     private PointMapper pointMapper;
+    @Resource
+    private DeviceService deviceService;
 
 
     @Override
@@ -155,6 +159,12 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
+    public List<Point> selectByDeviceId(Long deviceId) {
+        Device device = deviceService.selectById(deviceId);
+        return selectByProfileId(device.getProfileId());
+    }
+
+    @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Point> list(PointDto pointDto) {
         if (!Optional.ofNullable(pointDto.getPage()).isPresent()) {
@@ -167,10 +177,10 @@ public class PointServiceImpl implements PointService {
     public LambdaQueryWrapper<Point> fuzzyQuery(PointDto pointDto) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (null != pointDto) {
-            if (StringUtils.isNotBlank(pointDto.getName())) {
+            if (StrUtil.isNotBlank(pointDto.getName())) {
                 queryWrapper.like(Point::getName, pointDto.getName());
             }
-            if (StringUtils.isNotBlank(pointDto.getType())) {
+            if (StrUtil.isNotBlank(pointDto.getType())) {
                 queryWrapper.eq(Point::getType, pointDto.getType());
             }
             if (null != pointDto.getRw()) {

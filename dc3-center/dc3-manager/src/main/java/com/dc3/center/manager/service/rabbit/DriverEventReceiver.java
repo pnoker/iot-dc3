@@ -14,6 +14,7 @@
 package com.dc3.center.manager.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.dc3.center.manager.service.BatchService;
 import com.dc3.center.manager.service.DriverSdkService;
 import com.dc3.center.manager.service.EventService;
@@ -30,7 +31,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class DriverEventReceiver {
         try {
             MessageProperties properties = message.getMessageProperties();
             channel.basicAck(properties.getDeliveryTag(), true);
-            if (null == driverEvent || StringUtils.isEmpty(driverEvent.getServiceName())) {
+            if (null == driverEvent || StrUtil.isEmpty(driverEvent.getServiceName())) {
                 log.error("Invalid driver event {}", driverEvent);
                 return;
             }

@@ -36,10 +36,13 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -64,12 +67,26 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public List<PointValue> realtime(Long deviceId) {
-        String key = Common.Cache.REAL_TIME_VALUES_KEY_PREFIX + deviceId;
-        List<PointValue> pointValues = redisUtil.getKey(key, List.class);
-        if (null == pointValues) {
-            throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
+        R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
+        if (listR.isOk()) {
+            List<String> keys = new ArrayList<>();
+            String prefix = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_";
+
+            List<Point> points = listR.getData();
+            for (Point point : points) {
+                keys.add(prefix + point.getId());
+            }
+            if (keys.size() > 0) {
+                List<PointValue> pointValues = redisUtil.getKeys(keys, PointValue.class);
+                pointValues = pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
+                if (pointValues.size() > 0) {
+                    return pointValues;
+                }
+            }
+        } else {
+            throw new ServiceException(listR.getMessage());
         }
-        return pointValues;
+        throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
     }
 
     @Override
@@ -108,7 +125,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public void addPointValue(PointValue pointValue) {
+    public void savePointValue(PointValue pointValue) {
         if (null != pointValue) {
             pointValue.setCreateTime(System.currentTimeMillis());
             threadPoolExecutor.execute(() -> dataCustomService.postHandle(pointValue));
@@ -118,7 +135,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public void addPointValues(List<PointValue> pointValues) {
+    public void savePointValues(List<PointValue> pointValues) {
         if (null != pointValues) {
             if (pointValues.size() > 0) {
                 Future<List<PointValue>> future = threadPoolExecutor.submit(() -> {
@@ -130,21 +147,21 @@ public class PointValueServiceImpl implements PointValueService {
                     try {
                         dataCustomService.postHandle(future.get());
                     } catch (Exception e) {
-                        log.error("Add point values to post handle error {}", e.getMessage());
+                        log.error("Save point values to post handle error {}", e.getMessage());
                     }
                 });
                 threadPoolExecutor.execute(() -> {
                     try {
                         savePointValuesToMongo(future.get());
                     } catch (Exception e) {
-                        log.error("Add point values to mongo error {}", e.getMessage());
+                        log.error("Save point values to mongo error {}", e.getMessage());
                     }
                 });
                 threadPoolExecutor.execute(() -> {
                     try {
                         savePointValuesToRedis(future.get());
                     } catch (Exception e) {
-                        log.error("Add point values to redis error {}", e.getMessage());
+                        log.error("Save point values to redis error {}", e.getMessage());
                     }
                 });
             }

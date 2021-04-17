@@ -14,6 +14,7 @@
 package com.dc3.center.auth.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.dc3.center.auth.bean.TokenValid;
 import com.dc3.center.auth.bean.UserLimit;
 import com.dc3.center.auth.service.TokenService;
@@ -26,7 +27,6 @@ import com.dc3.common.utils.KeyUtil;
 import com.dc3.common.utils.RedisUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -54,7 +54,7 @@ public class TokenServiceImpl implements TokenService {
     public String generateSalt(String username) {
         String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + username;
         String salt = redisUtil.getKey(redisSaltKey, String.class);
-        if (StringUtils.isBlank(salt)) {
+        if (StrUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
             redisUtil.setKey(redisSaltKey, salt, Common.Cache.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
         }
@@ -68,7 +68,7 @@ public class TokenServiceImpl implements TokenService {
         if (null != select) {
             String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + user.getName();
             String salt = redisUtil.getKey(redisSaltKey, String.class);
-            if (StringUtils.isNotBlank(salt)) {
+            if (StrUtil.isNotBlank(salt)) {
                 if (Dc3Util.md5(select.getPassword() + salt).equals(user.getPassword())) {
                     String redisTokenKey = Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + user.getName();
                     String token = KeyUtil.generateToken(user.getName(), salt);
@@ -84,7 +84,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public TokenValid checkTokenValid(String username, String salt, String token) {
         String redisToken = redisUtil.getKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username, String.class);
-        if (StringUtils.isBlank(redisToken) || !redisToken.equals(token)) {
+        if (StrUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
         try {
