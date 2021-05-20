@@ -155,10 +155,10 @@ public class KeyUtil {
      * @param username String
      * @return String
      */
-    public static String generateToken(String username, String salt) {
+    public static String generateToken(String username, String salt, Long tenantId) {
         JwtBuilder builder = Jwts.builder()
                 .setSubject(username)
-                .setIssuer(Common.KEY)
+                .setIssuer(Common.KEY + tenantId)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, salt)
                 .setExpiration(Dc3Util.expireTime(Common.Cache.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
@@ -173,12 +173,13 @@ public class KeyUtil {
      * @param token    String
      * @return Claims
      */
-    public static Claims parserToken(String username, String salt, String token) {
+    public static Claims parserToken(String username, String salt, String token, Long tenantId) {
         return Jwts.parser()
                 .requireSubject(username)
-                .requireIssuer(Common.KEY)
+                .requireIssuer(Common.KEY + tenantId)
                 .setSigningKey(salt)
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }

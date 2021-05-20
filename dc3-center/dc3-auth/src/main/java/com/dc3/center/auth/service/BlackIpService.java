@@ -26,16 +26,18 @@ public interface BlackIpService extends Service<BlackIp, BlackIpDto> {
     /**
      * 根据 Ip 查询 BlackIp
      *
-     * @param ip
+     * @param ip       IP
+     * @param tenantId Tenant Id
      * @return BlackIp
      */
-    BlackIp selectByIp(String ip);
+    BlackIp selectByIp(String ip, Long tenantId);
 
     /**
      * 根据 Ip 是否在Ip黑名单列表
      *
-     * @param ip
+     * @param ip       IP
+     * @param tenantId Tenant Id
      * @return boolean
      */
-    boolean checkBlackIpValid(String ip);
+    boolean checkBlackIpValid(String ip, Long tenantId);
 }

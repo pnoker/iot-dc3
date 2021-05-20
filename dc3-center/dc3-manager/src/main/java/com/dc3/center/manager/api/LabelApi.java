@@ -35,13 +35,14 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_LABEL_URL_PREFIX)
 public class LabelApi implements LabelClient {
+
     @Resource
     private LabelService labelService;
 
     @Override
-    public R<Label> add(Label label) {
+    public R<Label> add(Label label, Long tenantId) {
         try {
-            Label add = labelService.add(label);
+            Label add = labelService.add(label.setTenantId(tenantId));
             if (null != add) {
                 return R.ok(add);
             }
@@ -61,9 +62,9 @@ public class LabelApi implements LabelClient {
     }
 
     @Override
-    public R<Label> update(Label label) {
+    public R<Label> update(Label label, Long tenantId) {
         try {
-            Label update = labelService.update(label);
+            Label update = labelService.update(label.setTenantId(tenantId));
             if (null != update) {
                 return R.ok(update);
             }
@@ -87,8 +88,9 @@ public class LabelApi implements LabelClient {
     }
 
     @Override
-    public R<Page<Label>> list(LabelDto labelDto) {
+    public R<Page<Label>> list(LabelDto labelDto, Long tenantId) {
         try {
+            labelDto.setTenantId(tenantId);
             Page<Label> page = labelService.list(labelDto);
             if (null != page) {
                 return R.ok(page);

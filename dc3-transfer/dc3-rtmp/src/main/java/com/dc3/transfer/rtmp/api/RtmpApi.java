@@ -39,9 +39,9 @@ public class RtmpApi implements RtmpClient {
     private RtmpService rtmpService;
 
     @Override
-    public R<Rtmp> add(Rtmp rtmp) {
+    public R<Rtmp> add(Rtmp rtmp, Long tenantId) {
         try {
-            Rtmp add = rtmpService.add(rtmp);
+            Rtmp add = rtmpService.add(rtmp.setTenantId(tenantId));
             if (null != add) {
                 return R.ok(add);
             }
@@ -61,9 +61,9 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Rtmp> update(Rtmp rtmp) {
+    public R<Rtmp> update(Rtmp rtmp, Long tenantId) {
         try {
-            Rtmp update = rtmpService.update(rtmp);
+            Rtmp update = rtmpService.update(rtmp.setTenantId(tenantId));
             if (null != update) {
                 return R.ok(update);
             }
@@ -87,8 +87,9 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Page<Rtmp>> list(RtmpDto rtmpDto) {
+    public R<Page<Rtmp>> list(RtmpDto rtmpDto, Long tenantId) {
         try {
+            rtmpDto.setTenantId(tenantId);
             Page<Rtmp> page = rtmpService.list(rtmpDto);
             if (null != page) {
                 return R.ok(page);

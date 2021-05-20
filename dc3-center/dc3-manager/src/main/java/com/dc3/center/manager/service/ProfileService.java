@@ -31,7 +31,7 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
      * @param name
      * @return Profile
      */
-    Profile selectByName(String name);
+    Profile selectByName(String name, Long tenantId);
 
     /**
      * 根据驱动 ID 查询

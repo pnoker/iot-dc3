@@ -70,10 +70,7 @@ public class LabelBindServiceImpl implements LabelBindService {
             }
     )
     public boolean delete(Long id) {
-        LabelBind labelBind = selectById(id);
-        if (null == labelBind) {
-            throw new NotFoundException("The label bind does not exist");
-        }
+        selectById(id);
         return labelBindMapper.deleteById(id) > 0;
     }
 
@@ -86,10 +83,7 @@ public class LabelBindServiceImpl implements LabelBindService {
             }
     )
     public LabelBind update(LabelBind labelBind) {
-        LabelBind temp = selectById(labelBind.getId());
-        if (null == temp) {
-            throw new NotFoundException("The label bind does not exist");
-        }
+        selectById(labelBind.getId());
         labelBind.setUpdateTime(null);
         if (labelBindMapper.updateById(labelBind) > 0) {
             return labelBindMapper.selectById(labelBind.getId());

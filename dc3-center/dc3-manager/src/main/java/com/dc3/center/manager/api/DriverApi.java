@@ -39,9 +39,9 @@ public class DriverApi implements DriverClient {
     private DriverService driverService;
 
     @Override
-    public R<Driver> add(Driver driver) {
+    public R<Driver> add(Driver driver, Long tenantId) {
         try {
-            Driver add = driverService.add(driver);
+            Driver add = driverService.add(driver.setTenantId(tenantId));
             if (null != add) {
                 return R.ok(add);
             }
@@ -61,9 +61,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> update(Driver driver) {
+    public R<Driver> update(Driver driver, Long tenantId) {
         try {
-            Driver update = driverService.update(driver);
+            Driver update = driverService.update(driver.setTenantId(tenantId));
             if (null != update) {
                 return R.ok(update);
             }
@@ -94,9 +94,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> selectByHostPort(String host, Integer port) {
+    public R<Driver> selectByHostPort(String host, Integer port, Long tenantId) {
         try {
-            Driver select = driverService.selectByHostPort(host, port);
+            Driver select = driverService.selectByHostPort(host, port, tenantId);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -104,8 +104,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Page<Driver>> list(DriverDto driverDto) {
+    public R<Page<Driver>> list(DriverDto driverDto, Long tenantId) {
         try {
+            driverDto.setTenantId(tenantId);
             Page<Driver> page = driverService.list(driverDto);
             if (null != page) {
                 return R.ok(page);

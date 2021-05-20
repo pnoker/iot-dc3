@@ -18,8 +18,8 @@ import com.dc3.api.center.manager.feign.GroupClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.GroupDto;
 import com.dc3.common.model.Group;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +39,7 @@ public class GroupClientHystrix implements FallbackFactory<GroupClient> {
         return new GroupClient() {
 
             @Override
-            public R<Group> add(Group group) {
+            public R<Group> add(Group group, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -49,7 +49,7 @@ public class GroupClientHystrix implements FallbackFactory<GroupClient> {
             }
 
             @Override
-            public R<Group> update(Group group) {
+            public R<Group> update(Group group, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -59,7 +59,7 @@ public class GroupClientHystrix implements FallbackFactory<GroupClient> {
             }
 
             @Override
-            public R<Page<Group>> list(GroupDto groupDto) {
+            public R<Page<Group>> list(GroupDto groupDto, Long tenantId) {
                 return R.fail(message);
             }
 

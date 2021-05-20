@@ -23,10 +23,7 @@ import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -45,7 +42,7 @@ public interface DriverClient {
      * @return Driver
      */
     @PostMapping("/add")
-    R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver);
+    R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 删除 Driver
@@ -63,7 +60,7 @@ public interface DriverClient {
      * @return Driver
      */
     @PostMapping("/update")
-    R<Driver> update(@Validated(Update.class) @RequestBody Driver driver);
+    R<Driver> update(@Validated(Update.class) @RequestBody Driver driver, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 查询 Driver
@@ -91,7 +88,7 @@ public interface DriverClient {
      * @return Driver
      */
     @GetMapping("/host/{host}/port/{port}")
-    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port);
+    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 分页查询 Driver
@@ -100,6 +97,6 @@ public interface DriverClient {
      * @return Page<Driver>
      */
     @PostMapping("/list")
-    R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto);
+    R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

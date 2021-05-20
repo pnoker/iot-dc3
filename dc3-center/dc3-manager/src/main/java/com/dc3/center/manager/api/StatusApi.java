@@ -40,8 +40,9 @@ public class StatusApi implements StatusClient {
     private StatusService statusService;
 
     @Override
-    public R<Map<Long, String>> driverStatus(DriverDto driverDto) {
+    public R<Map<Long, String>> driverStatus(DriverDto driverDto, Long tenantId) {
         try {
+            driverDto.setTenantId(tenantId);
             Map<Long, String> statuses = statusService.driver(driverDto);
             return R.ok(statuses);
         } catch (Exception e) {
@@ -50,8 +51,9 @@ public class StatusApi implements StatusClient {
     }
 
     @Override
-    public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto) {
+    public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto, Long tenantId) {
         try {
+            deviceDto.setTenantId(tenantId);
             Map<Long, String> statuses = statusService.device(deviceDto);
             return R.ok(statuses);
         } catch (Exception e) {

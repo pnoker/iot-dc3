@@ -14,8 +14,8 @@
 package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.manager.service.GroupService;
 import com.dc3.api.center.manager.feign.GroupClient;
+import com.dc3.center.manager.service.GroupService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.GroupDto;
@@ -35,13 +35,14 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_GROUP_URL_PREFIX)
 public class GroupApi implements GroupClient {
+
     @Resource
     private GroupService groupService;
 
     @Override
-    public R<Group> add(Group group) {
+    public R<Group> add(Group group, Long tenantId) {
         try {
-            Group add = groupService.add(group);
+            Group add = groupService.add(group.setTenantId(tenantId));
             if (null != add) {
                 return R.ok(add);
             }
@@ -61,9 +62,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> update(Group group) {
+    public R<Group> update(Group group, Long tenantId) {
         try {
-            Group update = groupService.update(group);
+            Group update = groupService.update(group.setTenantId(tenantId));
             if (null != update) {
                 return R.ok(update);
             }
@@ -87,8 +88,9 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Page<Group>> list(GroupDto groupDto) {
+    public R<Page<Group>> list(GroupDto groupDto, Long tenantId) {
         try {
+            groupDto.setTenantId(tenantId);
             Page<Group> page = groupService.list(groupDto);
             if (null != page) {
                 return R.ok(page);

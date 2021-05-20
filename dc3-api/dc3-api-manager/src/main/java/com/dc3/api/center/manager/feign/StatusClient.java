@@ -22,6 +22,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public interface StatusClient {
      * @return Map<Long, String>
      */
     @PostMapping("/driver")
-    R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto);
+    R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 查询 Device 服务状态
@@ -51,6 +52,6 @@ public interface StatusClient {
      * @return Map<Long, String>
      */
     @PostMapping("/device")
-    R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto);
+    R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

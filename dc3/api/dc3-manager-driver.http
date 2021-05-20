@@ -21,6 +21,7 @@ POST http://localhost:8400/manager/driver/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
 
 {
   "name": "测试驱动",
@@ -61,6 +62,13 @@ Cache-Control: no-cache
 ### 根据 ID 查询 Driver
 #/manager/driver/id/:id
 GET http://localhost:8400/manager/driver/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 ServiceName 查询 Driver
+#/manager/driver/service/:serviceName
+GET http://localhost:8400/manager/driver/service/dc3-driver-test
 Accept: */*
 Cache-Control: no-cache
 

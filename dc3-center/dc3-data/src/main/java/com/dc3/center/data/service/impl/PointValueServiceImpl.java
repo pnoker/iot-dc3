@@ -64,6 +64,49 @@ public class PointValueServiceImpl implements PointValueService {
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
+    @Override
+    public void savePointValue(PointValue pointValue) {
+        if (null != pointValue) {
+            pointValue.setCreateTime(System.currentTimeMillis());
+            threadPoolExecutor.execute(() -> dataCustomService.postHandle(pointValue));
+            threadPoolExecutor.execute(() -> savePointValueToMongo(pointValue));
+            threadPoolExecutor.execute(() -> savePointValueToRedis(pointValue));
+        }
+    }
+
+    @Override
+    public void savePointValues(List<PointValue> pointValues) {
+        if (null != pointValues) {
+            if (pointValues.size() > 0) {
+                Future<List<PointValue>> future = threadPoolExecutor.submit(() -> {
+                    pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
+                    return pointValues;
+                });
+
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        dataCustomService.postHandle(future.get());
+                    } catch (Exception e) {
+                        log.error("Save point values to post handle error {}", e.getMessage());
+                    }
+                });
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        savePointValuesToMongo(future.get());
+                    } catch (Exception e) {
+                        log.error("Save point values to mongo error {}", e.getMessage());
+                    }
+                });
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        savePointValuesToRedis(future.get());
+                    } catch (Exception e) {
+                        log.error("Save point values to redis error {}", e.getMessage());
+                    }
+                });
+            }
+        }
+    }
 
     @Override
     public List<PointValue> realtime(Long deviceId) {
@@ -122,50 +165,6 @@ public class PointValueServiceImpl implements PointValueService {
         Query query = new Query(criteria);
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
         return mongoTemplate.findOne(query, PointValue.class);
-    }
-
-    @Override
-    public void savePointValue(PointValue pointValue) {
-        if (null != pointValue) {
-            pointValue.setCreateTime(System.currentTimeMillis());
-            threadPoolExecutor.execute(() -> dataCustomService.postHandle(pointValue));
-            threadPoolExecutor.execute(() -> savePointValueToMongo(pointValue));
-            threadPoolExecutor.execute(() -> savePointValueToRedis(pointValue));
-        }
-    }
-
-    @Override
-    public void savePointValues(List<PointValue> pointValues) {
-        if (null != pointValues) {
-            if (pointValues.size() > 0) {
-                Future<List<PointValue>> future = threadPoolExecutor.submit(() -> {
-                    pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
-                    return pointValues;
-                });
-
-                threadPoolExecutor.execute(() -> {
-                    try {
-                        dataCustomService.postHandle(future.get());
-                    } catch (Exception e) {
-                        log.error("Save point values to post handle error {}", e.getMessage());
-                    }
-                });
-                threadPoolExecutor.execute(() -> {
-                    try {
-                        savePointValuesToMongo(future.get());
-                    } catch (Exception e) {
-                        log.error("Save point values to mongo error {}", e.getMessage());
-                    }
-                });
-                threadPoolExecutor.execute(() -> {
-                    try {
-                        savePointValuesToRedis(future.get());
-                    } catch (Exception e) {
-                        log.error("Save point values to redis error {}", e.getMessage());
-                    }
-                });
-            }
-        }
     }
 
     @Override

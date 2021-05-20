@@ -20,6 +20,7 @@ import com.dc3.common.constant.Common;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -38,7 +39,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/driver")
-    R<List<Dictionary>> driverDictionary();
+    R<List<Dictionary>> driverDictionary(@RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 查询驱动属性 Dictionary
@@ -46,7 +47,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/driver_attribute")
-    R<List<Dictionary>> driverAttributeDictionary();
+    R<List<Dictionary>> driverAttributeDictionary(@RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 查询位号属性 Dictionary
@@ -54,7 +55,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/point_attribute")
-    R<List<Dictionary>> pointAttributeDictionary();
+    R<List<Dictionary>> pointAttributeDictionary(@RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 查询模板 Dictionary
@@ -62,7 +63,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/profile")
-    R<List<Dictionary>> profileDictionary();
+    R<List<Dictionary>> profileDictionary(@RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 查询分组 Dictionary
@@ -70,7 +71,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/group")
-    R<List<Dictionary>> groupDictionary();
+    R<List<Dictionary>> groupDictionary(@RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 查询设备 Dictionary
@@ -79,7 +80,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/device/{parent}")
-    R<List<Dictionary>> deviceDictionary(@NotNull @PathVariable("parent") String parent);
+    R<List<Dictionary>> deviceDictionary(@NotNull @PathVariable("parent") String parent, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 查询位号 Dictionary
@@ -88,6 +89,6 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/point/{parent}")
-    R<List<Dictionary>> pointDictionary(@NotNull @PathVariable("parent") String parent);
+    R<List<Dictionary>> pointDictionary(@NotNull @PathVariable("parent") String parent, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

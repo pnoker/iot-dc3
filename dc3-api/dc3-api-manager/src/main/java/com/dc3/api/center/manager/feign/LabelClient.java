@@ -23,10 +23,7 @@ import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -45,7 +42,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/add")
-    R<Label> add(@Validated(Insert.class) @RequestBody Label label);
+    R<Label> add(@Validated(Insert.class) @RequestBody Label label, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 删除 Label
@@ -63,7 +60,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/update")
-    R<Label> update(@Validated(Update.class) @RequestBody Label label);
+    R<Label> update(@Validated(Update.class) @RequestBody Label label, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 查询 Label
@@ -81,6 +78,6 @@ public interface LabelClient {
      * @return Page<Label>
      */
     @PostMapping("/list")
-    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto);
+    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

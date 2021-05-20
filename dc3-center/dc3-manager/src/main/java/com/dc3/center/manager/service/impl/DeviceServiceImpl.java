@@ -182,6 +182,7 @@ public class DeviceServiceImpl implements DeviceService {
             if (null != deviceDto.getGroupId()) {
                 queryWrapper.eq(Device::getGroupId, deviceDto.getGroupId());
             }
+            queryWrapper.eq(Device::getTenantId, deviceDto.getTenantId());
         }
         return queryWrapper;
     }

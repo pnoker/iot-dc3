@@ -20,10 +20,7 @@ import com.dc3.common.model.User;
 import com.dc3.common.valid.Auth;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -42,7 +39,7 @@ public interface TokenClient {
      * @return R<String>
      */
     @GetMapping("/salt")
-    R<String> generateSalt(@NotNull @RequestParam(value = "username") String username);
+    R<String> generateSalt(@NotNull @RequestParam(value = "username") String username, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 生成用户 Token 令牌
@@ -51,7 +48,7 @@ public interface TokenClient {
      * @return R<String>
      */
     @PostMapping("/generate")
-    R<String> generateToken(@Validated(Auth.class) @RequestBody User user);
+    R<String> generateToken(@Validated(Auth.class) @RequestBody User user, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 检测用户 Token 令牌是否有效
@@ -62,7 +59,7 @@ public interface TokenClient {
      * @return R<Boolean>
      */
     @GetMapping("/check")
-    R<Boolean> checkTokenValid(@NotNull @RequestParam(value = "username") String username, @NotNull @RequestParam(value = "salt") String salt, @NotNull @RequestParam(value = "token") String token);
+    R<Long> checkTokenValid(@NotNull @RequestParam(value = "username") String username, @NotNull @RequestParam(value = "salt") String salt, @NotNull @RequestParam(value = "token") String token, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 注销用户的Token令牌
@@ -71,6 +68,6 @@ public interface TokenClient {
      * @return R<Boolean>
      */
     @GetMapping("/cancel")
-    R<Boolean> cancelToken(@NotNull @RequestParam(value = "username") String username);
+    R<Boolean> cancelToken(@NotNull @RequestParam(value = "username") String username, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

@@ -16,6 +16,9 @@ package com.dc3.common.model;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -52,6 +55,10 @@ public class Driver extends Description {
     @Min(value = 8600, message = "invalid port,port range is 8600-8799", groups = {Insert.class, Update.class})
     @Max(value = 8799, message = "invalid port,port range is 8600-8799", groups = {Insert.class, Update.class})
     private Integer port;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long tenantId;
 
     @TableField(exist = false)
     private String status;

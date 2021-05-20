@@ -1,5 +1,7 @@
 driver:
   name: VirtualDriver
+  tenant: default
+  project: @project.artifactId@
   description: @project.description@
   schedule:
     status:
@@ -16,6 +18,9 @@ driver:
       name: host
       type: string
       value: localhost
+      form: input\select\checkox\switch\date
+      option: {自定义一个option，用于渲染form，例如可以配置正则、单选、多选、日期类型}
+      required: true
       description: Ip
     - displayName: 端口
       name: port
@@ -34,7 +39,7 @@ server:
 
 spring:
   application:
-    name: @project.artifactId@
+    name: ${driver.project}_${driver.tenant}
 
 logging:
   level:

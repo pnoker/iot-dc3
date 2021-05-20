@@ -13,13 +13,16 @@
 
 package com.dc3.center.manager.service.impl;
 
+import com.dc3.api.center.auth.feign.TenantClient;
 import com.dc3.center.manager.service.*;
+import com.dc3.common.bean.R;
 import com.dc3.common.bean.driver.DriverRegister;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Driver;
 import com.dc3.common.model.DriverAttribute;
 import com.dc3.common.model.PointAttribute;
+import com.dc3.common.model.Tenant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +41,9 @@ import java.util.Map;
 public class DriverSdkServiceImpl implements DriverSdkService {
 
     @Resource
+    private TenantClient tenantClient;
+
+    @Resource
     private DriverService driverService;
     @Resource
     private DriverAttributeService driverAttributeService;
@@ -50,6 +56,14 @@ public class DriverSdkServiceImpl implements DriverSdkService {
 
     @Override
     public void driverRegister(DriverRegister driverRegister) {
+        // check tenant
+        R<Tenant> tenantR = tenantClient.selectByName(driverRegister.getTenant());
+        if (tenantR.isOk()) {
+            driverRegister.getDriver().setTenantId(tenantR.getData().getId());
+        } else {
+            throw new ServiceException("Invalid {}, {}", driverRegister.getTenant(), tenantR.getMessage());
+        }
+
         // register driver
         Driver driver = driverRegister.getDriver();
         log.info("Register driver {}", driver);
@@ -61,7 +75,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", driver);
             try {
-                Driver byHostPort = driverService.selectByHostPort(driver.getHost(), driver.getPort());
+                Driver byHostPort = driverService.selectByHostPort(driver.getHost(), driver.getPort(), driver.getTenantId());
                 throw new ServiceException("The port(" + driver.getPort() + ") is already occupied by driver(" + byHostPort.getName() + "/" + byHostPort.getServiceName() + ")");
             } catch (NotFoundException notFoundException2) {
                 driver = driverService.add(driver);

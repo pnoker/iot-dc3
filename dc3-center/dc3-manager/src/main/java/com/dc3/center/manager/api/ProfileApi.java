@@ -43,9 +43,9 @@ public class ProfileApi implements ProfileClient {
     private NotifyService notifyService;
 
     @Override
-    public R<Profile> add(Profile profile) {
+    public R<Profile> add(Profile profile, Long tenantId) {
         try {
-            Profile add = profileService.add(profile);
+            Profile add = profileService.add(profile.setTenantId(tenantId));
             if (null != add) {
                 notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, add);
                 return R.ok(add);
@@ -71,9 +71,9 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<Profile> update(Profile profile) {
+    public R<Profile> update(Profile profile, Long tenantId) {
         try {
-            Profile update = profileService.update(profile);
+            Profile update = profileService.update(profile.setTenantId(tenantId));
             if (null != update) {
                 notifyService.notifyDriverProfile(Common.Driver.Profile.UPDATE, update);
                 return R.ok(update);
@@ -98,8 +98,9 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<Page<Profile>> list(ProfileDto profileDto) {
+    public R<Page<Profile>> list(ProfileDto profileDto, Long tenantId) {
         try {
+            profileDto.setTenantId(tenantId);
             Page<Profile> page = profileService.list(profileDto);
             if (null != page) {
                 return R.ok(page);

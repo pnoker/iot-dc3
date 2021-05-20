@@ -51,8 +51,8 @@ public class TokenServiceImpl implements TokenService {
     private RedisUtil redisUtil;
 
     @Override
-    public String generateSalt(String username) {
-        String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + username;
+    public String generateSalt(String username, Long tenantId) {
+        String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + username + Common.Cache.DOT + tenantId;
         String salt = redisUtil.getKey(redisSaltKey, String.class);
         if (StrUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
@@ -62,33 +62,33 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateToken(User user) {
-        checkUserLimit(user.getName());
-        User select = userService.selectByName(user.getName());
+    public String generateToken(User user, Long tenantId) {
+        checkUserLimit(user.getName(), tenantId);
+        User select = userService.selectByName(user.getName(), tenantId);
         if (null != select) {
-            String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + user.getName();
+            String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + user.getName() + Common.Cache.DOT + tenantId;
             String salt = redisUtil.getKey(redisSaltKey, String.class);
             if (StrUtil.isNotBlank(salt)) {
                 if (Dc3Util.md5(select.getPassword() + salt).equals(user.getPassword())) {
-                    String redisTokenKey = Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + user.getName();
-                    String token = KeyUtil.generateToken(user.getName(), salt);
+                    String redisTokenKey = Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + user.getName() + Common.Cache.DOT + tenantId;
+                    String token = KeyUtil.generateToken(user.getName(), salt, tenantId);
                     redisUtil.setKey(redisTokenKey, token, Common.Cache.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
                     return token;
                 }
             }
         }
-        updateUserLimit(user.getName(), true);
+        updateUserLimit(user.getName(), true, tenantId);
         throw new ServiceException("Invalid username、password、salt");
     }
 
     @Override
-    public TokenValid checkTokenValid(String username, String salt, String token) {
-        String redisToken = redisUtil.getKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username, String.class);
+    public TokenValid checkTokenValid(String username, String salt, String token, Long tenantId) {
+        String redisToken = redisUtil.getKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username + Common.Cache.DOT + tenantId, String.class);
         if (StrUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
         try {
-            Claims claims = KeyUtil.parserToken(username, salt, token);
+            Claims claims = KeyUtil.parserToken(username, salt, token, tenantId);
             return new TokenValid(true, claims.getExpiration());
         } catch (Exception e) {
             return new TokenValid(false, null);
@@ -96,8 +96,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public boolean cancelToken(String username) {
-        redisUtil.removeKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username);
+    public boolean cancelToken(String username, Long tenantId) {
+        redisUtil.removeKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username + Common.Cache.DOT + tenantId);
         return true;
     }
 
@@ -106,14 +106,14 @@ public class TokenServiceImpl implements TokenService {
      *
      * @param username Username
      */
-    private void checkUserLimit(String username) {
-        String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
+    private void checkUserLimit(String username, Long tenantId) {
+        String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username + Common.Cache.DOT + tenantId;
         UserLimit limit = redisUtil.getKey(redisKey, UserLimit.class);
         if (null != limit && limit.getTimes() >= 5) {
             Date now = new Date();
             long interval = limit.getExpireTime().getTime() - now.getTime();
             if (interval > 0) {
-                limit = updateUserLimit(username, false);
+                limit = updateUserLimit(username, false, tenantId);
                 throw new ServiceException("Access restricted，Please try again after {}", Dc3Util.formatData(limit.getExpireTime()));
             }
         }
@@ -125,10 +125,10 @@ public class TokenServiceImpl implements TokenService {
      * @param username Username
      * @return UserLimit
      */
-    private UserLimit updateUserLimit(String username, boolean expireTime) {
+    private UserLimit updateUserLimit(String username, boolean expireTime, Long tenantId) {
         int amount = Common.Cache.USER_LIMIT_TIMEOUT;
-        String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
-        UserLimit limit = (UserLimit) Optional.ofNullable(redisUtil.getKey(redisKey, UserLimit.class)).orElse(new UserLimit(0, new Date()));
+        String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username + Common.Cache.DOT + tenantId;
+        UserLimit limit = Optional.ofNullable(redisUtil.getKey(redisKey, UserLimit.class)).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
         if (limit.getTimes() > 20) {
             //TODO 拉黑IP和锁定用户操作，然后通过Gateway进行拦截

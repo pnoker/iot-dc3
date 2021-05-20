@@ -16,8 +16,8 @@ package com.dc3.api.center.manager.hystrix;
 import com.dc3.api.center.manager.feign.DictionaryClient;
 import com.dc3.common.bean.Dictionary;
 import com.dc3.common.bean.R;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -39,37 +39,37 @@ public class DictionaryClientHystrix implements FallbackFactory<DictionaryClient
         return new DictionaryClient() {
 
             @Override
-            public R<List<Dictionary>> driverDictionary() {
+            public R<List<Dictionary>> driverDictionary(Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> driverAttributeDictionary() {
+            public R<List<Dictionary>> driverAttributeDictionary(Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> pointAttributeDictionary() {
+            public R<List<Dictionary>> pointAttributeDictionary(Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> profileDictionary() {
+            public R<List<Dictionary>> profileDictionary(Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> groupDictionary() {
+            public R<List<Dictionary>> groupDictionary(Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> deviceDictionary(String parent) {
+            public R<List<Dictionary>> deviceDictionary(String parent, Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> pointDictionary(String parent) {
+            public R<List<Dictionary>> pointDictionary(String parent, Long tenantId) {
                 return R.fail(message);
             }
         };

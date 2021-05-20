@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-transfer</artifactId>
-        <version>1.3.0.SR</version>
+        <version>1.3.1.SR</version>
     </parent>
 
     <artifactId>dc3-rtmp</artifactId>
@@ -27,13 +27,13 @@
 
     <dependencies>
 
-        <!-- dc3 Api Rtmp -->
+        <!-- Dc3 Api Rtmp -->
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-api-rtmp</artifactId>
         </dependency>
 
-        <!-- dc3 Common Core -->
+        <!-- Dc3 Common Core -->
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-core</artifactId>

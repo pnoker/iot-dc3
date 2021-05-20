@@ -14,6 +14,9 @@
 package com.dc3.common.model;
 
 import com.dc3.common.valid.Insert;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -47,6 +50,10 @@ public class Rtmp extends Description {
     private Short videoType;
     private Boolean run;
     private Boolean autoStart;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long tenantId;
 
     public Rtmp(long id, boolean run) {
         super.setId(id);

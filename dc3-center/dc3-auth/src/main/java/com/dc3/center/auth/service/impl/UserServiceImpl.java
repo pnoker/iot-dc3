@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.USER + Common.Cache.ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name+'.'+#user.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
             }
     )
     public User add(User user) {
-        User select = selectByName(user.getName());
+        User select = selectByName(user.getName(), user.getTenantId());
         if (null != select) {
             throw new DuplicateException("The user already exists");
         }
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.USER + Common.Cache.ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name+'.'+#user.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -116,10 +116,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.NAME, key = "#name", unless = "#result==null")
-    public User selectByName(String name) {
+    @Cacheable(value = Common.Cache.USER + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
+    public User selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         queryWrapper.eq(User::getName, name);
+        queryWrapper.eq(User::getTenantId, tenantId);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -133,8 +134,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkUserValid(String name) {
-        User user = selectByName(name);
+    public boolean checkUserValid(String name, Long tenantId) {
+        User user = selectByName(name, tenantId);
         if (null != user) {
             return user.getEnable();
         }
@@ -158,6 +159,7 @@ public class UserServiceImpl implements UserService {
             if (StrUtil.isNotBlank(userDto.getName())) {
                 queryWrapper.like(User::getName, userDto.getName());
             }
+            queryWrapper.eq(User::getTenantId, userDto.getTenantId());
         }
         return queryWrapper;
     }

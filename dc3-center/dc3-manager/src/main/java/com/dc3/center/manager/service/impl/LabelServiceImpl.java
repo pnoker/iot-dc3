@@ -24,7 +24,6 @@ import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.LabelBindDto;
 import com.dc3.common.dto.LabelDto;
-import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Label;
@@ -47,6 +46,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class LabelServiceImpl implements LabelService {
+
     @Resource
     private LabelBindService labelBindService;
     @Resource
@@ -56,7 +56,7 @@ public class LabelServiceImpl implements LabelService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.LABEL + Common.Cache.ID, key = "#label.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.LABEL + Common.Cache.NAME, key = "#label.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.LABEL + Common.Cache.NAME, key = "#label.name+'.'+#label.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.LABEL + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -64,10 +64,7 @@ public class LabelServiceImpl implements LabelService {
             }
     )
     public Label add(Label label) {
-        if (null != selectByName(label.getName())) {
-            throw new DuplicateException("The label already exists");
-        }
-
+        selectByName(label.getName(), label.getTenantId());
         if (labelMapper.insert(label) > 0) {
             return labelMapper.selectById(label.getId());
         }
@@ -101,7 +98,7 @@ public class LabelServiceImpl implements LabelService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.LABEL + Common.Cache.ID, key = "#label.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.LABEL + Common.Cache.NAME, key = "#label.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.LABEL + Common.Cache.NAME, key = "#label.name+'.'+#label.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.LABEL + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -109,10 +106,7 @@ public class LabelServiceImpl implements LabelService {
             }
     )
     public Label update(Label label) {
-        Label temp = selectById(label.getId());
-        if (null == temp) {
-            throw new NotFoundException("The label does not exist");
-        }
+        selectById(label.getId());
         label.setUpdateTime(null);
         if (labelMapper.updateById(label) > 0) {
             Label select = labelMapper.selectById(label.getId());
@@ -133,10 +127,11 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.LABEL + Common.Cache.NAME, key = "#name", unless = "#result==null")
-    public Label selectByName(String name) {
+    @Cacheable(value = Common.Cache.LABEL + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
+    public Label selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         queryWrapper.eq(Label::getName, name);
+        queryWrapper.eq(Label::getTenantId, tenantId);
         Label label = labelMapper.selectOne(queryWrapper);
         if (null == label) {
             throw new NotFoundException("The label does not exist");
@@ -163,6 +158,7 @@ public class LabelServiceImpl implements LabelService {
             if (StrUtil.isNotBlank(labelDto.getColor())) {
                 queryWrapper.eq(Label::getColor, labelDto.getColor());
             }
+            queryWrapper.eq(Label::getTenantId, labelDto.getTenantId());
         }
         return queryWrapper;
     }

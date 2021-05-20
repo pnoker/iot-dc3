@@ -14,9 +14,9 @@
 package com.dc3.driver.service.netty.tcp;
 
 import cn.hutool.core.util.CharsetUtil;
-import com.dc3.common.model.PointValue;
-import com.dc3.common.model.Point;
 import com.dc3.common.bean.driver.AttributeInfo;
+import com.dc3.common.model.Point;
+import com.dc3.common.model.PointValue;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.sdk.util.DriverUtils;
@@ -67,12 +67,6 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     private DriverService driverService;
     @Resource
     private DriverContext driverContext;
-
-    @Override
-    @SneakyThrows
-    public void channelActive(ChannelHandlerContext context) {
-        log.debug("Virtual Listening Driver Listener({}) accept clint({})", context.channel().localAddress(), context.channel().remoteAddress());
-    }
 
     @Override
     @SneakyThrows
@@ -142,7 +136,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
         log.debug(throwable.getMessage());
-        context.close();
+        context.disconnect();
     }
 
 }

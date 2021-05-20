@@ -41,6 +41,7 @@ public class DriverProperty {
             regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$",
             message = "invalid name,contains invalid characters or length is not in the range of 2~32",
             groups = {Insert.class, Update.class})
+    private String tenant;
     private String name;
     private String description;
     private ScheduleProperty schedule;

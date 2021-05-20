@@ -174,13 +174,13 @@ public class BatchServiceImpl implements BatchService {
 
         Profile profile;
         try {
-            profile = profileService.selectByName(batchProfile.getName());
+            profile = profileService.selectByName(batchProfile.getName(), driver.getTenantId());
             profile.setShare(batchProfile.getShare());
             profile.setDescription("批量导入：更新操作");
             profile = profileService.update(profile);
             notifyService.notifyDriverProfile(Common.Driver.Profile.UPDATE, profile);
         } catch (NotFoundException notFoundException) {
-            profile = new Profile(batchProfile.getName(), batchProfile.getShare(), driver.getId());
+            profile = new Profile(batchProfile.getName(), batchProfile.getShare(), driver.getId(), driver.getTenantId());
             profile.setDescription("批量导入：新增操作");
             profile = profileService.add(profile);
             notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
@@ -260,7 +260,8 @@ public class BatchServiceImpl implements BatchService {
                         importPoint.getAccrue(),
                         importPoint.getFormat(),
                         importPoint.getUnit(),
-                        profile.getId()
+                        profile.getId(),
+                        profile.getTenantId()
                 );
                 point.setDescription("批量导入：新增操作");
                 point = pointService.add(point);
@@ -281,9 +282,9 @@ public class BatchServiceImpl implements BatchService {
             // If group does not exist, add a new group
             Group groupTemp;
             try {
-                groupTemp = groupService.selectByName(importGroup.getName());
+                groupTemp = groupService.selectByName(importGroup.getName(), driver.getTenantId());
             } catch (NotFoundException notFoundException) {
-                groupTemp = new Group(importGroup.getName());
+                groupTemp = new Group(importGroup.getName(), driver.getTenantId());
                 groupTemp = groupService.add(groupTemp);
             }
 

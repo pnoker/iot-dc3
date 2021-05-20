@@ -66,12 +66,6 @@ public class Description implements Serializable {
     private Date updateTime;
 
     /**
-     * 租户
-     */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String tenant = "default";
-
-    /**
      * 逻辑删除标识
      * 1：删除
      * 0：未删除

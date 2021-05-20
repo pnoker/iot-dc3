@@ -32,13 +32,14 @@ import java.util.List;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_DICTIONARY_URL_PREFIX)
 public class DictionaryApi implements DictionaryClient {
+
     @Resource
     private DictionaryService dictionaryService;
 
     @Override
-    public R<List<Dictionary>> driverDictionary() {
+    public R<List<Dictionary>> driverDictionary(Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.driverDictionary();
+            List<Dictionary> dictionaryList = dictionaryService.driverDictionary(tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }
@@ -49,9 +50,9 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> driverAttributeDictionary() {
+    public R<List<Dictionary>> driverAttributeDictionary(Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.driverAttributeDictionary();
+            List<Dictionary> dictionaryList = dictionaryService.driverAttributeDictionary(tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }
@@ -62,9 +63,9 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> pointAttributeDictionary() {
+    public R<List<Dictionary>> pointAttributeDictionary(Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.pointAttributeDictionary();
+            List<Dictionary> dictionaryList = dictionaryService.pointAttributeDictionary(tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }
@@ -75,9 +76,9 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> profileDictionary() {
+    public R<List<Dictionary>> profileDictionary(Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.profileDictionary();
+            List<Dictionary> dictionaryList = dictionaryService.profileDictionary(tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }
@@ -88,9 +89,9 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> groupDictionary() {
+    public R<List<Dictionary>> groupDictionary(Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.groupDictionary();
+            List<Dictionary> dictionaryList = dictionaryService.groupDictionary(tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }
@@ -101,9 +102,9 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> deviceDictionary(String parent) {
+    public R<List<Dictionary>> deviceDictionary(String parent, Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.deviceDictionary(parent);
+            List<Dictionary> dictionaryList = dictionaryService.deviceDictionary(parent, tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }
@@ -114,9 +115,9 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> pointDictionary(String parent) {
+    public R<List<Dictionary>> pointDictionary(String parent, Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.pointDictionary(parent);
+            List<Dictionary> dictionaryList = dictionaryService.pointDictionary(parent, tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }

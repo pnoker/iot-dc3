@@ -33,16 +33,16 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_AUTH_BLACK_IP_URL_PREFIX)
+@RequestMapping(value = Common.Service.DC3_AUTH_BLACK_IP_URL_PREFIX)
 public class BlackIpApi implements BlackIpClient {
 
     @Resource
     private BlackIpService blackIpService;
 
     @Override
-    public R<BlackIp> add(BlackIp blackIp) {
+    public R<BlackIp> add(BlackIp blackIp, Long tenantId) {
         try {
-            BlackIp add = blackIpService.add(blackIp);
+            BlackIp add = blackIpService.add(blackIp.setTenantId(tenantId));
             if (null != add) {
                 return R.ok(add);
             }
@@ -62,9 +62,9 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<BlackIp> update(BlackIp blackIp) {
+    public R<BlackIp> update(BlackIp blackIp, Long tenantId) {
         try {
-            BlackIp update = blackIpService.update(blackIp);
+            BlackIp update = blackIpService.update(blackIp.setTenantId(tenantId));
             if (null != update) {
                 return R.ok(update);
             }
@@ -88,9 +88,9 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<BlackIp> selectByIp(String ip) {
+    public R<BlackIp> selectByIp(String ip, Long tenantId) {
         try {
-            BlackIp select = blackIpService.selectByIp(ip);
+            BlackIp select = blackIpService.selectByIp(ip, tenantId);
             if (null != select) {
                 return R.ok(select);
             }
@@ -101,8 +101,9 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
+    public R<Page<BlackIp>> list(BlackIpDto blackIpDto, Long tenantId) {
         try {
+            blackIpDto.setTenantId(tenantId);
             Page<BlackIp> page = blackIpService.list(blackIpDto);
             if (null != page) {
                 return R.ok(page);
@@ -114,9 +115,9 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<Boolean> checkBlackIpValid(String ip) {
+    public R<Boolean> checkBlackIpValid(String ip, Long tenantId) {
         try {
-            return blackIpService.checkBlackIpValid(ip) ? R.ok() : R.fail();
+            return blackIpService.checkBlackIpValid(ip, tenantId) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

@@ -51,10 +51,11 @@ public class DictionaryServiceImpl implements DictionaryService {
     private PointMapper pointMapper;
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DIC, key = "'dirver_dic'", unless = "#result==null")
-    public List<Dictionary> driverDictionary() {
+    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> driverDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
+        queryWrapper.eq(Driver::getTenantId, tenantId);
         List<Driver> driverList = driverMapper.selectList(queryWrapper);
         for (Driver driver : driverList) {
             Dictionary driverDictionary = new Dictionary().setLabel(driver.getName()).setValue(driver.getId());
@@ -64,9 +65,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, key = "'driver_attribute_dic'", unless = "#result==null")
-    public List<Dictionary> driverAttributeDictionary() {
-        List<Dictionary> driverDictionaryList = driverDictionary();
+    @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> driverAttributeDictionary(Long tenantId) {
+        List<Dictionary> driverDictionaryList = driverDictionary(tenantId);
         for (Dictionary driverDictionary : driverDictionaryList) {
             List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
             LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
@@ -84,9 +85,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, key = "'point_attribute_dic'", unless = "#result==null")
-    public List<Dictionary> pointAttributeDictionary() {
-        List<Dictionary> driverDictionaryList = driverDictionary();
+    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> pointAttributeDictionary(Long tenantId) {
+        List<Dictionary> driverDictionaryList = driverDictionary(tenantId);
         for (Dictionary driverDictionary : driverDictionaryList) {
             List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
             LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
@@ -104,13 +105,14 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.DIC, key = "'profile_dic'", unless = "#result==null")
-    public List<Dictionary> profileDictionary() {
-        List<Dictionary> driverDictionaryList = driverDictionary();
+    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> profileDictionary(Long tenantId) {
+        List<Dictionary> driverDictionaryList = driverDictionary(tenantId);
         for (Dictionary driverDictionary : driverDictionaryList) {
             List<Dictionary> profileDictionaryList = new ArrayList<>(16);
             LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
             queryWrapper.eq(Profile::getDriverId, driverDictionary.getValue());
+            queryWrapper.eq(Profile::getTenantId, tenantId);
             List<Profile> profileList = profileMapper.selectList(queryWrapper);
             driverDictionary.setDisabled(true);
             driverDictionary.setValue(RandomUtil.randomLong());
@@ -124,10 +126,11 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP + Common.Cache.DIC, key = "'group_dic'", unless = "#result==null")
-    public List<Dictionary> groupDictionary() {
+    @Cacheable(value = Common.Cache.GROUP + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> groupDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
+        queryWrapper.eq(Group::getTenantId, tenantId);
         List<Group> groupList = groupMapper.selectList(queryWrapper);
         for (Group group : groupList) {
             Dictionary groupDictionary = new Dictionary().setLabel(group.getName()).setValue(group.getId());
@@ -137,16 +140,17 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DIC, key = "'device_dic.'+#parent", unless = "#result==null")
-    public List<Dictionary> deviceDictionary(String parent) {
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DIC, key = "'dic.'+#parent+'.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> deviceDictionary(String parent, Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         switch (parent) {
             case "group":
-                List<Dictionary> groupDictionaryList = groupDictionary();
+                List<Dictionary> groupDictionaryList = groupDictionary(tenantId);
                 for (Dictionary groupDictionary : groupDictionaryList) {
                     List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
                     queryWrapper.eq(Device::getGroupId, groupDictionary.getValue());
+                    queryWrapper.eq(Device::getTenantId, tenantId);
                     List<Device> deviceList = deviceMapper.selectList(queryWrapper);
                     groupDictionary.setDisabled(true);
                     groupDictionary.setValue(RandomUtil.randomLong());
@@ -159,12 +163,13 @@ public class DictionaryServiceImpl implements DictionaryService {
                 dictionaryList = groupDictionaryList;
                 break;
             case "driver":
-                List<Dictionary> driverDictionaryList = profileDictionary();
+                List<Dictionary> driverDictionaryList = driverDictionary(tenantId);
                 for (Dictionary driverDictionary : driverDictionaryList) {
                     for (Dictionary profileDictionary : driverDictionary.getChildren()) {
                         List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
                         queryWrapper.eq(Device::getProfileId, profileDictionary.getValue());
+                        queryWrapper.eq(Device::getTenantId, tenantId);
                         List<Device> deviceList = deviceMapper.selectList(queryWrapper);
                         profileDictionary.setDisabled(true);
                         profileDictionary.setValue(RandomUtil.randomLong());
@@ -179,12 +184,15 @@ public class DictionaryServiceImpl implements DictionaryService {
                 break;
             case "profile":
                 List<Dictionary> profileDictionaryList = new ArrayList<>(16);
-                List<Profile> profileList = profileMapper.selectList(Wrappers.<Profile>query().lambda());
+                LambdaQueryWrapper<Profile> profileQueryWrapper = Wrappers.<Profile>query().lambda();
+                profileQueryWrapper.eq(Profile::getTenantId, tenantId);
+                List<Profile> profileList = profileMapper.selectList(profileQueryWrapper);
                 for (Profile profile : profileList) {
                     Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profile.getId());
                     List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
                     queryWrapper.eq(Device::getProfileId, profileDictionary.getValue());
+                    queryWrapper.eq(Device::getTenantId, tenantId);
                     List<Device> deviceList = deviceMapper.selectList(queryWrapper);
                     profileDictionary.setDisabled(true);
                     profileDictionary.setValue(RandomUtil.randomLong());
@@ -204,18 +212,21 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.DIC, key = "'point_dic.'+#parent", unless = "#result==null")
-    public List<Dictionary> pointDictionary(String parent) {
+    @Cacheable(value = Common.Cache.POINT + Common.Cache.DIC, key = "'dic.'+#parent+'.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> pointDictionary(String parent, Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         switch (parent) {
             case "profile":
                 List<Dictionary> profileDictionaryList = new ArrayList<>(16);
-                List<Profile> profileList = profileMapper.selectList(Wrappers.<Profile>query().lambda());
+                LambdaQueryWrapper<Profile> profileQueryWrapper = Wrappers.<Profile>query().lambda();
+                profileQueryWrapper.eq(Profile::getTenantId, tenantId);
+                List<Profile> profileList = profileMapper.selectList(profileQueryWrapper);
                 for (Profile profile : profileList) {
                     Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profile.getId());
                     List<Dictionary> pointDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
                     queryWrapper.eq(Point::getProfileId, profile.getId());
+                    queryWrapper.eq(Point::getTenantId, tenantId);
                     List<Point> pointList = pointMapper.selectList(queryWrapper);
                     profileDictionary.setDisabled(true);
                     profileDictionary.setValue(RandomUtil.randomLong());
@@ -230,12 +241,15 @@ public class DictionaryServiceImpl implements DictionaryService {
                 break;
             case "device":
                 List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
-                List<Device> deviceList = deviceMapper.selectList(Wrappers.<Device>query().lambda());
+                LambdaQueryWrapper<Device> deviceQueryWrapper = Wrappers.<Device>query().lambda();
+                deviceQueryWrapper.eq(Device::getTenantId, tenantId);
+                List<Device> deviceList = deviceMapper.selectList(deviceQueryWrapper);
                 for (Device device : deviceList) {
                     Dictionary deviceDictionary = new Dictionary().setLabel(device.getName()).setValue(device.getId());
                     List<Dictionary> pointDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
                     queryWrapper.eq(Point::getProfileId, device.getProfileId());
+                    queryWrapper.eq(Point::getTenantId, tenantId);
                     List<Point> pointList = pointMapper.selectList(queryWrapper);
                     deviceDictionary.setDisabled(true);
                     deviceDictionary.setValue(RandomUtil.randomLong());

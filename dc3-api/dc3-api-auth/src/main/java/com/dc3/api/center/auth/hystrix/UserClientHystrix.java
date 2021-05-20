@@ -39,7 +39,7 @@ public class UserClientHystrix implements FallbackFactory<UserClient> {
         return new UserClient() {
 
             @Override
-            public R<User> add(User user) {
+            public R<User> add(User user, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -49,7 +49,7 @@ public class UserClientHystrix implements FallbackFactory<UserClient> {
             }
 
             @Override
-            public R<User> update(User user) {
+            public R<User> update(User user, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -64,17 +64,17 @@ public class UserClientHystrix implements FallbackFactory<UserClient> {
             }
 
             @Override
-            public R<User> selectByName(String name) {
+            public R<User> selectByName(String name, Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<User>> list(UserDto userDto) {
+            public R<Page<User>> list(UserDto userDto, Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> checkUserValid(String username) {
+            public R<Boolean> checkUserValid(String username, Long tenantId) {
                 return R.fail(message);
             }
         };

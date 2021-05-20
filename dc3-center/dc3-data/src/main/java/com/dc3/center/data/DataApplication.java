@@ -13,15 +13,15 @@
 
 package com.dc3.center.data;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.cloud.client.SpringCloudApplication;
+import com.dc3.config.autoconfigure.Dc3Application;
+import com.dc3.config.boot.SpringApplication;
 
 /**
  * 消息中心中心服务启动入口
  *
  * @author pnoker
  */
-@SpringCloudApplication
+@Dc3Application
 public class DataApplication {
     public static void main(String[] args) {
         SpringApplication.run(DataApplication.class, args);

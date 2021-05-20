@@ -1,5 +1,7 @@
 driver:
   name: OpcDaDriver
+  tenant: default
+  project: @project.artifactId@
   description: @project.description@
   schedule:
     status:
@@ -49,7 +51,7 @@ server:
 
 spring:
   application:
-    name: @project.artifactId@
+    name: ${driver.project}_${driver.tenant}
 
 logging:
   level:
