@@ -23,10 +23,7 @@ import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -46,7 +43,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/add")
-    R<Point> add(@Validated(Insert.class) @RequestBody Point point);
+    R<Point> add(@Validated(Insert.class) @RequestBody Point point, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 删除 Point
@@ -64,7 +61,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/update")
-    R<Point> update(@Validated(Update.class) @RequestBody Point point);
+    R<Point> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 查询 Point
@@ -91,6 +88,6 @@ public interface PointClient {
      * @return Page<Point>
      */
     @PostMapping("/list")
-    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto);
+    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

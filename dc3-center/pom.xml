@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>1.3.0.SR</version>
+        <version>1.3.1.SR</version>
     </parent>
 
     <artifactId>dc3-center</artifactId>
@@ -54,7 +54,7 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
-        <!-- dc3 Common Config -->
+        <!-- Dc3 Common Config -->
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-config</artifactId>

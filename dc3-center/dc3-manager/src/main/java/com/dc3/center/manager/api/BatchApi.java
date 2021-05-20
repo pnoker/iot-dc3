@@ -39,6 +39,7 @@ import java.util.List;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_BATCH_URL_PREFIX)
 public class BatchApi implements BatchClient {
+
     @Resource
     private BatchService batchService;
 

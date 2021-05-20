@@ -45,6 +45,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class GroupServiceImpl implements GroupService {
+
     @Resource
     private DeviceService deviceService;
     @Resource
@@ -54,7 +55,7 @@ public class GroupServiceImpl implements GroupService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.GROUP + Common.Cache.ID, key = "#group.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#group.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.GROUP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -63,7 +64,7 @@ public class GroupServiceImpl implements GroupService {
     )
     public Group add(Group group) {
         try {
-            selectByName(group.getName());
+            selectByName(group.getName(), group.getTenantId());
             throw new DuplicateException("The device group already exists");
         } catch (NotFoundException notFoundException) {
             if (groupMapper.insert(group) > 0) {
@@ -96,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.GROUP + Common.Cache.ID, key = "#group.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#group.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.GROUP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
@@ -125,8 +126,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#name", unless = "#result==null")
-    public Group selectByName(String name) {
+    @Cacheable(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
+    public Group selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         queryWrapper.eq(Group::getName, name);
         Group group = groupMapper.selectOne(queryWrapper);
@@ -152,6 +153,7 @@ public class GroupServiceImpl implements GroupService {
             if (StrUtil.isNotBlank(groupDto.getName())) {
                 queryWrapper.like(Group::getName, groupDto.getName());
             }
+            queryWrapper.eq(Group::getTenantId, groupDto.getTenantId());
         }
         return queryWrapper;
     }

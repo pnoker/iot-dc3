@@ -61,7 +61,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
+        log.debug("Plc S7 Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
         Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getType());
         return String.valueOf(serializer.dispense(plcs7PointVariable));
@@ -69,7 +69,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        log.debug("Opc Da Read, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
+        log.debug("Plc S7 Read, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
         S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
         Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType());
         store(serializer, plcs7PointVariable, value.getType(), value.getValue());
@@ -97,9 +97,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 获取 plcs7 serializer
      * 先从缓存中取，没有就新建
      *
-     * @param deviceId
-     * @param driverInfo
-     * @return
+     * @param deviceId   Device Id
+     * @param driverInfo DeviceInfo Map
+     * @return S7Serializer
      */
     private S7Serializer getS7Serializer(Long deviceId, Map<String, AttributeInfo> driverInfo) {
         S7Connector s7Connector = s7ConnectorMap.get(deviceId);
@@ -121,8 +121,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 获取位号变量信息
      *
-     * @param pointInfo
-     * @return
+     * @param pointInfo PointInfo Map
+     * @return Plcs7PointVariable
      */
     private Plcs7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo, String type) {
         log.debug("Plc S7 Point Info {}", JSON.toJSONString(pointInfo));
@@ -132,10 +132,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 向 Plc S7 写数据
      *
-     * @param serializer
-     * @param plcs7PointVariable
-     * @param type
-     * @param value
+     * @param serializer         S7Serializer
+     * @param plcs7PointVariable Plcs7PointVariable
+     * @param type               Value Type
+     * @param value              String Value
      */
     private void store(S7Serializer serializer, Plcs7PointVariable plcs7PointVariable, String type, String value) {
         switch (type.toLowerCase()) {

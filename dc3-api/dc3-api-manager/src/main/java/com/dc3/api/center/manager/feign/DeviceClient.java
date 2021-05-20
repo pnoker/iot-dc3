@@ -23,10 +23,7 @@ import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -45,7 +42,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @PostMapping("/add")
-    R<Device> add(@Validated(Insert.class) @RequestBody Device device);
+    R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 删除 Device
@@ -63,7 +60,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @PostMapping("/update")
-    R<Device> update(@Validated(Update.class) @RequestBody Device device);
+    R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 查询 Device
@@ -81,6 +78,6 @@ public interface DeviceClient {
      * @return R<Page < Device>>
      */
     @PostMapping("/list")
-    R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto);
+    R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

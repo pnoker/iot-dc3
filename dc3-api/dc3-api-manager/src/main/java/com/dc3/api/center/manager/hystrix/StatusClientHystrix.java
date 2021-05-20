@@ -17,8 +17,8 @@ import com.dc3.api.center.manager.feign.StatusClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.dto.DriverDto;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -40,12 +40,12 @@ public class StatusClientHystrix implements FallbackFactory<StatusClient> {
         return new StatusClient() {
 
             @Override
-            public R<Map<Long, String>> driverStatus(DriverDto driverDto) {
+            public R<Map<Long, String>> driverStatus(DriverDto driverDto, Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto) {
+            public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto, Long tenantId) {
                 return R.fail(message);
             }
 

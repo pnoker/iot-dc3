@@ -29,6 +29,6 @@ public interface GroupService extends Service<Group, GroupDto> {
      * @param name
      * @return
      */
-    Group selectByName(String name);
+    Group selectByName(String name, Long tenantId);
 
 }

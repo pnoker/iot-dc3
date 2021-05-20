@@ -36,20 +36,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class RtmpDto implements Serializable, Converter<Rtmp, RtmpDto> {
-    private static final long serialVersionUID = 1L;
-
-    private String name;
-    private Short videoType;
-    private Boolean run;
-    private Boolean autoStart;
-    private Long userId;
+public class RtmpDto extends Rtmp implements Serializable, Converter<Rtmp, RtmpDto> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     public RtmpDto(boolean autoStart) {
-        this.autoStart = autoStart;
+        super.setAutoStart(autoStart);
     }
 
     @Override

@@ -23,10 +23,7 @@ import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -41,11 +38,12 @@ public interface BlackIpClient {
     /**
      * 新增 BlackIp
      *
-     * @param blackIp BlackIp
+     * @param blackIp  BlackIp
+     * @param tenantId TenantId
      * @return BlackIp
      */
     @PostMapping("/add")
-    R<BlackIp> add(@Validated(Insert.class) @RequestBody BlackIp blackIp);
+    R<BlackIp> add(@Validated(Insert.class) @RequestBody BlackIp blackIp, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 删除 BlackIp
@@ -62,11 +60,12 @@ public interface BlackIpClient {
      * 支  持: Enable
      * 不支持: Ip
      *
-     * @param blackIp BlackIp
+     * @param blackIp  BlackIp
+     * @param tenantId TenantId
      * @return BlackIp
      */
     @PostMapping("/update")
-    R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp);
+    R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 查询 BlackIp
@@ -80,28 +79,31 @@ public interface BlackIpClient {
     /**
      * 根据 Ip 查询 BlackIp
      *
-     * @param ip Black Ip
+     * @param ip       Black Ip
+     * @param tenantId TenantId
      * @return BlackIp
      */
     @GetMapping("/ip/{ip}")
-    R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip);
+    R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 分页查询 BlackIp
      *
      * @param blackIpDto Dto
+     * @param tenantId   TenantId
      * @return Page<BlackIp>
      */
     @PostMapping("/list")
-    R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpDto blackIpDto);
+    R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpDto blackIpDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 检测 Ip 是否在 Ip 黑名单列表
      *
-     * @param ip Black Ip
+     * @param ip       Black Ip
+     * @param tenantId TenantId
      * @return Boolean
      */
     @GetMapping("/check/{ip}")
-    R<Boolean> checkBlackIpValid(@NotNull @PathVariable(value = "ip") String ip);
+    R<Boolean> checkBlackIpValid(@NotNull @PathVariable(value = "ip") String ip, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
 }

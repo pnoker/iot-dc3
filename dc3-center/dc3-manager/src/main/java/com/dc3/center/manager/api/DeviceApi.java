@@ -36,15 +36,16 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_MANAGER_DEVICE_URL_PREFIX)
 public class DeviceApi implements DeviceClient {
+
     @Resource
     private DeviceService deviceService;
     @Resource
     private NotifyService notifyService;
 
     @Override
-    public R<Device> add(Device device) {
+    public R<Device> add(Device device, Long tenantId) {
         try {
-            Device add = deviceService.add(device);
+            Device add = deviceService.add(device.setTenantId(tenantId));
             if (null != add) {
                 notifyService.notifyDriverDevice(Common.Driver.Device.ADD, add);
                 return R.ok(add);
@@ -70,9 +71,9 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<Device> update(Device device) {
+    public R<Device> update(Device device, Long tenantId) {
         try {
-            Device update = deviceService.update(device);
+            Device update = deviceService.update(device.setTenantId(tenantId));
             if (null != update) {
                 notifyService.notifyDriverDevice(Common.Driver.Device.UPDATE, update);
                 return R.ok(update);
@@ -97,8 +98,9 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<Page<Device>> list(DeviceDto deviceDto) {
+    public R<Page<Device>> list(DeviceDto deviceDto, Long tenantId) {
         try {
+            deviceDto.setTenantId(tenantId);
             Page<Device> page = deviceService.list(deviceDto);
             if (null != page) {
                 return R.ok(page);

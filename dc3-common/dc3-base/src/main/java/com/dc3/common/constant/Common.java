@@ -23,7 +23,7 @@ public interface Common {
     /**
      * 默认密钥
      */
-    String KEY = "pnoker/dc3";
+    String KEY = "pnoker/dc3/";
 
     /**
      * 默认密码
@@ -66,6 +66,7 @@ public interface Common {
     interface Response {
         String OK = "ok";
         String ERROR = "error";
+        String CONTENT_TYPE = "Content-Type";
     }
 
     /**
@@ -238,20 +239,22 @@ public interface Common {
      * 服务名称 & 服务基地址
      */
     interface Service {
-        /**
-         * dc3-gateway 服务
-         */
-        String DC3_GATEWAY_AUTH_USER = "X-Auth-User";
-        String DC3_GATEWAY_AUTH_SALT = "X-Auth-Salt";
-        String DC3_GATEWAY_AUTH_TOKEN = "X-Auth-Token";
 
         /**
          * dc3-auth 服务
          */
         String DC3_AUTH_SERVICE_NAME = "DC3-AUTH";
         String DC3_AUTH_USER_URL_PREFIX = "/auth/user";
+        String DC3_AUTH_TENANT_URL_PREFIX = "/auth/tenant";
         String DC3_AUTH_TOKEN_URL_PREFIX = "/auth/token";
         String DC3_AUTH_BLACK_IP_URL_PREFIX = "/auth/black_ip";
+        String DC3_AUTH_DICTIONARY_URL_PREFIX = "/auth/dictionary";
+
+        String DC3_AUTH_USER = "X-Auth-User";
+        String DC3_AUTH_SALT = "X-Auth-Salt";
+        String DC3_AUTH_TOKEN = "X-Auth-Token";
+        String DC3_AUTH_USER_ID = "X-Auth-User-Id";
+        String DC3_AUTH_TENANT_ID = "X-Auth-Tenant-Id";
 
         /**
          * dc3-manager 服务
@@ -333,33 +336,33 @@ public interface Common {
         String POINT_ID = "_point_id";
         String ATTRIBUTE_ID = "_attribute_id";
 
-        String IP = "_ip";
         String NAME = "_name";
-        String STATUS = "_status";
         String VALUE = "_value";
-        String VALUES = "_values";
-        String DIC = "_dic";
+        String STATUS = "_status";
         String LIST = "_list";
+        String DIC = "_dic";
         String SALT = "_salt";
         String TOKEN = "_token";
         String LIMIT = "_limit";
-        String HOST_PORT = "_host_port";
         String SERVICE_NAME = "_service_name";
+        String IP = "_ip";
+        String HOST_PORT = "_host_port";
 
         String DRIVER = "driver";
         String DRIVER_ATTRIBUTE = "driver_attribute";
-        String POINT_ATTRIBUTE = "point_attribute";
-        String PROFILE = "profile";
         String DRIVER_INFO = "driver_info";
-        String POINT = "point";
+        String PROFILE = "profile";
         String GROUP = "group";
         String DEVICE = "device";
+        String POINT = "point";
+        String POINT_ATTRIBUTE = "point_attribute";
         String POINT_INFO = "point_info";
         String USER = "user";
         String RTMP = "rtmp";
         String LABEL = "label";
         String LABEL_BIND = "label_bind";
         String BLACK_IP = "black_ip";
+        String TENANT = "tenant";
 
         String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
         String DRIVER_STATUS_KEY_PREFIX = Common.Cache.DRIVER + Common.Cache.STATUS + Common.Cache.SEPARATOR;

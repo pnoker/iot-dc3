@@ -18,8 +18,8 @@ import com.dc3.api.center.manager.feign.ProfileClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.model.Profile;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +39,7 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
         return new ProfileClient() {
 
             @Override
-            public R<Profile> add(Profile profile) {
+            public R<Profile> add(Profile profile, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -49,7 +49,7 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
             }
 
             @Override
-            public R<Profile> update(Profile profile) {
+            public R<Profile> update(Profile profile, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -59,7 +59,7 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
             }
 
             @Override
-            public R<Page<Profile>> list(ProfileDto profileDto) {
+            public R<Page<Profile>> list(ProfileDto profileDto, Long tenantId) {
                 return R.fail(message);
             }
 

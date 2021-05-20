@@ -18,8 +18,8 @@ import com.dc3.api.center.manager.feign.LabelClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.LabelDto;
 import com.dc3.common.model.Label;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +39,7 @@ public class LabelClientHystrix implements FallbackFactory<LabelClient> {
         return new LabelClient() {
 
             @Override
-            public R<Label> add(Label label) {
+            public R<Label> add(Label label, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -49,7 +49,7 @@ public class LabelClientHystrix implements FallbackFactory<LabelClient> {
             }
 
             @Override
-            public R<Label> update(Label label) {
+            public R<Label> update(Label label, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -59,7 +59,7 @@ public class LabelClientHystrix implements FallbackFactory<LabelClient> {
             }
 
             @Override
-            public R<Page<Label>> list(LabelDto labelDto) {
+            public R<Page<Label>> list(LabelDto labelDto, Long tenantId) {
                 return R.fail(message);
             }
         };

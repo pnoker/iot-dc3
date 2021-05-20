@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.gateway.filter;
+package com.dc3.gateway.filter.factory;
 
 import com.dc3.api.center.auth.feign.TokenClient;
 import com.dc3.common.bean.R;
@@ -41,16 +41,18 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
     @Resource
     private TokenClient tokenClient;
 
-    class AuthenticGatewayFilter implements GatewayFilter {
+    static class AuthenticGatewayFilter implements GatewayFilter {
 
         @Override
         public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-            ServerHttpRequest request = exchange.getRequest();
+            /*ServerHttpRequest request = exchange.getRequest();
             try {
-                R<Boolean> tokenValid = tokenClient.checkTokenValid(
-                        GatewayUtil.getRequestHeader(request, Common.Service.DC3_GATEWAY_AUTH_USER),
-                        GatewayUtil.getRequestHeader(request, Common.Service.DC3_GATEWAY_AUTH_SALT),
-                        GatewayUtil.getRequestHeader(request, Common.Service.DC3_GATEWAY_AUTH_TOKEN)
+                String headerTenantId = GatewayUtil.getRequestHeader(request, Common.Service.DC3_AUTH_TENANT_ID);
+                R<Long> tokenValid = tokenClient.checkTokenValid(
+                        GatewayUtil.getRequestHeader(request, Common.Service.DC3_AUTH_USER),
+                        GatewayUtil.getRequestHeader(request, Common.Service.DC3_AUTH_SALT),
+                        GatewayUtil.getRequestHeader(request, Common.Service.DC3_AUTH_TOKEN),
+                        Long.parseLong(headerTenantId)
                 );
                 if (tokenValid.isOk()) {
                     return chain.filter(exchange);
@@ -58,7 +60,8 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);*/
+            System.out.println("mjjj_______________________________");
             return exchange.getResponse().setComplete();
         }
 

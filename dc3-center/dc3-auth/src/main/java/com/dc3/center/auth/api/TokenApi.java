@@ -36,32 +36,33 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(Common.Service.DC3_AUTH_TOKEN_URL_PREFIX)
 public class TokenApi implements TokenClient {
+
     @Resource
     private TokenService tokenService;
 
     @Override
-    public R<String> generateSalt(String username) {
-        String salt = tokenService.generateSalt(username);
+    public R<String> generateSalt(String username, Long tenantId) {
+        String salt = tokenService.generateSalt(username, tenantId);
         return null != salt ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }
 
     @Override
-    public R<String> generateToken(User user) {
-        String token = tokenService.generateToken(user);
+    public R<String> generateToken(User user, Long tenantId) {
+        String token = tokenService.generateToken(user, tenantId);
         return null != token ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
     }
 
     @Override
-    public R<Boolean> checkTokenValid(String username, String salt, String token) {
-        TokenValid tokenValid = tokenService.checkTokenValid(username, salt, token);
+    public R<Long> checkTokenValid(String username, String salt, String token, Long tenantId) {
+        TokenValid tokenValid = tokenService.checkTokenValid(username, salt, token, tenantId);
         if (tokenValid.isValid()) {
-            return R.ok("The token will expire in " + Dc3Util.formatData(tokenValid.getExpireTime()));
+            return R.ok(tokenValid.getExpireTime().getTime(), "The token will expire in " + Dc3Util.formatData(tokenValid.getExpireTime()));
         }
         throw new UnAuthorizedException("Token invalid");
     }
 
     @Override
-    public R<Boolean> cancelToken(String username) {
-        return tokenService.cancelToken(username) ? R.ok() : R.fail();
+    public R<Boolean> cancelToken(String username, Long tenantId) {
+        return tokenService.cancelToken(username, tenantId) ? R.ok() : R.fail();
     }
 }

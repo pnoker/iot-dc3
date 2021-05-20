@@ -18,11 +18,9 @@ import com.dc3.api.center.manager.feign.DriverClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.model.Driver;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * <p>DriverClientHystrix
@@ -41,7 +39,7 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
         return new DriverClient() {
 
             @Override
-            public R<Driver> add(Driver driver) {
+            public R<Driver> add(Driver driver, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -51,7 +49,7 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
             }
 
             @Override
-            public R<Driver> update(Driver driver) {
+            public R<Driver> update(Driver driver, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -66,12 +64,12 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
             }
 
             @Override
-            public R<Driver> selectByHostPort(String host, Integer port) {
+            public R<Driver> selectByHostPort(String host, Integer port, Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Driver>> list(DriverDto driverDto) {
+            public R<Page<Driver>> list(DriverDto driverDto, Long tenantId) {
                 return R.fail(message);
             }
 

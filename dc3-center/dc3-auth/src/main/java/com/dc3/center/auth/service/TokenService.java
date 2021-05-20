@@ -28,7 +28,7 @@ public interface TokenService {
      * @param username Username
      * @return String
      */
-    String generateSalt(String username);
+    String generateSalt(String username, Long tenantId);
 
     /**
      * 生成用户的Token令牌
@@ -36,7 +36,7 @@ public interface TokenService {
      * @param user Username
      * @return String
      */
-    String generateToken(User user);
+    String generateToken(User user, Long tenantId);
 
     /**
      * 校验用户的Token令牌是否有效
@@ -45,12 +45,12 @@ public interface TokenService {
      * @param token    Token
      * @return TokenValid
      */
-    TokenValid checkTokenValid(String username, String salt, String token);
+    TokenValid checkTokenValid(String username, String salt, String token, Long tenantId);
 
     /**
      * 注销用户的Token令牌
      *
      * @param username Username
      */
-    boolean cancelToken(String username);
+    boolean cancelToken(String username, Long tenantId);
 }

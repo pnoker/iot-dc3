@@ -192,6 +192,7 @@ public class PointServiceImpl implements PointService {
             if (null != pointDto.getProfileId()) {
                 queryWrapper.eq(Point::getProfileId, pointDto.getProfileId());
             }
+            queryWrapper.eq(Point::getTenantId, pointDto.getTenantId());
         }
         return queryWrapper;
     }

@@ -18,8 +18,8 @@ import com.dc3.api.center.manager.feign.DeviceClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +39,7 @@ public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
         return new DeviceClient() {
 
             @Override
-            public R<Device> add(Device device) {
+            public R<Device> add(Device device, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -49,7 +49,7 @@ public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
             }
 
             @Override
-            public R<Device> update(Device device) {
+            public R<Device> update(Device device, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -59,7 +59,7 @@ public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
             }
 
             @Override
-            public R<Page<Device>> list(DeviceDto deviceDto) {
+            public R<Page<Device>> list(DeviceDto deviceDto, Long tenantId) {
                 return R.fail(message);
             }
 

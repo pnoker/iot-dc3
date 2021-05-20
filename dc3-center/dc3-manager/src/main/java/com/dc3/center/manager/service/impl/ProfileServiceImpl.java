@@ -62,7 +62,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#profile.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#profile.name+'.'+#profile.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -72,7 +72,7 @@ public class ProfileServiceImpl implements ProfileService {
     )
     public Profile add(Profile profile) {
         try {
-            selectByName(profile.getName());
+            selectByName(profile.getName(), profile.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException) {
             driverService.selectById(profile.getDriverId());
@@ -113,7 +113,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#profile.name", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#profile.name+'.'+#profile.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -143,10 +143,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#name", unless = "#result==null")
-    public Profile selectByName(String name) {
+    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
+    public Profile selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getName, name);
+        queryWrapper.eq(Profile::getTenantId, tenantId);
         Profile profile = profileMapper.selectOne(queryWrapper);
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
@@ -188,6 +189,7 @@ public class ProfileServiceImpl implements ProfileService {
             if (null != profileDto.getDriverId()) {
                 queryWrapper.eq(Profile::getDriverId, profileDto.getDriverId());
             }
+            queryWrapper.eq(Profile::getTenantId, profileDto.getTenantId());
         }
         return queryWrapper;
     }

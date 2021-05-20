@@ -73,6 +73,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
                 serviceName,
                 Common.Driver.Event.DRIVER_REGISTER,
                 new DriverRegister(
+                        driverProperty.getTenant(),
                         driver,
                         driverProperty.getDriverAttribute(),
                         driverProperty.getPointAttribute()

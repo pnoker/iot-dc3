@@ -21,10 +21,7 @@ import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.model.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -43,7 +40,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/add")
-    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp);
+    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 删除 Rtmp
@@ -61,7 +58,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/update")
-    R<Rtmp> update(@RequestBody Rtmp rtmp);
+    R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 根据 ID 查询 Rtmp
@@ -79,7 +76,7 @@ public interface RtmpClient {
      * @return R<Page < Rtmp>>
      */
     @PostMapping("/list")
-    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto);
+    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
 
     /**
      * 启动 Rtmp 转码任务

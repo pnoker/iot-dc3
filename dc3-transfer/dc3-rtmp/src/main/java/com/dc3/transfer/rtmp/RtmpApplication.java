@@ -13,21 +13,25 @@
 
 package com.dc3.transfer.rtmp;
 
-import org.springframework.boot.SpringApplication;
+import com.dc3.config.autoconfigure.Dc3Application;
+import com.dc3.config.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.context.annotation.AdviceMode;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Rtmp 视频转码服务启动入口
  *
  * @author pnoker
  */
-@EnableCaching
-@SpringCloudApplication
+@Dc3Application
+@EnableTransactionManagement
+@EnableCaching(mode = AdviceMode.ASPECTJ)
 public class RtmpApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RtmpApplication.class, args);
     }
+
 }
 

@@ -7,4 +7,4 @@
 https://doc.dc3.site
 https://gitee.com/pnoker/iot-dc3
 https://github.com/pnoker/iot-dc3
-${AnsiColor.BRIGHT_CYAN}DC3 IOT Platform V1.3.0.SR ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors
+${AnsiColor.BRIGHT_CYAN}DC3 IOT Platform V1.3.1.SR ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors

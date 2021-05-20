@@ -13,8 +13,9 @@
 
 package com.dc3.gateway.config;
 
-import com.dc3.gateway.filter.AuthenticGatewayFilterFactory;
 import com.dc3.gateway.filter.BlackIpGlobalFilter;
+import com.dc3.gateway.filter.HeaderGlobalFilter;
+import com.dc3.gateway.filter.factory.AuthenticGatewayFilterFactory;
 import com.dc3.gateway.hystrix.GatewayHystrix;
 import feign.codec.Decoder;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,11 @@ public class GatewayConfig {
     @LoadBalanced
     public WebClient.Builder loadBalancedWebClientBuilder() {
         return WebClient.builder();
+    }
+
+    @Bean
+    public HeaderGlobalFilter headerGlobalFilter() {
+        return new HeaderGlobalFilter();
     }
 
     @Bean

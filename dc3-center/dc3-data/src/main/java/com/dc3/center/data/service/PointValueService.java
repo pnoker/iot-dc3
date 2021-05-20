@@ -25,6 +25,20 @@ import java.util.List;
 public interface PointValueService {
 
     /**
+     * 新增 PointValue
+     *
+     * @param pointValue PointValue
+     */
+    void savePointValue(PointValue pointValue);
+
+    /**
+     * 批量新增 PointValue
+     *
+     * @param pointValues PointValue Array
+     */
+    void savePointValues(List<PointValue> pointValues);
+
+    /**
      * 获取实时数据
      *
      * @param deviceId Device Id
@@ -49,20 +63,6 @@ public interface PointValueService {
      * @return PointValue
      */
     PointValue latest(Long deviceId, Long pointId);
-
-    /**
-     * 新增 PointValue
-     *
-     * @param pointValue PointValue
-     */
-    void savePointValue(PointValue pointValue);
-
-    /**
-     * 批量新增 PointValue
-     *
-     * @param pointValues PointValue Array
-     */
-    void savePointValues(List<PointValue> pointValues);
 
     /**
      * 获取带分页、排序

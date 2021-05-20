@@ -18,8 +18,8 @@ import com.dc3.api.center.manager.feign.PointClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
         return new PointClient() {
 
             @Override
-            public R<Point> add(Point point) {
+            public R<Point> add(Point point, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -51,7 +51,7 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
             }
 
             @Override
-            public R<Point> update(Point point) {
+            public R<Point> update(Point point, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -66,7 +66,7 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
             }
 
             @Override
-            public R<Page<Point>> list(PointDto pointDto) {
+            public R<Page<Point>> list(PointDto pointDto, Long tenantId) {
                 return R.fail(message);
             }
 

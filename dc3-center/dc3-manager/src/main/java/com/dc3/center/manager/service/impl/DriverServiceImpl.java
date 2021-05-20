@@ -60,7 +60,7 @@ public class DriverServiceImpl implements DriverService {
             put = {
                     @CachePut(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#driver.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, key = "#driver.serviceName", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.host+'.'+#driver.port", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.host+'.'+#driver.port+'.'+#driver.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
@@ -71,7 +71,7 @@ public class DriverServiceImpl implements DriverService {
     )
     public Driver add(Driver driver) {
         try {
-            selectByServiceName(driver.getName());
+            selectByServiceName(driver.getServiceName());
             throw new DuplicateException("The driver already exists");
         } catch (NotFoundException notFoundException) {
             if (driverMapper.insert(driver) > 0) {
@@ -108,7 +108,7 @@ public class DriverServiceImpl implements DriverService {
             put = {
                     @CachePut(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#driver.id", condition = "#result!=null"),
                     @CachePut(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, key = "#driver.serviceName", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.host+'.'+#driver.port", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.host+'.'+#driver.port+'.'+#driver.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
@@ -166,11 +166,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#host+'.'+#port", unless = "#result==null")
-    public Driver selectByHostPort(String host, Integer port) {
+    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#host+'.'+#port+'.'+#tenantId", unless = "#result==null")
+    public Driver selectByHostPort(String host, Integer port, Long tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getHost, host);
         queryWrapper.eq(Driver::getPort, port);
+        queryWrapper.eq(Driver::getTenantId, tenantId);
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
             throw new NotFoundException("The driver does not exist");
@@ -203,6 +204,7 @@ public class DriverServiceImpl implements DriverService {
             if (null != driverDto.getPort()) {
                 queryWrapper.eq(Driver::getPort, driverDto.getPort());
             }
+            queryWrapper.eq(Driver::getTenantId, driverDto.getTenantId());
         }
         return queryWrapper;
     }

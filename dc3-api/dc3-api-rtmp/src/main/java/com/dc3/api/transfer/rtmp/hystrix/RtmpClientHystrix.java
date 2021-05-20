@@ -18,8 +18,8 @@ import com.dc3.api.transfer.rtmp.feign.RtmpClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.model.Rtmp;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,7 +38,7 @@ public class RtmpClientHystrix implements FallbackFactory<RtmpClient> {
 
         return new RtmpClient() {
             @Override
-            public R<Rtmp> add(Rtmp rtmp) {
+            public R<Rtmp> add(Rtmp rtmp, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -48,7 +48,7 @@ public class RtmpClientHystrix implements FallbackFactory<RtmpClient> {
             }
 
             @Override
-            public R<Rtmp> update(Rtmp rtmp) {
+            public R<Rtmp> update(Rtmp rtmp, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -58,7 +58,7 @@ public class RtmpClientHystrix implements FallbackFactory<RtmpClient> {
             }
 
             @Override
-            public R<Page<Rtmp>> list(RtmpDto rtmpDto) {
+            public R<Page<Rtmp>> list(RtmpDto rtmpDto, Long tenantId) {
                 return R.fail(message);
             }
 

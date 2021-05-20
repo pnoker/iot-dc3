@@ -13,9 +13,9 @@
 
 package com.dc3.gateway;
 
-import org.springframework.boot.SpringApplication;
+import com.dc3.config.autoconfigure.Dc3Application;
+import com.dc3.config.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.SpringCloudApplication;
 
 /**
  * 平台网关服务入口
@@ -23,9 +23,11 @@ import org.springframework.cloud.client.SpringCloudApplication;
  * @author pnoker
  */
 @EnableCaching
-@SpringCloudApplication
+@Dc3Application
 public class GatewayApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }
+
 }

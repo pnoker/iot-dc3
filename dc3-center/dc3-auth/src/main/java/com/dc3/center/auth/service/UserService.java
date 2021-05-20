@@ -30,7 +30,7 @@ public interface UserService extends Service<User, UserDto> {
      * @param nama
      * @return User
      */
-    User selectByName(String nama);
+    User selectByName(String nama, Long tenantId);
 
     /**
      * 根据用户名判断用户是否存在
@@ -38,7 +38,7 @@ public interface UserService extends Service<User, UserDto> {
      * @param name
      * @return boolean
      */
-    boolean checkUserValid(String name);
+    boolean checkUserValid(String name, Long tenantId);
 
     /**
      * 重置密码

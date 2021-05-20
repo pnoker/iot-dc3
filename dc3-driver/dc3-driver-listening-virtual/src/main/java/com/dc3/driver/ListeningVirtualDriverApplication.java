@@ -13,15 +13,15 @@
 
 package com.dc3.driver;
 
-import org.springframework.boot.SpringApplication;
+import com.dc3.config.autoconfigure.Dc3Application;
+import com.dc3.config.boot.SpringApplication;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cloud.client.SpringCloudApplication;
 
 /**
  * @author pnoker
  */
 @EnableCaching
-@SpringCloudApplication
+@Dc3Application
 public class ListeningVirtualDriverApplication {
 
     public static void main(String[] args) {

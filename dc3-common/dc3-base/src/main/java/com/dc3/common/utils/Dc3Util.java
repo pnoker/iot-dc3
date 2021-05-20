@@ -24,6 +24,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -135,13 +136,13 @@ public class Dc3Util {
     }
 
     /**
-     * 判断字符串是否为 用户名格式（2-32）
+     * 判断字符串是否为 用户名格式（2-64）
      *
      * @param name String
      * @return boolean
      */
     public static boolean isName(String name) {
-        String regex = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$";
+        String regex = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,63}$";
         return ReUtil.isMatch(regex, name);
     }
 
@@ -446,6 +447,51 @@ public class Dc3Util {
         }
 
         return hostNames;
+    }
+
+    /**
+     * 从 Request 中获取指定 Key 的 Header 值
+     *
+     * @param httpServletRequest HttpServletRequest
+     * @param key                String
+     * @return String
+     */
+    public static String getRequestHeader(HttpServletRequest httpServletRequest, String key) {
+        return httpServletRequest.getHeader(key);
+    }
+
+    /**
+     * 从 Request 中获取指定 User ID 的 Header 值
+     *
+     * @param httpServletRequest HttpServletRequest
+     * @return Long
+     */
+    public static long getRequestUserId(HttpServletRequest httpServletRequest) {
+        long userId = -1L;
+        String header = getRequestHeader(httpServletRequest, Common.Service.DC3_AUTH_USER_ID);
+        try {
+            userId = Long.parseLong(header.trim());
+            return userId;
+        } catch (Exception e) {
+            return userId;
+        }
+    }
+
+    /**
+     * 从 Request 中获取指定 Tenant ID 的 Header 值
+     *
+     * @param httpServletRequest HttpServletRequest
+     * @return Long
+     */
+    public static long getRequestTenantId(HttpServletRequest httpServletRequest) {
+        long tenantId = -1L;
+        String header = getRequestHeader(httpServletRequest, Common.Service.DC3_AUTH_TENANT_ID);
+        try {
+            tenantId = Long.parseLong(header.trim());
+            return tenantId;
+        } catch (Exception e) {
+            return tenantId;
+        }
     }
 
 }

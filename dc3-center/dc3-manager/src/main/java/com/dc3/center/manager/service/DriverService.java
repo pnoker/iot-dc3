@@ -38,7 +38,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
      * @param port Driver Service Port
      * @return Driver
      */
-    Driver selectByHostPort(String host, Integer port);
+    Driver selectByHostPort(String host, Integer port, Long tenantId);
 
     /**
      * 根据 DEVICE ID 查询

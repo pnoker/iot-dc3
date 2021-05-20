@@ -44,9 +44,9 @@ public class PointApi implements PointClient {
     private NotifyService notifyService;
 
     @Override
-    public R<Point> add(Point point) {
+    public R<Point> add(Point point, Long tenantId) {
         try {
-            Point add = pointService.add(point);
+            Point add = pointService.add(point.setTenantId(tenantId));
             if (null != add) {
                 notifyService.notifyDriverPoint(Common.Driver.Point.ADD, add);
                 return R.ok(add);
@@ -72,9 +72,9 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Point> update(Point point) {
+    public R<Point> update(Point point, Long tenantId) {
         try {
-            Point update = pointService.update(point);
+            Point update = pointService.update(point.setTenantId(tenantId));
             if (null != update) {
                 notifyService.notifyDriverPoint(Common.Driver.Point.UPDATE, update);
                 return R.ok(update);
@@ -112,8 +112,9 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Page<Point>> list(PointDto pointDto) {
+    public R<Page<Point>> list(PointDto pointDto, Long tenantId) {
         try {
+            pointDto.setTenantId(tenantId);
             Page<Point> page = pointService.list(pointDto);
             if (null != page) {
                 return R.ok(page);

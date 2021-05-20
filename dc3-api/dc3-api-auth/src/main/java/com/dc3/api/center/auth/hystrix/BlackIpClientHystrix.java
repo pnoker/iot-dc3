@@ -18,8 +18,8 @@ import com.dc3.api.center.auth.feign.BlackIpClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.BlackIpDto;
 import com.dc3.common.model.BlackIp;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,7 +39,7 @@ public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
         return new BlackIpClient() {
 
             @Override
-            public R<BlackIp> add(BlackIp blackIp) {
+            public R<BlackIp> add(BlackIp blackIp, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -49,7 +49,7 @@ public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
             }
 
             @Override
-            public R<BlackIp> update(BlackIp blackIp) {
+            public R<BlackIp> update(BlackIp blackIp, Long tenantId) {
                 return R.fail(message);
             }
 
@@ -59,17 +59,17 @@ public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
             }
 
             @Override
-            public R<BlackIp> selectByIp(String ip) {
+            public R<BlackIp> selectByIp(String ip, Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
+            public R<Page<BlackIp>> list(BlackIpDto blackIpDto, Long tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> checkBlackIpValid(String ip) {
+            public R<Boolean> checkBlackIpValid(String ip, Long tenantId) {
                 return R.fail(message);
             }
         };
