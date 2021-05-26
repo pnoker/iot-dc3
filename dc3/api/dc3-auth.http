@@ -45,8 +45,8 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 重置 User 密码
-#/auth/user/restPassword/:id
-POST http://localhost:8300/auth/user/rest/1
+#/auth/user/reset/:id
+POST http://localhost:8300/auth/user/reset/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -88,7 +88,7 @@ Cache-Control: no-cache
 }
 
 
-### 检测用户是否存在
+### 检测 User 是否存在并有效
 #/auth/user/check/:name
 GET http://localhost:8300/auth/user/check/dc3
 Accept: */*
@@ -155,6 +155,7 @@ POST http://localhost:8300/auth/black_ip/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
 
 {
   "ip": "127.0.0.1",
@@ -168,6 +169,7 @@ POST http://localhost:8300/auth/black_ip/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
 
 {
   "id": 1,
@@ -189,6 +191,7 @@ Cache-Control: no-cache
 GET http://localhost:8300/auth/black_ip/ip/127.0.0.1
 Accept: */*
 Cache-Control: no-cache
+X-Auth-Tenant-Id:-1
 
 
 ### 分页查询 BlackIp
@@ -197,6 +200,7 @@ POST http://localhost:8300/auth/black_ip/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
+X-Auth-Tenant-Id:-1
 
 {
   "ip": "",
@@ -213,11 +217,12 @@ Cache-Control: no-cache
 }
 
 
-### 检测BlackIp是否存在
+### 查询 BlackIp 是否存在并有效
 #/auth/black_ip/check/:ip
 GET http://localhost:8300/auth/black_ip/check/192.168.0.1
 Accept: */*
 Cache-Control: no-cache
+X-Auth-Tenant-Id:-1
 
 
 ### 根据 ID 删除 BlackIp
