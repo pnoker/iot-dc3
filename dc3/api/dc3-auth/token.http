@@ -1,0 +1,60 @@
+#
+#  Copyright 2016-2021 Pnoker. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+### --------------------- Token ---------------------
+### 生成用户 Salt
+#/auth/token/salt
+GET http://localhost:8300/auth/token/salt
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=pnoker
+
+
+### 生成用户 Token 令牌
+#/auth/token/generate
+# pnoker/10e339be1130a90dc1b9ff0332abced6
+# Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6"+"verfdkkq")
+POST http://localhost:8300/auth/token/generate
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "pnoker",
+  "password": "a7e77f9e8eb23326c13526d576f6ddea"
+}
+
+
+### 检测用户 Token 令牌是否有效
+#/auth/token/:token
+GET http://localhost:8300/auth/token/check
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=pnoker&salt=55j0122u9v5gthhp&token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwbm9rZXIiLCJpc3MiOiJwbm9rZXIvZGMzIiwiaWF0IjoxNjA4ODAyMjIzLCJleHAiOjE2MDg4NDU0MjN9.8tfdKHZHUXpJqIPUzx_YuyHPXFpOgWbCd2tShu2qRKw
+
+
+### 注销用户 Token 令牌
+#/auth/token/cancel
+GET http://localhost:8300/auth/token/cancel
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Cache-Control: no-cache
+
+username=pnoker
