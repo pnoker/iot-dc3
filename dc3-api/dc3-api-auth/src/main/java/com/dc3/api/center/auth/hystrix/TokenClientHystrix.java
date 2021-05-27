@@ -14,8 +14,8 @@
 package com.dc3.api.center.auth.hystrix;
 
 import com.dc3.api.center.auth.feign.TokenClient;
+import com.dc3.common.bean.Login;
 import com.dc3.common.bean.R;
-import com.dc3.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -37,22 +37,22 @@ public class TokenClientHystrix implements FallbackFactory<TokenClient> {
         return new TokenClient() {
 
             @Override
-            public R<String> generateSalt(String username, Long tenantId) {
+            public R<String> generateSalt(String name) {
                 return R.fail(message);
             }
 
             @Override
-            public R<String> generateToken(User user, Long tenantId) {
+            public R<String> generateToken(Login login) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Long> checkTokenValid(String username, String salt, String token, Long tenantId) {
+            public R<Long> checkTokenValid(Login login) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> cancelToken(String username, Long tenantId) {
+            public R<Boolean> cancelToken(String name) {
                 return R.fail(message);
             }
 

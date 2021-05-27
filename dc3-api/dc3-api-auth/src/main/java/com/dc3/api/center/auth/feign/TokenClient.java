@@ -14,13 +14,16 @@
 package com.dc3.api.center.auth.feign;
 
 import com.dc3.api.center.auth.hystrix.TokenClientHystrix;
+import com.dc3.common.bean.Login;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.User;
+import com.dc3.common.utils.Dc3Util;
 import com.dc3.common.valid.Auth;
+import com.dc3.common.valid.Check;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
 
@@ -35,39 +38,40 @@ public interface TokenClient {
     /**
      * 生成用户随机 Salt
      *
-     * @param username Username
+     * @param name Username
      * @return R<String>
      */
-    @GetMapping("/salt")
-    R<String> generateSalt(@NotNull @RequestParam(value = "username") String username, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    @PostMapping("/salt")
+    R<String> generateSalt(@NotNull @RequestBody String name);
 
     /**
      * 生成用户 Token 令牌
      *
-     * @param user
+     * @param login Login
      * @return R<String>
      */
     @PostMapping("/generate")
-    R<String> generateToken(@Validated(Auth.class) @RequestBody User user, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<String> generateToken(@Validated(Auth.class) @RequestBody Login login);
 
     /**
      * 检测用户 Token 令牌是否有效
      *
-     * @param username Username
-     * @param salt     Salt
-     * @param token    Token
+     * @param login Login
      * @return R<Boolean>
      */
-    @GetMapping("/check")
-    R<Long> checkTokenValid(@NotNull @RequestParam(value = "username") String username, @NotNull @RequestParam(value = "salt") String salt, @NotNull @RequestParam(value = "token") String token, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    @PostMapping("/check")
+    R<Long> checkTokenValid(@Validated(Check.class) @RequestBody Login login);
 
     /**
      * 注销用户的Token令牌
      *
-     * @param username Username
+     * @param name Username
      * @return R<Boolean>
      */
-    @GetMapping("/cancel")
-    R<Boolean> cancelToken(@NotNull @RequestParam(value = "username") String username, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    @PostMapping("/cancel")
+    R<Boolean> cancelToken(@NotNull @RequestBody String name);
 
+    static void main(String[] args) {
+        System.out.println(Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6" + "dsb785i4ikx0h4wt"));
+    }
 }
