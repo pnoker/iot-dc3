@@ -39,7 +39,7 @@ public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
         return new BlackIpClient() {
 
             @Override
-            public R<BlackIp> add(BlackIp blackIp, Long tenantId) {
+            public R<BlackIp> add(BlackIp blackIp) {
                 return R.fail(message);
             }
 
@@ -49,7 +49,7 @@ public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
             }
 
             @Override
-            public R<BlackIp> update(BlackIp blackIp, Long tenantId) {
+            public R<BlackIp> update(BlackIp blackIp) {
                 return R.fail(message);
             }
 
@@ -59,17 +59,17 @@ public class BlackIpClientHystrix implements FallbackFactory<BlackIpClient> {
             }
 
             @Override
-            public R<BlackIp> selectByIp(String ip, Long tenantId) {
+            public R<BlackIp> selectByIp(String ip) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<BlackIp>> list(BlackIpDto blackIpDto, Long tenantId) {
+            public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> checkBlackIpValid(String ip, Long tenantId) {
+            public R<Boolean> checkBlackIpValid(String ip) {
                 return R.fail(message);
             }
         };

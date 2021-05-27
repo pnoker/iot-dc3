@@ -23,7 +23,10 @@ import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
 
@@ -42,7 +45,7 @@ public interface UserClient {
      * @return User
      */
     @PostMapping("/add")
-    R<User> add(@Validated(Insert.class) @RequestBody User user, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<User> add(@Validated(Insert.class) @RequestBody User user);
 
     /**
      * 根据 ID 删除 User
@@ -63,7 +66,7 @@ public interface UserClient {
      * @return User
      */
     @PostMapping("/update")
-    R<User> update(@Validated(Update.class) @RequestBody User user, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<User> update(@Validated(Update.class) @RequestBody User user);
 
     /**
      * 根据 ID 重置 User 密码
@@ -90,7 +93,7 @@ public interface UserClient {
      * @return User
      */
     @GetMapping("/name/{name}")
-    R<User> selectByName(@NotNull @PathVariable(value = "name") String name, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<User> selectByName(@NotNull @PathVariable(value = "name") String name);
 
     /**
      * 分页查询 User
@@ -99,7 +102,7 @@ public interface UserClient {
      * @return Page<User>
      */
     @PostMapping("/list")
-    R<Page<User>> list(@RequestBody(required = false) UserDto userDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Page<User>> list(@RequestBody(required = false) UserDto userDto);
 
     /**
      * 检测用户是否存在
@@ -108,6 +111,6 @@ public interface UserClient {
      * @return Boolean
      */
     @GetMapping("/check/{name}")
-    R<Boolean> checkUserValid(@NotNull @PathVariable(value = "name") String name, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Boolean> checkUserValid(@NotNull @PathVariable(value = "name") String name);
 
 }
