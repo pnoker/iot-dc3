@@ -17,44 +17,50 @@
 ### --------------------- Token ---------------------
 ### 生成用户 Salt
 #/auth/token/salt
-GET http://localhost:8300/auth/token/salt
+POST http://localhost:8300/auth/token/salt
 Accept: */*
-Content-Type: application/x-www-form-urlencoded
+Content-Type: text/plain
 Cache-Control: no-cache
 
-username=pnoker
+pnoker
 
 
 ### 生成用户 Token 令牌
 #/auth/token/generate
 # pnoker/10e339be1130a90dc1b9ff0332abced6
 # Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6"+"verfdkkq")
-POST http://localhost:8300/auth/token/generate
+POST http://localhost:8300/auth/token/generate?tenant=default
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
 {
+  "tenant": "default",
   "name": "pnoker",
-  "password": "a7e77f9e8eb23326c13526d576f6ddea"
+  "salt": "dsb785i4ikx0h4wt",
+  "password": "8f9812cee01121acb1f3cab6a08e58c4"
 }
 
 
 ### 检测用户 Token 令牌是否有效
 #/auth/token/:token
-GET http://localhost:8300/auth/token/check
+POST http://localhost:8300/auth/token/check
 Accept: */*
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 Cache-Control: no-cache
 
-username=pnoker&salt=55j0122u9v5gthhp&token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwbm9rZXIiLCJpc3MiOiJwbm9rZXIvZGMzIiwiaWF0IjoxNjA4ODAyMjIzLCJleHAiOjE2MDg4NDU0MjN9.8tfdKHZHUXpJqIPUzx_YuyHPXFpOgWbCd2tShu2qRKw
+{
+    "name": "pnoker",
+    "salt": "dsb785i4ikx0h4wt",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwbm9rZXIvZGMzIiwic3ViIjoicG5va2VyIiwiaWF0IjoxNjIyMTEwNTE5LCJleHAiOjE2MjIxNTM3MTl9.WeE8iLppqPhNNqhNFTlGvEiq6EQBhdxb7z8AER8N_vQ"
+}
 
 
 ### 注销用户 Token 令牌
 #/auth/token/cancel
-GET http://localhost:8300/auth/token/cancel
+POST http://localhost:8300/auth/token/cancel
 Accept: */*
-Content-Type: application/x-www-form-urlencoded
+Content-Type: text/plain
 Cache-Control: no-cache
 
-username=pnoker
+pnoker

@@ -1,0 +1,127 @@
+#
+#  Copyright 2016-2021 Pnoker. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+### --------------------- Driver ---------------------
+### 新增 Driver
+#/manager/driver/add
+POST http://localhost:8400/manager/driver/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
+
+{
+  "name": "测试驱动",
+  "serviceName": "dc3-driver-test",
+  "host": "127.0.0.1",
+  "port": 8799,
+  "description": "测试驱动"
+}
+
+
+### 新增 Driver
+#/manager/driver/batch_import
+POST http://localhost:8400/manager/driver/batch_import
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+< ./file/batch-import.json
+
+
+### 修改 Driver
+#/manager/driver/update
+POST http://localhost:8400/manager/driver/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
+
+{
+  "id": 1,
+  "name": "测试驱动",
+  "serviceName": "dc3-driver-test",
+  "host": "127.0.0.1",
+  "port": 8799,
+  "description": "测试驱动"
+}
+
+
+### 根据 ID 查询 Driver
+#/manager/driver/id/:id
+GET http://localhost:8400/manager/driver/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 ServiceName 查询 Driver
+#/manager/driver/service/:serviceName
+GET http://localhost:8400/manager/driver/service/dc3-driver-test
+Accept: */*
+Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
+
+
+### 查询 Driver 服务状态
+#/manager/status/driver，支持name\serverName\host模糊查询，port精准查询
+POST http://localhost:8400/manager/status/driver
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 分页查询 Driver
+#/manager/driver/list，支持name\serverName\host模糊查询，port精准查询
+POST http://localhost:8400/manager/driver/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 根据 ID 删除 Driver
+#/manager/driver/delete/:id
+POST http://localhost:8400/manager/driver/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
