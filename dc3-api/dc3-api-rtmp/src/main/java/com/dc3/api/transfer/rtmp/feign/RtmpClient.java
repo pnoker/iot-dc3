@@ -40,7 +40,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/add")
-    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Rtmp
@@ -58,7 +58,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/update")
-    R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Rtmp
@@ -76,7 +76,7 @@ public interface RtmpClient {
      * @return R<Page < Rtmp>>
      */
     @PostMapping("/list")
-    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 启动 Rtmp 转码任务
