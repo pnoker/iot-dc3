@@ -1,0 +1,84 @@
+#
+#  Copyright 2016-2021 Pnoker. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+### --------------------- Driver Info ---------------------
+### 新增 DriverInfo
+#/manager/driver_info/add
+POST http://localhost:8400/manager/driver_info/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "driverAttributeId": 1,
+  "value": "localhost",
+  "profileId": -1,
+  "description": "测试驱动配置"
+}
+
+
+### 修改 DriverInfo
+#/manager/driver_info/update
+POST http://localhost:8400/manager/driver_info/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "driverAttributeId": 1,
+  "value": "localhost",
+  "profileId": -1,
+  "description": "测试驱动配置"
+}
+
+
+### 根据 ID 查询 DriverInfo
+#/manager/driver_info/id/:id
+GET http://localhost:8400/manager/driver_info/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+
+### 分页查询 DriverInfo
+#/manager/driver_info/list，支持driverAttributeId\profileId精准查询
+POST http://localhost:8400/manager/driver_info/list
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 根据 ID 删除 DriverInfo
+#/manager/driver_info/delete/:id
+POST http://localhost:8400/manager/driver_info/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+###
