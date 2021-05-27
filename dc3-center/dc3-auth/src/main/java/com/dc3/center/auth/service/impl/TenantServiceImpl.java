@@ -119,7 +119,11 @@ public class TenantServiceImpl implements TenantService {
     public Tenant selectByName(String name) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
         queryWrapper.eq(Tenant::getName, name);
-        return tenantMapper.selectOne(queryWrapper);
+        Tenant tenant = tenantMapper.selectOne(queryWrapper);
+        if (null == tenant) {
+            throw new NotFoundException("The tenant does not exist");
+        }
+        return tenant;
     }
 
     @Override

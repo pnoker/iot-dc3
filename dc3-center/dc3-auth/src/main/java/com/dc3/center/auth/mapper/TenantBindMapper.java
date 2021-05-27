@@ -11,31 +11,17 @@
  * limitations under the License.
  */
 
-package com.dc3.center.auth.service;
+package com.dc3.center.auth.mapper;
 
-import com.dc3.common.base.Service;
-import com.dc3.common.dto.BlackIpDto;
-import com.dc3.common.model.BlackIp;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.dc3.common.model.TenantBind;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * User Interface
+ * Mapper
  *
  * @author pnoker
  */
-public interface BlackIpService extends Service<BlackIp, BlackIpDto> {
-    /**
-     * 根据 Ip 查询 BlackIp
-     *
-     * @param ip IP
-     * @return BlackIp
-     */
-    BlackIp selectByIp(String ip);
-
-    /**
-     * 根据 Ip 是否在Ip黑名单列表
-     *
-     * @param ip IP
-     * @return boolean
-     */
-    boolean checkBlackIpValid(String ip);
+@Mapper
+public interface TenantBindMapper extends BaseMapper<TenantBind> {
 }

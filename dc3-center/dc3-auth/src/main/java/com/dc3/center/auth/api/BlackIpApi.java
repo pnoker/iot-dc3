@@ -40,9 +40,9 @@ public class BlackIpApi implements BlackIpClient {
     private BlackIpService blackIpService;
 
     @Override
-    public R<BlackIp> add(BlackIp blackIp, Long tenantId) {
+    public R<BlackIp> add(BlackIp blackIp) {
         try {
-            BlackIp add = blackIpService.add(blackIp.setTenantId(tenantId));
+            BlackIp add = blackIpService.add(blackIp);
             if (null != add) {
                 return R.ok(add);
             }
@@ -62,9 +62,9 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<BlackIp> update(BlackIp blackIp, Long tenantId) {
+    public R<BlackIp> update(BlackIp blackIp) {
         try {
-            BlackIp update = blackIpService.update(blackIp.setTenantId(tenantId));
+            BlackIp update = blackIpService.update(blackIp);
             if (null != update) {
                 return R.ok(update);
             }
@@ -88,9 +88,9 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<BlackIp> selectByIp(String ip, Long tenantId) {
+    public R<BlackIp> selectByIp(String ip) {
         try {
-            BlackIp select = blackIpService.selectByIp(ip, tenantId);
+            BlackIp select = blackIpService.selectByIp(ip);
             if (null != select) {
                 return R.ok(select);
             }
@@ -101,9 +101,8 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<Page<BlackIp>> list(BlackIpDto blackIpDto, Long tenantId) {
+    public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
         try {
-            blackIpDto.setTenantId(tenantId);
             Page<BlackIp> page = blackIpService.list(blackIpDto);
             if (null != page) {
                 return R.ok(page);
@@ -115,9 +114,9 @@ public class BlackIpApi implements BlackIpClient {
     }
 
     @Override
-    public R<Boolean> checkBlackIpValid(String ip, Long tenantId) {
+    public R<Boolean> checkBlackIpValid(String ip) {
         try {
-            return blackIpService.checkBlackIpValid(ip, tenantId) ? R.ok() : R.fail();
+            return blackIpService.checkBlackIpValid(ip) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

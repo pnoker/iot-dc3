@@ -27,18 +27,34 @@ public interface UserService extends Service<User, UserDto> {
     /**
      * 根据用户名查询用户
      *
-     * @param nama
+     * @param nama Username
      * @return User
      */
-    User selectByName(String nama, Long tenantId);
+    User selectByName(String nama);
+
+    /**
+     * 根据手机号查询用户
+     *
+     * @param phone Phone
+     * @return User
+     */
+    User selectByPhone(String phone);
+
+    /**
+     * 根据邮箱查询用户
+     *
+     * @param email Email
+     * @return User
+     */
+    User selectByEmail(String email);
 
     /**
      * 根据用户名判断用户是否存在
      *
-     * @param name
+     * @param name Username
      * @return boolean
      */
-    boolean checkUserValid(String name, Long tenantId);
+    boolean checkUserValid(String name);
 
     /**
      * 重置密码

@@ -40,9 +40,9 @@ public class UserApi implements UserClient {
     private UserService userService;
 
     @Override
-    public R<User> add(User user, Long tenantId) {
+    public R<User> add(User user) {
         try {
-            User add = userService.add(user.setTenantId(tenantId));
+            User add = userService.add(user);
             if (null != add) {
                 return R.ok(add);
             }
@@ -62,9 +62,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<User> update(User user, Long tenantId) {
+    public R<User> update(User user) {
         try {
-            User update = userService.update(user.setName(null).setTenantId(tenantId));
+            User update = userService.update(user.setName(null));
             if (null != update) {
                 return R.ok(update);
             }
@@ -97,9 +97,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<User> selectByName(String name, Long tenantId) {
+    public R<User> selectByName(String name) {
         try {
-            User select = userService.selectByName(name, tenantId);
+            User select = userService.selectByName(name);
             if (null != select) {
                 return R.ok(select);
             }
@@ -110,9 +110,8 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Page<User>> list(UserDto userDto, Long tenantId) {
+    public R<Page<User>> list(UserDto userDto) {
         try {
-            userDto.setTenantId(tenantId);
             Page<User> page = userService.list(userDto);
             if (null != page) {
                 return R.ok(page);
@@ -124,9 +123,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Boolean> checkUserValid(String name, Long tenantId) {
+    public R<Boolean> checkUserValid(String name) {
         try {
-            return userService.checkUserValid(name, tenantId) ? R.ok() : R.fail();
+            return userService.checkUserValid(name) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

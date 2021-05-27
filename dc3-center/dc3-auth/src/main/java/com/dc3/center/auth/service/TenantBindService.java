@@ -14,28 +14,23 @@
 package com.dc3.center.auth.service;
 
 import com.dc3.common.base.Service;
-import com.dc3.common.dto.BlackIpDto;
-import com.dc3.common.model.BlackIp;
+import com.dc3.common.dto.TenantBindDto;
+import com.dc3.common.model.TenantBind;
 
 /**
- * User Interface
+ * TenantBind Interface
  *
  * @author pnoker
  */
-public interface BlackIpService extends Service<BlackIp, BlackIpDto> {
-    /**
-     * 根据 Ip 查询 BlackIp
-     *
-     * @param ip IP
-     * @return BlackIp
-     */
-    BlackIp selectByIp(String ip);
+public interface TenantBindService extends Service<TenantBind, TenantBindDto> {
 
     /**
-     * 根据 Ip 是否在Ip黑名单列表
+     * 根据 租户ID 和 关联的对象ID 查询
      *
-     * @param ip IP
-     * @return boolean
+     * @param tenantId TenantID
+     * @param entityId entityId
+     * @param type     Type
+     * @return TenantBind
      */
-    boolean checkBlackIpValid(String ip);
+    TenantBind selectByTenantIdAndEntityId(Long tenantId, Long entityId, String type);
 }
