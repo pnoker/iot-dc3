@@ -22,10 +22,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 /**
  * 驱动表
@@ -45,7 +42,7 @@ public class Driver extends Description {
     private String name;
 
     @NotBlank(message = "service name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid service name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_]{1,31}$", message = "invalid service name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String serviceName;
 
     @NotBlank(message = "host can't be empty", groups = {Insert.class})

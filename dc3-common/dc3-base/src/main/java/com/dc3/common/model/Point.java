@@ -64,7 +64,26 @@ public class Point extends Description {
     @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
     private Long profileId;
 
+    @JsonSerialize(using = ToStringSerializer.class)
+    // TODO 后期实现位号分组 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
+    private Long groupId;
+
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long tenantId;
+
+    public Point(String name, String type, Short rw, Float base, Float minimum, Float maximum, Float multiple, Boolean accrue, String format, String unit, Long profileId, Long tenantId) {
+        this.name = name;
+        this.type = type;
+        this.rw = rw;
+        this.base = base;
+        this.minimum = minimum;
+        this.maximum = maximum;
+        this.multiple = multiple;
+        this.accrue = accrue;
+        this.format = format;
+        this.unit = unit;
+        this.profileId = profileId;
+        this.tenantId = tenantId;
+    }
 }

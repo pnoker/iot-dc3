@@ -77,6 +77,33 @@ public class Dc3Util {
      * @param str String
      * @return Byte Array
      */
+    public static String encodeString(String str) {
+        return new String(
+                Base64.getEncoder().encode(str.getBytes(StandardCharsets.UTF_8)),
+                StandardCharsets.UTF_8
+        );
+    }
+
+    /**
+     * 必须配合encodeString使用，用于encodeString编码之后解码
+     *
+     * @param str String
+     * @return Byte Array
+     */
+    public static String decodeString(String str) {
+        return new String(
+                Base64.getDecoder().decode(str),
+                StandardCharsets.UTF_8
+        );
+    }
+
+
+    /**
+     * 将字符串进行Base64编码
+     *
+     * @param str String
+     * @return Byte Array
+     */
     public static byte[] encode(String str) {
         return Base64.getEncoder().encode(str.getBytes(StandardCharsets.UTF_8));
     }
@@ -153,7 +180,7 @@ public class Dc3Util {
      * @return boolean
      */
     public static boolean isPhone(String phone) {
-        String regex = "^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$";
+        String regex = "^[1]([3-9])[0-9]{9}$";
         return ReUtil.isMatch(regex, phone);
     }
 
@@ -164,7 +191,7 @@ public class Dc3Util {
      * @return boolean
      */
     public static boolean isMail(String mail) {
-        String regex = "^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$";
+        String regex = "^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$";
         return ReUtil.isMatch(regex, mail);
     }
 

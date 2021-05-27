@@ -17,8 +17,6 @@ import com.dc3.common.valid.Auth;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -42,6 +40,12 @@ public class User extends Description {
     @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "invalid name , /^[a-zA-Z]\\w{2,15}$/", groups = {Insert.class})
     private String name;
 
+    @Pattern(regexp = "^[1]([3-9])[0-9]{9}$", message = "invalid phone , /^[1]([3-9])[0-9]{9}$/", groups = {Insert.class, Update.class})
+    private String phone;
+
+    @Pattern(regexp = "^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$", message = "invalid email , /^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$/", groups = {Insert.class, Update.class})
+    private String email;
+
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @NotBlank(message = "password can't be empty", groups = {Insert.class, Auth.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "invalid password , /^[a-zA-Z]\\w{7,15}$/", groups = {Insert.class, Update.class})
@@ -49,7 +53,4 @@ public class User extends Description {
 
     private Boolean enable;
 
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long tenantId;
 }

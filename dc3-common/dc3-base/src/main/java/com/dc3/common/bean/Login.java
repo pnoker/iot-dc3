@@ -11,20 +11,19 @@
  * limitations under the License.
  */
 
-package com.dc3.common.model;
+package com.dc3.common.bean;
 
-import com.dc3.common.valid.Insert;
-import com.dc3.common.valid.Update;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import lombok.*;
+import com.dc3.common.valid.Auth;
+import com.dc3.common.valid.Check;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 /**
- * 标签表
+ * Login
  *
  * @author pnoker
  */
@@ -32,14 +31,21 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class Label extends Description {
+public class Login {
 
+    @NotBlank(message = "tenant can't be empty", groups = {Auth.class})
+    private String tenant;
+
+    @NotBlank(message = "name can't be empty", groups = {Check.class, Auth.class})
     private String name;
-    private String color;
 
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long tenantId;
+    @NotBlank(message = "salt can't be empty", groups = {Check.class, Auth.class})
+    private String salt;
+
+    @NotBlank(message = "password can't be empty", groups = {Auth.class})
+    private String password;
+
+    @NotBlank(message = "token can't be empty", groups = {Check.class})
+    private String token;
+
 }

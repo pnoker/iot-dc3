@@ -11,35 +11,38 @@
  * limitations under the License.
  */
 
-package com.dc3.common.model;
+package com.dc3.common.dto;
 
-import com.dc3.common.valid.Insert;
-import com.dc3.common.valid.Update;
+import com.dc3.common.base.Converter;
+import com.dc3.common.bean.Pages;
+import com.dc3.common.model.TenantBind;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
-import lombok.experimental.Accessors;
-
-import javax.validation.constraints.NotNull;
+import org.springframework.beans.BeanUtils;
 
 /**
- * 标签表
+ * TenantBind DTO
  *
  * @author pnoker
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Label extends Description {
+public class TenantBindDto extends TenantBind implements Converter<TenantBind, TenantBindDto> {
 
-    private String name;
-    private String color;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
 
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long tenantId;
+    @Override
+    public void convertToDo(TenantBind bind) {
+        BeanUtils.copyProperties(this, bind);
+    }
+
+    @Override
+    public TenantBindDto convert(TenantBind bind) {
+        BeanUtils.copyProperties(bind, this);
+        return this;
+    }
 }
