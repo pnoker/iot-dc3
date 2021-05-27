@@ -14,7 +14,8 @@
 package com.dc3.gateway.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.dc3.common.exception.ServiceException;
+import com.dc3.common.exception.NotFoundException;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 import java.util.Objects;
@@ -57,9 +58,24 @@ public class GatewayUtil {
     public static String getRequestHeader(ServerHttpRequest request, String key) {
         String header = request.getHeaders().getFirst(key);
         if (!StrUtil.isNotBlank(header)) {
-            throw new ServiceException("Invalid request header of " + key);
+            throw new NotFoundException("Invalid request header of " + key);
         }
         return header;
+    }
+
+    /**
+     * 获取 Request Cookie
+     *
+     * @param request ServerHttpRequest
+     * @param key     cookie key
+     * @return request cookie value
+     */
+    public static String getRequestCookie(ServerHttpRequest request, String key) {
+        HttpCookie cookie = request.getCookies().getFirst(key);
+        if (null == cookie || !StrUtil.isNotBlank(cookie.getValue())) {
+            throw new NotFoundException("Invalid request cookie of " + key);
+        }
+        return cookie.getValue();
     }
 
     /**
@@ -70,6 +86,7 @@ public class GatewayUtil {
      */
     public static String getTenant(ServerHttpRequest request) {
         String path = request.getURI().getPath();
+        //TODO
         return path;
     }
 }
