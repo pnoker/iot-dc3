@@ -42,7 +42,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/add")
-    R<Label> add(@Validated(Insert.class) @RequestBody Label label, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Label> add(@Validated(Insert.class) @RequestBody Label label, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Label
@@ -60,7 +60,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/update")
-    R<Label> update(@Validated(Update.class) @RequestBody Label label, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Label> update(@Validated(Update.class) @RequestBody Label label, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Label
@@ -78,6 +78,6 @@ public interface LabelClient {
      * @return Page<Label>
      */
     @PostMapping("/list")
-    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }

@@ -42,7 +42,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/add")
-    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Profile
@@ -60,7 +60,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/update")
-    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Profile
@@ -78,6 +78,6 @@ public interface ProfileClient {
      * @return Page<Profile>
      */
     @PostMapping("/list")
-    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }
