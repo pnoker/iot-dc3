@@ -64,7 +64,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<Dictionary> userDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(User::getTenantId, tenantId);
         List<User> userList = userMapper.selectList(queryWrapper);
         for (User user : userList) {
             Dictionary driverDictionary = new Dictionary().setLabel(user.getName()).setValue(user.getId());
@@ -78,7 +77,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<Dictionary> blackIpDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
-        queryWrapper.eq(BlackIp::getTenantId, tenantId);
         List<BlackIp> blackIpList = blackIpMapper.selectList(queryWrapper);
         for (BlackIp blackIp : blackIpList) {
             Dictionary driverDictionary = new Dictionary().setLabel(blackIp.getIp()).setValue(blackIp.getId());

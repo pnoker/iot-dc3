@@ -49,14 +49,14 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#blackIp.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip+'.'+#blackIp.tenantId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public BlackIp add(BlackIp blackIp) {
-        BlackIp select = selectByIp(blackIp.getIp(), blackIp.getTenantId());
+        BlackIp select = selectByIp(blackIp.getIp());
         if (null != select) {
             throw new ServiceException("The ip already exists in the blacklist");
         }
@@ -86,7 +86,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#blackIp.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip+'.'+#blackIp.tenantId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
@@ -109,11 +109,10 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#ip+'.'+#tenantId", unless = "#result==null")
-    public BlackIp selectByIp(String ip, Long tenantId) {
+    @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#ip", unless = "#result==null")
+    public BlackIp selectByIp(String ip) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         queryWrapper.eq(BlackIp::getIp, ip);
-        queryWrapper.eq(BlackIp::getTenantId, tenantId);
         return blackIpMapper.selectOne(queryWrapper);
     }
 
@@ -127,8 +126,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public boolean checkBlackIpValid(String ip, Long tenantId) {
-        BlackIp blackIp = selectByIp(ip, tenantId);
+    public boolean checkBlackIpValid(String ip) {
+        BlackIp blackIp = selectByIp(ip);
         if (null != blackIp) {
             return blackIp.getEnable();
         }
@@ -142,7 +141,6 @@ public class BlackIpServiceImpl implements BlackIpService {
             if (StrUtil.isNotBlank(blackIpDto.getIp())) {
                 queryWrapper.like(BlackIp::getIp, blackIpDto.getIp());
             }
-            queryWrapper.eq(BlackIp::getTenantId, blackIpDto.getTenantId());
         }
         return queryWrapper;
     }
