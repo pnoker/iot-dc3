@@ -70,20 +70,10 @@ management:
     health:
       show-details: ALWAYS
 
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 30000
-  threadpool:
-    default:
-      coreSize: 1024
-
 eureka:
   instance:
     prefer-ip-address: true
+    hostname: @project.artifactId@
     status-page-url-path: /actuator/info
     health-check-url-path: /actuator/health
     lease-renewal-interval-in-seconds: 10
