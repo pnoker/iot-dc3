@@ -15,7 +15,6 @@ package com.dc3.common.model;
 
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
@@ -24,7 +23,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotNull;
 
 /**
- * 标签表
+ * 租户关系表
  *
  * @author pnoker
  */
@@ -34,12 +33,15 @@ import javax.validation.constraints.NotNull;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Label extends Description {
+public class TenantBind extends Description {
 
-    private String name;
-    private String color;
-
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "tenant id can't be empty", groups = {Insert.class, Update.class})
     private Long tenantId;
+
+    @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "entity id can't be empty", groups = {Insert.class, Update.class})
+    private Long entityId;
+
+    private String type;
 }

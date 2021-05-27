@@ -23,7 +23,7 @@ public interface Common {
     /**
      * 默认密钥
      */
-    String KEY = "pnoker/dc3/";
+    String KEY = "pnoker/dc3";
 
     /**
      * 默认密码
@@ -67,6 +67,10 @@ public interface Common {
         String OK = "ok";
         String ERROR = "error";
         String CONTENT_TYPE = "Content-Type";
+    }
+
+    interface Entity {
+        String USER = "user";
     }
 
     /**
@@ -254,6 +258,7 @@ public interface Common {
         String DC3_AUTH_SALT = "X-Auth-Salt";
         String DC3_AUTH_TOKEN = "X-Auth-Token";
         String DC3_AUTH_USER_ID = "X-Auth-User-Id";
+        String DC3_AUTH_TENANT = "X-Auth-Tenant";
         String DC3_AUTH_TENANT_ID = "X-Auth-Tenant-Id";
 
         /**
@@ -329,14 +334,18 @@ public interface Common {
         String SEPARATOR = "::";
 
         String ID = "_id";
+        String ENTITY_ID = "_entity_id";
         String DRIVER_ID = "_driver_id";
         String PROFILE_ID = "_profile_id";
         String GROUP_ID = "_group_id";
         String DEVICE_ID = "_device_id";
         String POINT_ID = "_point_id";
         String ATTRIBUTE_ID = "_attribute_id";
+        String TENANT_ID = "_tenant_id";
 
         String NAME = "_name";
+        String PHONE = "_phone";
+        String EMAIL = "_email";
         String VALUE = "_value";
         String STATUS = "_status";
         String LIST = "_list";
@@ -363,6 +372,7 @@ public interface Common {
         String LABEL_BIND = "label_bind";
         String BLACK_IP = "black_ip";
         String TENANT = "tenant";
+        String TENANT_BIND = "tenant_bind";
 
         String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
         String DRIVER_STATUS_KEY_PREFIX = Common.Cache.DRIVER + Common.Cache.STATUS + Common.Cache.SEPARATOR;

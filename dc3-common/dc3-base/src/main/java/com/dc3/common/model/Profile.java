@@ -48,7 +48,18 @@ public class Profile extends Description {
     @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
     private Long driverId;
 
+    @JsonSerialize(using = ToStringSerializer.class)
+    // TODO 后期实现模版分组 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
+    private Long groupId;
+
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long tenantId;
+
+    public Profile(String name, Boolean share, Long driverId, Long tenantId) {
+        this.name = name;
+        this.share = share;
+        this.driverId = driverId;
+        this.tenantId = tenantId;
+    }
 }
