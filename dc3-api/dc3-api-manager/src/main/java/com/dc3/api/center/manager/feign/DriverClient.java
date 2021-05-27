@@ -42,7 +42,7 @@ public interface DriverClient {
      * @return Driver
      */
     @PostMapping("/add")
-    R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Driver
@@ -60,7 +60,7 @@ public interface DriverClient {
      * @return Driver
      */
     @PostMapping("/update")
-    R<Driver> update(@Validated(Update.class) @RequestBody Driver driver, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Driver> update(@Validated(Update.class) @RequestBody Driver driver, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Driver
@@ -88,7 +88,7 @@ public interface DriverClient {
      * @return Driver
      */
     @GetMapping("/host/{host}/port/{port}")
-    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 分页查询 Driver
@@ -97,6 +97,6 @@ public interface DriverClient {
      * @return Page<Driver>
      */
     @PostMapping("/list")
-    R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }

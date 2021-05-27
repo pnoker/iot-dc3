@@ -43,7 +43,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/add")
-    R<Point> add(@Validated(Insert.class) @RequestBody Point point, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Point> add(@Validated(Insert.class) @RequestBody Point point, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Point
@@ -61,7 +61,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/update")
-    R<Point> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Point> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Point
@@ -88,6 +88,6 @@ public interface PointClient {
      * @return Page<Point>
      */
     @PostMapping("/list")
-    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }

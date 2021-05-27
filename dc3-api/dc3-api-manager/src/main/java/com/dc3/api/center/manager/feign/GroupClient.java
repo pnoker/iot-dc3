@@ -42,7 +42,7 @@ public interface GroupClient {
      * @return Group
      */
     @PostMapping("/add")
-    R<Group> add(@Validated(Insert.class) @RequestBody Group group, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Group> add(@Validated(Insert.class) @RequestBody Group group, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Group
@@ -60,7 +60,7 @@ public interface GroupClient {
      * @return Group
      */
     @PostMapping("/update")
-    R<Group> update(@Validated(Update.class) @RequestBody Group group, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Group> update(@Validated(Update.class) @RequestBody Group group, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Group
@@ -78,6 +78,6 @@ public interface GroupClient {
      * @return Page<Group>
      */
     @PostMapping("/list")
-    R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto, @RequestHeader(Common.Service.DC3_AUTH_TENANT_ID) Long tenantId);
+    R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }
