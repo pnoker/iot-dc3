@@ -15,7 +15,6 @@ package com.dc3.gateway.filter;
 
 import com.dc3.api.center.auth.feign.BlackIpClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
 import com.dc3.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -41,16 +40,16 @@ public class BlackIpGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return 1;
+        return 0;
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         String remoteIp = GatewayUtil.getRemoteIp(request);
-        String headerTenantId = GatewayUtil.getRequestHeader(request, Common.Service.DC3_AUTH_TENANT_ID);
-        R<Boolean> blackIpValid = blackIpClient.checkBlackIpValid(remoteIp, Long.parseLong(headerTenantId));
-        if (null == blackIpValid || blackIpValid.isOk()) {
+
+        R<Boolean> blackIpValid = blackIpClient.checkBlackIpValid(remoteIp);
+        if (blackIpValid.isOk()) {
             log.error("Forbidden Ip: {}", remoteIp);
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             return exchange.getResponse().setComplete();
