@@ -20,6 +20,23 @@
     <version>1.3.1.SR</version>
     <packaging>pom</packaging>
 
+    <developers>
+        <developer>
+            <id>pnoker</id>
+            <name>pnoker</name>
+            <email>pnokers@icloud.com</email>
+            <organization>pnoker.github.io</organization>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <name>${project.artifactId}</name>
     <url>https://github.com/pnoker/iot-dc3</url>
     <inceptionYear>2017-2020</inceptionYear>
@@ -205,9 +222,56 @@
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub DC3 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
+        </repository>
+    </distributionManagement>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-plugin</id>
+            <name>spring-plugin</name>
+            <url>https://maven.aliyun.com/repository/spring-plugin</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>Aliyun Apache Maven Packages</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>github</id>
+            <name>GitHub DC3 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <finalName>${project.name}</finalName>
@@ -341,58 +405,5 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <developers>
-        <developer>
-            <id>pnoker</id>
-            <name>pnoker</name>
-            <email>pnokers@icloud.com</email>
-            <organization>pnoker.github.io</organization>
-        </developer>
-    </developers>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub DC3 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>aliyun</id>
-            <name>aliyun</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-plugin</id>
-            <name>spring-plugin</name>
-            <url>https://maven.aliyun.com/repository/spring-plugin</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
 </project>
