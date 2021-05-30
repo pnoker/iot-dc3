@@ -44,6 +44,8 @@ public class Profile extends Description {
 
     private Boolean share;
 
+    private Boolean enable;
+
     @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
     private Long driverId;

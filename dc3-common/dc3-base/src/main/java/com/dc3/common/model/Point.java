@@ -60,6 +60,8 @@ public class Point extends Description {
     private String format;
     private String unit;
 
+    private Boolean enable;
+
     @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
     private Long profileId;
@@ -72,7 +74,8 @@ public class Point extends Description {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long tenantId;
 
-    public Point(String name, String type, Short rw, Float base, Float minimum, Float maximum, Float multiple, Boolean accrue, String format, String unit, Long profileId, Long tenantId) {
+    public Point(String name, String type, Short rw, Float base, Float minimum, Float maximum, Float multiple,
+                 Boolean accrue, String format, String unit, Long profileId, Long tenantId) {
         this.name = name;
         this.type = type;
         this.rw = rw;

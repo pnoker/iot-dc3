@@ -53,6 +53,8 @@ public class Driver extends Description {
     @Max(value = 8799, message = "invalid port,port range is 8600-8799", groups = {Insert.class, Update.class})
     private Integer port;
 
+    private Boolean enable;
+
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonSerialize(using = ToStringSerializer.class)
     private Long tenantId;

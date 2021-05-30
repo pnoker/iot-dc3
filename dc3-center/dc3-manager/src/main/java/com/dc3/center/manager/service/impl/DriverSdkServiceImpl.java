@@ -58,14 +58,12 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     public void driverRegister(DriverRegister driverRegister) {
         // check tenant
         R<Tenant> tenantR = tenantClient.selectByName(driverRegister.getTenant());
-        if (tenantR.isOk()) {
-            driverRegister.getDriver().setTenantId(tenantR.getData().getId());
-        } else {
+        if (!tenantR.isOk()) {
             throw new ServiceException("Invalid {}, {}", driverRegister.getTenant(), tenantR.getMessage());
         }
 
         // register driver
-        Driver driver = driverRegister.getDriver();
+        Driver driver = driverRegister.getDriver().setTenantId(tenantR.getData().getId());
         log.info("Register driver {}", driver);
         try {
             Driver byServiceName = driverService.selectByServiceName(driver.getServiceName());
