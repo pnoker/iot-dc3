@@ -249,9 +249,9 @@
 
     <repositories>
         <repository>
-            <id>aliyun</id>
+            <id>aliyun-nexus</id>
             <name>Aliyun Apache Maven Packages</name>
-            <url>https://maven.aliyun.com/repository/public</url>
+            <url>https://maven.aliyun.com/repository/central</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -261,7 +261,7 @@
         </repository>
 
         <repository>
-            <id>github</id>
+            <id>github-dc3</id>
             <name>GitHub DC3 Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
             <releases>
