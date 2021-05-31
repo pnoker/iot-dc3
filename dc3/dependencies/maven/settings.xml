@@ -123,6 +123,13 @@
           <passphrase>optional; leave empty if not used.</passphrase>
         </server>
         -->
+
+        <server>
+            <id>github</id>
+            <username>pnoker</username>
+            <password>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</password>
+        </server>
+
     </servers>
 
     <!-- mirrors
