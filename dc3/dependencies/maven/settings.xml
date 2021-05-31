@@ -127,7 +127,7 @@
         <server>
             <id>github-dc3</id>
             <username>pnoker</username>
-            <password>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</password>
+            <password>${GITHUB_DC3_TOKEN}</password>
         </server>
 
     </servers>
