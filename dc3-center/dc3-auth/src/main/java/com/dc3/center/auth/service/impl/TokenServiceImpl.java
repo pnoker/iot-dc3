@@ -74,7 +74,7 @@ public class TokenServiceImpl implements TokenService {
         Tenant tempTenant = tenantService.selectByName(tenant);
         User tempUser = userService.selectByName(name);
         if (tempTenant.getEnable() && tempUser.getEnable()) {
-            tenantBindService.selectByTenantIdAndEntityId(tempTenant.getId(), tempUser.getId(), Common.Entity.USER);
+            tenantBindService.selectByTenantIdAndUserId(tempTenant.getId(), tempUser.getId());
             String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + name;
             String tempSalt = redisUtil.getKey(redisSaltKey, String.class);
             if (StrUtil.isNotBlank(tempSalt) && tempSalt.equals(salt)) {

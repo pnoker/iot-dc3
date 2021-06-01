@@ -13,7 +13,6 @@
 
 package com.dc3.center.auth.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,7 +49,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.ID, key = "#tenantBind.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.ENTITY_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.entityId+'.'+#tenantBind.type", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.userId+'.'+#tenantBind.type", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -68,7 +67,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.ENTITY_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -82,7 +81,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.ID, key = "#tenantBind.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.ENTITY_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.entityId+'.'+#tenantBind.type", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.userId+'.'+#tenantBind.type", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -109,12 +108,11 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.ENTITY_ID, key = "#tenantId+'.'+#entityId+'.'+#type", unless = "#result==null")
-    public TenantBind selectByTenantIdAndEntityId(Long tenantId, Long entityId, String type) {
+    @Cacheable(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, key = "#tenantId+'.'+#userId", unless = "#result==null")
+    public TenantBind selectByTenantIdAndUserId(Long tenantId, Long userId) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
         queryWrapper.eq(TenantBind::getTenantId, tenantId);
-        queryWrapper.eq(TenantBind::getEntityId, entityId);
-        queryWrapper.eq(TenantBind::getType, type);
+        queryWrapper.eq(TenantBind::getUserId, userId);
         TenantBind tenantBind = tenantBindMapper.selectOne(queryWrapper);
         if (null == tenantBind) {
             throw new NotFoundException("The tenant bind does not exist");
@@ -138,11 +136,8 @@ public class TenantBindServiceImpl implements TenantBindService {
             if (null != tenantBindDto.getTenantId()) {
                 queryWrapper.eq(TenantBind::getTenantId, tenantBindDto.getTenantId());
             }
-            if (null != tenantBindDto.getEntityId()) {
-                queryWrapper.eq(TenantBind::getEntityId, tenantBindDto.getEntityId());
-            }
-            if (StrUtil.isNotBlank(tenantBindDto.getType())) {
-                queryWrapper.eq(TenantBind::getType, tenantBindDto.getType());
+            if (null != tenantBindDto.getUserId()) {
+                queryWrapper.eq(TenantBind::getUserId, tenantBindDto.getUserId());
             }
         }
         return queryWrapper;
