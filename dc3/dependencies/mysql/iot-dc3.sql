@@ -130,6 +130,30 @@ CREATE TABLE `dc3_profile`
   ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for dc3_profile_bind
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_profile_bind`;
+CREATE TABLE `dc3_profile_bind`
+(
+    `id`          bigint(20)                                              NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `profile_id`  bigint(20)                                              NOT NULL COMMENT '模版ID',
+    `device_id`   bigint(20)                                              NOT NULL COMMENT '设备ID',
+    `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+    `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+    `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `profile_id` (`profile_id`) USING BTREE,
+    INDEX `device_id` (`device_id`) USING BTREE,
+    CONSTRAINT `dc3_profile_bind_ibfk_1` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT `dc3_profile_bind_ibfk_2` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '设备与模版映射关联表'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for dc3_driver_info
 -- ----------------------------
 DROP TABLE IF EXISTS `dc3_driver_info`;

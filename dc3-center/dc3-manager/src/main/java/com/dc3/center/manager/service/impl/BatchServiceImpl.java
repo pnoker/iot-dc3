@@ -148,7 +148,9 @@ public class BatchServiceImpl implements BatchService {
                 if (infoMap.size() > 0) {
                     devicePointInfoMap.put(device.getId(), infoMap);
                 }
-                Map<String, Long> nameMap = getPointNameMap(device.getProfileId());
+
+                //todo bug getDriverId
+                Map<String, Long> nameMap = getPointNameMap(device.getDriverId());
                 if (nameMap.size() > 0) {
                     devicePointNameMap.put(device.getId(), nameMap);
                 }
@@ -615,7 +617,8 @@ public class BatchServiceImpl implements BatchService {
      */
     public Map<Long, Map<String, AttributeInfo>> getDevicePointInfoMap(Device device, Map<Long, Map<Long, Point>> profilePointMap, Map<Long, PointAttribute> pointAttributeMap) {
         Map<Long, Map<String, AttributeInfo>> attributeInfoMap = new ConcurrentHashMap<>(16);
-        profilePointMap.get(device.getProfileId()).keySet()
+        //todo bug getDriverId
+        profilePointMap.get(device.getDriverId()).keySet()
                 .forEach(pointId -> {
                     List<PointInfo> pointInfos = pointInfoService.selectByDeviceIdAndPointId(device.getId(), pointId);
                     Map<String, AttributeInfo> infoMap = new ConcurrentHashMap<>(16);
