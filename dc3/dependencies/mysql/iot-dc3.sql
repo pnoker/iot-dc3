@@ -162,16 +162,16 @@ CREATE TABLE `dc3_driver_info`
     `id`                  bigint(20)                                              NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `driver_attribute_id` bigint(20)                                              NOT NULL COMMENT '连接配置ID',
     `value`               varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '值',
-    `profile_id`          bigint(20)                                              NOT NULL COMMENT '模板ID',
+    `device_id`           bigint(20)                                              NOT NULL COMMENT '设备ID',
     `description`         varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time`         datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time`         datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
     `deleted`             tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `driver_attribute_id` (`driver_attribute_id`) USING BTREE,
-    INDEX `profile_id` (`profile_id`) USING BTREE,
+    INDEX `device_id` (`device_id`) USING BTREE,
     CONSTRAINT `dc3_driver_info_ibfk_1` FOREIGN KEY (`driver_attribute_id`) REFERENCES `dc3_driver_attribute` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT `dc3_driver_info_ibfk_2` FOREIGN KEY (`profile_id`) REFERENCES `dc3_profile` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT `dc3_driver_info_ibfk_2` FOREIGN KEY (`device_id`) REFERENCES `dc3_device` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   CHARACTER SET = utf8
