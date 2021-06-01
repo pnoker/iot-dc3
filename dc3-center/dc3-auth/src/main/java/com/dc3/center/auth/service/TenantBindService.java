@@ -25,12 +25,11 @@ import com.dc3.common.model.TenantBind;
 public interface TenantBindService extends Service<TenantBind, TenantBindDto> {
 
     /**
-     * 根据 租户ID 和 关联的对象ID 查询
+     * 根据 租户ID 和 关联的用户ID 查询
      *
      * @param tenantId TenantID
-     * @param entityId entityId
-     * @param type     Type
+     * @param userId   userId
      * @return TenantBind
      */
-    TenantBind selectByTenantIdAndEntityId(Long tenantId, Long entityId, String type);
+    TenantBind selectByTenantIdAndUserId(Long tenantId, Long userId);
 }

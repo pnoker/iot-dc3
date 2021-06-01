@@ -17,7 +17,6 @@ import com.dc3.api.center.auth.hystrix.TokenClientHystrix;
 import com.dc3.common.bean.Login;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
-import com.dc3.common.utils.Dc3Util;
 import com.dc3.common.valid.Auth;
 import com.dc3.common.valid.Check;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -70,8 +69,4 @@ public interface TokenClient {
      */
     @PostMapping("/cancel")
     R<Boolean> cancelToken(@NotNull @RequestBody String name);
-
-    static void main(String[] args) {
-        System.out.println(Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6" + "dsb785i4ikx0h4wt"));
-    }
 }
