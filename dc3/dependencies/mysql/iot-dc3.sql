@@ -307,16 +307,16 @@ CREATE TABLE `dc3_tenant_bind`
 (
     `id`          bigint(20)                                              NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `tenant_id`   bigint(20)                                              NOT NULL COMMENT '租户ID',
-    `entity_id`   bigint(20)                                              NOT NULL COMMENT '实体ID，可为用户、设备、设备组、模板、点位、用户',
-    `type`        varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '关联实体类型，user、device、profile、group、point',
+    `user_id`     bigint(20)                                              NOT NULL COMMENT '用户ID',
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `tenant_id` (`tenant_id`) USING BTREE,
-    INDEX `entity_id` (`entity_id`) USING BTREE,
-    CONSTRAINT `dc3_tenant_bind_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `dc3_tenant` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+    INDEX `user_id` (`user_id`) USING BTREE,
+    CONSTRAINT `dc3_tenant_bind_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `dc3_tenant` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT `dc3_tenant_bind_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `dc3_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   CHARACTER SET = utf8
@@ -433,15 +433,12 @@ CREATE TABLE `dc3_black_ip`
     `id`          bigint(20)                                              NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `ip`          varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT 'ip',
     `enable`      tinyint(4)                                              NULL DEFAULT 1 COMMENT '是否可用',
-    `tenant_id`   bigint(20)                                              NOT NULL COMMENT '租户ID',
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
     `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
     `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `ip` (`ip`) USING BTREE,
-    INDEX `tenant_id` (`tenant_id`) USING BTREE,
-    CONSTRAINT `dc3_black_ip_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `dc3_tenant` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+    UNIQUE INDEX `ip` (`ip`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   CHARACTER SET = utf8
@@ -464,7 +461,7 @@ VALUES (-1, 'pnoker', 18304071393, 'pnokers@icloud.com', '10e339be1130a90dc1b9ff
 -- Records of dc3_tenant_bind
 -- ----------------------------
 INSERT INTO `dc3_tenant_bind`
-VALUES (-1, -1, -1, 'user', '平台开发默认租户和默认用户关联', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
+VALUES (-1, -1, -1, '平台开发默认租户和默认用户关联', '2019-10-01 00:00:00', '2019-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_rtmp

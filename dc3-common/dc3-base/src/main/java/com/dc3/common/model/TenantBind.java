@@ -40,8 +40,7 @@ public class TenantBind extends Description {
     private Long tenantId;
 
     @JsonSerialize(using = ToStringSerializer.class)
-    @NotNull(message = "entity id can't be empty", groups = {Insert.class, Update.class})
-    private Long entityId;
+    @NotNull(message = "user id can't be empty", groups = {Insert.class, Update.class})
+    private Long userId;
 
-    private String type;
 }
