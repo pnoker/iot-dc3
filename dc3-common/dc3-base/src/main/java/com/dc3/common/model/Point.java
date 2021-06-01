@@ -67,7 +67,7 @@ public class Point extends Description {
     private Long profileId;
 
     @JsonSerialize(using = ToStringSerializer.class)
-    // TODO 后期实现位号分组 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
+    // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
