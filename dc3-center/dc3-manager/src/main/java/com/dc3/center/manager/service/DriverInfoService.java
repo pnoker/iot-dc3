@@ -27,16 +27,16 @@ import java.util.List;
 public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
 
     /**
-     * 根据模板属性配置 ID 和 模板 ID 查询
+     * 根据驱动属性配置 ID 和 设备 ID 查询
      *
      * @param driverAttributeId Driver Attribute Id
-     * @param profileId         Profile Id
+     * @param deviceId          Device Id
      * @return DriverInfo
      */
-    DriverInfo selectByAttributeIdAndProfileId(Long driverAttributeId, Long profileId);
+    DriverInfo selectByAttributeIdAndDeviceId(Long driverAttributeId, Long deviceId);
 
     /**
-     * 根据模板属性配置 ID 查询
+     * 根据驱动属性配置 ID 查询
      *
      * @param driverAttributeId Driver Attribute Id
      * @return DriverInfo Array
@@ -44,10 +44,10 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
     List<DriverInfo> selectByAttributeId(Long driverAttributeId);
 
     /**
-     * 根据模板 ID 查询
+     * 根据设备 ID 查询
      *
-     * @param profileId Profile Id
+     * @param deviceId Device Id
      * @return DriverInfo Array
      */
-    List<DriverInfo> selectByProfileId(Long profileId);
+    List<DriverInfo> selectByDeviceId(Long deviceId);
 }
