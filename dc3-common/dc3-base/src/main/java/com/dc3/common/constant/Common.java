@@ -61,16 +61,12 @@ public interface Common {
     String TEMP_FILE_PATH = System.getProperty("java.io.tmpdir") + "/dc3/";
 
     /**
-     * 应答语
+     * Http Response 相关常量
      */
     interface Response {
         String OK = "ok";
         String ERROR = "error";
         String CONTENT_TYPE = "Content-Type";
-    }
-
-    interface Entity {
-        String USER = "user";
     }
 
     /**
@@ -334,45 +330,47 @@ public interface Common {
         String SEPARATOR = "::";
 
         String ID = "_id";
-        String ENTITY_ID = "_entity_id";
-        String DRIVER_ID = "_driver_id";
-        String PROFILE_ID = "_profile_id";
-        String GROUP_ID = "_group_id";
-        String DEVICE_ID = "_device_id";
-        String POINT_ID = "_point_id";
-        String ATTRIBUTE_ID = "_attribute_id";
         String TENANT_ID = "_tenant_id";
+        String USER_ID = "_user_id";
+        String DRIVER_ID = "_driver_id";
+        String GROUP_ID = "_group_id";
+        String PROFILE_ID = "_profile_id";
+        String POINT_ID = "_point_id";
+        String DEVICE_ID = "_device_id";
+        String ATTRIBUTE_ID = "_attribute_id";
+        String ENTITY_ID = "_entity_id";
 
+        String TENANT = "tenant";
+        String TENANT_BIND = "tenant_bind";
+        String BLACK_IP = "black_ip";
+        String RTMP = "rtmp";
+        String USER = "user";
         String NAME = "_name";
         String PHONE = "_phone";
         String EMAIL = "_email";
         String VALUE = "_value";
         String STATUS = "_status";
-        String LIST = "_list";
-        String DIC = "_dic";
         String SALT = "_salt";
         String TOKEN = "_token";
         String LIMIT = "_limit";
-        String SERVICE_NAME = "_service_name";
+        String LIST = "_list";
+        String DIC = "_dic";
         String IP = "_ip";
-        String HOST_PORT = "_host_port";
 
+        String HOST_PORT = "_host_port";
+        String SERVICE_NAME = "_service_name";
         String DRIVER = "driver";
-        String DRIVER_ATTRIBUTE = "driver_attribute";
         String DRIVER_INFO = "driver_info";
+        String DRIVER_ATTRIBUTE = "driver_attribute";
         String PROFILE = "profile";
+        String PROFILE_BIND = "profile_bind";
         String GROUP = "group";
         String DEVICE = "device";
         String POINT = "point";
         String POINT_ATTRIBUTE = "point_attribute";
         String POINT_INFO = "point_info";
-        String USER = "user";
-        String RTMP = "rtmp";
         String LABEL = "label";
         String LABEL_BIND = "label_bind";
-        String BLACK_IP = "black_ip";
-        String TENANT = "tenant";
-        String TENANT_BIND = "tenant_bind";
 
         String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
         String DRIVER_STATUS_KEY_PREFIX = Common.Cache.DRIVER + Common.Cache.STATUS + Common.Cache.SEPARATOR;
