@@ -18,7 +18,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.GroupMapper;
-import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.GroupService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
@@ -47,10 +46,10 @@ import java.util.Optional;
 public class GroupServiceImpl implements GroupService {
 
     @Resource
-    private DeviceService deviceService;
-    @Resource
     private GroupMapper groupMapper;
 
+
+    //todo 分组逻辑需要调整，同时支持驱动、模版、位号、设备，分组只是一种UI上的显示逻辑，不影响实际数据采集
     @Override
     @Caching(
             put = {
@@ -84,13 +83,8 @@ public class GroupServiceImpl implements GroupService {
             }
     )
     public boolean delete(Long id) {
-        try {
-            deviceService.selectDeviceByGroupId(id);
-            throw new ServiceException("The group already bound by the device");
-        } catch (NotFoundException notFoundException) {
-            selectById(id);
-            return groupMapper.deleteById(id) > 0;
-        }
+        selectById(id);
+        return groupMapper.deleteById(id) > 0;
     }
 
     @Override
