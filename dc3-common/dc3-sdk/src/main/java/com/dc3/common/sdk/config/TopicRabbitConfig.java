@@ -43,8 +43,8 @@ public class TopicRabbitConfig {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         rabbitTemplate.setMandatory(true);
-        rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
-            log.error("Send message({}) to exchange({}), routingKey({}) failed: {}", message, exchange, routingKey, replyText);
+        rabbitTemplate.setReturnsCallback((message) -> {
+            log.error("Send message({}) to exchange({}), routingKey({}) failed: {}", message.getMessage(), message.getExchange(), message.getRoutingKey(), message.getReplyText());
         });
         rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
             if (!ack) {
