@@ -17,14 +17,18 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.model.Driver;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * <p>Driver Interface
  *
  * @author pnoker
  */
 public interface DriverService extends Service<Driver, DriverDto> {
+
     /**
-     * 根据驱动 SERVICE NAME 查询
+     * 根据 驱动ServiceName 查询 驱动
      *
      * @param serviceName Driver Service Name
      * @return Driver
@@ -32,7 +36,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Driver selectByServiceName(String serviceName);
 
     /**
-     * 根据驱动 HOST & PORT 查询
+     * 根据 驱动 Host & Port 查询 驱动
      *
      * @param host Driver Service Host
      * @param port Driver Service Port
@@ -41,7 +45,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Driver selectByHostPort(String host, Integer port, Long tenantId);
 
     /**
-     * 根据 DEVICE ID 查询
+     * 根据 驱动Id 查询 驱动
      *
      * @param deviceId Device Id
      * @return Driver
@@ -49,11 +53,19 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Driver selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 PROFILE ID 查询
+     * 根据 驱动Id集 查询 驱动集
+     *
+     * @param ids Driver Id Array
+     * @return Driver Array
+     */
+    List<Driver> selectByIds(Set<Long> ids);
+
+    /**
+     * 根据 模版Id 查询 驱动集
      *
      * @param profileId Profile Id
-     * @return Driver
+     * @return Driver Array
      */
-    Driver selectByProfileId(Long profileId);
+    List<Driver> selectByProfileId(Long profileId);
 
 }

@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DriverMapper;
 import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.DriverService;
-import com.dc3.center.manager.service.ProfileService;
+import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverDto;
@@ -29,7 +29,6 @@ import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Driver;
-import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -38,6 +37,9 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>DriverService Impl
@@ -51,7 +53,7 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private DriverMapper driverMapper;
     @Resource
-    private ProfileService profileService;
+    private ProfileBindService profileBindService;
     @Resource
     private DeviceService deviceService;
 
@@ -94,13 +96,8 @@ public class DriverServiceImpl implements DriverService {
             }
     )
     public boolean delete(Long id) {
-        try {
-            profileService.selectByDriverId(id);
-            throw new ServiceException("The driver already bound by the profile");
-        } catch (NotFoundException notFoundException1) {
-            selectById(id);
-            return driverMapper.deleteById(id) > 0;
-        }
+        selectById(id);
+        return driverMapper.deleteById(id) > 0;
     }
 
     @Override
@@ -142,15 +139,7 @@ public class DriverServiceImpl implements DriverService {
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, key = "#deviceId", unless = "#result==null")
     public Driver selectByDeviceId(Long deviceId) {
         Device device = deviceService.selectById(deviceId);
-        Profile profile = profileService.selectById(device.getProfileId());
-        return selectById(profile.getDriverId());
-    }
-
-    @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
-    public Driver selectByProfileId(Long profileId) {
-        Profile profile = profileService.selectById(profileId);
-        return selectById(profile.getDriverId());
+        return selectById(device.getDriverId());
     }
 
     @Override
@@ -177,6 +166,21 @@ public class DriverServiceImpl implements DriverService {
             throw new NotFoundException("The driver does not exist");
         }
         return driver;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public List<Driver> selectByIds(Set<Long> ids) {
+        return driverMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
+    public List<Driver> selectByProfileId(Long profileId) {
+        Set<Long> deviceIds = profileBindService.selectByProfileId(profileId);
+        List<Device> devices = deviceService.selectByIds(deviceIds);
+        Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
+        return selectByIds(driverIds);
     }
 
     @Override
