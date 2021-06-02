@@ -42,7 +42,7 @@ public class DriverInfo extends Description {
     private String value;
 
     @JsonSerialize(using = ToStringSerializer.class)
-    @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
-    private Long profileId;
+    @NotNull(message = "device id can't be empty", groups = {Insert.class, Update.class})
+    private Long deviceId;
 
 }
