@@ -32,7 +32,10 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>ProfileBindService Impl
@@ -42,6 +45,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class ProfileBindServiceImpl implements ProfileBindService {
+
     @Resource
     private ProfileBindMapper profileBindMapper;
 
@@ -49,6 +53,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Caching(
             put = {@CachePut(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#profileBind.id", condition = "#result!=null")},
             evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
@@ -64,6 +70,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -77,6 +85,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Caching(
             put = {@CachePut(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#profileBind.id", condition = "#result!=null")},
             evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
@@ -98,6 +108,24 @@ public class ProfileBindServiceImpl implements ProfileBindService {
             throw new NotFoundException("The profile bind does not exist");
         }
         return profileBind;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
+    public Set<Long> selectByProfileId(Long profileId) {
+        ProfileBindDto profileBindDto = new ProfileBindDto();
+        profileBindDto.setProfileId(profileId);
+        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));
+        return profileBinds.stream().map(ProfileBind::getDeviceId).collect(Collectors.toSet());
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, key = "#deviceId", unless = "#result==null")
+    public Set<Long> selectByDeviceId(Long deviceId) {
+        ProfileBindDto profileBindDto = new ProfileBindDto();
+        profileBindDto.setDeviceId(deviceId);
+        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));
+        return profileBinds.stream().map(ProfileBind::getProfileId).collect(Collectors.toSet());
     }
 
     @Override

@@ -47,11 +47,7 @@ public class Profile extends Description {
     private Boolean enable;
 
     @JsonSerialize(using = ToStringSerializer.class)
-    @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
-    private Long driverId;
-
-    @JsonSerialize(using = ToStringSerializer.class)
-    // TODO 后期实现模版分组 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
+    // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -61,7 +57,7 @@ public class Profile extends Description {
     public Profile(String name, Boolean share, Long driverId, Long tenantId) {
         this.name = name;
         this.share = share;
-        this.driverId = driverId;
+        //this.driverId = driverId;
         this.tenantId = tenantId;
     }
 }
