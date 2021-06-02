@@ -18,6 +18,7 @@ import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Point Interface
@@ -27,7 +28,7 @@ import java.util.List;
 public interface PointService extends Service<Point, PointDto> {
 
     /**
-     * 根据位号 NAME & 模板 ID 查询
+     * 根据 位号Name & 模板Id 查询位号
      *
      * @param name      Point Name
      * @param profileId Profile Id
@@ -36,7 +37,15 @@ public interface PointService extends Service<Point, PointDto> {
     Point selectByNameAndProfileId(String name, Long profileId);
 
     /**
-     * 根据 模板 ID 查询
+     * 根据 设备Id 查询位号
+     *
+     * @param deviceId Device Id
+     * @return Point Array
+     */
+    List<Point> selectByDeviceId(Long deviceId);
+
+    /**
+     * 根据 模板Id 查询位号
      *
      * @param profileId Profile Id
      * @return Point Array
@@ -44,10 +53,10 @@ public interface PointService extends Service<Point, PointDto> {
     List<Point> selectByProfileId(Long profileId);
 
     /**
-     * 根据 设备 ID 查询
+     * 根据 模板Id 集查询位号
      *
-     * @param deviceId Device Id
+     * @param profileIds Profile Id Set
      * @return Point Array
      */
-    List<Point> selectByDeviceId(Long deviceId);
+    List<Point> selectByProfileIds(Set<Long> profileIds);
 }

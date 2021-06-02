@@ -18,15 +18,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.PointMapper;
-import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.PointService;
+import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
-import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -36,8 +35,10 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * <p>PointService Impl
@@ -51,8 +52,7 @@ public class PointServiceImpl implements PointService {
     @Resource
     private PointMapper pointMapper;
     @Resource
-    private DeviceService deviceService;
-
+    private ProfileBindService profileBindService;
 
     @Override
     @Caching(
@@ -147,6 +147,12 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
+    public List<Point> selectByDeviceId(Long deviceId) {
+        Set<Long> profileIds = profileBindService.selectByDeviceId(deviceId);
+        return selectByProfileIds(profileIds);
+    }
+
+    @Override
     @Cacheable(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
     public List<Point> selectByProfileId(Long profileId) {
         PointDto pointDto = new PointDto();
@@ -159,9 +165,21 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<Point> selectByDeviceId(Long deviceId) {
-        Device device = deviceService.selectById(deviceId);
-        return selectByProfileId(device.getProfileId());
+    @Cacheable(value = Common.Cache.POINT + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public List<Point> selectByProfileIds(Set<Long> profileIds) {
+        List<Point> points = new ArrayList<>(16);
+        profileIds.forEach(profileId -> {
+            PointDto pointDto = new PointDto();
+            pointDto.setProfileId(profileId);
+            List<Point> pointList = pointMapper.selectList(fuzzyQuery(pointDto));
+            if (null != pointList) {
+                points.addAll(pointList);
+            }
+        });
+        if (points.size() < 1) {
+            throw new NotFoundException("The points does not exist");
+        }
+        return points;
     }
 
     @Override
