@@ -23,6 +23,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * NotifyService Impl
@@ -40,16 +41,18 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverProfile(String command, Profile profile) {
-        Driver driver = driverService.selectByProfileId(profile.getId());
-        if (null != driver) {
-            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.PROFILE).setCommand(command).setContent(profile);
-            notifyDriver(driver, operation);
+        List<Driver> drivers = driverService.selectByProfileId(profile.getId());
+        if (null != drivers) {
+            drivers.forEach(driver -> {
+                DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.PROFILE).setCommand(command).setContent(profile);
+                notifyDriver(driver, operation);
+            });
         }
     }
 
     @Override
     public void notifyDriverDevice(String command, Device device) {
-        Driver driver = driverService.selectByProfileId(device.getProfileId());
+        Driver driver = driverService.selectById(device.getDriverId());
         if (null != driver) {
             DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DEVICE).setCommand(command).setContent(device);
             notifyDriver(driver, operation);
@@ -58,17 +61,19 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void notifyDriverPoint(String command, Point point) {
-        Driver driver = driverService.selectByProfileId(point.getProfileId());
-        if (null != driver) {
-            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.POINT).setCommand(command).setContent(point);
-            notifyDriver(driver, operation);
+        List<Driver> drivers = driverService.selectByProfileId(point.getProfileId());
+        if (null != drivers) {
+            drivers.forEach(driver -> {
+                DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.POINT).setCommand(command).setContent(point);
+                notifyDriver(driver, operation);
+            });
         }
     }
 
 
     @Override
     public void notifyDriverDriverInfo(String command, DriverInfo driverInfo) {
-        Driver driver = driverService.selectByProfileId(driverInfo.getProfileId());
+        Driver driver = driverService.selectByDeviceId(driverInfo.getDeviceId());
         if (null != driver) {
             DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DRIVER_INFO).setCommand(command).setContent(driverInfo);
             notifyDriver(driver, operation);
@@ -87,7 +92,7 @@ public class NotifyServiceImpl implements NotifyService {
     /**
      * notify driver
      *
-     * @param driver    Driver
+     * @param driver              Driver
      * @param driverConfiguration DriverConfiguration
      */
     private void notifyDriver(Driver driver, DriverConfiguration driverConfiguration) {
