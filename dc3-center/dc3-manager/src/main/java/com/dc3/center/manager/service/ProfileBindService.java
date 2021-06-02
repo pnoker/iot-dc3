@@ -17,11 +17,29 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.ProfileBindDto;
 import com.dc3.common.model.ProfileBind;
 
+import java.util.Set;
+
 /**
  * <p>ProfileBind Interface
  *
  * @author pnoker
  */
 public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto> {
+
+    /**
+     * 根据 模版ID 查询关联的 设备ID 集合
+     *
+     * @param profileId Profile Id
+     * @return Device Id Set
+     */
+    Set<Long> selectByProfileId(Long profileId);
+
+    /**
+     * 根据 设备ID 查询关联的 模版ID 集合
+     *
+     * @param deviceId Device Id
+     * @return Profile Id Set
+     */
+    Set<Long> selectByDeviceId(Long deviceId);
 
 }

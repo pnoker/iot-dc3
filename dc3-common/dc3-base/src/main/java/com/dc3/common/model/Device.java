@@ -25,6 +25,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.Set;
 
 /**
  * 设备表
@@ -51,12 +52,15 @@ public class Device extends Description {
 
     private Boolean enable;
 
-    @JsonSerialize(using = ToStringSerializer.class)
-    @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
-    private Long profileId;
+    @TableField(exist = false)
+    private Set<Long> profileIds;
 
     @JsonSerialize(using = ToStringSerializer.class)
-    @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
+    @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
+    private Long driverId;
+
+    @JsonSerialize(using = ToStringSerializer.class)
+    // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -69,7 +73,7 @@ public class Device extends Description {
     public Device(String name, Long profileId, Long groupId) {
         super();
         this.name = name;
-        this.profileId = profileId;
+        //this.profileId = profileId;
         this.groupId = groupId;
     }
 }

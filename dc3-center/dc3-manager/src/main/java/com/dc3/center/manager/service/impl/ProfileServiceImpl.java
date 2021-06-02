@@ -18,8 +18,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.ProfileMapper;
-import com.dc3.center.manager.service.DeviceService;
-import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
@@ -39,6 +37,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * <p>ProfileService Impl
@@ -49,10 +48,6 @@ import java.util.Optional;
 @Service
 public class ProfileServiceImpl implements ProfileService {
 
-    @Resource
-    private DriverService driverService;
-    @Resource
-    private DeviceService deviceService;
     @Resource
     private PointService pointService;
     @Resource
@@ -66,7 +61,6 @@ public class ProfileServiceImpl implements ProfileService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -75,7 +69,6 @@ public class ProfileServiceImpl implements ProfileService {
             selectByName(profile.getName(), profile.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException) {
-            driverService.selectById(profile.getDriverId());
             if (profileMapper.insert(profile) > 0) {
                 return profileMapper.selectById(profile.getId());
             }
@@ -90,22 +83,16 @@ public class ProfileServiceImpl implements ProfileService {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
         try {
-            deviceService.selectDeviceByProfileId(id);
-            throw new ServiceException("The profile already bound by the device");
-        } catch (NotFoundException notFoundException1) {
-            try {
-                pointService.selectByProfileId(id);
-                throw new ServiceException("The profile already bound by the point");
-            } catch (NotFoundException notFoundException2) {
-                selectById(id);
-                return profileMapper.deleteById(id) > 0;
-            }
+            pointService.selectByProfileId(id);
+            throw new ServiceException("The profile already bound by the point");
+        } catch (NotFoundException notFoundException2) {
+            selectById(id);
+            return profileMapper.deleteById(id) > 0;
         }
     }
 
@@ -117,7 +104,6 @@ public class ProfileServiceImpl implements ProfileService {
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -156,15 +142,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
-    public List<Profile> selectByDriverId(Long driverId) {
-        ProfileDto profileDto = new ProfileDto();
-        profileDto.setDriverId(driverId);
-        List<Profile> profiles = profileMapper.selectList(fuzzyQuery(profileDto));
-        if (null == profiles || profiles.size() < 1) {
-            throw new NotFoundException("The profiles does not exist");
-        }
-        return profiles;
+    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public List<Profile> selectByIds(Set<Long> ids) {
+        return profileMapper.selectBatchIds(ids);
     }
 
     @Override
@@ -185,9 +165,6 @@ public class ProfileServiceImpl implements ProfileService {
             }
             if (null != profileDto.getShare()) {
                 queryWrapper.eq(Profile::getShare, profileDto.getShare());
-            }
-            if (null != profileDto.getDriverId()) {
-                queryWrapper.eq(Profile::getDriverId, profileDto.getDriverId());
             }
             queryWrapper.eq(Profile::getTenantId, profileDto.getTenantId());
         }

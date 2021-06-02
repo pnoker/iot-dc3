@@ -18,6 +18,7 @@ import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.model.Profile;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Profile Interface
@@ -25,19 +26,21 @@ import java.util.List;
  * @author pnoker
  */
 public interface ProfileService extends Service<Profile, ProfileDto> {
+
     /**
-     * 根据模板 NAME 查询
+     * 根据 模板Name 查询模版
      *
-     * @param name
+     * @param name Profile Name
      * @return Profile
      */
     Profile selectByName(String name, Long tenantId);
 
     /**
-     * 根据驱动 ID 查询
+     * 根据 模版Id集 查询模版
      *
-     * @param driverId driver id
+     * @param ids Profile Id Set
      * @return Profile Array
      */
-    List<Profile> selectByDriverId(Long driverId);
+    List<Profile> selectByIds(Set<Long> ids);
+
 }
