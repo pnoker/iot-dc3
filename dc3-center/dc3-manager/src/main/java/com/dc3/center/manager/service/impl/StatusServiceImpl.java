@@ -47,6 +47,14 @@ public class StatusServiceImpl implements StatusService {
     private DeviceService deviceService;
 
     @Override
+    public String driver(String serviceName) {
+        String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + serviceName;
+        String status = redisUtil.getKey(key, String.class);
+        status = null != status ? status : Common.Driver.Status.UNREGISTERED;
+        return status;
+    }
+
+    @Override
     public Map<Long, String> driver(DriverDto driverDto) {
         Map<Long, String> statusMap = new HashMap<>(16);
 
@@ -58,6 +66,14 @@ public class StatusServiceImpl implements StatusService {
             statusMap.put(driver.getId(), status);
         });
         return statusMap;
+    }
+
+    @Override
+    public String device(Long id) {
+        String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + id;
+        String status = redisUtil.getKey(key, String.class);
+        status = null != status ? status : Common.Driver.Status.UNREGISTERED;
+        return status;
     }
 
     @Override
