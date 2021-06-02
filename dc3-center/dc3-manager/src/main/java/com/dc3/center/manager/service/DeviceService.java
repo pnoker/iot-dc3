@@ -18,6 +18,7 @@ import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Device Interface
@@ -27,28 +28,28 @@ import java.util.List;
 public interface DeviceService extends Service<Device, DeviceDto> {
 
     /**
-     * 根据设备 NAME 和分组 ID 查询
+     * 根据 设备Name 和 租户Id 查询设备
      *
-     * @param name    Name
-     * @param groupId Group Id
+     * @param name     Device Name
+     * @param tenantId Tenant Id
      * @return Device
      */
-    Device selectDeviceByNameAndGroupId(String name, Long groupId);
+    Device selectByName(String name, Long tenantId);
 
     /**
-     * 根据模版 ID 查询
+     * 根据 驱动Id 查询该驱动下的全部设备
      *
-     * @param profileId Profile Id
+     * @param driverId Driver Id
      * @return Device Array
      */
-    List<Device> selectDeviceByProfileId(Long profileId);
+    List<Device> selectByDriverId(Long driverId);
 
     /**
-     * 根据分组 ID 查询
+     * 根据 设备Id集 查询设备
      *
-     * @param groupId Group Id
+     * @param ids Device Id Set
      * @return Device Array
      */
-    List<Device> selectDeviceByGroupId(Long groupId);
+    List<Device> selectByIds(Set<Long> ids);
 
 }

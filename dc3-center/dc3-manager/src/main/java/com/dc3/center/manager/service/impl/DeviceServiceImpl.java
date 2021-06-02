@@ -22,6 +22,7 @@ import com.dc3.center.manager.service.DeviceService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * <p>DeviceService Impl
@@ -52,19 +54,18 @@ public class DeviceServiceImpl implements DeviceService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, key = "#device.name+'.'+#device.groupId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Device add(Device device) {
         try {
-            selectDeviceByNameAndGroupId(device.getName(), device.getGroupId());
-            throw new ServiceException("The device already exists in the group");
+            selectByName(device.getName(), device.getTenantId());
+            throw new DuplicateException("The device already exists");
         } catch (NotFoundException notFoundException) {
             if (deviceMapper.insert(device) > 0) {
                 return deviceMapper.selectById(device.getId());
@@ -77,10 +78,9 @@ public class DeviceServiceImpl implements DeviceService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -93,12 +93,11 @@ public class DeviceServiceImpl implements DeviceService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, key = "#device.name+'.'+#device.groupId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -124,11 +123,11 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.NAME + Common.Cache.GROUP_ID, key = "#name+'.'+#groupId", unless = "#result==null")
-    public Device selectDeviceByNameAndGroupId(String name, Long groupId) {
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
+    public Device selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getName, name);
-        queryWrapper.eq(Device::getGroupId, groupId);
+        queryWrapper.eq(Device::getTenantId, tenantId);
         Device device = deviceMapper.selectOne(queryWrapper);
         if (null == device) {
             throw new NotFoundException("The device does not exist");
@@ -137,10 +136,10 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
-    public List<Device> selectDeviceByProfileId(Long profileId) {
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
+    public List<Device> selectByDriverId(Long driverId) {
         DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setProfileId(profileId);
+        deviceDto.setDriverId(driverId);
         List<Device> devices = deviceMapper.selectList(fuzzyQuery(deviceDto));
         if (null == devices || devices.size() < 1) {
             throw new NotFoundException("The devices does not exist");
@@ -149,15 +148,9 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.GROUP_ID + Common.Cache.LIST, key = "#groupId", unless = "#result==null")
-    public List<Device> selectDeviceByGroupId(Long groupId) {
-        DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setGroupId(groupId);
-        List<Device> devices = deviceMapper.selectList(fuzzyQuery(deviceDto));
-        if (null == devices || devices.size() < 1) {
-            throw new NotFoundException("The devices does not exist");
-        }
-        return devices;
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public List<Device> selectByIds(Set<Long> ids) {
+        return deviceMapper.selectBatchIds(ids);
     }
 
     @Override
@@ -176,8 +169,8 @@ public class DeviceServiceImpl implements DeviceService {
             if (StrUtil.isNotBlank(deviceDto.getName())) {
                 queryWrapper.like(Device::getName, deviceDto.getName());
             }
-            if (null != deviceDto.getProfileId()) {
-                queryWrapper.eq(Device::getProfileId, deviceDto.getProfileId());
+            if (null != deviceDto.getDriverId()) {
+                queryWrapper.eq(Device::getDriverId, deviceDto.getDriverId());
             }
             if (null != deviceDto.getGroupId()) {
                 queryWrapper.eq(Device::getGroupId, deviceDto.getGroupId());
