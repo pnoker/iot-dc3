@@ -86,17 +86,46 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
 
     @Override
     public void upsertProfile(Profile profile) {
-        // Add profile driver info to context
-        driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
-
         // Add profile point to context
-        driverContext.getDriverMetadata().getProfilePointMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
+        driverContext.getDriverMetadata().getPointMap().computeIfAbsent(profile.getId(), k -> new ConcurrentHashMap<>(16));
     }
 
     @Override
     public void deleteProfile(Long id) {
-        driverContext.getDriverMetadata().getProfileDriverInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
-        driverContext.getDriverMetadata().getProfilePointMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        driverContext.getDriverMetadata().getPointMap().entrySet().removeIf(next -> next.getKey().equals(id));
+    }
+
+    @Override
+    public void upsertDevice(Device device) {
+        // Add device driver info to context
+        driverContext.getDriverMetadata().getDriverInfoMap().computeIfAbsent(device.getId(), k -> new ConcurrentHashMap<>(16));
+        // Add device to context
+        driverContext.getDriverMetadata().getDeviceMap().put(device.getId(), device);
+        // Add device name to context
+        driverContext.getDriverMetadata().getDeviceNameMap().put(device.getName(), device.getId());
+    }
+
+    @Override
+    public void deleteDevice(Long id) {
+        driverContext.getDriverMetadata().getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        driverContext.getDriverMetadata().getDeviceNameMap().entrySet().removeIf(next -> next.getValue().equals(id));
+        driverContext.getDriverMetadata().getDriverInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        driverContext.getDriverMetadata().getPointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
+    }
+
+    @Override
+    public void upsertPoint(Point point) {
+        // Upsert point to profile point map context
+        driverContext.getDriverMetadata().getPointMap().computeIfAbsent(point.getProfileId(), k -> new ConcurrentHashMap<>(16)).put(point.getId(), point);
+    }
+
+    @Override
+    public void deletePoint(Long pointId, Long profileId) {
+        // Delete point from profile point map context
+        driverContext.getDriverMetadata().getPointMap().computeIfPresent(profileId, (k, v) -> {
+            v.entrySet().removeIf(next -> next.getKey().equals(pointId));
+            return v;
+        });
     }
 
     @Override
@@ -121,36 +150,6 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
                 return v;
             });
         }
-    }
-
-    @Override
-    public void upsertDevice(Device device) {
-        // Add device to context
-        driverContext.getDriverMetadata().getDeviceMap().put(device.getId(), device);
-        // Add device name to context
-        driverContext.getDriverMetadata().getDeviceNameMap().put(device.getName(), device.getId());
-    }
-
-    @Override
-    public void deleteDevice(Long id) {
-        driverContext.getDriverMetadata().getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
-        driverContext.getDriverMetadata().getDeviceNameMap().entrySet().removeIf(next -> next.getValue().equals(id));
-        driverContext.getDriverMetadata().getPointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
-    }
-
-    @Override
-    public void upsertPoint(Point point) {
-        // Upsert point to profile point map context
-        driverContext.getDriverMetadata().getPointMap().computeIfAbsent(point.getProfileId(), k -> new ConcurrentHashMap<>(16)).put(point.getId(), point);
-    }
-
-    @Override
-    public void deletePoint(Long pointId, Long profileId) {
-        // Delete point from profile point map context
-        driverContext.getDriverMetadata().getPointMap().computeIfPresent(profileId, (k, v) -> {
-            v.entrySet().removeIf(next -> next.getKey().equals(pointId));
-            return v;
-        });
     }
 
     @Override
