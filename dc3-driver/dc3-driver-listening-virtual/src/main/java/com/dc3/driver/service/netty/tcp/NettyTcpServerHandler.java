@@ -74,16 +74,16 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = (ByteBuf) msg;
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
-        Long deviceId = nettyTcpServerHandler.driverContext.getDeviceIdByDeviceName(deviceName);
+        Long deviceId = nettyTcpServerHandler.driverContext.getDeviceIdByName(deviceName);
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
 
         //TODO 简单的例子，用于存储channel，然后配合write接口实现向下发送数据
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
         List<PointValue> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyTcpServerHandler.driverContext.getDriverMetadata().getDevicePointInfoMap().get(deviceId);
+        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyTcpServerHandler.driverContext.getDriverMetadata().getPointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
-            Point point = nettyTcpServerHandler.driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
+            Point point = nettyTcpServerHandler.driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);
             int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
             int end = DriverUtils.value(infoMap.get("end").getType(), infoMap.get("end").getValue());
