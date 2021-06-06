@@ -62,7 +62,7 @@ public class DriverMetadata implements Serializable {
     private Map<String, Long> deviceNameMap;
 
     /**
-     * profileId,(pointId,point)
+     * profileId(pointId,point)
      */
     private Map<Long, Map<Long, Point>> pointMap;
 
