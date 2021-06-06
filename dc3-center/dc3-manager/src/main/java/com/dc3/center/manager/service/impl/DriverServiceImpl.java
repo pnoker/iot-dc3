@@ -178,9 +178,12 @@ public class DriverServiceImpl implements DriverService {
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
     public List<Driver> selectByProfileId(Long profileId) {
         Set<Long> deviceIds = profileBindService.selectByProfileId(profileId);
-        List<Device> devices = deviceService.selectByIds(deviceIds);
-        Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
-        return selectByIds(driverIds);
+        if (null != deviceIds && deviceIds.size() > 0) {
+            List<Device> devices = deviceService.selectByIds(deviceIds);
+            Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
+            return selectByIds(driverIds);
+        }
+        return null;
     }
 
     @Override
