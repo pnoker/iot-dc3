@@ -53,13 +53,6 @@ public interface DictionaryService {
     List<Dictionary> profileDictionary(Long tenantId);
 
     /**
-     * 获取分组字典
-     *
-     * @return
-     */
-    List<Dictionary> groupDictionary(Long tenantId);
-
-    /**
      * 获取设备字典
      * group/driver/profile
      *

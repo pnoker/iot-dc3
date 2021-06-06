@@ -66,14 +66,6 @@ public interface DictionaryClient {
     R<List<Dictionary>> profileDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
-     * 查询分组 Dictionary
-     *
-     * @return List<Dictionary>
-     */
-    @GetMapping("/group")
-    R<List<Dictionary>> groupDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
-
-    /**
      * 查询设备 Dictionary
      *
      * @param parent group/driver/profile

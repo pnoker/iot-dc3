@@ -89,19 +89,6 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> groupDictionary(Long tenantId) {
-        try {
-            List<Dictionary> dictionaryList = dictionaryService.groupDictionary(tenantId);
-            if (null != dictionaryList) {
-                return R.ok(dictionaryList);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
     public R<List<Dictionary>> deviceDictionary(String parent, Long tenantId) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.deviceDictionary(parent, tenantId);
