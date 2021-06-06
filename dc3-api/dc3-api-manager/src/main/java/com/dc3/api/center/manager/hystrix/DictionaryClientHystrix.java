@@ -59,11 +59,6 @@ public class DictionaryClientHystrix implements FallbackFactory<DictionaryClient
             }
 
             @Override
-            public R<List<Dictionary>> groupDictionary(Long tenantId) {
-                return R.fail(message);
-            }
-
-            @Override
             public R<List<Dictionary>> deviceDictionary(String parent, Long tenantId) {
                 return R.fail(message);
             }
