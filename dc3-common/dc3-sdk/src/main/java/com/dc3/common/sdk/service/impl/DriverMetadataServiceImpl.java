@@ -99,8 +99,6 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
     public void upsertDevice(Device device) {
         // Add device to context
         driverContext.getDriverMetadata().getDeviceMap().put(device.getId(), device);
-        // Add device name to context
-        driverContext.getDriverMetadata().getDeviceNameMap().put(device.getName(), device.getId());
         // Add device driver info to context
         driverContext.getDriverMetadata().getDriverInfoMap().computeIfAbsent(device.getId(), k -> new ConcurrentHashMap<>(16));
         // Add device point info to context
@@ -110,7 +108,6 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
     @Override
     public void deleteDevice(Long id) {
         driverContext.getDriverMetadata().getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
-        driverContext.getDriverMetadata().getDeviceNameMap().entrySet().removeIf(next -> next.getValue().equals(id));
         driverContext.getDriverMetadata().getDriverInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
         driverContext.getDriverMetadata().getPointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
     }

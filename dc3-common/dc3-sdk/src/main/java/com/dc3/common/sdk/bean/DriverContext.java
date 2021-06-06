@@ -105,20 +105,6 @@ public class DriverContext {
     }
 
     /**
-     * 根据 设备Name 获取设备Id
-     *
-     * @param deviceName Device Name
-     * @return Device Id
-     */
-    public Long getDeviceIdByName(String deviceName) {
-        Long deviceId = this.driverMetadata.getDeviceNameMap().get(deviceName);
-        if (null == deviceId) {
-            throw new NotFoundException("Device(" + deviceName + ") does not exist");
-        }
-        return deviceId;
-    }
-
-    /**
      * 根据 设备Id 获取位号
      *
      * @param deviceId Device Id
