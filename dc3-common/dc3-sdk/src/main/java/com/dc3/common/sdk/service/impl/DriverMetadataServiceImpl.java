@@ -135,19 +135,19 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
     public void deleteDevice(Long id) {
         driverContext.getDriverMetadata().getDeviceMap().entrySet().removeIf(next -> next.getKey().equals(id));
         driverContext.getDriverMetadata().getDeviceNameMap().entrySet().removeIf(next -> next.getValue().equals(id));
-        driverContext.getDriverMetadata().getDevicePointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
+        driverContext.getDriverMetadata().getPointInfoMap().entrySet().removeIf(next -> next.getKey().equals(id));
     }
 
     @Override
     public void upsertPoint(Point point) {
         // Upsert point to profile point map context
-        driverContext.getDriverMetadata().getProfilePointMap().computeIfAbsent(point.getProfileId(), k -> new ConcurrentHashMap<>(16)).put(point.getId(), point);
+        driverContext.getDriverMetadata().getPointMap().computeIfAbsent(point.getProfileId(), k -> new ConcurrentHashMap<>(16)).put(point.getId(), point);
     }
 
     @Override
     public void deletePoint(Long pointId, Long profileId) {
         // Delete point from profile point map context
-        driverContext.getDriverMetadata().getProfilePointMap().computeIfPresent(profileId, (k, v) -> {
+        driverContext.getDriverMetadata().getPointMap().computeIfPresent(profileId, (k, v) -> {
             v.entrySet().removeIf(next -> next.getKey().equals(pointId));
             return v;
         });
@@ -158,7 +158,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         // Add the point info to the device point info map context
         PointAttribute attribute = driverContext.getDriverMetadata().getPointAttributeMap().get(pointInfo.getPointAttributeId());
         if (null != attribute) {
-            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfAbsent(pointInfo.getDeviceId(), k -> new ConcurrentHashMap<>(16))
+            driverContext.getDriverMetadata().getPointInfoMap().computeIfAbsent(pointInfo.getDeviceId(), k -> new ConcurrentHashMap<>(16))
                     .computeIfAbsent(pointInfo.getPointId(), k -> new ConcurrentHashMap<>(16))
                     .put(attribute.getName(), new AttributeInfo(pointInfo.getValue(), attribute.getType()));
         }
@@ -171,7 +171,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             String attributeName = attribute.getName();
 
             // Delete the point info from the device info map context
-            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfPresent(deviceId, (key1, value1) -> {
+            driverContext.getDriverMetadata().getPointInfoMap().computeIfPresent(deviceId, (key1, value1) -> {
                 value1.computeIfPresent(pointId, (key2, value2) -> {
                     value2.entrySet().removeIf(next -> next.getKey().equals(attributeName));
                     return value2;
@@ -180,7 +180,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             });
 
             // If the point attribute is null, delete the point info from the device info map context
-            driverContext.getDriverMetadata().getDevicePointInfoMap().computeIfPresent(deviceId, (key, value) -> {
+            driverContext.getDriverMetadata().getPointInfoMap().computeIfPresent(deviceId, (key, value) -> {
                 value.entrySet().removeIf(next -> next.getValue().size() < 1);
                 return value;
             });

@@ -13,13 +13,13 @@
 
 package com.dc3.common.sdk.service.impl;
 
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
-import com.dc3.common.bean.driver.AttributeInfo;
+import com.dc3.common.model.PointValue;
 import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverCommandService;
+import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,10 +45,10 @@ public class DriverCommandServiceImpl implements DriverCommandService {
         Device device = driverContext.getDeviceByDeviceId(deviceId);
         try {
             String rawValue = driverCustomService.read(
-                    driverContext.getProfileDriverInfoByProfileId(device.getProfileId()),
-                    driverContext.getDevicePointInfoByDeviceIdAndPointId(deviceId, pointId),
+                    driverContext.getDriverInfoByDeviceId(deviceId),
+                    driverContext.getPointInfoByDeviceIdAndPointId(deviceId, pointId),
                     device,
-                    driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId)
+                    driverContext.getPointByDeviceIdAndPointId(deviceId, pointId)
             );
 
             PointValue pointValue = new PointValue(deviceId, pointId, rawValue, driverService.convertValue(deviceId, pointId, rawValue));
@@ -65,10 +65,10 @@ public class DriverCommandServiceImpl implements DriverCommandService {
         Device device = driverContext.getDeviceByDeviceId(deviceId);
         try {
             return driverCustomService.write(
-                    driverContext.getProfileDriverInfoByProfileId(device.getProfileId()),
-                    driverContext.getDevicePointInfoByDeviceIdAndPointId(deviceId, pointId),
+                    driverContext.getDriverInfoByDeviceId(deviceId),
+                    driverContext.getPointInfoByDeviceIdAndPointId(deviceId, pointId),
                     device,
-                    new AttributeInfo(value, driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId).getType())
+                    new AttributeInfo(value, driverContext.getPointByDeviceIdAndPointId(deviceId, pointId).getType())
             );
         } catch (Exception e) {
             log.error("DriverCommandServiceImpl.write{}", e.getMessage(), e);
