@@ -13,15 +13,7 @@
 
 package com.dc3.driver.service.netty.udp;
 
-import cn.hutool.core.util.CharsetUtil;
-import com.dc3.common.bean.driver.AttributeInfo;
-import com.dc3.common.model.Point;
-import com.dc3.common.model.PointValue;
-import com.dc3.common.sdk.bean.DriverContext;
-import com.dc3.common.sdk.service.DriverService;
-import com.dc3.common.sdk.util.DriverUtils;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
+import com.dc3.driver.service.netty.NettyServerHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -32,9 +24,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 报文处理，需要视具体情况开发
@@ -65,69 +54,12 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
     }
 
     @Resource
-    private DriverService driverService;
-    @Resource
-    private DriverContext driverContext;
+    private NettyServerHandler nettyServerHandler;
 
     @Override
     @SneakyThrows
     public void channelRead0(ChannelHandlerContext context, DatagramPacket msg) {
-        ByteBuf byteBuf = msg.content();
-        log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
-        String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
-        Long deviceId = nettyUdpServerHandler.driverContext.getDeviceIdByName(deviceName);
-        String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
-
-        List<PointValue> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyUdpServerHandler.driverContext.getDriverMetadata().getPointInfoMap().get(deviceId);
-        for (Long pointId : pointInfoMap.keySet()) {
-            Point point = nettyUdpServerHandler.driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
-            Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);
-            int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
-            int end = DriverUtils.value(infoMap.get("end").getType(), infoMap.get("end").getValue());
-
-            if (infoMap.get("key").getValue().equals(hexKey)) {
-                PointValue pointValue = null;
-                switch (point.getName()) {
-                    case "海拔":
-                        float altitude = byteBuf.getFloat(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(altitude),
-                                nettyUdpServerHandler.driverService.convertValue(deviceId, pointId, String.valueOf(altitude)));
-                        break;
-                    case "速度":
-                        double speed = byteBuf.getDouble(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(speed),
-                                nettyUdpServerHandler.driverService.convertValue(deviceId, pointId, String.valueOf(speed)));
-                        break;
-                    case "液位":
-                        long level = byteBuf.getLong(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(level),
-                                nettyUdpServerHandler.driverService.convertValue(deviceId, pointId, String.valueOf(level)));
-                        break;
-                    case "方向":
-                        int direction = byteBuf.getInt(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(direction),
-                                nettyUdpServerHandler.driverService.convertValue(deviceId, pointId, String.valueOf(direction)));
-                        break;
-                    case "锁定":
-                        boolean lock = byteBuf.getBoolean(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(lock),
-                                nettyUdpServerHandler.driverService.convertValue(deviceId, pointId, String.valueOf(lock)));
-                        break;
-                    case "经纬":
-                        String lalo = byteBuf.toString(start, end, CharsetUtil.CHARSET_ISO_8859_1).trim();
-                        pointValue = new PointValue(deviceId, pointId, lalo,
-                                nettyUdpServerHandler.driverService.convertValue(deviceId, pointId, lalo));
-                        break;
-                    default:
-                        break;
-                }
-                if (null != pointValue) {
-                    pointValues.add(pointValue);
-                }
-            }
-        }
-        nettyUdpServerHandler.driverService.pointValueSender(pointValues);
+        nettyUdpServerHandler.nettyServerHandler.read(context, msg.content());
     }
 
     @Override
