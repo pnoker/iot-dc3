@@ -155,7 +155,7 @@ public class DriverMetadataReceiver {
             driverMetadataService.upsertPoint(point);
         } else if (Common.Driver.Point.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete point {}", point.getName());
-            driverMetadataService.deletePoint(point.getId(), point.getProfileId());
+            driverMetadataService.deletePoint(point.getProfileId(), point.getId());
         }
     }
 
@@ -171,7 +171,7 @@ public class DriverMetadataReceiver {
             driverMetadataService.upsertDriverInfo(driverInfo);
         } else if (Common.Driver.DriverInfo.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete driver info {}", driverInfo);
-            driverMetadataService.deleteDriverInfo(driverInfo.getDriverAttributeId(), driverInfo.getDeviceId());
+            driverMetadataService.deleteDriverInfo(driverInfo.getDeviceId(), driverInfo.getDriverAttributeId());
         }
     }
 
@@ -187,7 +187,7 @@ public class DriverMetadataReceiver {
             driverMetadataService.upsertPointInfo(pointInfo);
         } else if (Common.Driver.PointInfo.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete point info {}", pointInfo);
-            driverMetadataService.deletePointInfo(pointInfo.getId(), pointInfo.getPointAttributeId(), pointInfo.getPointId());
+            driverMetadataService.deletePointInfo(pointInfo.getPointId(), pointInfo.getId(), pointInfo.getPointAttributeId());
         }
     }
 

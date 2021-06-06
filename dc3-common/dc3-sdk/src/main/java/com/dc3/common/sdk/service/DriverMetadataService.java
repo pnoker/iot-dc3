@@ -63,10 +63,10 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中位号
      *
-     * @param id        Id
      * @param profileId Profile Id
+     * @param id        Id
      */
-    void deletePoint(Long id, Long profileId);
+    void deletePoint(Long profileId, Long id);
 
     /**
      * 向 DeviceDriver 中添加驱动配置信息
@@ -78,10 +78,10 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中添加驱动配置信息
      *
-     * @param attributeId Attribute Id
      * @param deviceId    Device Id
+     * @param attributeId Attribute Id
      */
-    void deleteDriverInfo(Long attributeId, Long deviceId);
+    void deleteDriverInfo(Long deviceId, Long attributeId);
 
     /**
      * 向 DeviceDriver 中添加位号配置信息
@@ -93,9 +93,9 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中添加位号配置信息
      *
+     * @param deviceId    Device Id
      * @param pointId     Point Id
      * @param attributeId Attribute Id
-     * @param deviceId    Device Id
      */
-    void deletePointInfo(Long pointId, Long attributeId, Long deviceId);
+    void deletePointInfo(Long deviceId, Long pointId, Long attributeId);
 }
