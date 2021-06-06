@@ -53,7 +53,7 @@ public class DriverServiceImpl implements DriverService {
 
     public String convertValue(Long deviceId, Long pointId, String rawValue) {
         String value;
-        Point point = driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
+        Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
         switch (point.getType()) {
             case Common.ValueType.STRING:
                 value = rawValue;
