@@ -23,7 +23,10 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author pnoker
@@ -48,33 +51,49 @@ public class DriverContext {
     }
 
     /**
-     * 通过模版 ID 获取驱动配置信息
+     * 根据 设备Id 获取连接设备的驱动配置信息
      *
-     * @param profileId Profile ID
+     * @param deviceId Device Id
      * @return Map<String, AttributeInfo>
      */
-    public Map<String, AttributeInfo> getProfileDriverInfoByProfileId(Long profileId) {
-        return this.driverMetadata.getProfileDriverInfoMap().get(profileId);
+    public Map<String, AttributeInfo> getDriverInfoByDeviceId(Long deviceId) {
+        return this.driverMetadata.getDriverInfoMap().get(deviceId);
     }
 
     /**
-     * 通过 Device Name 获取设备 ID
+     * 根据 设备Id 获取连接设备的全部位号配置信息
      *
-     * @param deviceName Device Name
-     * @return Device ID
+     * @param deviceId Device Id
+     * @return Map<Long, Map < String, AttributeInfo>>
      */
-    public Long getDeviceIdByDeviceName(String deviceName) {
-        Long deviceId = driverMetadata.getDeviceNameMap().get(deviceName);
-        if (null == deviceId) {
-            throw new NotFoundException("Device(" + deviceName + ") does not exist");
+    public Map<Long, Map<String, AttributeInfo>> getPointInfoByDeviceId(Long deviceId) {
+        Map<Long, Map<String, AttributeInfo>> tmpMap = this.driverMetadata.getPointInfoMap().get(deviceId);
+        if (null == tmpMap || tmpMap.size() < 1) {
+            //todo 提示信息需要统一替换
+            throw new NotFoundException("Device(" + deviceId + ") does not exist");
         }
-        return deviceId;
+        return tmpMap;
     }
 
     /**
-     * 通过设备 ID 获取设备
+     * 根据 设备Id 和 位号Id 获取连接设备的位号配置信息
      *
-     * @param deviceId Device ID
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @return Map<String, AttributeInfo>
+     */
+    public Map<String, AttributeInfo> getPointInfoByDeviceIdAndPointId(Long deviceId, Long pointId) {
+        Map<String, AttributeInfo> tmpMap = getPointInfoByDeviceId(deviceId).get(pointId);
+        if (null == tmpMap || tmpMap.size() < 1) {
+            throw new NotFoundException("Point(" + pointId + ") info does not exist");
+        }
+        return tmpMap;
+    }
+
+    /**
+     * 根据 设备Id 获取设备
+     *
+     * @param deviceId Device Id
      * @return Device
      */
     public Device getDeviceByDeviceId(Long deviceId) {
@@ -86,59 +105,56 @@ public class DriverContext {
     }
 
     /**
-     * 通过 Device ID & Point ID 获取位号
+     * 根据 设备Name 获取设备Id
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
+     * @param deviceName Device Name
+     * @return Device Id
+     */
+    public Long getDeviceIdByName(String deviceName) {
+        Long deviceId = this.driverMetadata.getDeviceNameMap().get(deviceName);
+        if (null == deviceId) {
+            throw new NotFoundException("Device(" + deviceName + ") does not exist");
+        }
+        return deviceId;
+    }
+
+    /**
+     * 根据 设备Id 获取位号
+     *
+     * @param deviceId Device Id
+     * @return Point Array
+     */
+    public List<Point> getPointByDeviceId(Long deviceId) {
+        Device device = getDeviceByDeviceId(deviceId);
+        return this.driverMetadata.getPointMap().entrySet().stream()
+                .filter(entry -> device.getProfileIds().contains(entry.getKey()))
+                .map(entry -> new ArrayList<>(entry.getValue().values()))
+                .reduce(new ArrayList<>(), (total, temp) -> {
+                    total.addAll(temp);
+                    return total;
+                });
+    }
+
+    /**
+     * 根据 设备Id和位号Id 获取位号
+     *
+     * @param deviceId Device Id
+     * @param pointId  Point Id
      * @return Point
      */
-    public Point getDevicePointByDeviceIdAndPointId(Long deviceId, Long pointId) {
-        Map<Long, Point> map = driverMetadata.getProfilePointMap().get(getDeviceByDeviceId(deviceId).getProfileId());
-        if (null == map) {
-            throw new NotFoundException("Device(" + deviceId + ") profile does not exist");
+    public Point getPointByDeviceIdAndPointId(Long deviceId, Long pointId) {
+        Device device = getDeviceByDeviceId(deviceId);
+        Optional<Map<Long, Point>> optional = this.driverMetadata.getPointMap().entrySet().stream()
+                .filter(entry -> device.getProfileIds().contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .filter(entry -> entry.containsKey(pointId))
+                .findFirst();
+
+        if (optional.isPresent()) {
+            return optional.get().get(pointId);
         }
-        Point point = map.get(pointId);
-        if (null == point) {
-            throw new NotFoundException("Point(" + pointId + ") point does not exist");
-        }
-        return point;
+
+        throw new NotFoundException("Point(" + pointId + ") point does not exist");
     }
 
-    /**
-     * 通过 Device ID & Point Name 获取位号 ID
-     *
-     * @param deviceId  Device ID
-     * @param pointName Point Name
-     * @return Device Point ID
-     */
-    public Long getDevicePointIdByDeviceIdAndPointName(Long deviceId, String pointName) {
-        Map<String, Long> map = driverMetadata.getDevicePointNameMap().get(deviceId);
-        if (null == map) {
-            throw new NotFoundException("Device(" + deviceId + ") does not exist");
-        }
-        Long pointId = map.get(pointName);
-        if (null == pointId) {
-            throw new NotFoundException("Point(" + pointName + ") does not exist");
-        }
-        return pointId;
-    }
-
-    /**
-     * 通过 Device Id & Point Id 获取位号配置信息
-     *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @return Map<String, AttributeInfo>
-     */
-    public Map<String, AttributeInfo> getDevicePointInfoByDeviceIdAndPointId(Long deviceId, Long pointId) {
-        Map<Long, Map<String, AttributeInfo>> tmpMap = driverMetadata.getDevicePointInfoMap().get(deviceId);
-        if (null == tmpMap) {
-            throw new NotFoundException("Device(" + deviceId + ") does not exist");
-        }
-        Map<String, AttributeInfo> infoMap = tmpMap.get(pointId);
-        if (null == infoMap) {
-            throw new NotFoundException("Point(" + pointId + ") info does not exist");
-        }
-        return infoMap;
-    }
 }
