@@ -75,13 +75,13 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
         ByteBuf byteBuf = msg.content();
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
-        Long deviceId = nettyUdpServerHandler.driverContext.getDeviceIdByDeviceName(deviceName);
+        Long deviceId = nettyUdpServerHandler.driverContext.getDeviceIdByName(deviceName);
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
 
         List<PointValue> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyUdpServerHandler.driverContext.getDriverMetadata().getDevicePointInfoMap().get(deviceId);
+        Map<Long, Map<String, AttributeInfo>> pointInfoMap = nettyUdpServerHandler.driverContext.getDriverMetadata().getPointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
-            Point point = nettyUdpServerHandler.driverContext.getDevicePointByDeviceIdAndPointId(deviceId, pointId);
+            Point point = nettyUdpServerHandler.driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);
             int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
             int end = DriverUtils.value(infoMap.get("end").getType(), infoMap.get("end").getValue());
