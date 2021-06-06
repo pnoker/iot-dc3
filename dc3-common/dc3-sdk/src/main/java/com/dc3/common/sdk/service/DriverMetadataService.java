@@ -50,9 +50,9 @@ public interface DriverMetadataService {
      * 删除 DeviceDriver 中添加驱动配置信息
      *
      * @param attributeId Attribute Id
-     * @param profileId   Profile Id
+     * @param deviceId    Device Id
      */
-    void deleteDriverInfo(Long attributeId, Long profileId);
+    void deleteDriverInfo(Long attributeId, Long deviceId);
 
     /**
      * 向 DeviceDriver 中添加设备

@@ -171,7 +171,7 @@ public class DriverMetadataReceiver {
             driverMetadataService.upsertDriverInfo(driverInfo);
         } else if (Common.Driver.DriverInfo.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete driver info {}", driverInfo);
-            driverMetadataService.deleteDriverInfo(driverInfo.getDriverAttributeId(), driverInfo.getProfileId());
+            driverMetadataService.deleteDriverInfo(driverInfo.getDriverAttributeId(), driverInfo.getDeviceId());
         }
     }
 

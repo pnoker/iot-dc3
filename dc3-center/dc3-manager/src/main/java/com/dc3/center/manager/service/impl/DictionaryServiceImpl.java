@@ -108,7 +108,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> profileDictionary(Long tenantId) {
         List<Dictionary> driverDictionaryList = driverDictionary(tenantId);
-        for (Dictionary driverDictionary : driverDictionaryList) {
+        /*for (Dictionary driverDictionary : driverDictionaryList) {
             List<Dictionary> profileDictionaryList = new ArrayList<>(16);
             LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
             queryWrapper.eq(Profile::getDriverId, driverDictionary.getValue());
@@ -121,7 +121,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                 profileDictionaryList.add(profileDictionary);
             }
             driverDictionary.setChildren(profileDictionaryList);
-        }
+        }*/
         return driverDictionaryList;
     }
 
@@ -164,7 +164,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                 break;
             case "driver":
                 List<Dictionary> driverDictionaryList = driverDictionary(tenantId);
-                for (Dictionary driverDictionary : driverDictionaryList) {
+                /*for (Dictionary driverDictionary : driverDictionaryList) {
                     for (Dictionary profileDictionary : driverDictionary.getChildren()) {
                         List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
@@ -179,7 +179,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                         }
                         profileDictionary.setChildren(deviceDictionaryList);
                     }
-                }
+                }*/
                 dictionaryList = driverDictionaryList;
                 break;
             case "profile":
@@ -187,7 +187,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                 LambdaQueryWrapper<Profile> profileQueryWrapper = Wrappers.<Profile>query().lambda();
                 profileQueryWrapper.eq(Profile::getTenantId, tenantId);
                 List<Profile> profileList = profileMapper.selectList(profileQueryWrapper);
-                for (Profile profile : profileList) {
+                /*for (Profile profile : profileList) {
                     Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profile.getId());
                     List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
@@ -202,7 +202,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                     }
                     profileDictionary.setChildren(deviceDictionaryList);
                     profileDictionaryList.add(profileDictionary);
-                }
+                }*/
                 dictionaryList = profileDictionaryList;
                 break;
             default:
@@ -244,7 +244,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                 LambdaQueryWrapper<Device> deviceQueryWrapper = Wrappers.<Device>query().lambda();
                 deviceQueryWrapper.eq(Device::getTenantId, tenantId);
                 List<Device> deviceList = deviceMapper.selectList(deviceQueryWrapper);
-                for (Device device : deviceList) {
+                /*for (Device device : deviceList) {
                     Dictionary deviceDictionary = new Dictionary().setLabel(device.getName()).setValue(device.getId());
                     List<Dictionary> pointDictionaryList = new ArrayList<>(16);
                     LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
@@ -259,7 +259,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                     }
                     deviceDictionary.setChildren(pointDictionaryList);
                     deviceDictionaryList.add(deviceDictionary);
-                }
+                }*/
                 dictionaryList = deviceDictionaryList;
                 break;
             default:

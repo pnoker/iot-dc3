@@ -104,19 +104,19 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         // Add driver info to driver info map context
         DriverAttribute attribute = driverContext.getDriverMetadata().getDriverAttributeMap().get(driverInfo.getDriverAttributeId());
         if (null != attribute) {
-            driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfAbsent(driverInfo.getProfileId(), k -> new ConcurrentHashMap<>(16))
+            driverContext.getDriverMetadata().getDriverInfoMap().computeIfAbsent(driverInfo.getDeviceId(), k -> new ConcurrentHashMap<>(16))
                     .put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
         }
     }
 
     @Override
-    public void deleteDriverInfo(Long attributeId, Long profileId) {
+    public void deleteDriverInfo(Long attributeId, Long deviceId) {
         DriverAttribute attribute = driverContext.getDriverMetadata().getDriverAttributeMap().get(attributeId);
         if (null != attribute) {
             String attributeName = attribute.getName();
 
             // Delete driver info from driver info map context
-            driverContext.getDriverMetadata().getProfileDriverInfoMap().computeIfPresent(profileId, (k, v) -> {
+            driverContext.getDriverMetadata().getDriverInfoMap().computeIfPresent(deviceId, (k, v) -> {
                 v.entrySet().removeIf(next -> next.getKey().equals(attributeName));
                 return v;
             });
