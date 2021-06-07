@@ -107,30 +107,22 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DIC, key = "'dic.'+#parent+'.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> deviceDictionary(String parent, Long tenantId) {
-        List<Dictionary> dictionaries = new ArrayList<>(16);
-        switch (parent) {
-            case "driver":
-                List<Dictionary> driverDictionaryList = driverDictionary(tenantId);
-                driverDictionaryList.forEach(driverDictionary -> {
-                    LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-                    queryWrapper.eq(Device::getDriverId, driverDictionary.getValue());
-                    queryWrapper.eq(Device::getTenantId, tenantId);
-                    List<Device> deviceList = deviceMapper.selectList(queryWrapper);
-                    List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
-                    deviceList.forEach(device -> deviceDictionaryList.add(new Dictionary().setLabel(device.getName()).setValue(device.getId())));
+    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    public List<Dictionary> deviceDictionary(Long tenantId) {
+        List<Dictionary> dictionaries = driverDictionary(tenantId);
+        dictionaries.forEach(driverDictionary -> {
+            LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
+            queryWrapper.eq(Device::getDriverId, driverDictionary.getValue());
+            queryWrapper.eq(Device::getTenantId, tenantId);
+            List<Device> deviceList = deviceMapper.selectList(queryWrapper);
+            List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
+            deviceList.forEach(device -> deviceDictionaryList.add(new Dictionary().setLabel(device.getName()).setValue(device.getId())));
 
-                    driverDictionary.setDisabled(true);
-                    driverDictionary.setValue(RandomUtil.randomLong());
-                    driverDictionary.setChildren(deviceDictionaryList);
-                });
+            driverDictionary.setDisabled(true);
+            driverDictionary.setValue(RandomUtil.randomLong());
+            driverDictionary.setChildren(deviceDictionaryList);
+        });
 
-                dictionaries = driverDictionaryList;
-                break;
-            default:
-                break;
-        }
         return dictionaries;
     }
 

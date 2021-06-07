@@ -36,10 +36,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -67,7 +64,7 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     public void savePointValue(PointValue pointValue) {
         if (null != pointValue) {
-            pointValue.setCreateTime(System.currentTimeMillis());
+            pointValue.setCreateTime(new Date());
             threadPoolExecutor.execute(() -> dataCustomService.postHandle(pointValue));
             threadPoolExecutor.execute(() -> savePointValueToMongo(pointValue));
             threadPoolExecutor.execute(() -> savePointValueToRedis(pointValue));
@@ -79,7 +76,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (null != pointValues) {
             if (pointValues.size() > 0) {
                 Future<List<PointValue>> future = threadPoolExecutor.submit(() -> {
-                    pointValues.forEach(pointValue -> pointValue.setCreateTime(System.currentTimeMillis()));
+                    pointValues.forEach(pointValue -> pointValue.setCreateTime(new Date()));
                     return pointValues;
                 });
 

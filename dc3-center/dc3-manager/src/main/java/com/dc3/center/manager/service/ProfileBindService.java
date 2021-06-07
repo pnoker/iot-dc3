@@ -27,12 +27,27 @@ import java.util.Set;
 public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto> {
 
     /**
+     * 根据 设备Id 删除关联的模版映射
+     *
+     * @param deviceId Device Id
+     */
+    boolean deleteByDeviceId(Long deviceId);
+
+    /**
+     * 根据 模版ID和设备Id 删除关联的模版映射
+     *
+     * @param profileId Profile Id
+     * @param deviceId  Device Id
+     */
+    boolean deleteByProfileIdAndDeviceId(Long profileId, Long deviceId);
+
+    /**
      * 根据 模版ID 查询关联的 设备ID 集合
      *
      * @param profileId Profile Id
      * @return Device Id Set
      */
-    Set<Long> selectByProfileId(Long profileId);
+    Set<Long> selectDeviceIdByProfileId(Long profileId);
 
     /**
      * 根据 设备ID 查询关联的 模版ID 集合
@@ -40,6 +55,6 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param deviceId Device Id
      * @return Profile Id Set
      */
-    Set<Long> selectByDeviceId(Long deviceId);
+    Set<Long> selectProfileIdByDeviceId(Long deviceId);
 
 }

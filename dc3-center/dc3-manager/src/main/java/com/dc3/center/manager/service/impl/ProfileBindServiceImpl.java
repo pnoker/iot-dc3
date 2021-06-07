@@ -83,6 +83,39 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Caching(
+            evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+            }
+    )
+    public boolean deleteByDeviceId(Long deviceId) {
+        ProfileBindDto profileBindDto = new ProfileBindDto();
+        profileBindDto.setDeviceId(deviceId);
+        return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
+    }
+
+    @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+            }
+    )
+    public boolean deleteByProfileIdAndDeviceId(Long profileId, Long deviceId) {
+        ProfileBindDto profileBindDto = new ProfileBindDto();
+        profileBindDto.setProfileId(profileId);
+        profileBindDto.setDeviceId(deviceId);
+        return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
+    }
+
+    @Override
+    @Caching(
             put = {@CachePut(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#profileBind.id", condition = "#result!=null")},
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
@@ -112,7 +145,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
-    public Set<Long> selectByProfileId(Long profileId) {
+    public Set<Long> selectDeviceIdByProfileId(Long profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setProfileId(profileId);
         List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));
@@ -121,7 +154,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, key = "#deviceId", unless = "#result==null")
-    public Set<Long> selectByDeviceId(Long deviceId) {
+    public Set<Long> selectProfileIdByDeviceId(Long deviceId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setDeviceId(deviceId);
         List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));
