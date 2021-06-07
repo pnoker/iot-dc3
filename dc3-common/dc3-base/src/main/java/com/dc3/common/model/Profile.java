@@ -16,13 +16,10 @@ package com.dc3.common.model;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
@@ -42,22 +39,19 @@ public class Profile extends Description {
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String name;
 
-    private Boolean share;
+    private Boolean share = true;
 
     private Boolean enable;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonSerialize(using = ToStringSerializer.class)
     private Long tenantId;
 
     public Profile(String name, Boolean share, Long driverId, Long tenantId) {
         this.name = name;
         this.share = share;
-        //this.driverId = driverId;
         this.tenantId = tenantId;
     }
 }

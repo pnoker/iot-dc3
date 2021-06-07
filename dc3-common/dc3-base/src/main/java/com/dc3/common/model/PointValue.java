@@ -13,19 +13,19 @@
 
 package com.dc3.common.model;
 
+import com.dc3.common.constant.Common;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -42,18 +42,16 @@ public class PointValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @MongoId
-    private ObjectId id;
+    private String id;
 
     /**
      * 设备ID，同MySQl中等 设备ID 一致
      */
-    @JsonSerialize(using = ToStringSerializer.class)
     private Long deviceId;
 
     /**
      * 位号ID，同MySQl中等 位号ID 一致
      */
-    @JsonSerialize(using = ToStringSerializer.class)
     private Long pointId;
 
     /**
@@ -80,8 +78,14 @@ public class PointValue implements Serializable {
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     private Boolean multi;
-    private Long originTime;
-    private Long createTime;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonFormat(pattern = Common.DATE_FORMAT, timezone = Common.TIMEZONE)
+    private Date originTime;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonFormat(pattern = Common.DATE_FORMAT, timezone = Common.TIMEZONE)
+    private Date createTime;
 
     public PointValue(Long pointId, String rawValue, String value) {
         this.pointId = pointId;
@@ -94,7 +98,7 @@ public class PointValue implements Serializable {
         this.pointId = pointId;
         this.rawValue = rawValue;
         this.value = value;
-        this.originTime = System.currentTimeMillis();
+        this.originTime = new Date();
     }
 
     public PointValue(Long deviceId, Long pointId, String rawValue, String value, int timeOut, TimeUnit timeUnit) {
@@ -104,13 +108,13 @@ public class PointValue implements Serializable {
         this.value = value;
         this.timeOut = timeOut;
         this.timeUnit = timeUnit;
-        this.originTime = System.currentTimeMillis();
+        this.originTime = new Date();
     }
 
     public PointValue(Long deviceId, List<PointValue> children) {
         this.deviceId = deviceId;
         this.children = children;
-        this.originTime = System.currentTimeMillis();
+        this.originTime = new Date();
     }
 
     public PointValue(Long deviceId, List<PointValue> children, int timeOut, TimeUnit timeUnit) {
@@ -118,6 +122,6 @@ public class PointValue implements Serializable {
         this.children = children;
         this.timeOut = timeOut;
         this.timeUnit = timeUnit;
-        this.originTime = System.currentTimeMillis();
+        this.originTime = new Date();
     }
 }

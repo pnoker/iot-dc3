@@ -14,10 +14,8 @@
 package com.dc3.common.bean;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.dc3.common.valid.Insert;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,7 +39,6 @@ public class Dictionary {
     @NotBlank(message = "label can't be empty", groups = {Insert.class})
     private String label;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "value can't be empty", groups = {Insert.class})
     private Long value;
 
