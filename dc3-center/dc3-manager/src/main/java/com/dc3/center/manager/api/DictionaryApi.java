@@ -89,9 +89,9 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> deviceDictionary(String parent, Long tenantId) {
+    public R<List<Dictionary>> deviceDictionary(Long tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.deviceDictionary(parent, tenantId);
+            List<Dictionary> dictionaryList = dictionaryService.deviceDictionary(tenantId);
             if (null != dictionaryList) {
                 return R.ok(dictionaryList);
             }

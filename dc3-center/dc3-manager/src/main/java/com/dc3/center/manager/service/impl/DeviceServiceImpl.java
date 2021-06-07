@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.service.DeviceService;
+import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
@@ -26,6 +27,7 @@ import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
+import com.dc3.common.model.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -34,6 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,6 +52,8 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Resource
     private DeviceMapper deviceMapper;
+    @Resource
+    private ProfileBindService profileBindService;
 
     @Override
     @Caching(
@@ -68,7 +73,13 @@ public class DeviceServiceImpl implements DeviceService {
             throw new DuplicateException("The device already exists");
         } catch (NotFoundException notFoundException) {
             if (deviceMapper.insert(device) > 0) {
-                return deviceMapper.selectById(device.getId());
+                device.getProfileIds().forEach(profileId -> {
+                    ProfileBind profileBind = new ProfileBind(profileId, device.getId());
+                    profileBindService.add(profileBind);
+                });
+                Device select = deviceMapper.selectById(device.getId());
+                select.setProfileIds(device.getProfileIds());
+                return select;
             }
             throw new ServiceException("The device add failed");
         }
@@ -86,6 +97,7 @@ public class DeviceServiceImpl implements DeviceService {
     )
     public boolean delete(Long id) {
         selectById(id);
+        profileBindService.deleteByDeviceId(id);
         return deviceMapper.deleteById(id) > 0;
     }
 
@@ -104,8 +116,17 @@ public class DeviceServiceImpl implements DeviceService {
     public Device update(Device device) {
         selectById(device.getId());
         device.setUpdateTime(null);
+        Set<Long> newProfileIds = device.getProfileIds();
+        Set<Long> oldProfileIds = profileBindService.selectProfileIdByDeviceId(device.getId());
+        Set<Long> add = new HashSet<>(newProfileIds);
+        add.removeAll(oldProfileIds);
+        Set<Long> delete = new HashSet<>(oldProfileIds);
+        delete.removeAll(newProfileIds);
+        add.forEach(id -> profileBindService.add(new ProfileBind(id, device.getId())));
+        delete.forEach(id -> profileBindService.deleteByProfileIdAndDeviceId(id, device.getId()));
         if (deviceMapper.updateById(device) > 0) {
             Device select = deviceMapper.selectById(device.getId());
+            select.setProfileIds(newProfileIds);
             device.setName(select.getName()).setGroupId(select.getGroupId());
             return select;
         }
@@ -119,7 +140,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == device) {
             throw new NotFoundException("The device does not exist");
         }
-        return device;
+        return device.setProfileIds(profileBindService.selectProfileIdByDeviceId(id));
     }
 
     @Override
@@ -132,7 +153,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == device) {
             throw new NotFoundException("The device does not exist");
         }
-        return device;
+        return device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId()));
     }
 
     @Override
@@ -144,13 +165,16 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == devices || devices.size() < 1) {
             throw new NotFoundException("The devices does not exist");
         }
+        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));
         return devices;
     }
 
     @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Device> selectByIds(Set<Long> ids) {
-        return deviceMapper.selectBatchIds(ids);
+        List<Device> devices = deviceMapper.selectBatchIds(ids);
+        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));
+        return devices;
     }
 
     @Override
@@ -159,7 +183,9 @@ public class DeviceServiceImpl implements DeviceService {
         if (!Optional.ofNullable(deviceDto.getPage()).isPresent()) {
             deviceDto.setPage(new Pages());
         }
-        return deviceMapper.selectPage(deviceDto.getPage().convert(), fuzzyQuery(deviceDto));
+        Page<Device> page = deviceMapper.selectPage(deviceDto.getPage().convert(), fuzzyQuery(deviceDto));
+        page.getRecords().forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));
+        return page;
     }
 
     @Override
@@ -172,10 +198,9 @@ public class DeviceServiceImpl implements DeviceService {
             if (null != deviceDto.getDriverId()) {
                 queryWrapper.eq(Device::getDriverId, deviceDto.getDriverId());
             }
-            if (null != deviceDto.getGroupId()) {
-                queryWrapper.eq(Device::getGroupId, deviceDto.getGroupId());
+            if (null != deviceDto.getTenantId()) {
+                queryWrapper.eq(Device::getTenantId, deviceDto.getTenantId());
             }
-            queryWrapper.eq(Device::getTenantId, deviceDto.getTenantId());
         }
         return queryWrapper;
     }

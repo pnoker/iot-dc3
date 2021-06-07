@@ -147,7 +147,9 @@ public class GroupServiceImpl implements GroupService {
             if (StrUtil.isNotBlank(groupDto.getName())) {
                 queryWrapper.like(Group::getName, groupDto.getName());
             }
-            queryWrapper.eq(Group::getTenantId, groupDto.getTenantId());
+            if (null != groupDto.getTenantId()) {
+                queryWrapper.eq(Group::getTenantId, groupDto.getTenantId());
+            }
         }
         return queryWrapper;
     }

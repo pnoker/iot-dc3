@@ -68,11 +68,10 @@ public interface DictionaryClient {
     /**
      * 查询设备 Dictionary
      *
-     * @param parent group/driver/profile
      * @return List<Dictionary>
      */
-    @GetMapping("/device/{parent}")
-    R<List<Dictionary>> deviceDictionary(@NotNull @PathVariable("parent") String parent, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    @GetMapping("/device")
+    R<List<Dictionary>> deviceDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 查询位号 Dictionary

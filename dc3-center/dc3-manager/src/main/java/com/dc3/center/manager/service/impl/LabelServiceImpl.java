@@ -158,7 +158,9 @@ public class LabelServiceImpl implements LabelService {
             if (StrUtil.isNotBlank(labelDto.getColor())) {
                 queryWrapper.eq(Label::getColor, labelDto.getColor());
             }
-            queryWrapper.eq(Label::getTenantId, labelDto.getTenantId());
+            if (null != labelDto.getTenantId()) {
+                queryWrapper.eq(Label::getTenantId, labelDto.getTenantId());
+            }
         }
         return queryWrapper;
     }

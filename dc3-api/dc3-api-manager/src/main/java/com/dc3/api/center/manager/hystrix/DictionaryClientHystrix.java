@@ -59,7 +59,7 @@ public class DictionaryClientHystrix implements FallbackFactory<DictionaryClient
             }
 
             @Override
-            public R<List<Dictionary>> deviceDictionary(String parent, Long tenantId) {
+            public R<List<Dictionary>> deviceDictionary(Long tenantId) {
                 return R.fail(message);
             }
 

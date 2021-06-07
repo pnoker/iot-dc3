@@ -148,7 +148,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<Point> selectByDeviceId(Long deviceId) {
-        Set<Long> profileIds = profileBindService.selectByDeviceId(deviceId);
+        Set<Long> profileIds = profileBindService.selectProfileIdByDeviceId(deviceId);
         return selectByProfileIds(profileIds);
     }
 
@@ -210,7 +210,9 @@ public class PointServiceImpl implements PointService {
             if (null != pointDto.getProfileId()) {
                 queryWrapper.eq(Point::getProfileId, pointDto.getProfileId());
             }
-            queryWrapper.eq(Point::getTenantId, pointDto.getTenantId());
+            if (null != pointDto.getTenantId()) {
+                queryWrapper.eq(Point::getTenantId, pointDto.getTenantId());
+            }
         }
         return queryWrapper;
     }

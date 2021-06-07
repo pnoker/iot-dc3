@@ -56,10 +56,9 @@ public interface DictionaryService {
      * 获取设备字典
      * group/driver/profile
      *
-     * @param parent
      * @return
      */
-    List<Dictionary> deviceDictionary(String parent, Long tenantId);
+    List<Dictionary> deviceDictionary(Long tenantId);
 
     /**
      * 获取位号字典
