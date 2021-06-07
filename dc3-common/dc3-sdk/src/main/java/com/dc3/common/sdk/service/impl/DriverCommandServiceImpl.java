@@ -55,7 +55,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
             driverService.pointValueSender(pointValue);
             return pointValue;
         } catch (Exception e) {
-            log.error("DriverCommandServiceImpl.read{}", e.getMessage(), e);
+            log.error("DriverCommandServiceImpl.read : {}", e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }
@@ -71,7 +71,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
                     new AttributeInfo(value, driverContext.getPointByDeviceIdAndPointId(deviceId, pointId).getType())
             );
         } catch (Exception e) {
-            log.error("DriverCommandServiceImpl.write{}", e.getMessage(), e);
+            log.error("DriverCommandServiceImpl.write : {}", e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
     }

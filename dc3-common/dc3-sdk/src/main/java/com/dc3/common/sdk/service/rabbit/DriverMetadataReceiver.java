@@ -104,6 +104,7 @@ public class DriverMetadataReceiver {
                 break;
             case Common.Driver.Event.DRIVER_METADATA_SYNC_BACK:
                 DriverMetadata driverMetadata = Convert.convert(DriverMetadata.class, driverConfiguration.getContent());
+                log.debug("Initialization driver metadata : {}", JSON.toJSONString(driverMetadata, true));
                 driverContext.setDriverMetadata(driverMetadata);
                 break;
             default:

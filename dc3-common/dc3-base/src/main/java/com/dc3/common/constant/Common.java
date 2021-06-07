@@ -48,7 +48,7 @@ public interface Common {
     /**
      * 时间格式化
      */
-    String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
     /**
      * 用户主目录

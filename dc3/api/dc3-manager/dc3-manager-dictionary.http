@@ -35,30 +35,9 @@ Accept: */*
 Cache-Control: no-cache
 
 
-### 查询 Group Dictionary
-#/manager/dictionary/group
-GET http://localhost:8400/manager/dictionary/group
-Accept: */*
-Cache-Control: no-cache
-
-
-### 查询 Device/group Dictionary
-#/manager/dictionary/device/group
-GET http://localhost:8400/manager/dictionary/device/group
-Accept: */*
-Cache-Control: no-cache
-
-
 ### 查询 Device/driver Dictionary
 #/manager/dictionary/device/driver
 GET http://localhost:8400/manager/dictionary/device/driver
-Accept: */*
-Cache-Control: no-cache
-
-
-### 查询 Device/profile Dictionary
-#/manager/dictionary/device/profile
-GET http://localhost:8400/manager/dictionary/device/profile
 Accept: */*
 Cache-Control: no-cache
 

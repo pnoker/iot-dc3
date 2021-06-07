@@ -14,6 +14,8 @@
 package com.dc3.common.sdk.service.job;
 
 import com.dc3.common.bean.driver.AttributeInfo;
+import com.dc3.common.model.Device;
+import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverCommandService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -44,11 +47,23 @@ public class DriverReadScheduleJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap = driverContext.getDriverMetadata().getPointInfoMap();
-        pointInfoMap.forEach(
-                (deviceId, pointMap) -> pointMap.forEach(
-                        (pointId, point) -> threadPoolExecutor.execute(() -> driverCommandService.read(deviceId, pointId))
-                )
-        );
+        Map<Long, Device> deviceMap = driverContext.getDriverMetadata().getDeviceMap();
+        deviceMap.values().forEach(device -> {
+            Set<Long> profileIds = device.getProfileIds();
+            Map<Long, Map<String, AttributeInfo>> pointInfoMap = driverContext.getDriverMetadata().getPointInfoMap().get(device.getId());
+            if (null != pointInfoMap && null != profileIds) {
+                profileIds.forEach(profileId -> {
+                    Map<Long, Point> pointMap = driverContext.getDriverMetadata().getProfileMap().get(profileId);
+                    if (null != pointMap) {
+                        pointMap.keySet().forEach(pointId -> {
+                            Map<String, AttributeInfo> map = pointInfoMap.get(pointId);
+                            if (null != map) {
+                                threadPoolExecutor.execute(() -> driverCommandService.read(device.getId(), pointId));
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 }

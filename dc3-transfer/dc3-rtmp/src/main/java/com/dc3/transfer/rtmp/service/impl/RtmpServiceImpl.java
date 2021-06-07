@@ -261,7 +261,9 @@ public class RtmpServiceImpl implements RtmpService {
             if (null != rtmpDto.getAutoStart()) {
                 queryWrapper.eq(Rtmp::getAutoStart, rtmpDto.getAutoStart());
             }
-            queryWrapper.eq(Rtmp::getTenantId, rtmpDto.getTenantId());
+            if (null != rtmpDto.getTenantId()) {
+                queryWrapper.eq(Rtmp::getTenantId, rtmpDto.getTenantId());
+            }
         }
         return queryWrapper;
     }
