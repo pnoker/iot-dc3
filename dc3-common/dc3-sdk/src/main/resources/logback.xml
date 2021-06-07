@@ -15,7 +15,8 @@
 <!DOCTYPE configuration>
 <configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <!--<logger name="org.springframework.boot.autoconfigure.thymeleaf" level="ERROR"/>
+    <logger name="com.dc3.common.sdk.service.impl.DriverServiceImpl" level="WARN"/>
+    <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="ERROR"/>
     <logger name="org.springframework.boot.web.embedded.undertow" level="WARN"/>
     <logger name="org.springframework.cloud.netflix.eureka" level="WARN"/>
     <logger name="org.springframework.cloud.gateway.route" level="WARN"/>
@@ -43,7 +44,7 @@
     <logger name="com.netflix" level="ERROR"/>
     <logger name="org.quartz" level="WARN"/>
     <logger name="org.jboss" level="ERROR"/>
-    <logger name="org.xnio" level="WARN"/>-->
+    <logger name="org.xnio" level="WARN"/>
 
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
 
