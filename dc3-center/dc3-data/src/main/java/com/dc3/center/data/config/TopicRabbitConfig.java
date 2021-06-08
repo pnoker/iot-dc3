@@ -60,6 +60,27 @@ public class TopicRabbitConfig {
     }
 
     @Bean
+    TopicExchange eventExchange() {
+        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
+    }
+
+    @Bean
+    Queue deviceEventQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        // 15秒：15 * 1000 = 15000L
+        arguments.put("x-message-ttl", 15000L);
+        return new Queue(Common.Rabbit.QUEUE_DEVICE_EVENT, true, false, false, arguments);
+    }
+
+    @Bean
+    Binding deviceEventBinding() {
+        return BindingBuilder
+                .bind(deviceEventQueue())
+                .to(eventExchange())
+                .with(Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + "*");
+    }
+
+    @Bean
     TopicExchange valueExchange() {
         return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, false);
     }
