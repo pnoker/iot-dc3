@@ -73,16 +73,22 @@
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
 
-        <!-- Dc3 Common Config -->
-        <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-config</artifactId>
-        </dependency>
-
         <!-- Dc3 Api -->
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-api-auth</artifactId>
+        </dependency>
+
+        <!-- Dc3 Common Profiles -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-profiles</artifactId>
+        </dependency>
+
+        <!-- Apache Pool2 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
 
     </dependencies>
