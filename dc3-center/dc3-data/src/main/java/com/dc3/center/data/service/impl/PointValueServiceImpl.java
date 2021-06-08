@@ -198,7 +198,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         Pages pages = Optional.ofNullable(pointValueDto.getPage()).orElse(new Pages());
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
-            criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
+            criteria.and("originTime").gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
         Future<Long> count = threadPoolExecutor.submit(() -> {
