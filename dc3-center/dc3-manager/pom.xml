@@ -27,7 +27,7 @@
 
     <dependencies>
 
-        <!-- MongoDB-->
+        <!-- Spring MongoDB-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
@@ -44,8 +44,6 @@
             <groupId>com.dc3</groupId>
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
-
-        <!-- Dc3 Manager Api -->
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-api-manager</artifactId>

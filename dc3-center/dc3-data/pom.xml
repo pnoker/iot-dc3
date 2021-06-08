@@ -27,28 +27,22 @@
 
     <dependencies>
 
+        <!-- Spring MongoDB-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
         <!-- Spring RabbitMq -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!-- MongoDB-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-
-        <!-- Quartz -->
+        <!-- Spring Quartz -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
-
-        <!-- Dc3 Common Core -->
-        <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-core</artifactId>
         </dependency>
 
         <!-- Dc3 Api -->
@@ -59,6 +53,18 @@
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-api-data</artifactId>
+        </dependency>
+
+        <!-- Dc3 Common Profiles -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-profiles</artifactId>
+        </dependency>
+
+        <!-- Dc3 Common Core -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-core</artifactId>
         </dependency>
 
     </dependencies>

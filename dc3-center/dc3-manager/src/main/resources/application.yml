@@ -9,6 +9,7 @@ spring:
       - register
       - monitor
       - server
+      - rabbitmq
       - mysql
       - mongo
       - redis
