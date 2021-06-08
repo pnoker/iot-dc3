@@ -18,6 +18,7 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:1.8.251
 MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV JAVA_OPS -server -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+ENV GC_LOG -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintHeapAtGC -XX:+PrintReferenceGC -XX:+PrintGCApplicationStoppedTime -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=10M -Xloggc:/dc3-driver/dc3-driver-mqtt/dc3/logs/gc/driver/mqtt/dc3-driver-mqtt-gc-%t.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-driver/dc3-driver-mqtt \
@@ -30,4 +31,4 @@ ADD ./target/dc3-driver-mqtt.jar ./
 EXPOSE 8701
 VOLUME /dc3-driver/dc3-driver-mqtt/dc3/logs
 
-CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-mqtt.jar
+CMD java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-mqtt.jar
