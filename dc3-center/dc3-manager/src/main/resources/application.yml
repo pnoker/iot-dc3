@@ -4,12 +4,22 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  profiles:
+    active:
+      - register
+      - monitor
+      - server
+      - mysql
+      - mongo
+      - redis
+      - feign
   main:
     allow-bean-definition-overriding: true
   mvc:
     throw-exception-if-no-handler-found: true
-  resources:
-    add-mappings: false
+  web:
+    resources:
+      add-mappings: false
   redis:
     database: 2
   cache:

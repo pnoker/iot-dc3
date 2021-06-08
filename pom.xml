@@ -78,11 +78,6 @@
     </properties>
 
     <dependencies>
-        <!-- Spring Cloud Starter -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
 
         <!-- Spring Configuration-->
         <dependency>
