@@ -29,6 +29,7 @@
     <description>IOT DC3 平台 配置集合。</description>
 
     <dependencies>
+
         <!-- Spring Aop -->
         <dependency>
             <groupId>org.springframework</groupId>
