@@ -1,52 +1,24 @@
 server:
   port: 8100
-  undertow:
-    threads:
-      io: 2
-      worker: 20
-    buffer-size: 512
 
 spring:
   application:
     name: @project.artifactId@
-  security:
-    user:
-      name: ${SECURITY_USER_NAME:dc3}
-      password: ${SECURITY_USER_PASSWORD:dc3}
-  transaction:
-    rollback-on-commit-failure: true
+  profiles:
+    active:
+      - register
+      - monitor
+      - server
 
 logging:
   level:
     com.dc3: DEBUG
   file:
     name: dc3/logs/center/${spring.application.name}.log
-  logback:
-    rollingpolicy:
-      max-history: 30
-      total-size-cap: 2GB
-      clean-history-on-start: true
 
 eureka:
   dashboard:
     path: ${EUREKA_DASHBOARD_PATH:/}
-  instance:
-    prefer-ip-address: true
-    hostname: @project.artifactId@
-    status-page-url-path: /actuator/info
-    health-check-url-path: /actuator/health
-    lease-renewal-interval-in-seconds: 10
-    lease-expiration-duration-in-seconds: 15
-  client:
-    region: dc3
-    availability-zones:
-      dc3: defaultZone
-    fetch-registry: false
-    register-with-eureka: false
-    prefer-same-zone-eureka: true
-    registry-fetch-interval-seconds: 5
-    service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${EUREKA_HOST:dc3-register}:${EUREKA_PORT:8100}/eureka/
   server:
     eviction-interval-timer-in-ms: 4000
     enable-self-preservation: false
