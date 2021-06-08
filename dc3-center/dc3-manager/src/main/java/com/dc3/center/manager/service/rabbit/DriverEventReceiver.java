@@ -49,13 +49,14 @@ public class DriverEventReceiver {
     @Resource
     private RedisUtil redisUtil;
     @Resource
+    private EventService eventService;
+    @Resource
     private BatchService batchService;
     @Resource
     private DriverSdkService driverSdkService;
+
     @Resource
     private RabbitTemplate rabbitTemplate;
-    @Resource
-    private EventService eventService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
