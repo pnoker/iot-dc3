@@ -18,6 +18,7 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:1.8.251 AS base
 MAINTAINER pnoker pnokers.icloud.com
 
 ENV JAVA_OPS -server -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+ENV GC_LOG -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintHeapAtGC -XX:+PrintReferenceGC -XX:+PrintGCApplicationStoppedTime -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=10M -Xloggc:/dc3-transfer/dc3-rtmp/dc3/logs/gc/transfer/dc3-rtmp-gc-%t.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-transfer/dc3-rtmp \
@@ -35,5 +36,5 @@ COPY --from=build /usr/local /usr/local
 EXPOSE 8803
 VOLUME /dc3-transfer/dc3-rtmp/dc3/logs
 
-CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-rtmp.jar
+CMD java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-rtmp.jar
 

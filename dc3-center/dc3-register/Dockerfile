@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:1.8.251
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.6.6
 MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV JAVA_OPS -server -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
