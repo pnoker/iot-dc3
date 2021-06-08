@@ -15,6 +15,7 @@
 <!DOCTYPE configuration>
 <configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="com.dc3.common.sdk.service.impl.DriverServiceImpl" level="WARN"/>
     <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="ERROR"/>
     <logger name="org.springframework.boot.web.embedded.undertow" level="WARN"/>
     <logger name="org.springframework.cloud.netflix.eureka" level="WARN"/>
@@ -28,6 +29,7 @@
     <logger name="org.springframework.cloud.stream" level="WARN"/>
     <logger name="org.springframework.integration" level="WARN"/>
     <logger name="org.springframework.scheduling" level="WARN"/>
+    <logger name="de.codecentric.boot.admin" level="ERROR"/>
     <logger name="org.springframework.data" level="ERROR"/>
     <logger name="org.springframework.amqp" level="WARN"/>
     <logger name="com.zaxxer.hikari.pool" level="ERROR"/>

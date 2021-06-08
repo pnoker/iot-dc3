@@ -22,13 +22,6 @@ spring:
     user:
       name: ${SECURITY_USER_NAME:dc3}
       password: ${SECURITY_USER_PASSWORD:dc3}
-  cloud:
-    loadbalancer:
-      ribbon:
-        enabled: false
-      cache:
-        caffeine:
-          spec: initialCapacity=10,maximumSize=500,expireAfterAccess=600s
   rabbitmq:
     virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
     host: ${RABBITMQ_HOST:dc3-rabbitmq}

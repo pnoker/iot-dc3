@@ -17,10 +17,7 @@ import com.dc3.common.base.Converter;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.model.Rtmp;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
@@ -36,6 +33,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class RtmpDto extends Rtmp implements Serializable, Converter<Rtmp, RtmpDto> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
