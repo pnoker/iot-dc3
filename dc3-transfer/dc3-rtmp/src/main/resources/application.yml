@@ -9,6 +9,14 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  profiles:
+    active:
+      - register
+      - monitor
+      - server
+      - mysql
+      - redis
+      - feign
   main:
     allow-bean-definition-overriding: true
   mvc:

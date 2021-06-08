@@ -213,12 +213,6 @@
             </dependency>
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-config</artifactId>
-                <version>${project.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.dc3</groupId>
                 <artifactId>dc3-profiles</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>

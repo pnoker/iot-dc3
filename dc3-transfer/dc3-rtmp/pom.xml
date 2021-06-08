@@ -33,6 +33,12 @@
             <artifactId>dc3-api-rtmp</artifactId>
         </dependency>
 
+        <!-- Dc3 Common Profiles -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-profiles</artifactId>
+        </dependency>
+
         <!-- Dc3 Common Core -->
         <dependency>
             <groupId>com.dc3</groupId>

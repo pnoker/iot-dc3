@@ -31,7 +31,6 @@
     <modules>
         <module>dc3-core</module>
         <module>dc3-base</module>
-        <module>dc3-config</module>
         <module>dc3-profiles</module>
         <module>dc3-sdk</module>
     </modules>

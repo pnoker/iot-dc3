@@ -9,7 +9,7 @@
 > 
 >
 >
-> 其中：MySQL、MongoDB、Redis、RabbitMQ 用户名密码均在 dc3-common/dc3-config/src/main/resources/bootstrap.yml 里，默认为：`dc3` ，如果想修改用户名密码可以全文搜索，并进行统一修改。
+> 其中：MySQL、MongoDB、Redis、RabbitMQ 用户名密码均在 dc3-common/dc3-profiles/src/main/resources/bootstrap.yml 里，默认为：`dc3` ，如果想修改用户名密码可以全文搜索，并进行统一修改。
 >
 
 
