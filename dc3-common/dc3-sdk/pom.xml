@@ -27,6 +27,12 @@
 
     <dependencies>
 
+        <!-- Spring Cloud Starter -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
         <!-- Undertow Web 容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -42,35 +48,23 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
-        
-        <!-- Spring Aop -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
-        </dependency>
 
-        <!-- Eureka -->
+        <!-- Spring Cloud Eureka -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
-        <!-- Resilience4j -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
-        </dependency>
-
-        <!-- Actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <!-- Admin -->
+        <!-- Spring Admin -->
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>
+        </dependency>
+
+        <!-- Spring Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- Spring RabbitMq -->
@@ -79,10 +73,16 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!-- Quartz -->
+        <!-- Spring Quartz -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
+        <!-- Dc3 Boot Starter -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-boot-starter</artifactId>
         </dependency>
 
         <!-- Caffeine Cache -->
@@ -96,12 +96,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-        </dependency>
-
-        <!-- Dc3 Boot Starter -->
-        <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-boot-starter</artifactId>
         </dependency>
 
         <!-- Dc3 Common Base -->

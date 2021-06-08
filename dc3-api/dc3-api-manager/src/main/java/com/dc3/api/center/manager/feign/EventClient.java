@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_EVENT_URL_PREFIX, name = Common.Service.DC3_DATA_SERVICE_NAME, fallbackFactory = EventClientHystrix.class)
+@FeignClient(path = Common.Service.DC3_MANAGER_EVENT_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = EventClientHystrix.class)
 public interface EventClient {
 
     /**
