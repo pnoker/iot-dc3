@@ -1,0 +1,13 @@
+spring:
+  redis:
+    host: ${REDIS_HOST:dc3-redis}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:dc3}
+    timeout: 15S
+    lettuce:
+      pool:
+        max-active: 64
+        min-idle: 4
+  cache:
+    type: redis
+    cache-names: dc3-cache
