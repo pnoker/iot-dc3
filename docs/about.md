@@ -27,7 +27,7 @@
 
 :whale2: 邮箱: pnokers@icloud.com
 
-:speech_balloon: 如果感兴趣可以加入 `IOT DC3` 微信技术交流群（微信号: 18304071393，请备注: DC3微信技术交流群）
+:speech_balloon: 如果感兴趣可以加入 `IOT DC3` 微信技术交流群（微信号: 18304071393，请备注: DC3微信技术交流群 + 姓名）
 
 <p align="center">
     <img src="./images/wechat/wechat.jpg" width="25%" alt="Wechat">
