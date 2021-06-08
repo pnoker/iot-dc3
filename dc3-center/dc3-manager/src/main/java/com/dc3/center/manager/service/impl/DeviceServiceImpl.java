@@ -18,8 +18,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DeviceMapper;
-import com.dc3.center.manager.service.DeviceService;
-import com.dc3.center.manager.service.ProfileBindService;
+import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
@@ -27,6 +26,8 @@ import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
+import com.dc3.common.model.Point;
+import com.dc3.common.model.Profile;
 import com.dc3.common.model.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -55,6 +56,13 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private ProfileBindService profileBindService;
 
+    @Resource
+    private NotifyService notifyService;
+    @Resource
+    private ProfileService profileService;
+    @Resource
+    private PointService pointService;
+
     @Override
     @Caching(
             put = {
@@ -74,8 +82,11 @@ public class DeviceServiceImpl implements DeviceService {
         } catch (NotFoundException notFoundException) {
             if (deviceMapper.insert(device) > 0) {
                 device.getProfileIds().forEach(profileId -> {
-                    ProfileBind profileBind = new ProfileBind(profileId, device.getId());
-                    profileBindService.add(profileBind);
+                    Profile profile = profileService.selectById(profileId);
+                    profileBindService.add(new ProfileBind(profile.getId(), device.getId()));
+                    notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
+                    List<Point> points = pointService.selectByProfileId(profile.getId());
+                    points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
                 });
                 Device select = deviceMapper.selectById(device.getId());
                 select.setProfileIds(device.getProfileIds());
@@ -122,8 +133,14 @@ public class DeviceServiceImpl implements DeviceService {
         add.removeAll(oldProfileIds);
         Set<Long> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
-        add.forEach(id -> profileBindService.add(new ProfileBind(id, device.getId())));
-        delete.forEach(id -> profileBindService.deleteByProfileIdAndDeviceId(id, device.getId()));
+        add.forEach(profileId -> {
+            Profile profile = profileService.selectById(profileId);
+            profileBindService.add(new ProfileBind(profile.getId(), device.getId()));
+            notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
+            List<Point> points = pointService.selectByProfileId(profile.getId());
+            points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
+        });
+        delete.forEach(profileId -> profileBindService.deleteByProfileIdAndDeviceId(profileId, device.getId()));
         if (deviceMapper.updateById(device) > 0) {
             Device select = deviceMapper.selectById(device.getId());
             select.setProfileIds(newProfileIds);
