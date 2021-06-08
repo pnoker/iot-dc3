@@ -28,7 +28,6 @@ spring:
 logging:
   level:
     com.dc3: DEBUG
-    de.codecentric.boot.admin: ERROR
   file:
     name: dc3/logs/center/${spring.application.name}.log
   logback:
