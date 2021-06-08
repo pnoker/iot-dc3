@@ -1,0 +1,26 @@
+spring:
+  sql:
+    init:
+      encoding: utf-8
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:dc3}
+    hikari:
+      pool-name: dc3-hikaricp
+      max-lifetime: 1765000
+      maximum-pool-size: 64
+      minimum-idle: 4
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapping
+  global-config:
+    banner: false
+    db-config:
+      table-prefix: dc3_
+      logic-delete-value: 1
+      logic-not-delete-value: 0

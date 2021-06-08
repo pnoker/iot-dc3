@@ -1,0 +1,22 @@
+server:
+  undertow:
+    threads:
+      io: 2
+      worker: 20
+    buffer-size: 512
+  thread:
+    prefix: dc3-thread-
+    core-pool-size: 4
+    maximum-pool-size: 1024
+    keep-alive-time: 10
+
+spring:
+  transaction:
+    rollback-on-commit-failure: true
+
+logging:
+  logback:
+    rollingpolicy:
+      max-history: 30
+      total-size-cap: 2GB
+      clean-history-on-start: true
