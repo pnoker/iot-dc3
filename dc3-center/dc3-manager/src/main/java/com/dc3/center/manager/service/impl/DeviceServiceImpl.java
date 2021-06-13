@@ -54,14 +54,14 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private DeviceMapper deviceMapper;
     @Resource
-    private ProfileBindService profileBindService;
+    private ProfileService profileService;
+    @Resource
+    private PointService pointService;
 
     @Resource
     private NotifyService notifyService;
     @Resource
-    private ProfileService profileService;
-    @Resource
-    private PointService pointService;
+    private ProfileBindService profileBindService;
 
     @Override
     @Caching(
@@ -81,13 +81,7 @@ public class DeviceServiceImpl implements DeviceService {
             throw new DuplicateException("The device already exists");
         } catch (NotFoundException notFoundException) {
             if (deviceMapper.insert(device) > 0) {
-                device.getProfileIds().forEach(profileId -> {
-                    Profile profile = profileService.selectById(profileId);
-                    profileBindService.add(new ProfileBind(profile.getId(), device.getId()));
-                    notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
-                    List<Point> points = pointService.selectByProfileId(profile.getId());
-                    points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
-                });
+                addProfileBind(device.getId(), device.getProfileIds());
                 Device select = deviceMapper.selectById(device.getId());
                 select.setProfileIds(device.getProfileIds());
                 return select;
@@ -126,25 +120,24 @@ public class DeviceServiceImpl implements DeviceService {
     )
     public Device update(Device device) {
         selectById(device.getId());
-        device.setUpdateTime(null);
-        Set<Long> newProfileIds = device.getProfileIds();
+
+        Set<Long> newProfileIds = null != device.getProfileIds() ? device.getProfileIds() : new HashSet<>();
         Set<Long> oldProfileIds = profileBindService.selectProfileIdByDeviceId(device.getId());
+
         Set<Long> add = new HashSet<>(newProfileIds);
         add.removeAll(oldProfileIds);
+
         Set<Long> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
-        add.forEach(profileId -> {
-            Profile profile = profileService.selectById(profileId);
-            profileBindService.add(new ProfileBind(profile.getId(), device.getId()));
-            notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
-            List<Point> points = pointService.selectByProfileId(profile.getId());
-            points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
-        });
+
+        addProfileBind(device.getId(), add);
         delete.forEach(profileId -> profileBindService.deleteByProfileIdAndDeviceId(profileId, device.getId()));
+
+        device.setUpdateTime(null);
         if (deviceMapper.updateById(device) > 0) {
             Device select = deviceMapper.selectById(device.getId());
             select.setProfileIds(newProfileIds);
-            device.setName(select.getName()).setGroupId(select.getGroupId());
+            device.setName(select.getName());
             return select;
         }
         throw new ServiceException("The device update failed");
@@ -190,6 +183,9 @@ public class DeviceServiceImpl implements DeviceService {
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Device> selectByIds(Set<Long> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);
+        if (null == devices || devices.size() < 1) {
+            throw new NotFoundException("The devices does not exist");
+        }
         devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));
         return devices;
     }
@@ -220,6 +216,22 @@ public class DeviceServiceImpl implements DeviceService {
             }
         }
         return queryWrapper;
+    }
+
+    private void addProfileBind(Long deviceId, Set<Long> profileIds) {
+        if (null != profileIds) {
+            profileIds.forEach(profileId -> {
+                Profile profile = profileService.selectById(profileId);
+                profileBindService.add(new ProfileBind(profile.getId(), deviceId));
+
+                // Notify Driver Profile
+                notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
+
+                // Notify Driver Point
+                List<Point> points = pointService.selectByProfileId(profile.getId());
+                points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
+            });
+        }
     }
 
 }

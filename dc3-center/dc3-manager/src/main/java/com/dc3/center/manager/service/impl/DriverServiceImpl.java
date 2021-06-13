@@ -171,19 +171,20 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Driver> selectByIds(Set<Long> ids) {
-        return driverMapper.selectBatchIds(ids);
+        List<Driver> drivers = driverMapper.selectBatchIds(ids);
+        if (null == drivers || drivers.size() < 1) {
+            throw new NotFoundException("The driver does not exist");
+        }
+        return drivers;
     }
 
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
     public List<Driver> selectByProfileId(Long profileId) {
         Set<Long> deviceIds = profileBindService.selectDeviceIdByProfileId(profileId);
-        if (null != deviceIds && deviceIds.size() > 0) {
-            List<Device> devices = deviceService.selectByIds(deviceIds);
-            Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
-            return selectByIds(driverIds);
-        }
-        return null;
+        List<Device> devices = deviceService.selectByIds(deviceIds);
+        Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
+        return selectByIds(driverIds);
     }
 
     @Override

@@ -38,16 +38,15 @@ import javax.annotation.Resource;
 public class ProfileApi implements ProfileClient {
 
     @Resource
-    private ProfileService profileService;
-    @Resource
     private NotifyService notifyService;
+    @Resource
+    private ProfileService profileService;
 
     @Override
     public R<Profile> add(Profile profile, Long tenantId) {
         try {
             Profile add = profileService.add(profile.setTenantId(tenantId));
             if (null != add) {
-                notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
