@@ -183,7 +183,11 @@
                 <scope>compile</scope>
             </dependency>
 
-            <!-- Dc3 Boot Starter -->
+            <!--
+                 Dc3 Boot Starter
+                 关于这个 Dc3 Boot Starter 加载 License 的说明：
+                 这个是用于绑定程序所在机器硬件参数和License，仅针对商业版本，主要是防止重复部署和防止盗版，开源版本无任何授权限制
+             -->
             <dependency>
                 <groupId>com.dc3</groupId>
                 <artifactId>dc3-boot-starter</artifactId>

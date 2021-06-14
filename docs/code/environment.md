@@ -2,25 +2,21 @@
 
 > **⚠️请注意；⚠️请注意；⚠️请注意：**
 >
-> **开发模式**，为了便于快速搭建开发环境，数据库和消息组件均采用容器模式启动，如果是实际项目中建议最好不要使用 docker 部署数据库和消息组件服务；
+> 为了便于快速搭建**开发环境**，数据库（MySQL、Redis、MongoDB）和消息组件（RabbitMQ）均采用容器启动。
 >
-> **手动部署**，安装 MySQL、MongoDB、Redis、RabbitMQ 可以参考配置文件 dc3/dependencies 中的配置文件。
->
-> 
->
->
-> 其中：MySQL、MongoDB、Redis、RabbitMQ 用户名密码均在 dc3-common/dc3-profiles/src/main/resources/bootstrap.yml 里，默认为：`dc3` ，如果想修改用户名密码可以全文搜索，并进行统一修改。
->
+> 如果是在**生产环境**下，<u>建议直接在宿主机上安装数据库和消息组件</u>，数据库（MySQL、Redis、MongoDB）和消息组件（RabbitMQ）安装配置文件在 dc3/dependencies 中，可参考自行手动安装。
 
 
 
-### 安装 Java
+### 安装 Java 1.8
+
+> 其他版本的 JDK 理论也行，只要兼容 JDK1.8 即可。
 
 - Java JDK 1.8 [Java SE Development Kit 8 Downloads](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
 
 
 
-### 安装 Maven
+### 安装 Maven 3.6
 
 - Maven 3.6 [Installing Apache Maven](http://maven.apache.org/install.html)
 
