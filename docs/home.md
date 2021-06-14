@@ -38,7 +38,7 @@
  * [x] 自主可控：私有云、公有云、边缘部署；
  * [X] 完善性：设备快速接入、注册、权限校验；
  * [ ] 安全(开发中...)：数据加密传输；
- * [ ] 多租户(开发中...)：命名空间，多租户化；
+ * [x] 多租户：命名空间，多租户化；
  * [X] 云原生：Kubernetes；
  * [x] 容器化：Docker。
 
@@ -52,5 +52,4 @@
 ![iot-dc3-architecture](images/dc3/architecture2.jpg)
 
 [`Spring Cloud Netflix`](https://cloud.spring.io/spring-cloud-netflix)、[`Spring Cloud Gateway`](https://cloud.spring.io/spring-cloud-gateway)、[`Spring Cloud Security`](https://cloud.spring.io/spring-cloud-security)、[`Spring Cloud OpenFeign`](https://cloud.spring.io/spring-cloud-openfeign) 等微服务模块。
-
 
