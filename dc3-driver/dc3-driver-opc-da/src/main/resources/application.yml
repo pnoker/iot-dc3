@@ -19,32 +19,62 @@ driver:
       type: string
       value: localhost
       description: Opc Da Host
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: CLSID
       name: clsId
       type: string
       value: F8582CF2-88FB-11D0-B850-00C0F0104305
       description: Opc Da Server CLAID
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 用户名
       name: username
       type: string
       value: dc3
       description: Opc Da UserName
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 密码
       name: password
       type: string
       value: dc3dc3
       description: Opc Da Passward
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
   point-attribute:
     - displayName: 分组
       name: group
       type: string
       value: GROUP
       description: 分组名称
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 位号
       name: tag
       type: string
       value: TAG
       description: 位号名称
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
 
 server:
   port: 8602

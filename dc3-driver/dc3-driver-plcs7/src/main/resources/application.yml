@@ -19,32 +19,62 @@ driver:
       type: string
       value: 192.168.0.20
       description: Ip
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 端口
       name: port
       type: int
       value: 102
       description: Port
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
   point-attribute:
     - displayName: DB序号
       name: dbNum
       type: int
       value: 0
       description: 数据块号，从 0 开始计数
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 字偏移
       name: byteOffset
       type: int
       value: 0
       description: 字偏移
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 位偏移
       name: bitOffset
       type: int
       value: 0
       description: 位偏移
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 数据块长度
       name: blockSize
       type: int
       value: 8
       description: 数据块长度
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
 
 server:
   port: 8601
