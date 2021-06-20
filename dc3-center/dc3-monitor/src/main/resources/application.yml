@@ -23,4 +23,4 @@ logging:
   level:
     com.dc3: DEBUG
   file:
-    name: dc3/logs/center/${spring.application.name}.log
+    name: dc3/logs/center/monitor/${spring.application.name}.log
