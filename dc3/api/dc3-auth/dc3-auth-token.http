@@ -19,10 +19,10 @@
 #/auth/token/salt
 POST http://localhost:8300/auth/token/salt
 Accept: */*
-Content-Type: text/plain
+Content-Type: application/json
 Cache-Control: no-cache
 
-pnoker
+"pnoker"
 
 
 ### 生成用户 Token 令牌
@@ -60,7 +60,7 @@ Cache-Control: no-cache
 #/auth/token/cancel
 POST http://localhost:8300/auth/token/cancel
 Accept: */*
-Content-Type: text/plain
+Content-Type: application/json
 Cache-Control: no-cache
 
-pnoker
+"pnoker"

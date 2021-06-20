@@ -17,6 +17,8 @@
 
  ![iot-dc3-architecture](images/dc3/architecture1.jpg)
 
+
+
 #### DC3 模块划分，四层架构
 
  * [x] 驱动层：用于提供标准或者私有协议连接物理设备的 `SDK`，负责南向设备的数据采集和指令控制，基于 `SDK` 可实现驱动的快速开发；
