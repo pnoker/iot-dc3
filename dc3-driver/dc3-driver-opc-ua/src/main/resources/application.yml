@@ -19,27 +19,52 @@ driver:
       type: string
       value: localhost
       description: Opc Ua IP
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 端口
       name: port
       type: int
       value: 18600
       description: Opc Ua Port
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 路径
       name: path
       type: string
       value: /
       description: Opc Ua Path
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
   point-attribute:
     - displayName: 命名空间
       name: namespace
       type: int
       value: 5
       description: 命名空间索引
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 位号
       name: tag
       type: string
       value: TAG
       description: 位号名称
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
 
 server:
   port: 8603

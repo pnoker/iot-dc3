@@ -18,21 +18,33 @@ driver:
       name: host
       type: string
       value: localhost
-      form: input\select\checkox\switch\date
-      option: {自定义一个option，用于渲染form，例如可以配置正则、单选、多选、日期类型}
-      required: true
       description: Ip
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 端口
       name: port
       type: int
       value: 18600
       description: Port
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
   point-attribute:
     - displayName: 位号
       name: tag
       type: string
       value: TAG
       description: 位号名称
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
 
 server:
   port: 8600

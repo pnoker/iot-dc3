@@ -24,21 +24,41 @@ driver:
       type: string
       value: 62
       description: 报文关键字
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 起始字节
       name: start
       type: int
       value: 0
       description: 起始字节，包含该字节
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 结束字节
       name: end
       type: int
       value: 8
       description: 结束字节，不包含该字节
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 类型
       name: type
       type: string
       value: string
       description: 解析类型，short、int、long、float、double、boolean、string
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
 
 server:
   port: 8700

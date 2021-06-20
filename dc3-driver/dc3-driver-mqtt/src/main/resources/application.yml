@@ -19,11 +19,21 @@ driver:
       type: string
       value: commandTopic
       description: 测点/设备接收下行指令的Mqtt主题
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
     - displayName: 指令Qos
       name: commandQos
       type: int
       value: 2
       description: 测点/设备接收下行指令的Mqtt主题的Qos
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
   mqtt:
     username: dc3
     password: dc3
