@@ -32,4 +32,4 @@ logging:
     com.dc3: DEBUG
     #com.dc3.center.manager.service.rabbit: INFO
   file:
-    name: dc3/logs/center/${spring.application.name}.log
+    name: dc3/logs/center/manager/${spring.application.name}.log
