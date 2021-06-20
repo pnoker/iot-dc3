@@ -18,11 +18,18 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.6.6
 MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV JAVA_OPS -server -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
-ENV GC_LOG -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintHeapAtGC -XX:+PrintReferenceGC -XX:+PrintGCApplicationStoppedTime -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=10M -Xloggc:/dc3-gateway/dc3/logs/gc/dc3-gateway-gc-%t.log
+ENV GC_LOG -XX:+PrintGCDetails \
+           -XX:+PrintGCDateStamps \
+           -XX:+PrintTenuringDistribution \
+           -XX:+PrintHeapAtGC \
+           -XX:+PrintReferenceGC \
+           -XX:+PrintGCApplicationStoppedTime \
+           -XX:+UseGCLogFileRotation \
+           -XX:NumberOfGCLogFiles=10 \
+           -XX:GCLogFileSize=10M \
+           -Xloggc:dc3/logs/gateway/gc/dc3-gateway-gc.log
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-gateway \
-    && mkdir -p /dc3-gateway/dc3/logs
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /dc3-gateway
 
@@ -31,4 +38,5 @@ ADD ./target/dc3-gateway.jar ./
 EXPOSE 8000
 VOLUME /dc3-gateway/dc3/logs
 
-CMD java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-gateway.jar
+CMD mkdir -p /dc3-gateway/dc3/logs/gateway/gc \
+    && java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-gateway.jar
