@@ -34,4 +34,4 @@ logging:
   level:
     com.dc3: DEBUG
   file:
-    name: dc3/logs/transfer/${spring.application.name}.log
+    name: dc3/logs/transfer/rtmp/${spring.application.name}.log
