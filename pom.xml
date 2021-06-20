@@ -260,6 +260,18 @@
         </repository>
 
         <repository>
+            <id>gitee-pnoker</id>
+            <name>Gitee Pnoker Apache Maven Packages</name>
+            <url>https://gitee.com/pnoker/maven/raw/master</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
             <id>github-pnoker</id>
             <name>GitHub Pnoker Apache Maven Packages</name>
             <url>https://raw.github.com/pnoker/maven/master</url>
