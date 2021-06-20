@@ -18,11 +18,18 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:1.8.251
 MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV JAVA_OPS -server -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
-ENV GC_LOG -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintHeapAtGC -XX:+PrintReferenceGC -XX:+PrintGCApplicationStoppedTime -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=10M -Xloggc:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs/gc/driver/modbus/dc3-driver-modbus-tcp-gc-%t.log
+ENV GC_LOG -XX:+PrintGCDetails \
+           -XX:+PrintGCDateStamps \
+           -XX:+PrintTenuringDistribution \
+           -XX:+PrintHeapAtGC \
+           -XX:+PrintReferenceGC \
+           -XX:+PrintGCApplicationStoppedTime \
+           -XX:+UseGCLogFileRotation \
+           -XX:NumberOfGCLogFiles=10 \
+           -XX:GCLogFileSize=10M \
+           -Xloggc:dc3/logs/driver/modbus-tcp/gc/dc3-driver-modbus-tcp-gc.log
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-driver/dc3-driver-modbus-tcp \
-    && mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /dc3-driver/dc3-driver-modbus-tcp
 
@@ -31,4 +38,5 @@ ADD ./target/dc3-driver-modbus-tcp.jar ./
 EXPOSE 8604
 VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
 
-CMD java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-modbus-tcp.jar
+CMD mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/logs/driver/modbus-tcp/gc \
+    && java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-driver-modbus-tcp.jar
