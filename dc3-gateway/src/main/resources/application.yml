@@ -110,4 +110,4 @@ logging:
   level:
     com.dc3: DEBUG
   file:
-    name: dc3/logs/${spring.application.name}.log
+    name: dc3/logs/gateway/${spring.application.name}.log
