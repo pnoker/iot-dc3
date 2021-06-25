@@ -19,12 +19,11 @@ import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.valid.Auth;
 import com.dc3.common.valid.Check;
+import com.dc3.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * <p>令牌 FeignClient
@@ -37,11 +36,11 @@ public interface TokenClient {
     /**
      * 生成用户随机 Salt
      *
-     * @param name Username
+     * @param login Login
      * @return R<String>
      */
     @PostMapping("/salt")
-    R<String> generateSalt(@NotNull @RequestBody String name);
+    R<String> generateSalt(@Validated(Update.class) @RequestBody Login login);
 
     /**
      * 生成用户 Token 令牌
@@ -64,9 +63,9 @@ public interface TokenClient {
     /**
      * 注销用户的Token令牌
      *
-     * @param name Username
+     * @param login Login
      * @return R<Boolean>
      */
     @PostMapping("/cancel")
-    R<Boolean> cancelToken(@NotNull @RequestBody String name);
+    R<Boolean> cancelToken(@Validated(Update.class) @RequestBody Login login);
 }
