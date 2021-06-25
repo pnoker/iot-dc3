@@ -37,7 +37,7 @@ public class TokenClientHystrix implements FallbackFactory<TokenClient> {
         return new TokenClient() {
 
             @Override
-            public R<String> generateSalt(String name) {
+            public R<String> generateSalt(Login login) {
                 return R.fail(message);
             }
 
@@ -52,7 +52,7 @@ public class TokenClientHystrix implements FallbackFactory<TokenClient> {
             }
 
             @Override
-            public R<Boolean> cancelToken(String name) {
+            public R<Boolean> cancelToken(Login login) {
                 return R.fail(message);
             }
 
