@@ -25,12 +25,8 @@
 
 ## 🚀 作者  
 
-> DC3 开源项目是工作之余的产物，个人兴趣爱好之一，代码更新主要活跃在周末和法定节假日。
+> DC3 开源项目是工作之余的产物，也是个人兴趣爱好之一。
 
 :whale2: 邮箱: pnokers@icloud.com
 
-:speech_balloon: 如果感兴趣可以加入 `IOT DC3` 微信技术交流群（微信号: 18304071393，请备注: DC3微信技术交流群 + 姓名）
-
-<p align="center">
-    <img src="./images/wechat/wechat.jpg" width="25%" alt="Wechat">
-<p/>
+:speech_balloon: 如果感兴趣可以加入 `IOT DC3` 微信技术交流群（Email，请备注: DC3微信技术交流群 + 姓名）

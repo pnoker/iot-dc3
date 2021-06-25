@@ -15,6 +15,7 @@ package com.dc3.common.bean;
 
 import com.dc3.common.valid.Auth;
 import com.dc3.common.valid.Check;
+import com.dc3.common.valid.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ public class Login {
     @NotBlank(message = "tenant can't be empty", groups = {Auth.class})
     private String tenant;
 
-    @NotBlank(message = "name can't be empty", groups = {Check.class, Auth.class})
+    @NotBlank(message = "name can't be empty", groups = {Check.class, Auth.class, Update.class})
     private String name;
 
     @NotBlank(message = "salt can't be empty", groups = {Check.class, Auth.class})
