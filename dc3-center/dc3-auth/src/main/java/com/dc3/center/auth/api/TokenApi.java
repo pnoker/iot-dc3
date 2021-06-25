@@ -41,8 +41,8 @@ public class TokenApi implements TokenClient {
     private TokenService tokenService;
 
     @Override
-    public R<String> generateSalt(String name) {
-        String salt = tokenService.generateSalt(name);
+    public R<String> generateSalt(Login login) {
+        String salt = tokenService.generateSalt(login.getName());
         return null != salt ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }
 
@@ -62,8 +62,8 @@ public class TokenApi implements TokenClient {
     }
 
     @Override
-    public R<Boolean> cancelToken(String name) {
-        return tokenService.cancelToken(name) ? R.ok() : R.fail();
+    public R<Boolean> cancelToken(Login login) {
+        return tokenService.cancelToken(login.getName()) ? R.ok() : R.fail();
     }
 
     /*static void main(String[] args) {

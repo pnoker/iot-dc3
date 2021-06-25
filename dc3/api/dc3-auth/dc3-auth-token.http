@@ -22,14 +22,16 @@ Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
-"pnoker"
+{
+  "name": "pnoker"
+}
 
 
 ### 生成用户 Token 令牌
 #/auth/token/generate
 # pnoker/10e339be1130a90dc1b9ff0332abced6
 # Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6"+"verfdkkq")
-POST http://localhost:8300/auth/token/generate?tenant=default
+POST http://localhost:8300/auth/token/generate
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -50,9 +52,9 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-    "name": "pnoker",
-    "salt": "dsb785i4ikx0h4wt",
-    "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwbm9rZXIvZGMzIiwic3ViIjoicG5va2VyIiwiaWF0IjoxNjIyMTEwNTE5LCJleHAiOjE2MjIxNTM3MTl9.WeE8iLppqPhNNqhNFTlGvEiq6EQBhdxb7z8AER8N_vQ"
+  "name": "pnoker",
+  "salt": "dsb785i4ikx0h4wt",
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwbm9rZXIvZGMzIiwic3ViIjoicG5va2VyIiwiaWF0IjoxNjIyMTEwNTE5LCJleHAiOjE2MjIxNTM3MTl9.WeE8iLppqPhNNqhNFTlGvEiq6EQBhdxb7z8AER8N_vQ"
 }
 
 
@@ -63,4 +65,6 @@ Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
-"pnoker"
+{
+  "name": "pnoker"
+}
