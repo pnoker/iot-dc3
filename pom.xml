@@ -57,7 +57,7 @@
     </modules>
 
     <properties>
-        <spring-boot.version>2.4.6</spring-boot.version>
+        <spring-boot.version>2.4.8</spring-boot.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
 
         <caffeine.version>3.0.2</caffeine.version>
