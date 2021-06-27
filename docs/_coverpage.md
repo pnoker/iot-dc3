@@ -12,7 +12,7 @@
 - 边、云部署
 - 多协议、跨平台、快速开发
 
-[Demo Application](https://web.dc3.site)
 [Gitee](https://gitee.com/pnoker/iot-dc3)
 [GitHub](https://github.com/pnoker/iot-dc3)
+[Demo Application](https://web.dc3.site)
 [马上开始](home.md)

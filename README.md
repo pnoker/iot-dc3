@@ -1,4 +1,4 @@
- :rocket: 项目文档请阅读 [`IOT DC3 Wiki(https://doc.dc3.site)`](https://doc.dc3.site) ！
+ :rocket: 项目文档请阅读 [`IOT DC3 Wiki (https://doc.dc3.site)`](https://doc.dc3.site) ！
 
  :boom:  你的 `Star` 是我开发的动力，下载源码 `git clone https://gitee.com/pnoker/iot-dc3.git` ！ 
 
@@ -61,10 +61,10 @@
 
 ### 3 项目文档
 
-> 详情请阅读 [`IOT DC3 Wiki(https://doc.dc3.site)`](https://doc.dc3.site) 文档
+> 详情请阅读 [`IOT DC3 Wiki (https://doc.dc3.site)`](https://doc.dc3.site) 文档
 >
 > **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
 
-> **入门：一睹为快，快速启动一个，[`Demo Application(https://web.dc3.site)`](https://doc.dc3.site) ！**
+> **入门：一睹为快，快速启动一个，[`Demo Application (https://web.dc3.site)`](https://web.dc3.site) ！**
 >
 > 请阅读 [`快速开始`](https://doc.dc3.site/#/quick-start?id=%e4%b8%80%e7%9d%b9%e4%b8%ba%e5%bf%ab) 文档
