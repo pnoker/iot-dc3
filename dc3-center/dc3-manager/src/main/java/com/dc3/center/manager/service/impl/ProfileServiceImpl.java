@@ -166,6 +166,9 @@ public class ProfileServiceImpl implements ProfileService {
             if (null != profileDto.getShare()) {
                 queryWrapper.eq(Profile::getShare, profileDto.getShare());
             }
+            if (null != profileDto.getEnable()) {
+                queryWrapper.eq(Profile::getEnable, profileDto.getEnable());
+            }
             if (null != profileDto.getTenantId()) {
                 queryWrapper.eq(Profile::getTenantId, profileDto.getTenantId());
             }

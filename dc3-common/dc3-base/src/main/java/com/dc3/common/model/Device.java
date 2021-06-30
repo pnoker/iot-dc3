@@ -23,6 +23,7 @@ import lombok.experimental.Accessors;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -51,7 +52,7 @@ public class Device extends Description {
     private Boolean enable;
 
     @TableField(exist = false)
-    private Set<Long> profileIds;
+    private Set<Long> profileIds = new HashSet<>(8);
 
     @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
     private Long driverId;
@@ -61,9 +62,6 @@ public class Device extends Description {
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Long tenantId;
-
-    @TableField(exist = false)
-    private String status;
 
     public Device(String name, Long profileId, Long groupId) {
         super();

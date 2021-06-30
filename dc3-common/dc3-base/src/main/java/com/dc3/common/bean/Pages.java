@@ -41,12 +41,21 @@ public class Pages implements Serializable {
     private long size = 20;
     private long startTime;
     private long endTime;
-    private List<OrderItem> orders = new ArrayList<>(16);
+    private List<OrderItem> orders = new ArrayList<>(4);
 
     public <T> Page<T> convert() {
         Page<T> page = new Page<>();
         BeanUtils.copyProperties(this, page);
-        page.getOrders().add(OrderItem.desc("create_time"));
+
+        boolean createTimeOrder = false;
+        for (OrderItem order : page.orders()) {
+            if (order.getColumn().equals("create_time")) {
+                createTimeOrder = true;
+            }
+        }
+        if (!createTimeOrder) {
+            page.orders().add(OrderItem.desc("create_time"));
+        }
         return page;
     }
 

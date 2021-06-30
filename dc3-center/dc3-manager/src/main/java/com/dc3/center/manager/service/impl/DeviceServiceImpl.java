@@ -211,6 +211,9 @@ public class DeviceServiceImpl implements DeviceService {
             if (null != deviceDto.getDriverId()) {
                 queryWrapper.eq(Device::getDriverId, deviceDto.getDriverId());
             }
+            if (null != deviceDto.getEnable()) {
+                queryWrapper.eq(Device::getEnable, deviceDto.getEnable());
+            }
             if (null != deviceDto.getTenantId()) {
                 queryWrapper.eq(Device::getTenantId, deviceDto.getTenantId());
             }
@@ -228,8 +231,11 @@ public class DeviceServiceImpl implements DeviceService {
                 notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
 
                 // Notify Driver Point
-                List<Point> points = pointService.selectByProfileId(profile.getId());
-                points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
+                try {
+                    List<Point> points = pointService.selectByProfileId(profile.getId());
+                    points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
+                } catch (Exception ignored) {
+                }
             });
         }
     }

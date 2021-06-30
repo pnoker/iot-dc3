@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * <p>位号配置属性 FeignClient
@@ -73,6 +74,15 @@ public interface PointAttributeClient {
      */
     @GetMapping("/id/{id}")
     R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") Long id);
+
+    /**
+     * 根据 驱动ID 查询 PointAttribute
+     *
+     * @param id PointAttribute Id
+     * @return PointAttribute Array
+     */
+    @GetMapping("/driverId/{id}")
+    R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 PointAttribute

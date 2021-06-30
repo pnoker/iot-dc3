@@ -25,47 +25,46 @@ import java.util.List;
 public interface DictionaryService {
 
     /**
-     * 获取驱动字典
+     * 获取租户驱动字典
      *
-     * @return
+     * @return Dictionary Array
      */
     List<Dictionary> driverDictionary(Long tenantId);
 
     /**
      * 获取驱动配置属性字典
      *
-     * @return
+     * @return Dictionary Array
      */
     List<Dictionary> driverAttributeDictionary(Long tenantId);
 
     /**
      * 获取位号配置属性字典
      *
-     * @return
+     * @return Dictionary Array
      */
     List<Dictionary> pointAttributeDictionary(Long tenantId);
 
     /**
-     * 获取模板字典
+     * 获取租户模板字典
      *
-     * @return
+     * @return Dictionary Array
      */
     List<Dictionary> profileDictionary(Long tenantId);
 
     /**
-     * 获取设备字典
-     * group/driver/profile
+     * 获取租户驱动下设备字典
      *
-     * @return
+     * @return Dictionary Array
      */
     List<Dictionary> deviceDictionary(Long tenantId);
 
     /**
-     * 获取位号字典
-     * driver/profile/device
+     * 获取租户模板、设备位号字典
+     * profile/device
      *
      * @param parent
-     * @return
+     * @return Dictionary Array
      */
     List<Dictionary> pointDictionary(String parent, Long tenantId);
 

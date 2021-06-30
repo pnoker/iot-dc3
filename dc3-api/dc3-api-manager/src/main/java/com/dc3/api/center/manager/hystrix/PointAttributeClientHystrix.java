@@ -22,6 +22,9 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
 /**
  * <p>PointAttributeClientHystrix
  *
@@ -55,6 +58,11 @@ public class PointAttributeClientHystrix implements FallbackFactory<PointAttribu
 
             @Override
             public R<PointAttribute> selectById(Long id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<PointAttribute>> selectByDriverId(@NotNull Long id) {
                 return R.fail(message);
             }
 

@@ -50,7 +50,7 @@ public class StatusServiceImpl implements StatusService {
     public String driver(String serviceName) {
         String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + serviceName;
         String status = redisUtil.getKey(key, String.class);
-        status = null != status ? status : Common.Driver.Status.UNREGISTERED;
+        status = null != status ? status : Common.Driver.Status.OFFLINE;
         return status;
     }
 
@@ -62,7 +62,7 @@ public class StatusServiceImpl implements StatusService {
         page.getRecords().forEach(driver -> {
             String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
             String status = redisUtil.getKey(key, String.class);
-            status = null != status ? status : Common.Driver.Status.UNREGISTERED;
+            status = null != status ? status : Common.Driver.Status.OFFLINE;
             statusMap.put(driver.getId(), status);
         });
         return statusMap;
@@ -72,7 +72,7 @@ public class StatusServiceImpl implements StatusService {
     public String device(Long id) {
         String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + id;
         String status = redisUtil.getKey(key, String.class);
-        status = null != status ? status : Common.Driver.Status.UNREGISTERED;
+        status = null != status ? status : Common.Driver.Status.OFFLINE;
         return status;
     }
 
@@ -84,7 +84,7 @@ public class StatusServiceImpl implements StatusService {
         page.getRecords().forEach(device -> {
             String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + device.getId();
             String status = redisUtil.getKey(key, String.class);
-            status = null != status ? status : Common.Driver.Status.UNREGISTERED;
+            status = null != status ? status : Common.Driver.Status.OFFLINE;
             statusMap.put(device.getId(), status);
         });
         return statusMap;

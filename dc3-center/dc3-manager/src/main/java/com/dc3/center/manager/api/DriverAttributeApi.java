@@ -14,17 +14,20 @@
 package com.dc3.center.manager.api;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.manager.service.DriverAttributeService;
 import com.dc3.api.center.manager.feign.DriverAttributeClient;
+import com.dc3.center.manager.service.DriverAttributeService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DriverAttributeDto;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>驱动连接配置信息 Client 接口实现
@@ -80,6 +83,21 @@ public class DriverAttributeApi implements DriverAttributeClient {
             if (null != select) {
                 return R.ok(select);
             }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<DriverAttribute>> selectByDriverId(Long id) {
+        try {
+            List<DriverAttribute> select = driverAttributeService.selectByDriverId(id);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (NotFoundException ne) {
+            return R.ok(new ArrayList<>());
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
