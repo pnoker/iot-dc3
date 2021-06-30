@@ -19,12 +19,15 @@ import com.dc3.center.manager.service.PointAttributeService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointAttributeDto;
+import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>驱动属性配置信息 Client 接口实现
@@ -80,6 +83,21 @@ public class PointAttributeApi implements PointAttributeClient {
             if (null != select) {
                 return R.ok(select);
             }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<PointAttribute>> selectByDriverId(Long id) {
+        try {
+            List<PointAttribute> select = pointAttributeService.selectByDriverId(id);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (NotFoundException ne) {
+            return R.ok(new ArrayList<>());
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

@@ -22,6 +22,9 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
 /**
  * <p>DriverAttributeClient
  *
@@ -55,6 +58,11 @@ public class DriverAttributeClientHystrix implements FallbackFactory<DriverAttri
 
             @Override
             public R<DriverAttribute> selectById(Long id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<DriverAttribute>> selectByDriverId(Long id) {
                 return R.fail(message);
             }
 

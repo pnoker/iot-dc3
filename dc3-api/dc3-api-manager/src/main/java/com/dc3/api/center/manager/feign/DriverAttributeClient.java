@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * <p>驱动配置属性 FeignClient
@@ -73,6 +74,15 @@ public interface DriverAttributeClient {
      */
     @GetMapping("/id/{id}")
     R<DriverAttribute> selectById(@NotNull @PathVariable(value = "id") Long id);
+
+    /**
+     * 根据 驱动ID 查询 DriverAttribute
+     *
+     * @param id DriverAttribute Id
+     * @return DriverAttribute
+     */
+    @GetMapping("/driverId/{id}")
+    R<List<DriverAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 DriverAttribute

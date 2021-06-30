@@ -20,7 +20,7 @@ spring:
       - mongo
       - redis
       - feign
-      - dev
+      #- dev
   main:
     allow-bean-definition-overriding: true
   mvc:
@@ -32,7 +32,7 @@ spring:
     database: 3
   cache:
     redis:
-      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:60S}
+      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
 
 logging:
   level:

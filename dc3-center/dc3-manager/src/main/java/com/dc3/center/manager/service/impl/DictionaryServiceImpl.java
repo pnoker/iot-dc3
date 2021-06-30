@@ -117,9 +117,6 @@ public class DictionaryServiceImpl implements DictionaryService {
             List<Device> deviceList = deviceMapper.selectList(queryWrapper);
             List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
             deviceList.forEach(device -> deviceDictionaryList.add(new Dictionary().setLabel(device.getName()).setValue(device.getId())));
-
-            driverDictionary.setDisabled(true);
-            driverDictionary.setValue(RandomUtil.randomLong());
             driverDictionary.setChildren(deviceDictionaryList);
         });
 
@@ -146,8 +143,6 @@ public class DictionaryServiceImpl implements DictionaryService {
                     pointList.forEach(point -> pointDictionaryList.add(new Dictionary().setLabel(point.getName()).setValue(point.getId())));
 
                     Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profile.getId());
-                    profileDictionary.setDisabled(true);
-                    profileDictionary.setValue(RandomUtil.randomLong());
                     profileDictionary.setChildren(pointDictionaryList);
 
                     profileDictionaryList.add(profileDictionary);
@@ -174,16 +169,12 @@ public class DictionaryServiceImpl implements DictionaryService {
                         pointList.forEach(point -> pointDictionaryList.add(new Dictionary().setLabel(point.getName()).setValue(point.getId())));
 
                         Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profileId);
-                        profileDictionary.setDisabled(true);
-                        profileDictionary.setValue(RandomUtil.randomLong());
                         profileDictionary.setChildren(pointDictionaryList);
 
                         profileDictionaryLists.add(profileDictionary);
                     });
 
                     Dictionary deviceDictionary = new Dictionary().setLabel(device.getName()).setValue(device.getId());
-                    deviceDictionary.setDisabled(true);
-                    deviceDictionary.setValue(RandomUtil.randomLong());
                     deviceDictionary.setChildren(profileDictionaryLists);
 
                     deviceDictionaryList.add(deviceDictionary);
