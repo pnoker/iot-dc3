@@ -36,19 +36,16 @@ public class MqttProperty {
     @NotBlank(message = "url can't be empty")
     private String url;
 
-    @NotBlank(message = "auth type can't be empty")
-    private AuthTypeEnum authType;
+    @NotNull
+    private AuthTypeEnum authType = AuthTypeEnum.NONE;
 
-    @NotBlank(message = "username can't be empty")
     private String username;
-
-    @NotBlank(message = "password can't be empty")
     private String password;
 
-    private String caCrt = "/home/mi/Code/mi/emqx-docker/certs/ca.crt";
-    private String clientKeyPass = "";
-    private String clientKey = "/home/mi/Code/mi/emqx-docker/certs/server.key";
-    private String clientCrt = "/home/mi/Code/mi/emqx-docker/certs/server.crt";
+    private String caCrt = "classpath:/certs/ca.crt";
+    private String clientKeyPass = "dc3-client";
+    private String clientKey = "classpath:/certs/client.key";
+    private String clientCrt = "classpath:/certs/client.crt";
 
     @Size(min = 1, message = "at least one qos")
     private List<Integer> qos;
@@ -63,19 +60,7 @@ public class MqttProperty {
     private Integer completionTimeout;
 
     public enum AuthTypeEnum {
-
-        NONE("none"),
-        CLIENT_ID("clientId"),
-        USERNAME("username"),
-        X509("x509");
-
-        @Getter
-        @Setter
-        private String authType;
-
-        AuthTypeEnum(String authType) {
-            this.authType = authType;
-        }
+        NONE, CLIENT_ID, USERNAME, X509
     }
 
 }
