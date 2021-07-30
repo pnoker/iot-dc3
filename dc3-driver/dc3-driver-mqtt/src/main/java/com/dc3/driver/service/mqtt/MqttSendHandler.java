@@ -20,7 +20,7 @@ import org.springframework.messaging.handler.annotation.Header;
 /**
  * @author pnoker
  */
-@MessagingGateway(defaultRequestChannel = "mqttOutChannel")
+@MessagingGateway(defaultRequestChannel = "mqttOutputChannel")
 public interface MqttSendHandler {
     /**
      * 使用 Default Topic & Default Qos 发送数据

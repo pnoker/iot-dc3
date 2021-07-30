@@ -33,17 +33,28 @@ import java.util.List;
 @Validated({Insert.class, Update.class})
 @ConfigurationProperties(prefix = "driver.mqtt")
 public class MqttProperty {
+    @NotBlank(message = "url can't be empty")
+    private String url;
+
+    @NotBlank(message = "auth type can't be empty")
+    private AuthTypeEnum authType;
+
     @NotBlank(message = "username can't be empty")
     private String username;
 
     @NotBlank(message = "password can't be empty")
     private String password;
 
-    @NotBlank(message = "url can't be empty")
-    private String url;
+    private String caCrt = "/home/mi/Code/mi/emqx-docker/certs/ca.crt";
+    private String clientKeyPass = "";
+    private String clientKey = "/home/mi/Code/mi/emqx-docker/certs/server.key";
+    private String clientCrt = "/home/mi/Code/mi/emqx-docker/certs/server.crt";
 
     @Size(min = 1, message = "at least one qos")
     private List<Integer> qos;
+
+    @Size(min = 1, message = "at least one topic")
+    private List<String> topics;
 
     @NotNull(message = "keep alive interval can't be empty")
     private Integer keepAlive;
@@ -51,7 +62,20 @@ public class MqttProperty {
     @NotNull(message = "completion timeout can't be empty")
     private Integer completionTimeout;
 
-    @Size(min = 1, message = "at least one topic")
-    private List<String> topics;
+    public enum AuthTypeEnum {
+
+        NONE("none"),
+        CLIENT_ID("clientId"),
+        USERNAME("username"),
+        X509("x509");
+
+        @Getter
+        @Setter
+        private String authType;
+
+        AuthTypeEnum(String authType) {
+            this.authType = authType;
+        }
+    }
 
 }
