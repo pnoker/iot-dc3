@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "driver.mqtt.auth-type",
+      "type": "com.dc3.driver.bean.MqttProperty.AuthTypeEnum",
+      "description": "mqtt auth type."
+    }
+  ]
+}

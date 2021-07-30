@@ -32,6 +32,7 @@
         <jwt.version>0.9.1</jwt.version>
         <hutool.version>5.6.3</hutool.version>
         <fastjson.version>1.2.76</fastjson.version>
+        <bouncycastle.version>1.46</bouncycastle.version>
     </properties>
 
     <dependencies>
@@ -96,10 +97,10 @@
             <version>${fastjson.version}</version>
         </dependency>
 
-        <!-- Bouncy Castle -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
 
     </dependencies>

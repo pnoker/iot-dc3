@@ -13,6 +13,8 @@
 
 package com.dc3.driver.config;
 
+import cn.hutool.core.util.StrUtil;
+import com.dc3.common.utils.KeyUtil;
 import com.dc3.driver.bean.MqttProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -56,20 +58,40 @@ public class MqttConfig {
     private MqttProperty mqttProperty;
 
     @Bean
-    public MqttConnectOptions getMqttConnectOptions() {
-        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-        mqttConnectOptions.setUserName(mqttProperty.getUsername());
-        mqttConnectOptions.setPassword(mqttProperty.getPassword().toCharArray());
-        mqttConnectOptions.setServerURIs(new String[]{mqttProperty.getUrl()});
-        mqttConnectOptions.setKeepAliveInterval(mqttProperty.getKeepAlive());
-        return mqttConnectOptions;
-    }
-
-    @Bean
     public MqttPahoClientFactory mqttClientFactory() {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
         factory.setConnectionOptions(getMqttConnectOptions());
         return factory;
+    }
+
+    @Bean
+    public MqttConnectOptions getMqttConnectOptions() {
+        MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+
+
+        // username & password
+        if (mqttProperty.getAuthType().equals(MqttProperty.AuthTypeEnum.USERNAME)) {
+            mqttConnectOptions.setUserName(mqttProperty.getUsername());
+            mqttConnectOptions.setPassword(mqttProperty.getPassword().toCharArray());
+        }
+
+        // tls x509
+        if (mqttProperty.getAuthType().equals(MqttProperty.AuthTypeEnum.X509)) {
+            mqttConnectOptions.setSocketFactory(KeyUtil.getSocketFactory(
+                    mqttProperty.getCaCrt(),
+                    mqttProperty.getClientCrt(),
+                    mqttProperty.getClientKey(),
+                    StrUtil.isBlank(mqttProperty.getClientKeyPass()) ? "" : mqttProperty.getClientKeyPass()
+            ));
+            if (!StrUtil.isBlank(mqttProperty.getUsername()) && !StrUtil.isBlank(mqttProperty.getPassword())) {
+                mqttConnectOptions.setUserName(mqttProperty.getUsername());
+                mqttConnectOptions.setPassword(mqttProperty.getPassword().toCharArray());
+            }
+        }
+
+        mqttConnectOptions.setServerURIs(new String[]{mqttProperty.getUrl()});
+        mqttConnectOptions.setKeepAliveInterval(mqttProperty.getKeepAlive());
+        return mqttConnectOptions;
     }
 
     @Bean
@@ -105,6 +127,11 @@ public class MqttConfig {
     }
 
     @Bean
+    public MessageChannel mqttOutputChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
     public MessageProducer inbound() {
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
                 clientId + "_inbound",
@@ -119,12 +146,7 @@ public class MqttConfig {
     }
 
     @Bean
-    public MessageChannel mqttOutChannel() {
-        return new DirectChannel();
-    }
-
-    @Bean
-    @ServiceActivator(inputChannel = "mqttOutChannel")
+    @ServiceActivator(inputChannel = "mqttOutputChannel")
     public MessageHandler outbound() {
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(clientId, mqttClientFactory());
         messageHandler.setAsync(true);
