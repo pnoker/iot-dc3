@@ -352,13 +352,6 @@
                     <configuration>
                         <finalName>${project.build.finalName}</finalName>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <!-- 过滤文件 -->
                 <plugin>
