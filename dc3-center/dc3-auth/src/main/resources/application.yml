@@ -12,6 +12,7 @@ spring:
       - mysql
       - redis
       - feign
+      #用于本地启动
       #- dev
   main:
     allow-bean-definition-overriding: true
