@@ -31,14 +31,34 @@ public interface Common {
     String DEFAULT_PASSWORD = "dc3dc3dc3";
 
     /**
-     * 对称加密算法
+     * 加密算法 对称AES
      */
-    String KEY_ALGORITHM_AES = "AES";
+    String ALGORITHM_AES = "AES";
 
     /**
-     * 非对称加密算法
+     * 加密算法 非对称RSA
      */
-    String KEY_ALGORITHM_RSA = "RSA";
+    String ALGORITHM_RSA = "RSA";
+
+    /**
+     * 加密算法 SHA256withRSA
+     */
+    String ALGORITHM_SHA256_RSA = "SHA256withRSA";
+
+    /**
+     * 证书类型 X.509
+     */
+    String CERTIFICATE_X509 = "X.509";
+
+    /**
+     * 证书类型 PKCS12
+     */
+    String CERTIFICATE_PKCS12 = "PKCS12";
+
+    /**
+     * 证书类型 JKS
+     */
+    String CERTIFICATE_JKS = "jks";
 
     /**
      * 时区

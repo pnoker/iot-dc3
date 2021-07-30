@@ -96,6 +96,12 @@
             <version>${fastjson.version}</version>
         </dependency>
 
+        <!-- Bouncy Castle -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

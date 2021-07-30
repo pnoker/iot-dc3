@@ -48,7 +48,7 @@ public class KeyUtil {
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
     public static Keys.Aes genAesKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(Common.KEY_ALGORITHM_AES);
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(Common.ALGORITHM_AES);
         keyGenerator.init(128);
         SecretKey secretKey = keyGenerator.generateKey();
         return new Keys.Aes(Dc3Util.encode(secretKey.getEncoded()));
@@ -65,9 +65,9 @@ public class KeyUtil {
     public static String encryptAes(String str, String privateKey) throws Exception {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
-        Key key = new SecretKeySpec(keyBytes, Common.KEY_ALGORITHM_AES);
+        Key key = new SecretKeySpec(keyBytes, Common.ALGORITHM_AES);
         //AES加密
-        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_AES);
+        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_AES);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return Dc3Util.encode(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
     }
@@ -83,9 +83,9 @@ public class KeyUtil {
     public static String decryptAes(String str, String privateKey) throws Exception {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
-        Key key = new SecretKeySpec(keyBytes, Common.KEY_ALGORITHM_AES);
+        Key key = new SecretKeySpec(keyBytes, Common.ALGORITHM_AES);
         //AES解密
-        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_AES);
+        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_AES);
         cipher.init(Cipher.DECRYPT_MODE, key);
         //64位解码加密后的字符串
         byte[] inputByte = Dc3Util.decode(str.getBytes(StandardCharsets.UTF_8));
@@ -99,7 +99,7 @@ public class KeyUtil {
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
     public static Keys.Rsa genRsaKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(Common.KEY_ALGORITHM_RSA);
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(Common.ALGORITHM_RSA);
         keyPairGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
@@ -121,9 +121,9 @@ public class KeyUtil {
         //base64编码的公钥
         byte[] keyBytes = Dc3Util.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(Common.KEY_ALGORITHM_RSA).generatePublic(keySpec);
+        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(Common.ALGORITHM_RSA).generatePublic(keySpec);
         //RSA加密
-        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_RSA);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         return Dc3Util.encode(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
     }
@@ -140,9 +140,9 @@ public class KeyUtil {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(Common.KEY_ALGORITHM_RSA).generatePrivate(keySpec);
+        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(Common.ALGORITHM_RSA).generatePrivate(keySpec);
         //RSA解密
-        Cipher cipher = Cipher.getInstance(Common.KEY_ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_RSA);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
         //64位解码加密后的字符串
         byte[] inputByte = Dc3Util.decode(str.getBytes(StandardCharsets.UTF_8));

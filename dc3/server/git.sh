@@ -20,16 +20,26 @@ set -e
 
 cd ../../
 
-git push origin
-git push gitee
-git push coding
+git pull --tags
+develop_tag=$(echo dc3.develop.$(date +'%Y%m%d').$(git tag -l "dc3.develop.$(date +'%Y%m%d').*" | wc -l | xargs printf '%02d'))
+echo ${develop_tag}
+git tag ${develop_tag}
+
+git push origin --tags
+git push gitee --tags
+git push coding --tags
 
 git checkout master
 git merge develop
 
-git push origin
-git push gitee
-git push coding
+git pull --tags
+release_tag=$(echo dc3.release.$(date +'%Y%m%d').$(git tag -l "dc3.release.$(date +'%Y%m%d').*" | wc -l | xargs printf '%02d'))
+echo ${release_tag}
+git tag ${release_tag}
+
+git push origin --tags
+git push gitee --tags
+git push coding --tags
 
 git checkout develop
 
