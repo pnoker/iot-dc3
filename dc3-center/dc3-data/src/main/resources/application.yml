@@ -20,7 +20,6 @@ spring:
       - mongo
       - redis
       - feign
-      - dev
   main:
     allow-bean-definition-overriding: true
   mvc:
