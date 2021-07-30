@@ -71,6 +71,11 @@ public interface Common {
     String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
     /**
+     * resources path
+     */
+    String CLASSPATH = "classpath:";
+
+    /**
      * 用户主目录
      */
     String USER_HOME_PATH = System.getProperty("user.home") + "/.dc3/";

@@ -496,10 +496,8 @@ services:
     image: pnoker/dc3-emqx:1.0.0
     restart: always
     ports:
-      - 1884:1884
-      - 18084:18084
-    environment:
-      - EMQX_LOADED_PLUGINS=emqx_recon,emqx_retainer,emqx_management,emqx_dashboard,emqx_auth_username
+      - 8883:8883
+      - 18083:18083
     container_name: dc3-emqx
     hostname: dc3-emqx
     volumes:

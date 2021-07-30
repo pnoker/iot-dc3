@@ -14,13 +14,14 @@
 #  limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/emqx:4.2
+FROM registry.cn-beijing.aliyuncs.com/dc3/emqx:4.3.6
 MAINTAINER pnoker <pnokers.icloud.com>
 
-COPY ./emqx.conf /opt/emqx/etc/emqx.conf
-COPY ./plugins/*.conf /opt/emqx/etc/plugins/
+COPY --chown=emqx:emqx ./emqx.conf /opt/emqx/etc/emqx.conf
 
-USER root
-RUN chgrp -Rf emqx /opt/emqx && chmod -Rf g+w /opt/emqx \
-    && chown -Rf emqx /opt/emqx
-USER emqx
+COPY --chown=emqx:emqx ./certs/ca.crt /opt/emqx/etc/certs
+COPY --chown=emqx:emqx ./certs/server.key /opt/emqx/etc/certs
+COPY --chown=emqx:emqx ./certs/server.crt /opt/emqx/etc/certs
+
+COPY --chown=emqx:emqx ./data/* /opt/emqx/data/
+COPY --chown=emqx:emqx ./plugins/*.conf /opt/emqx/etc/plugins/

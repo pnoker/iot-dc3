@@ -60,6 +60,8 @@
                 <includes>
                     <include>**/application.yml</include>
                     <include>**/*.json</include>
+                    <include>**/*.key</include>
+                    <include>**/*.crt</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>

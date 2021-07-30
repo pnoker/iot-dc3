@@ -35,14 +35,14 @@ driver:
         data-type: static/url
         data: jsonString
   mqtt:
-    url: tcp://dc3-emqx:8883
+    url: ssl://dc3-emqx:8883
     auth-type: X509
     username: dc3
     password: dc3
-    ca-crt: ./certs/ca.crt
-    client-key-pass: emqx-mqtt
-    client-key: ./certs/client.key
-    client-crt: ./certs/client.crt
+    ca-crt: classpath:/certs/ca.crt
+    client-key-pass: dc3-client
+    client-key: classpath:/certs/client.key
+    client-crt: classpath:/certs/client.crt
     qos:
       - 0
     topics:

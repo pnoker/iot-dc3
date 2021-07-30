@@ -121,9 +121,9 @@
       "description": "driver completion timeout for mqtt server."
     },
     {
-      "name": "driver.mqtt.url",
-      "type": "java.lang.String",
-      "description": "driver url for mqtt server."
+      "name": "driver.mqtt.auth-type",
+      "type": "com.dc3.driver.bean.MqttProperty.AuthTypeEnum",
+      "description": "mqtt auth type."
     },
     {
       "name": "driver.mqtt.qos",
@@ -154,6 +154,26 @@
       "name": "driver.mqtt.default.receive.enable",
       "type": "java.lang.Boolean",
       "description": "driver default topic receive enable for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.ca-crt",
+      "type": "java.lang.String",
+      "description": "driver ca crt for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.client-key-pass",
+      "type": "java.lang.String",
+      "description": "driver client key pass for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.client-key",
+      "type": "java.lang.String",
+      "description": "driver client key for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.client-crt",
+      "type": "java.lang.String",
+      "description": "driver client crt for mqtt server."
     }
   ]
 }

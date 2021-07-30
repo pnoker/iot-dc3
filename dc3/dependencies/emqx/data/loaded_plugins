@@ -1,0 +1,10 @@
+{emqx_management, true}.
+{emqx_dashboard, true}.
+{emqx_modules, false}.
+{emqx_recon, true}.
+{emqx_retainer, true}.
+{emqx_telemetry, true}.
+{emqx_rule_engine, true}.
+{emqx_bridge_mqtt, false}.
+{emqx_auth_mnesia, true}.
+{emqx_auth_mysql, false}.
