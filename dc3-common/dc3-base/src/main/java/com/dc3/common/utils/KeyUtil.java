@@ -19,13 +19,25 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.KeySpec;
@@ -39,6 +51,7 @@ import java.util.Date;
  *
  * @author pnoker
  */
+@Slf4j
 public class KeyUtil {
 
     /**
@@ -180,6 +193,51 @@ public class KeyUtil {
                 .setSigningKey(salt)
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public static SSLSocketFactory getSocketFactory(final String caCrtFile, final String crtFile, final String keyFile, final String password) {
+        try {
+            Security.addProvider(new BouncyCastleProvider());
+
+            // load CA certificate
+            PEMReader reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(Paths.get(caCrtFile)))));
+            X509Certificate caCert = (X509Certificate) reader.readObject();
+            reader.close();
+
+            // load client certificate
+            reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(Paths.get(crtFile)))));
+            X509Certificate cert = (X509Certificate) reader.readObject();
+            reader.close();
+
+            // load client private key
+            reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(Paths.get(keyFile)))), password::toCharArray);
+            KeyPair key = (KeyPair) reader.readObject();
+            reader.close();
+
+            // CA certificate is used to authenticate server
+            KeyStore caKs = KeyStore.getInstance(KeyStore.getDefaultType());
+            caKs.load(null, null);
+            caKs.setCertificateEntry("cacertfile", caCert);
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(caKs);
+
+            // client key and certificates are sent to server so it can authenticate us
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(null, null);
+            ks.setCertificateEntry("certfile", cert);
+            ks.setKeyEntry("keyfile", key.getPrivate(), password.toCharArray(), new java.security.cert.Certificate[]{cert});
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(ks, password.toCharArray());
+
+            // finally, create SSL socket factory
+            SSLContext context = SSLContext.getInstance("TLSv1.2");
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+            return context.getSocketFactory();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
     }
 
 }
