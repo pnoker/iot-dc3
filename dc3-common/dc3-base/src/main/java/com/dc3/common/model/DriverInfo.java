@@ -36,6 +36,7 @@ public class DriverInfo extends Description {
     @NotNull(message = "driver attribute id can't be empty", groups = {Insert.class, Update.class})
     private Long driverAttributeId;
 
+    @NotNull(message = "driver attribute value can't be empty", groups = {Insert.class, Update.class})
     private String value;
 
     @NotNull(message = "device id can't be empty", groups = {Insert.class, Update.class})

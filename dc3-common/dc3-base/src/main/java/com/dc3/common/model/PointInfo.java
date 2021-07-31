@@ -36,6 +36,7 @@ public class PointInfo extends Description {
     @NotNull(message = "point attribute id can't be empty", groups = {Insert.class, Update.class})
     private Long pointAttributeId;
 
+    @NotNull(message = "point attribute value can't be empty", groups = {Insert.class, Update.class})
     private String value;
 
     @NotNull(message = "device id can't be empty", groups = {Insert.class, Update.class})
