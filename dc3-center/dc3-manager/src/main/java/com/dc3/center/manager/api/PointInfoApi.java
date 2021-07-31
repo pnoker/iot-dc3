@@ -98,6 +98,19 @@ public class PointInfoApi implements PointInfoClient {
     }
 
     @Override
+    public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId) {
+        try {
+            PointInfo select = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
     public R<Page<PointInfo>> list(PointInfoDto pointInfoDto) {
         try {
             Page<PointInfo> page = pointInfoService.list(pointInfoDto);
