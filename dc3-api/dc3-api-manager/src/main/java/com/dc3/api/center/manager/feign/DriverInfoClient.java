@@ -75,6 +75,16 @@ public interface DriverInfoClient {
     R<DriverInfo> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
+     * 根据 属性ID 和 设备ID 查询 DriverInfo
+     *
+     * @param attributeId Attribute Id
+     * @param deviceId    Device Id
+     * @return DriverInfo
+     */
+    @GetMapping("/attributeId/{attributeId}/deviceId/{deviceId}")
+    R<DriverInfo> selectByAttributeIdAndDeviceId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId);
+
+    /**
      * 分页查询 DriverInfo
      *
      * @param driverInfoDto DriverInfo Dto
