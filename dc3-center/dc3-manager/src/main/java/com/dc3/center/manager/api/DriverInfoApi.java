@@ -98,6 +98,19 @@ public class DriverInfoApi implements DriverInfoClient {
     }
 
     @Override
+    public R<DriverInfo> selectByAttributeIdAndDeviceId(Long attributeId, Long deviceId) {
+        try {
+            DriverInfo select = driverInfoService.selectByAttributeIdAndDeviceId(attributeId, deviceId);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
     public R<Page<DriverInfo>> list(DriverInfoDto driverInfoDto) {
         try {
             Page<DriverInfo> page = driverInfoService.list(driverInfoDto);
