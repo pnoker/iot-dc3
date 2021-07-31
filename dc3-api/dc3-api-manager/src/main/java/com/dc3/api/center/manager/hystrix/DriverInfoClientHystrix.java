@@ -18,8 +18,8 @@ import com.dc3.api.center.manager.feign.DriverInfoClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.DriverInfoDto;
 import com.dc3.common.model.DriverInfo;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -55,6 +55,11 @@ public class DriverInfoClientHystrix implements FallbackFactory<DriverInfoClient
 
             @Override
             public R<DriverInfo> selectById(Long id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<DriverInfo> selectByAttributeIdAndDeviceId(Long attributeId, Long deviceId) {
                 return R.fail(message);
             }
 
