@@ -75,6 +75,17 @@ public interface PointInfoClient {
     R<PointInfo> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
+     * 根据 属性ID、设备ID 和 位号ID 查询 PointInfo
+     *
+     * @param attributeId Attribute Id
+     * @param deviceId    Device Id
+     * @param pointId     Point Id
+     * @return PointInfo
+     */
+    @GetMapping("/attributeId/{attributeId}/deviceId/{deviceId}/pointId/{pointId}")
+    R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+
+    /**
      * 分页查询 PointInfo
      *
      * @param pointInfoDto PointInfo Dto
