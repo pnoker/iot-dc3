@@ -103,9 +103,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
             }
     )
     public DriverInfo update(DriverInfo driverInfo) {
-        DriverInfo temp = selectById(driverInfo.getId());
+        DriverInfo oldDriverInfo = selectById(driverInfo.getId());
         driverInfo.setUpdateTime(null);
-        if (!temp.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) || !temp.getDeviceId().equals(driverInfo.getDeviceId())) {
+        if (!oldDriverInfo.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) || !oldDriverInfo.getDeviceId().equals(driverInfo.getDeviceId())) {
             try {
                 selectByAttributeIdAndDeviceId(driverInfo.getDriverAttributeId(), driverInfo.getDeviceId());
                 throw new DuplicateException("The driver info already exists");
