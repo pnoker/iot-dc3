@@ -26,6 +26,7 @@ import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
+import com.dc3.common.model.Point;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,6 +39,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>ProfileService Impl
@@ -68,9 +70,14 @@ public class ProfileServiceImpl implements ProfileService {
         try {
             selectByName(profile.getName(), profile.getTenantId());
             throw new DuplicateException("The profile already exists");
-        } catch (NotFoundException notFoundException) {
+        } catch (NotFoundException notFoundException1) {
             if (profileMapper.insert(profile) > 0) {
-                return profileMapper.selectById(profile.getId());
+                Profile select = profileMapper.selectById(profile.getId());
+                try {
+                    select.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
+                } catch (NotFoundException ignored) {
+                }
+                return select;
             }
             throw new ServiceException("The profile add failed");
         }
@@ -112,6 +119,10 @@ public class ProfileServiceImpl implements ProfileService {
         profile.setUpdateTime(null);
         if (profileMapper.updateById(profile) > 0) {
             Profile select = profileMapper.selectById(profile.getId());
+            try {
+                select.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
+            } catch (NotFoundException ignored) {
+            }
             profile.setName(select.getName());
             return select;
         }
@@ -124,6 +135,10 @@ public class ProfileServiceImpl implements ProfileService {
         Profile profile = profileMapper.selectById(id);
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
+        }
+        try {
+            profile.setPointIds(pointService.selectByProfileId(id).stream().map(Point::getId).collect(Collectors.toSet()));
+        } catch (NotFoundException ignored) {
         }
         return profile;
     }
@@ -138,13 +153,24 @@ public class ProfileServiceImpl implements ProfileService {
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
         }
+        try {
+            profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
+        } catch (NotFoundException ignored) {
+        }
         return profile;
     }
 
     @Override
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Profile> selectByIds(Set<Long> ids) {
-        return profileMapper.selectBatchIds(ids);
+        List<Profile> profiles = profileMapper.selectBatchIds(ids);
+        profiles.forEach(profile -> {
+            try {
+                profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
+            } catch (NotFoundException ignored) {
+            }
+        });
+        return profiles;
     }
 
     @Override
@@ -153,7 +179,14 @@ public class ProfileServiceImpl implements ProfileService {
         if (!Optional.ofNullable(profileDto.getPage()).isPresent()) {
             profileDto.setPage(new Pages());
         }
-        return profileMapper.selectPage(profileDto.getPage().convert(), fuzzyQuery(profileDto));
+        Page<Profile> page = profileMapper.selectPage(profileDto.getPage().convert(), fuzzyQuery(profileDto));
+        page.getRecords().forEach(profile -> {
+            try {
+                profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
+            } catch (NotFoundException ignored) {
+            }
+        });
+        return page;
     }
 
     @Override

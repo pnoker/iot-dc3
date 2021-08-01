@@ -182,6 +182,16 @@ public class DictionaryServiceImpl implements DictionaryService {
 
                 dictionaries = deviceDictionaryList;
                 break;
+            case "point":
+                List<Dictionary> pointDictionaryList = new ArrayList<>(16);
+
+                LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
+                queryWrapper.eq(Point::getTenantId, tenantId);
+                List<Point> pointList = pointMapper.selectList(queryWrapper);
+                pointList.forEach(point -> pointDictionaryList.add(new Dictionary().setLabel(point.getName()).setValue(point.getId())));
+
+                dictionaries = pointDictionaryList;
+                break;
             default:
                 break;
         }
