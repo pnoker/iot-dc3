@@ -94,9 +94,9 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> selectByHostPort(String host, Integer port, Long tenantId) {
+    public R<Driver> selectByHostPort(String type, String host, Integer port, Long tenantId) {
         try {
-            Driver select = driverService.selectByHostPort(host, port, tenantId);
+            Driver select = driverService.selectByHostPort(type, host, port, tenantId);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());

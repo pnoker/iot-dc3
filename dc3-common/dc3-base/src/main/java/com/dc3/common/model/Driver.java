@@ -64,11 +64,12 @@ public class Driver extends Description {
     @TableField(exist = false)
     private String status;
 
-    public Driver(String name, String serviceName, String host, Integer port) {
+    public Driver(String name, String serviceName, String host, Integer port, String type) {
         super();
         this.name = name;
         this.serviceName = serviceName;
         this.host = host;
         this.port = port;
+        this.type = type;
     }
 }

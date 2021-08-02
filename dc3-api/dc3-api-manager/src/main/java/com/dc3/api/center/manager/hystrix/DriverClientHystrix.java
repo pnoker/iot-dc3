@@ -64,7 +64,7 @@ public class DriverClientHystrix implements FallbackFactory<DriverClient> {
             }
 
             @Override
-            public R<Driver> selectByHostPort(String host, Integer port, Long tenantId) {
+            public R<Driver> selectByHostPort(String type, String host, Integer port, Long tenantId) {
                 return R.fail(message);
             }
 

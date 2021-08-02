@@ -387,6 +387,33 @@ services:
         aliases:
           - dc3-driver-modbus-tcp
 
+  edge-gateway:
+    build:
+      context: ../dc3-driver/dc3-driver-edge-gateway/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-edge-gateway:1.0.0
+    restart: always
+    ports:
+      - 8702:8702
+    environment:
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - EUREKA_HOST=dc3-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
+    container_name: dc3-driver-edge-gateway
+    hostname: dc3-driver-edge-gateway
+    volumes:
+      - logs:/dc3-driver/dc3-driver-edge-gateway/dc3/logs
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-edge-gateway
+
   rtmp:
     build:
       context: ../dc3-transfer/dc3-rtmp/
