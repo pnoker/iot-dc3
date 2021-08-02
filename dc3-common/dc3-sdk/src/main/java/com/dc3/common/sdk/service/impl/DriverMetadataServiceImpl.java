@@ -64,7 +64,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             throw new ServiceException("The driver port is invalid, port range is 8600-8799");
         }
 
-        Driver driver = new Driver(driverProperty.getName(), this.serviceName, localHost, this.port);
+        Driver driver = new Driver(driverProperty.getName(), this.serviceName, localHost, this.port, driverProperty.getType());
         driver.setDescription(driverProperty.getDescription());
         log.info("The driver {}/{} is initializing", driver.getServiceName(), driver.getName());
 

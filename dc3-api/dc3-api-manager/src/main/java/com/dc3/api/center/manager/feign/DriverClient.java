@@ -81,14 +81,15 @@ public interface DriverClient {
     R<Driver> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName);
 
     /**
-     * 根据 HOST & PORT 查询 Driver
+     * 根据 TYPE & HOST & PORT 查询 Driver
      *
+     * @param type Driver type
      * @param host Driver Host
      * @param port Driver Port
      * @return Driver
      */
-    @GetMapping("/host/{host}/port/{port}")
-    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    @GetMapping("/type/{type}/host/{host}/port/{port}")
+    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "type") String type, @NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 分页查询 Driver
