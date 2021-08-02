@@ -166,6 +166,7 @@ public interface Common {
 
         interface Type {
             String DRIVER = "driver";
+            String GATEWAY = "gateway";
             String PROFILE = "profile";
             String DEVICE = "device";
             String POINT = "point";

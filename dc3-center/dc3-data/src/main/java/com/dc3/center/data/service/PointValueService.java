@@ -56,6 +56,14 @@ public interface PointValueService {
     PointValue realtime(Long deviceId, Long pointId);
 
     /**
+     * 获取一个设备最新的位号数据集合
+     *
+     * @param deviceId Device Id
+     * @return PointValue Array
+     */
+    List<PointValue> latest(Long deviceId);
+
+    /**
      * 获取最新的一个位号数据
      *
      * @param deviceId Device Id

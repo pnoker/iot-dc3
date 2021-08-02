@@ -18,8 +18,8 @@ import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.PointValueDto;
 import com.dc3.common.model.PointValue;
-import org.springframework.cloud.openfeign.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
             }
 
             @Override
-            public R<PointValue> latest(Long deviceId) {
+            public R<List<PointValue>> latest(Long deviceId) {
                 return R.fail(message);
             }
 

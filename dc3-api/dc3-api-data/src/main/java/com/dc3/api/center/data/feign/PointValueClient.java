@@ -40,7 +40,7 @@ public interface PointValueClient {
      * 获取实时值，读 Redis
      *
      * @param deviceId Device Id
-     * @return String Value
+     * @return PointValue Array
      */
     @GetMapping("/realtime/device_id/{deviceId}")
     R<List<PointValue>> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId);
@@ -56,13 +56,13 @@ public interface PointValueClient {
     R<PointValue> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
 
     /**
-     * 查询最新 PointValue
+     * 查询最新 PointValue 集合
      *
      * @param deviceId Device Id
-     * @return PointValue
+     * @return PointValue Array
      */
     @GetMapping("/latest/device_id/{deviceId}")
-    R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<List<PointValue>> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
      * 查询最新 PointValue

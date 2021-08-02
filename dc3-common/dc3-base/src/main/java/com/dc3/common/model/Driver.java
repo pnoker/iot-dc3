@@ -50,6 +50,8 @@ public class Driver extends Description {
     @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$", message = "invalid host", groups = {Insert.class, Update.class})
     private String host;
 
+    private String type;
+
     @Min(value = 8600, message = "invalid port,port range is 8600-8799", groups = {Insert.class, Update.class})
     @Max(value = 8799, message = "invalid port,port range is 8600-8799", groups = {Insert.class, Update.class})
     private Integer port;

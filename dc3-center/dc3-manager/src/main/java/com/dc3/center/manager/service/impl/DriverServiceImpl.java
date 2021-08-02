@@ -212,6 +212,10 @@ public class DriverServiceImpl implements DriverService {
             if (null != driverDto.getPort()) {
                 queryWrapper.eq(Driver::getPort, driverDto.getPort());
             }
+            if (StrUtil.isBlank(driverDto.getType())) {
+                driverDto.setType(Common.Driver.Type.DRIVER);
+            }
+            queryWrapper.like(Driver::getType, driverDto.getType());
             if (null != driverDto.getEnable()) {
                 queryWrapper.eq(Driver::getEnable, driverDto.getEnable());
             }

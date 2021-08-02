@@ -140,28 +140,46 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public PointValue latest(Long deviceId, Long pointId) {
-        R<Device> r = deviceClient.selectById(deviceId);
-        if (!r.isOk()) {
-            return null;
-        }
-
-        Criteria criteria = new Criteria();
-        criteria.and("deviceId").is(deviceId);
-        if (r.getData().getMulti()) {
-            criteria.and("multi").is(true);
-            if (null != pointId) {
-                criteria.and("children").elemMatch(
-                        (new Criteria()).and("pointId").is(pointId)
-                );
+    public List<PointValue> latest(Long deviceId) {
+        List<PointValue> pointValues = new ArrayList<>();
+        R<Device> deviceR = deviceClient.selectById(deviceId);
+        if (deviceR.isOk()) {
+            R<List<Point>> pointsR = pointClient.selectByDeviceId(deviceId);
+            if (pointsR.isOk()) {
+                pointsR.getData().forEach(point -> {
+                    pointValues.add(latest(deviceId, point.getId()));
+                });
             }
-        } else if (null != pointId) {
-            criteria.and("pointId").is(pointId);
         }
 
-        Query query = new Query(criteria);
-        query.with(Sort.by(Sort.Direction.DESC, "originTime"));
-        return mongoTemplate.findOne(query, PointValue.class);
+        return pointValues;
+    }
+
+    @Override
+    public PointValue latest(Long deviceId, Long pointId) {
+        PointValue pointValue = null;
+
+        R<Device> deviceR = deviceClient.selectById(deviceId);
+        if (deviceR.isOk()) {
+            Criteria criteria = new Criteria();
+            criteria.and("deviceId").is(deviceId);
+            if (deviceR.getData().getMulti()) {
+                criteria.and("multi").is(true);
+                if (null != pointId) {
+                    criteria.and("children").elemMatch(
+                            (new Criteria()).and("pointId").is(pointId)
+                    );
+                }
+            } else if (null != pointId) {
+                criteria.and("pointId").is(pointId);
+            }
+
+            Query query = new Query(criteria);
+            query.with(Sort.by(Sort.Direction.DESC, "originTime"));
+            pointValue = mongoTemplate.findOne(query, PointValue.class);
+        }
+
+        return pointValue;
     }
 
     @Override
