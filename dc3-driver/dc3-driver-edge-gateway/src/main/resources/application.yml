@@ -1,5 +1,5 @@
 driver:
-  name: EdgeGatewayDriver
+  name: EdgeGateway
   tenant: default
   type: gateway
   project: @project.artifactId@
@@ -49,7 +49,7 @@ driver:
     topics:
       - mqtt/group/device/#
     client:
-      id: dc3-mqtt-client
+      id: dc3-edge-gateway-client
     default:
       topic: dc3-mqtt-topic
       qos: 1
