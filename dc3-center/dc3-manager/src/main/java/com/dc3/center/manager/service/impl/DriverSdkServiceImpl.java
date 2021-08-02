@@ -73,7 +73,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", driver);
             try {
-                Driver byHostPort = driverService.selectByHostPort(driver.getHost(), driver.getPort(), driver.getTenantId());
+                Driver byHostPort = driverService.selectByHostPort(driver.getType(), driver.getHost(), driver.getPort(), driver.getTenantId());
                 throw new ServiceException("The port(" + driver.getPort() + ") is already occupied by driver(" + byHostPort.getName() + "/" + byHostPort.getServiceName() + ")");
             } catch (NotFoundException notFoundException2) {
                 driver = driverService.add(driver);
