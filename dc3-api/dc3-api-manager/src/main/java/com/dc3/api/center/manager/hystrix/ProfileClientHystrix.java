@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * <p>ProfileClientHystrix
  *
@@ -55,6 +57,11 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
 
             @Override
             public R<Profile> selectById(Long id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<Profile>> selectByDeviceId(Long deviceId) {
                 return R.fail(message);
             }
 

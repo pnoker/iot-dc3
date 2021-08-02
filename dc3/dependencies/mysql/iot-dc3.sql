@@ -32,6 +32,7 @@ CREATE TABLE `dc3_driver`
     `service_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '协议服务名称',
     `host`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '主机IP',
     `port`         int(11)                                                 NOT NULL COMMENT '端口',
+    `type`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT 'driver' COMMENT '类型，deriver、gateway...',
     `enable`       tinyint(4)                                              NULL DEFAULT 1 COMMENT '是否可用',
     `tenant_id`    bigint(20)                                              NOT NULL COMMENT '租户ID',
     `description`  varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',

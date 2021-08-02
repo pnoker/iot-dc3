@@ -1,6 +1,7 @@
 driver:
   name: ListeningVirtualDriver
   tenant: default
+  type: driver
   project: @project.artifactId@
   description: @project.description@
   custom:

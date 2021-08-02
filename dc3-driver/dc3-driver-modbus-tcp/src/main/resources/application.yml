@@ -1,6 +1,7 @@
 driver:
   name: ModbusDriver
   tenant: default
+  type: driver
   project: @project.artifactId@
   description: @project.description@
   schedule:

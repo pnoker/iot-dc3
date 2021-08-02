@@ -65,11 +65,11 @@ public class PointValueApi implements PointValueClient {
     }
 
     @Override
-    public R<PointValue> latest(Long deviceId) {
+    public R<List<PointValue>> latest(Long deviceId) {
         try {
-            PointValue pointValue = pointValueService.latest(deviceId, null);
-            if (null != pointValue) {
-                return R.ok(pointValue);
+            List<PointValue> pointValues = pointValueService.latest(deviceId);
+            if (null != pointValues) {
+                return R.ok(pointValues);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());

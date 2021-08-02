@@ -13,6 +13,7 @@
 
 package com.dc3.common.sdk.bean;
 
+import com.dc3.common.constant.Common;
 import com.dc3.common.model.DriverAttribute;
 import com.dc3.common.model.PointAttribute;
 import com.dc3.common.valid.Insert;
@@ -43,6 +44,7 @@ public class DriverProperty {
             groups = {Insert.class, Update.class})
     private String tenant;
     private String name;
+    private String type = Common.Driver.Type.DRIVER;
     private String description;
     private ScheduleProperty schedule;
     private List<DriverAttribute> driverAttribute;

@@ -36,6 +36,11 @@
       "description": "driver name."
     },
     {
+      "name": "driver.type",
+      "type": "java.lang.String",
+      "description": "driver type, default:driver, driver|gateway...,."
+    },
+    {
       "name": "driver.tenant",
       "type": "java.lang.String",
       "description": "driver tenant."

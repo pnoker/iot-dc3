@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>模板 Client 接口实现
@@ -87,6 +88,19 @@ public class ProfileApi implements ProfileClient {
     public R<Profile> selectById(Long id) {
         try {
             Profile select = profileService.selectById(id);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<Profile>> selectByDeviceId(Long deviceId) {
+        try {
+            List<Profile> select = profileService.selectByDeviceId(deviceId);
             if (null != select) {
                 return R.ok(select);
             }

@@ -43,4 +43,12 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
      */
     List<Profile> selectByIds(Set<Long> ids);
 
+    /**
+     * 根据 设备Id集 查询模版
+     *
+     * @param deviceId Device Id
+     * @return Profile Array
+     */
+    List<Profile> selectByDeviceId(Long deviceId);
+
 }

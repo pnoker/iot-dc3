@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.ProfileMapper;
+import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
@@ -26,6 +27,7 @@ import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
+import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +56,8 @@ public class ProfileServiceImpl implements ProfileService {
     private PointService pointService;
     @Resource
     private ProfileMapper profileMapper;
+    @Resource
+    private DeviceService deviceService;
 
     @Override
     @Caching(
@@ -171,6 +175,12 @@ public class ProfileServiceImpl implements ProfileService {
             }
         });
         return profiles;
+    }
+
+    @Override
+    public List<Profile> selectByDeviceId(Long deviceId) {
+        Device device = deviceService.selectById(deviceId);
+        return selectByIds(device.getProfileIds());
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * <p>模板 FeignClient
@@ -70,6 +71,15 @@ public interface ProfileClient {
      */
     @GetMapping("/id/{id}")
     R<Profile> selectById(@NotNull @PathVariable(value = "id") Long id);
+
+    /**
+     * 根据 设备 ID 查询 Profile 集合
+     *
+     * @param deviceId Device Id
+     * @return Profile Array
+     */
+    @GetMapping("/deviceId/{deviceId}")
+    R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
      * 分页查询 Profile

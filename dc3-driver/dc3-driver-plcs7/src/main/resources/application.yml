@@ -1,6 +1,7 @@
 driver:
   name: PlcS7Driver
   tenant: default
+  type: driver
   project: @project.artifactId@
   description: @project.description@
   schedule:
