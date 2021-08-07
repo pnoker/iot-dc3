@@ -23,7 +23,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,7 +46,7 @@ public class PointValueScheduleJob extends QuartzJobBean {
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
-    public static List<PointValue> pointValues = new LinkedList<>();
+    public static List<PointValue> pointValues = new ArrayList<>();
     public static ReentrantReadWriteLock valueLock = new ReentrantReadWriteLock();
     public static AtomicLong valueCount = new AtomicLong(0), valueSpeed = new AtomicLong(0);
 
@@ -65,7 +65,7 @@ public class PointValueScheduleJob extends QuartzJobBean {
             valueLock.writeLock().lock();
             if (pointValues.size() > 0) {
                 pointValueService.savePointValues(pointValues);
-                pointValues = new LinkedList<>();
+                pointValues.clear();
             }
             valueLock.writeLock().unlock();
         });

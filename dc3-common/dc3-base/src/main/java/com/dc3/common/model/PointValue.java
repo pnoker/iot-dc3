@@ -72,7 +72,7 @@ public class PointValue implements Serializable {
     private List<PointValue> children;
 
     @Transient
-    private int timeOut = 15;
+    private Integer timeOut = 15;
 
     @Transient
     private TimeUnit timeUnit = TimeUnit.MINUTES;

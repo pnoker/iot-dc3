@@ -22,7 +22,6 @@ import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointValueDto;
-import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.model.PointValue;
@@ -75,28 +74,26 @@ public class PointValueServiceImpl implements PointValueService {
     public void savePointValues(List<PointValue> pointValues) {
         if (null != pointValues) {
             if (pointValues.size() > 0) {
-                Future<List<PointValue>> future = threadPoolExecutor.submit(() -> {
-                    pointValues.forEach(pointValue -> pointValue.setCreateTime(new Date()));
-                    return pointValues;
-                });
+
+                final List<PointValue> saveValues = pointValues.stream().map(pointValue -> pointValue.setCreateTime(new Date())).collect(Collectors.toList());
 
                 threadPoolExecutor.execute(() -> {
                     try {
-                        dataCustomService.postHandle(future.get());
+                        dataCustomService.postHandle(saveValues);
                     } catch (Exception e) {
                         log.error("Save point values to post handle error {}", e.getMessage());
                     }
                 });
                 threadPoolExecutor.execute(() -> {
                     try {
-                        savePointValuesToMongo(future.get());
+                        savePointValuesToMongo(saveValues);
                     } catch (Exception e) {
                         log.error("Save point values to mongo error {}", e.getMessage());
                     }
                 });
                 threadPoolExecutor.execute(() -> {
                     try {
-                        savePointValuesToRedis(future.get());
+                        savePointValuesToRedis(saveValues);
                     } catch (Exception e) {
                         log.error("Save point values to redis error {}", e.getMessage());
                     }
@@ -109,34 +106,27 @@ public class PointValueServiceImpl implements PointValueService {
     public List<PointValue> realtime(Long deviceId) {
         R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
         if (listR.isOk()) {
-            List<String> keys = new ArrayList<>();
             String prefix = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_";
-
-            List<Point> points = listR.getData();
-            for (Point point : points) {
-                keys.add(prefix + point.getId());
-            }
+            List<String> keys = listR.getData().stream().map(point -> prefix + point.getId()).collect(Collectors.toList());
             if (keys.size() > 0) {
                 List<PointValue> pointValues = redisUtil.getKeys(keys, PointValue.class);
-                pointValues = pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
+                pointValues = pointValues.stream().filter(Objects::nonNull).map(pointValue -> pointValue.setTimeOut(null).setTimeUnit(null)).collect(Collectors.toList());
                 if (pointValues.size() > 0) {
                     return pointValues;
                 }
             }
-        } else {
-            throw new ServiceException(listR.getMessage());
         }
-        throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
+        return null;
     }
 
     @Override
     public PointValue realtime(Long deviceId, Long pointId) {
         String key = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_" + pointId;
         PointValue pointValue = redisUtil.getKey(key, PointValue.class);
-        if (null == pointValue) {
-            throw new ServiceException("No realtime value, Please use '/latest' to get the final data");
+        if (null != pointValue) {
+            return pointValue.setTimeOut(null).setTimeUnit(null);
         }
-        return pointValue;
+        return null;
     }
 
     @Override
@@ -144,15 +134,12 @@ public class PointValueServiceImpl implements PointValueService {
         List<PointValue> pointValues = new ArrayList<>();
         R<Device> deviceR = deviceClient.selectById(deviceId);
         if (deviceR.isOk()) {
-            R<List<Point>> pointsR = pointClient.selectByDeviceId(deviceId);
-            if (pointsR.isOk()) {
-                pointsR.getData().forEach(point -> {
-                    pointValues.add(latest(deviceId, point.getId()));
-                });
+            R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
+            if (listR.isOk()) {
+                listR.getData().forEach(point -> pointValues.add(latest(deviceId, point.getId())));
             }
         }
-
-        return pointValues;
+        return pointValues.stream().filter(Objects::nonNull).map(pointValue -> pointValue.setTimeOut(null).setTimeUnit(null)).collect(Collectors.toList());
     }
 
     @Override
@@ -166,9 +153,7 @@ public class PointValueServiceImpl implements PointValueService {
             if (deviceR.getData().getMulti()) {
                 criteria.and("multi").is(true);
                 if (null != pointId) {
-                    criteria.and("children").elemMatch(
-                            (new Criteria()).and("pointId").is(pointId)
-                    );
+                    criteria.and("children").elemMatch((new Criteria()).and("pointId").is(pointId));
                 }
             } else if (null != pointId) {
                 criteria.and("pointId").is(pointId);
@@ -179,6 +164,9 @@ public class PointValueServiceImpl implements PointValueService {
             pointValue = mongoTemplate.findOne(query, PointValue.class);
         }
 
+        if (null != pointValue) {
+            pointValue.setTimeOut(null).setTimeUnit(null);
+        }
         return pointValue;
     }
 
@@ -189,9 +177,9 @@ public class PointValueServiceImpl implements PointValueService {
         pointValueDto = Optional.ofNullable(pointValueDto).orElse(new PointValueDto());
 
         if (null != pointValueDto.getDeviceId()) {
-            R<Device> r = deviceClient.selectById(pointValueDto.getDeviceId());
-            if (r.isOk()) {
-                Device device = r.getData();
+            R<Device> deviceR = deviceClient.selectById(pointValueDto.getDeviceId());
+            if (deviceR.isOk()) {
+                Device device = deviceR.getData();
                 criteria.and("deviceId").is(pointValueDto.getDeviceId());
                 if (!device.getMulti()) {
                     if (null != pointValueDto.getPointId()) {
@@ -205,8 +193,8 @@ public class PointValueServiceImpl implements PointValueService {
                 }
             }
         } else if (null != pointValueDto.getPointId()) {
-            R<Point> r = pointClient.selectById(pointValueDto.getPointId());
-            if (r.isOk()) {
+            R<Point> pointR = pointClient.selectById(pointValueDto.getPointId());
+            if (pointR.isOk()) {
                 criteria.orOperator(
                         (new Criteria()).and("pointId").is(pointValueDto.getPointId()),
                         (new Criteria()).and("children").elemMatch((new Criteria()).and("pointId").is(pointValueDto.getPointId()))
@@ -231,7 +219,8 @@ public class PointValueServiceImpl implements PointValueService {
             return mongoTemplate.find(query, PointValue.class);
         });
 
-        return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count.get()).setRecords(pointValues.get());
+        return (new Page<PointValue>()).setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count.get())
+                .setRecords(pointValues.get().stream().filter(Objects::nonNull).map(pointValue -> pointValue.setTimeOut(null).setTimeUnit(null)).collect(Collectors.toList()));
     }
 
     /**
