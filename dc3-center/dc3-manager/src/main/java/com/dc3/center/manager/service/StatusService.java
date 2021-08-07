@@ -56,4 +56,12 @@ public interface StatusService {
      * @return Map<Long, String>
      */
     Map<Long, String> device(DeviceDto deviceDto);
+
+    /**
+     * 根据 模板ID 查询 Device 服务状态
+     *
+     * @param profileId Profile Id
+     * @return Map<Long, String>
+     */
+    Map<Long, String> deviceByProfileId(Long profileId);
 }

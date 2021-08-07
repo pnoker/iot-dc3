@@ -35,10 +35,8 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>PointService Impl
@@ -64,6 +62,7 @@ public class PointServiceImpl implements PointService {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.UNIT, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -90,6 +89,7 @@ public class PointServiceImpl implements PointService {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.UNIT, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
@@ -111,6 +111,7 @@ public class PointServiceImpl implements PointService {
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.UNIT, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -201,6 +202,13 @@ public class PointServiceImpl implements PointService {
             pointDto.setPage(new Pages());
         }
         return pointMapper.selectPage(pointDto.getPage().convert(), fuzzyQuery(pointDto));
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.POINT + Common.Cache.UNIT, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    public Map<Long, String> unit(Set<Long> pointIds) {
+        List<Point> points = pointMapper.selectBatchIds(pointIds);
+        return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>位号配置信息 Client 接口实现
@@ -101,6 +102,32 @@ public class PointInfoApi implements PointInfoClient {
     public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId) {
         try {
             PointInfo select = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<PointInfo>> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+        try {
+            List<PointInfo> select = pointInfoService.selectByDeviceIdAndPointId(deviceId, pointId);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<PointInfo>> selectByDeviceId(Long deviceId) {
+        try {
+            List<PointInfo> select = pointInfoService.selectByDeviceId(deviceId);
             if (null != select) {
                 return R.ok(select);
             }

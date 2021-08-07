@@ -382,6 +382,7 @@ public interface Common {
         String LIST = "_list";
         String DIC = "_dic";
         String IP = "_ip";
+        String UNIT = "_UNIT";
 
         String HOST_PORT = "_host_port";
         String SERVICE_NAME = "_service_name";

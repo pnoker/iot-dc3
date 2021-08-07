@@ -45,6 +45,14 @@ public interface DeviceService extends Service<Device, DeviceDto> {
     List<Device> selectByDriverId(Long driverId);
 
     /**
+     * 根据 模板Id 查询该驱动下的全部设备
+     *
+     * @param profileId Profile Id
+     * @return Device Array
+     */
+    List<Device> selectByProfileId(Long profileId);
+
+    /**
      * 根据 设备Id集 查询设备
      *
      * @param ids Device Id Set

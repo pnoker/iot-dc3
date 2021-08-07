@@ -18,12 +18,14 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.PointInfoMapper;
 import com.dc3.center.manager.service.PointInfoService;
+import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointInfoDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
+import com.dc3.common.model.Point;
 import com.dc3.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,6 +37,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>PointInfoService Impl
@@ -44,6 +48,9 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PointInfoServiceImpl implements PointInfoService {
+
+    @Resource
+    private PointService pointService;
 
     @Resource
     private PointInfoMapper pointInfoMapper;
@@ -59,6 +66,7 @@ public class PointInfoServiceImpl implements PointInfoService {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -82,6 +90,7 @@ public class PointInfoServiceImpl implements PointInfoService {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
@@ -100,6 +109,7 @@ public class PointInfoServiceImpl implements PointInfoService {
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.ATTRIBUTE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.POINT_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.POINT_INFO + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
@@ -152,6 +162,21 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
         if (null == pointInfos || pointInfos.size() < 1) {
+            throw new NotFoundException("The point infos does not exist");
+        }
+        return pointInfos;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.POINT_INFO + Common.Cache.DEVICE_ID + Common.Cache.LIST, key = "#deviceId", unless = "#result==null")
+    public List<PointInfo> selectByDeviceId(Long deviceId) {
+        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
+        List<Point> points = pointService.selectByDeviceId(deviceId);
+        Set<Long> pointIds = points.stream().map(Point::getId).collect(Collectors.toSet());
+        queryWrapper.eq(PointInfo::getDeviceId, deviceId);
+        queryWrapper.in(PointInfo::getPointId, pointIds);
+        List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
+        if (null == pointInfos) {
             throw new NotFoundException("The point infos does not exist");
         }
         return pointInfos;
