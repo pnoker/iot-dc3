@@ -81,7 +81,7 @@ public interface PointAttributeClient {
      * @param id PointAttribute Id
      * @return PointAttribute Array
      */
-    @GetMapping("/driverId/{id}")
+    @GetMapping("/driver_id/{id}")
     R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id);
 
     /**

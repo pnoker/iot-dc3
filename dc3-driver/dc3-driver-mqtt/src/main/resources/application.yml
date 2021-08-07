@@ -45,13 +45,15 @@ driver:
     client-key: classpath:/certs/client.key
     client-crt: classpath:/certs/client.crt
     qos:
-      - 0
+      - 1
+      - 1
     topics:
-      - mqtt/group/device/#
+      - driver/${spring.application.name}/device/+
+      - driver/${spring.application.name}/gateway/+
     client:
-      id: dc3-mqtt-client
+      id: ${spring.application.name}
     default:
-      topic: dc3-mqtt-topic
+      topic: default/${spring.application.name}
       qos: 1
       receive:
         enable: true

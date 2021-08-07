@@ -78,7 +78,7 @@ public interface DeviceClient {
      * @param driverId Driver Id
      * @return R<Device>
      */
-    @GetMapping("/driverId/{driverId}")
+    @GetMapping("/driver_id/{driverId}")
     R<List<Device>> selectByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId);
 
     /**
@@ -87,7 +87,7 @@ public interface DeviceClient {
      * @param profileId Profile Id
      * @return R<Device>
      */
-    @GetMapping("/profileId/{profileId}")
+    @GetMapping("/profile_id/{profileId}")
     R<List<Device>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
 
     /**

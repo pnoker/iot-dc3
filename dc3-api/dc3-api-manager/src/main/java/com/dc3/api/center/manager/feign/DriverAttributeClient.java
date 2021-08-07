@@ -81,7 +81,7 @@ public interface DriverAttributeClient {
      * @param id DriverAttribute Id
      * @return DriverAttribute
      */
-    @GetMapping("/driverId/{id}")
+    @GetMapping("/driver_id/{id}")
     R<List<DriverAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id);
 
     /**
