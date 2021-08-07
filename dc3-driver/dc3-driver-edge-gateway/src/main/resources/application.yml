@@ -36,12 +36,12 @@ driver:
         data-type: static/url
         data: jsonString
   mqtt:
-    url: ssl://10.49.28.100:8883
+    url: ssl://dc3-emqx:8883
     auth-type: X509
-    username: iiot
-    password: uYLZypvzhZWqX7Ih
+    username: dc3
+    password: dc3
     ca-crt: classpath:/certs/ca.crt
-    client-key-pass: emqx-mqtt
+    client-key-pass: dc3-client
     client-key: classpath:/certs/client.key
     client-crt: classpath:/certs/client.crt
     qos:
