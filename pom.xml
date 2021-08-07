@@ -60,6 +60,7 @@
         <spring-boot.version>2.4.8</spring-boot.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
 
+        <guava.version>23.0</guava.version>
         <caffeine.version>3.0.2</caffeine.version>
         <mybatis.plus.version>3.4.3</mybatis.plus.version>
         <spring-boot-admin.version>2.4.1</spring-boot-admin.version>
@@ -106,6 +107,14 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
