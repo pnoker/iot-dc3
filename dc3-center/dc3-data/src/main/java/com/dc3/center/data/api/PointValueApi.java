@@ -16,6 +16,7 @@ package com.dc3.center.data.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.center.data.service.PointValueService;
+import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointValueDto;
@@ -39,36 +40,22 @@ public class PointValueApi implements PointValueClient {
     private PointValueService pointValueService;
 
     @Override
-    public R<List<PointValue>> realtime(Long deviceId) {
+    public R<List<PointValue>> latest(Long deviceId, Boolean history) {
         try {
             List<PointValue> pointValues = pointValueService.realtime(deviceId);
-            if (null != pointValues) {
-                return R.ok(pointValues, "ok");
+            if (null == pointValues) {
+                pointValues = pointValueService.latest(deviceId);
             }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
-    public R<PointValue> realtime(Long deviceId, Long pointId) {
-        try {
-            PointValue pointValue = pointValueService.realtime(deviceId, pointId);
-            if (null != pointValue) {
-                return R.ok(pointValue, "ok");
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
-    public R<List<PointValue>> latest(Long deviceId) {
-        try {
-            List<PointValue> pointValues = pointValueService.latest(deviceId);
             if (null != pointValues) {
+                if (history) {
+                    pointValues.forEach(pointValue -> {
+                        PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100L));
+                        Page<PointValue> page = pointValueService.list(pointValueDto);
+                        if (null != page) {
+                            pointValue.setChildren(page.getRecords());
+                        }
+                    });
+                }
                 return R.ok(pointValues);
             }
         } catch (Exception e) {
@@ -78,10 +65,20 @@ public class PointValueApi implements PointValueClient {
     }
 
     @Override
-    public R<PointValue> latest(Long deviceId, Long pointId) {
+    public R<PointValue> latest(Long deviceId, Long pointId, Boolean history) {
         try {
-            PointValue pointValue = pointValueService.latest(deviceId, pointId);
+            PointValue pointValue = pointValueService.realtime(deviceId, pointId);
+            if (null == pointValue) {
+                pointValue = pointValueService.latest(deviceId, pointId);
+            }
             if (null != pointValue) {
+                if (history) {
+                    PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointId).setPage((new Pages()).setSize(100L));
+                    Page<PointValue> page = pointValueService.list(pointValueDto);
+                    if (null != page) {
+                        pointValue.setChildren(page.getRecords());
+                    }
+                }
                 return R.ok(pointValue);
             }
         } catch (Exception e) {
