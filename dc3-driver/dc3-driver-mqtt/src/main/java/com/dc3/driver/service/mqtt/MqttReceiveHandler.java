@@ -25,6 +25,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * mqtt上行数据例子：
@@ -40,6 +41,7 @@ import javax.annotation.Resource;
 @Slf4j
 @Configuration
 public class MqttReceiveHandler {
+
     @Resource
     private DriverService driverService;
 
@@ -58,7 +60,7 @@ public class MqttReceiveHandler {
             log.info(
                     "defaultTopicReceiver\nheader:{},\npayload:{}",
                     JSON.toJSONString(message.getHeaders(), true),
-                    JSON.toJSONString(message.getPayload(), true)
+                    message.getPayload()
             );
         };
     }
@@ -67,16 +69,23 @@ public class MqttReceiveHandler {
     @ServiceActivator(inputChannel = "mqttInputChannel")
     public MessageHandler handler() {
         return message -> {
+            String topic = Objects.requireNonNull(message.getHeaders().get("mqtt_receivedTopic")).toString();
             log.info(
-                    "{}\nheader:{}, payload:{}",
-                    message.getHeaders().get("mqtt_receivedTopic"),
+                    "TopicReceiver: {}\nheader:{},\npayload:{}",
+                    topic,
                     JSON.toJSONString(message.getHeaders(), true),
                     JSON.toJSONString(message.getPayload(), true)
             );
-            DevicePayLoad devicePayLoad = JSON.parseObject(message.getPayload().toString(), DevicePayLoad.class);
-            PointValue pointValue = new PointValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue(),
-                    driverService.convertValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue()));
-            driverService.pointValueSender(pointValue);
+
+            try {
+                DevicePayLoad devicePayLoad = JSON.parseObject(message.getPayload().toString(), DevicePayLoad.class);
+
+                PointValue pointValue = new PointValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue(),
+                        driverService.convertValue(devicePayLoad.getDeviceId(), devicePayLoad.getPointId(), devicePayLoad.getValue()));
+                driverService.pointValueSender(pointValue);
+            } catch (Exception e) {
+                log.error("TopicReceiver: {}, point value error: {}", topic, e.getMessage());
+            }
         };
     }
 }

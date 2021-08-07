@@ -78,7 +78,7 @@ public interface ProfileClient {
      * @param deviceId Device Id
      * @return Profile Array
      */
-    @GetMapping("/deviceId/{deviceId}")
+    @GetMapping("/device_id/{deviceId}")
     R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**

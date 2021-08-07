@@ -82,7 +82,7 @@ public interface DriverInfoClient {
      * @param deviceId    Device Id
      * @return DriverInfo
      */
-    @GetMapping("/attributeId/{attributeId}/deviceId/{deviceId}")
+    @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}")
     R<DriverInfo> selectByAttributeIdAndDeviceId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
@@ -91,7 +91,7 @@ public interface DriverInfoClient {
      * @param deviceId Device Id
      * @return DriverInfo Array
      */
-    @GetMapping("/deviceId/{deviceId}")
+    @GetMapping("/device_id/{deviceId}")
     R<List<DriverInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**

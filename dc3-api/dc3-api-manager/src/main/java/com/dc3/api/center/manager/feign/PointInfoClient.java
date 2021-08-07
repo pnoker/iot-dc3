@@ -83,7 +83,7 @@ public interface PointInfoClient {
      * @param pointId     Point Id
      * @return PointInfo
      */
-    @GetMapping("/attributeId/{attributeId}/deviceId/{deviceId}/pointId/{pointId}")
+    @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
     R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
 
     /**
@@ -93,7 +93,7 @@ public interface PointInfoClient {
      * @param pointId  Point Id
      * @return PointInfo
      */
-    @GetMapping("/deviceId/{deviceId}/pointId/{pointId}")
+    @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
     R<List<PointInfo>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
 
     /**
@@ -102,7 +102,7 @@ public interface PointInfoClient {
      * @param deviceId Device Id
      * @return PointInfo
      */
-    @GetMapping("/deviceId/{deviceId}")
+    @GetMapping("/device_id/{deviceId}")
     R<List<PointInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**

@@ -80,7 +80,7 @@ public interface PointClient {
      * @param deviceId Device Id
      * @return Point Array
      */
-    @GetMapping("/deviceId/{deviceId}")
+    @GetMapping("/device_id/{deviceId}")
     R<List<Point>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
@@ -89,7 +89,7 @@ public interface PointClient {
      * @param profileId Profile Id
      * @return Point Array
      */
-    @GetMapping("/profileId/{profileId}")
+    @GetMapping("/profile_id/{profileId}")
     R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
 
     /**

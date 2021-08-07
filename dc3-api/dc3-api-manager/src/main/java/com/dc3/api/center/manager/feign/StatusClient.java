@@ -59,7 +59,7 @@ public interface StatusClient {
      * @param driverId Driver Id
      * @return Map<Long, String>
      */
-    @GetMapping("/device/driverId/{driverId}")
+    @GetMapping("/device/driver_id/{driverId}")
     R<Map<Long, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId);
 
     /**
@@ -69,7 +69,7 @@ public interface StatusClient {
      * @param profileId Profile Id
      * @return Map<Long, String>
      */
-    @GetMapping("/device/profileId/{profileId}")
+    @GetMapping("/device/profile_id/{profileId}")
     R<Map<Long, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
 
 }
