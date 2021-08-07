@@ -382,7 +382,7 @@ public interface Common {
         String LIST = "_list";
         String DIC = "_dic";
         String IP = "_ip";
-        String UNIT = "_UNIT";
+        String UNIT = "_unit";
 
         String HOST_PORT = "_host_port";
         String SERVICE_NAME = "_service_name";
@@ -399,9 +399,9 @@ public interface Common {
         String LABEL = "label";
         String LABEL_BIND = "label_bind";
 
-        String REAL_TIME_VALUE_KEY_PREFIX = Common.Cache.POINT + Common.Cache.VALUE + Common.Cache.SEPARATOR;
-        String DRIVER_STATUS_KEY_PREFIX = Common.Cache.DRIVER + Common.Cache.STATUS + Common.Cache.SEPARATOR;
-        String DEVICE_STATUS_KEY_PREFIX = Common.Cache.DEVICE + Common.Cache.STATUS + Common.Cache.SEPARATOR;
+        String REAL_TIME_VALUE_KEY_PREFIX = Cache.POINT + Cache.VALUE + Cache.SEPARATOR;
+        String DRIVER_STATUS_KEY_PREFIX = Cache.DRIVER + Cache.STATUS + Cache.SEPARATOR;
+        String DEVICE_STATUS_KEY_PREFIX = Cache.DEVICE + Cache.STATUS + Cache.SEPARATOR;
     }
 
 }
