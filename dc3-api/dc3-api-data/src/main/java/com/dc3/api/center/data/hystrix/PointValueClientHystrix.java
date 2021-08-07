@@ -41,22 +41,12 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
         return new PointValueClient() {
 
             @Override
-            public R<List<PointValue>> realtime(Long deviceId) {
+            public R<List<PointValue>> latest(Long deviceId, Boolean history) {
                 return R.fail(message);
             }
 
             @Override
-            public R<PointValue> realtime(Long deviceId, Long pointId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<List<PointValue>> latest(Long deviceId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<PointValue> latest(Long deviceId, Long pointId) {
+            public R<PointValue> latest(Long deviceId, Long pointId, Boolean history) {
                 return R.fail(message);
             }
 

@@ -20,10 +20,7 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointValueDto;
 import com.dc3.common.model.PointValue;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -37,32 +34,13 @@ import java.util.List;
 public interface PointValueClient {
 
     /**
-     * 获取实时值，读 Redis
-     *
-     * @param deviceId Device Id
-     * @return PointValue Array
-     */
-    @GetMapping("/realtime/device_id/{deviceId}")
-    R<List<PointValue>> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId);
-
-    /**
-     * 获取实时值，读 Redis
-     *
-     * @param deviceId Device Id
-     * @param pointId  Point Id
-     * @return String Value
-     */
-    @GetMapping("/realtime/device_id/{deviceId}/point_id/{pointId}")
-    R<PointValue> realtime(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
-
-    /**
      * 查询最新 PointValue 集合
      *
      * @param deviceId Device Id
      * @return PointValue Array
      */
     @GetMapping("/latest/device_id/{deviceId}")
-    R<List<PointValue>> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<List<PointValue>> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId, @RequestParam(required = false, defaultValue = "false") Boolean history);
 
     /**
      * 查询最新 PointValue
@@ -72,7 +50,7 @@ public interface PointValueClient {
      * @return PointValue
      */
     @GetMapping("/latest/device_id/{deviceId}/point_id/{pointId}")
-    R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+    R<PointValue> latest(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId, @RequestParam(required = false, defaultValue = "false") Boolean history);
 
     /**
      * 分页查询 PointValue
