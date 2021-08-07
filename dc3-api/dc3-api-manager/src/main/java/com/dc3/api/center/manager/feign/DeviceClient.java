@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 设备 FeignClient
@@ -70,6 +71,24 @@ public interface DeviceClient {
      */
     @GetMapping("/id/{id}")
     R<Device> selectById(@NotNull @PathVariable(value = "id") Long id);
+
+    /**
+     * 根据 驱动ID 查询 Device
+     *
+     * @param driverId Driver Id
+     * @return R<Device>
+     */
+    @GetMapping("/driverId/{driverId}")
+    R<List<Device>> selectByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId);
+
+    /**
+     * 根据 模板ID 查询 Device
+     *
+     * @param profileId Profile Id
+     * @return R<Device>
+     */
+    @GetMapping("/profileId/{profileId}")
+    R<List<Device>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
 
     /**
      * 分页查询 Device

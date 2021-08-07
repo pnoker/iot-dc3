@@ -23,6 +23,8 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>PointClientHystrix
@@ -66,7 +68,17 @@ public class PointClientHystrix implements FallbackFactory<PointClient> {
             }
 
             @Override
+            public R<List<Point>> selectByProfileId(Long profileId) {
+                return R.fail(message);
+            }
+
+            @Override
             public R<Page<Point>> list(PointDto pointDto, Long tenantId) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Map<Long, String>> unit(Set<Long> pointIds) {
                 return R.fail(message);
             }
 

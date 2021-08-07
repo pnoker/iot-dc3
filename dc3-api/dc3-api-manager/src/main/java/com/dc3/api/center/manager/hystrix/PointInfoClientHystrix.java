@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * <p>PointInfoClientHystrix
  *
@@ -60,6 +62,16 @@ public class PointInfoClientHystrix implements FallbackFactory<PointInfoClient> 
 
             @Override
             public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<PointInfo>> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<PointInfo>> selectByDeviceId(Long deviceId) {
                 return R.fail(message);
             }
 

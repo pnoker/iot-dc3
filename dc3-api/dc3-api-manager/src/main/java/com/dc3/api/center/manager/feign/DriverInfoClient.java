@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * <p>驱动配置信息 FeignClient
@@ -83,6 +84,15 @@ public interface DriverInfoClient {
      */
     @GetMapping("/attributeId/{attributeId}/deviceId/{deviceId}")
     R<DriverInfo> selectByAttributeIdAndDeviceId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId);
+
+    /**
+     * 根据 设备ID 查询 DriverInfo
+     *
+     * @param deviceId Device Id
+     * @return DriverInfo Array
+     */
+    @GetMapping("/deviceId/{deviceId}")
+    R<List<DriverInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
      * 分页查询 DriverInfo

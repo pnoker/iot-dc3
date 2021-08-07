@@ -49,6 +49,15 @@ public class StatusClientHystrix implements FallbackFactory<StatusClient> {
                 return R.fail(message);
             }
 
+            @Override
+            public R<Map<Long, String>> deviceStatusByDriverId(Long driverId) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Map<Long, String>> deviceStatusByProfileId(Long profileId) {
+                return R.fail(message);
+            }
         };
     }
 }
