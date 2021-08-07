@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>设备 Client 接口实现
@@ -88,6 +89,32 @@ public class DeviceApi implements DeviceClient {
     public R<Device> selectById(Long id) {
         try {
             Device select = deviceService.selectById(id);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<Device>> selectByDriverId(Long driverId) {
+        try {
+            List<Device> select = deviceService.selectByDriverId(driverId);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<Device>> selectByProfileId(Long profileId) {
+        try {
+            List<Device> select = deviceService.selectByProfileId(profileId);
             if (null != select) {
                 return R.ok(select);
             }

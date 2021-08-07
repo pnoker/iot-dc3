@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>位号配置信息 Client 接口实现
@@ -101,6 +102,19 @@ public class DriverInfoApi implements DriverInfoClient {
     public R<DriverInfo> selectByAttributeIdAndDeviceId(Long attributeId, Long deviceId) {
         try {
             DriverInfo select = driverInfoService.selectByAttributeIdAndDeviceId(attributeId, deviceId);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<List<DriverInfo>> selectByDeviceId(Long deviceId) {
+        try {
+            List<DriverInfo> select = driverInfoService.selectByDeviceId(deviceId);
             if (null != select) {
                 return R.ok(select);
             }

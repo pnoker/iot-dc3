@@ -45,6 +45,14 @@ public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
     List<PointInfo> selectByAttributeId(Long pointAttributeId);
 
     /**
+     * 根据 设备 ID 查询
+     *
+     * @param deviceId Device Id
+     * @return PointInfo Array
+     */
+    List<PointInfo> selectByDeviceId(Long deviceId);
+
+    /**
      * 根据 设备 ID & 位号 ID 查询
      *
      * @param deviceId Device Id

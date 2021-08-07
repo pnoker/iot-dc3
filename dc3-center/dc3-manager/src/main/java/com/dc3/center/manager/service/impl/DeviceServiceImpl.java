@@ -180,6 +180,11 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public List<Device> selectByProfileId(Long profileId) {
+        return selectByIds(profileBindService.selectDeviceIdByProfileId(profileId));
+    }
+
+    @Override
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Device> selectByIds(Set<Long> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);

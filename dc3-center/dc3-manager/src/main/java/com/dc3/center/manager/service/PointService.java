@@ -18,6 +18,7 @@ import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,4 +60,12 @@ public interface PointService extends Service<Point, PointDto> {
      * @return Point Array
      */
     List<Point> selectByProfileIds(Set<Long> profileIds);
+
+    /**
+     * 查询 位号单位
+     *
+     * @param pointIds Point Id Set
+     * @return Map<Long, String>
+     */
+    Map<Long, String> unit(Set<Long> pointIds);
 }

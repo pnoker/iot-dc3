@@ -61,4 +61,26 @@ public class StatusApi implements StatusClient {
         }
     }
 
+    @Override
+    public R<Map<Long, String>> deviceStatusByDriverId(Long driverId) {
+        try {
+            DeviceDto deviceDto = new DeviceDto();
+            deviceDto.setDriverId(driverId);
+            Map<Long, String> statuses = statusService.device(deviceDto);
+            return R.ok(statuses);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public R<Map<Long, String>> deviceStatusByProfileId(Long profileId) {
+        try {
+            Map<Long, String> statuses = statusService.deviceByProfileId(profileId);
+            return R.ok(statuses);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
 }

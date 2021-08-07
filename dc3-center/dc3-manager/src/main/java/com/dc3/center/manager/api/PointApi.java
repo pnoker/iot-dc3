@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>位号 Client 接口实现
@@ -99,6 +101,19 @@ public class PointApi implements PointClient {
     }
 
     @Override
+    public R<List<Point>> selectByProfileId(Long profileId) {
+        try {
+            List<Point> select = pointService.selectByProfileId(profileId);
+            if (null != select) {
+                return R.ok(select);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
     public R<List<Point>> selectByDeviceId(Long deviceId) {
         try {
             List<Point> select = pointService.selectByDeviceId(deviceId);
@@ -118,6 +133,19 @@ public class PointApi implements PointClient {
             Page<Point> page = pointService.list(pointDto);
             if (null != page) {
                 return R.ok(page);
+            }
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.fail();
+    }
+
+    @Override
+    public R<Map<Long, String>> unit(Set<Long> pointIds) {
+        try {
+            Map<Long, String> units = pointService.unit(pointIds);
+            if (null != units) {
+                return R.ok(units);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());

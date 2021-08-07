@@ -16,6 +16,7 @@ package com.dc3.center.manager.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.DriverService;
+import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.center.manager.service.StatusService;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
@@ -45,6 +46,8 @@ public class StatusServiceImpl implements StatusService {
     private DriverService driverService;
     @Resource
     private DeviceService deviceService;
+    @Resource
+    private ProfileBindService profileBindService;
 
     @Override
     public String driver(String serviceName) {
@@ -86,6 +89,19 @@ public class StatusServiceImpl implements StatusService {
             String status = redisUtil.getKey(key, String.class);
             status = null != status ? status : Common.Driver.Status.OFFLINE;
             statusMap.put(device.getId(), status);
+        });
+        return statusMap;
+    }
+
+    @Override
+    public Map<Long, String> deviceByProfileId(Long profileId) {
+        Map<Long, String> statusMap = new HashMap<>(16);
+
+        profileBindService.selectDeviceIdByProfileId(profileId).forEach(id -> {
+            String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + id;
+            String status = redisUtil.getKey(key, String.class);
+            status = null != status ? status : Common.Driver.Status.OFFLINE;
+            statusMap.put(id, status);
         });
         return statusMap;
     }
