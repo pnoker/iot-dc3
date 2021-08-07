@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * <p>DriverInfoClientHystrix
  *
@@ -60,6 +62,11 @@ public class DriverInfoClientHystrix implements FallbackFactory<DriverInfoClient
 
             @Override
             public R<DriverInfo> selectByAttributeIdAndDeviceId(Long attributeId, Long deviceId) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<List<DriverInfo>> selectByDeviceId(Long deviceId) {
                 return R.fail(message);
             }
 

@@ -19,11 +19,9 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.dto.DriverDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -53,5 +51,25 @@ public interface StatusClient {
      */
     @PostMapping("/device")
     R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+
+    /**
+     * 根据 驱动ID 查询 Device 服务状态
+     * ONLINE, OFFLINE, MAINTAIN, FAULT
+     *
+     * @param driverId Driver Id
+     * @return Map<Long, String>
+     */
+    @GetMapping("/device/driverId/{driverId}")
+    R<Map<Long, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId);
+
+    /**
+     * 根据 模板ID 查询 Device 服务状态
+     * ONLINE, OFFLINE, MAINTAIN, FAULT
+     *
+     * @param profileId Profile Id
+     * @return Map<Long, String>
+     */
+    @GetMapping("/device/profileId/{profileId}")
+    R<Map<Long, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
 
 }

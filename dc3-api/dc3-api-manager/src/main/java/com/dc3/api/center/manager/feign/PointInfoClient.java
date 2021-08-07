@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * <p>位号配置信息 FeignClient
@@ -84,6 +85,25 @@ public interface PointInfoClient {
      */
     @GetMapping("/attributeId/{attributeId}/deviceId/{deviceId}/pointId/{pointId}")
     R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+
+    /**
+     * 根据 设备ID 和 位号ID 查询 PointInfo
+     *
+     * @param deviceId Device Id
+     * @param pointId  Point Id
+     * @return PointInfo
+     */
+    @GetMapping("/deviceId/{deviceId}/pointId/{pointId}")
+    R<List<PointInfo>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+
+    /**
+     * 根据 设备ID 查询 PointInfo
+     *
+     * @param deviceId Device Id
+     * @return PointInfo
+     */
+    @GetMapping("/deviceId/{deviceId}")
+    R<List<PointInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
      * 分页查询 PointInfo

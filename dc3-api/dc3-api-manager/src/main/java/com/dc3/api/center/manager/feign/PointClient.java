@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>位号 FeignClient
@@ -82,6 +84,15 @@ public interface PointClient {
     R<List<Point>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
 
     /**
+     * 根据 模板 ID 查询 Point
+     *
+     * @param profileId Profile Id
+     * @return Point Array
+     */
+    @GetMapping("/profileId/{profileId}")
+    R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
+
+    /**
      * 分页查询 Point
      *
      * @param pointDto Point Dto
@@ -90,4 +101,12 @@ public interface PointClient {
     @PostMapping("/list")
     R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
+    /**
+     * 查询 位号单位
+     *
+     * @param pointIds Point Id Set
+     * @return Map<Long, String>
+     */
+    @PostMapping("/unit")
+    R<Map<Long, String>> unit(@RequestBody(required = false) Set<Long> pointIds);
 }
