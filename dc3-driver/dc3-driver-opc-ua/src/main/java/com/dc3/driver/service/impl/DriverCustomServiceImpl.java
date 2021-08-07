@@ -13,35 +13,29 @@
 
 package com.dc3.driver.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
-import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.DriverContext;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.driver.key.KeyLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
-import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static com.dc3.common.sdk.util.DriverUtils.attribute;
 import static com.dc3.common.sdk.util.DriverUtils.value;
@@ -59,26 +53,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
 
-    private static KeyLoader keyLoader;
-
-    static {
-        try {
-            //TODO 每次都会生成证书，生产环境可以调整为固定证书
-            Path securityTempDir = Paths.get(System.getProperty("java.io.tmpdir"), "security");
-            Files.createDirectories(securityTempDir);
-            if (!Files.exists(securityTempDir)) {
-                throw new ServiceException("unable to create security dir: " + securityTempDir);
-            }
-
-            keyLoader = new KeyLoader().load(securityTempDir);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Opc Ua Client Map
-     */
     private static Map<Long, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
 
 
@@ -88,7 +62,25 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        return readItem(device.getId(), driverInfo, pointInfo);
+        int namespace = attribute(pointInfo, "namespace");
+        String tag = attribute(pointInfo, "tag");
+
+        NodeId nodeId = new NodeId(namespace, tag);
+        CompletableFuture<String> value = new CompletableFuture<>();
+        OpcUaClient client = getOpcUaClient(device.getId(), driverInfo);
+
+        client.connect().get();
+        client.readValue(0.0, TimestampsToReturn.Both, nodeId).thenAccept(dataValue -> {
+            try {
+                value.complete(dataValue.getValue().getValue().toString());
+            } catch (Exception e) {
+                log.error("accept point(ns={};s={}) value error: {}", namespace, tag, e.getMessage());
+            }
+        });
+        String rawValue = value.get(1, TimeUnit.SECONDS);
+        log.debug("read point(ns={};s={}) value: {}", namespace, tag, rawValue);
+        return rawValue;
+
     }
 
     @Override
@@ -99,18 +91,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void schedule() {
-
-        /*
-        TODO:设备状态
-        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，也可以在read中实现设备状态的设置；
-        你可以通过某种判断机制确定设备的状态，然后通过driverService.deviceEventSender接口将设备状态交给SDK管理。
-
-        设备状态（DeviceStatus）如下：
-        ONLINE:在线
-        OFFLINE:离线
-        MAINTAIN:维护
-        FAULT:故障
-         */
         driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE));
     }
 
@@ -122,8 +102,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return OpcUaClient
      * @throws UaException UaException
      */
-    private OpcUaClient getOpcUaClient(Long deviceId, Map<String, AttributeInfo> driverInfo) throws UaException {
-        log.debug("Opc Ua Client Info: {}", JSON.toJSONString(driverInfo));
+    private OpcUaClient getOpcUaClient(Long deviceId, Map<String, AttributeInfo> driverInfo) {
         OpcUaClient opcUaClient = clientMap.get(deviceId);
         if (null == opcUaClient) {
             try {
@@ -133,59 +112,19 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                                 attribute(driverInfo, "port"),
                                 attribute(driverInfo, "path")
                         ),
-                        endpoints -> endpoints
-                                .stream()
-                                .findFirst(),
+                        endpoints -> endpoints.stream().findFirst(),
                         configBuilder -> configBuilder
-                                .setApplicationName(LocalizedText.english("DC3 Opc Ua Client"))
-                                .setApplicationUri("urn:dc3:opc:ua:client")
-                                .setCertificate(keyLoader.getClientCertificate())
-                                .setKeyPair(keyLoader.getClientKeyPair())
                                 .setIdentityProvider(new AnonymousProvider())
                                 .setRequestTimeout(uint(5000))
                                 .build()
                 );
                 clientMap.put(deviceId, opcUaClient);
             } catch (UaException e) {
+                log.error("get opc ua client error: {}", e.getMessage());
                 clientMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-                throw new UaException(e);
             }
         }
-        return opcUaClient;
-    }
-
-    /**
-     * Read Opc Ua Point Value
-     *
-     * @param deviceId   Device Id
-     * @param driverInfo Driver Info
-     * @param pointInfo  Point Info
-     * @return String Value
-     * @throws Exception
-     */
-    public String readItem(Long deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo) {
-        CompletableFuture<String> value = new CompletableFuture<>();
-
-        OpcUaClient client;
-        try {
-            int namespace = attribute(pointInfo, "namespace");
-            String tag = attribute(pointInfo, "tag");
-            NodeId nodeId = new NodeId(namespace, tag);
-
-            client = getOpcUaClient(deviceId, driverInfo);
-            client.connect().get();
-            client.readValue(0.0, TimestampsToReturn.Both, nodeId).thenAccept(dataValue -> {
-                try {
-                    value.complete(dataValue.getValue().getValue().toString());
-                } catch (Exception e) {
-                    log.error("Opc Ua Point(ns={};s={}) does not exist", namespace, tag);
-                }
-            });
-            return value.get();
-        } catch (InterruptedException | ExecutionException | UaException e) {
-            log.error("Opc Ua Point Read Error: {}", e.getMessage(), e);
-            return null;
-        }
+        return clientMap.get(deviceId);
     }
 
     /**
@@ -236,8 +175,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                 default:
                     break;
             }
-        } catch (InterruptedException | ExecutionException | UaException e) {
-            log.error("Opc Ua Point Write Error: {}", e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Opc Ua Point Write Error: {}", e.getMessage());
         }
     }
 

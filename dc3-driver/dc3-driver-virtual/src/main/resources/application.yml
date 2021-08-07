@@ -10,7 +10,7 @@ driver:
       corn: '0/10 * * * * ?'
     read:
       enable: true
-      corn: '0/10 * * * * ?'
+      corn: '0/30 * * * * ?'
     custom:
       enable: true
       corn: '0/5 * * * * ?'
