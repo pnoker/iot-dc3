@@ -79,12 +79,6 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
 
-        <!-- Dc3 Boot Starter -->
-        <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-boot-starter</artifactId>
-        </dependency>
-
         <!-- Caffeine Cache -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>

@@ -192,17 +192,6 @@
                 <scope>compile</scope>
             </dependency>
 
-            <!--
-                 Dc3 Boot Starter
-                 关于这个 Dc3 Boot Starter 加载 License 的说明：
-                 这个是用于绑定程序所在机器硬件参数和License，仅针对商业版本，主要是防止重复部署和防止盗版，开源版本无任何授权限制
-             -->
-            <dependency>
-                <groupId>com.dc3</groupId>
-                <artifactId>dc3-boot-starter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- Dc3 Driver Sdk  -->
             <dependency>
                 <groupId>com.dc3</groupId>
@@ -243,8 +232,8 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>spring-plugin</id>
-            <name>spring-plugin</name>
+            <id>aliyun-spring-plugin</id>
+            <name>Aliyun Apache Maven Spring Plugin Packages</name>
             <url>https://maven.aliyun.com/repository/spring-plugin</url>
             <releases>
                 <enabled>true</enabled>
@@ -257,45 +246,9 @@
 
     <repositories>
         <repository>
-            <id>aliyun-nexus</id>
+            <id>aliyun-central</id>
             <name>Aliyun Apache Maven Packages</name>
             <url>https://maven.aliyun.com/repository/central</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>gitee-pnoker</id>
-            <name>Gitee Pnoker Apache Maven Packages</name>
-            <url>https://gitee.com/pnoker/maven/raw/master</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>github-pnoker</id>
-            <name>GitHub Pnoker Apache Maven Packages</name>
-            <url>https://raw.github.com/pnoker/maven/master</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>github-dc3</id>
-            <name>GitHub DC3 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

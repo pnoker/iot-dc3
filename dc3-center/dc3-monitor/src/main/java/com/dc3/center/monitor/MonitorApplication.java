@@ -13,8 +13,8 @@
 
 package com.dc3.center.monitor;
 
-import com.dc3.config.autoconfigure.Dc3Application;
-import com.dc3.config.boot.SpringApplication;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
 
 /**
@@ -22,7 +22,7 @@ import de.codecentric.boot.admin.server.config.EnableAdminServer;
  *
  * @author pnoker
  */
-@Dc3Application
+@SpringBootApplication
 @EnableAdminServer
 public class MonitorApplication {
 
