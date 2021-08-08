@@ -19,4 +19,4 @@
 set -e
 
 cd ../../
-mvn clean -U package
+mvn -s dc3/dependencies/maven/settings.xml clean -U package

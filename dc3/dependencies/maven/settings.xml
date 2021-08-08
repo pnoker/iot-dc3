@@ -38,7 +38,8 @@
  |
  |-->
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
     <!-- localRepository
      | The path to the local repository maven will use to store artifacts.
      |
@@ -123,13 +124,6 @@
           <passphrase>optional; leave empty if not used.</passphrase>
         </server>
         -->
-
-        <server>
-            <id>github-dc3</id>
-            <username>pnoker</username>
-            <password>${GITHUB_DC3_TOKEN}</password>
-        </server>
-
     </servers>
 
     <!-- mirrors
@@ -158,7 +152,7 @@
          -->
 
         <mirror>
-            <id>aliyun-nexus</id>
+            <id>aliyun-central</id>
             <mirrorOf>central</mirrorOf>
             <name>Aliyun Apache Maven Packages</name>
             <url>https://maven.aliyun.com/repository/central</url>
