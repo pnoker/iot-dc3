@@ -28,23 +28,3 @@ echo "${develop_tag}"
 git tag "${develop_tag}"
 
 git push origin --tags
-git push gitee --tags
-git push coding --tags
-
-git checkout master
-git merge develop
-
-git pull --tags
-# shellcheck disable=SC2116
-# shellcheck disable=SC2046
-release_tag=$(echo dc3.release.$(date +'%Y%m%d').$(git tag -l "dc3.release.$(date +'%Y%m%d').*" | wc -l | xargs printf '%02d'))
-echo "${release_tag}"
-git tag "${release_tag}"
-
-git push origin --tags
-git push gitee --tags
-git push coding --tags
-
-git checkout develop
-
-
