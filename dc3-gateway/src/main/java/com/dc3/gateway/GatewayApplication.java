@@ -13,8 +13,8 @@
 
 package com.dc3.gateway;
 
-import com.dc3.config.autoconfigure.Dc3Application;
-import com.dc3.config.boot.SpringApplication;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 /**
@@ -23,7 +23,7 @@ import org.springframework.cache.annotation.EnableCaching;
  * @author pnoker
  */
 @EnableCaching
-@Dc3Application
+@SpringBootApplication
 public class GatewayApplication {
 
     public static void main(String[] args) {

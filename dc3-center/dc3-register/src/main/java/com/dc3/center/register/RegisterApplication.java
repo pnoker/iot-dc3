@@ -13,8 +13,8 @@
 
 package com.dc3.center.register;
 
-import com.dc3.config.autoconfigure.Dc3Application;
-import com.dc3.config.boot.SpringApplication;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 /**
@@ -22,7 +22,7 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
  *
  * @author pnoker
  */
-@Dc3Application
+@SpringBootApplication
 @EnableEurekaServer
 public class RegisterApplication {
 
