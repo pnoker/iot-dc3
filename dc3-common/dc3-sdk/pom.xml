@@ -25,6 +25,11 @@
 
     <description>IOT DC3 平台 驱动 SDK 。</description>
 
+    <properties>
+        <jna.version>5.8.0</jna.version>
+        <oshi.version>5.8.0</oshi.version>
+    </properties>
+
     <dependencies>
 
         <!-- Spring Cloud Starter -->
@@ -79,17 +84,27 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
 
-        <!-- Caffeine Cache -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
-        </dependency>
-
         <!-- Apache Pool2 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
+        </dependency>
+
+        <!-- Oshi & Jna -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>${oshi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>${jna.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>${jna.version}</version>
         </dependency>
 
         <!-- Dc3 Common Base -->
