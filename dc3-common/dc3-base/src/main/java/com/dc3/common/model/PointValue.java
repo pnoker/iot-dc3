@@ -72,6 +72,15 @@ public class PointValue implements Serializable {
     private List<PointValue> children;
 
     @Transient
+    private Short rw;
+
+    @Transient
+    private String unit;
+
+    @Transient
+    private String type;
+
+    @Transient
     private Integer timeOut = 15;
 
     @Transient

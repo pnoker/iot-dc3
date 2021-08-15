@@ -295,6 +295,7 @@ public interface Common {
         String DC3_MANAGER_POINT_URL_PREFIX = "/manager/point";
         String DC3_MANAGER_GROUP_URL_PREFIX = "/manager/group";
         String DC3_MANAGER_DEVICE_URL_PREFIX = "/manager/device";
+        String DC3_MANAGER_AUTO_URL_PREFIX = "/manager/auto";
         String DC3_MANAGER_POINT_INFO_URL_PREFIX = "/manager/point_info";
         String DC3_MANAGER_DRIVER_INFO_URL_PREFIX = "/manager/driver_info";
         String DC3_MANAGER_LABEL_URL_PREFIX = "/manager/label";
@@ -372,6 +373,7 @@ public interface Common {
         String RTMP = "rtmp";
         String USER = "user";
         String NAME = "_name";
+        String TYPE = "_type";
         String PHONE = "_phone";
         String EMAIL = "_email";
         String VALUE = "_value";
