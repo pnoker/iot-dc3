@@ -11,45 +11,45 @@
  * limitations under the License.
  */
 
-package com.dc3.driver.service.mqtt;
+package com.dc3.driver.mqtt.service;
 
-import org.springframework.integration.annotation.MessagingGateway;
+
 import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 
 /**
  * @author pnoker
  */
-@MessagingGateway(defaultRequestChannel = "mqttOutputChannel")
-public interface MqttSendHandler {
+public interface MqttSendService {
+
     /**
-     * 使用 Default Topic & Default Qos 发送数据
+     * Use Default Topic & Default Qos Send Data
      *
      * @param data string
      */
     void sendToMqtt(String data);
 
     /**
-     * 使用 Default Topic & 自定义 Qos 发送数据
+     * Use Default Topic & Custom Qos Send Data
      *
-     * @param qos  自定义 Qos
+     * @param qos  Custom Qos
      * @param data string
      */
     void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
 
     /**
-     * 使用 自定义 Topic & Default Qos 发送数据
+     * Use Custom Topic & Default Qos Send Data
      *
-     * @param topic 自定义 Topic
+     * @param topic Custom Topic
      * @param data  string
      */
     void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
 
     /**
-     * 使用 自定义 Topic & 自定义 Qos 发送数据
+     * Use Custom Topic & Custom Qos Send Data
      *
-     * @param topic 自定义 Topic
-     * @param qos   自定义 Qos
+     * @param topic Custom Topic
+     * @param qos   Custom Qos
      * @param data  string
      */
     void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);

@@ -11,22 +11,22 @@
  * limitations under the License.
  */
 
-package com.dc3.driver.bean;
+package com.dc3.driver.mqtt.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+
+import com.dc3.common.sdk.bean.mqtt.MessageHeader;
 
 /**
  * @author pnoker
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Accessors(chain = true)
-public class DevicePayLoad {
-    private Long deviceId;
-    private Long pointId;
-    private String value;
+public interface MqttReceiveService {
+
+    /**
+     * receive opcua value
+     *
+     * @param client        String
+     * @param messageHeader MessageHeader
+     * @param data          String
+     */
+    void receiveValue(String client, MessageHeader messageHeader, String data);
 }

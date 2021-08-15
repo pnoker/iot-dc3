@@ -20,7 +20,7 @@ import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.driver.service.mqtt.MqttSendHandler;
+import com.dc3.driver.mqtt.service.MqttSendService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +41,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
     @Resource
-    private MqttSendHandler mqttSendHandler;
+    private MqttSendService mqttSendService;
 
     @Override
     public void initial() {
@@ -57,9 +57,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         String commandTopic = attribute(pointInfo, "commandTopic"), value = values.getValue();
         try {
             int commandQos = attribute(pointInfo, "commandQos");
-            mqttSendHandler.sendToMqtt(commandTopic, commandQos, value);
+            mqttSendService.sendToMqtt(commandTopic, commandQos, value);
         } catch (Exception e) {
-            mqttSendHandler.sendToMqtt(commandTopic, value);
+            mqttSendService.sendToMqtt(commandTopic, value);
         }
         return true;
     }
