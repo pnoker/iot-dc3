@@ -68,12 +68,6 @@
             <artifactId>spring-aspects</artifactId>
         </dependency>
 
-        <!-- Apache Pool2 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-        </dependency>
-
         <!-- Dc3 Common Base -->
         <dependency>
             <groupId>com.dc3</groupId>
