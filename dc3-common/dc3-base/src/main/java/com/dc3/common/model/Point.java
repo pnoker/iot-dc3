@@ -15,6 +15,7 @@ package com.dc3.common.model;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.dc3.common.constant.Common;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -39,24 +40,24 @@ import javax.validation.constraints.Pattern;
 public class Point extends Description {
 
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_.]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String name;
 
-    private String type;
-    private Short rw;
+    private String type = Common.ValueType.STRING;
+    private Short rw = 0;
 
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float base;
+    private Float base = 0F;
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float minimum;
+    private Float minimum = -999999F;
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float maximum;
+    private Float maximum = 999999F;
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float multiple;
+    private Float multiple = 1F;
 
-    private Boolean accrue;
-    private String format;
-    private String unit;
+    private Boolean accrue = false;
+    private String format = "%.3f";
+    private String unit = "\"";
 
     private Boolean enable;
 

@@ -32,6 +32,7 @@ public class BatchProfile implements Serializable {
 
     private String name;
     private Boolean share;
+    private Short type;
 
     private Map<String, String> driverConfig;
 

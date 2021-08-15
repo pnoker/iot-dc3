@@ -39,10 +39,12 @@ import java.util.Set;
 public class Profile extends Description {
 
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_.]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String name;
 
     private Boolean share = true;
+
+    private Short type = 1;
 
     private Boolean enable;
 
@@ -51,6 +53,8 @@ public class Profile extends Description {
 
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private Long groupId;
+
+    private Long deviceId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Long tenantId;
