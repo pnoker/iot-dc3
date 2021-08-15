@@ -50,7 +50,7 @@ public class MqttProperties {
     private String client;
 
     @NotNull(message = "default topic can't be empty")
-    private Topic defaultSendTopic = new Topic("value/mi-iiot-driver-mqtt-opc_default/edge/" + RandomUtil.randomString(6), 1);
+    private Topic defaultSendTopic = new Topic("value/dc3-driver-mqtt-opc_default/edge/" + RandomUtil.randomString(6), 1);
 
     @Size(min = 1, message = "at least one topic")
     private List<Topic> receiveTopics;

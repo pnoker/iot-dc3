@@ -33,16 +33,16 @@
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
-        <!-- Dc3 Common Profiles -->
-        <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-profiles</artifactId>
-        </dependency>
-
         <!-- Dc3 Common Core -->
         <dependency>
             <groupId>com.dc3</groupId>
             <artifactId>dc3-core</artifactId>
+        </dependency>
+
+        <!-- Dc3 Common Profiles -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-profiles</artifactId>
         </dependency>
 
     </dependencies>

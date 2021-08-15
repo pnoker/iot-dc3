@@ -108,8 +108,10 @@ CREATE TABLE `dc3_profile`
     `id`          bigint(20)                                              NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `name`        varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '模板名称',
     `share`       tinyint(4)                                              NULL DEFAULT 0 COMMENT '公有/私有模板标识',
+    `type`        tinyint(4)                                              NULL DEFAULT 1 COMMENT '系统创建/用户创建/驱动创建',
     `enable`      tinyint(4)                                              NULL DEFAULT 1 COMMENT '是否可用',
     `group_id`    bigint(20)                                              NULL DEFAULT NULL COMMENT '分组ID',
+    `device_id`   bigint(20)                                              NULL DEFAULT NULL COMMENT '设备ID',
     `tenant_id`   bigint(20)                                              NOT NULL COMMENT '租户ID',
     `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
     `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
@@ -118,9 +120,11 @@ CREATE TABLE `dc3_profile`
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `name` (`name`) USING BTREE,
     INDEX `group_id` (`group_id`) USING BTREE,
+    INDEX `device_id` (`device_id`) USING BTREE,
     INDEX `tenant_id` (`tenant_id`) USING BTREE,
     CONSTRAINT `dc3_profile_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `dc3_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT `dc3_profile_ibfk_2` FOREIGN KEY (`tenant_id`) REFERENCES `dc3_tenant` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT `dc3_profile_ibfk_2` FOREIGN KEY (`device_id`) REFERENCES `dc3_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT `dc3_profile_ibfk_3` FOREIGN KEY (`tenant_id`) REFERENCES `dc3_tenant` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   CHARACTER SET = utf8
