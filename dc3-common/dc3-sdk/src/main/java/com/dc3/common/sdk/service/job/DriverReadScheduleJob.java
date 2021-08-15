@@ -16,7 +16,7 @@ package com.dc3.common.sdk.service.job;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
@@ -53,7 +53,7 @@ public class DriverReadScheduleJob extends QuartzJobBean {
             Map<Long, Map<String, AttributeInfo>> pointInfoMap = driverContext.getDriverMetadata().getPointInfoMap().get(device.getId());
             if (null != pointInfoMap && null != profileIds) {
                 profileIds.forEach(profileId -> {
-                    Map<Long, Point> pointMap = driverContext.getDriverMetadata().getProfileMap().get(profileId);
+                    Map<Long, Point> pointMap = driverContext.getDriverMetadata().getProfilePointMap().get(profileId);
                     if (null != pointMap) {
                         pointMap.keySet().forEach(pointId -> {
                             Map<String, AttributeInfo> map = pointInfoMap.get(pointId);

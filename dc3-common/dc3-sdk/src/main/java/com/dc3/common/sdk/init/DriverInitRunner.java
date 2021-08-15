@@ -13,13 +13,14 @@
 
 package com.dc3.common.sdk.init;
 
-import com.dc3.common.sdk.bean.DriverProperty;
+import com.dc3.common.sdk.bean.driver.DriverProperty;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverMetadataService;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,11 @@ import javax.annotation.Resource;
  */
 @Component
 @ComponentScan(basePackages = {
-        "com.dc3.common.sdk"
+        "com.dc3.common.sdk",
+        "com.dc3.api.center.manager"
+})
+@EnableFeignClients(basePackages = {
+        "com.dc3.api.center.manager.*"
 })
 @EnableConfigurationProperties({DriverProperty.class})
 public class DriverInitRunner implements ApplicationRunner {

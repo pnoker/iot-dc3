@@ -20,7 +20,7 @@ import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.*;
-import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverMetadataService;
 import com.dc3.common.sdk.service.DriverService;
 import com.rabbitmq.client.Channel;

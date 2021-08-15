@@ -14,9 +14,9 @@
 package com.dc3.common.sdk.api;
 
 import com.dc3.common.bean.R;
-import com.dc3.common.model.PointValue;
 import com.dc3.common.constant.Common;
-import com.dc3.common.sdk.bean.CmdParameter;
+import com.dc3.common.model.PointValue;
+import com.dc3.common.sdk.bean.command.CmdParameter;
 import com.dc3.common.sdk.service.DriverCommandService;
 import com.dc3.common.valid.Read;
 import com.dc3.common.valid.ValidatableList;

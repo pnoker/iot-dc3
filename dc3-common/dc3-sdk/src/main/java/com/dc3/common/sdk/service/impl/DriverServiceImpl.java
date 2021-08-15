@@ -22,7 +22,7 @@ import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.model.DriverEvent;
 import com.dc3.common.model.Point;
 import com.dc3.common.model.PointValue;
-import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -89,7 +89,16 @@ public class DriverServiceImpl implements DriverService {
                 break;
             case Common.ValueType.BOOLEAN:
                 try {
-                    value = String.valueOf(Boolean.parseBoolean(rawValue.trim()));
+                    try {
+                        Double booleanValue = Convert.convert(Double.class, rawValue.trim());
+                        if (booleanValue > 0) {
+                            value = Boolean.TRUE.toString();
+                        } else {
+                            value = Boolean.FALSE.toString();
+                        }
+                    } catch (Exception e) {
+                        value = String.valueOf(Boolean.parseBoolean(rawValue.trim()));
+                    }
                 } catch (Exception e) {
                     throw new ServiceException("Invalid device({}) point({}) value({}), error: {}", deviceId, pointId, rawValue, e.getMessage());
                 }

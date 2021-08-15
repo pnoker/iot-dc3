@@ -90,6 +90,12 @@
             <artifactId>commons-pool2</artifactId>
         </dependency>
 
+        <!-- Dc3 Api -->
+        <dependency>
+            <groupId>com.dc3</groupId>
+            <artifactId>dc3-api-manager</artifactId>
+        </dependency>
+
         <!-- Oshi & Jna -->
         <dependency>
             <groupId>com.github.oshi</groupId>
@@ -105,12 +111,6 @@
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
             <version>${jna.version}</version>
-        </dependency>
-
-        <!-- Dc3 Common Base -->
-        <dependency>
-            <groupId>com.dc3</groupId>
-            <artifactId>dc3-base</artifactId>
         </dependency>
 
     </dependencies>

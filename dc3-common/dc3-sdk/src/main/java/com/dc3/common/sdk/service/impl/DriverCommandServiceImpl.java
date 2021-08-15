@@ -13,11 +13,12 @@
 
 package com.dc3.common.sdk.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.PointValue;
-import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCommandService;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
@@ -43,6 +44,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @Override
     public PointValue read(Long deviceId, Long pointId) {
         Device device = driverContext.getDeviceByDeviceId(deviceId);
+
         try {
             String rawValue = driverCustomService.read(
                     driverContext.getDriverInfoByDeviceId(deviceId),
