@@ -21,6 +21,7 @@ import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.ProfileBindDto;
+import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.ProfileBind;
@@ -55,15 +56,21 @@ public class ProfileBindServiceImpl implements ProfileBindService {
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public ProfileBind add(ProfileBind profileBind) {
-        if (profileBindMapper.insert(profileBind) > 0) {
-            return profileBindMapper.selectById(profileBind.getId());
+        try {
+            selectByDeviceIdAndProfileId(profileBind.getDeviceId(), profileBind.getProfileId());
+            throw new DuplicateException("The profile bind already exists");
+        } catch (NotFoundException notFoundException) {
+            if (profileBindMapper.insert(profileBind) > 0) {
+                return profileBindMapper.selectById(profileBind.getId());
+            }
+            throw new ServiceException("The profile bind add failed");
         }
-        throw new ServiceException("The profile bind add failed");
     }
 
     @Override
@@ -72,6 +79,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#id", condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -87,6 +95,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -103,6 +112,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -120,6 +130,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
@@ -137,6 +148,19 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#id", unless = "#result==null")
     public ProfileBind selectById(Long id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
+        if (null == profileBind) {
+            throw new NotFoundException("The profile bind does not exist");
+        }
+        return profileBind;
+    }
+
+    @Override
+    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, key = "#deviceId+'.'+#profileId", unless = "#result==null")
+    public ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
+        ProfileBindDto profileBindDto = new ProfileBindDto();
+        profileBindDto.setDeviceId(deviceId);
+        profileBindDto.setProfileId(profileId);
+        ProfileBind profileBind = profileBindMapper.selectOne(fuzzyQuery(profileBindDto));
         if (null == profileBind) {
             throw new NotFoundException("The profile bind does not exist");
         }

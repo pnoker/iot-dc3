@@ -115,6 +115,7 @@ public class BatchServiceImpl implements BatchService {
     public DriverMetadata batchDriverMetadata(String serviceName) {
         DriverMetadata driverMetadata = new DriverMetadata();
         Driver driver = driverService.selectByServiceName(serviceName);
+        driverMetadata.setDriverId(driver.getId()).setTenantId(driver.getTenantId());
 
         try {
             Map<Long, DriverAttribute> driverAttributeMap = getDriverAttributeMap(driver.getId());
@@ -132,8 +133,11 @@ public class BatchServiceImpl implements BatchService {
             Map<Long, Device> deviceMap = getDeviceMap(devices);
             driverMetadata.setDeviceMap(deviceMap);
 
-            Map<Long, Map<Long, Point>> profilePointMap = getProfileMap(deviceIds);
-            driverMetadata.setProfileMap(profilePointMap);
+            Map<String, Long> deviceNameMap = deviceMap.values().stream().collect(Collectors.toMap(Device::getName, Device::getId));
+            driverMetadata.setDeviceNameMap(deviceNameMap);
+
+            Map<Long, Map<Long, Point>> profilePointMap = getProfilePointMap(deviceIds);
+            driverMetadata.setProfilePointMap(profilePointMap);
 
             Map<Long, Map<Long, Map<String, AttributeInfo>>> devicePointInfoMap = getPointInfoMap(devices, profilePointMap, pointAttributeMap);
             driverMetadata.setPointInfoMap(devicePointInfoMap);
@@ -158,7 +162,7 @@ public class BatchServiceImpl implements BatchService {
 
         Profile profile;
         try {
-            profile = profileService.selectByName(batchProfile.getName(), driver.getTenantId());
+            profile = profileService.selectByNameAndType(batchProfile.getName(), batchProfile.getType(), driver.getTenantId());
             profile.setShare(batchProfile.getShare());
             profile.setDescription("批量导入：更新操作");
             profile = profileService.update(profile);
@@ -645,13 +649,13 @@ public class BatchServiceImpl implements BatchService {
      * @param deviceIds Device Id Set
      * @return map(profileId ( pointId, point))
      */
-    public Map<Long, Map<Long, Point>> getProfileMap(Set<Long> deviceIds) {
-        Map<Long, Map<Long, Point>> pointMap = new ConcurrentHashMap<>(16);
+    public Map<Long, Map<Long, Point>> getProfilePointMap(Set<Long> deviceIds) {
+        Map<Long, Map<Long, Point>> profilePointMap = new ConcurrentHashMap<>(16);
         deviceIds.forEach(deviceId -> {
             Set<Long> profileIds = profileBindService.selectProfileIdByDeviceId(deviceId);
-            profileIds.forEach(profileId -> pointMap.put(profileId, getPointMap(profileId)));
+            profileIds.forEach(profileId -> profilePointMap.put(profileId, getPointMap(profileId)));
         });
-        return pointMap;
+        return profilePointMap;
     }
 
     /**

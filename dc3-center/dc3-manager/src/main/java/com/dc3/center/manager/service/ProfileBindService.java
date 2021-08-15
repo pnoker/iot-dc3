@@ -42,6 +42,15 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
     boolean deleteByProfileIdAndDeviceId(Long profileId, Long deviceId);
 
     /**
+     * 根据 设备ID 和 模版ID 查询关联的模版映射
+     *
+     * @param deviceId  Device Id
+     * @param profileId Profile Id
+     * @return ProfileBind
+     */
+    ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
+
+    /**
      * 根据 模版ID 查询关联的 设备ID 集合
      *
      * @param profileId Profile Id
