@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.bean;
+package com.dc3.common.sdk.bean.driver;
 
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.bean.driver.DriverMetadata;
@@ -112,7 +112,7 @@ public class DriverContext {
      */
     public List<Point> getPointByDeviceId(Long deviceId) {
         Device device = getDeviceByDeviceId(deviceId);
-        return this.driverMetadata.getProfileMap().entrySet().stream()
+        return this.driverMetadata.getProfilePointMap().entrySet().stream()
                 .filter(entry -> device.getProfileIds().contains(entry.getKey()))
                 .map(entry -> new ArrayList<>(entry.getValue().values()))
                 .reduce(new ArrayList<>(), (total, temp) -> {
@@ -130,7 +130,7 @@ public class DriverContext {
      */
     public Point getPointByDeviceIdAndPointId(Long deviceId, Long pointId) {
         Device device = getDeviceByDeviceId(deviceId);
-        Optional<Map<Long, Point>> optional = this.driverMetadata.getProfileMap().entrySet().stream()
+        Optional<Map<Long, Point>> optional = this.driverMetadata.getProfilePointMap().entrySet().stream()
                 .filter(entry -> device.getProfileIds().contains(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .filter(entry -> entry.containsKey(pointId))

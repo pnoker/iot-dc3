@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.bean;
+package com.dc3.common.sdk.bean.schedule;
 
 import lombok.Getter;
 import lombok.Setter;

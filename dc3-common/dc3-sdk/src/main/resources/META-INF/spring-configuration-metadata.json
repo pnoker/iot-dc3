@@ -127,38 +127,33 @@
     },
     {
       "name": "driver.mqtt.auth-type",
-      "type": "com.dc3.driver.bean.MqttProperty.AuthTypeEnum",
+      "type": "com.dc3.common.sdk.bean.mqtt.MqttProperties.AuthTypeEnum",
       "description": "mqtt auth type."
     },
     {
-      "name": "driver.mqtt.qos",
-      "type": "java.util.List",
-      "description": "driver qos(int list) for mqtt server."
+      "name": "driver.mqtt.receive-topics",
+      "type": "java.util.List<com.dc3.common.sdk.bean.mqtt.MqttProperties.Topic>",
+      "description": "driver receive topics(string list) for mqtt server."
     },
     {
-      "name": "driver.mqtt.topics",
-      "type": "java.util.List",
-      "description": "driver topics(string list) for mqtt server."
+      "name": "driver.mqtt.default-send-topic",
+      "type": "com.dc3.common.sdk.bean.mqtt.MqttProperties.Topic",
+      "description": "driver default sent topic for mqtt server."
     },
     {
-      "name": "driver.mqtt.client.id",
+      "name": "driver.mqtt.default-send-topic.name",
+      "type": "java.lang.String",
+      "description": "driver default sent topic name for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.default-send-topic.qos",
+      "type": "java.lang.Integer",
+      "description": "driver default sent topic qos for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.client",
       "type": "java.lang.String",
       "description": "driver client id for mqtt server."
-    },
-    {
-      "name": "driver.mqtt.default.qos",
-      "type": "java.lang.Integer",
-      "description": "driver default qos for mqtt server."
-    },
-    {
-      "name": "driver.mqtt.default.topic",
-      "type": "java.lang.String",
-      "description": "driver default topic for mqtt server."
-    },
-    {
-      "name": "driver.mqtt.default.receive.enable",
-      "type": "java.lang.Boolean",
-      "description": "driver default topic receive enable for mqtt server."
     },
     {
       "name": "driver.mqtt.ca-crt",

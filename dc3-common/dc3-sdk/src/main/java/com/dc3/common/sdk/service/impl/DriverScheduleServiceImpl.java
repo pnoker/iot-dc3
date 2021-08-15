@@ -13,9 +13,9 @@
 
 package com.dc3.common.sdk.service.impl;
 
-import com.dc3.common.sdk.bean.DriverProperty;
-import com.dc3.common.sdk.bean.ScheduleConfig;
-import com.dc3.common.sdk.bean.ScheduleProperty;
+import com.dc3.common.sdk.bean.driver.DriverProperty;
+import com.dc3.common.sdk.bean.schedule.ScheduleConfig;
+import com.dc3.common.sdk.bean.schedule.ScheduleProperty;
 import com.dc3.common.sdk.service.DriverScheduleService;
 import com.dc3.common.sdk.service.job.DriverCustomScheduleJob;
 import com.dc3.common.sdk.service.job.DriverReadScheduleJob;
