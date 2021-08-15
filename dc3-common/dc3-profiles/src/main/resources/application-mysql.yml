@@ -1,6 +1,5 @@
 spring:
   datasource:
-    sql-script-encoding: utf-8
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -11,6 +10,9 @@ spring:
       max-lifetime: 1765000
       maximum-pool-size: 64
       minimum-idle: 4
+  sql:
+    init:
+      encoding: utf-8
 
 mybatis-plus:
   configuration:
