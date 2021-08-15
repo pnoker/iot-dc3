@@ -19,7 +19,7 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.model.Point;
-import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +47,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
+        if (point.getType().equals("string")) {
+            return RandomUtil.randomString(8);
+        }
+        if (point.getType().equals("boolean")) {
+            return String.valueOf(RandomUtil.randomBoolean());
+        }
         return String.valueOf(RandomUtil.randomDouble(100));
     }
 
