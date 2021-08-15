@@ -31,9 +31,10 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
      * 根据 模板Name 查询模版
      *
      * @param name Profile Name
+     * @param type Profile Type
      * @return Profile
      */
-    Profile selectByName(String name, Long tenantId);
+    Profile selectByNameAndType(String name, Short type, Long tenantId);
 
     /**
      * 根据 模版Id集 查询模版
@@ -44,7 +45,7 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
     List<Profile> selectByIds(Set<Long> ids);
 
     /**
-     * 根据 设备Id集 查询模版
+     * 根据 设备Id 查询模版
      *
      * @param deviceId Device Id
      * @return Profile Array

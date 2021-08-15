@@ -105,7 +105,7 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     public List<PointValue> realtime(Long deviceId) {
         R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
-        if (listR.isOk()) {
+        if (!listR.isOk()) {
             String prefix = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_";
             List<String> keys = listR.getData().stream().map(point -> prefix + point.getId()).collect(Collectors.toList());
             if (keys.size() > 0) {
@@ -123,22 +123,33 @@ public class PointValueServiceImpl implements PointValueService {
     public PointValue realtime(Long deviceId, Long pointId) {
         String key = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_" + pointId;
         PointValue pointValue = redisUtil.getKey(key, PointValue.class);
+
         if (null != pointValue) {
-            return pointValue.setTimeOut(null).setTimeUnit(null);
+            pointValue.setTimeOut(null).setTimeUnit(null);
         }
-        return null;
+        return pointValue;
     }
 
     @Override
     public List<PointValue> latest(Long deviceId) {
         List<PointValue> pointValues = new ArrayList<>();
+
         R<Device> deviceR = deviceClient.selectById(deviceId);
-        if (deviceR.isOk()) {
-            R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
-            if (listR.isOk()) {
-                listR.getData().forEach(point -> pointValues.add(latest(deviceId, point.getId())));
-            }
+        if (!deviceR.isOk()) {
+            return pointValues;
         }
+
+        R<List<Point>> pointsR = pointClient.selectByDeviceId(deviceId);
+        if (!pointsR.isOk()) {
+            return pointValues;
+        }
+
+        pointsR.getData().forEach(point -> {
+            PointValue pointValue = latest(deviceId, point.getId());
+            if (null != pointValue) {
+                pointValues.add(pointValue.setRw(point.getRw()).setType(point.getType()).setUnit(point.getUnit()));
+            }
+        });
         return pointValues.stream().filter(Objects::nonNull).map(pointValue -> pointValue.setTimeOut(null).setTimeUnit(null)).collect(Collectors.toList());
     }
 
@@ -167,6 +178,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (null != pointValue) {
             pointValue.setTimeOut(null).setTimeUnit(null);
         }
+
         return pointValue;
     }
 

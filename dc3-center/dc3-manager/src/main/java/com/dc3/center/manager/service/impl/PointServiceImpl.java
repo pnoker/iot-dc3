@@ -72,7 +72,7 @@ public class PointServiceImpl implements PointService {
     public Point add(Point point) {
         try {
             selectByNameAndProfileId(point.getName(), point.getProfileId());
-            throw new ServiceException("The point already exists in the profile");
+            throw new DuplicateException("The point already exists in the profile");
         } catch (NotFoundException notFoundException) {
             if (pointMapper.insert(point) > 0) {
                 return pointMapper.selectById(point.getId());

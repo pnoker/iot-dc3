@@ -38,6 +38,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -63,7 +64,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#profile.name+'.'+#profile.tenantId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -72,7 +73,7 @@ public class ProfileServiceImpl implements ProfileService {
     )
     public Profile add(Profile profile) {
         try {
-            selectByName(profile.getName(), profile.getTenantId());
+            selectByNameAndType(profile.getName(), profile.getType(), profile.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException1) {
             if (profileMapper.insert(profile) > 0) {
@@ -92,7 +93,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Caching(
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
@@ -111,7 +112,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Caching(
             put = {
                     @CachePut(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#profile.name+'.'+#profile.tenantId", condition = "#result!=null")
+                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
             },
             evict = {
                     @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
@@ -148,10 +149,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
-    public Profile selectByName(String name, Long tenantId) {
+    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, key = "#name+'.'+#type+'.'+#tenantId", unless = "#result==null")
+    public Profile selectByNameAndType(String name, Short type, Long tenantId) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getName, name);
+        queryWrapper.eq(Profile::getType, type);
         queryWrapper.eq(Profile::getTenantId, tenantId);
         Profile profile = profileMapper.selectOne(queryWrapper);
         if (null == profile) {
@@ -167,13 +169,16 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Profile> selectByIds(Set<Long> ids) {
-        List<Profile> profiles = profileMapper.selectBatchIds(ids);
-        profiles.forEach(profile -> {
-            try {
-                profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
-            } catch (NotFoundException ignored) {
-            }
-        });
+        List<Profile> profiles = new ArrayList<>();
+        if (null != ids && ids.size() > 0) {
+            profiles = profileMapper.selectBatchIds(ids);
+            profiles.forEach(profile -> {
+                try {
+                    profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
+                } catch (NotFoundException ignored) {
+                }
+            });
+        }
         return profiles;
     }
 

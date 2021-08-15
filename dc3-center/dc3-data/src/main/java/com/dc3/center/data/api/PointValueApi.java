@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -49,10 +50,13 @@ public class PointValueApi implements PointValueClient {
             if (null != pointValues) {
                 if (history) {
                     pointValues.forEach(pointValue -> {
-                        PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100L));
-                        Page<PointValue> page = pointValueService.list(pointValueDto);
-                        if (null != page) {
-                            pointValue.setChildren(page.getRecords());
+                        if (!pointValue.getType().equals(Common.ValueType.STRING)) {
+                            PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100L));
+                            Page<PointValue> page = pointValueService.list(pointValueDto);
+                            if (null != page) {
+                                pointValue.setChildren(page.getRecords().stream()
+                                        .map(pointValueChild -> pointValueChild.setId(null).setDeviceId(null).setPointId(null)).collect(Collectors.toList()));
+                            }
                         }
                     });
                 }
@@ -76,7 +80,8 @@ public class PointValueApi implements PointValueClient {
                     PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointId).setPage((new Pages()).setSize(100L));
                     Page<PointValue> page = pointValueService.list(pointValueDto);
                     if (null != page) {
-                        pointValue.setChildren(page.getRecords());
+                        pointValue.setChildren(page.getRecords().stream()
+                                .map(pointValueChild -> pointValueChild.setId(null).setDeviceId(null).setPointId(null)).collect(Collectors.toList()));
                     }
                 }
                 return R.ok(pointValue);
