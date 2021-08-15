@@ -44,17 +44,13 @@ driver:
     client-key-pass: dc3-client
     client-key: classpath:/certs/client.key
     client-crt: classpath:/certs/client.crt
-    qos:
-      - 0
-    topics:
-      - mqtt/group/device/#
-    client:
-      id: dc3-edge-gateway-client
-    default:
-      topic: dc3-mqtt-topic
+    client: ${spring.application.name}
+    receive-topics:
+      - qos: 0
+        name: mqtt/group/device/#
+    default-send-topic:
       qos: 1
-      receive:
-        enable: true
+      name: dc3-mqtt-topic
     keep-alive: 15
     completion-timeout: 3000
 

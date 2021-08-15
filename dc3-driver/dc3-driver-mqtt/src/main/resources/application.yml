@@ -44,19 +44,15 @@ driver:
     client-key-pass: dc3-client
     client-key: classpath:/certs/client.key
     client-crt: classpath:/certs/client.crt
-    qos:
-      - 1
-      - 1
-    topics:
-      - driver/${spring.application.name}/device/+
-      - driver/${spring.application.name}/gateway/+
-    client:
-      id: ${spring.application.name}
-    default:
-      topic: default/${spring.application.name}
+    client:  ${spring.application.name}
+    receive-topics:
+      - qos: 1
+        name: driver/${spring.application.name}/device/+
+      - qos: 1
+        name: driver/${spring.application.name}/gateway/+
+    default-send-topic:
       qos: 1
-      receive:
-        enable: true
+      topic: default/${spring.application.name}
     keep-alive: 15
     completion-timeout: 3000
 

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.driver.service.mqtt;
+package com.dc3.driver.mqtt.handler;
 
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.mqtt.support.MqttHeaders;
