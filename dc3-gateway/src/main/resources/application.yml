@@ -78,7 +78,7 @@ spring:
             - Path=/api/v3/data/**
           filters:
             - StripPrefix=2
-            - Authentic
+            #- Authentic
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@hostKeyResolver}'
@@ -109,7 +109,8 @@ spring:
 resilience4j:
   timelimiter:
     configs:
-      timeout-duration: 10S
+      default:
+        timeout-duration: 15S
 
 logging:
   level:
