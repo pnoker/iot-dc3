@@ -18,7 +18,7 @@ import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.model.PointValue;
-import com.dc3.common.sdk.bean.DriverContext;
+import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.sdk.util.DriverUtils;
 import com.dc3.driver.service.netty.tcp.NettyTcpServer;
