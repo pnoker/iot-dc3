@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.model;
+package com.dc3.common.bean.point;
 
 import com.dc3.common.constant.Common;
 import com.fasterxml.jackson.annotation.JsonFormat;

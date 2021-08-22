@@ -13,7 +13,7 @@
 
 package com.dc3.common.sdk.service;
 
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 
 /**
  * @author pnoker

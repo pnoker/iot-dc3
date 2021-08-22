@@ -17,7 +17,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.common.bean.R;
 import com.dc3.common.dto.PointValueDto;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;

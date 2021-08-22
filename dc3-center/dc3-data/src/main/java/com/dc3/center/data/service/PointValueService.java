@@ -15,7 +15,7 @@ package com.dc3.center.data.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.common.dto.PointValueDto;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 
 import java.util.List;
 

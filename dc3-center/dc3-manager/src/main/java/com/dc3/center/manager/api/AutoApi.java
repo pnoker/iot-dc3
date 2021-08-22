@@ -16,7 +16,7 @@ package com.dc3.center.manager.api;
 import com.dc3.api.center.manager.feign.AutoClient;
 import com.dc3.center.manager.service.AutoService;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.DevicePoint;
+import com.dc3.common.bean.point.PointDetail;
 import com.dc3.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,9 +39,9 @@ public class AutoApi implements AutoClient {
 
 
     @Override
-    public R<DevicePoint> autoCreateDeviceAndPoint(DevicePoint devicePoint, Long tenantId) {
+    public R<PointDetail> autoCreateDeviceAndPoint(PointDetail pointDetail, Long tenantId) {
         try {
-            DevicePoint createDeviceAndPoint = autoService.autoCreateDeviceAndPointDriver(devicePoint.getDeviceName(), devicePoint.getPointName(), devicePoint.getDriverId(), tenantId);
+            PointDetail createDeviceAndPoint = autoService.autoCreateDeviceAndPointDriver(pointDetail.getDeviceName(), pointDetail.getPointName(), pointDetail.getDriverId(), tenantId);
             if (null != createDeviceAndPoint) {
                 return R.ok(createDeviceAndPoint);
             }

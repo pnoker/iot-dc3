@@ -13,11 +13,10 @@
 
 package com.dc3.common.sdk.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCommandService;
 import com.dc3.common.sdk.service.DriverCustomService;

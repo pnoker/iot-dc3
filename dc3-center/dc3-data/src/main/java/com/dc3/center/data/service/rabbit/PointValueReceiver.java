@@ -16,7 +16,7 @@ package com.dc3.center.data.service.rabbit;
 import com.dc3.center.data.service.DataCustomService;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.center.data.service.job.PointValueScheduleJob;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;

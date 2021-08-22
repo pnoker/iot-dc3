@@ -20,10 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -53,8 +50,8 @@ public class ThreadPoolConfig {
                 thread.getKeepAliveTime(),
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
-                (r) -> new Thread(r, "[ThreadPoolExecutor]" + thread.getPrefix() + threadPoolAtomic.getAndIncrement()),
-                (r, e) -> log.error("ThreadPoolExecutor Rejected"));
+                (r) -> new Thread(r, "[T]" + thread.getPrefix() + threadPoolAtomic.getAndIncrement()),
+                (r, e) -> new BlockingRejectedExecutionHandler());
     }
 
     /**
@@ -64,8 +61,19 @@ public class ThreadPoolConfig {
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
         return new ScheduledThreadPoolExecutor(
                 thread.getCorePoolSize(),
-                (r) -> new Thread(r, "[ScheduledThreadPoolExecutor]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
-                (r, e) -> log.error("ScheduledThreadPoolExecutor Rejected"));
+                (r) -> new Thread(r, "[S]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
+                (r, e) -> new BlockingRejectedExecutionHandler());
+    }
+
+    private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            try {
+                executor.getQueue().put(r);
+            } catch (InterruptedException e) {
+                log.error(e.getMessage());
+            }
+        }
     }
 
 }

@@ -133,9 +133,6 @@ public class BatchServiceImpl implements BatchService {
             Map<Long, Device> deviceMap = getDeviceMap(devices);
             driverMetadata.setDeviceMap(deviceMap);
 
-            Map<String, Long> deviceNameMap = deviceMap.values().stream().collect(Collectors.toMap(Device::getName, Device::getId));
-            driverMetadata.setDeviceNameMap(deviceNameMap);
-
             Map<Long, Map<Long, Point>> profilePointMap = getProfilePointMap(deviceIds);
             driverMetadata.setProfilePointMap(profilePointMap);
 

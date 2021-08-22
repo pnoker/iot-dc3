@@ -43,21 +43,21 @@ public class Point extends Description {
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/\\.\\|]{1,31}$", message = "invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String name;
 
-    private String type = Common.ValueType.STRING;
-    private Short rw = 0;
+    private String type;
+    private Short rw;
 
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float base = 0F;
+    private Float base;
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float minimum = -999999F;
+    private Float minimum;
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float maximum = 999999F;
+    private Float maximum;
     @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Float multiple = 1F;
+    private Float multiple;
 
-    private Boolean accrue = false;
-    private String format = "%.3f";
-    private String unit = "\"";
+    private Boolean accrue;
+    private String format;
+    private String unit;
 
     private Boolean enable;
 
@@ -84,5 +84,18 @@ public class Point extends Description {
         this.unit = unit;
         this.profileId = profileId;
         this.tenantId = tenantId;
+    }
+
+    public Point setDefault() {
+        this.type = Common.ValueType.STRING;
+        this.rw = 0;
+        this.base = 0F;
+        this.minimum = -999999F;
+        this.maximum = 999999F;
+        this.multiple = 1F;
+        this.accrue = false;
+        this.format = "%3.f";
+        this.unit = "\"";
+        return this;
     }
 }

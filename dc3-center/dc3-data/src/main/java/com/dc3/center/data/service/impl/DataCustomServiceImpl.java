@@ -14,7 +14,7 @@
 package com.dc3.center.data.service.impl;
 
 import com.dc3.center.data.service.DataCustomService;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,7 @@ public class DataCustomServiceImpl implements DataCustomService {
     }
 
     @Override
-    public void postHandle(List<PointValue> pointValues) {
+    public void postHandle(Long deviceId, List<PointValue> pointValues) {
         // TODO 接收数据之后，存储数据的时候的操作，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
     }
 

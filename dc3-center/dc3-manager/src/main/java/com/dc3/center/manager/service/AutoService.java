@@ -13,7 +13,7 @@
 
 package com.dc3.center.manager.service;
 
-import com.dc3.common.bean.driver.DevicePoint;
+import com.dc3.common.bean.point.PointDetail;
 
 /**
  * <p>Auto Interface
@@ -30,5 +30,5 @@ public interface AutoService {
      * @param tenantId   Tenant Id
      * @return booleaDevicePointn
      */
-    DevicePoint autoCreateDeviceAndPointDriver(String deviceName, String pointName, Long driverId, Long tenantId);
+    PointDetail autoCreateDeviceAndPointDriver(String deviceName, String pointName, Long driverId, Long tenantId);
 }
