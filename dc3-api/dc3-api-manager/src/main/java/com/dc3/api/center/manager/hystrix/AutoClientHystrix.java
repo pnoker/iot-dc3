@@ -21,7 +21,7 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>DeviceClientHystrix
+ * <p>AutoClientHystrix
  *
  * @author pnoker
  */
