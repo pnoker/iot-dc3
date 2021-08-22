@@ -21,7 +21,7 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.model.DriverEvent;
 import com.dc3.common.model.Point;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;

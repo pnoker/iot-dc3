@@ -18,7 +18,7 @@ import com.dc3.api.center.data.hystrix.PointValueClientHystrix;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.PointValueDto;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

@@ -14,7 +14,7 @@
 package com.dc3.common.dto;
 
 import com.dc3.common.bean.Pages;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;

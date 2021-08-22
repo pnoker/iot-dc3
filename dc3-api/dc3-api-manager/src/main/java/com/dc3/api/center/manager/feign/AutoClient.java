@@ -15,9 +15,8 @@ package com.dc3.api.center.manager.feign;
 
 import com.dc3.api.center.manager.hystrix.AutoClientHystrix;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.DevicePoint;
+import com.dc3.common.bean.point.PointDetail;
 import com.dc3.common.constant.Common;
-import com.dc3.common.model.Device;
 import com.dc3.common.valid.Insert;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
- * 设备 FeignClient
+ * 自发现 FeignClient
  *
  * @author pnoker
  */
@@ -34,6 +33,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface AutoClient {
 
     @PostMapping("/create_device_point")
-    R<DevicePoint> autoCreateDeviceAndPoint(@Validated(Insert.class) @RequestBody DevicePoint devicePoint, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<PointDetail> autoCreateDeviceAndPoint(@Validated(Insert.class) @RequestBody PointDetail pointDetail, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }

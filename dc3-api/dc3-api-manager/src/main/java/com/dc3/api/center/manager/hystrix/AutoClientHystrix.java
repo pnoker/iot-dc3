@@ -15,7 +15,7 @@ package com.dc3.api.center.manager.hystrix;
 
 import com.dc3.api.center.manager.feign.AutoClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.bean.driver.DevicePoint;
+import com.dc3.common.bean.point.PointDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ public class AutoClientHystrix implements FallbackFactory<AutoClient> {
         return new AutoClient() {
 
             @Override
-            public R<DevicePoint> autoCreateDeviceAndPoint(DevicePoint devicePoint, Long tenantId) {
+            public R<PointDetail> autoCreateDeviceAndPoint(PointDetail pointDetail, Long tenantId) {
                 return R.fail(message);
             }
         };

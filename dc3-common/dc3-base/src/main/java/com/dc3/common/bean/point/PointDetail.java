@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.bean.driver;
+package com.dc3.common.bean.point;
 
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
- * 设备位号
+ * 设备位号详情
  *
  * @author pnoker
  */
@@ -35,7 +35,7 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class DevicePoint {
+public class PointDetail {
 
     @NotBlank(message = "device name can't be empty", groups = {Insert.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/\\.\\|]{1,31}$", message = "invalid device name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
@@ -51,7 +51,7 @@ public class DevicePoint {
     private Long deviceId;
     private Long pointId;
 
-    public DevicePoint(Long deviceId, Long pointId) {
+    public PointDetail(Long deviceId, Long pointId) {
         this.deviceId = deviceId;
         this.pointId = pointId;
     }

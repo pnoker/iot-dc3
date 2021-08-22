@@ -14,7 +14,7 @@
 package com.dc3.center.data.service.job;
 
 import com.dc3.center.data.service.PointValueService;
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

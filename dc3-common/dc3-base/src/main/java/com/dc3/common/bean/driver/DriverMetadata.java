@@ -13,7 +13,10 @@
 
 package com.dc3.common.bean.driver;
 
-import com.dc3.common.model.*;
+import com.dc3.common.model.Device;
+import com.dc3.common.model.DriverAttribute;
+import com.dc3.common.model.Point;
+import com.dc3.common.model.PointAttribute;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,6 +40,7 @@ public class DriverMetadata implements Serializable {
 
     private Long driverId;
     private Long tenantId;
+
     private Map<Long, DriverAttribute> driverAttributeMap;
     private Map<Long, PointAttribute> pointAttributeMap;
 
@@ -56,16 +60,6 @@ public class DriverMetadata implements Serializable {
     private Map<Long, Device> deviceMap;
 
     /**
-     * deviceName,deviceId
-     */
-    private Map<String, Long> deviceNameMap;
-
-    /**
-     * profileId,profile
-     */
-    private Map<Long, Profile> profileMap;
-
-    /**
      * profileId(pointId,point)
      */
     private Map<Long, Map<Long, Point>> profilePointMap;
@@ -74,7 +68,6 @@ public class DriverMetadata implements Serializable {
         this.driverAttributeMap = new ConcurrentHashMap<>(16);
         this.pointAttributeMap = new ConcurrentHashMap<>(16);
         this.deviceMap = new ConcurrentHashMap<>(16);
-        this.deviceNameMap = new ConcurrentHashMap<>(16);
         this.driverInfoMap = new ConcurrentHashMap<>(16);
         this.pointInfoMap = new ConcurrentHashMap<>(16);
         this.profilePointMap = new ConcurrentHashMap<>(16);

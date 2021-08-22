@@ -13,7 +13,7 @@
 
 package com.dc3.center.data.service;
 
-import com.dc3.common.model.PointValue;
+import com.dc3.common.bean.point.PointValue;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public interface DataCustomService {
 
     void postHandle(PointValue pointValue);
 
-    void postHandle(List<PointValue> pointValues);
+    void postHandle(Long deviceId, List<PointValue> pointValues);
 
     void afterHandle(PointValue pointValue);
 }

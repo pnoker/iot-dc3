@@ -39,10 +39,16 @@ if (!db.getUser("dc3")) {
 if (db.createCollection("pointValue")) {
     db.pointValue.ensureIndex({
         "deviceId": 1,
-        "pointId": 1,
+        "pointId": 1
+    }, {
+        name: "IX_device_point_id",
+        unique: false,
+        background: true
+    });
+    db.pointValue.ensureIndex({
         "originTime": 1
     }, {
-        name: "IX_point_value",
+        name: "IX_origin_time",
         unique: false,
         background: true
     });
@@ -50,10 +56,16 @@ if (db.createCollection("pointValue")) {
 
 if (db.createCollection("driverEvent")) {
     db.driverEvent.ensureIndex({
-        "serviceName": 1,
+        "serviceName": 1
+    }, {
+        name: "IX_service_name",
+        unique: false,
+        background: true
+    });
+    db.driverEvent.ensureIndex({
         "originTime": 1
     }, {
-        name: "IX_driver_event",
+        name: "IX_origin_time",
         unique: false,
         background: true
     });
@@ -62,10 +74,16 @@ if (db.createCollection("driverEvent")) {
 if (db.createCollection("deviceEvent")) {
     db.deviceEvent.ensureIndex({
         "deviceId": 1,
-        "pointId": 1,
+        "pointId": 1
+    }, {
+        name: "IX_device_point_id",
+        unique: false,
+        background: true
+    });
+    db.deviceEvent.ensureIndex({
         "originTime": 1
     }, {
-        name: "IX_device_event",
+        name: "IX_origin_time",
         unique: false,
         background: true
     });

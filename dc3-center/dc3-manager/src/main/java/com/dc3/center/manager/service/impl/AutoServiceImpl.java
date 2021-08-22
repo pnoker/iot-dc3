@@ -14,7 +14,7 @@
 package com.dc3.center.manager.service.impl;
 
 import com.dc3.center.manager.service.*;
-import com.dc3.common.bean.driver.DevicePoint;
+import com.dc3.common.bean.point.PointDetail;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.model.Device;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * <p>AutoService Impl
+ * AutoService Impl
  *
  * @author pnoker
  */
@@ -49,12 +49,13 @@ public class AutoServiceImpl implements AutoService {
 
 
     @Override
-    public DevicePoint autoCreateDeviceAndPointDriver(String deviceName, String pointName, Long driverId, Long tenantId) {
+    public PointDetail autoCreateDeviceAndPointDriver(String deviceName, String pointName, Long driverId, Long tenantId) {
         // add device
         Device device = new Device();
         device.setName(deviceName).setDriverId(driverId).setTenantId(tenantId).setDescription("auto create by driver");
         try {
             device = deviceService.add(device);
+
             // notify driver add device
             notifyService.notifyDriverDevice(Common.Driver.Device.ADD, device);
         } catch (DuplicateException duplicateException) {
@@ -74,20 +75,19 @@ public class AutoServiceImpl implements AutoService {
 
         // add profile bind
         if (null != device.getId() && null != profile.getId()) {
-            ProfileBind profileBind = new ProfileBind();
-            profileBind.setDeviceId(device.getId()).setProfileId(profile.getId());
             try {
-                profileBind = profileBindService.add(profileBind);
-            } catch (DuplicateException duplicateException) {
-                profileBind = profileBindService.selectByDeviceIdAndProfileId(device.getId(), profile.getId());
+                ProfileBind profileBind = new ProfileBind();
+                profileBind.setDeviceId(device.getId()).setProfileId(profile.getId());
+                profileBindService.add(profileBind);
             } catch (Exception ignored) {
             }
 
             // add point
             Point point = new Point();
-            point.setName(pointName).setProfileId(profile.getId()).setTenantId(tenantId);
+            point.setName(pointName).setProfileId(profile.getId()).setTenantId(tenantId).setDefault();
             try {
                 point = pointService.add(point);
+
                 // notify driver add point
                 notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point);
             } catch (DuplicateException duplicateException) {
@@ -95,7 +95,7 @@ public class AutoServiceImpl implements AutoService {
             } catch (Exception ignored) {
             }
 
-            return new DevicePoint(device.getId(), point.getId());
+            return new PointDetail(device.getId(), point.getId());
         }
         return null;
     }
