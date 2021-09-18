@@ -16,7 +16,7 @@ package com.dc3.center.manager.service;
 import com.dc3.common.bean.point.PointDetail;
 
 /**
- * <p>Auto Interface
+ * Auto Interface
  *
  * @author pnoker
  */

@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * MongoDB 位号数据
+ *
  * @author pnoker
  */
 @Data

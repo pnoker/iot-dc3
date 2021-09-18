@@ -18,7 +18,7 @@ import com.dc3.common.dto.LabelDto;
 import com.dc3.common.model.Label;
 
 /**
- * <p>Label Interface
+ * Label Interface
  *
  * @author pnoker
  */

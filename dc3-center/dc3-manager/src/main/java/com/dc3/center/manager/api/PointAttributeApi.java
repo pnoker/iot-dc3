@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>驱动属性配置信息 Client 接口实现
+ * 驱动属性配置信息 Client 接口实现
  *
  * @author pnoker
  */

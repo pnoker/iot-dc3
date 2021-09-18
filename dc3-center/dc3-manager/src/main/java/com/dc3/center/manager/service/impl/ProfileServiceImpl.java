@@ -45,7 +45,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * <p>ProfileService Impl
+ * ProfileService Impl
  *
  * @author pnoker
  */

@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * <p>DriverAttributeClient
+ * DriverAttributeClient
  *
  * @author pnoker
  */

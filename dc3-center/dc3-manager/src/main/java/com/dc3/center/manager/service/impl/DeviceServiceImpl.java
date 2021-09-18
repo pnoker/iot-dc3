@@ -43,7 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * <p>DeviceService Impl
+ * DeviceService Impl
  *
  * @author pnoker
  */

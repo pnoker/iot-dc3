@@ -16,7 +16,7 @@ package com.dc3.center.manager.service;
 import com.dc3.common.bean.driver.DriverRegister;
 
 /**
- * <p>Driver Sdk Interface
+ * Driver Sdk Interface
  *
  * @author pnoker
  */

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * <p>Device Interface
+ * Device Interface
  *
  * @author pnoker
  */

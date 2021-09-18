@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * <p>DeviceClientHystrix
+ * DeviceClientHystrix
  *
  * @author pnoker
  */

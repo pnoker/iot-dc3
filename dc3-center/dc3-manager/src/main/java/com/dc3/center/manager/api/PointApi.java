@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>位号 Client 接口实现
+ * 位号 Client 接口实现
  *
  * @author pnoker
  */

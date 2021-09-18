@@ -20,7 +20,7 @@ import com.dc3.common.model.ProfileBind;
 import java.util.Set;
 
 /**
- * <p>ProfileBind Interface
+ * ProfileBind Interface
  *
  * @author pnoker
  */

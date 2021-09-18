@@ -20,7 +20,7 @@ import com.dc3.common.bean.driver.AttributeInfo;
 import java.util.Map;
 
 /**
- * <p>自定义驱动接口，开发的自定义驱动需要实现 read 和 write 接口，可以参考以提供的驱动模块写法</p>
+ * 自定义驱动接口，开发的自定义驱动需要实现 read 和 write 接口，可以参考以提供的驱动模块写法</p>
  *
  * <ol>
  * <li>{@link DriverCustomService#initial} 初始化操作，需要根据不同的驱动实现该功能</li>

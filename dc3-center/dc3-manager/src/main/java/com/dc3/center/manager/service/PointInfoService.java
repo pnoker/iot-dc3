@@ -20,7 +20,7 @@ import com.dc3.common.model.PointInfo;
 import java.util.List;
 
 /**
- * <p>PointInfo Interface
+ * PointInfo Interface
  *
  * @author pnoker
  */

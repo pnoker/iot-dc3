@@ -36,7 +36,7 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * <p>LabelBindService Impl
+ * LabelBindService Impl
  *
  * @author pnoker
  */

@@ -27,7 +27,7 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 /**
- * <p>设备 Client 接口实现
+ * 设备 Client 接口实现
  *
  * @author pnoker
  */

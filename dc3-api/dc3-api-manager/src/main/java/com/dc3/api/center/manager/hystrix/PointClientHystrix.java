@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>PointClientHystrix
+ * PointClientHystrix
  *
  * @author pnoker
  */

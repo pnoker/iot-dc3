@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * <p>自发现 Client 接口实现
+ * 自发现 Client 接口实现
  *
  * @author pnoker
  */

@@ -32,7 +32,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * <p>驱动配置属性 FeignClient
+ * 驱动配置属性 FeignClient
  *
  * @author pnoker
  */

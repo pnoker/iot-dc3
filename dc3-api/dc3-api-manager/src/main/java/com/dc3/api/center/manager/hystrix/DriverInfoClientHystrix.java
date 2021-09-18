@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * <p>DriverInfoClientHystrix
+ * DriverInfoClientHystrix
  *
  * @author pnoker
  */

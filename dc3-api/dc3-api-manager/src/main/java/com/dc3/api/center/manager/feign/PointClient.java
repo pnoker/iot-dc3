@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>位号 FeignClient
+ * 位号 FeignClient
  *
  * @author pnoker
  */

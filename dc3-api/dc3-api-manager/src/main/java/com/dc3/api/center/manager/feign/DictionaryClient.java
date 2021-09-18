@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * <p>字典 FeignClient
+ * 字典 FeignClient
  *
  * @author pnoker
  */

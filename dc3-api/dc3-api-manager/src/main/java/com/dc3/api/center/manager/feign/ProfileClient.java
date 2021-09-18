@@ -29,7 +29,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * <p>模板 FeignClient
+ * 模板 FeignClient
  *
  * @author pnoker
  */

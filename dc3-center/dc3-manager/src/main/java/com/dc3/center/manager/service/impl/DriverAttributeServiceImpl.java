@@ -37,7 +37,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * <p>DriverAttributeService Impl
+ * DriverAttributeService Impl
  *
  * @author pnoker
  */

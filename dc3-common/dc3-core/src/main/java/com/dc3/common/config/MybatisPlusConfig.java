@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * <p>MybatisPlus配置
+ * MybatisPlus配置
  *
  * @author : pnoker
  */

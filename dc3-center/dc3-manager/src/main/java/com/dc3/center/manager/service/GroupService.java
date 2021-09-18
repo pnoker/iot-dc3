@@ -18,7 +18,7 @@ import com.dc3.common.dto.GroupDto;
 import com.dc3.common.model.Group;
 
 /**
- * <p>Group Interface
+ * Group Interface
  *
  * @author pnoker
  */

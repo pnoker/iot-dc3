@@ -20,7 +20,7 @@ import com.dc3.common.model.DriverAttribute;
 import java.util.List;
 
 /**
- * <p>DriverAttribute Interface
+ * DriverAttribute Interface
  *
  * @author pnoker
  */
