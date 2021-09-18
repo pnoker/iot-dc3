@@ -16,7 +16,7 @@ package com.dc3.center.manager.service;
 import com.dc3.common.model.*;
 
 /**
- * <p>Notify Interface
+ * Notify Interface
  *
  * @author pnoker
  */

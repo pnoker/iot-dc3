@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * <p>ProfileBindService Impl
+ * ProfileBindService Impl
  *
  * @author pnoker
  */

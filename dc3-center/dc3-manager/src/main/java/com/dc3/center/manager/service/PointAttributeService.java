@@ -20,7 +20,7 @@ import com.dc3.common.model.PointAttribute;
 import java.util.List;
 
 /**
- * <p>PointAttribute Interface
+ * PointAttribute Interface
  *
  * @author pnoker
  */

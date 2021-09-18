@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * <p>Profile Interface
+ * Profile Interface
  *
  * @author pnoker
  */

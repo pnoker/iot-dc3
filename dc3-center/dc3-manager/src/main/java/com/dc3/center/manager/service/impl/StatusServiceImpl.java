@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p>DeviceService Impl
+ * DeviceService Impl
  *
  * @author pnoker
  */

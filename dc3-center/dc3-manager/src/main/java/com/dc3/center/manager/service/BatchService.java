@@ -19,7 +19,7 @@ import com.dc3.common.bean.driver.DriverMetadata;
 import java.util.List;
 
 /**
- * <p>BatchService Interface
+ * BatchService Interface
  *
  * @author pnoker
  */

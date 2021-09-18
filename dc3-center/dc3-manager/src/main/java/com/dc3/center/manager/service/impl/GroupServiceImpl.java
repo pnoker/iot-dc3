@@ -37,7 +37,7 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * <p>GroupService Impl
+ * GroupService Impl
  *
  * @author pnoker
  */

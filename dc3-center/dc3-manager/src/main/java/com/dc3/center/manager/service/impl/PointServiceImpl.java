@@ -39,7 +39,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * <p>PointService Impl
+ * PointService Impl
  *
  * @author pnoker
  */

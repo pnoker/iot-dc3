@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>Point Interface
+ * Point Interface
  *
  * @author pnoker
  */

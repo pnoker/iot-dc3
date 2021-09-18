@@ -23,7 +23,7 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>LabelClientHystrix
+ * LabelClientHystrix
  *
  * @author pnoker
  */

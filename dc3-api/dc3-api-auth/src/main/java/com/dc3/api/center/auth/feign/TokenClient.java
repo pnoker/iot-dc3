@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * <p>令牌 FeignClient
+ * 令牌 FeignClient
  *
  * @author pnoker
  */

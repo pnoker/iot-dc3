@@ -20,7 +20,7 @@ import org.springframework.context.annotation.AdviceMode;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * <p>设备管理服务入口
+ * 设备管理服务入口
  *
  * @author pnoker
  */

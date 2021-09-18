@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * <p>PointAttributeService Impl
+ * PointAttributeService Impl
  *
  * @author pnoker
  */

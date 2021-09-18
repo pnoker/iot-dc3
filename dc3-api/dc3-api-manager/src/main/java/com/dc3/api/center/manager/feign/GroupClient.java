@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotNull;
 
 /**
- * <p>分组 FeignClient
+ * 分组 FeignClient
  *
  * @author pnoker
  */

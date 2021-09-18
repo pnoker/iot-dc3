@@ -19,7 +19,7 @@ import com.dc3.common.dto.DriverDto;
 import java.util.Map;
 
 /**
- * <p>Device Interface
+ * Device Interface
  *
  * @author pnoker
  */

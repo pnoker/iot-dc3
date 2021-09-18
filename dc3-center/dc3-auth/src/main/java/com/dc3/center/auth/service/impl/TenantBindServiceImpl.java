@@ -35,7 +35,7 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 /**
- * <p>TenantBindService Impl
+ * TenantBindService Impl
  *
  * @author pnoker
  */

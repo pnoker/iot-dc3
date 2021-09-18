@@ -18,7 +18,7 @@ import com.dc3.common.dto.LabelBindDto;
 import com.dc3.common.model.LabelBind;
 
 /**
- * <p>LabelBind Interface
+ * LabelBind Interface
  *
  * @author pnoker
  */

@@ -29,7 +29,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * <p>模板 Client 接口实现
+ * 模板 Client 接口实现
  *
  * @author pnoker
  */
