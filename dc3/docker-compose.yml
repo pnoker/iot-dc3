@@ -588,7 +588,7 @@ services:
     environment:
       - discovery.type=single-node
     networks:
-      minet:
+      dc3net:
         aliases:
           - dc3-elasticsearch
 
