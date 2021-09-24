@@ -31,25 +31,28 @@
   - [2.19 DC3 Camera Bosch NBN-832V-IP](driver/xx.md)
   - [2.19 DC3 Camera Hikvision DS-2CD2342WD-I](driver/xx.md)
 
-- 3.错误
-  - [3.1 Mongo 启动失败](error/mongo-error.md)
-  - [3.2 DC3 Start 依赖包引用失败](error/dc3-start-error.md)
+- 3.文档
+  - [3.1 安装 Centos7](tip/install-centos7.md)
+  - [3.2 Centos 创建用户](tip/centos-create-user.md)
+  - [3.3 Centos 安装桌面环境](tip/centos-install-gnome.md)
+  - [3.4 Centos 安装KVM](tip/centos-install-kvm.md)
+  - [3.5 Centos 安装VNC](tip/centos-install-vnc.md)
+  - [3.6 Centos 安装Pip](tip/centos-install-pip.md)
+  - [3.7 Docker Compose](tip/docker-compose.md)
+  - [3.8 FFmpeg](tip/ffmpeg.md)
+  - [3.9 Nginx 代理](tip/nginx-prefix.md)
+  - [3.10 Nginx Rtmp](tip/nginx-rtmp.md)
+  - [3.11 Nohup](tip/nohup.md)
+  - [3.12 NodeJs](tip/nodejs-upgrade.md)
+  - [3.13 Http Code](tip/http-code.md)
+  - [3.14 String.format()](tip/string-format.md)
 
-- [4 关于项目](about.md)
-
----
-- 附件
-  - [安装 Centos7](tip/install-centos7.md)
-  - [Centos 创建用户](tip/centos-create-user.md)
-  - [Centos 安装桌面环境](tip/centos-install-gnome.md)
-  - [Centos 安装KVM](tip/centos-install-kvm.md)
-  - [Centos 安装VNC](tip/centos-install-vnc.md)
-  - [Centos 安装Pip](tip/centos-install-pip.md)
-  - [Docker Compose](tip/docker-compose.md)
-  - [FFmpeg](tip/ffmpeg.md)
-  - [Nginx 代理](tip/nginx-prefix.md)
-  - [Nginx Rtmp](tip/nginx-rtmp.md)
-  - [Nohup](tip/nohup.md)
-  - [NodeJs](tip/nodejs-upgrade.md)
-  - [Http Code](tip/http-code.md)
-  - [String.format()](tip/string-format.md)
+- 4.错误
+  - [4.1 Mongo 启动失败](error/mongo-error.md)
+  - [4.2 DC3 Start 依赖包引用失败](error/dc3-start-error.md)
+  - [4.3 重置 MySQL 服务](error/reset-mysql-error.md)
+  - [4.4 重置 Redis 服务](error/reset-redis-error.md)
+  - [4.5 重置 Mongo 服务](error/reset-mongo-error.md)
+  - [4.6 重置 Rabbitmq 服务](error/reset-rabbitmq-error.md)
+    
+- [5 关于项目](about.md)

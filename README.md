@@ -74,7 +74,6 @@
 - 新分支命名格式：`docs/username_description`，例如：`docs/pnoker_新增mqtt使用说明`
 - 在新分支上编辑文档、代码，并提交代码
 - 最后 `PR` 合并到 `develop` 分支，等待作者合并即可
-- <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=4bwvuseyLQok-u0zSGVfj_xCMMK9qJN2&jump_from=webapi"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="DC3开源交流群" title="DC3开源交流群"></a>
 
 
 
