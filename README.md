@@ -10,6 +10,7 @@
 	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
 </p>
 
+
 ------
 
 
@@ -71,8 +72,9 @@
 
 - 从 `master` 分支  `checkout` 一个新分支（**注**：*请务必保证 `master` 代码是最新的*）
 - 新分支命名格式：`docs/username_description`，例如：`docs/pnoker_新增mqtt使用说明`
-- 在新分支上编辑文档，并提交代码
+- 在新分支上编辑文档、代码，并提交代码
 - 最后 `PR` 合并到 `develop` 分支，等待作者合并即可
+- <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=4bwvuseyLQok-u0zSGVfj_xCMMK9qJN2&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="DC3开源交流群" title="DC3开源交流群"></a>
 
 
 
