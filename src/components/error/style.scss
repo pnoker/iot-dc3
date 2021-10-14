@@ -1,0 +1,35 @@
+.error {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .img {
+    height: 360px;
+    width: 100%;
+    max-width: 430px;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: contain;
+  }
+
+  .content {
+    text-align: center;
+
+    h1 {
+      color: #1296DB;
+      font-size: 72px;
+      font-weight: 600;
+      line-height: 72px;
+      margin-bottom: 24px;
+    }
+
+    .desc {
+      color: black;
+      font-size: 15px;
+      line-height: 28px;
+      margin-bottom: 16px;
+    }
+  }
+}

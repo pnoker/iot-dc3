@@ -1,0 +1,48 @@
+{
+  "name": "iot-dc3-web",
+  "version": "1.3.2",
+  "private": true,
+  "author": "pnoker",
+  "description": "IoT DC3 Web Application UI",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "clipboard": "^2.0.8",
+    "core-js": "^3.15.1",
+    "echarts": "^5.1.2",
+    "element-ui": "^2.15.2",
+    "highlight.js": "^11.2.0",
+    "insert-css": "^2.0.0",
+    "js-base64": "^3.6.1",
+    "js-cookie": "latest",
+    "js-md5": "^0.7.3",
+    "nprogress": "latest",
+    "vue": "^2.6.14",
+    "vue-axios": "^3.2.4",
+    "vue-baidu-map": "^0.21.22",
+    "vue-gemini-scrollbar": "^2.0.1",
+    "vue-highlightjs": "^1.3.3",
+    "vue-router": "^3.5.2",
+    "vue-sparklines": "^0.2.1",
+    "vuex": "^3.6.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.5.13",
+    "@vue/cli-plugin-router": "^4.5.13",
+    "@vue/cli-plugin-vuex": "^4.5.13",
+    "@vue/cli-service": "^4.5.13",
+    "node-sass": "^4.14.1 ",
+    "sass-loader": "^8.0.2",
+    "vue-cli-plugin-element": "^1.0.1",
+    "vue-template-compiler": "^2.6.14",
+    "webpack": "^4.36.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}

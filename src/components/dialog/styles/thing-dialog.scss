@@ -1,0 +1,42 @@
+.thing-dialog {
+
+  .el-dialog {
+    width: 500px;
+  }
+
+  .el-dialog__title {
+    font-size: 16px;
+  }
+
+  .el-dialog__body {
+    padding: 30px 30px 15px 30px;
+  }
+
+  .el-form-item__content {
+    width: 100%;
+
+    .el-select {
+      width: 100%;
+    }
+
+    .el-textarea__inner {
+      height: 100px;
+    }
+  }
+}
+
+.thing-dialog-form-item {
+  display: flex;
+
+  .el-form-item__label {
+    width: 100px;
+    height: 32px;
+    text-align: justify;
+  }
+
+  .el-form-item__label::after {
+    display: inline-block;
+    width: 100%;
+    content: "";
+  }
+}

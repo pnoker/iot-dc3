@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile
+    image: pnoker/iot-dc3-web:1.0.0
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    container_name: iot-dc3-web
+    hostname: iot-dc3-web
+    volumes:
+      - nginx:/var/log/nginx
+    networks:
+      dc3net:
+        aliases:
+          - iot-dc3-web
+
+volumes:
+  nginx:
+
+networks:
+  dc3net:
+    driver: 'bridge'
+...

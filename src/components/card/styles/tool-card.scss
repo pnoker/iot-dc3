@@ -1,0 +1,56 @@
+.tool-card {
+  padding: 2px 2px 2px 0;
+  border-radius: 5px;
+  box-sizing: border-box;
+
+  .el-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .el-card__body {
+    padding: 10px;
+  }
+}
+
+.tool-content {
+  display: flex;
+  flex-direction: column;
+
+  .content-search {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+
+    .search-form {
+      display: flex;
+
+      .search-form-small {
+        width: 120px;
+      }
+
+      .search-form-medium {
+        width: 150px;
+      }
+
+      .search-form-large {
+        width: 300px;
+      }
+    }
+
+    .search-button {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .tool-operation {
+    display: flex;
+    justify-content: space-between;
+
+    .tool-page {
+      display: flex;
+      padding-right: 10px;
+    }
+  }
+}
