@@ -11,7 +11,7 @@
                 </div>
                 <div class="thing-footer">
                     <div class="thing-footer-title">
-                        <span>{{name}}</span>
+                        <span class="thing-body-content-dashboard-name">{{name}}</span>
                     </div>
                 </div>
             </div>
@@ -76,5 +76,13 @@
             min-width: 200px;
             max-width: 280px;
         }
+    }
+
+    .thing-body-content-dashboard-name {
+        display: block;
+        width: 280px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 </style>

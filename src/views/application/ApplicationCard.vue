@@ -11,7 +11,7 @@
                 </div>
                 <div class="thing-footer">
                     <div class="thing-footer-title">
-                        <span>{{name}}</span>
+                        <span class="thing-body-content-application-name">{{name}}</span>
                     </div>
                 </div>
             </div>
@@ -31,7 +31,7 @@
             },
             icon: {
                 type: String,
-                default: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+                default: 'images/app/application.jpg'
             },
             url: {
                 type: String,
@@ -68,6 +68,18 @@
     .thing-body-content-application-icon {
         width: 120px;
         cursor: pointer;
+
+        .el-avatar {
+            background: transparent;
+        }
+    }
+
+    .thing-body-content-application-name {
+        display: block;
+        width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
 </style>
