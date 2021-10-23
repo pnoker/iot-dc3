@@ -23,12 +23,12 @@ export const deviceById = (id) => request({
 });
 
 export const deviceByDriverId = (driverId) => request({
-    url: 'api/v3/manager/device/driverId/' + driverId,
+    url: 'api/v3/manager/device/driver_id/' + driverId,
     method: 'get'
 });
 
 export const deviceByProfileId = (profileId) => request({
-    url: 'api/v3/manager/device/profileId/' + profileId,
+    url: 'api/v3/manager/device/profile_id/' + profileId,
     method: 'get'
 });
 
@@ -46,11 +46,11 @@ export const deviceStatus = (device) => request({
 });
 
 export const deviceStatusByDriverId = (driverId) => request({
-    url: 'api/v3/manager/status/device/driverId/' + driverId,
+    url: 'api/v3/manager/status/device/driver_id/' + driverId,
     method: 'get'
 });
 
 export const deviceStatusByProfileId = (profileId) => request({
-    url: 'api/v3/manager/status/device/profileId/' + profileId,
+    url: 'api/v3/manager/status/device/profile_id/' + profileId,
     method: 'get'
 });

@@ -56,12 +56,6 @@
             this.device();
             this.drivers();
             this.profiles();
-            this.interval = setInterval(() => {
-                this.driver();
-                this.device();
-                this.drivers();
-                this.profiles();
-            }, 60000);
         },
         beforeRouteLeave(to, from, next) {
             if (this.interval) {

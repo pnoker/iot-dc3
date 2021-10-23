@@ -23,7 +23,7 @@ export const profileById = (id) => request({
 });
 
 export const profileByDeviceId = (deviceId) => request({
-    url: 'api/v3/manager/profile/deviceId/' + deviceId,
+    url: 'api/v3/manager/profile/device_id/' + deviceId,
     method: 'get'
 });
 

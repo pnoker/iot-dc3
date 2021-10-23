@@ -64,11 +64,6 @@
             this.driver();
             this.profile();
             this.list();
-            this.interval = setInterval(() => {
-                this.driver();
-                this.profile();
-                this.list();
-            }, 60000);
         },
         beforeRouteLeave(to, from, next) {
             if (this.interval) {

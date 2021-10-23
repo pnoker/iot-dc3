@@ -36,12 +36,12 @@ export const pointUnit = (pointIds) => request({
 });
 
 export const pointByProfileId = (profileId) => request({
-    url: 'api/v3/manager/point/profileId/' + profileId,
+    url: 'api/v3/manager/point/profile_id/' + profileId,
     method: 'get'
 });
 
 export const pointByDeviceId = (deviceId) => request({
-    url: 'api/v3/manager/point/deviceId/' + deviceId,
+    url: 'api/v3/manager/point/device_id/' + deviceId,
     method: 'get'
 });
 

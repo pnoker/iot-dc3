@@ -71,13 +71,6 @@
             this.point();
             this.drivers();
             this.profiles();
-            this.interval = setInterval(() => {
-                this.profile();
-                this.device();
-                this.point();
-                this.drivers();
-                this.profiles();
-            }, 60000);
         },
         beforeRouteLeave(to, from, next) {
             if (this.interval) {

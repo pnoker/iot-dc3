@@ -46,7 +46,6 @@
         },
         created() {
             this.list();
-            this.interval = setInterval(() => this.list(), 60000);
         },
         beforeRouteLeave(to, from, next) {
             if (this.interval) {

@@ -13,12 +13,12 @@ export const driverInfoUpdate = (driverInfo) => request({
 });
 
 export const driverInfoByAttributeIdAndDeviceId = (attributeId, deviceId) => request({
-    url: 'api/v3/manager/driver_info/attributeId/' + attributeId + '/deviceId/' + deviceId,
+    url: 'api/v3/manager/driver_info/attributeId/' + attributeId + '/device_id/' + deviceId,
     method: 'get'
 });
 
 export const driverInfoByDeviceId = (deviceId) => request({
-    url: 'api/v3/manager/driver_info/deviceId/' + deviceId,
+    url: 'api/v3/manager/driver_info/device_id/' + deviceId,
     method: 'get'
 });
 
@@ -35,11 +35,11 @@ export const pointInfoUpdate = (pointInfo) => request({
 });
 
 export const pointInfoByDeviceIdAndPointId = (deviceId, pointId) => request({
-    url: 'api/v3/manager/point_info/deviceId/' + deviceId + '/pointId/' + pointId,
+    url: 'api/v3/manager/point_info/device_id/' + deviceId + '/pointId/' + pointId,
     method: 'get'
 });
 
 export const pointInfoByDeviceId = (deviceId) => request({
-    url: 'api/v3/manager/point_info/deviceId/' + deviceId,
+    url: 'api/v3/manager/point_info/device_id/' + deviceId,
     method: 'get'
 });

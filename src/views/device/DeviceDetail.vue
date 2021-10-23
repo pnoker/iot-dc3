@@ -142,17 +142,6 @@
             this.status();
             this.profiles();
             this.points();
-
-            this.interval1 = setInterval(() => {
-                this.device();
-                this.status();
-                this.profiles();
-                this.points();
-            }, 60000);
-
-            this.interval2 = setInterval(() => {
-                this.pointValues();
-            }, 5000);
         },
         beforeRouteLeave(to, from, next) {
             if (this.interval1) {
