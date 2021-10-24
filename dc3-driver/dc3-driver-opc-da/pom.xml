@@ -25,12 +25,16 @@
 
     <description>IOT DC3 平台 Opc Da 驱动。</description>
 
+    <properties>
+        <j.interop.version>2.0.4</j.interop.version>
+    </properties>
+
     <dependencies>
 
         <dependency>
             <groupId>org.jinterop</groupId>
             <artifactId>j-interop</artifactId>
-            <version>2.0.4</version>
+            <version>${j.interop.version}</version>
         </dependency>
 
     </dependencies>

@@ -26,7 +26,7 @@
     <description>IOT DC3 平台 Modbus TCP 驱动。</description>
 
     <properties>
-        <modbus.version>3.0.3</modbus.version>
+        <modbus.version>3.0.4</modbus.version>
     </properties>
 
     <dependencies>
@@ -50,7 +50,7 @@
             </snapshots>
             <id>ias-snapshots</id>
             <name>Infinite Automation Snapshot Repository</name>
-            <url>https://maven.mangoautomation.net/repository/ias-snapshot/</url>
+            <url>https://maven.mangoautomation.net/repository/ias-snapshot</url>
         </repository>
         <repository>
             <releases>
@@ -61,7 +61,7 @@
             </snapshots>
             <id>ias-releases</id>
             <name>Infinite Automation Release Repository</name>
-            <url>https://maven.mangoautomation.net/repository/ias-release/</url>
+            <url>https://maven.mangoautomation.net/repository/ias-release</url>
         </repository>
     </repositories>
 
