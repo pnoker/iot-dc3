@@ -34,10 +34,12 @@ Cache-Control: no-cache
 #/api/v3/token/salt
 GET http://localhost:8000/api/v3/token/salt
 Accept: */*
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 Cache-Control: no-cache
 
-username=pnoker
+{
+  "name": "pnoker"
+}
 
 
 ### 生成用户 Token 令牌
