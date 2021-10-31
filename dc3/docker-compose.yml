@@ -485,6 +485,18 @@ services:
         aliases:
           - dc3-mongo
 
+  opentsdb:
+    image: opentsdb/opentsdb
+    restart: always
+    ports:
+      - 4242:4242
+    container_name: dc3-opentsdb
+    hostname: dc3-opentsdb
+    networks:
+      dc3net:
+        aliases:
+          - dc3-opentsdb
+
   redis:
     build:
       context: ./dependencies/redis/
