@@ -36,7 +36,7 @@
                         </ul>
                     </div>
                 </div>
-                <div v-if="!embedded" class="thing-footer">
+                <div v-if="!embedded" class="thing__footer">
                     <div class="thing-copy-id">
                         <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
                             <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>

@@ -10,7 +10,7 @@
                 <dashboard-card v-for="i in 6" :name="'数据看板 '+i"></dashboard-card>
             </div>
         </title-card>
-        <title-card title="统计">
+        <title-card class="home-count" title="统计">
             <div id="data-count"></div>
         </title-card>
     </div>
@@ -93,30 +93,43 @@
 
 <style lang="scss">
     .home-app {
+        margin-bottom: 4px;
+
         .home-app-item {
             display: flex;
             flex-wrap: wrap;
         }
 
+        .el-card {
+            border: 1px solid #ffffff;
+        }
+
         .el-card__body {
-            padding-bottom: 0px;
+            padding-bottom: 0;
         }
     }
 
     .home-dashboard {
+        margin-bottom: 4px;
+
         .home-dashboard-item {
             display: flex;
             flex-wrap: wrap;
         }
 
+        .el-card {
+            border: 1px solid #ffffff;
+        }
+
         .el-card__body {
-            padding-bottom: 0px;
+            padding-bottom: 0;
         }
     }
 
-    #data-count {
-        width: 100%;
-        height: 320px;
+    .home-count {
+        #data-count {
+            width: 100%;
+            height: 320px;
+        }
     }
-
 </style>

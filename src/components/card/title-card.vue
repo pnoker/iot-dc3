@@ -1,8 +1,8 @@
 <template>
-    <div class="card_title">
+    <div class="title-card">
         <el-card shadow="hover">
             <div slot="header">
-                <span class="title_header">{{title}}</span>
+                <span class="title-card__header">{{title}}</span>
             </div>
             <slot/>
         </el-card>
@@ -22,12 +22,11 @@
 </script>
 
 <style lang="scss">
-    .card_title {
-        padding: 2px 3px;
+    .title-card {
         border-radius: 5px;
         box-sizing: border-box;
 
-        .title_header {
+        .title-card__header {
             font-size: 14px;
             font-weight: bold;
         }

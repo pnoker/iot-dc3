@@ -9,8 +9,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="thing-footer">
-                    <div class="thing-footer-title">
+                <div class="thing__footer">
+                    <div class="thing__footer-title">
                         <span class="thing-body-content-application-name">{{name}}</span>
                     </div>
                 </div>
@@ -31,7 +31,7 @@
             },
             icon: {
                 type: String,
-                default: 'images/app/application.jpg'
+                default: 'images/app/application.png'
             },
             url: {
                 type: String,

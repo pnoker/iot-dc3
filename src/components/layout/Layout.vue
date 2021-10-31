@@ -34,7 +34,7 @@
                         <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
-                <el-badge :value="12" :max="99" class="user_badge" type="primary">
+                <el-badge :value="3" :max="99" class="user_badge" type="primary">
                     <span class="small" @click="handleMessage">管理员</span>
                 </el-badge>
             </el-col>
@@ -148,7 +148,7 @@
         right: 0;
         left: 0;
         bottom: 0;
-        padding: 4px 1px 4px 4px;
+        padding: 5px 0 5px 0;
         position: absolute;
         background: #f0f2f5;
     }

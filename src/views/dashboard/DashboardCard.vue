@@ -9,8 +9,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="thing-footer">
-                    <div class="thing-footer-title">
+                <div class="thing__footer">
+                    <div class="thing__footer-title">
                         <span class="thing-body-content-dashboard-name">{{name}}</span>
                     </div>
                 </div>

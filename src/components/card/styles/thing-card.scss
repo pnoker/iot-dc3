@@ -196,14 +196,14 @@
   }
 }
 
-.thing-footer {
+.thing__footer {
   height: 20px;
   margin-top: 2px;
   display: flex;
   justify-content: space-between;
   border-top: 1px solid #dcdfe6;
 
-  .thing-footer-title {
+  .thing__footer-title {
     text-align: center;
     font-size: 14px;
     font-weight: bold;
