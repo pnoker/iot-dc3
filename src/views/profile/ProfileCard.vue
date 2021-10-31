@@ -1,20 +1,20 @@
 <template>
     <div class="thing-card">
         <el-card shadow="hover">
-            <div class="thing-content">
+            <div class="thing-card-content">
                 <div class="thing-header" v-bind:class="{'header-enable':data.enable,'header-disable':!data.enable}">
                     <div class="thing-icon"><img :src="icon" :alt="data.name"></div>
                     <div class="thing-name thing-content-nowrap-title" @click="copyId(data.id)">{{data.name}}</div>
                     <div title="状态" class="thing-status"></div>
                 </div>
-                <div class="thing-body">
-                    <div class="thing-body-content">
+                <div class="thing-card__body">
+                    <div class="thing-card-body-content">
                         <ul class="thing-body-content-item">
                             <li class="thing-content-nowrap-item"><span><i class="el-icon-ice-cream-square"/> 位号个数: </span>{{data.pointIds.length||0}}</li>
                             <li class="thing-content-nowrap-item"><span><i class="el-icon-collection-tag"/> 位号: </span>{{point(data.pointIds)}}</li>
                         </ul>
                     </div>
-                    <div title="模板描述信息" class="thing-body-content">
+                    <div title="模板描述信息" class="thing-card-body-content">
                         <p class="thing-content-nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
                     <div class="thing-body-content-time">
@@ -26,7 +26,7 @@
                         </ul>
                     </div>
                 </div>
-                <div v-if="!embedded" class="thing__footer">
+                <div v-if="!embedded" class="thing-card__footer">
                     <div class="thing-copy-id">
                         <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
                             <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>

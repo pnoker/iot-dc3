@@ -1,17 +1,17 @@
 <template>
     <div class="thing-card thing-card-application">
         <el-card shadow="hover">
-            <div class="thing-content">
-                <div class="thing-body">
-                    <div class="thing-body-content">
-                        <div class="thing-body-content-application-icon" @click="show()">
+            <div class="thing-card-content">
+                <div class="thing-card__body">
+                    <div class="thing-card-body-content">
+                        <div class="thing-card-body-content-application-icon" @click="show()">
                             <el-avatar shape="square" :size="120" fit="fill" :src="icon"></el-avatar>
                         </div>
                     </div>
                 </div>
-                <div class="thing__footer">
-                    <div class="thing__footer-title">
-                        <span class="thing-body-content-application-name">{{name}}</span>
+                <div class="thing-card__footer">
+                    <div class="thing-card-footer-title">
+                        <span class="thing-card-body-content-application-name">{{name}}</span>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
         }
     }
 
-    .thing-body-content-application-icon {
+    .thing-card-body-content-application-icon {
         width: 120px;
         cursor: pointer;
 
@@ -74,7 +74,7 @@
         }
     }
 
-    .thing-body-content-application-name {
+    .thing-card-body-content-application-name {
         display: block;
         width: 120px;
         overflow: hidden;

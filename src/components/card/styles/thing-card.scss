@@ -42,7 +42,7 @@
   cursor: pointer;
 }
 
-.thing-content {
+.thing-card-content {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -106,7 +106,7 @@
   border-bottom: 1px solid #fbc4c4;
 }
 
-.thing-body {
+.thing-card__body {
   display: flex;
   flex-direction: column;
 
@@ -114,7 +114,7 @@
     padding-inline-start: 5px;
   }
 
-  .thing-body-content {
+  .thing-card-body-content {
     display: flex;
     justify-content: center;
 
@@ -196,14 +196,14 @@
   }
 }
 
-.thing__footer {
+.thing-card__footer {
   height: 20px;
   margin-top: 2px;
   display: flex;
   justify-content: space-between;
   border-top: 1px solid #dcdfe6;
 
-  .thing__footer-title {
+  .thing-card-footer-title {
     text-align: center;
     font-size: 14px;
     font-weight: bold;

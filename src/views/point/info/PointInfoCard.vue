@@ -1,13 +1,13 @@
 <template>
     <div class="thing-card cursor-pointer" @click="select(data)">
         <el-card :shadow="data.shadow">
-            <div class="thing-content">
+            <div class="thing-card-content">
                 <div class="thing-header" v-bind:class="{'header-enable':isConfig,'header-disable':!isConfig}">
                     <div class="thing-icon"><img :src="isSelect" :alt="data.name"></div>
                     <div class="thing-name thing-content-nowrap-title" @click="copyId(data.id)">{{data.name}}</div>
                 </div>
-                <div class="thing-body">
-                    <div class="thing-body-content">
+                <div class="thing-card__body">
+                    <div class="thing-card-body-content">
                         <ul class="thing-body-content-item">
                             <li class="thing-content-nowrap-item" :key="attribute.id" v-if="attribute" v-for="attribute in attributes">
                                 <span><i class="el-icon-goblet"/> {{attribute.displayName}}: </span>{{data[attribute.name].value}}

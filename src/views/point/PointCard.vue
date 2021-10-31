@@ -1,14 +1,14 @@
 <template>
     <div class="thing-card">
         <el-card shadow="hover">
-            <div class="thing-content">
+            <div class="thing-card-content">
                 <div class="thing-header" v-bind:class="{'header-enable':data.enable,'header-disable':!data.enable}">
                     <div class="thing-icon"><img :src="icon" :alt="data.name"></div>
                     <div class="thing-name thing-content-nowrap-title" @click="copyId(data.id)">{{data.name}}</div>
                     <div title="状态" class="thing-status"></div>
                 </div>
-                <div class="thing-body">
-                    <div class="thing-body-content">
+                <div class="thing-card__body">
+                    <div class="thing-card-body-content">
                         <ul class="thing-body-content-item-point thing-body-content-item">
                             <li class="thing-content-nowrap-item"><span><i class="el-icon-location-outline"/> 所属模板: </span>{{profile(data.profileId)}}</li>
                             <li class="thing-content-nowrap-item"><span><i class="el-icon-location-outline"/> 累计标识: </span>{{data.accrue?'累计':'不累计'}}</li>
@@ -24,7 +24,7 @@
                             <li class="thing-content-nowrap-item"><span><i class="el-icon-location-outline"/> 最大值: </span>{{data.maximum}}</li>
                         </ul>
                     </div>
-                    <div title="位号描述信息" class="thing-body-content">
+                    <div title="位号描述信息" class="thing-card-body-content">
                         <p class="thing-content-nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
                     <div class="thing-body-content-time">
@@ -36,7 +36,7 @@
                         </ul>
                     </div>
                 </div>
-                <div v-if="!embedded" class="thing__footer">
+                <div v-if="!embedded" class="thing-card__footer">
                     <div class="thing-copy-id">
                         <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
                             <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>

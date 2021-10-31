@@ -1,7 +1,7 @@
 <template>
     <div class="thing-card">
         <el-card shadow="hover">
-            <div class="thing-content">
+            <div class="thing-card-content">
                 <div class="thing-header" v-bind:class="{'header-enable':data.interval<200,'header-disable':data.interval>=200}">
                     <div class="thing-icon"><img :src="icon" :alt="data.name"></div>
                     <div class="thing-name thing-content-nowrap-title" @click="copyId(data.id)">{{point(data.pointId)}}</div>
@@ -12,8 +12,8 @@
                         <el-tag v-else-if="data.rw===2" type="success" effect="plain">读写</el-tag>
                     </div>
                 </div>
-                <div class="thing-body">
-                    <div class="thing-body-content">
+                <div class="thing-card__body">
+                    <div class="thing-card-body-content">
                         <ul class="thing-body-content-value">
                             <li title="处理值，点击复制" class="thing-content-nowrap-item value" @click="copyValue(data)">{{data.value}}</li>
                             <li v-if="embedded" title="详细内容" class="value-detail thing-content-nowrap-item">
@@ -45,7 +45,7 @@
                         </ul>
                     </div>
                 </div>
-                <div v-if="!embedded" class="thing__footer">
+                <div v-if="!embedded" class="thing-card__footer">
                     <div class="thing-copy-id">
                         <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
                             <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>
