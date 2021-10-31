@@ -7,16 +7,15 @@
 	<a><img src="https://img.shields.io/badge/Spring Boot-2.3.2.RELEASE-blue.svg"></a>
 	<a><img src="https://img.shields.io/badge/Spring Cloud-Hoxton.SR8-blue.svg"></a>
 	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
-	<br><strong>DC3是基于Spring Cloud的开源可分布式物联网(IOT)平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。<br>IOT DC3 is an open source, distributed Internet of Things (IOT) platform based on Spring Cloud. It is used for rapid development of IOT projects and management of IOT devices. It is a set of solutions for IOT system.</strong>
+	<br><strong>DC3 是基于 Spring Cloud 的开源可分布式物联网 (IOT) 平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。</strong>
 </p>
-
 
 ------
 
 
 ### 1 DC3 架构设计
 
- ![iot-dc3-architecture](./docs/images/dc3/architecture1.jpg)
+![iot-dc3-architecture](./docs/images/dc3/architecture1.jpg)
 
 
 
@@ -25,7 +24,7 @@
  * [x] 驱动层：用于提供标准或者私有协议连接物理设备的 `SDK`，负责南向设备的数据采集和指令控制，基于 `SDK` 可实现驱动的快速开发；
  * [x] 数据层：负责设备数据的收集和入库，并提供数据管理接口服务；
  * [x] 管理层：用于提供微服务注册中心、设备指令接口、设备注册与关联配对、数据管理中心，是所有微服务交互的核心部分，负责各类配置数据的管理，并对外提供接口服务；
- * [ ] 应用层(开发中...)：用于提供数据开放、任务调度、报警与消息通知、日志管理等，具备对接第三方平台能力。
+ * [ ] 应用层(开发中...)：用于提供规则引擎、数据开放、任务调度、报警与消息通知、日志管理等，具备对接第三方平台能力。
 
 
 
