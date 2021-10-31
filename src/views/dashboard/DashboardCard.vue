@@ -4,14 +4,14 @@
             <div class="thing-card-content">
                 <div class="thing-card__body">
                     <div class="thing-card-body-content">
-                        <div class="thing-body-content-dashboard-snapshot" @click="show()">
+                        <div class="thing-card-body-content-dashboard-snapshot" @click="show()">
                             <img :src="snapshot">
                         </div>
                     </div>
                 </div>
                 <div class="thing-card__footer">
                     <div class="thing-card-footer-title">
-                        <span class="thing-body-content-dashboard-name">{{name}}</span>
+                        <span class="thing-card-body-content-dashboard-name">{{name}}</span>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
         }
     }
 
-    .thing-body-content-dashboard-snapshot {
+    .thing-card-body-content-dashboard-snapshot {
         width: 280px;
         min-width: 200px;
         max-width: 280px;
@@ -78,7 +78,7 @@
         }
     }
 
-    .thing-body-content-dashboard-name {
+    .thing-card-body-content-dashboard-name {
         display: block;
         width: 280px;
         overflow: hidden;

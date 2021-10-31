@@ -38,10 +38,6 @@
   }
 }
 
-.cursor-pointer {
-  cursor: pointer;
-}
-
 .thing-card-content {
   height: 100%;
   display: flex;
@@ -96,6 +92,10 @@
     font-size: large;
     flex: 1;
   }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 .header-enable {
