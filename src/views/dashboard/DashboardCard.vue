@@ -3,7 +3,7 @@
         <el-card shadow="hover">
             <div class="thing-card-content">
                 <div class="thing-card__body">
-                    <div class="thing-card-body-content">
+                    <div class="thing-card-body__content">
                         <div class="thing-card-body-content-dashboard-snapshot" @click="show()">
                             <img :src="snapshot">
                         </div>

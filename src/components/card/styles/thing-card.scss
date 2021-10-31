@@ -2,7 +2,7 @@
   border-radius: 5px;
   box-sizing: border-box;
 
-  .thing-content-nowrap-title {
+  .nowrap-name {
     display: block;
     width: 200px;
     overflow: hidden;
@@ -10,7 +10,7 @@
     text-overflow: ellipsis;
   }
 
-  .thing-content-nowrap-item {
+  .nowrap-item {
     display: block;
     width: 300px;
     overflow: hidden;
@@ -18,7 +18,7 @@
     text-overflow: ellipsis;
   }
 
-  .thing-content-nowrap-description {
+  .nowrap-description {
     display: block;
     width: 350px;
     overflow: hidden;
@@ -38,20 +38,13 @@
   }
 }
 
-.thing-card-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.thing-header {
+.thing-card__header {
   width: 100%;
   height: 55px;
   display: flex;
   border-bottom: 1px solid #dcdfe6;
 
-  .thing-icon {
+  .thing-card-header-icon {
     width: 48px;
     height: 48px;
     margin-right: 12px;
@@ -64,7 +57,7 @@
     }
   }
 
-  .thing-name {
+  .thing-card-header-name {
     height: 48px;
     line-height: 48px;
     font-size: 14px;
@@ -77,14 +70,14 @@
     }
   }
 
-  .thing-status {
+  .thing-card-header-status {
     height: 48px;
     line-height: 48px;
     text-align: right;
     flex: 1;
   }
 
-  .thing-unit {
+  .thing-card-header-unit {
     height: 48px;
     line-height: 48px;
     text-align: right;
@@ -92,18 +85,6 @@
     font-size: large;
     flex: 1;
   }
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.header-enable {
-  border-bottom: 1px solid #c2e7b0;
-}
-
-.header-disable {
-  border-bottom: 1px solid #fbc4c4;
 }
 
 .thing-card__body {
@@ -114,20 +95,20 @@
     padding-inline-start: 5px;
   }
 
-  .thing-card-body-content {
+  .thing-card-body__content {
     display: flex;
     justify-content: center;
 
-    p.thing-content-nowrap-description {
+    p.nowrap-description {
       text-align: center;
-    }
-
-    .thing-body-content-time {
-      margin-top: 5px;
     }
   }
 
-  .thing-body-content-item {
+  .thing-card-body-content-time {
+    margin-top: 5px;
+  }
+
+  .thing-card-body-content-item {
     display: flex;
     flex-direction: column;
     list-style: none;
@@ -180,19 +161,10 @@
     }
   }
 
-  .thing-body-content-time {
+  .thing-card-body-content-time {
     display: flex;
     justify-content: space-between;
     padding-right: 5px;
-  }
-}
-
-.detail-body {
-  list-style: none;
-
-  li {
-    font-size: 13px;
-    margin-top: 8px;
   }
 }
 
@@ -211,18 +183,46 @@
     margin-top: 5px;
   }
 
-  .thing-copy-id {
+  .thing-card-footer-copy-id {
     height: 35px;
     line-height: 35px;
     text-align: center;
   }
 
-  .thing-operation {
+  .thing-card-footer-operation {
     height: 35px;
     display: flex;
 
-    .thing-tooltip {
+    .operation-tooltip {
       margin-right: 10px;
     }
+  }
+}
+
+.thing-card-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.header-enable {
+  border-bottom: 1px solid #c2e7b0;
+}
+
+.header-disable {
+  border-bottom: 1px solid #fbc4c4;
+}
+
+.detail-body {
+  list-style: none;
+
+  li {
+    font-size: 13px;
+    margin-top: 8px;
   }
 }

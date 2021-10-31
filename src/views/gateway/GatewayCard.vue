@@ -2,10 +2,10 @@
     <div class="thing-card">
         <el-card shadow="hover">
             <div class="thing-card-content">
-                <div class="thing-header" v-bind:class="{'header-enable':data.enable,'header-disable':!data.enable}">
-                    <div class="thing-icon"><img :src="icon" :alt="data.name"></div>
-                    <div class="thing-name thing-content-nowrap-title" @click="copyId(data.id)">{{data.name}}</div>
-                    <div title="状态" class="thing-status">
+                <div class="thing-card__header" v-bind:class="{'header-enable':data.enable,'header-disable':!data.enable}">
+                    <div class="thing-card-header-icon"><img :src="icon" :alt="data.name"></div>
+                    <div class="thing-card-header-name nowrap-name" @click="copyId(data.id)">{{data.name}}</div>
+                    <div title="状态" class="thing-card-header-status">
                         <el-tag v-if="status(data.id)==='ONLINE'" type="success" effect="plain">在线</el-tag>
                         <el-tag v-else-if="status(data.id)==='MAINTAIN'" type="warning" effect="plain">维护</el-tag>
                         <el-tag v-else-if="status(data.id)==='FAULT'" type="danger" effect="plain">故障</el-tag>
@@ -15,40 +15,40 @@
                     </div>
                 </div>
                 <div class="thing-card__body">
-                    <div class="thing-card-body-content">
-                        <ul class="thing-body-content-item">
-                            <li class="thing-content-nowrap-item"><span><i class="el-icon-connection"/> 端口: </span>{{data.port}}</li>
-                            <li class="thing-content-nowrap-item"><span><i class="el-icon-monitor"/> 主机: </span>{{data.host}}</li>
-                            <li class="thing-content-nowrap-item"><span><i class="el-icon-s-promotion"/> 网关服务: </span>{{data.serviceName}}</li>
+                    <div class="thing-card-body__content">
+                        <ul class="thing-card-body-content-item">
+                            <li class="nowrap-item"><span><i class="el-icon-connection"/> 端口: </span>{{data.port}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-monitor"/> 主机: </span>{{data.host}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-s-promotion"/> 网关服务: </span>{{data.serviceName}}</li>
                         </ul>
                     </div>
-                    <div title="网关描述信息" class="thing-card-body-content">
-                        <p class="thing-content-nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
+                    <div title="网关描述信息" class="thing-card-body__content">
+                        <p class="nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
-                    <div class="thing-body-content-time">
-                        <ul class="thing-body-content-item">
+                    <div class="thing-card-body-content-time">
+                        <ul class="thing-card-body-content-item">
                             <li><span><i class="el-icon-edit-outline"/> 修改日期: </span>{{timestamp(data.createTime)}}</li>
                         </ul>
-                        <ul class="thing-body-content-item">
+                        <ul class="thing-card-body-content-item">
                             <li><span><i class="el-icon-sunset"/> 创建日期: </span>{{timestamp(data.updateTime)}}</li>
                         </ul>
                     </div>
                 </div>
                 <div class="thing-card__footer">
-                    <div class="thing-copy-id">
+                    <div class="thing-card-footer-copy-id">
                         <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
                             <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>
                         </el-tooltip>
                     </div>
-                    <div class="thing-operation">
+                    <div class="thing-card-footer-operation">
                         <el-popconfirm title="是否确定停用该网关？" placement="top" icon="el-icon-remove-outline">
-                            <el-button class="thing-tooltip" type="text" slot="reference" disabled>停用</el-button>
+                            <el-button class="operation-tooltip" type="text" slot="reference" disabled>停用</el-button>
                         </el-popconfirm>
                         <el-popconfirm title="是否确定启用该网关？" placement="top" icon="el-icon-remove-outline">
-                            <el-button class="thing-tooltip" type="text" slot="reference" disabled>启用</el-button>
+                            <el-button class="operation-tooltip" type="text" slot="reference" disabled>启用</el-button>
                         </el-popconfirm>
                         <el-popconfirm title="是否确定删除该网关？" placement="top" icon="el-icon-remove-outline">
-                            <el-button class="thing-tooltip" type="text" slot="reference" disabled>删除</el-button>
+                            <el-button class="operation-tooltip" type="text" slot="reference" disabled>删除</el-button>
                         </el-popconfirm>
                         <el-button type="text" @click="detail(data.id)">详情</el-button>
                     </div>

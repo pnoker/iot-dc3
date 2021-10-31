@@ -3,7 +3,7 @@
         <el-card shadow="hover">
             <div class="thing-card-content">
                 <div class="thing-card__body">
-                    <div class="thing-card-body-content">
+                    <div class="thing-card-body__content">
                         <div class="thing-card-body-content-application-icon" @click="show()">
                             <el-avatar shape="square" :size="120" fit="fill" :src="icon"></el-avatar>
                         </div>
