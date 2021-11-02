@@ -486,7 +486,10 @@ services:
           - dc3-mongo
 
   opentsdb:
-    image: opentsdb/opentsdb
+    build:
+      context: ./dependencies/opentsdb/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-opentsdb:1.0.0
     restart: always
     ports:
       - 4242:4242
