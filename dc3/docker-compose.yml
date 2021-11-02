@@ -495,6 +495,10 @@ services:
       - 4242:4242
     container_name: dc3-opentsdb
     hostname: dc3-opentsdb
+    volumes:
+      - opentsdb_data:/data/hbase
+      - opentsdb_tmp:/tmp
+      - opentsdb_plugins:/opentsdb-plugins
     networks:
       dc3net:
         aliases:
@@ -558,6 +562,21 @@ services:
       dc3net:
         aliases:
           - dc3-emqx
+
+  grafana:
+    build:
+      context: ./dependencies/grafana/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-grafana:1.0.0
+    restart: always
+    ports:
+      - 3000:3000
+    container_name: dc3-grafana
+    hostname: dc3-grafana
+    networks:
+      dc3net:
+        aliases:
+          - dc3-grafana
 
   flink:
     image: flink:1.10
@@ -647,6 +666,9 @@ volumes:
   emqx_lib:
   emqx_data:
   emqx_log:
+  opentsdb_data:
+  opentsdb_tmp:
+  opentsdb_plugins:
   portainer:
 
 networks:
