@@ -20,6 +20,7 @@ import com.dc3.common.bean.point.TsPointValue;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import okhttp3.internal.annotations.EverythingIsNonNull;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -34,7 +35,8 @@ import java.util.List;
 @Service
 public class DataCustomServiceImpl implements DataCustomService {
 
-    private static final String putUrl = "";
+    private static final boolean details = false;
+    private static final String putUrl = "http://dc3-opentsdb:4242/api/put";
 
     @Resource
     private OkHttpClient okHttpClient;
@@ -107,20 +109,24 @@ public class DataCustomServiceImpl implements DataCustomService {
     private void savePointValueToOpenTsdb(List<TsPointValue> tsPointValues) {
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), JSON.toJSONString(tsPointValues));
         Request request = new Request.Builder()
-                .url(putUrl)
+                .url(details ? putUrl + "?details" : putUrl)
                 .post(requestBody)
                 .build();
 
-        try {
-            Response response = okHttpClient.newCall(request).execute();
-            ResponseBody body = response.body();
-            if (null != body) {
-                log.debug("send pointValue to opentsdb {}: {}", response.message(), body.string());
-                body.close();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call call, IOException e) {
+                log.error("send pointValue to opentsdb error: {}", e.getMessage());
             }
-            response.close();
-        } catch (IOException e) {
-            log.error("send pointValue to opentsdb error: {}", e.getMessage());
-        }
+
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call call, Response response) throws IOException {
+                if (details && null != response.body()) {
+                    log.debug("send pointValue to opentsdb {}: {}", response.message(), response.body().string());
+                }
+            }
+        });
     }
 }
