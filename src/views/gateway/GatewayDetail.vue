@@ -4,7 +4,7 @@
             <el-tabs v-model="active" @tab-click="changeActive">
                 <el-tab-pane label="网关详情" name="detail">
                     <el-card shadow="hover">
-                        <ul class="detail-body">
+                        <ul>
                             <li><i class="el-icon-data-line"></i> 网关名称: {{data.name}}</li>
                             <li><i class="el-icon-collection-tag"></i> 关联设备 [{{listDeviceData.length||0}} 个]: {{deviceName()}}</li>
                             <li><i class="el-icon-edit-outline"></i> 修改日期: {{timestamp(data.createTime)}}</li>
@@ -57,12 +57,6 @@
             this.device();
             this.drivers();
             this.profiles();
-        },
-        beforeRouteLeave(to, from, next) {
-            if (this.interval) {
-                clearInterval(this.interval);
-            }
-            next();
         },
         methods: {
             driver() {
@@ -118,5 +112,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/thing-card.scss";
+    @import "~@/components/card/styles/things-card.scss";
 </style>

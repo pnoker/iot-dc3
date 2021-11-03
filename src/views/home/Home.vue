@@ -1,17 +1,17 @@
 <template>
     <div>
         <title-card class="home-app" title="导航">
-            <div class="home-app-item">
+            <div class="app-item">
                 <application-card v-for="i in 12" :name="'应用 '+i"></application-card>
             </div>
         </title-card>
         <title-card class="home-dashboard" title="看板">
-            <div class="home-dashboard-item">
+            <div class="dashboard-item">
                 <dashboard-card v-for="i in 6" :name="'数据看板 '+i"></dashboard-card>
             </div>
         </title-card>
         <title-card class="home-count" title="统计">
-            <div id="data-count"></div>
+            <div id="count-data"></div>
         </title-card>
     </div>
 </template>
@@ -35,7 +35,7 @@
             }
         },
         mounted() {
-            let chart = echarts.init(document.getElementById('data-count'));
+            let chart = echarts.init(document.getElementById('count-data'));
             this.data = this.data.map(item => [item[1], item[0], item[2]]);
             let option = {
                 legend: {
@@ -93,9 +93,10 @@
 
 <style lang="scss">
     .home-app {
+        margin-top: 1px;
         margin-bottom: 4px;
 
-        .home-app-item {
+        .app-item {
             display: flex;
             flex-wrap: wrap;
         }
@@ -112,7 +113,7 @@
     .home-dashboard {
         margin-bottom: 4px;
 
-        .home-dashboard-item {
+        .dashboard-item {
             display: flex;
             flex-wrap: wrap;
         }
@@ -127,7 +128,7 @@
     }
 
     .home-count {
-        #data-count {
+        #count-data {
             width: 100%;
             height: 320px;
         }

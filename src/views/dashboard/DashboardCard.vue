@@ -1,17 +1,17 @@
 <template>
-    <div class="thing-card thing-card-dashboard">
+    <div class="things-card things-card-dashboard">
         <el-card shadow="hover">
-            <div class="thing-card-content">
-                <div class="thing-card__body">
-                    <div class="thing-card-body__content">
-                        <div class="thing-card-body-content-dashboard-snapshot" @click="show()">
+            <div class="things-card-content">
+                <div class="things-card__body">
+                    <div class="things-card-body-content">
+                        <div class="things-card-body-content-dashboard-snapshot" @click="show()">
                             <img :src="snapshot">
                         </div>
                     </div>
                 </div>
-                <div class="thing-card__footer">
-                    <div class="thing-card-footer-title">
-                        <span class="thing-card-body-content-dashboard-name">{{name}}</span>
+                <div class="things-card__footer">
+                    <div class="things-card-footer-title">
+                        <span class="things-card-body-content-dashboard-name">{{name}}</span>
                     </div>
                 </div>
             </div>
@@ -49,9 +49,9 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/thing-card.scss";
+    @import "~@/components/card/styles/things-card.scss";
 
-    .thing-card-dashboard {
+    .things-card-dashboard {
         width: 300px;
         height: 210px;
         margin-right: 10px;
@@ -65,7 +65,7 @@
         }
     }
 
-    .thing-card-body-content-dashboard-snapshot {
+    .things-card-body-content-dashboard-snapshot {
         width: 280px;
         min-width: 200px;
         max-width: 280px;
@@ -78,7 +78,7 @@
         }
     }
 
-    .thing-card-body-content-dashboard-name {
+    .things-card-body-content-dashboard-name {
         display: block;
         width: 280px;
         overflow: hidden;

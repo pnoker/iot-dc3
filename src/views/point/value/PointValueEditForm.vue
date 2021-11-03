@@ -1,19 +1,19 @@
 <template>
     <el-dialog title="编辑位号值" :visible.sync="formVisible"
-               class="thing-dialog"
+               class="things-dialog"
                :show-close="false"
                :append-to-body="true"
                :model-append-to-body="false"
                :close-on-click-modal="false"
                :close-on-press-escape="false">
         <el-form ref="formData" size="small" :model="formData" :rules="formRule">
-            <el-form-item class="thing-dialog-form-item" label="位号值" prop="value">
+            <el-form-item class="things-dialog-form-item" label="位号值" prop="value">
                 <el-input clearable
                           placeholder="请输入位号值"
                           v-model="formData.value">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="操作描述" prop="description">
+            <el-form-item class="things-dialog-form-item" label="操作描述" prop="description">
                 <el-input clearable
                           type="textarea"
                           maxlength="300"
@@ -92,5 +92,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/dialog/styles/thing-dialog.scss";
+    @import "~@/components/dialog/styles/things-dialog.scss";
 </style>

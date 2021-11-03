@@ -1,13 +1,13 @@
 <template>
-    <div class="thing-card">
+    <div class="things-card">
         <el-card shadow="hover">
-            <div class="thing-card-content">
-                <div class="thing-card__header" v-bind:class="{'header-enable':data.enable,'header-disable':!data.enable}">
-                    <div class="thing-card-header-icon">
+            <div class="things-card-content">
+                <div class="things-card__header" v-bind:class="{'header-enable':data.enable,'header-disable':!data.enable}">
+                    <div class="things-card-header-icon">
                         <img :src="icon" :alt="data.name">
                     </div>
-                    <div class="thing-card-header-name nowrap-name" @click="copyId(data.id)">{{data.name}}</div>
-                    <div title="状态" class="thing-card-header-status">
+                    <div class="things-card-header-name nowrap-name" @click="copyId(data.id)">{{data.name}}</div>
+                    <div title="状态" class="things-card-header-status">
                         <el-tag v-if="status(data.id)==='ONLINE'" type="success" effect="plain">在线</el-tag>
                         <el-tag v-else-if="status(data.id)==='MAINTAIN'" type="warning" effect="plain">维护</el-tag>
                         <el-tag v-else-if="status(data.id)==='FAULT'" type="danger" effect="plain">故障</el-tag>
@@ -15,33 +15,33 @@
                         <el-tag v-else type="info" effect="plain">离线</el-tag>
                     </div>
                 </div>
-                <div class="thing-card__body">
-                    <div class="thing-card-body__content">
-                        <ul class="thing-card-body-content-item">
+                <div class="things-card__body">
+                    <div class="things-card-body-content">
+                        <ul>
                             <li class="nowrap-item"><span><i class="el-icon-s-promotion"/> 所属驱动: </span>{{driver(data.driverId)}}</li>
                             <li class="nowrap-item"><span><i class="el-icon-tickets"/> 包含模板: </span>{{data.profileIds?profile(data.profileIds):''}}</li>
                             <li class="nowrap-item"><span><i class="el-icon-coin"/> 存储类型: </span>{{data.multi?'结构数据':'单点数据'}}</li>
                         </ul>
                     </div>
-                    <div title="设备描述信息" class="thing-card-body__content">
+                    <div title="设备描述信息" class="things-card-body-content">
                         <p class="nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
-                    <div class="thing-card-body-content-time">
-                        <ul class="thing-card-body-content-item">
+                    <div class="things-card-body-content-time">
+                        <ul>
                             <li><span><i class="el-icon-edit-outline"/> 修改日期: </span>{{timestamp(data.createTime)}}</li>
                         </ul>
-                        <ul class="thing-card-body-content-item">
+                        <ul>
                             <li><span><i class="el-icon-sunset"/> 创建日期: </span>{{timestamp(data.updateTime)}}</li>
                         </ul>
                     </div>
                 </div>
-                <div v-if="!embedded" class="thing-card__footer">
-                    <div class="thing-card-footer-copy-id">
+                <div v-if="!embedded" class="things-card__footer">
+                    <div class="things-card-footer-copy-id">
                         <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
                             <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>
                         </el-tooltip>
                     </div>
-                    <div class="thing-card-footer-operation">
+                    <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该设备？" placement="top" icon="el-icon-remove-outline">
                             <el-button class="operation-tooltip" type="text" slot="reference" :disabled="!data.enable">停用</el-button>
                         </el-popconfirm>
@@ -147,6 +147,6 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/thing-card.scss";
+    @import "~@/components/card/styles/things-card.scss";
 </style>
 

@@ -1,19 +1,19 @@
 <template>
     <el-dialog title="新增设备" :visible.sync="formVisible"
-               class="thing-dialog"
+               class="things-dialog"
                :show-close="false"
                :append-to-body="true"
                :model-append-to-body="false"
                :close-on-click-modal="false"
                :close-on-press-escape="false">
         <el-form ref="formData" size="small" :model="formData" :rules="formRule">
-            <el-form-item class="thing-dialog-form-item" label="设备名称" prop="name">
+            <el-form-item class="things-dialog-form-item" label="设备名称" prop="name">
                 <el-input clearable
                           placeholder="请输入设备名称"
                           v-model="formData.name">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="所属驱动" prop="driverId">
+            <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
                 <el-select clearable
                            placeholder="请选择所属驱动 | 网关"
                            filterable
@@ -26,7 +26,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="包含模板" prop="profileIds">
+            <el-form-item class="things-dialog-form-item" label="包含模板" prop="profileIds">
                 <el-select clearable
                            placeholder="请选择包含模板"
                            :multiple="true"
@@ -40,7 +40,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="存储类型" prop="multi">
+            <el-form-item class="things-dialog-form-item" label="存储类型" prop="multi">
                 <el-select clearable
                            placeholder="请选择存储类型"
                            v-model="formData.multi">
@@ -48,7 +48,7 @@
                     <el-option label="结构数据" :value="true"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="描述" prop="description">
+            <el-form-item class="things-dialog-form-item" label="描述" prop="description">
                 <el-input clearable
                           type="textarea"
                           maxlength="300"
@@ -151,5 +151,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/dialog/styles/thing-dialog.scss";
+    @import "~@/components/dialog/styles/things-dialog.scss";
 </style>

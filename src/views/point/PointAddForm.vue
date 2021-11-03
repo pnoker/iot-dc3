@@ -1,19 +1,19 @@
 <template>
     <el-dialog title="新增位号" :visible.sync="formVisible"
-               class="thing-dialog"
+               class="things-dialog"
                :show-close="false"
                :append-to-body="true"
                :model-append-to-body="false"
                :close-on-click-modal="false"
                :close-on-press-escape="false">
         <el-form ref="formData" size="small" :model="formData" :rules="formRule">
-            <el-form-item class="thing-dialog-form-item" label="位号名称" prop="name">
+            <el-form-item class="things-dialog-form-item" label="位号名称" prop="name">
                 <el-input clearable
                           placeholder="请输入位号名称"
                           v-model="formData.name">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="数据类型" prop="type">
+            <el-form-item class="things-dialog-form-item" label="数据类型" prop="type">
                 <el-select clearable
                            placeholder="请选择数据类型"
                            v-model="formData.type">
@@ -27,7 +27,7 @@
                     <el-option label="布尔量(boolean)" value="boolean"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="读写类型" prop="rw">
+            <el-form-item class="things-dialog-form-item" label="读写类型" prop="rw">
                 <el-select clearable
                            placeholder="请选择读写类型"
                            v-model="formData.rw">
@@ -36,7 +36,7 @@
                     <el-option label="读写" :value="2"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="累计标识" prop="accrue">
+            <el-form-item class="things-dialog-form-item" label="累计标识" prop="accrue">
                 <el-select clearable
                            placeholder="请选择累计标识"
                            v-model="formData.accrue">
@@ -44,43 +44,43 @@
                     <el-option label="不累计" :value="false"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="数据格式" prop="format">
+            <el-form-item class="things-dialog-form-item" label="数据格式" prop="format">
                 <el-input clearable
                           placeholder="请输入数据格式"
                           v-model="formData.format">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="单位" prop="unit">
+            <el-form-item class="things-dialog-form-item" label="单位" prop="unit">
                 <el-input clearable
                           placeholder="请输入单位"
                           v-model="formData.unit">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="基值" prop="base">
+            <el-form-item class="things-dialog-form-item" label="基值" prop="base">
                 <el-input clearable
                           placeholder="请输入基值"
                           v-model="formData.base">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="倍数" prop="multiple">
+            <el-form-item class="things-dialog-form-item" label="倍数" prop="multiple">
                 <el-input clearable
                           placeholder="请输入倍数"
                           v-model="formData.multiple">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="最小值" prop="minimum">
+            <el-form-item class="things-dialog-form-item" label="最小值" prop="minimum">
                 <el-input clearable
                           placeholder="请输入最小值"
                           v-model="formData.minimum">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="最大值" prop="maximum">
+            <el-form-item class="things-dialog-form-item" label="最大值" prop="maximum">
                 <el-input clearable
                           placeholder="请输入最大值"
                           v-model="formData.maximum">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="描述" prop="description">
+            <el-form-item class="things-dialog-form-item" label="描述" prop="description">
                 <el-input clearable
                           type="textarea"
                           maxlength="300"
@@ -231,5 +231,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/dialog/styles/thing-dialog.scss";
+    @import "~@/components/dialog/styles/things-dialog.scss";
 </style>

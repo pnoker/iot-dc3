@@ -1,6 +1,6 @@
 <template>
     <el-dialog title="数据详情" :visible.sync="detailVisible"
-               class="thing-dialog"
+               class="things-dialog"
                :show-close="false"
                :append-to-body="true"
                :model-append-to-body="false"
@@ -42,5 +42,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/dialog/styles/thing-dialog.scss";
+    @import "~@/components/dialog/styles/things-dialog.scss";
 </style>

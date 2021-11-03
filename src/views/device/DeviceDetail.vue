@@ -4,7 +4,7 @@
             <el-tabs v-model="active" @tab-click="changeActive">
                 <el-tab-pane label="设备详情" name="detail">
                     <el-card shadow="hover">
-                        <ul class="detail-body">
+                        <ul>
                             <li><i class="el-icon-data-line"></i> 设备名称: {{data.name}}</li>
                             <li><i class="el-icon-tickets"></i> 包含模板 [{{data.profileIds.length||0}} 个]: {{profileName(data.profileIds)}}</li>
                             <li><i class="el-icon-collection-tag"></i> 包含位号 [{{listPointData.length||0}} 个]: {{pointName()}}</li>
@@ -143,15 +143,6 @@
             this.profiles();
             this.points();
         },
-        beforeRouteLeave(to, from, next) {
-            if (this.interval1) {
-                clearInterval(this.interval1);
-            }
-            if (this.interval2) {
-                clearInterval(this.interval2);
-            }
-            next();
-        },
         methods: {
             device() {
                 deviceById(this.id).then(res => {
@@ -265,5 +256,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/thing-card.scss";
+    @import "~@/components/card/styles/things-card.scss";
 </style>

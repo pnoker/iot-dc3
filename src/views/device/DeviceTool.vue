@@ -1,10 +1,10 @@
 <template>
     <div class="tool-card">
         <el-card shadow="hover">
-            <div class="tool-content">
-                <div class="content-search">
+            <div class="tool-card-content">
+                <div class="tool-card-content-search">
                     <el-form :inline="true" :model="formData" :rules="formRule" ref="formData" size="small">
-                        <div class="search-form">
+                        <div class="tool-card-content-search-form">
                             <el-form-item label="设备名称" prop="name">
                                 <el-input clearable
                                           placeholder="请输入设备名称"
@@ -44,15 +44,15 @@
                                 </el-select>
                             </el-form-item>
                         </div>
-                        <el-form-item class="search-button">
+                        <el-form-item class="tool-card-content-search-button">
                             <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
                             <el-button icon="el-icon-refresh-left" @click="reset">重置</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
-                <div class="tool-operation">
+                <div class="tool-card-content-operation">
                     <el-button type="success" size="small" icon="el-icon-plus" @click="showAdd">新增</el-button>
-                    <div class="tool-page">
+                    <div class="tool-card-content-operation-page">
                         <el-pagination background layout="total, prev, pager, next, sizes"
                                        :page-sizes="[12, 24, 36, 48]"
                                        :page-size="+page.size"

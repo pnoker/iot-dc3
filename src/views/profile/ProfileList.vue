@@ -56,12 +56,6 @@
             this.point();
             this.list();
         },
-        beforeRouteLeave(to, from, next) {
-            if (this.interval) {
-                clearInterval(this.interval);
-            }
-            next();
-        },
         methods: {
             list() {
                 profileList({

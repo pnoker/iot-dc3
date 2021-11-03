@@ -65,12 +65,6 @@
             this.profile();
             this.list();
         },
-        beforeRouteLeave(to, from, next) {
-            if (this.interval) {
-                clearInterval(this.interval);
-            }
-            next();
-        },
         methods: {
             list() {
                 deviceList({
@@ -162,7 +156,8 @@
 </script>
 
 <style lang="scss">
-    .home {
-        height: 100%;
+    .things-list {
+        display: flex;
+        flex-wrap: wrap;
     }
 </style>

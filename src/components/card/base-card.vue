@@ -1,5 +1,5 @@
 <template>
-    <div class="card_base">
+    <div class="base-card">
         <el-card shadow="hover">
             <slot/>
         </el-card>
@@ -13,10 +13,18 @@
 </script>
 
 <style lang="scss">
-    .card_base {
-        padding: 2px 3px;
+    .base-card {
         border-radius: 5px;
         box-sizing: border-box;
+
+        ul {
+            list-style: none;
+
+            li {
+                font-size: 13px;
+                margin-top: 8px;
+            }
+        }
 
         .el-card {
             width: 100%;
@@ -25,11 +33,6 @@
 
         .el-card__body {
             padding: 10px;
-        }
-
-        &:first-child {
-            padding-top: 0;
-            padding-left: 0;
         }
     }
 </style>

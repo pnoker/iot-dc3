@@ -1,14 +1,14 @@
 <template>
-    <div class="thing-card cursor-pointer" @click="select(data)">
+    <div class="things-card cursor-pointer" @click="select(data)">
         <el-card :shadow="data.shadow">
-            <div class="thing-card-content">
-                <div class="thing-card__header" v-bind:class="{'header-enable':isConfig,'header-disable':!isConfig}">
-                    <div class="thing-card-header-icon"><img :src="isSelect" :alt="data.name"></div>
-                    <div class="thing-card-header-name nowrap-name" @click="copyId(data.id)">{{data.name}}</div>
+            <div class="things-card-content">
+                <div class="things-card__header" v-bind:class="{'header-enable':isConfig,'header-disable':!isConfig}">
+                    <div class="things-card-header-icon"><img :src="isSelect" :alt="data.name"></div>
+                    <div class="things-card-header-name nowrap-name" @click="copyId(data.id)">{{data.name}}</div>
                 </div>
-                <div class="thing-card__body">
-                    <div class="thing-card-body__content">
-                        <ul class="thing-card-body-content-item">
+                <div class="things-card__body">
+                    <div class="things-card-body-content">
+                        <ul>
                             <li class="nowrap-item" :key="attribute.id" v-if="attribute" v-for="attribute in attributes">
                                 <span><i class="el-icon-goblet"/> {{attribute.displayName}}: </span>{{data[attribute.name].value}}
                             </li>
@@ -74,5 +74,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/thing-card.scss";
+    @import "~@/components/card/styles/things-card.scss";
 </style>

@@ -1,19 +1,19 @@
 <template>
     <el-dialog title="新增模板" :visible.sync="formVisible"
-               class="thing-dialog"
+               class="things-dialog"
                :show-close="false"
                :append-to-body="true"
                :model-append-to-body="false"
                :close-on-click-modal="false"
                :close-on-press-escape="false">
         <el-form ref="formData" size="small" :model="formData" :rules="formRule">
-            <el-form-item class="thing-dialog-form-item" label="模板名称" prop="name">
+            <el-form-item class="things-dialog-form-item" label="模板名称" prop="name">
                 <el-input clearable
                           placeholder="请输入模板名称"
                           v-model="formData.name">
                 </el-input>
             </el-form-item>
-            <el-form-item class="thing-dialog-form-item" label="描述" prop="description">
+            <el-form-item class="things-dialog-form-item" label="描述" prop="description">
                 <el-input clearable
                           type="textarea"
                           maxlength="300"
@@ -94,5 +94,5 @@
 </script>
 
 <style lang="scss">
-    @import "~@/components/dialog/styles/thing-dialog.scss";
+    @import "~@/components/dialog/styles/things-dialog.scss";
 </style>

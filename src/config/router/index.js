@@ -23,7 +23,7 @@ index.beforeEach((to, from, next) => {
 
     next();
 
-    /*if (meta.isAuth !== true || from.name === 'login') {
+    if (meta.isAuth !== true || from.name === 'login') {
         next();
     } else {
         const token = getStore(common.token_header);
@@ -42,7 +42,7 @@ index.beforeEach((to, from, next) => {
             console.warn('用户凭证已过期，请重新登录！', e);
             store.dispatch('ClearToken').then(() => next({path: '/login'}));
         });
-    }*/
+    }
 });
 
 index.afterEach(() => {
