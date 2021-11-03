@@ -61,13 +61,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
-        <spring-boot.version>2.5.2</spring-boot.version>
-        <spring-cloud.version>2020.0.3</spring-cloud.version>
-        <spring-boot-admin.version>2.5.2</spring-boot-admin.version>
+        <spring-boot.version>2.5.6</spring-boot.version>
+        <spring-cloud.version>2020.0.4</spring-cloud.version>
+        <spring-boot-admin.version>2.5.3</spring-boot-admin.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
 
-        <guava.version>23.0</guava.version>
         <codecov.version>2.7</codecov.version>
+        <guava.version>31.0.1-jre</guava.version>
         <findbugs.version>3.0.5</findbugs.version>
         <maven.jar.plugin>3.2.0</maven.jar.plugin>
         <mybatis.plus.version>3.4.3</mybatis.plus.version>
@@ -76,7 +76,6 @@
         <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
         <maven.resource.plugin>3.1.0</maven.resource.plugin>
         <maven.dependency.plugin>3.1.2</maven.dependency.plugin>
-        <maven.spring.boot.plugin>2.2.2.RELEASE</maven.spring.boot.plugin>
     </properties>
 
     <dependencies>
@@ -314,7 +313,6 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${maven.spring.boot.plugin}</version>
                     <configuration>
                         <finalName>${project.build.finalName}</finalName>
                     </configuration>
