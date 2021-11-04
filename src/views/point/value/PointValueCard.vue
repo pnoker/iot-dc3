@@ -5,7 +5,6 @@
                 <div class="things-card__header" v-bind:class="{'header-enable':data.interval<200,'header-disable':data.interval>=200}">
                     <div class="things-card-header-icon"><img :src="icon" :alt="data.name"></div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id)">{{point(data.pointId)}}</div>
-                    <div title="单位" class="things-card-header-unit">{{data.unit}}</div>
                     <div title="读写类型" class="things-card-header-status">
                         <el-tag v-if="data.rw===0" type="warning" effect="plain">只读</el-tag>
                         <el-tag v-else-if="data.rw===1" type="info" effect="plain">只写</el-tag>
@@ -15,17 +14,16 @@
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <ul class="things-card-body-content-value">
-                            <li title="处理值，点击复制" class="nowrap-item value" @click="copyValue(data)">{{data.value}}</li>
+                            <li title="处理值，点击复制" class="nowrap-item value" @click="copyValue(data)">{{data.value}}  {{data.unit}}</li>
+                            <li title="计算值" class="nowrap-item">{{data.calculateValue||'-'}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-sunrise"/> 原始值: </span>{{data.rawValue}}</li>
+                            <li v-if="!embedded" class="nowrap-item value-point"><span><i class="el-icon-s-finance"/> 所属设备: </span>{{device(data.deviceId)}}</li>
+                            <li v-if="!embedded" class="nowrap-item"><span><i class="el-icon-timer"/> 数据延时: </span>{{data.interval}} ms</li>
+                            <li class="nowrap-item"><span><i class="el-icon-edit-outline"/> 采集日期: </span>{{timestamp(data.originTime)}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-sunset"/> 保存日期: </span>{{timestamp(data.createTime)}}</li>
                             <li v-if="embedded" title="详细内容" class="value-detail nowrap-item">
                                 <i class="el-icon-zoom-in" @click="showDetail(data)"/>
                             </li>
-                            <li title="计算值" class="nowrap-item">{{data.calculateValue||'-'}}</li>
-                            <li title="原始值" class="nowrap-item">
-                                <i v-if="data.rw===1||data.rw===2" class="value-edit el-icon-edit" @click="showEdit(data)"/>
-                                {{data.rawValue}}
-                            </li>
-                            <li v-if="!embedded" title="所属设备" class="nowrap-item value-point">{{device(data.deviceId)}}</li>
-                            <li v-if="!embedded" title="Debug｜延时" class="nowrap-item">{{data.interval}} ms</li>
                         </ul>
                     </div>
                     <div v-if="embedded" class="things-card-body-content-time">
@@ -36,22 +34,9 @@
                                             :styles="spCurveStyles"/>
                         </sparkline>
                     </div>
-                    <div class="things-card-body-content-time">
-                        <ul>
-                            <li><span><i class="el-icon-edit-outline"/> 采集日期: </span>{{timestamp(data.originTime)}}</li>
-                        </ul>
-                        <ul>
-                            <li><span><i class="el-icon-sunset"/> 保存日期: </span>{{timestamp(data.createTime)}}</li>
-                        </ul>
-                    </div>
                 </div>
                 <div v-if="!embedded" class="things-card__footer">
-                    <div class="things-card-footer-copy-id">
-                        <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
-                            <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>
-                        </el-tooltip>
-                    </div>
-                    <div v-if="false" class="things-card-footer-operation">
+                    <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定删除该数据？" placement="top" icon="el-icon-remove-outline">
                             <el-button class="operation-tooltip" type="text" slot="reference">删除</el-button>
                         </el-popconfirm>
@@ -65,7 +50,7 @@
 </template>
 
 <script>
-    import {dateFormat, setCopyContent} from '@/util/util'
+    import {dateFormat, setCopyContent} from '@/util/util';
 
     export default {
         name: "point-value-card",

@@ -1,4 +1,4 @@
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 export const profileAdd = (profile) => request({
     url: 'api/v3/manager/profile/add',

@@ -1,4 +1,4 @@
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 export const driverInfoAdd = (driverInfo) => request({
     url: 'api/v3/manager/driver_info/add',

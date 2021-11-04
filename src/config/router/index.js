@@ -1,12 +1,18 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import CommonRouter from './common'
-import ViewsRouter from './views'
-import OperateRouter from './operate'
-import NProgress from "nprogress";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import CommonRouter from './common';
+import ViewsRouter from './views';
+import OperateRouter from './operate';
 import {getStore} from "@/util/store";
 import {checkTokenValid} from "@/api/token";
-import common from '@/util/common'
+import common from '@/util/common';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
+
+NProgress.configure({
+    easing: 'ease',
+    showSpinner: false
+});
 
 Vue.use(VueRouter);
 
@@ -20,8 +26,6 @@ index.beforeEach((to, from, next) => {
     if (meta.title) {
         document.title = to.meta.title;
     }
-
-    next();
 
     if (meta.isAuth !== true || from.name === 'login') {
         next();

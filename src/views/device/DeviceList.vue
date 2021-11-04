@@ -15,7 +15,7 @@
         </el-row>
 
         <el-row>
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listData">
+            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
                 <device-card
                         :data="data"
                         :driverTable="driverTable"
@@ -156,8 +156,4 @@
 </script>
 
 <style lang="scss">
-    .things-list {
-        display: flex;
-        flex-wrap: wrap;
-    }
 </style>

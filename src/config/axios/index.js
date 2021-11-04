@@ -1,13 +1,6 @@
-import axios from 'axios'
-import router from '@/config/router'
+import axios from 'axios';
+import router from '@/config/router';
 import store from '@/config/store';
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
-
-NProgress.configure({
-    easing: 'ease',
-    showSpinner: false
-});
 
 //跨域请求，允许保存cookie
 axios.defaults.withCredentials = true;
@@ -19,7 +12,6 @@ axios.defaults.validateStatus = function (status) {
 
 //HTTP Request拦截
 axios.interceptors.request.use(config => {
-    NProgress.start();
     config.headers['Content-Type'] = 'application/json';
     return config;
 }, error => {
@@ -29,7 +21,6 @@ axios.interceptors.request.use(config => {
 
 //HTTP Response拦截
 axios.interceptors.response.use(res => {
-    NProgress.done();
     const ok = res.data.ok || false, status = res.status || 200, message = res.data.message || 'Internal Server Error!';
 
     if (!ok) {

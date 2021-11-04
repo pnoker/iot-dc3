@@ -16,7 +16,7 @@
                 </el-tab-pane>
                 <el-tab-pane label="包含模板" name="profile">
                     <el-row>
-                        <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listProfileData">
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listProfileData">
                             <profile-card
                                     :data="data"
                                     :pointTable="pointTable"
@@ -38,7 +38,7 @@
                 </el-tab-pane>
                 <el-tab-pane label="设备数据" name="pointValue">
                     <el-row>
-                        <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-if="data" v-for="data in listPointValueData">
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-if="data" v-for="data in listPointValueData">
                             <point-value-card
                                     v-if="data"
                                     :data="data"

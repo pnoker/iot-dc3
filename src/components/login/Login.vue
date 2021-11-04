@@ -9,7 +9,7 @@
         <div class="login-wrapper-right animated bounceInDown">
             <div class="login-border">
                 <div class="login-main">
-                    <h4 class="login-title">IoT DC3 管理平台</h4>
+                    <h4 class="login-title">DC3 IoT 平台</h4>
                     <el-form ref="formData" class="login-form" status-icon label-width="0" :rules="formRule" :model="formData">
                         <el-form-item prop="tenant">
                             <el-input size="small"

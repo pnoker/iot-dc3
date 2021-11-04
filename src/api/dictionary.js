@@ -1,4 +1,4 @@
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 export const driverDictionary = () => request({
     url: 'api/v3/manager/dictionary/driver',

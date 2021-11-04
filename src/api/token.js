@@ -1,4 +1,4 @@
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 /**
  * 通过用户名获取 Salt

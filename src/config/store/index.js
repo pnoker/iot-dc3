@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import token from '@/config/store/modules/token'
-import interval from '@/config/store/modules/interval'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import token from '@/config/store/modules/token';
+import interval from '@/config/store/modules/interval';
 
 Vue.use(Vuex);
 

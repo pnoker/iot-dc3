@@ -3,7 +3,7 @@
   "version": "1.3.2",
   "private": true,
   "author": "pnoker",
-  "description": "IoT DC3 Web Application UI",
+  "description": "DC3 IoT 平台前端页面",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"

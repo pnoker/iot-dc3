@@ -15,6 +15,7 @@
                             <li class="nowrap-item"><span><i class="el-icon-location-outline"/> 基值: </span>{{data.base}}</li>
                             <li class="nowrap-item"><span><i class="el-icon-location-outline"/> 格式: </span>{{data.format}}</li>
                             <li class="nowrap-item"><span><i class="el-icon-location-outline"/> 最小值: </span>{{data.minimum}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-edit-outline"/> 修改日期: </span>{{timestamp(data.updateTime)}}</li>
                         </ul>
                         <ul class="things-body-content-item-column-2">
                             <li class="nowrap-item"><span><i class="el-icon-location-outline"/> 数据类型: </span>{{type(data.type)}}</li>
@@ -22,26 +23,14 @@
                             <li class="nowrap-item"><span><i class="el-icon-location-outline"/> 倍数: </span>{{data.multiple}}</li>
                             <li class="nowrap-item"><span><i class="el-icon-location-outline"/> 单位: </span>{{data.unit}}</li>
                             <li class="nowrap-item"><span><i class="el-icon-location-outline"/> 最大值: </span>{{data.maximum}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-sunset"/> 创建日期: </span>{{timestamp(data.createTime)}}</li>
                         </ul>
                     </div>
                     <div title="位号描述信息" class="things-card-body-content">
                         <p class="nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
-                    <div class="things-card-body-content-time">
-                        <ul>
-                            <li><span><i class="el-icon-edit-outline"/> 修改日期: </span>{{timestamp(data.createTime)}}</li>
-                        </ul>
-                        <ul>
-                            <li><span><i class="el-icon-sunset"/> 创建日期: </span>{{timestamp(data.updateTime)}}</li>
-                        </ul>
-                    </div>
                 </div>
                 <div v-if="!embedded" class="things-card__footer">
-                    <div class="things-card-footer-copy-id">
-                        <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
-                            <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>
-                        </el-tooltip>
-                    </div>
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该位号？" placement="top" icon="el-icon-remove-outline">
                             <el-button class="operation-tooltip" type="text" slot="reference" :disabled="!data.enable">停用</el-button>

@@ -1,4 +1,4 @@
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 // point
 export const pointAdd = (point) => request({

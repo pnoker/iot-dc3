@@ -12,26 +12,15 @@
                         <ul>
                             <li class="nowrap-item"><span><i class="el-icon-ice-cream-square"/> 位号个数: </span>{{data.pointIds.length||0}}</li>
                             <li class="nowrap-item"><span><i class="el-icon-collection-tag"/> 位号: </span>{{point(data.pointIds)}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-edit-outline"/> 修改日期: </span>{{timestamp(data.updateTime)}}</li>
+                            <li class="nowrap-item"><span><i class="el-icon-sunset"/> 创建日期: </span>{{timestamp(data.createTime)}}</li>
                         </ul>
                     </div>
                     <div title="模板描述信息" class="things-card-body-content">
                         <p class="nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
-                    <div class="things-card-body-content-time">
-                        <ul>
-                            <li><span><i class="el-icon-edit-outline"/> 修改日期: </span>{{timestamp(data.createTime)}}</li>
-                        </ul>
-                        <ul>
-                            <li><span><i class="el-icon-sunset"/> 创建日期: </span>{{timestamp(data.updateTime)}}</li>
-                        </ul>
-                    </div>
                 </div>
                 <div v-if="!embedded" class="things-card__footer">
-                    <div class="things-card-footer-copy-id">
-                        <el-tooltip class="item" effect="dark" placement="top" v-if="data.id" content="点击复制ID">
-                            <el-button class="button" type="text" icon="el-icon-document-copy" v-on:click="copyId(data.id)">{{data.id}}</el-button>
-                        </el-tooltip>
-                    </div>
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该模板？" placement="top" icon="el-icon-remove-outline">
                             <el-button class="operation-tooltip" type="text" slot="reference" :disabled="!data.enable">停用</el-button>

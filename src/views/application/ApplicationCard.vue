@@ -20,7 +20,7 @@
 </template>
 
 <script>
-    import {encode} from 'js-base64'
+    import {encode} from 'js-base64';
 
     export default {
         name: "application-card",

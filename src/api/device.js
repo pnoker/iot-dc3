@@ -1,4 +1,4 @@
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 export const deviceAdd = (device) => request({
     url: 'api/v3/manager/device/add',

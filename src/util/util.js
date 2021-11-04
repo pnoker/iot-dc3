@@ -1,4 +1,4 @@
-import {Message, Notification} from 'element-ui'
+import {Message, Notification} from 'element-ui';
 
 let failNotify = true, failNotifyText = '';
 

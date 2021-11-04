@@ -1,7 +1,7 @@
 import md5 from 'js-md5';
 
-import {getStore, removeCookies, removeStore, setCookies, setStore} from '@/util/store'
-import {cancelToken, generateSalt, generateToken} from '@/api/token'
+import {getStore, removeCookies, removeStore, setCookies, setStore} from '@/util/store';
+import {cancelToken, generateSalt, generateToken} from '@/api/token';
 
 import common from "@/util/common";
 

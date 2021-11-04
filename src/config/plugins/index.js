@@ -1,6 +1,6 @@
-import '@/config/plugins/element/element.js'
-import '@/config/plugins/highlight/highlight.js'
-import '@/config/plugins/map/baidu-map.js'
+import '@/config/plugins/element/element.js';
+import '@/config/plugins/highlight/highlight.js';
+import '@/config/plugins/map/baidu-map.js';
 
 console.log(
     '.___     ___________ ________  _________ ________    __      __      ___.    \n' +

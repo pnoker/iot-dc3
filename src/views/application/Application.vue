@@ -8,7 +8,7 @@
             :src="iframeUrl"></iframe>
 </template>
 <script>
-    import {decode} from 'js-base64'
+    import {decode} from 'js-base64';
 
     export default {
         props: {

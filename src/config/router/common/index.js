@@ -4,7 +4,7 @@ export default [
         path: '/login',
         meta: {
             isAuth: false,
-            title: 'IoT DC3'
+            title: 'DC3 IoT 平台'
         },
         component: () => import('@/components/login/Login')
     }, {

@@ -14,7 +14,7 @@
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
                     <el-row>
-                        <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listDeviceData">
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listDeviceData">
                             <device-card
                                     :data="data"
                                     :driverTable="driverTable"
