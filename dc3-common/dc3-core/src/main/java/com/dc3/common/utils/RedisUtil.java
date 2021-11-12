@@ -64,6 +64,36 @@ public class RedisUtil {
     }
 
     /**
+     * 批量添加 Key 缓存
+     *
+     * @param key   String key
+     * @param value Object
+     */
+    public void setKeys(String key, Object value) {
+        try {
+            redisTemplate.opsForValue().set(key, value);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 批量添加 Key 缓存,并设置失效时间
+     *
+     * @param key   String key
+     * @param value Object
+     * @param time  Time
+     * @param unit  TimeUnit
+     */
+    public void setKeys(String key, Object value, long time, TimeUnit unit) {
+        try {
+            redisTemplate.opsForValue().set(key, value, time, unit);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
      * 添加 Key 缓存,并设置失效时间
      *
      * @param key   String key
@@ -139,7 +169,7 @@ public class RedisUtil {
      * @param time Time
      * @param unit TimeUnit
      */
-    public void expire(String key, long time, TimeUnit unit) {
+    public void setExpire(String key, long time, TimeUnit unit) {
         try {
             if (time > 0) {
                 redisTemplate.expire(key, time, unit);
@@ -156,7 +186,7 @@ public class RedisUtil {
      * @param unit TimeUnit
      * @return long
      */
-    public long expire(String key, TimeUnit unit) {
+    public long getExpire(String key, TimeUnit unit) {
         try {
             Long expire = redisTemplate.getExpire(key, unit);
             return null != expire ? expire : 0L;
