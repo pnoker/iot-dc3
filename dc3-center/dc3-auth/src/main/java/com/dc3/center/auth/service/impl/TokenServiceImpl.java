@@ -106,7 +106,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public boolean cancelToken(String username) {
-        redisUtil.removeKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username);
+        redisUtil.deleteKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username);
         return true;
     }
 
