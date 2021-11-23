@@ -1,6 +1,8 @@
- :rocket: 非常欢迎广大兴趣爱好者的加入，你的  `Star` 是我们开发的动力 :boom:！
+ :boom: `IoT DC3` 新版管理平台，迭代开发中... :boom:
 
- :seedling: 该 `Web UI` ，需要借助 `DC3` 平台服务，https://gitee.com/pnoker/iot-dc3
+:rocket: 非常欢迎广大兴趣爱好者的加入，你的  `Star` 是我们开发的动力 ！
+
+ :seedling: 该 `Web UI` ，需要借助 `DC3` 平台服务，`https://gitee.com/pnoker/iot-dc3` 或 `https://github.com/pnoker/iot-dc3`
 
 ------
 
@@ -37,7 +39,7 @@ npm install -g yarn
 ## 二、源码
 
 ```bash
-git clone https://gitee.com/pnoker/dc3-web.git
+git clone https://github.com/pnoker/iot-dc3-web.git
 ```
 
 
