@@ -47,7 +47,7 @@ git clone https://github.com/pnoker/iot-dc3-web.git
 ## 三、开发
 
   ```bash
-  cd dc3-web
+  cd iot-dc3-web
   
   # install
   yarn
