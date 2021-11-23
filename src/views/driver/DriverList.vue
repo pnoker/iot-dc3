@@ -12,23 +12,26 @@
             ></driver-tool>
         </el-row>
 
-        <el-row>
-            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
-                <driver-card
-                        :data="data"
-                        :statusTable="statusTable"
-                ></driver-card>
-            </el-col>
-        </el-row>
+        <blank-card>
+            <el-row>
+                <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
+                    <driver-card
+                            :data="data"
+                            :statusTable="statusTable"
+                    ></driver-card>
+                </el-col>
+            </el-row>
+        </blank-card>
     </div>
 </template>
 <script>
+    import blankCard from '@/components/card/blank-card';
     import driverTool from './DriverTool'
     import driverCard from './DriverCard'
     import {driverList, driverStatus} from "@/api/driver";
 
     export default {
-        components: {driverTool, driverCard},
+        components: {blankCard, driverTool, driverCard},
         data() {
             return {
                 statusTable: {},

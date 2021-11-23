@@ -3,7 +3,7 @@
         <base-card>
             <el-tabs v-model="active" @tab-click="changeActive">
                 <el-tab-pane label="设备详情" name="detail">
-                    <el-card shadow="hover">
+                    <detail-card>
                         <ul>
                             <li><i class="el-icon-data-line"></i> 设备名称: {{data.name}}</li>
                             <li><i class="el-icon-tickets"></i> 包含模板 [{{data.profileIds.length||0}} 个]: {{profileName(data.profileIds)}}</li>
@@ -12,7 +12,7 @@
                             <li><i class="el-icon-edit-outline"></i> 修改日期: {{timestamp(data.createTime)}}</li>
                             <li><i class="el-icon-sunset"></i> 创建日期: {{timestamp(data.updateTime)}}</li>
                         </ul>
-                    </el-card>
+                    </detail-card>
                 </el-tab-pane>
                 <el-tab-pane label="包含模板" name="profile">
                     <el-row>
@@ -91,14 +91,14 @@
     </div>
 </template>
 <script>
-    import baseCard from '@/components/card/base-card'
-    import detailCard from '@/components/card/detail-card'
-    import deviceCard from './DeviceCard'
-    import profileCard from '../profile/ProfileCard'
-    import pointCard from '../point/PointCard'
-    import pointValueCard from '../point/value/PointValueCard'
-    import pointValueEditForm from '../point/value/PointValueEditForm'
-    import pointValueDetail from '../point/value/PointValueDetail'
+    import baseCard from '@/components/card/base-card';
+    import detailCard from '@/components/card/detail-card';
+    import deviceCard from './DeviceCard';
+    import profileCard from '../profile/ProfileCard';
+    import pointCard from '../point/PointCard';
+    import pointValueCard from '../point/value/PointValueCard';
+    import pointValueEditForm from '../point/value/PointValueEditForm';
+    import pointValueDetail from '../point/value/PointValueDetail';
     import {deviceById, deviceStatus} from "@/api/device";
     import {driverDictionary, pointDictionary, profileDictionary} from "@/api/dictionary";
     import {dateFormat, setCopyContent} from "@/util/util";

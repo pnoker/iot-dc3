@@ -14,17 +14,19 @@
             ></device-tool>
         </el-row>
 
-        <el-row>
-            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
-                <device-card
-                        :data="data"
-                        :driverTable="driverTable"
-                        :profileTable="profileTable"
-                        :statusTable="statusTable"
-                        @delete-thing="deleteThing"
-                ></device-card>
-            </el-col>
-        </el-row>
+        <blank-card>
+            <el-row>
+                <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
+                    <device-card
+                            :data="data"
+                            :driverTable="driverTable"
+                            :profileTable="profileTable"
+                            :statusTable="statusTable"
+                            @delete-thing="deleteThing"
+                    ></device-card>
+                </el-col>
+            </el-row>
+        </blank-card>
 
         <device-add-form
                 ref="add-form"
@@ -35,6 +37,7 @@
     </div>
 </template>
 <script>
+    import blankCard from '@/components/card/blank-card';
     import deviceTool from './DeviceTool'
     import deviceAddForm from './DeviceAddForm'
     import deviceCard from './DeviceCard'
@@ -42,7 +45,7 @@
     import {driverDictionary, profileDictionary} from "@/api/dictionary";
 
     export default {
-        components: {deviceTool, deviceAddForm, deviceCard},
+        components: {blankCard, deviceTool, deviceAddForm, deviceCard},
         data() {
             return {
                 driverDictionary: [],

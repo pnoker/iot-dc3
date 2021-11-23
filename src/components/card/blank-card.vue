@@ -1,5 +1,5 @@
 <template>
-    <div class="detail-card">
+    <div class="blank-card">
         <el-card shadow="hover">
             <slot/>
         </el-card>
@@ -8,15 +8,12 @@
 
 <script>
     export default {
-        name: "detail-card"
+        name: "blank-card"
     };
 </script>
 
 <style lang="scss">
-    .detail-card {
-        margin-left: 3px;
-        margin-right: 3px;
-        margin-bottom: 6px;
+    .blank-card {
         border-radius: 5px;
         box-sizing: border-box;
 

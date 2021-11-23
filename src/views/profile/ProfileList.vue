@@ -13,15 +13,17 @@
             ></profile-tool>
         </el-row>
 
-        <el-row>
-            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
-                <profile-card
-                        :data="data"
-                        :pointTable="pointTable"
-                        @delete-thing="deleteThing"
-                ></profile-card>
-            </el-col>
-        </el-row>
+        <blank-card>
+            <el-row>
+                <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
+                    <profile-card
+                            :data="data"
+                            :pointTable="pointTable"
+                            @delete-thing="deleteThing"
+                    ></profile-card>
+                </el-col>
+            </el-row>
+        </blank-card>
 
         <profile-add-form
                 ref="add-form"
@@ -30,6 +32,7 @@
     </div>
 </template>
 <script>
+    import blankCard from '@/components/card/blank-card';
     import profileTool from './ProfileTool'
     import profileAddForm from './ProfileAddForm'
     import profileCard from './ProfileCard'
@@ -37,7 +40,7 @@
     import {pointDictionary} from "@/api/dictionary";
 
     export default {
-        components: {profileTool, profileAddForm, profileCard},
+        components: {blankCard, profileTool, profileAddForm, profileCard},
         data() {
             return {
                 pointDictionary: [],

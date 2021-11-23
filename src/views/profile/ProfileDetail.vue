@@ -3,7 +3,7 @@
         <base-card>
             <el-tabs v-model="active" @tab-click="changeActive">
                 <el-tab-pane label="模板详情" name="detail">
-                    <el-card shadow="hover">
+                    <detail-card>
                         <ul>
                             <li><i class="el-icon-data-line"></i> 模板名称: {{data.name}}</li>
                             <li><i class="el-icon-collection-tag"></i> 包含位号 [{{listPointData.length||0}} 个]: {{pointName()}}</li>
@@ -11,7 +11,7 @@
                             <li><i class="el-icon-edit-outline"></i> 修改日期: {{timestamp(data.createTime)}}</li>
                             <li><i class="el-icon-sunset"></i> 创建日期: {{timestamp(data.updateTime)}}</li>
                         </ul>
-                    </el-card>
+                    </detail-card>
                 </el-tab-pane>
                 <el-tab-pane label="包含位号" name="point">
                     <el-row>
@@ -42,9 +42,10 @@
     </div>
 </template>
 <script>
-    import baseCard from '@/components/card/base-card'
-    import deviceCard from '../device/DeviceCard'
-    import pointCard from '../point/PointCard'
+    import baseCard from '@/components/card/base-card';
+    import detailCard from '@/components/card/detail-card';
+    import deviceCard from '../device/DeviceCard';
+    import pointCard from '../point/PointCard';
     import {dateFormat, setCopyContent} from "@/util/util";
     import {profileById} from "@/api/profile";
     import {pointByProfileId} from "@/api/point";
@@ -52,7 +53,7 @@
     import {driverDictionary, profileDictionary} from "@/api/dictionary";
 
     export default {
-        components: {baseCard, deviceCard, pointCard},
+        components: {baseCard, detailCard, deviceCard, pointCard},
         data() {
             return {
                 id: this.$route.query.id,

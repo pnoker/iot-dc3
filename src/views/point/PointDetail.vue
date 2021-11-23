@@ -3,14 +3,14 @@
         <base-card>
             <el-tabs v-model="active" @tab-click="changeActive">
                 <el-tab-pane label="位号详情" name="detail">
-                    <el-card shadow="hover">
+                    <detail-card>
                         <ul>
                             <li><i class="el-icon-data-line"></i> 位号名称: {{data.name}}</li>
                             <li><i class="el-icon-collection-tag"></i> 关联设备 [{{listDeviceData.length||0}} 个]: {{deviceName()}}</li>
                             <li><i class="el-icon-edit-outline"></i> 修改日期: {{timestamp(data.createTime)}}</li>
                             <li><i class="el-icon-sunset"></i> 创建日期: {{timestamp(data.updateTime)}}</li>
                         </ul>
-                    </el-card>
+                    </detail-card>
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
                     <el-row>
@@ -31,6 +31,7 @@
 </template>
 <script>
     import baseCard from '@/components/card/base-card';
+    import detailCard from '@/components/card/detail-card';
     import deviceCard from '../device/DeviceCard';
     import pointCard from '../point/PointCard';
     import {dateFormat, setCopyContent} from "@/util/util";
@@ -39,7 +40,7 @@
     import {driverById} from "@/api/driver";
 
     export default {
-        components: {baseCard, deviceCard, pointCard},
+        components: {baseCard, detailCard, deviceCard, pointCard},
         data() {
             return {
                 id: this.$route.query.id,
