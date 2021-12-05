@@ -22,17 +22,19 @@ import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.driver.bean.Plcs7PointVariable;
+import com.dc3.driver.bean.PlcS7PointVariable;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
 import com.github.s7connector.api.factory.S7ConnectorFactory;
 import com.github.s7connector.api.factory.S7SerializerFactory;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.dc3.common.sdk.util.DriverUtils.attribute;
 import static com.dc3.common.sdk.util.DriverUtils.value;
@@ -52,7 +54,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * Plc Connector Map
      */
-    private volatile Map<Long, S7Connector> s7ConnectorMap;
+    private volatile Map<Long, MyS7Connector> s7ConnectorMap;
+
+    @Data
+    private static class MyS7Connector {
+        private ReentrantReadWriteLock lock;
+        private S7Connector connector;
+    }
 
     @Override
     public void initial() {
@@ -62,18 +70,38 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
         log.debug("Plc S7 Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
-        S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
-        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getType());
-        return String.valueOf(serializer.dispense(plcs7PointVariable));
+        MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
+        myS7Connector.lock.writeLock().lock();
+        S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
+        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getType());
+
+        try {
+            return String.valueOf(serializer.dispense(plcs7PointVariable));
+        } catch (Exception e) {
+            log.error("Plc S7 Read Error: {}", e.getMessage());
+            return "nil";
+        } finally {
+            myS7Connector.lock.writeLock().unlock();
+        }
     }
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        log.debug("Plc S7 Read, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
-        S7Serializer serializer = getS7Serializer(device.getId(), driverInfo);
-        Plcs7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType());
-        store(serializer, plcs7PointVariable, value.getType(), value.getValue());
-        return true;
+        log.debug("Plc S7 Write, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
+        MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
+        myS7Connector.lock.writeLock().lock();
+        S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
+        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType());
+
+        try {
+            store(serializer, plcs7PointVariable, value.getType(), value.getValue());
+            return true;
+        } catch (Exception e) {
+            log.error("Plc S7 Write Error: {}", e.getMessage());
+            return false;
+        } finally {
+            myS7Connector.lock.writeLock().unlock();
+        }
     }
 
     @Override
@@ -101,21 +129,25 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo DeviceInfo Map
      * @return S7Serializer
      */
-    private S7Serializer getS7Serializer(Long deviceId, Map<String, AttributeInfo> driverInfo) {
-        S7Connector s7Connector = s7ConnectorMap.get(deviceId);
-        if (null == s7Connector) {
+    private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeInfo> driverInfo) {
+        MyS7Connector myS7Connector = s7ConnectorMap.get(deviceId);
+        if (null == myS7Connector) {
+            myS7Connector = new MyS7Connector();
+
             log.debug("Plc S7 Connection Info {}", JSON.toJSONString(driverInfo));
             try {
-                s7Connector = S7ConnectorFactory.buildTCPConnector().withHost(attribute(driverInfo, "host")).withPort(attribute(driverInfo, "port")).build();
+                S7Connector s7Connector = S7ConnectorFactory.buildTCPConnector()
+                        .withHost(attribute(driverInfo, "host"))
+                        .withPort(attribute(driverInfo, "port"))
+                        .build();
+                myS7Connector.setLock(new ReentrantReadWriteLock());
+                myS7Connector.setConnector(s7Connector);
             } catch (Exception e) {
                 throw new ServiceException("new s7connector fail" + e.getMessage());
             }
+            s7ConnectorMap.put(deviceId, myS7Connector);
         }
-        if (null != s7Connector) {
-            s7ConnectorMap.put(deviceId, s7Connector);
-            return S7SerializerFactory.buildSerializer(s7Connector);
-        }
-        throw new ServiceException("new s7connector fail");
+        return myS7Connector;
     }
 
     /**
@@ -124,43 +156,43 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo PointInfo Map
      * @return Plcs7PointVariable
      */
-    private Plcs7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo, String type) {
+    private PlcS7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo, String type) {
         log.debug("Plc S7 Point Info {}", JSON.toJSONString(pointInfo));
-        return new Plcs7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), type);
+        return new PlcS7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), type);
     }
 
     /**
      * 向 Plc S7 写数据
      *
      * @param serializer         S7Serializer
-     * @param plcs7PointVariable Plcs7PointVariable
+     * @param plcS7PointVariable Plcs7PointVariable
      * @param type               Value Type
      * @param value              String Value
      */
-    private void store(S7Serializer serializer, Plcs7PointVariable plcs7PointVariable, String type, String value) {
+    private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
         switch (type.toLowerCase()) {
             case Common.ValueType.INT:
                 int intValue = value(type, value);
-                serializer.store(intValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                serializer.store(intValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case Common.ValueType.LONG:
                 long longValue = value(type, value);
-                serializer.store(longValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                serializer.store(longValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case Common.ValueType.FLOAT:
                 float floatValue = value(type, value);
-                serializer.store(floatValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                serializer.store(floatValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case Common.ValueType.DOUBLE:
                 double doubleValue = value(type, value);
-                serializer.store(doubleValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                serializer.store(doubleValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case Common.ValueType.BOOLEAN:
                 boolean booleanValue = value(type, value);
-                serializer.store(booleanValue, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                serializer.store(booleanValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case Common.ValueType.STRING:
-                serializer.store(value, plcs7PointVariable.getDbNum(), plcs7PointVariable.getByteOffset());
+                serializer.store(value, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             default:
                 break;

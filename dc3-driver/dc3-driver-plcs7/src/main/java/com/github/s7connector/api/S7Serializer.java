@@ -12,7 +12,7 @@
  */
 package com.github.s7connector.api;
 
-import com.dc3.driver.bean.Plcs7PointVariable;
+import com.dc3.driver.bean.PlcS7PointVariable;
 import com.github.s7connector.exception.S7Exception;
 
 /**
@@ -53,7 +53,7 @@ public interface S7Serializer {
      * @return
      * @throws S7Exception the s7 exception
      */
-    Object dispense(Plcs7PointVariable plcs7PointVariable) throws S7Exception;
+    Object dispense(PlcS7PointVariable plcs7PointVariable) throws S7Exception;
 
     /**
      * Stores an Object to the Datablock.
