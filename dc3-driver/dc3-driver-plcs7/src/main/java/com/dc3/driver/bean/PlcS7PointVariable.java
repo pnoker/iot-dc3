@@ -28,7 +28,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Plcs7PointVariable {
+public class PlcS7PointVariable {
     private int dbNum;
     private int byteOffset;
     private int bitOffset;
@@ -36,7 +36,7 @@ public class Plcs7PointVariable {
     private S7Type type;
     private Class<?> fieldType;
 
-    public Plcs7PointVariable(int dbNum, int byteOffset, int bitOffset, int size, String s7Type) {
+    public PlcS7PointVariable(int dbNum, int byteOffset, int bitOffset, int size, String s7Type) {
         this.dbNum = dbNum;
         this.byteOffset = byteOffset;
         this.bitOffset = bitOffset;

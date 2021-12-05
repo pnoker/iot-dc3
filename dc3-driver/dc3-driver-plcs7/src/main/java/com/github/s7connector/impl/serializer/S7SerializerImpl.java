@@ -12,7 +12,7 @@
  */
 package com.github.s7connector.impl.serializer;
 
-import com.dc3.driver.bean.Plcs7PointVariable;
+import com.dc3.driver.bean.PlcS7PointVariable;
 import com.github.s7connector.api.DaveArea;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
@@ -30,7 +30,7 @@ import java.lang.reflect.Array;
 @Slf4j
 public final class S7SerializerImpl implements S7Serializer {
 
-    public static Object extractBytes(Plcs7PointVariable plcs7PointVariable, final byte[] buffer, final int byteOffset) {
+    public static Object extractBytes(PlcS7PointVariable plcs7PointVariable, final byte[] buffer, final int byteOffset) {
         try {
             final BeanEntry entry = BeanParser.parse(plcs7PointVariable);
             return entry.serializer.extract(entry.type, buffer, entry.byteOffset + byteOffset, entry.bitOffset);
@@ -171,7 +171,7 @@ public final class S7SerializerImpl implements S7Serializer {
      * add by pnoker
      */
     @Override
-    public Object dispense(Plcs7PointVariable plcs7PointVariable) throws S7Exception {
+    public Object dispense(PlcS7PointVariable plcs7PointVariable) throws S7Exception {
         try {
             final byte[] buffer = this.connector.read(DaveArea.DB, plcs7PointVariable.getDbNum(), plcs7PointVariable.getSize(), plcs7PointVariable.getByteOffset());
             return extractBytes(plcs7PointVariable, buffer, 0);
