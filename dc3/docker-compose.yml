@@ -504,6 +504,25 @@ services:
         aliases:
           - dc3-opentsdb
 
+  influxdb:
+    build:
+      context: ./dependencies/influxdb/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-influxdb:1.0.0
+    restart: always
+    ports:
+      - 8086:8086
+    container_name: dc3-influxdb
+    hostname: dc3-influxdb
+    volumes:
+      - influxdb:/var/lib/influxdb
+      - influxdb2:/var/lib/influxdb2
+      - influxdb2_etc:/etc/influxdb2
+    networks:
+      dc3net:
+        aliases:
+          - dc3-influxdb
+
   redis:
     build:
       context: ./dependencies/redis/
@@ -669,6 +688,9 @@ volumes:
   opentsdb_data:
   opentsdb_tmp:
   opentsdb_plugins:
+  influxdb:
+  influxdb2:
+  influxdb2_etc:
   portainer:
 
 networks:
