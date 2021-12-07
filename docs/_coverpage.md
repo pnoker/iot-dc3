@@ -14,5 +14,4 @@
 
 [Gitee](https://gitee.com/pnoker/iot-dc3)
 [GitHub](https://github.com/pnoker/iot-dc3)
-[Demo Application](https://web.dc3.site)
 [马上开始](home.md)

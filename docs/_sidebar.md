@@ -47,12 +47,15 @@
   - [3.13 Http Code](tip/http-code.md)
   - [3.14 String.format()](tip/string-format.md)
 
-- 4.错误
-  - [4.1 Mongo 启动失败](error/mongo-error.md)
-  - [4.2 DC3 Start 依赖包引用失败](error/dc3-start-error.md)
-  - [4.3 重置 MySQL 服务](error/reset-mysql-error.md)
-  - [4.4 重置 Redis 服务](error/reset-redis-error.md)
-  - [4.5 重置 Mongo 服务](error/reset-mongo-error.md)
-  - [4.6 重置 Rabbitmq 服务](error/reset-rabbitmq-error.md)
+- 4.集群
+  - [4.1 Mongo 集群部署](cluster/mongo.md)
+  
+- 5.错误
+  - [5.1 Mongo 启动失败](error/mongo-error.md)
+  - [5.2 DC3 Start 依赖包引用失败](error/dc3-start-error.md)
+  - [5.3 重置 MySQL 服务](error/reset-mysql-error.md)
+  - [5.4 重置 Redis 服务](error/reset-redis-error.md)
+  - [5.5 重置 Mongo 服务](error/reset-mongo-error.md)
+  - [5.6 重置 Rabbitmq 服务](error/reset-rabbitmq-error.md)
     
-- [5 关于项目](about.md)
+- [6 关于项目](about.md)
