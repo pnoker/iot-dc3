@@ -15,12 +15,15 @@ package com.dc3.common.utils;
 
 import cn.hutool.core.convert.Convert;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,22 +35,6 @@ public class RedisUtil {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
-
-    /**
-     * 判断 Key 是否存在
-     *
-     * @param key String key
-     * @return boolean
-     */
-    public boolean hasKey(String key) {
-        try {
-            Boolean hasKey = redisTemplate.hasKey(key);
-            return null != hasKey ? hasKey : false;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return false;
-    }
 
     /**
      * 添加 Key 缓存
@@ -64,36 +51,6 @@ public class RedisUtil {
     }
 
     /**
-     * 批量添加 Key 缓存
-     *
-     * @param key   String key
-     * @param value Object
-     */
-    public void setKeys(String key, Object value) {
-        try {
-            redisTemplate.opsForValue().set(key, value);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 批量添加 Key 缓存,并设置失效时间
-     *
-     * @param key   String key
-     * @param value Object
-     * @param time  Time
-     * @param unit  TimeUnit
-     */
-    public void setKeys(String key, Object value, long time, TimeUnit unit) {
-        try {
-            redisTemplate.opsForValue().set(key, value, time, unit);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
      * 添加 Key 缓存,并设置失效时间
      *
      * @param key   String key
@@ -104,6 +61,34 @@ public class RedisUtil {
     public void setKey(String key, Object value, long time, TimeUnit unit) {
         try {
             redisTemplate.opsForValue().set(key, value, time, unit);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 批量添加 Key 缓存
+     *
+     * @param valuesMap Map<String, Object>
+     */
+    public void setKey(Map<String, Object> valuesMap) {
+        try {
+            redisTemplate.opsForValue().multiSet(valuesMap);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 批量添加 Key 缓存,并设置失效时间
+     *
+     * @param valueMap     Map<String, Object>
+     * @param expireMillis Map<String, Long>
+     */
+    public void setKey(Map<String, Object> valueMap, Map<String, Long> expireMillis) {
+        try {
+            redisTemplate.opsForValue().multiSet(valueMap);
+            setExpire(expireMillis);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -127,13 +112,13 @@ public class RedisUtil {
     }
 
     /**
-     * 获取 Keys 缓存
+     * 批量获取 Key 缓存
      *
      * @param keys String key array
      * @param <T>  T
      * @return T Array
      */
-    public <T> List<T> getKeys(List<String> keys, Class<T> type) {
+    public <T> List<T> getKey(List<String> keys, Class<T> type) {
         try {
             List<Object> objects = redisTemplate.opsForValue().multiGet(keys);
             return Convert.toList(type, objects);
@@ -144,22 +129,47 @@ public class RedisUtil {
     }
 
     /**
-     * 删除 Keys 缓存
+     * 删除 Key 缓存
+     *
+     * @param key Key
+     */
+    public void deleteKey(String key) {
+        try {
+            redisTemplate.delete(key);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 批量删除 Key 缓存
      *
      * @param keys Key Array
      */
-    public void removeKey(String... keys) {
-        if (null != keys && keys.length > 0) {
+    public void deleteKey(List<String> keys) {
+        if (null != keys && keys.size() > 0) {
             try {
-                if (keys.length == 1) {
-                    redisTemplate.delete(keys[0]);
-                } else {
-                    redisTemplate.delete(Arrays.asList(keys));
-                }
+                redisTemplate.delete(keys);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * 判断 Key 是否存在
+     *
+     * @param key String key
+     * @return boolean
+     */
+    public boolean hasKey(String key) {
+        try {
+            Boolean hasKey = redisTemplate.hasKey(key);
+            return null != hasKey ? hasKey : false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return false;
     }
 
     /**
@@ -173,6 +183,47 @@ public class RedisUtil {
         try {
             if (time > 0) {
                 redisTemplate.expire(key, time, unit);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 批量指定键值失效时间
+     *
+     * @param expireMillis Map<String, Long>
+     */
+    public void setExpire(Map<String, Long> expireMillis) {
+        try {
+            if (null != expireMillis && expireMillis.size() > 0) {
+                StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+                redisTemplate.execute((RedisCallback<Object>) connection -> {
+                    expireMillis.forEach((key, expire) -> {
+                        byte[] serialize = stringRedisSerializer.serialize(key);
+                        if (null != serialize) {
+                            connection.pExpire(serialize, expire);
+                        }
+                    });
+                    return null;
+                });
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 指定键值在指定时间失效
+     *
+     * @param key  String key
+     * @param date Date
+     */
+    public void setExpireAt(String key, Date date) {
+        try {
+            Date current = new Date();
+            if (date.getTime() >= current.getTime()) {
+                redisTemplate.expireAt(key, date);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -195,4 +246,5 @@ public class RedisUtil {
         }
         return 0L;
     }
+
 }
