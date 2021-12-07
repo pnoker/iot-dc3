@@ -134,7 +134,7 @@ public class PointValueServiceImpl implements PointValueService {
             String prefix = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_";
             List<String> keys = listR.getData().stream().map(point -> prefix + point.getId()).collect(Collectors.toList());
             if (keys.size() > 0) {
-                List<PointValue> pointValues = redisUtil.getKeys(keys, PointValue.class);
+                List<PointValue> pointValues = redisUtil.getKey(keys, PointValue.class);
                 pointValues = pointValues.stream().filter(Objects::nonNull).map(pointValue -> pointValue.setTimeOut(null).setTimeUnit(null)).collect(Collectors.toList());
                 if (pointValues.size() > 0) {
                     return pointValues;
@@ -318,7 +318,15 @@ public class PointValueServiceImpl implements PointValueService {
      * @param pointValues Point Value Array
      */
     private void savePointValuesToRedis(final List<PointValue> pointValues) {
-        pointValues.forEach(this::savePointValueToRedis);
+        Map<String, Object> valueMap = new HashMap<>(16);
+        Map<String, Long> expireMap = new HashMap<>(16);
+        for (PointValue pointValue : pointValues) {
+            String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
+            String key = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey;
+            valueMap.put(key, pointValue);
+            expireMap.put(key, pointValue.getTimeUnit().toMillis(pointValue.getTimeOut()));
+        }
+        redisUtil.setKey(valueMap, expireMap);
     }
 
     private PointValue latestPointValue(Long deviceId, Long pointId) {
