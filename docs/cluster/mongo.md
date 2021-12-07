@@ -2,19 +2,19 @@
 
 
 
-### 1. 分片集群架构
+### 1. 分片复制集群架构
 
 ![](../images/dc3/cluster/mongo/mongo-1.png)
 
 > - `mongos`：提供路由数据库集群请求的入口，所有的请求都通过 `mongos` 进行协调，不需要在应用程序添加一个路由选择器，`mongos` 自己就是一个请求分发中心，它负责把对应的数据请求转发到对应的 `shard` 服务器上。在生产环境通常有多 `mongos` 作为请求的入口，防止其中一个挂掉所有的 `mongodb` 请求都没有办法操作。
 > - `config server`：为配置服务器，存储所有数据库元信息（路由、分片）的配置。`mongos` 本身没有物理存储分片服务器和数据路由信息，只是缓存在内存里，配置服务器则实际存储这些数据。`mongos` 第一次启动或者关掉重启就会从 `config server` 加载配置信息，以后如果配置服务器信息变化会通知到所有的 `mongos` 更新自己的状态，这样 `mongos` 就能继续准确路由。在生产环境通常有多个 `config server` 配置服务器，因为它存储了分片路由的元数据，防止数据丢失！
-> - shard：分片（`sharding`）是指将数据库拆分，将其分散在不同的机器上的过程。将数据分散到不同的机器上，不需要功能强大的服务器就可以存储更多的数据和处理更大的负载。基本思想就是将集合切成小块，这些块分散到若干片里，每个片只负责总数据的一部分，最后通过一个均衡器来对各个分片进行均衡（数据迁移）。
+> - shard：分片（`sharding`）是指将数据库拆分，将其分散在不同的机器上的过程。将数据分散到不同的机器上，不需要功能强大的服务器就可以存储更多的数据和处理更大的负载。基本思想就是将集合切成小块，这些块分散到若干片里，每个片只负责总数据的一部分，最后通过一个均衡器来对各个分片进行均衡（数据迁移），从3.6版本开始，每个 `shard` 必须部署为副本集（`replica set`）架构。
 
 
 
 ### 2. 集群部署规划
 
-| `name` | `ip` | `mongos` |  `config server`    | `replica set 1` |  `replica set 2`   |
+| `name` | `ip` | `mongos` |  `config server`    | `shard cluster 1` |  `shard cluster 2`   |
 | :-----: | :------: | :--: | :--: | :--: | :--: |
 | `node-01` | 127.0.0.1 | 27090 | 27080 | 27117 | 27217 |
 | `node-02` | 127.0.0.1 | 27091 | 27081 | 27118 | 27218 |
@@ -49,11 +49,11 @@ cd bin
 
 
 
-### 4. 配置 `shard` 分片集群
+### 4. 配置 `shard` 复制集
 
 #### 4.1 创建文件目录
 
->  分别创建两个分片集（`shard-cluster`）目录，多个以此类推 `shard-cluster-N`
+>  分别创建两个复制集（`shard-cluster`）目录，多个以此类推 `shard-cluster-N`
 
 ```bash
 cd /data
@@ -63,7 +63,7 @@ mkdir -p mongodb/dc3/shard-cluster-01 mongodb/dc3/shard-cluster-02
 
 
 
-> 为每个分片集创建三个 `node` 节点目录，多个以此类推 `node-N`
+> 为每个复制集创建三个分片 `node` 节点目录，多个以此类推 `node-N`
 
 ```bash
 cd shard-cluster-N
@@ -73,7 +73,7 @@ mkdir node-01 node-02 node-03
 
 
 
-> 为每个节点创建配置、数据、日志和Key目录，其他节点操作一致
+> 为每个分片节点创建配置、数据、日志和Key目录，其他节点操作一致
 
 ```bash
 cd node-N
@@ -85,7 +85,7 @@ mkdir data etc keys logs
 
 #### 4.2 配置文件
 
-> 在每个节点的 `etc` 下添加配置文件 `mongo.conf `
+> 在每个分片节点的 `etc` 下添加配置文件 `mongo.conf `
 
 ```yaml
 processManagement:
@@ -156,16 +156,22 @@ replication:
 /usr/local/mongodb/bin/mongod -f /data/mongodb/dc3/shard-cluster-01/node-02/etc/mongo.conf
 
 /usr/local/mongodb/bin/mongod -f /data/mongodb/dc3/shard-cluster-01/node-03/etc/mongo.conf
+
+/usr/local/mongodb/bin/mongod -f /data/mongodb/dc3/shard-cluster-02/node-01/etc/mongo.conf
+
+/usr/local/mongodb/bin/mongod -f /data/mongodb/dc3/shard-cluster-02/node-02/etc/mongo.conf
+
+/usr/local/mongodb/bin/mongod -f /data/mongodb/dc3/shard-cluster-02/node-03/etc/mongo.conf
 ```
 
 
 
-#### 4.4 配置 `node` 节点到同一个 `shard` 分片集
+#### 4.4 分片 `node` 节点配置到 `shard` 复制集
 
-> 不同  `shard` 分片集中的节点操作一致
+> 不同  `shard` 复制集中的分片节点操作一致
 
 ```bash
-# 登录任意一个 node 节点
+# 登录第一个复制集中任意一个分片 node 节点
 /usr/local/mongodb/bin/mongo --port 27117
 
 # 执行以下配置，注意 id、ip、port 配置无误
@@ -183,6 +189,38 @@ config = {
     {
       "_id": 2,
       "host": "127.0.0.1:27119"
+    }
+  ]
+};
+
+rs.initiate(config);
+
+# 查看分片集中的节点状态
+rs.status();
+
+# 退出
+exit
+
+---
+
+# 登录第二个复制集中任意一个分片 node 节点
+/usr/local/mongodb/bin/mongo --port 27217
+
+# 执行以下配置，注意 id、ip、port 配置无误
+config = {
+  "_id": "dc3_replica_2",
+  "members": [
+    {
+      "_id": 0,
+      "host": "127.0.0.1:27217"
+    },
+    {
+      "_id": 1,
+      "host": "127.0.0.1:27218"
+    },
+    {
+      "_id": 2,
+      "host": "127.0.0.1:27219"
     }
   ]
 };
@@ -304,7 +342,7 @@ replication:
 
 
 
-#### 5.4 配置 `node` 节点到同一个 `config server` 服务
+#### 5.4 配置 `node` 节点到 `config server` 服务
 
 ```bash
 # 登录任意一个 node 节点
@@ -373,7 +411,7 @@ mkdir etc  keys  logs
 
 #### 6.2 配置文件
 
-在每个节点的 `etc` 下添加配置文件 `mongos.conf `
+> 在每个节点的 `etc` 下添加配置文件 `mongos.conf `
 
 ```yaml
 processManagement:
@@ -413,13 +451,14 @@ sharding:
 
 
 
-#### 6.4 配置 `shard` 分片到 `mongos` 服务
+#### 6.4 配置 `shard` 复制集到 `mongos` 服务
 
 ```bash
 # 登录任意一个 node 节点
 /usr/local/mongodb/bin/mongo --port 27090
 
 sh.addShard("dc3_replica_1/127.0.0.1:27117,127.0.0.1:27118,127.0.0.1:27119");
+sh.addShard("dc3_replica_2/127.0.0.1:27217,127.0.0.1:27218,127.0.0.1:27219");
 
 # 查看路由服务节点的状态
 sh.status();
