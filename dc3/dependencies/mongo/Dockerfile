@@ -22,8 +22,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-mongo
 
-COPY ./iot-dc3.js ./config/
-COPY ./launch.sh ./
+COPY ./iot-dc3.js  ./config/
+COPY ./launch.sh   ./
 
 RUN chmod +x ./launch.sh
 

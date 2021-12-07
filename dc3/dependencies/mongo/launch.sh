@@ -18,11 +18,13 @@
 
 set -e
 
-mongod --smallfiles --bind_ip_all &
+mongod &
 
 while true; do
   mongo /dc3-mongo/config/iot-dc3.js && break
   sleep 5
 done
+
+mongod --shutdown && mongod --auth --smallfiles --bind_ip_all &
 
 wait
