@@ -49,6 +49,7 @@
 
 - 4.集群
   - [4.1 Mongo 集群部署](cluster/mongo.md)
+  - [4.2 Redis 集群部署](cluster/redis.md)
   
 - 5.错误
   - [5.1 Mongo 启动失败](error/mongo-error.md)
