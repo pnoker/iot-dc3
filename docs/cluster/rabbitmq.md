@@ -1078,7 +1078,7 @@ mqtt.default_pass = dc3
 ## credentials in order to connect. See also the mqtt.default_user/mqtt.default_pass
 ## keys. Anonymous connections are highly discouraged!
 ##
-mqtt.allow_anonymous = true
+mqtt.allow_anonymous = false
 
 ## If you have multiple vhosts, specify the one to which the
 ## adapter connects.
