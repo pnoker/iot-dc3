@@ -1375,17 +1375,3 @@ CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf
 
 /data/rabbitmq/dc3/node-03/sbin/rabbitmq-diagnostics status
 ```
-
-
-
-> **高可用 - 主从复制配置**
->
-> `CLUSTER REPLICATE <node_id>` 用来让集群中接收命令的节点成为 `node_id` 所指定节点的从节点，并开始对主节点进行复制。
-
-```bash
-/usr/local/redis/src/redis-cli -p 6101 cluster replicate a22940cd650ecbf823293f08836c8375199f7d1e
-
-/usr/local/redis/src/redis-cli -p 6201 cluster replicate c348f29d5aa3ac65593ed97fccabd36e7677ae41
-
-/usr/local/redis/src/redis-cli -p 6301 cluster replicate c5f306ea99017b59e1621e51875f81fdbf928fe7
-```
