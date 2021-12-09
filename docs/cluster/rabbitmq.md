@@ -80,14 +80,12 @@ cp -r rabbitmq-server/* rabbitmq/dc3/node-01/
 
 
 
-
-
-> 为每个节点创建配置目录，其他节点操作一致
+> 为每个节点创建配置和 `keys` 目录，其他节点操作一致
 
 ```bash
 cd node-N
 
-mkdir -p etc/rabbitmq
+mkdir -p etc/rabbitmq keys
 ```
 
 
