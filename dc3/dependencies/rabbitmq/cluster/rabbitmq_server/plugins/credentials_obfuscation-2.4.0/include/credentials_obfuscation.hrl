@@ -1,1 +1,0 @@
--define(PENDING_SECRET, '$pending-secret').
