@@ -2,7 +2,7 @@
 
 
 
-### 1. 分片复制集群架构
+### 1. 集群架构
 
 ![](../images/dc3/cluster/mongo/mongo-1.png)
 
@@ -28,7 +28,7 @@
 
 ### 3. 下载安装文件
 
-> 下载安装文件
+> 下载文件
 
 - 以 `Ubuntu` 为例： https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.5.tgz
 
@@ -36,12 +36,18 @@
 
 
 
-> 解压并验证安装包是否可用
+> 解压文件
 
 ```bash
 # 解压
 tar zxvf mongodb-linux-x86_64-ubuntu2004-5.0.5.tgz
+```
 
+
+
+> 校验文件
+
+```bash
 # 进入 bin 目录，测试 mongod 是否可用
 cd bin
 ./mongod -h
