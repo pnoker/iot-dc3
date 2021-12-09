@@ -84,6 +84,12 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
 
+        <!-- Spring Validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
         <!-- Spring Cache -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

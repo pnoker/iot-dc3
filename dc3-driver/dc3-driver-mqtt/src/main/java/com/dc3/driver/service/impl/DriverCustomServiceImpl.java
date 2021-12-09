@@ -49,6 +49,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
+        // 因为 MQTT 的数据来源是被动接收的，所以无需实现该 Read 方法
+        // 接收数据处理函数在 com.dc3.driver.mqtt.handler.MqttReceiveHandler.handlerValue
         return "nil";
     }
 
