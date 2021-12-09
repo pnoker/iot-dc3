@@ -1,0 +1,12 @@
+{application,syslog,
+             [{description,"An RFC 3164 and RFC 5424 compliant logging framework."},
+              {vsn,"4.0.0"},
+              {registered,[syslog_logger]},
+              {applications,[kernel,stdlib,sasl]},
+              {mod,{syslog,[]}},
+              {env,[{logger,[{handler,syslog,syslog_logger_h,#{}}]}]},
+              {maintainers,["Tobias Schlager"]},
+              {licenses,["MIT"]},
+              {links,[{"Github","https://github.com/schlagert/syslog"}]},
+              {pkg_name,syslog_app},
+              {modules, ['syslog','syslog_error_h','syslog_lager_backend','syslog_lib','syslog_logger','syslog_logger_h','syslog_monitor','syslog_rfc3164','syslog_rfc5424']}]}.

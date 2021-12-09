@@ -1,0 +1,2 @@
+-record (group, {v :: number(), g :: number(), delta :: number(), rank :: number()}).
+-record (quantile_estimator, {samples_count :: number(), data_count :: number(), inserts_since_compression :: number(), data :: [#group{}], invariant :: function()}).

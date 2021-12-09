@@ -1,0 +1,10 @@
+{application,ra,
+             [{description,"Raft library"},
+              {vsn,"2.0.3"},
+              {licenses,["Apache","MPL"]},
+              {links,[{"github","https://github.com/rabbitmq/ra"}]},
+              {modules, ['ra','ra_app','ra_bench','ra_counters','ra_dbg','ra_directory','ra_env','ra_file_handle','ra_flru','ra_leaderboard','ra_lib','ra_log','ra_log_ets','ra_log_meta','ra_log_pre_init','ra_log_reader','ra_log_segment','ra_log_segment_writer','ra_log_snapshot','ra_log_sup','ra_log_wal','ra_log_wal_sup','ra_machine','ra_machine_ets','ra_machine_simple','ra_metrics_ets','ra_monitors','ra_server','ra_server_proc','ra_server_sup','ra_server_sup_sup','ra_snapshot','ra_sup','ra_system','ra_system_sup','ra_systems_sup']},
+              {registered,[ra_sup]},
+              {applications,[kernel,stdlib,sasl,crypto,aten,gen_batch_server]},
+              {mod,{ra_app,[]}},
+              {env,[]}]}.
