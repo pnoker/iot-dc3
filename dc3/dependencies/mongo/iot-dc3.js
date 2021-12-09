@@ -12,9 +12,24 @@
  */
 
 db = db.getSiblingDB("admin");
-if (!db.getUser("dc3")) {
+db = db.getSiblingDB("authorization");
+if (!db.getUser("admin")) {
     db.createUser({
-        user: "dc3",
+        user: "admin",
+        pwd: "dc3",
+        roles: [
+            {
+                role: "readWrite",
+                db: "authorization",
+            },
+        ],
+    });
+}
+
+db = db.getSiblingDB("admin");
+if (!db.getUser("admin")) {
+    db.createUser({
+        user: "admin",
         pwd: "dc3",
         roles: [
             {
@@ -26,7 +41,6 @@ if (!db.getUser("dc3")) {
 }
 
 db = db.getSiblingDB("dc3");
-
 if (!db.getUser("dc3")) {
     db.createUser({
         user: "dc3",

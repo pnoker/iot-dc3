@@ -1,0 +1,12 @@
+{application,recon,
+             [{description,"Diagnostic tools for production use"},
+              {vsn,"2.5.1"},
+              {modules, ['recon','recon_alloc','recon_lib','recon_map','recon_rec','recon_trace']},
+              {registered,[]},
+              {applications,[kernel,stdlib]},
+              {licenses,["BSD"]},
+              {links,[{"Github","https://github.com/ferd/recon/"},
+                      {"Documentation","http://ferd.github.io/recon/"}]},
+              {build_tools,["mix","rebar3"]},
+              {files,["src/","script/","rebar.lock","mix.exs","README.md",
+                      "LICENSE"]}]}.

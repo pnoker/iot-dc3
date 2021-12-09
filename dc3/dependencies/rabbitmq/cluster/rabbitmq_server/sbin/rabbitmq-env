@@ -1,0 +1,194 @@
+#!/bin/sh -e
+##  This Source Code Form is subject to the terms of the Mozilla Public
+##  License, v. 2.0. If a copy of the MPL was not distributed with this
+##  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+##
+##  Copyright (c) 2007-2020 VMware, Inc. or its affiliates.  All rights reserved.
+##
+
+if [ "$RABBITMQ_ENV_LOADED" = 1 ]; then
+    return 0;
+fi
+
+if [ -z "$RABBITMQ_SCRIPTS_DIR" ]; then
+    # We set +e here since since our test for "readlink -f" below needs to
+    # be able to fail.
+    set +e
+    # Determine where this script is really located (if this script is
+    # invoked from another script, this is the location of the caller)
+    SCRIPT_PATH="$0"
+    while [ -h "$SCRIPT_PATH" ] ; do
+        # Determine if readlink -f is supported at all. TODO clean this up.
+        FULL_PATH=`readlink -f $SCRIPT_PATH 2>/dev/null`
+        if [ "$?" != "0" ]; then
+          REL_PATH=`readlink $SCRIPT_PATH`
+          if expr "$REL_PATH" : '/.*' > /dev/null; then
+            SCRIPT_PATH="$REL_PATH"
+          else
+            SCRIPT_PATH="`dirname "$SCRIPT_PATH"`/$REL_PATH"
+          fi
+        else
+          SCRIPT_PATH=$FULL_PATH
+        fi
+    done
+    set -e
+
+    RABBITMQ_SCRIPTS_DIR=`dirname $SCRIPT_PATH`
+fi
+
+_rmq_env_now()
+{
+    date '+%Y-%m-%d %H:%M:%S'
+}
+
+_rmq_env_print()
+{
+    _rmq_env_tmp="$1"
+    _rmq_env_tmp_len="${#_rmq_env_tmp}"
+    shift
+    printf '%s %s %s\n' "$(_rmq_env_now)" "$_rmq_env_tmp" "$1" 1>&2
+    shift
+    _rmq_env_print_line=''
+    _rmq_env_indent="$((_rmq_env_tmp_len + 21))"
+    for _rmq_env_print_line in "$@"
+    do
+        printf "%${_rmq_env_indent}s%s\n" ' ' "$_rmq_env_print_line" 1>&2
+    done
+    unset _rmq_env_print_line
+    unset _rmq_env_indent
+    unset _rmq_env_tmp_len
+    unset _rmq_env_tmp
+}
+
+_rmq_env_perr()
+{
+    _rmq_env_print '[error]' "$@"
+}
+
+_rmq_env_pwarn()
+{
+    _rmq_env_print '[warning]' "$@"
+}
+
+rmq_realpath() {
+    local path=$1
+
+    if [ -d "$path" ]; then
+        cd "$path" && pwd
+    elif [ -f "$path" ]; then
+        cd "$(dirname "$path")" && echo $(pwd)/$(basename "$path")
+    else
+        echo "$path"
+    fi
+}
+
+RABBITMQ_HOME="$(rmq_realpath "${RABBITMQ_SCRIPTS_DIR}/..")"
+ESCRIPT_DIR="${RABBITMQ_HOME}/escript"
+
+## Set defaults
+. ${RABBITMQ_SCRIPTS_DIR}/rabbitmq-defaults
+
+# We save the current value of $RABBITMQ_PID_FILE in case it was set by
+# an init script. If $CONF_ENV_FILE overrides it again, we must ignore
+# it and warn the user.
+saved_RABBITMQ_PID_FILE="$RABBITMQ_PID_FILE"
+
+## Get configuration variables from the configure environment file
+[ "x" = "x$RABBITMQ_CONF_ENV_FILE" ] && RABBITMQ_CONF_ENV_FILE=${CONF_ENV_FILE}
+if [ -f "${RABBITMQ_CONF_ENV_FILE}" ]; then
+    CONF_ENV_FILE_PHASE=rabbitmq-env
+    . ${RABBITMQ_CONF_ENV_FILE} || true
+fi
+
+[ -n "$ERL_EPMD_PORT" ] && export ERL_EPMD_PORT
+[ -n "$ERL_EPMD_ADDRESS" ] && export ERL_EPMD_ADDRESS
+
+DEFAULT_SCHEDULER_BIND_TYPE="db"
+[ -n "$SCHEDULER_BIND_TYPE" ] || SCHEDULER_BIND_TYPE="$DEFAULT_SCHEDULER_BIND_TYPE"
+[ -n "$RABBITMQ_SCHEDULER_BIND_TYPE" ] || RABBITMQ_SCHEDULER_BIND_TYPE="$SCHEDULER_BIND_TYPE"
+
+DEFAULT_DISTRIBUTION_BUFFER_SIZE=128000
+[ -n "$DISTRIBUTION_BUFFER_SIZE" ] || DISTRIBUTION_BUFFER_SIZE="$DEFAULT_DISTRIBUTION_BUFFER_SIZE"
+[ -n "$RABBITMQ_DISTRIBUTION_BUFFER_SIZE" ] || RABBITMQ_DISTRIBUTION_BUFFER_SIZE="$DISTRIBUTION_BUFFER_SIZE"
+
+DEFAULT_MAX_NUMBER_OF_PROCESSES=1048576
+[ -n "$MAX_NUMBER_OF_PROCESSES" ] || MAX_NUMBER_OF_PROCESSES="$DEFAULT_MAX_NUMBER_OF_PROCESSES"
+[ -n "$RABBITMQ_MAX_NUMBER_OF_PROCESSES" ] || RABBITMQ_MAX_NUMBER_OF_PROCESSES="$MAX_NUMBER_OF_PROCESSES"
+
+DEFAULT_MAX_NUMBER_OF_ATOMS=5000000
+[ -n "$MAX_NUMBER_OF_ATOMS" ] || MAX_NUMBER_OF_ATOMS="$DEFAULT_MAX_NUMBER_OF_ATOMS"
+[ -n "$RABBITMQ_MAX_NUMBER_OF_ATOMS" ] || RABBITMQ_MAX_NUMBER_OF_ATOMS="$MAX_NUMBER_OF_ATOMS"
+
+DEFAULT_SCHEDULER_BUSY_WAIT_THRESHOLD=none
+[ -n "$SCHEDULER_BUSY_WAIT_THRESHOLD" ] || SCHEDULER_BUSY_WAIT_THRESHOLD="$DEFAULT_SCHEDULER_BUSY_WAIT_THRESHOLD"
+[ -n "$RABBITMQ_SCHEDULER_BUSY_WAIT_THRESHOLD" ] || RABBITMQ_SCHEDULER_BUSY_WAIT_THRESHOLD="$SCHEDULER_BUSY_WAIT_THRESHOLD"
+
+## Common server defaults
+SERVER_ERL_ARGS=" +P $RABBITMQ_MAX_NUMBER_OF_PROCESSES +t $RABBITMQ_MAX_NUMBER_OF_ATOMS +stbt $RABBITMQ_SCHEDULER_BIND_TYPE +zdbbl $RABBITMQ_DISTRIBUTION_BUFFER_SIZE +sbwt $RABBITMQ_SCHEDULER_BUSY_WAIT_THRESHOLD +sbwtdcpu $RABBITMQ_SCHEDULER_BUSY_WAIT_THRESHOLD +sbwtdio $RABBITMQ_SCHEDULER_BUSY_WAIT_THRESHOLD "
+
+##--- Set environment vars RABBITMQ_<var_name> to defaults if not set
+
+[ "x" = "x$RABBITMQ_CTL_ERL_ARGS" ] && RABBITMQ_CTL_ERL_ARGS="$CTL_ERL_ARGS"
+[ "x" = "x$RABBITMQ_CTL_DIST_PORT_MIN" ] && RABBITMQ_CTL_DIST_PORT_MIN="$CTL_DIST_PORT_MIN"
+[ "x" = "x$RABBITMQ_CTL_DIST_PORT_MAX" ] && RABBITMQ_CTL_DIST_PORT_MAX="$CTL_DIST_PORT_MAX"
+[ "x" = "x$RABBITMQ_CTL_DIST_PORT_MIN" ] && RABBITMQ_CTL_DIST_PORT_MIN='35672'
+[ "x" = "x$RABBITMQ_CTL_DIST_PORT_MAX" ] && RABBITMQ_CTL_DIST_PORT_MAX="$(($RABBITMQ_CTL_DIST_PORT_MIN + 10))"
+
+[ "x" = "x$RABBITMQ_SERVER_ERL_ARGS" ] && RABBITMQ_SERVER_ERL_ARGS=${SERVER_ERL_ARGS}
+[ "x" = "x$RABBITMQ_SERVER_START_ARGS" ] && RABBITMQ_SERVER_START_ARGS=${SERVER_START_ARGS}
+[ "x" = "x$RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS" ] && RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=${SERVER_ADDITIONAL_ERL_ARGS}
+[ "x" = "x$RABBITMQ_SERVER_CODE_PATH" ] && RABBITMQ_SERVER_CODE_PATH=${SERVER_CODE_PATH}
+[ "x" = "x$RABBITMQ_IGNORE_SIGINT" ] && RABBITMQ_IGNORE_SIGINT="true"
+[ "xtrue" = "x$RABBITMQ_IGNORE_SIGINT" ] && RABBITMQ_IGNORE_SIGINT_FLAG="+B i"
+
+if [ -n "$saved_RABBITMQ_PID_FILE" ] && \
+    [ "$saved_RABBITMQ_PID_FILE" != "$RABBITMQ_PID_FILE" ]
+then
+    _rmq_env_pwarn 'RABBITMQ_PID_FILE was already set by the init script to:' \
+        "$saved_RABBITMQ_PID_FILE" \
+        'The value set in rabbitmq-env.conf is ignored because it would break the init script.'
+
+    RABBITMQ_PID_FILE="$saved_RABBITMQ_PID_FILE"
+fi
+
+[ "x" = "x$RABBITMQ_BOOT_MODULE" ] && RABBITMQ_BOOT_MODULE=${BOOT_MODULE}
+
+##--- End of overridden <var_name> variables
+
+_rmq_env_set_erl_libs()
+{
+    if [ -n "$ERL_LIBS" ]
+    then
+        export ERL_LIBS="$RABBITMQ_HOME/plugins:$ERL_LIBS"
+    else
+        export ERL_LIBS="$RABBITMQ_HOME/plugins"
+    fi
+}
+
+run_escript()
+{
+    escript_main="${1:?escript_main must be defined}"
+    shift
+    escript="${1:?escript must be defined}"
+    shift
+
+    _rmq_env_set_erl_libs
+
+    # Important: do not quote RABBITMQ_CTL_ERL_ARGS as they must be
+    # word-split
+    # shellcheck disable=SC2086
+    exec erl +B \
+        -boot "$CLEAN_BOOT_FILE" \
+        -noinput -noshell -hidden -smp enable \
+        $RABBITMQ_CTL_ERL_ARGS \
+        -kernel inet_dist_listen_min "$RABBITMQ_CTL_DIST_PORT_MIN" \
+        -kernel inet_dist_listen_max "$RABBITMQ_CTL_DIST_PORT_MAX" \
+        -run escript start \
+        -escript main "$escript_main" \
+        -extra "$escript" "$@"
+}
+
+RABBITMQ_ENV_LOADED=1
+
+# Since we source this elsewhere, don't accidentally stop execution
+true
