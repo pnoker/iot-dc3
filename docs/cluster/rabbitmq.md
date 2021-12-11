@@ -1083,7 +1083,7 @@ mqtt.vhost = /dc3
 
 ## Specify the exchange to which messages from MQTT clients are published.
 ##
-# mqtt.exchange = amq.topic
+mqtt.exchange = dc3.exchange.mqtt
 
 ## Specify TTL (time to live) to control the lifetime of non-clean sessions.
 ##
