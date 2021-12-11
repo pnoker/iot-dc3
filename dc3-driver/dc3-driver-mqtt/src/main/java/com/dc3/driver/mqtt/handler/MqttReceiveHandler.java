@@ -41,6 +41,14 @@ public class MqttReceiveHandler {
         return message -> {
             MessageHeader messageHeader = new MessageHeader(message.getHeaders());
             MqttPayload payload = JSON.parseObject(message.getPayload().toString(), MqttPayload.class);
+
+            // 此处用于接收 MQTT 发送过来的数据，订阅的主题为 application.yml 中 mqtt.receive-topics 配置的 Topic 列表
+            // +（加号）：可以（只能）匹配一个单词
+            // #（井号）：可以匹配多个单词（或者零个）
+
+            // 将解析之后的数据封装 com.dc3.common.bean.point.PointValue
+            // 然后调用 driverService.pointValueSender(pointValue) 进行数据推送
+            // Tip： 可参考 dc3-driver-listening-virtual 驱动
         };
     }
 }
