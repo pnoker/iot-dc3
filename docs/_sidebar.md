@@ -51,6 +51,7 @@
   - [4.1 Mongo 集群部署](cluster/mongo.md)
   - [4.2 Redis 集群部署](cluster/redis.md)
   - [4.3 RabbitMQ 集群部署](cluster/rabbitmq.md)
+  - [4.4 EMQ X 集群部署](cluster/emqx.md)
   
 - 5.错误
   - [5.1 Mongo 启动失败](error/mongo-error.md)
