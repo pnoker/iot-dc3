@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/mongo:4.0-xenial
+FROM registry.cn-beijing.aliyuncs.com/dc3/mongo:5.0.5
 MAINTAINER pnoker <pnokers.icloud.com>
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -25,7 +25,11 @@ WORKDIR /dc3-mongo
 COPY ./iot-dc3.js  ./config/
 COPY ./launch.sh   ./
 
-RUN chmod +x ./launch.sh
+RUN apt update \
+    && apt install tofrodos \
+    && apt clean \
+    && fromdos ./launch.sh \
+    && chmod +x ./launch.sh
 
 EXPOSE 27017
 
