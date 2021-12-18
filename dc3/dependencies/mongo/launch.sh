@@ -25,6 +25,6 @@ while true; do
   sleep 5
 done
 
-mongod --shutdown && mongod --auth --smallfiles --bind_ip_all &
+mongod --shutdown && mongod --auth --bind_ip_all &
 
 wait
