@@ -15,6 +15,9 @@
 
         <blank-card>
             <el-row>
+                <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                    <skeleton-card :loading="loading"></skeleton-card>
+                </el-col>
                 <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
                     <profile-card
                             :data="data"
@@ -33,6 +36,7 @@
 </template>
 <script>
     import blankCard from '@/components/card/blank-card';
+    import skeletonCard from '@/components/card/skeleton-card';
     import profileTool from './ProfileTool'
     import profileAddForm from './ProfileAddForm'
     import profileCard from './ProfileCard'
@@ -40,9 +44,10 @@
     import {pointDictionary} from "@/api/dictionary";
 
     export default {
-        components: {blankCard, profileTool, profileAddForm, profileCard},
+        components: {blankCard, skeletonCard, profileTool, profileAddForm, profileCard},
         data() {
             return {
+                loading: true,
                 pointDictionary: [],
                 pointTable: {},
                 listData: [],
@@ -69,6 +74,8 @@
                     this.page.total = data.total;
                     this.listData = data.records;
                 }).catch(() => {
+                }).finally(() => {
+                    this.loading = false;
                 });
             },
             point() {

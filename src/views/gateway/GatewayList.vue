@@ -13,6 +13,9 @@
         </el-row>
 
         <el-row>
+            <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                <skeleton-card :loading="loading"></skeleton-card>
+            </el-col>
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
                 <gateway-card
                         :data="data"
@@ -23,14 +26,16 @@
     </div>
 </template>
 <script>
+    import skeletonCard from '@/components/card/skeleton-card';
     import gatewayTool from './GatewayTool'
     import gatewayCard from './GatewayCard'
     import {driverList, driverStatus} from "@/api/driver";
 
     export default {
-        components: {gatewayTool, gatewayCard},
+        components: {skeletonCard, gatewayTool, gatewayCard},
         data() {
             return {
+                loading: true,
                 statusTable: {},
                 listData: [],
                 query: {
@@ -57,6 +62,8 @@
                     this.page.total = data.total;
                     this.listData = data.records;
                 }).catch(() => {
+                }).finally(() => {
+                    this.loading = false;
                 });
 
                 driverStatus({

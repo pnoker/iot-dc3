@@ -18,6 +18,9 @@
         </el-row>
 
         <el-row>
+            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in 12">
+                <skeleton-card :loading="loading"></skeleton-card>
+            </el-col>
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listData">
                 <point-card
                         :data="data"
@@ -35,6 +38,7 @@
     </div>
 </template>
 <script>
+    import skeletonCard from '@/components/card/skeleton-card';
     import pointTool from './PointTool'
     import pointAddForm from './PointAddForm'
     import pointCard from './PointCard'
@@ -62,9 +66,10 @@
                 }
             }
         },
-        components: {pointTool, pointAddForm, pointCard},
+        components: {skeletonCard, pointTool, pointAddForm, pointCard},
         data() {
             return {
+                loading: true,
                 profileDictionary: [],
                 profileTable: {},
                 listData: [],
@@ -92,6 +97,8 @@
                     this.page.total = data.total;
                     this.listData = data.records;
                 }).catch(() => {
+                }).finally(() => {
+                    this.loading = false;
                 });
             },
             profile() {

@@ -37,7 +37,7 @@
                 </div>
                 <div v-if="!embedded" class="things-card__footer">
                     <div class="things-card-footer-operation">
-                        <el-popconfirm title="是否确定删除该数据？" placement="top" icon="el-icon-remove-outline">
+                        <el-popconfirm title="是否确定删除该数据？该数据下的配置将会被全部删除，且该操作不可恢复！" placement="top" icon="el-icon-remove-outline">
                             <el-button class="operation-tooltip" type="text" slot="reference">删除</el-button>
                         </el-popconfirm>
                         <el-button type="text">编辑</el-button>

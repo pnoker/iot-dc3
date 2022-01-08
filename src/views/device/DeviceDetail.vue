@@ -16,6 +16,9 @@
                 </el-tab-pane>
                 <el-tab-pane label="包含模板" name="profile">
                     <el-row>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                            <skeleton-card :loading="profileLoading" :footer="true"></skeleton-card>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listProfileData">
                             <profile-card
                                     :data="data"
@@ -27,6 +30,9 @@
                 </el-tab-pane>
                 <el-tab-pane label="包含位号" name="point">
                     <el-row>
+                        <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in 12">
+                            <skeleton-card :loading="pointLoading" :footer="true"></skeleton-card>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listPointData">
                             <point-card
                                     :data="data"
@@ -36,8 +42,14 @@
                         </el-col>
                     </el-row>
                 </el-tab-pane>
+                <el-tab-pane label="设备模型" name="deviceCModel">
+
+                </el-tab-pane>
                 <el-tab-pane label="设备数据" name="pointValue">
                     <el-row>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                            <skeleton-card :loading="pointValueLoading" :footer="true"></skeleton-card>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-if="data" v-for="data in listPointValueData">
                             <point-value-card
                                     v-if="data"
@@ -51,6 +63,9 @@
                             ></point-value-card>
                         </el-col>
                     </el-row>
+                </el-tab-pane>
+                <el-tab-pane label="设备指令" name="deviceCommand">
+
                 </el-tab-pane>
                 <el-tab-pane label="设备事件" name="deviceEvent">
                     <el-timeline>
@@ -93,6 +108,7 @@
 <script>
     import baseCard from '@/components/card/base-card';
     import detailCard from '@/components/card/detail-card';
+    import skeletonCard from '@/components/card/skeleton-card';
     import deviceCard from './DeviceCard';
     import profileCard from '../profile/ProfileCard';
     import pointCard from '../point/PointCard';
@@ -106,7 +122,7 @@
     import {pointByDeviceId, pointValueByDeviceId} from "@/api/point";
 
     export default {
-        components: {baseCard, detailCard, deviceCard, profileCard, pointCard, pointValueCard, pointValueEditForm, pointValueDetail},
+        components: {baseCard, detailCard, skeletonCard, deviceCard, profileCard, pointCard, pointValueCard, pointValueEditForm, pointValueDetail},
         props: {
             name: String
         },
@@ -114,6 +130,9 @@
             return {
                 id: this.$route.query.id,
                 active: this.$route.query.active,
+                profileLoading: true,
+                pointLoading: true,
+                pointValueLoading: true,
                 data: {
                     profileIds: []
                 },
@@ -148,16 +167,23 @@
                 deviceById(this.id).then(res => {
                     this.data = res.data;
                     this.deviceTable[this.data.id] = this.data.name;
+                }).catch(() => {
                 });
             },
             profiles() {
                 profileByDeviceId(this.id).then(res => {
                     this.listProfileData = res.data;
+                }).catch(() => {
+                }).finally(() => {
+                    this.profileLoading = false;
                 });
             },
             points() {
                 pointByDeviceId(this.id).then(res => {
                     this.listPointData = res.data;
+                }).catch(() => {
+                }).finally(() => {
+                    this.pointLoading = false;
                 });
             },
             pointValues() {
@@ -173,6 +199,9 @@
                             this.listPointValueHistoryData[pointValue.pointId] = pointValue.children.reverse().map(pointValue => pointValue.value);
                         }
                     });
+                }).catch(() => {
+                }).finally(() => {
+                    this.pointValueLoading = false;
                 });
             },
             status() {

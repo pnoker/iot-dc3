@@ -15,6 +15,9 @@
                 </el-tab-pane>
                 <el-tab-pane label="包含位号" name="point">
                     <el-row>
+                        <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in 12">
+                            <skeleton-card :loading="pointLoading" :footer="true"></skeleton-card>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listPointData">
                             <point-card
                                     :data="data"
@@ -26,6 +29,9 @@
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
                     <el-row>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                            <skeleton-card :loading="deviceLoading" :footer="true"></skeleton-card>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listDeviceData">
                             <device-card
                                     :data="data"
@@ -37,6 +43,8 @@
                         </el-col>
                     </el-row>
                 </el-tab-pane>
+                <el-tab-pane label="模板模型" name="model">
+                </el-tab-pane>
             </el-tabs>
         </base-card>
     </div>
@@ -44,6 +52,7 @@
 <script>
     import baseCard from '@/components/card/base-card';
     import detailCard from '@/components/card/detail-card';
+    import skeletonCard from '@/components/card/skeleton-card';
     import deviceCard from '../device/DeviceCard';
     import pointCard from '../point/PointCard';
     import {dateFormat, setCopyContent} from "@/util/util";
@@ -53,11 +62,13 @@
     import {driverDictionary, profileDictionary} from "@/api/dictionary";
 
     export default {
-        components: {baseCard, detailCard, deviceCard, pointCard},
+        components: {baseCard, detailCard, skeletonCard, deviceCard, pointCard},
         data() {
             return {
                 id: this.$route.query.id,
                 active: this.$route.query.active,
+                deviceLoading: true,
+                pointLoading: true,
                 driverTable: {},
                 profileTable: {},
                 statusTable: {},
@@ -77,11 +88,15 @@
             profile() {
                 profileById(this.id).then(res => {
                     this.data = res.data;
+                }).catch(() => {
                 });
             },
             device() {
                 deviceByProfileId(this.id).then(res => {
                     this.listDeviceData = res.data;
+                }).catch(() => {
+                }).finally(() => {
+                    this.deviceLoading = false;
                 });
 
                 deviceStatusByProfileId(this.id).then(res => {
@@ -93,6 +108,8 @@
                 pointByProfileId(this.id).then(res => {
                     this.listPointData = res.data;
                 }).catch(() => {
+                }).finally(() => {
+                    this.pointLoading = false;
                 });
             },
             drivers() {

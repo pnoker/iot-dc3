@@ -2,12 +2,12 @@
     <div>
         <title-card class="home-app" title="导航">
             <div class="app-item">
-                <application-card v-for="i in 12" :name="'应用 '+i"></application-card>
+                <application-card :key="i" v-for="i in 12" :name="'应用 '+i"></application-card>
             </div>
         </title-card>
         <title-card class="home-dashboard" title="看板">
             <div class="dashboard-item">
-                <dashboard-card v-for="i in 6" :name="'数据看板 '+i"></dashboard-card>
+                <dashboard-card :key="i" v-for="i in 6" :name="'数据看板 '+i"></dashboard-card>
             </div>
         </title-card>
         <title-card class="home-count" title="统计">

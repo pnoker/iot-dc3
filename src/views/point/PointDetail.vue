@@ -62,6 +62,7 @@
             driver() {
                 driverById(this.id).then(res => {
                     this.data = res.data;
+                }).catch(() => {
                 });
             },
             device() {

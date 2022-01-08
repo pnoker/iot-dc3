@@ -195,6 +195,7 @@
                 pointById(id).then(res => {
                     this.pointFormData = res.data;
                     this.oldPointFormData = {...res.data};
+                }).catch(() => {
                 });
             },
             pointUpdate() {
@@ -202,6 +203,7 @@
                     if (valid) {
                         pointUpdate(this.pointFormData).then(res => {
                             this.oldPointFormData = {...res.data};
+                        }).catch(() => {
                         });
                     }
                 });

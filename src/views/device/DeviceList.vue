@@ -16,6 +16,9 @@
 
         <blank-card>
             <el-row>
+                <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                    <skeleton-card :loading="loading"></skeleton-card>
+                </el-col>
                 <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
                     <device-card
                             :data="data"
@@ -38,6 +41,7 @@
 </template>
 <script>
     import blankCard from '@/components/card/blank-card';
+    import skeletonCard from '@/components/card/skeleton-card';
     import deviceTool from './DeviceTool'
     import deviceAddForm from './DeviceAddForm'
     import deviceCard from './DeviceCard'
@@ -45,9 +49,10 @@
     import {driverDictionary, profileDictionary} from "@/api/dictionary";
 
     export default {
-        components: {blankCard, deviceTool, deviceAddForm, deviceCard},
+        components: {blankCard, skeletonCard, deviceTool, deviceAddForm, deviceCard},
         data() {
             return {
+                loading: true,
                 driverDictionary: [],
                 profileDictionary: [],
                 driverTable: {},
@@ -78,6 +83,8 @@
                     this.page.total = data.total;
                     this.listData = data.records;
                 }).catch(() => {
+                }).finally(() => {
+                    this.loading = false;
                 });
 
                 deviceStatus({

@@ -14,6 +14,9 @@
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
                     <el-row>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                            <skeleton-card :loading="deviceLoading" :footer="true"></skeleton-card>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listDeviceData">
                             <device-card
                                     :data="data"
@@ -25,6 +28,10 @@
                         </el-col>
                     </el-row>
                 </el-tab-pane>
+                <el-tab-pane label="驱动模型" name="model">
+                </el-tab-pane>
+                <el-tab-pane label="驱动事件" name="event">
+                </el-tab-pane>
             </el-tabs>
         </base-card>
     </div>
@@ -32,6 +39,7 @@
 <script>
     import baseCard from '@/components/card/base-card';
     import detailCard from '@/components/card/detail-card';
+    import skeletonCard from '@/components/card/skeleton-card';
     import deviceCard from '../device/DeviceCard';
     import pointCard from '../point/PointCard';
     import {dateFormat, setCopyContent} from "@/util/util";
@@ -40,11 +48,12 @@
     import {driverById} from "@/api/driver";
 
     export default {
-        components: {baseCard, detailCard, deviceCard, pointCard},
+        components: {baseCard, detailCard, skeletonCard, deviceCard, pointCard},
         data() {
             return {
                 id: this.$route.query.id,
                 active: this.$route.query.active,
+                deviceLoading: true,
                 driverTable: {},
                 profileTable: {},
                 statusTable: {},
@@ -62,12 +71,15 @@
             driver() {
                 driverById(this.id).then(res => {
                     this.data = res.data;
+                }).catch(() => {
                 });
             },
             device() {
                 deviceByDriverId(this.id).then(res => {
                     this.listDeviceData = res.data;
                 }).catch(() => {
+                }).finally(() => {
+                    this.deviceLoading = false;
                 });
 
                 deviceStatusByDriverId(this.id).then(res => {

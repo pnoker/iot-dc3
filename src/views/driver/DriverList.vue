@@ -14,6 +14,9 @@
 
         <blank-card>
             <el-row>
+                <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                    <skeleton-card :loading="loading"></skeleton-card>
+                </el-col>
                 <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
                     <driver-card
                             :data="data"
@@ -26,14 +29,16 @@
 </template>
 <script>
     import blankCard from '@/components/card/blank-card';
+    import skeletonCard from '@/components/card/skeleton-card';
     import driverTool from './DriverTool'
     import driverCard from './DriverCard'
     import {driverList, driverStatus} from "@/api/driver";
 
     export default {
-        components: {blankCard, driverTool, driverCard},
+        components: {blankCard, skeletonCard, driverTool, driverCard},
         data() {
             return {
+                loading: true,
                 statusTable: {},
                 listData: [],
                 query: {
@@ -60,6 +65,8 @@
                     this.page.total = data.total;
                     this.listData = data.records;
                 }).catch(() => {
+                }).finally(() => {
+                    this.loading = false;
                 });
 
                 driverStatus({

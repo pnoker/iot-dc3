@@ -37,7 +37,7 @@
                         <el-popconfirm title="是否确定启用该设备？" placement="top" icon="el-icon-remove-outline">
                             <el-button class="operation-tooltip" type="text" slot="reference" :disabled="data.enable">启用</el-button>
                         </el-popconfirm>
-                        <el-popconfirm title="是否确定删除该设备？" placement="top" icon="el-icon-circle-close" icon-color="red" @confirm="deleteThing(data.id)">
+                        <el-popconfirm title="是否确定删除该设备？该设备下的配置将会被全部删除，且该操作不可恢复！" placement="top" icon="el-icon-circle-close" icon-color="red" @confirm="deleteThing(data.id)">
                             <el-button class="operation-tooltip" type="text" slot="reference">删除</el-button>
                         </el-popconfirm>
                         <el-button type="text" @click="edit(data.id, data.driverId)">编辑</el-button>

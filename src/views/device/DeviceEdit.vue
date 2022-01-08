@@ -170,6 +170,9 @@
                 </div>
                 <div class="content-edit-point">
                     <el-row>
+                        <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                            <skeleton-card :loading="loading" :footer="true"></skeleton-card>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-if="data" v-for="data in pointInfoData">
                             <point-info-card
                                     :data="data"
@@ -185,6 +188,7 @@
 </template>
 
 <script>
+    import skeletonCard from '@/components/card/skeleton-card';
     import {driverDictionary, profileDictionary} from "@/api/dictionary";
     import {deviceById, deviceUpdate} from "@/api/device";
     import {driverAttributeByDriverId, pointAttributeByDriverId} from "@/api/attribute";
@@ -193,12 +197,13 @@
     import pointInfoCard from "../point/info/PointInfoCard"
 
     export default {
-        components: {pointInfoCard},
+        components: {skeletonCard, pointInfoCard},
         data() {
             return {
                 id: this.$route.query.id,
                 driverId: this.$route.query.driverId,
                 active: +this.$route.query.active,
+                loading: true,
                 driverDictionary: [],
                 profileDictionary: [],
                 driverTable: {},
@@ -285,6 +290,7 @@
                     this.changeDriver(this.driverId);
                     this.changePoint();
                     this.oldDeviceFormData = {...res.data};
+                }).catch(() => {
                 });
             },
             driver() {
@@ -336,9 +342,12 @@
                             });
                             return pointInfo;
                         });
+                    }).catch(() => {
                     });
 
                 }).catch(() => {
+                }).finally(() => {
+                    this.loading = false;
                 });
             },
             profileName(profileId) {
@@ -375,6 +384,7 @@
                         this.oldDriverFormData = JSON.parse(JSON.stringify(formData));
                     }).catch(() => {
                     });
+                }).catch(() => {
                 });
             },
             changePoint() {
@@ -397,7 +407,9 @@
                                 return pointInfo;
                             });
                         });
+                    }).catch(() => {
                     });
+                }).catch(() => {
                 });
             },
             changePointInfo(row) {
@@ -425,6 +437,7 @@
                             this.changeDriver(this.driverId);
                             this.changePoint(this.id);
                             this.oldDeviceFormData = {...res.data};
+                        }).catch(() => {
                         });
                     }
                 });
@@ -441,7 +454,15 @@
                                 value: this.driverFormData[attribute.name].value
                             };
 
-                            driverInfo.id ? driverInfoUpdate(driverInfo).then(res => loadFormData(formData, res, this)) : driverInfoAdd(driverInfo).then(res => loadFormData(formData, res, this));
+                            driverInfo.id ?
+                                driverInfoUpdate(driverInfo)
+                                    .then(res => loadFormData(formData, res, this))
+                                    .catch(() => {
+                                    }) :
+                                driverInfoAdd(driverInfo)
+                                    .then(res => loadFormData(formData, res, this))
+                                    .catch(() => {
+                                    });
 
                             function loadFormData(formData, res, that) {
                                 formData[attribute.name] = {
@@ -466,7 +487,15 @@
                                 value: this.pointFormData[attribute.name].value
                             };
 
-                            pointInfo.id ? pointInfoUpdate(pointInfo).then(res => loadTableData(res, attribute, this)) : pointInfoAdd(pointInfo).then(res => loadTableData(res, attribute, this));
+                            pointInfo.id ?
+                                pointInfoUpdate(pointInfo)
+                                    .then(res => loadTableData(res, attribute, this))
+                                    .catch(() => {
+                                    }) :
+                                pointInfoAdd(pointInfo)
+                                    .then(res => loadTableData(res, attribute, this))
+                                    .catch(() => {
+                                    });
 
                             function loadTableData(res, attribute, that) {
                                 that.pointInfoData = that.pointInfoData.map(tableData => {

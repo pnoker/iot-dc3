@@ -123,6 +123,7 @@
                 profileById(id).then(res => {
                     this.profileFormData = res.data;
                     this.oldProfileFormData = {...res.data};
+                }).catch(() => {
                 });
             },
             profileUpdate() {
@@ -130,6 +131,7 @@
                     if (valid) {
                         profileUpdate(this.profileFormData).then(res => {
                             this.oldProfileFormData = {...res.data};
+                        }).catch(() => {
                         });
                     }
                 });

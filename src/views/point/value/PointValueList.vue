@@ -15,6 +15,9 @@
 
         <blank-card>
             <el-row>
+                <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
+                    <skeleton-card :loading="loading"></skeleton-card>
+                </el-col>
                 <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
                     <point-value-card
                             :data="data"
@@ -30,15 +33,17 @@
 
 <script>
     import blankCard from '@/components/card/blank-card';
+    import skeletonCard from '@/components/card/skeleton-card';
     import pointValueTool from './PointValueTool';
     import pointValueCard from './PointValueCard';
     import {pointUnit, pointValueList} from "@/api/point";
     import {deviceDictionary, pointDictionary} from "@/api/dictionary";
 
     export default {
-        components: {blankCard, pointValueTool, pointValueCard},
+        components: {blankCard, skeletonCard, pointValueTool, pointValueCard},
         data() {
             return {
+                loading: true,
                 deviceDictionary: [],
                 pointDictionary: [],
                 deviceTable: {},
@@ -80,6 +85,8 @@
                         });
                     }
                 }).catch(() => {
+                }).finally(() => {
+                    this.loading = false;
                 });
             },
             device() {
