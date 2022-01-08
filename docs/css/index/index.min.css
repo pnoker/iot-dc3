@@ -1,0 +1,14 @@
+@charset "UTF-8";
+/*
+ * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+html,body,#app{margin:0;padding:0;color:#555;height:100%;font-size:12px;background-color:white}.base{height:9em;left:50%;margin:-7.5em;padding:3em;position:absolute;top:50%;width:9em;transform:rotateX(45deg) rotateZ(45deg);transform-style:preserve-3d}.cube,.cube:after,.cube:before{content:'';float:left;height:3em;position:absolute;width:3em}.cube{background-color:#05afd1;position:relative;transform:translateZ(3em);transform-style:preserve-3d;transition:.25s;box-shadow:13em 13em 1.5em rgba(0,0,0,0.1);animation:anim 1s infinite}.cube:after{background-color:#049dbc;transform:rotateX(-90deg) translateY(3em);transform-origin:100% 100%}.cube:before{background-color:#048ca7;transform:rotateY(90deg) translateX(3em);transform-origin:100% 0}.cube:nth-child(1){animation-delay:.05s}.cube:nth-child(2){animation-delay:.1s}.cube:nth-child(3){animation-delay:.15s}.cube:nth-child(4){animation-delay:.2s}.cube:nth-child(5){animation-delay:.25s}.cube:nth-child(6){animation-delay:.3s}.cube:nth-child(7){animation-delay:.35s}.cube:nth-child(8){animation-delay:.4s}.cube:nth-child(9){animation-delay:.45s}@keyframes anim{50%{transform:translateZ(0.5em)}}
