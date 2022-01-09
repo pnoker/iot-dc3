@@ -84,7 +84,9 @@
                 return this.statusTable[id];
             },
             detail(id) {
-                this.$router.push({name: 'gatewayDetail', query: {id, active: 'detail'}});
+                this.$router.push({name: 'gatewayDetail', query: {id, active: 'detail'}})
+                    .catch(() => {
+                    });
             },
             copyId(content) {
                 setCopyContent(content, true, '网关ID');

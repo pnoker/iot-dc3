@@ -26,6 +26,7 @@
                                     :data="data"
                                     :statusTable="driverStatusTable"
                                     :footer="true"
+                                    @select-change="selectChange"
                             ></driver-card>
                         </el-col>
                     </el-row>
@@ -39,6 +40,9 @@
                                 <ul>
                                     <li><i class="el-icon-data-line"></i> 驱动名称: {{data.name}}</li>
                                     <li><i class="el-icon-collection-tag"></i> 关联设备 [{{listDeviceData.length||0}} 个]: {{deviceName()}}</li>
+                                    <li class="nowrap-item"><span><i class="el-icon-connection"/> 端口: </span>{{data.port}}</li>
+                                    <li class="nowrap-item"><span><i class="el-icon-monitor"/> 主机: </span>{{data.host}}</li>
+                                    <li class="nowrap-item"><span><i class="el-icon-s-promotion"/> 驱动服务: </span>{{data.serviceName}}</li>
                                     <li><i class="el-icon-edit-outline"></i> 修改日期: {{timestamp(data.createTime)}}</li>
                                     <li><i class="el-icon-sunset"></i> 创建日期: {{timestamp(data.updateTime)}}</li>
                                 </ul>
@@ -134,6 +138,7 @@
                 deviceByDriverId(this.id).then(res => {
                     this.listDeviceData = res.data;
                 }).catch(() => {
+                    this.listDeviceData = [];
                 }).finally(() => {
                     this.deviceLoading = false;
                 });
@@ -141,6 +146,7 @@
                 deviceStatusByDriverId(this.id).then(res => {
                     this.deviceStatusTable = res.data;
                 }).catch(() => {
+                    this.deviceStatusTable = {};
                 });
             },
             drivers() {
@@ -168,6 +174,7 @@
                 }).then(res => {
                     const data = res.data;
                     this.page.total = data.total;
+                    data.records.forEach(driver => driver.active = this.id === driver.id);
                     this.listDriverData = data.records;
                 }).catch(() => {
                 }).finally(() => {
@@ -214,8 +221,23 @@
                 return this.listDeviceData.map(device => device.name).join(", ");
             },
             changeActive(tab) {
+                this.active = tab.name;
                 let query = this.$route.query;
-                this.$router.push({query: {...query, active: tab.name}});
+                this.$router.push({query: {...query, active: tab.name}})
+                    .catch(() => {
+                    });
+            },
+            selectChange(data) {
+                this.listDriverData.forEach(driver => driver.active = data.id === driver.id);
+                this.listDriverData = JSON.parse(JSON.stringify(this.listDriverData));
+
+                this.id = data.id;
+                let query = this.$route.query;
+                this.$router.push({query: {...query, id: data.id}}).then(() => {
+                    this.driver();
+                    this.device();
+                }).catch(() => {
+                });
             },
             copyId(content) {
                 setCopyContent(content, true, '驱动ID');

@@ -143,7 +143,9 @@
             next() {
                 this.active++;
                 if (this.active > 1) {
-                    this.$router.push({name: 'profile'});
+                    this.$router.push({name: 'profile'})
+                        .catch(() => {
+                        });
                 } else {
                     this.changeActive(this.active);
                 }
@@ -153,7 +155,9 @@
             },
             changeActive(step) {
                 let query = this.$route.query;
-                this.$router.push({query: {...query, active: step}});
+                this.$router.push({query: {...query, active: step}})
+                    .catch(() => {
+                    });
             }
         }
     };

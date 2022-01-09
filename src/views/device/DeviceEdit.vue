@@ -523,7 +523,9 @@
                 }
                 this.active += step;
                 if (this.active > 2) {
-                    this.$router.push({name: 'device'});
+                    this.$router.push({name: 'device'})
+                        .catch(() => {
+                        });
                 } else {
                     this.changeActive(this.active);
                 }
@@ -539,7 +541,9 @@
             },
             changeActive(step) {
                 let query = this.$route.query;
-                this.$router.push({query: {...query, active: step}});
+                this.$router.push({query: {...query, active: step}})
+                    .catch(() => {
+                    });
             }
         }
     };

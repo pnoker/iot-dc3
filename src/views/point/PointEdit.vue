@@ -215,7 +215,9 @@
             next() {
                 this.active++;
                 if (this.active > 0) {
-                    this.$router.push({name: 'profileEdit', query: {id: this.$route.query.profileId, active: '1'}});
+                    this.$router.push({name: 'profileEdit', query: {id: this.$route.query.profileId, active: '1'}})
+                        .catch(() => {
+                        });
                 } else {
                     this.changeActive(this.active);
                 }
@@ -225,7 +227,9 @@
             },
             changeActive(step) {
                 let query = this.$route.query;
-                this.$router.push({query: {...query, active: step}});
+                this.$router.push({query: {...query, active: step}})
+                    .catch(() => {
+                    });
             }
         }
     };

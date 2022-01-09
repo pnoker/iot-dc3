@@ -280,7 +280,9 @@
             },
             changeActive(tab) {
                 let query = this.$route.query;
-                this.$router.push({query: {...query, active: tab.name}});
+                this.$router.push({query: {...query, active: tab.name}})
+                    .catch(() => {
+                    });
             },
             copyId(content) {
                 setCopyContent(content, true, '设备ID');

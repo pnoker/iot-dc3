@@ -4,7 +4,7 @@
             <div class="things-card-content">
                 <div class="things-card__header" v-bind:class="{'header-enable':isConfig,'header-disable':!isConfig}">
                     <div class="things-card-header-icon"><img :src="isSelect" :alt="data.name"></div>
-                    <div class="things-card-header-name nowrap-name" @click="copyId(data.id)">{{data.name}}</div>
+                    <div class="things-card-header-name nowrap-name">{{data.name}}</div>
                 </div>
                 <div class="things-card__body">
                     <div class="things-card-body-content">

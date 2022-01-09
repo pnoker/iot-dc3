@@ -1,11 +1,11 @@
 <template>
-    <div class="things-card">
-        <el-card shadow="hover">
+    <div class="things-card" @click="select(data)">
+        <el-card :shadow="data.active?'always':'hover'" v-bind:class="{'active':data.active}">
             <div class="things-card-content">
                 <div class="things-card__header" v-bind:class="{'header-enable':data.enable,'header-disable':!data.enable}">
                     <div class="things-card-header-icon"><img :src="icon" :alt="data.name"></div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id)">{{data.name}}</div>
-                    <div title="状态" class="things-card-header-status">
+                    <div title="状态" class="things-card-header-status" v-bind:class="{'active':data.active}">
                         <el-tag v-if="status(data.id)==='ONLINE'" type="success" effect="plain">在线</el-tag>
                         <el-tag v-else-if="status(data.id)==='MAINTAIN'" type="warning" effect="plain">维护</el-tag>
                         <el-tag v-else-if="status(data.id)==='FAULT'" type="danger" effect="plain">故障</el-tag>
@@ -24,7 +24,7 @@
                             <li class="nowrap-item"><span><i class="el-icon-sunset"/> 创建日期: </span>{{timestamp(data.createTime)}}</li>
                         </ul>
                     </div>
-                    <div title="驱动描述信息" class="things-card-body-content">
+                    <div :title="data.description?data.description:'驱动描述信息'" class="things-card-body-content">
                         <p class="nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
                 </div>
@@ -53,6 +53,16 @@
     export default {
         name: "driver-card",
         props: {
+            icon: {
+                type: String,
+                default: 'images/common/driver.png'
+            },
+            statusTable: {
+                type: Object,
+                default: () => {
+                    return {};
+                }
+            },
             data: {
                 type: Object,
                 default: () => {
@@ -68,16 +78,6 @@
                     };
                 }
             },
-            statusTable: {
-                type: Object,
-                default: () => {
-                    return {};
-                }
-            },
-            icon: {
-                type: String,
-                default: 'images/common/driver.png'
-            },
             footer: {
                 type: Boolean,
                 default: () => {
@@ -90,7 +90,12 @@
                 return this.statusTable[id];
             },
             detail(id) {
-                this.$router.push({name: 'driverDetail', query: {id, active: 'detail'}});
+                this.$router.push({name: 'driverDetail', query: {id, active: 'detail'}})
+                    .catch(() => {
+                    });
+            },
+            select(data) {
+                this.$emit('select-change', data);
             },
             copyId(content) {
                 setCopyContent(content, true, '驱动ID');
@@ -104,4 +109,16 @@
 
 <style lang="scss">
     @import "~@/components/card/styles/things-card.scss";
+
+    .things-card-header-status.active {
+        background: transparent;
+    }
+
+    .active {
+        background: #ecf5ff;
+
+        .el-tag.el-tag--plain {
+            background: #ecf5ff;
+        }
+    }
 </style>

@@ -41,7 +41,9 @@
         methods: {
             show() {
                 if (this.url) {
-                    this.$router.push({name: 'application', query: {id: encode(this.url)}});
+                    this.$router.push({name: 'application', query: {id: encode(this.url)}})
+                        .catch(() => {
+                        });
                 }
             }
         }

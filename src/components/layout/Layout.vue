@@ -71,7 +71,9 @@
             },
             handleCommand(command) {
                 if (command === 'logout') {
-                    this.$store.dispatch('ClearToken').then(() => this.$router.push('/login'));
+                    this.$store.dispatch('ClearToken').then(() => this.$router.push('/login'))
+                        .catch(() => {
+                        });
                 } else if (command === 'help') {
                     window.open('https://doc.dc3.site');
                 }

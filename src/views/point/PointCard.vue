@@ -123,10 +123,14 @@
                 });
             },
             edit(id) {
-                this.$router.push({name: 'pointEdit', query: {id, profileId: this.data.profileId, active: '0'}});
+                this.$router.push({name: 'pointEdit', query: {id, profileId: this.data.profileId, active: '0'}})
+                    .catch(() => {
+                    });
             },
             detail(id) {
-                this.$router.push({name: 'pointDetail', query: {id, active: 'detail'}});
+                this.$router.push({name: 'pointDetail', query: {id, active: 'detail'}})
+                    .catch(() => {
+                    });
             },
             copyId(content) {
                 setCopyContent(content, true, '位号ID');

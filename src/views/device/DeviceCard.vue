@@ -120,10 +120,14 @@
                 });
             },
             edit(id, driverId) {
-                this.$router.push({name: 'deviceEdit', query: {id, driverId, active: '0'}});
+                this.$router.push({name: 'deviceEdit', query: {id, driverId, active: '0'}})
+                    .catch(() => {
+                    });
             },
             detail(id, driverId) {
-                this.$router.push({name: 'deviceDetail', query: {id, driverId, active: 'detail'}});
+                this.$router.push({name: 'deviceDetail', query: {id, driverId, active: 'detail'}})
+                    .catch(() => {
+                    });
             },
             copyId(content) {
                 setCopyContent(content, true, '设备ID');

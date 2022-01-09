@@ -90,10 +90,14 @@
                 });
             },
             edit(id) {
-                this.$router.push({name: 'profileEdit', query: {id, active: '0'}});
+                this.$router.push({name: 'profileEdit', query: {id, active: '0'}})
+                    .catch(() => {
+                    });
             },
             detail(id) {
-                this.$router.push({name: 'profileDetail', query: {id, active: 'detail'}});
+                this.$router.push({name: 'profileDetail', query: {id, active: 'detail'}})
+                    .catch(() => {
+                    });
             },
             copyId(content) {
                 setCopyContent(content, true, '模板ID');
