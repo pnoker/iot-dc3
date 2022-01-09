@@ -70,7 +70,7 @@ public class TranscodeRunner implements ApplicationRunner {
     }
 
     public List<Rtmp> authStartList() {
-        Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages().setSize(-1L)));
+        Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages().setSize(-1)));
         return Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>(16));
     }
 
