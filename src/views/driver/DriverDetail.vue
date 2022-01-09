@@ -17,6 +17,7 @@
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
                             <skeleton-card :loading="deviceLoading" :footer="true"></skeleton-card>
                         </el-col>
+                        <el-empty v-if="listDeviceData.length<1" description="暂无关联的设备数据！"></el-empty>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listDeviceData">
                             <device-card
                                     :data="data"
@@ -29,8 +30,10 @@
                     </el-row>
                 </el-tab-pane>
                 <el-tab-pane label="驱动模型" name="model">
+                    <el-empty description="暂无驱动模型数据！"></el-empty>
                 </el-tab-pane>
                 <el-tab-pane label="驱动事件" name="event">
+                    <el-empty description="暂无驱动事件数据！"></el-empty>
                 </el-tab-pane>
             </el-tabs>
         </base-card>
@@ -40,15 +43,17 @@
     import baseCard from '@/components/card/base-card';
     import detailCard from '@/components/card/detail-card';
     import skeletonCard from '@/components/card/skeleton-card';
+    import deviceList from '../device/DeviceList';
     import deviceCard from '../device/DeviceCard';
     import pointCard from '../point/PointCard';
     import {dateFormat, setCopyContent} from "@/util/util";
     import {deviceByDriverId, deviceStatusByDriverId} from "@/api/device";
     import {driverDictionary, profileDictionary} from "@/api/dictionary";
     import {driverById} from "@/api/driver";
+    import DriverList from "@/views/driver/DriverList";
 
     export default {
-        components: {baseCard, detailCard, skeletonCard, deviceCard, pointCard},
+        components: {DriverList, baseCard, detailCard, skeletonCard, deviceList, deviceCard, pointCard},
         data() {
             return {
                 id: this.$route.query.id,

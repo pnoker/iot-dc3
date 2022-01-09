@@ -1,5 +1,5 @@
 import {isNull} from "@/util/util";
-import {decode, encode} from 'js-base64'
+import {decode, encode} from 'js-base64';
 import Cookies from "js-cookie";
 
 export function getCookies(key) {

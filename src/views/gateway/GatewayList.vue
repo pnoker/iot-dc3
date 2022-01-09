@@ -27,8 +27,8 @@
 </template>
 <script>
     import skeletonCard from '@/components/card/skeleton-card';
-    import gatewayTool from './GatewayTool'
-    import gatewayCard from './GatewayCard'
+    import gatewayTool from './GatewayTool';
+    import gatewayCard from './GatewayCard';
     import {driverList, driverStatus} from "@/api/driver";
 
     export default {

@@ -30,9 +30,9 @@
     </div>
 </template>
 <script>
-    import baseCard from '@/components/card/base-card'
-    import deviceCard from '../device/DeviceCard'
-    import pointCard from '../point/PointCard'
+    import baseCard from '@/components/card/base-card';
+    import deviceCard from '../device/DeviceCard';
+    import pointCard from '../point/PointCard';
     import {dateFormat, setCopyContent} from "@/util/util";
     import {deviceByDriverId, deviceStatusByDriverId} from "@/api/device";
     import {driverDictionary, profileDictionary} from "@/api/dictionary";

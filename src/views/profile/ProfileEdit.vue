@@ -68,7 +68,7 @@
 </template>
 
 <script>
-    import pointList from '../point/PointList'
+    import pointList from '../point/PointList';
     import {profileById, profileUpdate} from "@/api/profile";
 
     export default {

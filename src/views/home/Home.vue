@@ -130,7 +130,7 @@
     .home-count {
         #count-data {
             width: 100%;
-            height: 320px;
+            height: 400px;
         }
     }
 </style>

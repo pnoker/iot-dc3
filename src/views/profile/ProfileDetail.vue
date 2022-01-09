@@ -18,6 +18,7 @@
                         <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in 12">
                             <skeleton-card :loading="pointLoading" :footer="true"></skeleton-card>
                         </el-col>
+                        <el-empty v-if="listPointData.length<1" description="暂无包含的位号数据！"></el-empty>
                         <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listPointData">
                             <point-card
                                     :data="data"
@@ -32,6 +33,7 @@
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
                             <skeleton-card :loading="deviceLoading" :footer="true"></skeleton-card>
                         </el-col>
+                        <el-empty v-if="listDeviceData.length<1" description="暂无关联的设备数据！"></el-empty>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listDeviceData">
                             <device-card
                                     :data="data"
@@ -44,6 +46,7 @@
                     </el-row>
                 </el-tab-pane>
                 <el-tab-pane label="模板模型" name="model">
+                    <el-empty description="暂无模板模型数据！"></el-empty>
                 </el-tab-pane>
             </el-tabs>
         </base-card>
