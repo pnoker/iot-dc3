@@ -21,7 +21,9 @@
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in 12">
                 <skeleton-card :loading="loading"></skeleton-card>
             </el-col>
-            <el-empty v-if="listData.length<1" description="暂无位号数据！"></el-empty>
+            <el-col>
+                <el-empty v-if="listData.length<1" description="暂无位号数据！"></el-empty>
+            </el-col>
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listData">
                 <point-card
                         :data="data"

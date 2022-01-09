@@ -19,7 +19,9 @@
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
                             <skeleton-card :loading="profileLoading" :footer="true"></skeleton-card>
                         </el-col>
-                        <el-empty v-if="listProfileData.length<1" description="暂无包含的模板数据！"></el-empty>
+                        <el-col>
+                            <el-empty v-if="listProfileData.length<1" description="暂无包含的模板数据！"></el-empty>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listProfileData">
                             <profile-card
                                     :data="data"
@@ -34,7 +36,9 @@
                         <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in 12">
                             <skeleton-card :loading="pointLoading" :footer="true"></skeleton-card>
                         </el-col>
-                        <el-empty v-if="listPointData.length<1" description="暂无包含的位号数据！"></el-empty>
+                        <el-col>
+                            <el-empty v-if="listPointData.length<1" description="暂无包含的位号数据！"></el-empty>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" :key="data.id" v-for="data in listPointData">
                             <point-card
                                     :data="data"
@@ -52,7 +56,9 @@
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
                             <skeleton-card :loading="pointValueLoading" :footer="true"></skeleton-card>
                         </el-col>
-                        <el-empty v-if="listPointValueData.length<1" description="暂无设备位号数据！"></el-empty>
+                        <el-col>
+                            <el-empty v-if="listPointValueData.length<1" description="暂无设备位号数据！"></el-empty>
+                        </el-col>
                         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-if="data" v-for="data in listPointValueData">
                             <point-value-card
                                     v-if="data"

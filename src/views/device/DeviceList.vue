@@ -19,7 +19,9 @@
                 <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in 12">
                     <skeleton-card :loading="loading"></skeleton-card>
                 </el-col>
-                <el-empty v-if="listData.length<1" description="暂无设备数据！"></el-empty>
+                <el-col>
+                    <el-empty v-if="listData.length<1" description="暂无设备数据！"></el-empty>
+                </el-col>
                 <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" :key="data.id" v-for="data in listData">
                     <device-card
                             :data="data"

@@ -52,7 +52,9 @@
                     </el-form>
                 </div>
                 <div class="tool-card-content-operation">
-                    <el-button type="success" size="small" icon="el-icon-plus" disabled>新增</el-button>
+                    <div>
+                        <el-button v-if="add" type="success" size="small" icon="el-icon-plus">新增</el-button>
+                    </div>
                     <div class="tool-card-content-operation-page">
                         <el-pagination background layout="total, prev, pager, next, sizes"
                                        :page-sizes="[12, 24, 36, 48]"
@@ -82,6 +84,12 @@
                 type: Object,
                 default: () => {
                     return {}
+                }
+            },
+            add: {
+                type: Boolean,
+                default: () => {
+                    return false;
                 }
             }
         },

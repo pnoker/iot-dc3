@@ -28,7 +28,7 @@
                         <p class="nowrap-description">{{data.description?data.description:'无描述信息'}}</p>
                     </div>
                 </div>
-                <div class="things-card__footer">
+                <div v-if="!footer" class="things-card__footer">
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该驱动？" placement="top" icon="el-icon-remove-outline">
                             <el-button class="operation-tooltip" type="text" slot="reference" disabled>停用</el-button>
@@ -77,6 +77,12 @@
             icon: {
                 type: String,
                 default: 'images/common/driver.png'
+            },
+            footer: {
+                type: Boolean,
+                default: () => {
+                    return false;
+                }
             }
         },
         methods: {
