@@ -48,10 +48,11 @@ public class PointValueApi implements PointValueClient {
                 pointValues = pointValueService.latest(deviceId);
             }
             if (null != pointValues) {
+                // 返回最近100个非字符类型的历史值
                 if (history) {
                     pointValues.forEach(pointValue -> {
                         if (!pointValue.getType().equals(Common.ValueType.STRING)) {
-                            PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100L));
+                            PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100));
                             Page<PointValue> page = pointValueService.list(pointValueDto);
                             if (null != page) {
                                 pointValue.setChildren(page.getRecords().stream()
@@ -76,8 +77,9 @@ public class PointValueApi implements PointValueClient {
                 pointValue = pointValueService.latest(deviceId, pointId);
             }
             if (null != pointValue) {
+                // 返回最近100个非字符类型的历史值
                 if (history) {
-                    PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointId).setPage((new Pages()).setSize(100L));
+                    PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointId).setPage((new Pages()).setSize(100));
                     Page<PointValue> page = pointValueService.list(pointValueDto);
                     if (null != page) {
                         pointValue.setChildren(page.getRecords().stream()
