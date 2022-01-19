@@ -61,16 +61,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
-        <spring-boot.version>2.5.6</spring-boot.version>
-        <spring-cloud.version>2020.0.4</spring-cloud.version>
-        <spring-boot-admin.version>2.5.3</spring-boot-admin.version>
+        <spring-boot.version>2.5.8</spring-boot.version>
+        <spring-cloud.version>2020.0.5</spring-cloud.version>
+        <spring-boot-admin.version>2.5.5</spring-boot-admin.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
 
         <codecov.version>2.7</codecov.version>
         <guava.version>31.0.1-jre</guava.version>
         <findbugs.version>3.0.5</findbugs.version>
         <maven.jar.plugin>3.2.0</maven.jar.plugin>
-        <mybatis.plus.version>3.4.3</mybatis.plus.version>
+        <mybatis.plus.version>3.5.0</mybatis.plus.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
