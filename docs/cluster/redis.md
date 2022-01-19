@@ -1283,7 +1283,7 @@ lazyfree-lazy-user-flush no
 # threads, if you have a 8 cores, try to use 6 threads. In order to
 # enable I/O threads use the following configuration directive:
 #
-# io-threads 4
+io-threads 4
 #
 # Setting io-threads to 1 will just use the main thread as usual.
 # When I/O threads are enabled, we only use threads for writes, that is
@@ -1292,7 +1292,7 @@ lazyfree-lazy-user-flush no
 # protocol parsing using the following configuration directive, by setting
 # it to yes:
 #
-# io-threads-do-reads no
+io-threads-do-reads yes
 #
 # Usually threading reads doesn't help much.
 #
@@ -1369,7 +1369,7 @@ disable-thp yes
 #
 # Please check https://redis.io/topics/persistence for more information.
 
-appendonly yes
+# appendonly yes
 
 # The name of the append only file (default: "appendonly.aof")
 
