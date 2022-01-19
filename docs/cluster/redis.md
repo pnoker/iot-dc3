@@ -99,6 +99,22 @@ mkdir data etc logs
 >  在每个节点的 `etc` 下添加配置文件 `redis.conf `
 
 ```yaml
+#
+#  Copyright 2016-2021 Pnoker. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
 # Redis configuration file example.
 #
 # Note that in order to read the configuration file, Redis must be
@@ -173,7 +189,7 @@ mkdir data etc logs
 # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES
 # JUST COMMENT OUT THE FOLLOWING LINE.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bind 127.0.0.1 -::1
+# bind 127.0.0.1 -::1
 
 # Protected mode is a layer of security protection, in order to avoid that
 # Redis instances left open on the internet are accessed and exploited.
@@ -249,7 +265,7 @@ tcp-keepalive 300
 # server to connected clients, masters or cluster peers.  These files should be
 # PEM formatted.
 #
-# tls-cert-file redis.crt 
+# tls-cert-file redis.crt
 # tls-key-file redis.key
 #
 # If the key file is encrypted using a passphrase, it can be included here
@@ -479,9 +495,9 @@ proc-title-template "{title} {listen-addr} {server-mode}"
 #
 # You can set these explicitly by uncommenting the three following lines.
 #
-# save 3600 1
-# save 300 100
-# save 60 10000
+save 3600 1
+save 300  100
+save 60   10000
 
 # By default Redis will stop accepting writes if RDB snapshots are enabled
 # (at least one save point) and the latest background save failed.
@@ -973,8 +989,8 @@ replica-priority 100
 # ACL LOG
 #
 # The ACL Log tracks failed commands and authentication events associated
-# with ACLs. The ACL Log is useful to troubleshoot failed commands blocked 
-# by ACLs. The ACL Log is stored in memory. You can reclaim memory with 
+# with ACLs. The ACL Log is useful to troubleshoot failed commands blocked
+# by ACLs. The ACL Log is stored in memory. You can reclaim memory with
 # ACL LOG RESET. Define the maximum entry length of the ACL Log below.
 acllog-max-len 128
 
@@ -1004,7 +1020,7 @@ acllog-max-len 128
 # New users are initialized with restrictive permissions by default, via the
 # equivalent of this ACL rule 'off resetkeys -@all'. Starting with Redis 6.2, it
 # is possible to manage access to Pub/Sub channels with ACL rules as well. The
-# default Pub/Sub channels permission if new users is controlled by the 
+# default Pub/Sub channels permission if new users is controlled by the
 # acl-pubsub-default configuration directive, which accepts one of these values:
 #
 # allchannels: grants access to all Pub/Sub channels
@@ -1091,6 +1107,8 @@ acllog-max-len 128
 # output buffers (but this is not needed if the policy is 'noeviction').
 #
 # maxmemory <bytes>
+# 4G * 1024M * 1024K* 1024B
+maxmemory 4294967296
 
 # MAXMEMORY POLICY: how Redis will select what to remove when maxmemory
 # is reached. You can select one from the following behaviors:
@@ -1120,6 +1138,7 @@ acllog-max-len 128
 # The default is:
 #
 # maxmemory-policy noeviction
+maxmemory-policy volatile-lru
 
 # LRU, LFU and minimal TTL algorithms are not precise algorithms but approximated
 # algorithms (in order to save memory), so you can tune it for speed or
@@ -1134,7 +1153,7 @@ acllog-max-len 128
 
 # Eviction processing is designed to function well with the default setting.
 # If there is an unusually large amount of write traffic, this value may need to
-# be increased.  Decreasing this value may reduce latency at the risk of 
+# be increased.  Decreasing this value may reduce latency at the risk of
 # eviction processing effectiveness
 #   0 = minimum latency, 10 = default, 100 = process without regard to latency
 #
@@ -1350,7 +1369,7 @@ disable-thp yes
 #
 # Please check https://redis.io/topics/persistence for more information.
 
-appendonly no
+appendonly yes
 
 # The name of the append only file (default: "appendonly.aof")
 
