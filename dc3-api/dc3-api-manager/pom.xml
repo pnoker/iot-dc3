@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>dc3-api</artifactId>
-        <version>1.3.2.SR</version>
+        <version>2022.1.0</version>
     </parent>
 
     <artifactId>dc3-api-manager</artifactId>

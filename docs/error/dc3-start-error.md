@@ -15,6 +15,6 @@
 ```bash
 cd dc3/dependencies/maven
 
-mvn install:install-file -Dfile=dc3-boot-starter-1.3.2.SR.jar -DgroupId=com.dc3 -DartifactId=dc3-boot-starter -Dversion=1.3.2.SR -Dpackaging=jar
+mvn install:install-file -Dfile=dc3-boot-starter-2022.1.0.jar -DgroupId=com.dc3 -DartifactId=dc3-boot-starter -Dversion=2022.1.0 -Dpackaging=jar
 ```
 

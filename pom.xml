@@ -17,7 +17,7 @@
 
     <groupId>com.dc3</groupId>
     <artifactId>iot-dc3</artifactId>
-    <version>1.3.2.SR</version>
+    <version>2022.1.0</version>
     <packaging>pom</packaging>
 
     <developers>
@@ -61,8 +61,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
-        <spring-boot.version>2.5.8</spring-boot.version>
-        <spring-cloud.version>2020.0.5</spring-cloud.version>
+        <spring-boot.version>2.6.2</spring-boot.version>
+        <spring-cloud.version>2021.0.0</spring-cloud.version>
         <spring-boot-admin.version>2.5.5</spring-boot-admin.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
 
@@ -196,7 +196,7 @@
             <!-- Dc3 Driver Sdk  -->
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-sdk</artifactId>
+                <artifactId>dc3-common-sdk</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
@@ -204,19 +204,25 @@
             <!-- Dc3 Common -->
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-core</artifactId>
+                <artifactId>dc3-common-api</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-base</artifactId>
+                <artifactId>dc3-common-core</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>com.dc3</groupId>
-                <artifactId>dc3-profiles</artifactId>
+                <artifactId>dc3-common-base</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.dc3</groupId>
+                <artifactId>dc3-common-profiles</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
@@ -314,7 +320,6 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${maven.spring.boot.plugin}</version>
                     <configuration>
                         <finalName>${project.build.finalName}</finalName>
                     </configuration>

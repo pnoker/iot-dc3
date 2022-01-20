@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>1.3.2.SR</version>
+        <version>2022.1.0</version>
     </parent>
 
     <artifactId>dc3-transfer</artifactId>
@@ -26,7 +26,7 @@
     <description>IOT DC3 平台数据交换服务集合。</description>
 
     <modules>
-        <module>dc3-rtmp</module>
+        <module>dc3-transfer-rtmp</module>
     </modules>
 
     <properties>

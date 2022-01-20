@@ -422,9 +422,9 @@ services:
 
   rtmp:
     build:
-      context: ../dc3-transfer/dc3-rtmp/
+      context: ../dc3-transfer/dc3-transfer-rtmp/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-rtmp:1.0.0
+    image: pnoker/dc3-transfer-rtmp:1.0.0
     restart: always
     ports:
       - 8803:8803
@@ -441,12 +441,12 @@ services:
       - EUREKA_PORT=8100
       - SECURITY_USER_NAME=dc3
       - SECURITY_USER_PASSWORD=dc3
-    container_name: dc3-rtmp
-    hostname: dc3-rtmp
+    container_name: dc3-transfer-rtmp
+    hostname: dc3-transfer-rtmp
     networks:
       dc3net:
         aliases:
-          - dc3-rtmp
+          - dc3-transfer-rtmp
 
   mysql:
     build:
