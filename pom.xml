@@ -76,7 +76,6 @@
         <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
         <maven.resource.plugin>3.1.0</maven.resource.plugin>
         <maven.dependency.plugin>3.1.2</maven.dependency.plugin>
-        <maven.spring.boot.plugin>2.2.2.RELEASE</maven.spring.boot.plugin>
     </properties>
 
     <dependencies>
