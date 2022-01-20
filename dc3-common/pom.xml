@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.dc3</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>1.3.2.SR</version>
+        <version>2022.1.0</version>
     </parent>
 
     <artifactId>dc3-common</artifactId>
@@ -29,10 +29,11 @@
     <description>IOT DC3 平台 Common 公共模块。</description>
 
     <modules>
-        <module>dc3-core</module>
-        <module>dc3-base</module>
-        <module>dc3-profiles</module>
-        <module>dc3-sdk</module>
+        <module>dc3-common-api</module>
+        <module>dc3-common-core</module>
+        <module>dc3-common-base</module>
+        <module>dc3-common-profiles</module>
+        <module>dc3-common-sdk</module>
     </modules>
 
 </project>
