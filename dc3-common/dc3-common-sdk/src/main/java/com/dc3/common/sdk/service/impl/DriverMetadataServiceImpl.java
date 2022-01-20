@@ -198,7 +198,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
                 }
             }).get(5, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException exception) {
-            driverService.close("The driver initialization failed, Check whether dc3-manager are started normally");
+            driverService.close("The driver initialization failed, Check whether dc3-center-manager are started normally");
         }
     }
 
@@ -216,7 +216,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
                 }
             }).get(5, TimeUnit.MINUTES);
         } catch (InterruptedException | ExecutionException | TimeoutException exception) {
-            driverService.close("The driver initialization failed, Sync driver metadata from dc3-manager timeout");
+            driverService.close("The driver initialization failed, Sync driver metadata from dc3-center-manager timeout");
         }
     }
 }

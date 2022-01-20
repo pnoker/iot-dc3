@@ -97,23 +97,23 @@ spec:
               servicePort: 80
           - path: /dc3/gateway
             backend:
-              serviceName: dc3-monitor
+              serviceName: dc3-center-monitor
               servicePort: 8000
           - path: /dc3/register
             backend:
-              serviceName: dc3-register
+              serviceName: dc3-center-register
               servicePort: 8100
           - path: /dc3/monitor
             backend:
-              serviceName: dc3-monitor
+              serviceName: dc3-center-monitor
               servicePort: 8200
           - path: /eureka/
             backend:
-              serviceName: dc3-register
+              serviceName: dc3-center-register
               servicePort: 8100
           - path: /monitor/
             backend:
-              serviceName: dc3-monitor
+              serviceName: dc3-center-monitor
               servicePort: 8200
 
 ---
@@ -139,33 +139,33 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dc3-register
+  name: dc3-center-register
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-register
+    dc3.service: dc3-center-register
 spec:
   ports:
     - name: "8100"
       port: 8100
       targetPort: 8100
   selector:
-    dc3.service: dc3-register
+    dc3.service: dc3-center-register
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dc3-monitor
+  name: dc3-center-monitor
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-monitor
+    dc3.service: dc3-center-monitor
 spec:
   ports:
     - name: "8200"
       port: 8200
       targetPort: 8200
   selector:
-    dc3.service: dc3-monitor
+    dc3.service: dc3-center-monitor
 
 ---
 apiVersion: v1
@@ -187,49 +187,49 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dc3-auth
+  name: dc3-center-auth
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-auth
+    dc3.service: dc3-center-auth
 spec:
   ports:
     - name: "8300"
       port: 8300
       targetPort: 8300
   selector:
-    dc3.service: dc3-auth
+    dc3.service: dc3-center-auth
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dc3-manager
+  name: dc3-center-manager
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-manager
+    dc3.service: dc3-center-manager
 spec:
   ports:
     - name: "8400"
       port: 8400
       targetPort: 8400
   selector:
-    dc3.service: dc3-manager
+    dc3.service: dc3-center-manager
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dc3-data
+  name: dc3-center-data
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-data
+    dc3.service: dc3-center-data
 spec:
   ports:
     - name: "8500"
       port: 8500
       targetPort: 8500
   selector:
-    dc3.service: dc3-data
+    dc3.service: dc3-center-data
 
 ---
 apiVersion: v1
@@ -340,15 +340,15 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dc3-register
+  name: dc3-center-register
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-register
+    dc3.service: dc3-center-register
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dc3.service: dc3-register
+      dc3.service: dc3-center-register
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -357,13 +357,13 @@ spec:
   template:
     metadata:
       labels:
-        dc3.service: dc3-register
+        dc3.service: dc3-center-register
         dc3.network/dc3net: "true"
     spec:
-      hostname: dc3-register
+      hostname: dc3-center-register
       containers:
-        - name: dc3-register
-          image: dc3.local/dc3-register:1.0.0
+        - name: dc3-center-register
+          image: dc3.local/dc3-center-register:1.0.0
           ports:
             - containerPort: 8100
           env:
@@ -374,15 +374,15 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dc3-monitor
+  name: dc3-center-monitor
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-monitor
+    dc3.service: dc3-center-monitor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dc3.service: dc3-monitor
+      dc3.service: dc3-center-monitor
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -391,13 +391,13 @@ spec:
   template:
     metadata:
       labels:
-        dc3.service: dc3-monitor
+        dc3.service: dc3-center-monitor
         dc3.network/dc3net: "true"
     spec:
-      hostname: dc3-monitor
+      hostname: dc3-center-monitor
       containers:
-        - name: dc3-monitor
-          image: dc3.local/dc3-monitor:1.0.0
+        - name: dc3-center-monitor
+          image: dc3.local/dc3-center-monitor:1.0.0
           ports:
             - containerPort: 8200
           env:
@@ -441,15 +441,15 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dc3-auth
+  name: dc3-center-auth
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-auth
+    dc3.service: dc3-center-auth
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dc3.service: dc3-auth
+      dc3.service: dc3-center-auth
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -458,13 +458,13 @@ spec:
   template:
     metadata:
       labels:
-        dc3.service: dc3-auth
+        dc3.service: dc3-center-auth
         dc3.network/dc3net: "true"
     spec:
-      hostname: dc3-auth
+      hostname: dc3-center-auth
       containers:
-        - name: dc3-auth
-          image: dc3.local/dc3-auth:1.0.0
+        - name: dc3-center-auth
+          image: dc3.local/dc3-center-auth:1.0.0
           ports:
             - containerPort: 8300
 
@@ -472,15 +472,15 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dc3-manager
+  name: dc3-center-manager
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-manager
+    dc3.service: dc3-center-manager
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dc3.service: dc3-manager
+      dc3.service: dc3-center-manager
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -489,13 +489,13 @@ spec:
   template:
     metadata:
       labels:
-        dc3.service: dc3-manager
+        dc3.service: dc3-center-manager
         dc3.network/dc3net: "true"
     spec:
-      hostname: dc3-manager
+      hostname: dc3-center-manager
       containers:
-        - name: dc3-manager
-          image: dc3.local/dc3-manager:1.0.0
+        - name: dc3-center-manager
+          image: dc3.local/dc3-center-manager:1.0.0
           ports:
             - containerPort: 8400
 
@@ -503,15 +503,15 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dc3-data
+  name: dc3-center-data
   namespace: kube-dc3
   labels:
-    dc3.service: dc3-data
+    dc3.service: dc3-center-data
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dc3.service: dc3-data
+      dc3.service: dc3-center-data
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -520,13 +520,13 @@ spec:
   template:
     metadata:
       labels:
-        dc3.service: dc3-data
+        dc3.service: dc3-center-data
         dc3.network/dc3net: "true"
     spec:
-      hostname: dc3-data
+      hostname: dc3-center-data
       containers:
-        - name: dc3-data
-          image: dc3.local/dc3-data:1.0.0
+        - name: dc3-center-data
+          image: dc3.local/dc3-center-data:1.0.0
           ports:
             - containerPort: 8500
 

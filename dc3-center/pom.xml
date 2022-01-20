@@ -26,11 +26,11 @@
     <description>IOT DC3 平台 综合管理中心集合，包含：服务注册与发现中心、服务监控中心、物联数据采集中心、授权与权限管理中心。</description>
 
     <modules>
-        <module>dc3-auth</module>
-        <module>dc3-register</module>
-        <module>dc3-monitor</module>
-        <module>dc3-manager</module>
-        <module>dc3-data</module>
+        <module>dc3-center-auth</module>
+        <module>dc3-center-register</module>
+        <module>dc3-center-monitor</module>
+        <module>dc3-center-manager</module>
+        <module>dc3-center-data</module>
     </modules>
 
     <properties>
