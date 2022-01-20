@@ -27,16 +27,16 @@ ENV GC_LOG -XX:+PrintGCDetails \
            -XX:+UseGCLogFileRotation \
            -XX:NumberOfGCLogFiles=10 \
            -XX:GCLogFileSize=10M \
-           -Xloggc:dc3/logs/center/data/gc/dc3-data-gc.log
+           -Xloggc:dc3/logs/center/data/gc/dc3-center-data-gc.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-WORKDIR /dc3-center/dc3-data
+WORKDIR /dc3-center/dc3-center-data
 
-ADD ./target/dc3-data.jar ./
+ADD ./target/dc3-center-data.jar ./
 
 EXPOSE 8500
-VOLUME /dc3-center/dc3-data/dc3/logs
+VOLUME /dc3-center/dc3-center-data/dc3/logs
 
-CMD mkdir -p /dc3-center/dc3-data/dc3/logs/center/data/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-data.jar
+CMD mkdir -p /dc3-center/dc3-center-data/dc3/logs/center/data/gc \
+    && java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-center-data.jar

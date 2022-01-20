@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "e8b40186-1a1d-4965-be86-67b818c058dd",
-		"name": "dc3-auth",
+		"name": "dc3-center-auth",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [

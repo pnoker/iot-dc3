@@ -42,88 +42,88 @@ services:
 
   register:
     build:
-      context: ../dc3-center/dc3-register/
+      context: ../dc3-center/dc3-center-register/
       dockerfile: ./Dockerfile
-    image: dc3.local/dc3-register:1.0.0
+    image: dc3.local/dc3-center-register:1.0.0
     restart: always
     ports:
       - 8100:8100
-    container_name: dc3-register
-    hostname: dc3-register
+    container_name: dc3-center-register
+    hostname: dc3-center-register
     volumes:
-      - logs:/dc3-center/dc3-register/dc3/logs
+      - logs:/dc3-center/dc3-center-register/dc3/logs
     networks:
       dc3net:
         aliases:
-          - dc3-register
+          - dc3-center-register
 
   monitor:
     build:
-      context: ../dc3-center/dc3-monitor/
+      context: ../dc3-center/dc3-center-monitor/
       dockerfile: ./Dockerfile
-    image: dc3.local/dc3-monitor:1.0.0
+    image: dc3.local/dc3-center-monitor:1.0.0
     restart: always
     ports:
       - 8200:8200
-    container_name: dc3-monitor
-    hostname: dc3-monitor
+    container_name: dc3-center-monitor
+    hostname: dc3-center-monitor
     volumes:
-      - logs:/dc3-center/dc3-monitor/dc3/logs
+      - logs:/dc3-center/dc3-center-monitor/dc3/logs
     networks:
       dc3net:
         aliases:
-          - dc3-monitor
+          - dc3-center-monitor
 
   auth:
     build:
-      context: ../dc3-center/dc3-auth/
+      context: ../dc3-center/dc3-center-auth/
       dockerfile: ./Dockerfile
-    image: dc3.local/dc3-auth:1.0.0
+    image: dc3.local/dc3-center-auth:1.0.0
     restart: always
     ports:
       - 8300:8300
-    container_name: dc3-auth
-    hostname: dc3-auth
+    container_name: dc3-center-auth
+    hostname: dc3-center-auth
     volumes:
-      - logs:/dc3-center/dc3-auth/dc3/logs
+      - logs:/dc3-center/dc3-center-auth/dc3/logs
     networks:
       dc3net:
         aliases:
-          - dc3-auth
+          - dc3-center-auth
 
   manager:
     build:
-      context: ../dc3-center/dc3-manager/
+      context: ../dc3-center/dc3-center-manager/
       dockerfile: ./Dockerfile
-    image: dc3.local/dc3-manager:1.0.0
+    image: dc3.local/dc3-center-manager:1.0.0
     restart: always
     ports:
       - 8400:8400
-    container_name: dc3-manager
-    hostname: dc3-manager
+    container_name: dc3-center-manager
+    hostname: dc3-center-manager
     volumes:
-      - logs:/dc3-center/dc3-manager/dc3/logs
+      - logs:/dc3-center/dc3-center-manager/dc3/logs
     networks:
       dc3net:
         aliases:
-          - dc3-manager
+          - dc3-center-manager
 
   data:
     build:
-      context: ../dc3-center/dc3-data/
+      context: ../dc3-center/dc3-center-data/
       dockerfile: ./Dockerfile
-    image: dc3.local/dc3-data:1.0.0
+    image: dc3.local/dc3-center-data:1.0.0
     restart: always
     ports:
       - 8500:8500
-    container_name: dc3-data
-    hostname: dc3-data
+    container_name: dc3-center-data
+    hostname: dc3-center-data
     volumes:
-      - logs:/dc3-center/dc3-data/dc3/logs
+      - logs:/dc3-center/dc3-center-data/dc3/logs
     networks:
       dc3net:
         aliases:
-          - dc3-data
+          - dc3-center-data
 
   virtual:
     build:

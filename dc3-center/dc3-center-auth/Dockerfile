@@ -27,16 +27,16 @@ ENV GC_LOG -XX:+PrintGCDetails \
            -XX:+UseGCLogFileRotation \
            -XX:NumberOfGCLogFiles=10 \
            -XX:GCLogFileSize=10M \
-           -Xloggc:dc3/logs/center/manager/gc/dc3-manager-gc.log
+           -Xloggc:dc3/logs/center/auth/gc/dc3-center-auth-gc.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-WORKDIR /dc3-center/dc3-manager
+WORKDIR /dc3-center/dc3-center-auth
 
-ADD ./target/dc3-manager.jar ./
+ADD ./target/dc3-center-auth.jar ./
 
-EXPOSE 8400
-VOLUME /dc3-center/dc3-manager/dc3/logs
+EXPOSE 8300
+VOLUME /dc3-center/dc3-center-auth/dc3/logs
 
-CMD mkdir -p /dc3-center/dc3-manager/dc3/logs/center/manager/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-manager.jar
+CMD mkdir -p /dc3-center/dc3-center-auth/dc3/logs/center/auth/gc \
+    && java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-center-auth.jar

@@ -134,25 +134,25 @@ public interface Common {
          */
         interface Event {
             /**
-             * 驱动注册握手事件，该事件用于校验当前 dc3-manager 是否可用
+             * 驱动注册握手事件，该事件用于校验当前 dc3-center-manager 是否可用
              */
             String DRIVER_HANDSHAKE = "driver_handshake";
             String DRIVER_HANDSHAKE_BACK = "driver_handshake_back";
 
             /**
-             * 驱动注册事件，该事件用于向 dc3-manager 注册驱动配置信息
+             * 驱动注册事件，该事件用于向 dc3-center-manager 注册驱动配置信息
              */
             String DRIVER_REGISTER = "driver_register";
             String DRIVER_REGISTER_BACK = "driver_register_back";
 
             /**
-             * 同步驱动元数据时间，该事件用于向 dc3-manager 发送驱动元数据同步请求
+             * 同步驱动元数据时间，该事件用于向 dc3-center-manager 发送驱动元数据同步请求
              */
             String DRIVER_METADATA_SYNC = "driver_metadata_sync";
             String DRIVER_METADATA_SYNC_BACK = "driver_metadata_sync_back";
 
             /**
-             * 驱动心跳事件，该事件用于向 dc3-manager 发送驱动的当前状态
+             * 驱动心跳事件，该事件用于向 dc3-center-manager 发送驱动的当前状态
              */
             String HEARTBEAT = "heartbeat";
 
@@ -262,7 +262,7 @@ public interface Common {
     interface Service {
 
         /**
-         * dc3-auth 服务
+         * dc3-center-auth 服务
          */
         String DC3_AUTH_SERVICE_NAME = "DC3-AUTH";
         String DC3_AUTH_USER_URL_PREFIX = "/auth/user";
@@ -279,7 +279,7 @@ public interface Common {
         String DC3_AUTH_TENANT_ID = "X-Auth-Tenant-Id";
 
         /**
-         * dc3-manager 服务
+         * dc3-center-manager 服务
          */
         String DC3_MANAGER_SERVICE_NAME = "DC3-MANAGER";
         String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
@@ -305,7 +305,7 @@ public interface Common {
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
 
         /**
-         * dc3-data 服务
+         * dc3-center-data 服务
          */
         String DC3_DATA_SERVICE_NAME = "DC3-DATA";
         String DC3_DATA_POINT_VALUE_URL_PREFIX = "/data/point_value";

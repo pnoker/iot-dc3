@@ -30,12 +30,12 @@
 127.0.0.1       dc3-redis
 127.0.0.1       dc3-mongo
 127.0.0.1       dc3-rabbitmq
-127.0.0.1       dc3-register
+127.0.0.1       dc3-center-register
 127.0.0.1       dc3-nginx
 # dev
-127.0.0.1       dc3-auth
-127.0.0.1       dc3-manager
-127.0.0.1       dc3-data
+127.0.0.1       dc3-center-auth
+127.0.0.1       dc3-center-manager
+127.0.0.1       dc3-center-data
 # End DC3
 ```
 
@@ -74,16 +74,16 @@ docker-compose up -d mysql redis mongo rabbitmq register monitor auth
 
 ### 启动 Manager & Data 服务
 
-在 Idea 中依次启动 `dc3-manager` 、 `dc3-data` 
+在 Idea 中依次启动 `dc3-center-manager` 、 `dc3-center-data` 
 
  Main函数为位置：
 
- `dc3-manager`：dc3-center/dc3-manager/src/main/java/com/dc3/center/manager/ManagerApplication.java
+ `dc3-center-manager`：dc3-center/dc3-center-manager/src/main/java/com/dc3/center/manager/ManagerApplication.java
 
- `dc3-data`：dc3-center/dc3-data/src/main/java/com/dc3/center/data/DataApplication.java
+ `dc3-center-data`：dc3-center/dc3-center-data/src/main/java/com/dc3/center/data/DataApplication.java
 
 
- 注意：在启动 `dc3-manager` 、 `dc3-data` 的时候由于开启了 `ASPECTJ` ，所以需要配置 `-javaagent:dc3/lib/aspectjweaver-1.9.5.jar`
+ 注意：在启动 `dc3-center-manager` 、 `dc3-center-data` 的时候由于开启了 `ASPECTJ` ，所以需要配置 `-javaagent:dc3/lib/aspectjweaver-1.9.5.jar`
 
 ![](../images/idea/aspectj.png)
 

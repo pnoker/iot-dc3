@@ -19,4 +19,4 @@ eureka:
     prefer-same-zone-eureka: true
     registry-fetch-interval-seconds: 5
     service-url:
-      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${EUREKA_HOST:dc3-register}:${EUREKA_PORT:8100}/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${EUREKA_HOST:dc3-center-register}:${EUREKA_PORT:8100}/eureka/

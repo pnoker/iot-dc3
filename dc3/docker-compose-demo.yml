@@ -19,14 +19,14 @@ version: '3'
 services:
 
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:demo
     restart: always
-    container_name: dc3-register
-    hostname: dc3-register
+    container_name: dc3-center-register
+    hostname: dc3-center-register
     networks:
       demo_net:
         aliases:
-          - dc3-register
+          - dc3-center-register
 
   mysql:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:demo
@@ -49,24 +49,24 @@ services:
           - dc3-redis
 
   auth:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-auth:demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:demo
     restart: always
-    container_name: dc3-auth
-    hostname: dc3-auth
+    container_name: dc3-center-auth
+    hostname: dc3-center-auth
     networks:
       demo_net:
         aliases:
-          - dc3-auth
+          - dc3-center-auth
 
   manager:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-manager:demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:demo
     restart: always
-    container_name: dc3-manager
-    hostname: dc3-manager
+    container_name: dc3-center-manager
+    hostname: dc3-center-manager
     networks:
       demo_net:
         aliases:
-          - dc3-manager
+          - dc3-center-manager
 
   mongo:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:demo
@@ -89,14 +89,14 @@ services:
           - dc3-rabbitmq
 
   data:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-data:demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:demo
     restart: always
-    container_name: dc3-data
-    hostname: dc3-data
+    container_name: dc3-center-data
+    hostname: dc3-center-data
     networks:
       demo_net:
         aliases:
-          - dc3-data
+          - dc3-center-data
 
   virtual:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:demo

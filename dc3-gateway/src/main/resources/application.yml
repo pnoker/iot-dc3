@@ -39,7 +39,7 @@ spring:
       routes:
         # auth
         - id: auth_route
-          uri: lb://dc3-auth
+          uri: lb://dc3-center-auth
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/black_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
@@ -56,7 +56,7 @@ spring:
                 fallbackUri: 'forward:/fallback'
         # manager
         - id: manager_route
-          uri: lb://dc3-manager
+          uri: lb://dc3-center-manager
           predicates:
             - Path=/api/v3/manager/**
           filters:
@@ -73,7 +73,7 @@ spring:
                 fallbackUri: 'forward:/fallback'
         # data
         - id: data_route
-          uri: lb://dc3-data
+          uri: lb://dc3-center-data
           predicates:
             - Path=/api/v3/data/**
           filters:
