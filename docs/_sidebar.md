@@ -1,6 +1,4 @@
-- 0.入门
-  - [简介](home.md)
-  - [快速开始](code/quick-start.md)
+- [**0.简介**](home.md)
 
 - 1.开发
   - [1.1 环境配置](code/environment.md)
@@ -62,4 +60,4 @@
   - [5.5 重置 Mongo 服务](error/reset-mongo-error.md)
   - [5.6 重置 Rabbitmq 服务](error/reset-rabbitmq-error.md)
     
-- [6 关于项目](about.md)
+- [**6 关于项目**](about.md)

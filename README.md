@@ -4,8 +4,8 @@
 	<a href='https://gitee.com/pnoker/iot-dc3/members'><img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'></img></a>
 	<br>
 	<a><img src="https://img.shields.io/badge/JDK-1.8-green.svg"></a>
-	<a><img src="https://img.shields.io/badge/Spring Boot-2.3.2.RELEASE-blue.svg"></a>
-	<a><img src="https://img.shields.io/badge/Spring Cloud-Hoxton.SR8-blue.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Boot-2.6.2-blue.svg"></a>
+	<a><img src="https://img.shields.io/badge/Spring Cloud-2021.0.0-blue.svg"></a>
 	<a href="https://github.com/pnoker/iot-dc3/blob/master/LICENSE"><img src="https://img.shields.io/github/license/pnoker/iot-dc3.svg"></a>	
 	<br><strong>DC3 是基于 Spring Cloud 的开源可分布式物联网 (IOT) 平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。</strong>
 </p>
@@ -58,12 +58,6 @@
 > 详情请阅读 [`IOT DC3 Wiki (https://doc.dc3.site)`](https://doc.dc3.site) 文档
 >
 > **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
-
-
-
-> **入门：一睹为快，快速启动一个！**
->
-> 请阅读 [`快速开始`](https://doc.dc3.site/#/quick-start?id=%e4%b8%80%e7%9d%b9%e4%b8%ba%e5%bf%ab) 文档
 
 
 
