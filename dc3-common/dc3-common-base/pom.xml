@@ -30,8 +30,8 @@
 
     <properties>
         <jwt.version>0.9.1</jwt.version>
-        <hutool.version>5.6.3</hutool.version>
-        <fastjson.version>1.2.76</fastjson.version>
+        <hutool.version>5.7.20</hutool.version>
+        <fastjson.version>1.2.79</fastjson.version>
     </properties>
 
     <dependencies>
