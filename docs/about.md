@@ -26,8 +26,6 @@
 
 > DC3 开源项目纯个人兴趣爱好，从16年开始利用业余时间开始设计、开发和测试，如果感兴趣参与可以 Email 说明。
 
-:rocket: 微信: `pnokers`  
-
 :beers: QQ群: `224029423`
 
 :whale2: 邮箱  : `pnokers@gmail.com`

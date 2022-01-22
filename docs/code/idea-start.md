@@ -2,13 +2,13 @@
 
 > **前提：** 务必保证至少需要给docker分配：1核 CPU 以及 4G 以上的运行内存！
 
-* JDK : `Oracle JDK 1.8` 或者 `OpenJDK8`；
+* JDK : 推荐使用 `Oracle JDK 1.8` 或者 `OpenJDK8`，理论来说其他版本也行；
 
 * Maven : 推荐使用 `Maven 3.6` ，理论来说其他版本也行；
 
-* IDE : `IntelliJ IDEA` 或者 `Eclipse`；
+* IDE : `IntelliJ IDEA` 或者 `Eclipse`，理论来说其他 Java IDE 也行；；
 
-* Docker : 需要提供 `docker` 和 `docker-compose` 指令，至少需要给 `docker` 分配 `4G` 的运行内存，如果配置国内镜像加速，下载镜像速度会快一些。
+* Docker : 需要提供 `docker` 和 `docker-compose` 指令，至少需要给 `docker` 分配 `4G` 的运行内存，建议配置国内镜像加速，下载镜像速度会快一些。
 
 
 
@@ -30,9 +30,9 @@
 127.0.0.1       dc3-redis
 127.0.0.1       dc3-mongo
 127.0.0.1       dc3-rabbitmq
-127.0.0.1       dc3-center-register
 127.0.0.1       dc3-nginx
 # dev
+127.0.0.1       dc3-center-register
 127.0.0.1       dc3-center-auth
 127.0.0.1       dc3-center-manager
 127.0.0.1       dc3-center-data
@@ -50,16 +50,18 @@
  - 内存数据库 : `Redis`
  - 消息中间件 : `RabbitMQ`
  - 服务注册中心 : `Register`
- - 服务监控中心 : `Monitor`
  - 权限管理中心 : `Auth`
 
 
 ```bash
 cd iot-dc3
+
+# 提示：如果你在使用 mvn clean -U package 时失败，请使用以下指令
 mvn -s dc3/dependencies/maven/settings.xml clean -U package
+
 cd dc3
-docker-compose build mysql redis mongo rabbitmq register monitor auth
-docker-compose up -d mysql redis mongo rabbitmq register monitor auth
+docker-compose build mysql redis mongo rabbitmq register auth
+docker-compose up -d mysql redis mongo rabbitmq register auth
 ```
 
 

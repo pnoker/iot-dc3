@@ -14,7 +14,7 @@
   -->
 
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
     <!-- mirrors
      | This is a list of mirrors to be used in downloading artifacts from remote repositories.
@@ -30,10 +30,10 @@
     <mirrors>
 
         <mirror>
-            <id>aliyun-central</id>
-            <mirrorOf>central</mirrorOf>
-            <name>Aliyun Apache Maven Central Packages</name>
-            <url>https://maven.aliyun.com/repository/central</url>
+            <id>public</id>
+            <mirrorOf>public</mirrorOf>
+            <name>Aliyun Apache Maven Public Packages</name>
+            <url>https://maven.aliyun.com/repository/public</url>
         </mirror>
 
     </mirrors>
