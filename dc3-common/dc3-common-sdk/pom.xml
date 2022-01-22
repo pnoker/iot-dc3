@@ -26,17 +26,11 @@
     <description>IOT DC3 平台 驱动 SDK 。</description>
 
     <properties>
-        <jna.version>5.8.0</jna.version>
-        <oshi.version>5.8.0</oshi.version>
+        <jna.version>5.10.0</jna.version>
+        <oshi.version>6.1.0</oshi.version>
     </properties>
 
     <dependencies>
-
-        <!-- Spring Cloud Starter -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
 
         <!-- Undertow Web 容器 -->
         <dependency>
