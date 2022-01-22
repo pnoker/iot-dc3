@@ -59,5 +59,6 @@
   - [5.4 重置 Redis 服务](error/reset-redis-error.md)
   - [5.5 重置 Mongo 服务](error/reset-mongo-error.md)
   - [5.6 重置 Rabbitmq 服务](error/reset-rabbitmq-error.md)
+  - [5.7 modbus4j 依赖下载失败](error/modbus4j-error.md)
     
 - [**6 关于项目**](about.md)

@@ -42,15 +42,15 @@
 
     <repositories>
         <repository>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
             <id>ias-snapshots</id>
             <name>Infinite Automation Snapshot Repository</name>
             <url>https://maven.mangoautomation.net/repository/ias-snapshot</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <releases>
