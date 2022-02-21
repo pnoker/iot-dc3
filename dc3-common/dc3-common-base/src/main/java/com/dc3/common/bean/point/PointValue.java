@@ -91,11 +91,11 @@ public class PointValue implements Serializable {
     private Boolean multi;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonFormat(pattern = Common.DATE_FORMAT, timezone = Common.TIMEZONE)
+    @JsonFormat(pattern = Common.COMPLETE_DATE_FORMAT, timezone = Common.TIMEZONE)
     private Date originTime;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonFormat(pattern = Common.DATE_FORMAT, timezone = Common.TIMEZONE)
+    @JsonFormat(pattern = Common.COMPLETE_DATE_FORMAT, timezone = Common.TIMEZONE)
     private Date createTime;
 
     public PointValue(Long pointId, String rawValue, String value) {

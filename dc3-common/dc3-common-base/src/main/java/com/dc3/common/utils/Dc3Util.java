@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,10 +43,10 @@ public class Dc3Util {
     /**
      * SimpleDateFormat ThreadLocal 保证线程安全
      */
-    private static final ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
+    private static final ThreadLocal<SimpleDateFormat> completeDateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected synchronized SimpleDateFormat initialValue() {
-            return new SimpleDateFormat(Common.DATE_FORMAT);
+            return new SimpleDateFormat(Common.COMPLETE_DATE_FORMAT);
         }
     };
 
@@ -145,7 +146,21 @@ public class Dc3Util {
      * @return String
      */
     public static String formatData(Date date) {
-        return simpleDateFormatThreadLocal.get().format(date);
+        return completeDateFormatThreadLocal.get().format(date);
+    }
+
+    /**
+     * 将字符串转为时间类型
+     *
+     * @param dateString Date String
+     * @return Date
+     */
+    public static Date stringToDate(String dateString) {
+        try {
+            return completeDateFormatThreadLocal.get().parse(dateString);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     /**
