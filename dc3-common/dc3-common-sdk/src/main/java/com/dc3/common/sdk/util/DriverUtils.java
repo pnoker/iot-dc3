@@ -14,8 +14,8 @@
 package com.dc3.common.sdk.util;
 
 import cn.hutool.core.convert.Convert;
-import com.dc3.common.constant.Common;
 import com.dc3.common.bean.driver.AttributeInfo;
+import com.dc3.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
@@ -73,6 +73,61 @@ public class DriverUtils {
     public static String base64Decode(String content) {
         byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
         return new String(Base64.getDecoder().decode(bytes));
+    }
+
+    /**
+     * 将 BCD byte[] 转成十进制字符串
+     *
+     * @param bytes Byte Array
+     * @return String
+     */
+    public static String bcdBytesToString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (int i = 0; i < bytes.length; i++) {
+            sb.append((byte) ((bytes[i] & 0xf0) >>> 4));
+            sb.append((byte) (bytes[i] & 0x0f));
+        }
+        return sb.toString().substring(0, 1).equalsIgnoreCase("0") ? sb
+                .toString().substring(1) : sb.toString();
+    }
+
+    /**
+     * 将十进制字符串转成 BCD byte[]
+     *
+     * @param decimalString decimal string
+     * @return byte array
+     */
+    public static byte[] strToBcdBytes(String decimalString) {
+        int length = decimalString.length();
+        int mod = length % 2;
+        if (mod != 0) {
+            decimalString = "0" + decimalString;
+            length = decimalString.length();
+        }
+        if (length >= 2) {
+            length = length / 2;
+        }
+        byte[] bcdBytes = new byte[length];
+        byte[] decimalBytes = decimalString.getBytes();
+        int j, k;
+        for (int i = 0; i < decimalString.length() / 2; i++) {
+            if ((decimalBytes[2 * i] >= '0') && (decimalBytes[2 * i] <= '9')) {
+                j = decimalBytes[2 * i] - '0';
+            } else if ((decimalBytes[2 * i] >= 'a') && (decimalBytes[2 * i] <= 'z')) {
+                j = decimalBytes[2 * i] - 'a' + 0x0a;
+            } else {
+                j = decimalBytes[2 * i] - 'A' + 0x0a;
+            }
+            if ((decimalBytes[2 * i + 1] >= '0') && (decimalBytes[2 * i + 1] <= '9')) {
+                k = decimalBytes[2 * i + 1] - '0';
+            } else if ((decimalBytes[2 * i + 1] >= 'a') && (decimalBytes[2 * i + 1] <= 'z')) {
+                k = decimalBytes[2 * i + 1] - 'a' + 0x0a;
+            } else {
+                k = decimalBytes[2 * i + 1] - 'A' + 0x0a;
+            }
+            bcdBytes[i] = (byte) ((j << 4) + k);
+        }
+        return bcdBytes;
     }
 
     /**
@@ -195,6 +250,22 @@ public class DriverUtils {
         for (byte[] value : bytes) {
             for (byte b : value) {
                 xor ^= b;
+            }
+        }
+        return xor;
+    }
+
+    /**
+     * 获取字节间的累加值
+     *
+     * @param bytes Byte Array
+     * @return Byte
+     */
+    public static byte sumBytes(byte[]... bytes) {
+        byte xor = 0x00;
+        for (byte[] value : bytes) {
+            for (byte b : value) {
+                xor += b;
             }
         }
         return xor;
