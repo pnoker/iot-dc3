@@ -40,6 +40,11 @@ services:
     hostname: dc3-gateway
     volumes:
       - logs:/dc3-gateway/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -63,6 +68,11 @@ services:
     hostname: dc3-center-register
     volumes:
       - logs:/dc3-center/dc3-center-register/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -87,6 +97,11 @@ services:
     hostname: dc3-center-monitor
     volumes:
       - logs:/dc3-center/dc3-center-monitor/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -117,6 +132,11 @@ services:
     hostname: dc3-center-auth
     volumes:
       - logs:/dc3-center/dc3-center-auth/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -158,6 +178,11 @@ services:
     hostname: dc3-center-manager
     volumes:
       - logs:/dc3-center/dc3-center-manager/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -199,6 +224,11 @@ services:
     hostname: dc3-center-data
     volumes:
       - logs:/dc3-center/dc3-center-data/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -226,6 +256,11 @@ services:
     hostname: dc3-driver-virtual
     volumes:
       - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -253,6 +288,11 @@ services:
     hostname: dc3-driver-plcs7
     volumes:
       - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -280,6 +320,11 @@ services:
     hostname: dc3-driver-opc-da
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-da/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -307,6 +352,11 @@ services:
     hostname: dc3-driver-opc-ua
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-ua/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -334,6 +384,11 @@ services:
     hostname: dc3-driver-listening-virtual
     volumes:
       - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -361,6 +416,11 @@ services:
     hostname: dc3-driver-mqtt
     volumes:
       - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -388,6 +448,11 @@ services:
     hostname: dc3-driver-modbus-tcp
     volumes:
       - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -415,6 +480,11 @@ services:
     hostname: dc3-driver-edge-gateway
     volumes:
       - logs:/dc3-driver/dc3-driver-edge-gateway/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -443,6 +513,11 @@ services:
       - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-transfer-rtmp
     hostname: dc3-transfer-rtmp
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -462,6 +537,11 @@ services:
     hostname: dc3-mysql
     volumes:
       - mysql:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -480,6 +560,11 @@ services:
     volumes:
       - mongo_config:/data/configdb
       - mongo_db:/data/db
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -499,6 +584,11 @@ services:
       - opentsdb_data:/data/hbase
       - opentsdb_tmp:/tmp
       - opentsdb_plugins:/opentsdb-plugins
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -518,6 +608,11 @@ services:
       - influxdb:/var/lib/influxdb
       - influxdb2:/var/lib/influxdb2
       - influxdb2_etc:/etc/influxdb2
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -535,6 +630,11 @@ services:
     hostname: dc3-redis
     volumes:
       - redis:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -555,6 +655,11 @@ services:
     hostname: dc3-rabbitmq
     volumes:
       - rabbitmq:/var/lib/rabbitmq
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -577,6 +682,11 @@ services:
       - emqx_lib:/opt/emqx/lib
       - emqx_data:/opt/emqx/data
       - emqx_log:/opt/emqx/log
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -592,6 +702,11 @@ services:
       - 3000:3000
     container_name: dc3-grafana
     hostname: dc3-grafana
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -599,18 +714,23 @@ services:
 
   flink:
     image: flink:1.10
+    command: taskmanager
     restart: always
     expose:
       - 6121
       - 6122
-    depends_on:
-      - jobmanager
-    container_name: dc3-flink-task
-    command: taskmanager
-    links:
-      - jobmanager:jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    container_name: dc3-flink-task
+    depends_on:
+      - jobmanager
+    links:
+      - jobmanager:jobmanager
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -618,15 +738,20 @@ services:
 
   jobmanager:
     image: flink:1.10
+    command: jobmanager
     restart: always
     expose:
       - 6123
     ports:
       - 8081:8081
-    container_name: dc3-flink-job
-    command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    container_name: dc3-flink-job
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -635,12 +760,17 @@ services:
   elasticsearch:
     image: elasticsearch:6.8.18
     restart: always
-    container_name: dc3-elasticsearch
-    hostname: dc3-elasticsearch
     ports:
       - 9200:9200
     environment:
       - discovery.type=single-node
+    container_name: dc3-elasticsearch
+    hostname: dc3-elasticsearch
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -653,6 +783,11 @@ services:
       - 1935:1935
     container_name: dc3-nginx
     hostname: dc3-nginx
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
@@ -660,15 +795,20 @@ services:
 
   portainer:
     image: portainer/portainer:alpine
+    command: -H unix:///var/run/docker.sock
     restart: always
-    container_name: portainer
-    hostname: dc3-portainer
     ports:
       - 9000:9000
-    command: -H unix:///var/run/docker.sock
+    container_name: portainer
+    hostname: dc3-portainer
     volumes:
       - portainer:/data
       - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '15'
     networks:
       dc3net:
         aliases:
