@@ -14,22 +14,24 @@
         <el-row :gutter="3">
             <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
                 <blank-card>
-                    <el-row>
-                        <el-col :key="data.id" v-for="data in 12">
-                            <skeleton-card :loading="driverLoading"></skeleton-card>
-                        </el-col>
-                        <el-col>
-                            <el-empty v-if="listDriverData.length<1" description="暂无驱动数据！"></el-empty>
-                        </el-col>
-                        <el-col :key="data.id" v-for="data in listDriverData">
-                            <driver-card
-                                    :data="data"
-                                    :statusTable="driverStatusTable"
-                                    :footer="true"
-                                    @select-change="selectChange"
-                            ></driver-card>
-                        </el-col>
-                    </el-row>
+                    <GeminiScrollbar class="my-scrollbar">
+                        <el-row>
+                            <el-col :key="data.id" v-for="data in 12">
+                                <skeleton-card :loading="driverLoading"></skeleton-card>
+                            </el-col>
+                            <el-col>
+                                <el-empty v-if="listDriverData.length<1" description="暂无驱动数据！"></el-empty>
+                            </el-col>
+                            <el-col :key="data.id" v-for="data in listDriverData">
+                                <driver-card
+                                        :data="data"
+                                        :statusTable="driverStatusTable"
+                                        :footer="true"
+                                        @select-change="selectChange"
+                                ></driver-card>
+                            </el-col>
+                        </el-row>
+                    </GeminiScrollbar>
                 </blank-card>
             </el-col>
             <el-col :xs="24" :sm="12" :md="16" :lg="18" :xl="20">
@@ -251,4 +253,7 @@
 </script>
 
 <style lang="scss">
+    .my-scrollbar {
+        height: 768px;
+    }
 </style>
