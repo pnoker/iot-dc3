@@ -6,7 +6,8 @@
   "description": "DC3 IoT 平台前端页面",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "serve:mock": "node ./config serve --env mock"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -29,6 +30,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@vue/cli-shared-utils": "latest",
     "@vue/cli-plugin-babel": "~4.5.15",
     "@vue/cli-plugin-router": "~4.5.15",
     "@vue/cli-plugin-vuex": "~4.5.15",
@@ -37,7 +39,10 @@
     "sass-loader": "^8.0.2",
     "vue-cli-plugin-element": "^1.0.1",
     "vue-template-compiler": "^2.6.14",
-    "webpack": "^5.0.0"
+    "webpack": "^5.0.0",
+    "dotenv": "latest",
+    "dotenv-expand": "latest",
+    "minimist": "latest"
   },
   "browserslist": [
     "> 1%",
