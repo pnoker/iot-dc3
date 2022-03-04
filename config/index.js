@@ -31,11 +31,11 @@ const args = require('minimist')(rawArgv, {
         'verbose'
     ]
 });
-const command = args._[0];
 
 const dotenv = require("dotenv");
 const dotenvExpand = require("dotenv-expand");
 const path = require("path");
+const command = args._[0];
 const env = args.env || "dev";
 loadEnv(env);
 
@@ -59,10 +59,10 @@ function loadEnv(env) {
             path: localPath,
             debug: process.env.DEBUG,
         });
-        dotenvExpand(localEnvConfig);
+        dotenvExpand.expand(localEnvConfig);
         // 加载env文件
         const envConfig = dotenv.config({path: envPath, debug: process.env.DEBUG});
-        dotenvExpand(envConfig);
+        dotenvExpand.expand(envConfig);
     } catch (err) {
         // 忽略文件不存在错误
         if (err.toString().indexOf("ENOENT") < 0) {

@@ -7,7 +7,14 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "serve:mock": "node ./config serve --env mock"
+    "serve:dev": "node ./config serve --env dev",
+    "serve:test": "node ./config serve --env test",
+    "serve:mock": "node ./config serve --env mock",
+    "serve:prod": "node ./config serve --env prod",
+    "build:dev": "node ./config build --env dev",
+    "build:test": "node ./config build --env test",
+    "build:mock": "node ./config build --env mock",
+    "build:prod": "node ./config build --env prod"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -27,7 +34,10 @@
     "vue-highlightjs": "^1.3.3",
     "vue-router": "^3.5.3",
     "vue-sparklines": "^0.2.1",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "dotenv": "latest",
+    "dotenv-expand": "latest",
+    "minimist": "latest"
   },
   "devDependencies": {
     "@vue/cli-shared-utils": "latest",
@@ -39,10 +49,7 @@
     "sass-loader": "^8.0.2",
     "vue-cli-plugin-element": "^1.0.1",
     "vue-template-compiler": "^2.6.14",
-    "webpack": "^5.0.0",
-    "dotenv": "latest",
-    "dotenv-expand": "latest",
-    "minimist": "latest"
+    "webpack": "^5.0.0"
   },
   "browserslist": [
     "> 1%",

@@ -5,7 +5,7 @@ module.exports = {
     devServer: {
         proxy: {
             '/api': {
-                target: 'http://dc3-gateway:8000',
+                target: process.env.VUE_APP_API_URL,
                 changeOrigin: true,
                 ws: true,
                 pathRewrite: {
