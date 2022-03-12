@@ -13,12 +13,14 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.mapper.ProfileMapper;
-import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
@@ -55,10 +57,11 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Resource
     private PointService pointService;
+
+    @Resource
+    private DeviceMapper deviceMapper;
     @Resource
     private ProfileMapper profileMapper;
-    @Resource
-    private DeviceService deviceService;
 
     @Override
     @Caching(
@@ -170,7 +173,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Cacheable(value = Common.Cache.PROFILE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Profile> selectByIds(Set<Long> ids) {
         List<Profile> profiles = new ArrayList<>();
-        if (null != ids && ids.size() > 0) {
+        if (CollectionUtil.isNotEmpty(ids)) {
             profiles = profileMapper.selectBatchIds(ids);
             profiles.forEach(profile -> {
                 try {
@@ -184,8 +187,11 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<Profile> selectByDeviceId(Long deviceId) {
-        Device device = deviceService.selectById(deviceId);
-        return selectByIds(device.getProfileIds());
+        Device device = deviceMapper.selectById(deviceId);
+        if (ObjectUtil.isNotNull(device)) {
+            return selectByIds(device.getProfileIds());
+        }
+        return new ArrayList<>();
     }
 
     @Override
