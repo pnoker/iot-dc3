@@ -17,6 +17,7 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.ProfileBindDto;
 import com.dc3.common.model.ProfileBind;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,19 +28,30 @@ import java.util.Set;
 public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto> {
 
     /**
-     * 根据 设备Id 删除关联的模版映射
+     * 根据 设备ID 新增关联的模版映射
+     *
+     * @param deviceId   Device Id
+     * @param profileIds Profile Id Set
+     * @return ProfileBind Array
+     */
+    List<ProfileBind> addByDeviceId(Long deviceId, Set<Long> profileIds);
+
+    /**
+     * 根据 设备ID 删除关联的模版映射
      *
      * @param deviceId Device Id
+     * @return boolean
      */
     boolean deleteByDeviceId(Long deviceId);
 
     /**
-     * 根据 模版ID和设备Id 删除关联的模版映射
+     * 根据 设备ID 和 模版ID 删除关联的模版映射
      *
-     * @param profileId Profile Id
      * @param deviceId  Device Id
+     * @param profileId Profile Id
+     * @return boolean
      */
-    boolean deleteByProfileIdAndDeviceId(Long profileId, Long deviceId);
+    boolean deleteByProfileIdAndDeviceId(Long deviceId, Long profileId);
 
     /**
      * 根据 设备ID 和 模版ID 查询关联的模版映射
