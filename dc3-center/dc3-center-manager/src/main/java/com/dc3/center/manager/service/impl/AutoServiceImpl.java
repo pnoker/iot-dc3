@@ -49,7 +49,7 @@ public class AutoServiceImpl implements AutoService {
 
 
     @Override
-    public PointDetail autoCreateDeviceAndPointDriver(String deviceName, String pointName, Long driverId, Long tenantId) {
+    public PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, Long driverId, Long tenantId) {
         // add device
         Device device = new Device();
         device.setName(deviceName).setDriverId(driverId).setTenantId(tenantId).setDescription("auto create by driver");
