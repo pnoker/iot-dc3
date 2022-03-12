@@ -13,6 +13,7 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -131,7 +132,7 @@ public class DeviceServiceImpl implements DeviceService {
         delete.removeAll(newProfileIds);
 
         addProfileBind(device.getId(), add);
-        delete.forEach(profileId -> profileBindService.deleteByProfileIdAndDeviceId(profileId, device.getId()));
+        delete.forEach(profileId -> profileBindService.deleteByProfileIdAndDeviceId(device.getId(), profileId));
 
         device.setUpdateTime(null);
         if (deviceMapper.updateById(device) > 0) {
@@ -188,7 +189,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Cacheable(value = Common.Cache.DEVICE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Device> selectByIds(Set<Long> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);
-        if (null == devices || devices.size() < 1) {
+        if (CollectionUtil.isEmpty(devices)) {
             throw new NotFoundException("The devices does not exist");
         }
         devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));

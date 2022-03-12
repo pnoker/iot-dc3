@@ -13,10 +13,12 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.ProfileBindMapper;
+import com.dc3.center.manager.mapper.ProfileMapper;
 import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
@@ -24,6 +26,7 @@ import com.dc3.common.dto.ProfileBindDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
+import com.dc3.common.model.Profile;
 import com.dc3.common.model.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -33,6 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -47,6 +51,8 @@ import java.util.stream.Collectors;
 @Service
 public class ProfileBindServiceImpl implements ProfileBindService {
 
+    @Resource
+    private ProfileMapper profileMapper;
     @Resource
     private ProfileBindMapper profileBindMapper;
 
@@ -71,6 +77,21 @@ public class ProfileBindServiceImpl implements ProfileBindService {
             }
             throw new ServiceException("The profile bind add failed");
         }
+    }
+
+    @Override
+    public List<ProfileBind> addByDeviceId(Long deviceId, Set<Long> profileIds) {
+        List<ProfileBind> profileBinds = new ArrayList<>();
+        if (null != profileIds) {
+            profileIds.forEach(profileId -> {
+                Profile profile = profileMapper.selectById(profileId);
+                if (ObjectUtil.isNotNull(profile)) {
+                    ProfileBind profileBind = add(new ProfileBind(profileId, deviceId));
+                    profileBinds.add(profileBind);
+                }
+            });
+        }
+        return profileBinds;
     }
 
     @Override
@@ -117,7 +138,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
                     @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean deleteByProfileIdAndDeviceId(Long profileId, Long deviceId) {
+    public boolean deleteByProfileIdAndDeviceId(Long deviceId, Long profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setProfileId(profileId);
         profileBindDto.setDeviceId(deviceId);

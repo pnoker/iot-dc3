@@ -13,12 +13,14 @@
 
 package com.dc3.center.manager.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.mapper.DriverMapper;
-import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
@@ -55,7 +57,7 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private ProfileBindService profileBindService;
     @Resource
-    private DeviceService deviceService;
+    private DeviceMapper deviceMapper;
 
     @Override
     @Caching(
@@ -138,8 +140,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, key = "#deviceId", unless = "#result==null")
     public Driver selectByDeviceId(Long deviceId) {
-        Device device = deviceService.selectById(deviceId);
-        return selectById(device.getDriverId());
+        Device device = deviceMapper.selectById(deviceId);
+        if (ObjectUtil.isNotNull(device)) {
+            return selectById(device.getDriverId());
+        }
+        throw new NotFoundException("The device does not exist");
     }
 
     @Override
@@ -173,7 +178,7 @@ public class DriverServiceImpl implements DriverService {
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Driver> selectByIds(Set<Long> ids) {
         List<Driver> drivers = driverMapper.selectBatchIds(ids);
-        if (null == drivers || drivers.size() < 1) {
+        if (CollectionUtil.isEmpty(drivers)) {
             throw new NotFoundException("The driver does not exist");
         }
         return drivers;
@@ -183,7 +188,10 @@ public class DriverServiceImpl implements DriverService {
     @Cacheable(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
     public List<Driver> selectByProfileId(Long profileId) {
         Set<Long> deviceIds = profileBindService.selectDeviceIdByProfileId(profileId);
-        List<Device> devices = deviceService.selectByIds(deviceIds);
+        List<Device> devices = deviceMapper.selectBatchIds(deviceIds);
+        if (CollectionUtil.isEmpty(devices)) {
+            throw new NotFoundException("The devices does not exist");
+        }
         Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
         return selectByIds(driverIds);
     }
