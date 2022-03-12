@@ -37,11 +37,10 @@ public class AutoApi implements AutoClient {
     @Resource
     private AutoService autoService;
 
-
     @Override
     public R<PointDetail> autoCreateDeviceAndPoint(PointDetail pointDetail, Long tenantId) {
         try {
-            PointDetail createDeviceAndPoint = autoService.autoCreateDeviceAndPointDriver(pointDetail.getDeviceName(), pointDetail.getPointName(), pointDetail.getDriverId(), tenantId);
+            PointDetail createDeviceAndPoint = autoService.autoCreateDeviceAndPoint(pointDetail.getDeviceName(), pointDetail.getPointName(), pointDetail.getDriverId(), tenantId);
             if (null != createDeviceAndPoint) {
                 return R.ok(createDeviceAndPoint);
             }
