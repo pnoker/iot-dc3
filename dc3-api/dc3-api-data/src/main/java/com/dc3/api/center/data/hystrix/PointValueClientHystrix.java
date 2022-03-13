@@ -35,7 +35,7 @@ public class PointValueClientHystrix implements FallbackFactory<PointValueClient
 
     @Override
     public PointValueClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-DATA" : throwable.getMessage();
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-DATA" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
         return new PointValueClient() {

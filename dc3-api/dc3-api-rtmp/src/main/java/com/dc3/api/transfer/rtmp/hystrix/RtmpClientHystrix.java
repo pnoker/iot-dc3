@@ -33,7 +33,7 @@ public class RtmpClientHystrix implements FallbackFactory<RtmpClient> {
 
     @Override
     public RtmpClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-RTMP" : throwable.getMessage();
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-TRANSFER-RTMP" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
         return new RtmpClient() {

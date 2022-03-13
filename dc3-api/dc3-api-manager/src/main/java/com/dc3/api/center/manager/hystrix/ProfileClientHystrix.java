@@ -35,7 +35,7 @@ public class ProfileClientHystrix implements FallbackFactory<ProfileClient> {
 
     @Override
     public ProfileClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
         return new ProfileClient() {
