@@ -33,7 +33,7 @@ public class UserClientHystrix implements FallbackFactory<UserClient> {
 
     @Override
     public UserClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-AUTH" : throwable.getMessage();
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-AUTH" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
         return new UserClient() {

@@ -35,7 +35,7 @@ public class DeviceClientHystrix implements FallbackFactory<DeviceClient> {
 
     @Override
     public DeviceClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-MANAGER" : throwable.getMessage();
+        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
         log.error("Hystrix:{}", message);
 
         return new DeviceClient() {
