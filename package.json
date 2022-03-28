@@ -5,8 +5,6 @@
   "author": "pnoker",
   "description": "DC3 IoT 平台前端页面",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
     "serve:dev": "node ./config serve --env dev",
     "serve:test": "node ./config serve --env test",
     "serve:mock": "node ./config serve --env mock",

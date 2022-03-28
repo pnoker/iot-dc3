@@ -46,7 +46,7 @@ service.run(command, args, rawArgv).catch(err => {
 
 function loadEnv(env) {
     try {
-        const envOptions = ["dev", "test", "mock", "prod"];
+        const envOptions = ["dev", "mock", "prod", "test"];
         if (!envOptions.includes(env)) {
             throw new Error(
                 `env: ${env} is invalid, options: ${JSON.stringify(envOptions)}`
