@@ -27,26 +27,29 @@ public interface UserService extends Service<User, UserDto> {
     /**
      * 根据用户名查询用户
      *
-     * @param nama Username
+     * @param name Username
+     * @param isEx Throw Exception
      * @return User
      */
-    User selectByName(String nama);
+    User selectByName(String name, boolean isEx);
 
     /**
      * 根据手机号查询用户
      *
      * @param phone Phone
+     * @param isEx  Throw Exception
      * @return User
      */
-    User selectByPhone(String phone);
+    User selectByPhone(String phone, boolean isEx);
 
     /**
      * 根据邮箱查询用户
      *
      * @param email Email
+     * @param isEx  Throw Exception
      * @return User
      */
-    User selectByEmail(String email);
+    User selectByEmail(String email, boolean isEx);
 
     /**
      * 根据用户名判断用户是否存在

@@ -14,13 +14,26 @@
 #  limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.6.6
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:corretto-11
 MAINTAINER pnoker <pnokers.icloud.com>
 
-ENV JAVA_OPS -server -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
+ENV JAVA_OPS -server \
+             -javaagent:/usr/local/java/lib/aspectjweaver.jar \
+             -Xms128m \
+             -Xmx2048m \
+             -Xss256k \
+             -Djava.security.egd=file:/dev/./urandom \
+             -XX:MaxDirectMemorySize=256m \
+             -XX:+UseCompressedOops \
+             -XX:+UseCompressedClassPointers \
+             -XX:+SegmentedCodeCache \
+             -XX:+PrintCommandLineFlags
+ENV GC_LOG   -verbose:gc \
+             -XX:+UseG1GC \
+             -XX:+ExplicitGCInvokesConcurrent \
+             -Xlog:gc*,safepoint:dc3/logs/center/monitor/gc/dc3-center-monitor-gc.log:time,uptime:filecount=20,filesize=20M
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-center/dc3-center-monitor/dc3/logs
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /dc3-center/dc3-center-monitor
 
@@ -29,4 +42,5 @@ ADD ./target/dc3-center-monitor.jar ./
 EXPOSE 8200
 VOLUME /dc3-center/dc3-center-monitor/dc3/logs
 
-CMD java ${JAVA_OPS} -Djava.security.egd=file:/dev/./urandom -jar dc3-center-monitor.jar
+CMD mkdir -p /dc3-center/dc3-center-monitor/dc3/logs/center/monitor/gc \
+    && java ${JAVA_OPS} -jar dc3-center-monitor.jar

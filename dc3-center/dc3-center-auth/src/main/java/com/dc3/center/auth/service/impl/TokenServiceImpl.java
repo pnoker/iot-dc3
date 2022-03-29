@@ -72,7 +72,7 @@ public class TokenServiceImpl implements TokenService {
     public String generateToken(String tenant, String name, String salt, String password) {
         checkUserLimit(name);
         Tenant tempTenant = tenantService.selectByName(tenant);
-        User tempUser = userService.selectByName(name);
+        User tempUser = userService.selectByName(name, false);
         if (tempTenant.getEnable() && tempUser.getEnable()) {
             tenantBindService.selectByTenantIdAndUserId(tempTenant.getId(), tempUser.getId());
             String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + name;

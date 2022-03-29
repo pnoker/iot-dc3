@@ -13,18 +13,19 @@
 
 package com.dc3.center.auth.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.auth.mapper.UserMapper;
 import com.dc3.center.auth.service.UserService;
+import com.dc3.common.annotation.Logs;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.constant.Common;
 import com.dc3.common.dto.UserDto;
-import com.dc3.common.exception.DuplicateException;
-import com.dc3.common.exception.NotFoundException;
-import com.dc3.common.exception.ServiceException;
+import com.dc3.common.exception.*;
 import com.dc3.common.model.User;
 import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Optional;
@@ -62,37 +64,38 @@ public class UserServiceImpl implements UserService {
                     @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
+    @Logs("Add user")
+    @Transactional
+    // 2022-03-13 检查：不通过，会返回密码数据
     public User add(User user) {
         // 判断用户是否存在
-        if (null != selectByName(user.getName())) {
-            throw new DuplicateException("The user already exists with username {}", user.getName());
+        User selectByName = selectByName(user.getName(), false);
+        if (ObjectUtil.isNotNull(selectByName)) {
+            throw new DuplicateException("The user already exists with username: {}", user.getName());
         }
 
-        // 判断 phone 是否存在
-        if (StrUtil.isNotBlank(user.getPhone())) {
-            if (null != selectByPhone(user.getPhone())) {
-                throw new DuplicateException("The user already exists with phone {}", user.getPhone());
+        // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
+        if (StrUtil.isNotEmpty(user.getPhone())) {
+            User selectByPhone = selectByPhone(user.getPhone(), false);
+            if (ObjectUtil.isNotNull(selectByPhone)) {
+                throw new DuplicateException("The user already exists with phone: {}", user.getPhone());
             }
-        } else {
-            user.setPhone(null);
         }
 
-
-        // 判断 email 是否存在
-        if (StrUtil.isNotBlank(user.getEmail())) {
-            if (null != selectByEmail(user.getEmail())) {
-                throw new DuplicateException("The user already exists with email {}", user.getEmail());
+        // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
+        if (StrUtil.isNotEmpty(user.getEmail())) {
+            User selectByEmail = selectByEmail(user.getEmail(), false);
+            if (ObjectUtil.isNotNull(selectByEmail)) {
+                throw new DuplicateException("The user already exists with email: {}", user.getEmail());
             }
-        } else {
-            user.setEmail(null);
         }
 
-
+        // 插入 user 数据，并返回插入后的 user
         if (userMapper.insert(user.setPassword(Dc3Util.md5(user.getPassword()))) > 0) {
             return userMapper.selectById(user.getId());
         }
 
-        throw new ServiceException("The user add failed");
+        throw new AddException("The user add failed: {}", user.toString());
     }
 
     @Override
@@ -106,6 +109,7 @@ public class UserServiceImpl implements UserService {
                     @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result==true")
             }
     )
+    @Transactional
     public boolean delete(Long id) {
         User user = selectById(id);
         if (null == user) {
@@ -129,12 +133,13 @@ public class UserServiceImpl implements UserService {
                     @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
             }
     )
+    @Transactional
     public User update(User user) {
         User byId = selectById(user.getId());
         // 判断 phone 是否修改
         if (StrUtil.isNotBlank(user.getPhone())) {
             if (null == byId.getPhone() || !byId.getPhone().equals(user.getPhone())) {
-                if (null != selectByPhone(user.getPhone())) {
+                if (null != selectByPhone(user.getPhone(), false)) {
                     throw new DuplicateException("The user already exists with phone {}", user.getPhone());
                 }
             }
@@ -145,7 +150,7 @@ public class UserServiceImpl implements UserService {
         // 判断 email 是否修改
         if (StrUtil.isNotBlank(user.getEmail())) {
             if (null == byId.getEmail() || !byId.getEmail().equals(user.getEmail())) {
-                if (null != selectByEmail(user.getEmail())) {
+                if (null != selectByEmail(user.getEmail(), false)) {
                     throw new DuplicateException("The user already exists with email {}", user.getEmail());
                 }
             }
@@ -170,30 +175,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = Common.Cache.USER + Common.Cache.NAME, key = "#name", unless = "#result==null")
-    public User selectByName(String name) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(User::getName, name);
-        User user = userMapper.selectOne(queryWrapper);
-        if (null == user) {
-            throw new NotFoundException("The user does not exist");
+    // 2022-03-13 检查：通过
+    public User selectByName(String name, boolean isEx) {
+        if (StrUtil.isEmpty(name)) {
+            if (isEx) {
+                throw new EmptyException("The name is empty");
+            }
+            return null;
         }
-        return user;
+
+        return selectByKey(User::getName, name, isEx);
     }
 
     @Override
     @Cacheable(value = Common.Cache.USER + Common.Cache.PHONE, key = "#phone", unless = "#result==null")
-    public User selectByPhone(String phone) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(User::getPhone, phone);
-        return userMapper.selectOne(queryWrapper);
+    // 2022-03-13 检查：通过
+    public User selectByPhone(String phone, boolean isEx) {
+        if (StrUtil.isEmpty(phone)) {
+            if (isEx) {
+                throw new EmptyException("The phone is empty");
+            }
+            return null;
+        }
+
+        return selectByKey(User::getPhone, phone, isEx);
     }
 
     @Override
     @Cacheable(value = Common.Cache.USER + Common.Cache.EMAIL, key = "#email", unless = "#result==null")
-    public User selectByEmail(String email) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(User::getEmail, email);
-        return userMapper.selectOne(queryWrapper);
+    // 2022-03-13 检查：通过
+    public User selectByEmail(String email, boolean isEx) {
+        if (StrUtil.isEmpty(email)) {
+            if (isEx) {
+                throw new EmptyException("The phone is empty");
+            }
+            return null;
+        }
+
+        return selectByKey(User::getEmail, email, isEx);
     }
 
     @Override
@@ -207,17 +226,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkUserValid(String name) {
-        User user = selectByName(name);
+        User user = selectByName(name, false);
         if (null != user) {
             return user.getEnable();
         }
 
-        user = selectByPhone(name);
+        user = selectByPhone(name, false);
         if (null != user) {
             return user.getEnable();
         }
 
-        user = selectByEmail(name);
+        user = selectByEmail(name, false);
         if (null != user) {
             return user.getEnable();
         }
@@ -244,6 +263,19 @@ public class UserServiceImpl implements UserService {
             }
         }
         return queryWrapper;
+    }
+
+    private User selectByKey(SFunction<User, ?> key, String value, boolean isEx) {
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
+        queryWrapper.eq(key, value);
+        User user = userMapper.selectOne(queryWrapper);
+        if (ObjectUtil.isNull(user)) {
+            if (isEx) {
+                throw new NotFoundException("The user does not exist");
+            }
+            return null;
+        }
+        return user;
     }
 
 }

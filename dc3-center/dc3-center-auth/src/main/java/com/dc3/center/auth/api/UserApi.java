@@ -99,7 +99,7 @@ public class UserApi implements UserClient {
     @Override
     public R<User> selectByName(String name) {
         try {
-            User select = userService.selectByName(name);
+            User select = userService.selectByName(name, false);
             if (null != select) {
                 return R.ok(select);
             }

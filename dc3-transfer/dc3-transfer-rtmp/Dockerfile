@@ -17,17 +17,21 @@
 FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:1.8.251 AS base
 MAINTAINER pnoker pnokers.icloud.com
 
-ENV JAVA_OPS -server -Xms128m -Xmx1024m -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m
-ENV GC_LOG -XX:+PrintGCDetails \
-           -XX:+PrintGCDateStamps \
-           -XX:+PrintTenuringDistribution \
-           -XX:+PrintHeapAtGC \
-           -XX:+PrintReferenceGC \
-           -XX:+PrintGCApplicationStoppedTime \
-           -XX:+UseGCLogFileRotation \
-           -XX:NumberOfGCLogFiles=10 \
-           -XX:GCLogFileSize=10M \
-           -Xloggc:dc3/logs/transfer/rtmp/gc/dc3-transfer-rtmp-gc.log
+ENV JAVA_OPS -server \
+             -javaagent:/usr/local/java/lib/aspectjweaver.jar \
+             -Xms128m \
+             -Xmx2048m \
+             -Xss256k \
+             -Djava.security.egd=file:/dev/./urandom \
+             -XX:MaxDirectMemorySize=256m \
+             -XX:+UseCompressedOops \
+             -XX:+UseCompressedClassPointers \
+             -XX:+SegmentedCodeCache \
+             -XX:+PrintCommandLineFlags
+ENV GC_LOG   -verbose:gc \
+             -XX:+UseG1GC \
+             -XX:+ExplicitGCInvokesConcurrent \
+             -Xlog:gc*,safepoint:dc3/logs/transfer/rtmp/gc/dc3-transfer-rtmp-gc.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -44,5 +48,5 @@ EXPOSE 8803
 VOLUME /dc3-transfer/dc3-transfer-rtmp/dc3/logs
 
 CMD mkdir -p /dc3-transfer/dc3-transfer-rtmp/dc3/logs/transfer/rtmp/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -Djava.security.egd=file:/dev/./urandom -jar dc3-transfer-rtmp.jar
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-transfer-rtmp.jar
 

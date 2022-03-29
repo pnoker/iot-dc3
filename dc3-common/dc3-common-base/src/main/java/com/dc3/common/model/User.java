@@ -36,19 +36,21 @@ import javax.validation.constraints.Pattern;
 @EqualsAndHashCode(callSuper = true)
 public class User extends Description {
 
-    @NotBlank(message = "name can't be empty", groups = {Insert.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "invalid name , /^[a-zA-Z]\\w{2,15}$/", groups = {Insert.class})
+    @NotBlank(message = "Name can't be empty", groups = {Insert.class, Auth.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "Invalid name , /^[a-zA-Z]\\w{2,15}$/", groups = {Insert.class})
     private String name;
 
-    @Pattern(regexp = "^[1]([3-9])[0-9]{9}$", message = "invalid phone , /^[1]([3-9])[0-9]{9}$/", groups = {Insert.class, Update.class})
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Pattern(regexp = "^[1]([3-9])[0-9]{9}$", message = "Invalid phone , /^[1]([3-9])[0-9]{9}$/", groups = {Insert.class, Update.class})
     private String phone;
 
-    @Pattern(regexp = "^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$", message = "invalid email , /^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$/", groups = {Insert.class, Update.class})
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Pattern(regexp = "^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$", message = "Invalid email , /^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$/", groups = {Insert.class, Update.class})
     private String email;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @NotBlank(message = "password can't be empty", groups = {Insert.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "invalid password , /^[a-zA-Z]\\w{7,15}$/", groups = {Insert.class, Update.class})
+    @NotBlank(message = "Password can't be empty", groups = {Insert.class, Auth.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "Invalid password , /^[a-zA-Z]\\w{7,15}$/", groups = {Insert.class, Update.class})
     private String password;
 
     private Boolean enable;

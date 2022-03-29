@@ -6,9 +6,9 @@ spring:
     name: @project.artifactId@
   profiles:
     active:
+      - server
       - register
       - monitor
-      - server
   boot:
     admin:
       context-path: ${MONITOR_CONTEXT_PATH:/}

@@ -265,7 +265,7 @@ public interface Common {
         /**
          * dc3-center-auth 服务
          */
-        String DC3_AUTH_SERVICE_NAME = "DC3-AUTH";
+        String DC3_AUTH_SERVICE_NAME = "DC3-CENTER-AUTH";
         String DC3_AUTH_USER_URL_PREFIX = "/auth/user";
         String DC3_AUTH_TENANT_URL_PREFIX = "/auth/tenant";
         String DC3_AUTH_TOKEN_URL_PREFIX = "/auth/token";
@@ -282,7 +282,7 @@ public interface Common {
         /**
          * dc3-center-manager 服务
          */
-        String DC3_MANAGER_SERVICE_NAME = "DC3-MANAGER";
+        String DC3_MANAGER_SERVICE_NAME = "DC3-CENTER-MANAGER";
         String DC3_MANAGER_DRIVER_URL_PREFIX = "/manager/driver";
         String DC3_MANAGER_BATCH_URL_PREFIX = "/manager/batch";
         String DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX = "/manager/driver_attribute";
@@ -302,13 +302,13 @@ public interface Common {
         /**
          * dc3-transfer-rtmp 服务
          */
-        String DC3_RTMP_SERVICE_NAME = "DC3-RTMP";
+        String DC3_RTMP_SERVICE_NAME = "DC3-TRANSFER-RTMP";
         String DC3_RTMP_URL_PREFIX = "/transfer/rtmp";
 
         /**
          * dc3-center-data 服务
          */
-        String DC3_DATA_SERVICE_NAME = "DC3-DATA";
+        String DC3_DATA_SERVICE_NAME = "DC3-CENTER-DATA";
         String DC3_DATA_POINT_VALUE_URL_PREFIX = "/data/point_value";
 
         /**

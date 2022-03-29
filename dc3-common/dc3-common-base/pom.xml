@@ -30,6 +30,8 @@
 
     <properties>
         <jwt.version>0.9.1</jwt.version>
+        <jaxb.version>2.3.0</jaxb.version>
+        <activation.version>1.1.1</activation.version>
         <hutool.version>5.7.20</hutool.version>
         <fastjson.version>1.2.79</fastjson.version>
     </properties>
@@ -68,6 +70,28 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>${jwt.version}</version>
+        </dependency>
+
+        <!-- Jaxb Api -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>${activation.version}</version>
         </dependency>
 
         <!-- Slf4j -->

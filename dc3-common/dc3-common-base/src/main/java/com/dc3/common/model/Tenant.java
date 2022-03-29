@@ -35,7 +35,7 @@ import javax.validation.constraints.Pattern;
 public class Tenant extends Description {
 
     @NotBlank(message = "name can't be empty", groups = {Insert.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "invalid name , /^[a-zA-Z]\\w{2,15}$/", groups = {Insert.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "Invalid name , /^[a-zA-Z]\\w{2,15}$/", groups = {Insert.class})
     private String name;
 
     private Boolean enable;
