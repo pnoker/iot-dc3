@@ -67,11 +67,15 @@ public class ThreadPoolConfig {
 
     private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+        public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
             try {
-                executor.getQueue().put(r);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage());
+                log.info("BlockingRejectedExecutionHandler: {}", executor.toString());
+
+                if (!executor.isShutdown()) {
+                    runnable.run();
+                }
+            } catch (Exception e) {
+                log.error("BlockingRejectedExecutionHandler: {}", e.getMessage(), e);
             }
         }
     }
