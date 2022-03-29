@@ -45,7 +45,7 @@ public class Description implements Serializable {
      */
     @TableId(type = IdType.ASSIGN_ID)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @NotNull(message = "id can't be empty", groups = {Update.class})
+    @NotNull(message = "Id can't be empty", groups = {Update.class})
     private Long id;
 
     /**

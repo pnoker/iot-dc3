@@ -18,10 +18,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class LogsAspect {
 
+    // 2022-03-13 检查：通过
     @Pointcut("@annotation(Logs)")
     public void logsCut() {
     }
 
+    // 2022-03-13 检查：通过
     @Around("logsCut()&&@annotation(logs)")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint, Logs logs) throws Throwable {
         String uuid = IdUtil.fastSimpleUUID();

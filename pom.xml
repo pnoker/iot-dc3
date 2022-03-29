@@ -62,7 +62,7 @@
 
         <spring-boot.version>2.6.5</spring-boot.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
-        <spring-boot-admin.version>2.6.1</spring-boot-admin.version>
+        <spring-boot-admin.version>2.6.3</spring-boot-admin.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
 
         <codecov.version>2.7</codecov.version>
@@ -274,6 +274,30 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <environment>dev</environment>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <environment>test</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <environment>prod</environment>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <finalName>${project.name}</finalName>

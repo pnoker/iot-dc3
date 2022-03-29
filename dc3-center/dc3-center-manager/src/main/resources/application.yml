@@ -6,15 +6,15 @@ spring:
     name: @project.artifactId@
   profiles:
     active:
+      - server
       - register
       - monitor
-      - server
       - rabbitmq
       - mysql
       - mongo
       - redis
       - feign
-      - ${PROFILE_ACTIVE:dev}
+      - ${environment:dev}
   main:
     allow-bean-definition-overriding: true
   mvc:
