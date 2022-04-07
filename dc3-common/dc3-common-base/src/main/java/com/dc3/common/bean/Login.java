@@ -34,19 +34,19 @@ import javax.validation.constraints.NotBlank;
 @Accessors(chain = true)
 public class Login {
 
-    @NotBlank(message = "tenant can't be empty", groups = {Auth.class})
+    @NotBlank(message = "Tenant can't be empty", groups = {Auth.class})
     private String tenant;
 
-    @NotBlank(message = "name can't be empty", groups = {Check.class, Auth.class, Update.class})
+    @NotBlank(message = "Name can't be empty", groups = {Check.class, Auth.class, Update.class})
     private String name;
 
-    @NotBlank(message = "salt can't be empty", groups = {Check.class, Auth.class})
+    @NotBlank(message = "Salt can't be empty", groups = {Check.class, Auth.class})
     private String salt;
 
-    @NotBlank(message = "password can't be empty", groups = {Auth.class})
+    @NotBlank(message = "Password can't be empty", groups = {Auth.class})
     private String password;
 
-    @NotBlank(message = "token can't be empty", groups = {Check.class})
+    @NotBlank(message = "Token can't be empty", groups = {Check.class})
     private String token;
 
 }

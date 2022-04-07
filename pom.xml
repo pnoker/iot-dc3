@@ -57,24 +57,24 @@
     </modules>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring-boot.version>2.6.5</spring-boot.version>
+        <spring-boot.version>2.6.6</spring-boot.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <spring-boot-admin.version>2.6.3</spring-boot-admin.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
 
         <codecov.version>2.7</codecov.version>
-        <guava.version>31.0.1-jre</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <findbugs.version>3.0.5</findbugs.version>
         <maven.jar.plugin>3.2.0</maven.jar.plugin>
-        <mybatis.plus.version>3.5.0</mybatis.plus.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.plugin>3.8.1</maven.compiler.plugin>
+        <mybatis.plus.version>3.5.1</mybatis.plus.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.plugin>3.8.0</maven.compiler.plugin>
         <maven.resource.plugin>3.1.0</maven.resource.plugin>
-        <maven.dependency.plugin>3.1.2</maven.dependency.plugin>
+        <maven.dependency.plugin>3.1.0</maven.dependency.plugin>
         <spring.boot.maven.plugin>2.2.2.RELEASE</spring.boot.maven.plugin>
     </properties>
 
