@@ -12,7 +12,7 @@ spring:
       - mysql
       - redis
       - feign
-      - ${environment:dev}
+      - ${NODE_ENV:dev}
   main:
     allow-bean-definition-overriding: true
   mvc:

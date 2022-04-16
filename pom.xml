@@ -279,7 +279,7 @@
         <profile>
             <id>dev</id>
             <properties>
-                <environment>dev</environment>
+                <NODE_ENV>dev</NODE_ENV>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -288,13 +288,13 @@
         <profile>
             <id>test</id>
             <properties>
-                <environment>test</environment>
+                <NODE_ENV>test</NODE_ENV>
             </properties>
         </profile>
         <profile>
             <id>prod</id>
             <properties>
-                <environment>prod</environment>
+                <NODE_ENV>prod</NODE_ENV>
             </properties>
         </profile>
     </profiles>
