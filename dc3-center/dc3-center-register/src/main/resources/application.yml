@@ -9,7 +9,7 @@ spring:
       - server
       - register
       - monitor
-      - ${environment:dev}
+      - ${NODE_ENV:dev}
 
 logging:
   level:
