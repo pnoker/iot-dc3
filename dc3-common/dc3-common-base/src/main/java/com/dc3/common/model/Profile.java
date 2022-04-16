@@ -17,6 +17,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -52,11 +54,14 @@ public class Profile extends Description {
     private Set<Long> pointIds = new HashSet<>(8);
 
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long groupId;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long deviceId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long tenantId;
 
     public Profile(String name, Boolean share, Long driverId, Long tenantId) {
