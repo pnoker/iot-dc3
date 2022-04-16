@@ -1,3 +1,11 @@
+# Development environment, customizable configuration
 eureka:
   instance:
+    # Custom node registration IP
     ip-address: ${SERVICE_HOST:192.168.0.103}
+  server:
+    # Turn off the self-protection mechanism
+    enable-self-preservation: false
+  client:
+    # Turn on the self-register
+    register-with-eureka: true

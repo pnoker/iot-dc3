@@ -62,6 +62,12 @@
             <artifactId>spring-cloud-commons</artifactId>
         </dependency>
 
+        <!-- Spring Web MVC -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
         <!-- Spring Aop -->
         <dependency>
             <groupId>org.springframework</groupId>

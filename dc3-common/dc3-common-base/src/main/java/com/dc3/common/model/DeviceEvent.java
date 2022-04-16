@@ -14,6 +14,8 @@
 package com.dc3.common.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,11 +49,13 @@ public class DeviceEvent implements Serializable {
     /**
      * 设备ID，同MySQl中等 设备ID 一致
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long deviceId;
 
     /**
      * 位号ID，同MySQl中等 位号ID 一致
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long pointId;
 
     /**

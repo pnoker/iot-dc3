@@ -4,5 +4,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.dc3.common.config.RedisTemplateConfig,\
   com.dc3.common.config.RedisCacheConfig,\
   com.dc3.common.config.ThreadPoolConfig,\
+  com.dc3.common.config.WebMvcConfig,\
   com.dc3.common.utils.RedisUtil,\
   com.dc3.common.annotation.LogsAspect
