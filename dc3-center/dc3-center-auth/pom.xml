@@ -33,12 +33,6 @@
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
-        <!-- Spring Elasticsearch -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-        </dependency>
-
         <!-- Dc3 Common Core -->
         <dependency>
             <groupId>com.dc3</groupId>

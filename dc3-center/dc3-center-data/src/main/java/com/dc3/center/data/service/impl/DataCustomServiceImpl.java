@@ -15,6 +15,7 @@ package com.dc3.center.data.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.dc3.center.data.service.DataCustomService;
+import com.dc3.center.data.service.elastic.PointValueRepository;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.bean.point.TsPointValue;
 import com.google.common.collect.Lists;
@@ -40,6 +41,9 @@ public class DataCustomServiceImpl implements DataCustomService {
 
     @Resource
     private OkHttpClient okHttpClient;
+
+    @Resource
+    private PointValueRepository pointValueRepository;
 
     @Override
     public void preHandle(PointValue pointValue) {

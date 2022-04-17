@@ -1,4 +1,4 @@
-package com.dc3.center.auth.config;
+package com.dc3.center.data.config;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +20,6 @@ public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
     public RestHighLevelClient elasticsearchClient() {
         final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
                 .connectedTo("localhost:9200")
-                //.withBasicAuth("elastic", "dc3dc3")
                 .build();
         return RestClients.create(clientConfiguration).rest();
     }
