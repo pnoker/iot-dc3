@@ -1,2 +1,6 @@
 server:
   host: 0.0.0.0
+  shutdownTimeout: 5s
+
+elasticsearch:
+  hosts: [ "http://dc3-elasticsearch:9200" ]
