@@ -6,6 +6,3 @@ eureka:
   server:
     # Turn off the self-protection mechanism
     enable-self-preservation: false
-  client:
-    # Turn on the self-register
-    register-with-eureka: true

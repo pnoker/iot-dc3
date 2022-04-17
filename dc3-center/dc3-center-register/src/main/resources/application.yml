@@ -20,8 +20,6 @@ logging:
 eureka:
   dashboard:
     path: ${EUREKA_DASHBOARD_PATH:/}
-  client:
-    register-with-eureka: false
   server:
     eviction-interval-timer-in-ms: 5000
     renewal-percent-threshold: 0.9
