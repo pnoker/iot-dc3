@@ -1,0 +1,28 @@
+cluster:
+  name: "dc3-elasticsearch"
+network:
+  host: 0.0.0.0
+
+#xpack:
+#  license:
+#    self_generated:
+#      type: basic
+#  security:
+#    enabled: true
+#    enrollment:
+#      enabled: true
+#    http:
+#      ssl:
+#        enabled: true
+#        keystore:
+#          path: certs/http.p12
+#        truststore:
+#          path: certs/http.p12
+#    transport:
+#      ssl:
+#        enabled: true
+#        verification_mode: certificate
+#        keystore:
+#          path: certs/transport.p12
+#        truststore:
+#          path: certs/transport.p12

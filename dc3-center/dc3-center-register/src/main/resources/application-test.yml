@@ -1,0 +1,5 @@
+# Test environment, customizable configuration
+eureka:
+  server:
+    # Turn off the self-protection mechanism
+    enable-self-preservation: false
