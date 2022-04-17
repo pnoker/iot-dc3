@@ -244,7 +244,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
             Query query = new Query(criteria);
-            query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
+            query.limit(pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
             query.with(Sort.by(Sort.Direction.DESC, "originTime"));
             return mongoTemplate.find(query, PointValue.class, collection);
         });
