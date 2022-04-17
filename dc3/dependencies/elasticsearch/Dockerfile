@@ -14,10 +14,10 @@
 #  limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/elasticsearch:8.1.2
+FROM registry.cn-beijing.aliyuncs.com/dc3/elasticsearch:7.17.2
 MAINTAINER pnoker <pnokers.icloud.com>
 
-COPY --chown=elasticsearch:elasticsearch config /usr/share/elasticsearch/config
+#COPY --chown=elasticsearch:elasticsearch config /usr/share/elasticsearch/config
 
 # bin/elasticsearch-create-enrollment-token  --scope kibana
 

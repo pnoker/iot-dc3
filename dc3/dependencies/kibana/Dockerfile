@@ -14,7 +14,7 @@
 #  limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/kibana:8.1.2
+FROM registry.cn-beijing.aliyuncs.com/dc3/kibana:7.17.2
 MAINTAINER pnoker <pnokers.icloud.com>
 
 COPY --chown=kibana:kibana config /usr/share/kibana/config
