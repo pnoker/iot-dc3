@@ -25,11 +25,6 @@
 
     <description>IOT DC3 平台 驱动 SDK 。</description>
 
-    <properties>
-        <jna.version>5.10.0</jna.version>
-        <oshi.version>6.1.0</oshi.version>
-    </properties>
-
     <dependencies>
 
         <!-- Undertow Web 容器 -->
@@ -106,17 +101,14 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>${oshi.version}</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
-            <version>${jna.version}</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>${jna.version}</version>
         </dependency>
 
         <!-- Dc3 Common Profiles -->

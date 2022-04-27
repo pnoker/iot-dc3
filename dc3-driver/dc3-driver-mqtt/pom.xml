@@ -25,10 +25,6 @@
 
     <description>IOT DC3 平台 Mqtt 驱动。</description>
 
-    <properties>
-        <bouncycastle.version>1.46</bouncycastle.version>
-    </properties>
-
     <dependencies>
 
         <!-- Spring Integration Stream -->
@@ -47,7 +43,6 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
-            <version>${bouncycastle.version}</version>
         </dependency>
 
     </dependencies>

@@ -15,7 +15,6 @@ package com.dc3.common.sdk.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverMetadata;
 import com.dc3.common.constant.Common;
@@ -23,6 +22,7 @@ import com.dc3.common.model.*;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverMetadataService;
 import com.dc3.common.sdk.service.DriverService;
+import com.dc3.common.utils.JsonUtil;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -104,7 +104,7 @@ public class DriverMetadataReceiver {
                 break;
             case Common.Driver.Event.DRIVER_METADATA_SYNC_BACK:
                 DriverMetadata driverMetadata = Convert.convert(DriverMetadata.class, driverConfiguration.getContent());
-                log.debug("Initialization driver metadata : {}", JSON.toJSONString(driverMetadata, true));
+                log.debug("Initialization driver metadata : {}", JsonUtil.toPrettyJsonString(driverMetadata));
                 driverContext.setDriverMetadata(driverMetadata);
                 break;
             default:
@@ -120,7 +120,7 @@ public class DriverMetadataReceiver {
     private void configurationProfile(DriverConfiguration driverConfiguration) {
         Profile profile = Convert.convert(Profile.class, driverConfiguration.getContent());
         if (Common.Driver.Profile.ADD.equals(driverConfiguration.getCommand()) || Common.Driver.Profile.UPDATE.equals(driverConfiguration.getCommand())) {
-            log.info("Upsert profile \n{}", JSON.toJSONString(profile, true));
+            log.info("Upsert profile \n{}", JsonUtil.toJsonString(profile));
             driverMetadataService.upsertProfile(profile);
         } else if (Common.Driver.Profile.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete profile {}", profile.getName());
@@ -136,7 +136,7 @@ public class DriverMetadataReceiver {
     private void configurationDevice(DriverConfiguration driverConfiguration) {
         Device device = Convert.convert(Device.class, driverConfiguration.getContent());
         if (Common.Driver.Device.ADD.equals(driverConfiguration.getCommand()) || Common.Driver.Device.UPDATE.equals(driverConfiguration.getCommand())) {
-            log.info("Upsert device \n{}", JSON.toJSONString(device, true));
+            log.info("Upsert device \n{}", JsonUtil.toJsonString(device));
             driverMetadataService.upsertDevice(device);
         } else if (Common.Driver.Device.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete device {}", device.getName());
@@ -152,7 +152,7 @@ public class DriverMetadataReceiver {
     private void configurationPoint(DriverConfiguration driverConfiguration) {
         Point point = Convert.convert(Point.class, driverConfiguration.getContent());
         if (Common.Driver.Point.ADD.equals(driverConfiguration.getCommand()) || Common.Driver.Point.UPDATE.equals(driverConfiguration.getCommand())) {
-            log.info("Upsert point \n{}", JSON.toJSONString(point, true));
+            log.info("Upsert point \n{}", JsonUtil.toJsonString(point));
             driverMetadataService.upsertPoint(point);
         } else if (Common.Driver.Point.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete point {}", point.getName());
@@ -168,7 +168,7 @@ public class DriverMetadataReceiver {
     private void configurationDriverInfo(DriverConfiguration driverConfiguration) {
         DriverInfo driverInfo = Convert.convert(DriverInfo.class, driverConfiguration.getContent());
         if (Common.Driver.DriverInfo.ADD.equals(driverConfiguration.getCommand()) || Common.Driver.DriverInfo.UPDATE.equals(driverConfiguration.getCommand())) {
-            log.info("Upsert driver info \n{}", JSON.toJSONString(driverInfo, true));
+            log.info("Upsert driver info \n{}", JsonUtil.toJsonString(driverInfo));
             driverMetadataService.upsertDriverInfo(driverInfo);
         } else if (Common.Driver.DriverInfo.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete driver info {}", driverInfo);
@@ -184,7 +184,7 @@ public class DriverMetadataReceiver {
     private void configurationPointInfo(DriverConfiguration driverConfiguration) {
         PointInfo pointInfo = Convert.convert(PointInfo.class, driverConfiguration.getContent());
         if (Common.Driver.PointInfo.ADD.equals(driverConfiguration.getCommand()) || Common.Driver.PointInfo.UPDATE.equals(driverConfiguration.getCommand())) {
-            log.info("Upsert point info \n{}", JSON.toJSONString(pointInfo, true));
+            log.info("Upsert point info \n{}", JsonUtil.toJsonString(pointInfo));
             driverMetadataService.upsertPointInfo(pointInfo);
         } else if (Common.Driver.PointInfo.DELETE.equals(driverConfiguration.getCommand())) {
             log.info("Delete point info {}", pointInfo);

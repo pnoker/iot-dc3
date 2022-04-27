@@ -13,8 +13,8 @@
 
 package com.dc3.common.exception;
 
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.bean.R;
+import com.dc3.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -80,7 +80,7 @@ public class GlobalExceptionAdvice {
             log.warn("Method Argument Not Valid Exception Handler: {}({})", error.getField(), error.getDefaultMessage());
             map.put(error.getField(), error.getDefaultMessage());
         });
-        return R.fail(JSON.toJSONString(map));
+        return R.fail(JsonUtil.toJsonString(map));
     }
 
 }

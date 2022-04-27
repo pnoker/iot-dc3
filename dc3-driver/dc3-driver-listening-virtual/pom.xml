@@ -25,17 +25,12 @@
 
     <description>IOT DC3 平台 ListeningVirtual驱动，监听模式，提供 Tcp 和 Udp 两种模式，仅用于测试用途。</description>
 
-    <properties>
-        <netty.version>4.1.73.Final</netty.version>
-    </properties>
-
     <dependencies>
 
         <!--Netty-->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>${netty.version}</version>
         </dependency>
 
     </dependencies>

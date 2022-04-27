@@ -25,16 +25,12 @@
 
     <description>IOT DC3 平台 Opc Ua 驱动。</description>
 
-    <properties>
-        <milo.version>0.6.3</milo.version>
-    </properties>
-
     <dependencies>
 
+        <!-- Eclipse Milo SDK Client -->
         <dependency>
             <groupId>org.eclipse.milo</groupId>
             <artifactId>sdk-client</artifactId>
-            <version>${milo.version}</version>
         </dependency>
 
     </dependencies>

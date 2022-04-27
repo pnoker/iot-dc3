@@ -62,11 +62,24 @@
 
         <spring-boot.version>2.6.6</spring-boot.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
-        <spring-boot-admin.version>2.6.3</spring-boot-admin.version>
+        <spring-boot-admin.version>2.6.6</spring-boot-admin.version>
         <spring-platform.version>Cairo-SR8</spring-platform.version>
 
-        <codecov.version>2.7</codecov.version>
+        <jwt.version>0.9.1</jwt.version>
+        <jna.version>5.11.0</jna.version>
+        <oshi.version>6.1.6</oshi.version>
+        <jaxb.version>3.0.2</jaxb.version>
+        <milo.version>0.6.5</milo.version>
+        <modbus.version>3.0.4</modbus.version>
         <guava.version>31.1-jre</guava.version>
+        <hutool.version>5.7.22</hutool.version>
+        <jaxb.api.version>2.3.1</jaxb.api.version>
+        <netty.version>4.1.76.Final</netty.version>
+        <j.interop.version>2.0.4</j.interop.version>
+        <activation.version>1.1.1</activation.version>
+        <bouncycastle.version>1.46</bouncycastle.version>
+
+        <codecov.version>2.7</codecov.version>
         <findbugs.version>3.0.5</findbugs.version>
         <maven.jar.plugin>3.2.0</maven.jar.plugin>
         <mybatis.plus.version>3.5.1</mybatis.plus.version>
@@ -74,6 +87,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.plugin>3.8.0</maven.compiler.plugin>
         <maven.resource.plugin>3.1.0</maven.resource.plugin>
+        <maven.source.plugin>3.2.1</maven.source.plugin>
         <maven.dependency.plugin>3.1.0</maven.dependency.plugin>
         <spring.boot.maven.plugin>2.2.2.RELEASE</spring.boot.maven.plugin>
     </properties>
@@ -106,13 +120,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <!-- Guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
 
     </dependencies>
@@ -164,6 +171,101 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-extension</artifactId>
                 <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- Jwt -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+
+            <!-- Oshi & Jna -->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+
+            <!-- Jaxb Api -->
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>${jaxb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>${activation.version}</version>
+            </dependency>
+
+            <!-- Eclipse Milo SDK Client -->
+            <dependency>
+                <groupId>org.eclipse.milo</groupId>
+                <artifactId>sdk-client</artifactId>
+                <version>${milo.version}</version>
+            </dependency>
+
+            <!-- Modbus -->
+            <dependency>
+                <groupId>com.infiniteautomation</groupId>
+                <artifactId>modbus4j</artifactId>
+                <version>${modbus.version}</version>
+            </dependency>
+
+            <!-- Guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!-- Hutool -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <!--Netty-->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <!-- Java Interop 相关 -->
+            <dependency>
+                <groupId>org.jinterop</groupId>
+                <artifactId>j-interop</artifactId>
+                <version>${j.interop.version}</version>
+            </dependency>
+
+            <!-- Tls Cert 相关 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk16</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <!-- Dc3 Api -->
@@ -318,6 +420,10 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
             </plugin>
             <plugin>
@@ -337,6 +443,19 @@
                         <source>${maven.compiler.source}</source>
                         <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven.source.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -365,27 +484,6 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.spotify</groupId>
-                    <artifactId>dockerfile-maven-plugin</artifactId>
-                    <version>1.4.13</version>
-                    <executions>
-                        <execution>
-                            <id>default</id>
-                            <goals>
-                                <goal>build</goal>
-                                <goal>push</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <repository>${docker.image.prefix}/pnoker/${project.artifactId}</repository>
-                        <tag>${project.version}</tag>
-                        <buildArgs>
-                            <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-                        </buildArgs>
-                    </configuration>
                 </plugin>
                 <!-- 过滤文件 -->
                 <plugin>

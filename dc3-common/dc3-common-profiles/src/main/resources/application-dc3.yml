@@ -1,0 +1,19 @@
+gateway:
+  save:
+    opentsdb: true
+    elasticsearch: true
+
+auth:
+  save:
+    opentsdb: true
+    elasticsearch: true
+
+manager:
+  save:
+    opentsdb: true
+    elasticsearch: true
+
+data:
+  save:
+    opentsdb: true
+    elasticsearch: true
