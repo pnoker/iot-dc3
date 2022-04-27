@@ -25,17 +25,12 @@
 
     <description>IOT DC3 平台 Modbus TCP 驱动。</description>
 
-    <properties>
-        <modbus.version>3.0.4</modbus.version>
-    </properties>
-
     <dependencies>
 
         <!-- Modbus -->
         <dependency>
             <groupId>com.infiniteautomation</groupId>
             <artifactId>modbus4j</artifactId>
-            <version>${modbus.version}</version>
         </dependency>
 
     </dependencies>

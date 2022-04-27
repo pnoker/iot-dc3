@@ -13,7 +13,7 @@
 
 package com.dc3.driver.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.dc3.common.utils.JsonUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
@@ -69,7 +69,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        log.debug("Plc S7 Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
+        log.debug("Plc S7 Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
         myS7Connector.lock.writeLock().lock();
         S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
@@ -87,7 +87,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        log.debug("Plc S7 Write, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
+        log.debug("Plc S7 Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(value));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
         myS7Connector.lock.writeLock().lock();
         S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
@@ -134,7 +134,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         if (null == myS7Connector) {
             myS7Connector = new MyS7Connector();
 
-            log.debug("Plc S7 Connection Info {}", JSON.toJSONString(driverInfo));
+            log.debug("Plc S7 Connection Info {}", JsonUtil.toJsonString(driverInfo));
             try {
                 S7Connector s7Connector = S7ConnectorFactory.buildTCPConnector()
                         .withHost(attribute(driverInfo, "host"))
@@ -157,7 +157,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return Plcs7PointVariable
      */
     private PlcS7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo, String type) {
-        log.debug("Plc S7 Point Info {}", JSON.toJSONString(pointInfo));
+        log.debug("Plc S7 Point Info {}", JsonUtil.toJsonString(pointInfo));
         return new PlcS7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), type);
     }
 

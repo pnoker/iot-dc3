@@ -67,10 +67,25 @@ server:
 spring:
   application:
     name: ${driver.project}_${driver.tenant}
+  profiles:
+    active:
+      - server
+      - register
+      - monitor
+      - rabbitmq
+      - quartz
+      - ${NODE_ENV:dev}
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
 
 logging:
   level:
-    com.dc3.common.sdk: DEBUG
     com.dc3: DEBUG
+    com.dc3.common.sdk: DEBUG
   file:
     name: dc3/logs/driver/listening-virtual/${spring.application.name}.log

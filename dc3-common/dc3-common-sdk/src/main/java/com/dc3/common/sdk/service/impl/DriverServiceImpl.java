@@ -15,7 +15,7 @@ package com.dc3.common.sdk.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
+import com.dc3.common.utils.JsonUtil;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DeviceEvent;
@@ -113,7 +113,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public void driverEventSender(DriverEvent driverEvent) {
         if (null != driverEvent) {
-            log.debug("Send driver event: {}", JSON.toJSONString(driverEvent));
+            log.debug("Send driver event: {}", JsonUtil.toJsonString(driverEvent));
             rabbitTemplate.convertAndSend(
                     Common.Rabbit.TOPIC_EXCHANGE_EVENT,
                     Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName,
@@ -124,7 +124,7 @@ public class DriverServiceImpl implements DriverService {
 
     public void deviceEventSender(DeviceEvent deviceEvent) {
         if (null != deviceEvent) {
-            log.debug("Send device event: {}", JSON.toJSONString(deviceEvent));
+            log.debug("Send device event: {}", JsonUtil.toJsonString(deviceEvent));
             rabbitTemplate.convertAndSend(
                     Common.Rabbit.TOPIC_EXCHANGE_EVENT,
                     Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName,
@@ -143,7 +143,7 @@ public class DriverServiceImpl implements DriverService {
 
     public void pointValueSender(PointValue pointValue) {
         if (null != pointValue) {
-            log.debug("Send point value: {}", JSON.toJSONString(pointValue));
+            log.debug("Send point value: {}", JsonUtil.toJsonString(pointValue));
             rabbitTemplate.convertAndSend(
                     Common.Rabbit.TOPIC_EXCHANGE_VALUE,
                     Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + serviceName,

@@ -14,14 +14,13 @@
 package com.dc3.center.manager.api;
 
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.dc3.api.center.manager.feign.BatchClient;
 import com.dc3.center.manager.service.BatchService;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.batch.BatchDriver;
 import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
-import com.dc3.common.utils.Dc3Util;
+import com.dc3.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,10 +50,7 @@ public class BatchApi implements BatchClient {
                 throw new ServiceException("Import file is empty");
             }
             // Convert json file to BatchDriver Array
-            List<BatchDriver> batchDrivers = JSON.parseArray(
-                    Dc3Util.inputStreamToString(multipartFile.getInputStream()),
-                    BatchDriver.class
-            );
+            List<BatchDriver> batchDrivers = JsonUtil.parseArray(multipartFile.getInputStream(), BatchDriver.class);
             if (null == batchDrivers) {
                 throw new ServiceException("Import file is blank");
             }

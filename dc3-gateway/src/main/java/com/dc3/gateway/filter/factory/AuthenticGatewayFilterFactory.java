@@ -13,7 +13,6 @@
 
 package com.dc3.gateway.filter.factory;
 
-import com.alibaba.fastjson.JSON;
 import com.dc3.api.center.auth.feign.TenantClient;
 import com.dc3.api.center.auth.feign.TokenClient;
 import com.dc3.common.bean.Login;
@@ -22,6 +21,7 @@ import com.dc3.common.constant.Common;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Tenant;
 import com.dc3.common.utils.Dc3Util;
+import com.dc3.common.utils.JsonUtil;
 import com.dc3.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -74,7 +74,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
             try {
                 String cookieToken = GatewayUtil.getRequestCookie(request, Common.Service.DC3_AUTH_TOKEN);
-                Login login = JSON.parseObject(Dc3Util.decode(cookieToken), Login.class);
+                Login login = JsonUtil.parseObject(Dc3Util.decode(cookieToken), Login.class);
                 log.debug("Request cookies: {}", login);
 
                 R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(login.getTenant());
@@ -103,7 +103,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 response.setStatusCode(HttpStatus.FORBIDDEN);
                 log.error(e.getMessage(), e);
 
-                DataBuffer dataBuffer = response.bufferFactory().wrap(JSON.toJSONBytes(R.fail(e.getMessage())));
+                DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
                 return response.writeWith(Mono.just(dataBuffer));
             }
 

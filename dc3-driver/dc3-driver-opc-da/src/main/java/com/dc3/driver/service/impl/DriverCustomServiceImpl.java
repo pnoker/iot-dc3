@@ -13,7 +13,7 @@
 
 package com.dc3.driver.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.dc3.common.utils.JsonUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
@@ -62,7 +62,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        log.debug("Opc Da Read, device: {}, point: {}", JSON.toJSONString(device), JSON.toJSONString(point));
+        log.debug("Opc Da Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
         Server server = getServer(device.getId(), driverInfo);
         try {
             Item item = getItem(server, pointInfo);
@@ -74,7 +74,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        log.debug("Opc Da Write, device: {}, value: {}", JSON.toJSONString(device), JSON.toJSONString(value));
+        log.debug("Opc Da Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(value));
         Server server = getServer(device.getId(), driverInfo);
         try {
             Item item = getItem(server, pointInfo);
@@ -115,7 +115,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         Server server = serverMap.get(deviceId);
         if (null == server) {
             ConnectionInformation connectionInformation = new ConnectionInformation(attribute(driverInfo, "host"), attribute(driverInfo, "clsId"), attribute(driverInfo, "username"), attribute(driverInfo, "password"));
-            log.debug("Opc Da Server Connection Info {}", JSON.toJSONString(connectionInformation));
+            log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(connectionInformation));
             server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
         }
         try {

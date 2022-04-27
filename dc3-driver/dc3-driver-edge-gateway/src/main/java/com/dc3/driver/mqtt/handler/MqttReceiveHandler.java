@@ -13,8 +13,8 @@
 
 package com.dc3.driver.mqtt.handler;
 
-import com.alibaba.fastjson.JSON;
 import com.dc3.common.sdk.bean.mqtt.MessageHeader;
+import com.dc3.common.utils.JsonUtil;
 import com.dc3.driver.mqtt.bean.MqttPayload;
 import com.dc3.driver.mqtt.service.MqttReceiveService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class MqttReceiveHandler {
     public MessageHandler handlerValue() {
         return message -> {
             MessageHeader messageHeader = new MessageHeader(message.getHeaders());
-            MqttPayload payload = JSON.parseObject(message.getPayload().toString(), MqttPayload.class);
+            MqttPayload payload = JsonUtil.parseObject(message.getPayload().toString(), MqttPayload.class);
         };
     }
 }

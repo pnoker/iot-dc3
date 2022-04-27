@@ -28,14 +28,6 @@
 
     <description>IOT DC3 平台 公共基础集合。</description>
 
-    <properties>
-        <jwt.version>0.9.1</jwt.version>
-        <jaxb.version>2.3.0</jaxb.version>
-        <activation.version>1.1.1</activation.version>
-        <hutool.version>5.7.20</hutool.version>
-        <fastjson.version>1.2.79</fastjson.version>
-    </properties>
-
     <dependencies>
         <!-- Spring Web -->
         <dependency>
@@ -75,29 +67,24 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
-            <version>${jwt.version}</version>
         </dependency>
 
         <!-- Jaxb Api -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-core</artifactId>
-            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
-            <version>${activation.version}</version>
         </dependency>
 
         <!-- Slf4j -->
@@ -118,18 +105,16 @@
             <artifactId>commons-fileupload</artifactId>
         </dependency>
 
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
         <!-- Hutool -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-
-        <!-- FastJson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
         </dependency>
 
     </dependencies>

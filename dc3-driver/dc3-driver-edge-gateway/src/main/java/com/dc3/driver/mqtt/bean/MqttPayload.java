@@ -13,7 +13,7 @@
 
 package com.dc3.driver.mqtt.bean;
 
-import com.alibaba.fastjson.JSON;
+import com.dc3.common.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,7 +32,7 @@ public class MqttPayload {
 
     public MqttPayload(DataType dataType, Object target) {
         this.dataType = dataType;
-        this.data = JSON.toJSONString(target);
+        this.data = JsonUtil.toJsonString(target);
     }
 
     @NoArgsConstructor

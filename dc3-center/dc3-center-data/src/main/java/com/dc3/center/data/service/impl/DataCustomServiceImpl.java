@@ -13,11 +13,11 @@
 
 package com.dc3.center.data.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.dc3.center.data.service.DataCustomService;
 import com.dc3.center.data.service.elastic.PointValueRepository;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.bean.point.TsPointValue;
+import com.dc3.common.utils.JsonUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -111,7 +111,7 @@ public class DataCustomServiceImpl implements DataCustomService {
      * @param tsPointValues TsPointValue Array
      */
     private void savePointValueToOpenTsdb(List<TsPointValue> tsPointValues) {
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), JSON.toJSONString(tsPointValues));
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), JsonUtil.toJsonString(tsPointValues));
         Request request = new Request.Builder()
                 .url(details ? putUrl + "?details" : putUrl)
                 .post(requestBody)

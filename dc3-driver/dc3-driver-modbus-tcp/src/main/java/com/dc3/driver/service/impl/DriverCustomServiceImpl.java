@@ -13,7 +13,7 @@
 
 package com.dc3.driver.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.dc3.common.utils.JsonUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.constant.Common;
 import com.dc3.common.model.Device;
@@ -103,7 +103,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws ModbusInitException ModbusInitException
      */
     public ModbusMaster getMaster(Long deviceId, Map<String, AttributeInfo> driverInfo) throws ModbusInitException {
-        log.debug("Modbus Tcp Connection Info {}", JSON.toJSONString(driverInfo));
+        log.debug("Modbus Tcp Connection Info {}", JsonUtil.toJsonString(driverInfo));
         ModbusMaster modbusMaster = masterMap.get(deviceId);
         if (null == modbusMaster) {
             IpParameters params = new IpParameters();
