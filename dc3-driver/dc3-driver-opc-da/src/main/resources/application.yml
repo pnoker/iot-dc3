@@ -1,6 +1,5 @@
 driver:
   name: OpcDaDriver
-  tenant: default
   type: driver
   project: @project.artifactId@
   description: @project.description@
@@ -81,13 +80,16 @@ server:
   port: 8602
 
 spring:
-  application:
-    name: ${driver.project}_${driver.tenant}
+  profiles:
+    active:
+      - server
+      - register
+      - monitor
+      - rabbitmq
+      - quartz
+      - driver
+      - ${NODE_ENV:dev}
 
 logging:
-  level:
-    com.freud.dcom.utgard.cases.*: INFO
-    com.dc3.common.sdk: DEBUG
-    com.dc3: DEBUG
   file:
     name: dc3/logs/driver/opcda/${spring.application.name}.log

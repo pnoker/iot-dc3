@@ -1,6 +1,5 @@
 driver:
   name: PlcS7Driver
-  tenant: default
   type: driver
   project: @project.artifactId@
   description: @project.description@
@@ -81,11 +80,16 @@ server:
   port: 8601
 
 spring:
-  application:
-    name: ${driver.project}_${driver.tenant}
+  profiles:
+    active:
+      - server
+      - register
+      - monitor
+      - rabbitmq
+      - quartz
+      - driver
+      - ${NODE_ENV:dev}
 
 logging:
-  level:
-    com.dc3: DEBUG
   file:
     name: dc3/logs/driver/plcs7/${spring.application.name}.log

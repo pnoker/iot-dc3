@@ -1,0 +1,12 @@
+# Development environment, customizable configuration
+eureka:
+  instance:
+    # Custom node registration IP
+    ip-address: ${SERVICE_HOST:192.168.0.103}
+
+# Log config
+logging:
+  level:
+    com.dc3: DEBUG
+    com.dc3.common.sdk: DEBUG
+    com.freud.dcom.utgard.cases.*: INFO

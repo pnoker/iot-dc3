@@ -92,7 +92,7 @@ public class DriverMetadataReceiver {
      */
     private void configurationDriver(DriverConfiguration driverConfiguration) {
         if (!Common.Response.OK.equals(driverConfiguration.getResponse())) {
-            driverService.close("The driver initialization failed {}", driverConfiguration.getResponse());
+            driverService.close("The driver initialization failed: {}", driverConfiguration.getResponse());
         }
 
         switch (driverConfiguration.getCommand()) {
@@ -104,7 +104,7 @@ public class DriverMetadataReceiver {
                 break;
             case Common.Driver.Event.DRIVER_METADATA_SYNC_BACK:
                 DriverMetadata driverMetadata = Convert.convert(DriverMetadata.class, driverConfiguration.getContent());
-                log.debug("Initialization driver metadata : {}", JsonUtil.toPrettyJsonString(driverMetadata));
+                log.debug("Initialization driver metadata: {}", JsonUtil.toPrettyJsonString(driverMetadata));
                 driverContext.setDriverMetadata(driverMetadata);
                 break;
             default:

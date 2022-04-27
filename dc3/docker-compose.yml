@@ -687,7 +687,7 @@ services:
     image: pnoker/dc3-emqx:1.0.0
     restart: always
     ports:
-      - 1883:1883
+      #- 1883:1883
       - 8883:8883
       - 18083:18083
     container_name: dc3-emqx

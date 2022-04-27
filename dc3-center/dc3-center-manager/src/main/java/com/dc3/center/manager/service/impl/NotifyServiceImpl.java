@@ -48,7 +48,7 @@ public class NotifyServiceImpl implements NotifyService {
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
-            log.warn("Notify Driver Profile : {}", e.getMessage());
+            log.warn("Notify Driver Profile: {}", e.getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ public class NotifyServiceImpl implements NotifyService {
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
-            log.warn("Notify Driver Point : {}", e.getMessage());
+            log.warn("Notify Driver Point: {}", e.getMessage());
         }
     }
 
@@ -72,7 +72,7 @@ public class NotifyServiceImpl implements NotifyService {
             DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DEVICE).setCommand(command).setContent(device);
             notifyDriver(driver, operation);
         } catch (Exception e) {
-            log.warn("Notify Driver Device : {}", e.getMessage());
+            log.warn("Notify Driver Device: {}", e.getMessage());
         }
     }
 
@@ -83,7 +83,7 @@ public class NotifyServiceImpl implements NotifyService {
             DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DRIVER_INFO).setCommand(command).setContent(driverInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
-            log.warn("Notify Driver DriverInfo : {}", e.getMessage());
+            log.warn("Notify Driver DriverInfo: {}", e.getMessage());
         }
     }
 
@@ -94,7 +94,7 @@ public class NotifyServiceImpl implements NotifyService {
             DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.POINT_INFO).setCommand(command).setContent(pointInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
-            log.warn("Notify Driver PointInfo : {}", e.getMessage());
+            log.warn("Notify Driver PointInfo: {}", e.getMessage());
         }
     }
 
