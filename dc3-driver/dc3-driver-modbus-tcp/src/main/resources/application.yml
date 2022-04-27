@@ -1,6 +1,5 @@
 driver:
   name: ModbusDriver
-  tenant: default
   type: driver
   project: @project.artifactId@
   description: @project.description@
@@ -71,8 +70,6 @@ server:
   port: 8604
 
 spring:
-  application:
-    name: ${driver.project}_${driver.tenant}
   profiles:
     active:
       - server
@@ -80,16 +77,9 @@ spring:
       - monitor
       - rabbitmq
       - quartz
-  main:
-    allow-bean-definition-overriding: true
-  mvc:
-    throw-exception-if-no-handler-found: true
-  web:
-    resources:
-      add-mappings: false
+      - driver
+      - ${NODE_ENV:dev}
 
 logging:
-  level:
-    com.dc3: DEBUG
   file:
     name: dc3/logs/driver/modbus-tcp/${spring.application.name}.log

@@ -1,6 +1,5 @@
 driver:
   name: MqttDriver
-  tenant: default
   type: driver
   project: @project.artifactId@
   description: @project.description@
@@ -52,7 +51,7 @@ driver:
         name: driver/${spring.application.name}/gateway/+
     default-send-topic:
       qos: 1
-      topic: default/${spring.application.name}
+      name: default/${spring.application.name}
     keep-alive: 15
     completion-timeout: 3000
 
@@ -60,12 +59,16 @@ server:
   port: 8701
 
 spring:
-  application:
-    name: ${driver.project}_${driver.tenant}
+  profiles:
+    active:
+      - server
+      - register
+      - monitor
+      - rabbitmq
+      - quartz
+      - driver
+      - ${NODE_ENV:dev}
 
 logging:
-  level:
-    com.dc3.common.sdk: DEBUG
-    com.dc3: DEBUG
   file:
     name: dc3/logs/driver/mqtt/${spring.application.name}.log

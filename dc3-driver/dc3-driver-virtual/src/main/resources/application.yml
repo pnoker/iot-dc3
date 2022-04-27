@@ -1,6 +1,5 @@
 driver:
   name: VirtualDriver
-  tenant: default
   type: driver
   project: @project.artifactId@
   description: @project.description@
@@ -51,14 +50,16 @@ server:
   port: 8600
 
 spring:
-  application:
-    name: ${driver.project}_${driver.tenant}
+  profiles:
+    active:
+      - server
+      - register
+      - monitor
+      - rabbitmq
+      - quartz
+      - driver
+      - ${NODE_ENV:dev}
 
 logging:
-  level:
-    com.dc3: DEBUG
-    #com.dc3.common.sdk.service: INFO
-    #com.dc3.common.sdk.service.job: INFO
-    #com.dc3.common.sdk.service.rabbit: INFO
   file:
     name: dc3/logs/driver/virtual/${spring.application.name}.log
