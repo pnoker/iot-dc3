@@ -162,7 +162,7 @@ public class KeyUtil {
                 .setIssuer(Common.KEY)
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, salt)
+                .signWith(SignatureAlgorithm.HS256, salt.getBytes(StandardCharsets.UTF_8))
                 .setExpiration(Dc3Util.expireTime(Common.Cache.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
         return builder.compact();
     }
@@ -179,7 +179,7 @@ public class KeyUtil {
         return Jwts.parser()
                 .requireIssuer(Common.KEY)
                 .requireSubject(username)
-                .setSigningKey(salt)
+                .setSigningKey(salt.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(token)
                 .getBody();
     }
