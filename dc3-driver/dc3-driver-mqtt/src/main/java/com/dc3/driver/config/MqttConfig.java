@@ -90,8 +90,8 @@ public class MqttConfig {
     @ServiceActivator(inputChannel = "mqttOutputChannel")
     public MessageHandler outbound() {
         MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(
-                mqttProperties.getClient() +
-                        "_out", mqttClientFactory());
+                mqttProperties.getClient() + "_out",
+                mqttClientFactory());
         messageHandler.setAsync(true);
         messageHandler.setDefaultQos(mqttProperties.getDefaultSendTopic().getQos());
         messageHandler.setDefaultTopic(mqttProperties.getDefaultSendTopic().getName());

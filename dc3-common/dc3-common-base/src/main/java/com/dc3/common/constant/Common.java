@@ -199,14 +199,6 @@ public interface Common {
             String DELETE = "delete_point_info";
             String UPDATE = "update_point_info";
         }
-
-        interface X509 {
-            String CLASS_PATH = "classpath:";
-            String CA_CERT_FILE = "cacertfile";
-            String CERT_FILE = "certfile";
-            String KEY_FILE = "keyfile";
-            String TLS_V1_2 = "TLSv1.2";
-        }
     }
 
     /**
