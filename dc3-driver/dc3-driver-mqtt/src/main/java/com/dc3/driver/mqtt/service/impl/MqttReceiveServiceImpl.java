@@ -1,9 +1,11 @@
-package com.dc3.driver.service.impl;
+package com.dc3.driver.mqtt.service.impl;
 
-import com.dc3.common.sdk.bean.mqtt.MessageHeader;
+import com.dc3.common.sdk.bean.mqtt.MqttMessage;
 import com.dc3.driver.mqtt.service.MqttReceiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author pnoker
@@ -13,6 +15,11 @@ import org.springframework.stereotype.Service;
 public class MqttReceiveServiceImpl implements MqttReceiveService {
 
     @Override
-    public void receiveValue(String client, MessageHeader messageHeader, String data) {
+    public void receiveValue(MqttMessage mqttMessage) {
+    }
+
+    @Override
+    public void receiveValues(List<MqttMessage> mqttMessageList) {
+
     }
 }

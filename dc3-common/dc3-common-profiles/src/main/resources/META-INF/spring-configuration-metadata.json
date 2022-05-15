@@ -184,6 +184,16 @@
       "name": "driver.mqtt.client-crt",
       "type": "java.lang.String",
       "description": "driver client crt for mqtt server."
+    },
+    {
+      "name": "driver.mqtt.batch.speed",
+      "type": "java.lang.Integer",
+      "description": "critical value of mqtt message batch saving speed."
+    },
+    {
+      "name": "driver.mqtt.batch.interval",
+      "type": "java.lang.Integer",
+      "description": "mqtt message batch saving cycle."
     }
   ]
 }

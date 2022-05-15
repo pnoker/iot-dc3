@@ -54,6 +54,9 @@ driver:
       name: default/${spring.application.name}
     keep-alive: 15
     completion-timeout: 3000
+    batch:
+      speed: ${MQTT_BATCH_SPEED:100}
+      interval: ${MQTT_BATCH_INTERVAL:5}
 
 server:
   port: 8701

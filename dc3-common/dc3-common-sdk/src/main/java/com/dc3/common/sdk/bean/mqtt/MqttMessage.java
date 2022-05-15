@@ -11,13 +11,14 @@
  * limitations under the License.
  */
 
-package com.dc3.driver.mqtt.bean;
+package com.dc3.common.sdk.bean.mqtt;
 
-import com.dc3.common.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * @author pnoker
@@ -26,17 +27,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class MqttPayload {
-    private DataType dataType = DataType.DEFAULT;
-    private String data;
-
-    public MqttPayload(DataType dataType, Object target) {
-        this.dataType = dataType;
-        this.data = JsonUtil.toJsonString(target);
-    }
-
-    @NoArgsConstructor
-    public enum DataType {
-        OPC_UA, OPC_DA, MODBUS, PLC, SERIAL, SOCKET, HEARTBEAT, DEFAULT
-    }
+public class MqttMessage implements Serializable {
+    private MessageHeader messageHeader;
+    private MessagePayload messagePayload;
 }

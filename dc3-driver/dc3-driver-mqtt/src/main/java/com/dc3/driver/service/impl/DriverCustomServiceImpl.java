@@ -20,6 +20,7 @@ import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
+import com.dc3.driver.mqtt.service.MqttScheduleService;
 import com.dc3.driver.mqtt.service.MqttSendService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,10 +42,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
     @Resource
+    private MqttScheduleService mqttScheduleService;
+    @Resource
     private MqttSendService mqttSendService;
 
     @Override
     public void initial() {
+        mqttScheduleService.initial();
     }
 
     @Override
