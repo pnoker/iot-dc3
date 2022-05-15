@@ -13,8 +13,9 @@
 
 package com.dc3.common.dto;
 
+import com.dc3.common.base.Converter;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.model.DeviceEvent;
+import com.dc3.common.model.DriverEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,7 +34,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class DriverEventDto implements Serializable {
+public class DriverEventDto implements Serializable, Converter<DriverEvent, DriverEventDto> {
     private static final long serialVersionUID = 1L;
 
     private String serviceName;
@@ -41,12 +42,13 @@ public class DriverEventDto implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    public void convertToDo(DeviceEvent deviceEvent) {
-        BeanUtils.copyProperties(this, deviceEvent);
+    @Override
+    public void convertDtoToDo(DriverEvent driverEvent) {
+        BeanUtils.copyProperties(this, driverEvent);
     }
 
-    public DriverEventDto convert(DeviceEvent deviceEvent) {
-        BeanUtils.copyProperties(deviceEvent, this);
-        return this;
+    @Override
+    public void convertDoToDto(DriverEvent driverEvent) {
+        BeanUtils.copyProperties(driverEvent, this);
     }
 }

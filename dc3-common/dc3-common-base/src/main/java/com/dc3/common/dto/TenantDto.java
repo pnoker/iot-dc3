@@ -34,13 +34,12 @@ public class TenantDto extends Tenant implements Converter<Tenant, TenantDto> {
     private Pages page;
 
     @Override
-    public void convertToDo(Tenant tenant) {
+    public void convertDtoToDo(Tenant tenant) {
         BeanUtils.copyProperties(this, tenant);
     }
 
     @Override
-    public TenantDto convert(Tenant tenant) {
+    public void convertDoToDto(Tenant tenant) {
         BeanUtils.copyProperties(tenant, this);
-        return this;
     }
 }

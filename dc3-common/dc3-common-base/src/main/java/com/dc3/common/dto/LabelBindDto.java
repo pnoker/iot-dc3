@@ -36,13 +36,12 @@ public class LabelBindDto extends LabelBind implements Converter<LabelBind, Labe
     private Pages page;
 
     @Override
-    public void convertToDo(LabelBind bind) {
+    public void convertDtoToDo(LabelBind bind) {
         BeanUtils.copyProperties(this, bind);
     }
 
     @Override
-    public LabelBindDto convert(LabelBind bind) {
+    public void convertDoToDto(LabelBind bind) {
         BeanUtils.copyProperties(bind, this);
-        return this;
     }
 }

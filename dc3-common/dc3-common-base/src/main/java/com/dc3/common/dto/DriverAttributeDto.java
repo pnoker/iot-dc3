@@ -38,13 +38,12 @@ public class DriverAttributeDto extends DriverAttribute implements Converter<Dri
     private Pages page;
 
     @Override
-    public void convertToDo(DriverAttribute info) {
+    public void convertDtoToDo(DriverAttribute info) {
         BeanUtils.copyProperties(this, info);
     }
 
     @Override
-    public DriverAttributeDto convert(DriverAttribute info) {
+    public void convertDoToDto(DriverAttribute info) {
         BeanUtils.copyProperties(info, this);
-        return this;
     }
 }

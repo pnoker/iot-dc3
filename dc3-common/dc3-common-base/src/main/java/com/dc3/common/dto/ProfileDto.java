@@ -38,13 +38,12 @@ public class ProfileDto extends Profile implements Converter<Profile, ProfileDto
     private Pages page;
 
     @Override
-    public void convertToDo(Profile profile) {
+    public void convertDtoToDo(Profile profile) {
         BeanUtils.copyProperties(this, profile);
     }
 
     @Override
-    public ProfileDto convert(Profile profile) {
+    public void convertDoToDto(Profile profile) {
         BeanUtils.copyProperties(profile, this);
-        return this;
     }
 }

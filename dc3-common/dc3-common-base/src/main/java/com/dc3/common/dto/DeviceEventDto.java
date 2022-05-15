@@ -13,6 +13,7 @@
 
 package com.dc3.common.dto;
 
+import com.dc3.common.base.Converter;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.model.DeviceEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,7 +34,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class DeviceEventDto implements Serializable {
+public class DeviceEventDto implements Serializable, Converter<DeviceEvent, DeviceEventDto> {
     private static final long serialVersionUID = 1L;
 
     private Long deviceId;
@@ -42,12 +43,11 @@ public class DeviceEventDto implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    public void convertToDo(DeviceEvent deviceEvent) {
+    public void convertDtoToDo(DeviceEvent deviceEvent) {
         BeanUtils.copyProperties(this, deviceEvent);
     }
 
-    public DeviceEventDto convert(DeviceEvent deviceEvent) {
+    public void convertDoToDto(DeviceEvent deviceEvent) {
         BeanUtils.copyProperties(deviceEvent, this);
-        return this;
     }
 }

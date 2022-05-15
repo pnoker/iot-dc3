@@ -36,13 +36,12 @@ public class ProfileBindDto extends ProfileBind implements Converter<ProfileBind
     private Pages page;
 
     @Override
-    public void convertToDo(ProfileBind bind) {
+    public void convertDtoToDo(ProfileBind bind) {
         BeanUtils.copyProperties(this, bind);
     }
 
     @Override
-    public ProfileBindDto convert(ProfileBind bind) {
+    public void convertDoToDto(ProfileBind bind) {
         BeanUtils.copyProperties(bind, this);
-        return this;
     }
 }

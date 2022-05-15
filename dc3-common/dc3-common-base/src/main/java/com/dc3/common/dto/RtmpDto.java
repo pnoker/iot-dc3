@@ -44,13 +44,12 @@ public class RtmpDto extends Rtmp implements Serializable, Converter<Rtmp, RtmpD
     }
 
     @Override
-    public void convertToDo(Rtmp rtmp) {
+    public void convertDtoToDo(Rtmp rtmp) {
         BeanUtils.copyProperties(this, rtmp);
     }
 
     @Override
-    public RtmpDto convert(Rtmp rtmp) {
+    public void convertDoToDto(Rtmp rtmp) {
         BeanUtils.copyProperties(rtmp, this);
-        return this;
     }
 }

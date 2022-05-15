@@ -36,13 +36,12 @@ public class BlackIpDto extends BlackIp implements Converter<BlackIp, BlackIpDto
     private Pages page;
 
     @Override
-    public void convertToDo(BlackIp blackIp) {
+    public void convertDtoToDo(BlackIp blackIp) {
         BeanUtils.copyProperties(this, blackIp);
     }
 
     @Override
-    public BlackIpDto convert(BlackIp blackIp) {
+    public void convertDoToDto(BlackIp blackIp) {
         BeanUtils.copyProperties(blackIp, this);
-        return this;
     }
 }
