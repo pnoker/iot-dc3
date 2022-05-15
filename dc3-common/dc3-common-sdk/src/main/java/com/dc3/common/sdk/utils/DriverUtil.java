@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.sdk.util;
+package com.dc3.common.sdk.utils;
 
 import cn.hutool.core.convert.Convert;
 import com.dc3.common.bean.driver.AttributeInfo;
@@ -27,7 +27,7 @@ import java.util.Map;
  * @author pnoker
  */
 @Slf4j
-public class DriverUtils {
+public class DriverUtil {
 
     /**
      * 获取 属性值
@@ -278,25 +278,25 @@ public class DriverUtils {
      * @return Class Name
      */
     public static String getTypeClassName(String type) {
-        String className = "java.lang.String";
+        String className = String.class.getName();
         switch (type.toLowerCase()) {
             case Common.ValueType.SHORT:
-                className = "java.lang.Short";
+                className = Short.class.getName();
                 break;
             case Common.ValueType.INT:
-                className = "java.lang.Integer";
+                className = Integer.class.getName();
                 break;
             case Common.ValueType.LONG:
-                className = "java.lang.Long";
+                className = Long.class.getName();
                 break;
             case Common.ValueType.FLOAT:
-                className = "java.lang.Float";
+                className = Float.class.getName();
                 break;
             case Common.ValueType.DOUBLE:
-                className = "java.lang.Double";
+                className = Double.class.getName();
                 break;
             case Common.ValueType.BOOLEAN:
-                className = "java.lang.Boolean";
+                className = Boolean.class.getName();
                 break;
             default:
                 break;

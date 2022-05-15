@@ -36,7 +36,7 @@ public class MqttReceiveHandler {
     private MqttReceiveService receiveService;
 
     @Bean
-    @ServiceActivator(inputChannel = "mqttValueInputChannel")
+    @ServiceActivator(inputChannel = "mqttInputChannel")
     public MessageHandler handlerValue() {
         return message -> {
             MessageHeader messageHeader = new MessageHeader(message.getHeaders());

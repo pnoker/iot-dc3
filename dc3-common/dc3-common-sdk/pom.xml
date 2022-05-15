@@ -111,6 +111,12 @@
             <artifactId>jna-platform</artifactId>
         </dependency>
 
+        <!-- Tls Cert 相关 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+        </dependency>
+
         <!-- Dc3 Common Profiles -->
         <dependency>
             <groupId>com.dc3</groupId>

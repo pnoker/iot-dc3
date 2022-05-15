@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Map;
 
-import static com.dc3.common.sdk.util.DriverUtils.attribute;
+import static com.dc3.common.sdk.utils.DriverUtil.attribute;
 
 /**
  * @author pnoker
