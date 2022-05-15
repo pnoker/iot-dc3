@@ -13,7 +13,6 @@
 
 package com.dc3.common.sdk.bean.mqtt;
 
-import cn.hutool.core.util.RandomUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,9 +49,9 @@ public class MqttProperties {
     private String client;
 
     @NotNull(message = "default topic can't be empty")
-    private Topic defaultSendTopic = new Topic("value/dc3-driver-mqtt_default/" + RandomUtil.randomString(6), 1);
+    private Topic defaultSendTopic = new Topic("dc3/d/v/dc3-driver-mqtt_default", 2);
 
-    @Size(min = 1, message = "at least one topic")
+    @Size(min = 1, message = "receive topic at least one topic")
     private List<Topic> receiveTopics;
 
     @NotNull(message = "keep alive interval can't be empty")

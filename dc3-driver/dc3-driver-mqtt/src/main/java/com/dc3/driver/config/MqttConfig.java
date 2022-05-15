@@ -13,11 +13,12 @@
 
 package com.dc3.driver.config;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.dc3.common.constant.Common;
 import com.dc3.common.sdk.bean.mqtt.MqttProperties;
+import com.dc3.common.sdk.utils.X509Util;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,18 +36,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
 import javax.annotation.Resource;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyPair;
-import java.security.KeyStore;
-import java.security.Security;
-import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 
 /**
@@ -58,11 +48,13 @@ import java.security.cert.X509Certificate;
 @EnableConfigurationProperties({MqttProperties.class})
 public class MqttConfig {
 
+    private static final String RANDOM_ID = Common.Cache.UNDERSCORE + RandomUtil.randomString(8);
+
     @Resource
     private MqttProperties mqttProperties;
 
     @Bean
-    public MessageChannel mqttValueInputChannel() {
+    public MessageChannel mqttInputChannel() {
         return new DirectChannel();
     }
 
@@ -72,22 +64,34 @@ public class MqttConfig {
     }
 
     @Bean
-    public MessageProducer valueInbound() {
+    public MessageProducer mqttInbound() {
+        // set default receive topic
+        String topicName = "dc3/mc/" + mqttProperties.getClient();
+        if (null == mqttProperties.getReceiveTopics()) {
+            mqttProperties.setReceiveTopics(new ArrayList<>());
+        }
+        boolean match = mqttProperties.getReceiveTopics().stream().anyMatch(topic -> topic.getName().equals(topicName));
+        if (!match) {
+            mqttProperties.getReceiveTopics().add(new MqttProperties.Topic(topicName, 2));
+        }
+
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
-                mqttProperties.getClient() + "_vin",
+                mqttProperties.getClient() + RANDOM_ID + "_in",
                 mqttClientFactory(),
                 mqttProperties.getReceiveTopics().stream().map(MqttProperties.Topic::getName).toArray(String[]::new));
-        adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
-        adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(mqttProperties.getReceiveTopics().stream().mapToInt(MqttProperties.Topic::getQos).toArray());
-        adapter.setOutputChannel(mqttValueInputChannel());
+        adapter.setOutputChannel(mqttInputChannel());
+        adapter.setConverter(new DefaultPahoMessageConverter());
+        adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
         return adapter;
     }
 
     @Bean
     @ServiceActivator(inputChannel = "mqttOutputChannel")
     public MessageHandler outbound() {
-        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(mqttProperties.getClient() + "_cout", mqttClientFactory());
+        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(
+                mqttProperties.getClient() +
+                        "_out", mqttClientFactory());
         messageHandler.setAsync(true);
         messageHandler.setDefaultQos(mqttProperties.getDefaultSendTopic().getQos());
         messageHandler.setDefaultTopic(mqttProperties.getDefaultSendTopic().getName());
@@ -113,7 +117,7 @@ public class MqttConfig {
 
         // tls x509
         if (mqttProperties.getAuthType().equals(MqttProperties.AuthTypeEnum.X509)) {
-            mqttConnectOptions.setSocketFactory(getSocketFactory(
+            mqttConnectOptions.setSocketFactory(X509Util.getSSLSocketFactory(
                     mqttProperties.getCaCrt(),
                     mqttProperties.getClientCrt(),
                     mqttProperties.getClientKey(),
@@ -125,67 +129,12 @@ public class MqttConfig {
             }
         }
 
+        // disable https hostname verification
+        mqttConnectOptions.setHttpsHostnameVerificationEnabled(false);
         mqttConnectOptions.setServerURIs(new String[]{mqttProperties.getUrl()});
         mqttConnectOptions.setKeepAliveInterval(mqttProperties.getKeepAlive());
         return mqttConnectOptions;
-    }
 
-    private SSLSocketFactory getSocketFactory(final String caCrtFile, final String crtFile, final String keyFile, final String password) {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            PEMReader reader;
-
-            // load CA certificate
-            String classpath = "classpath:";
-            if (caCrtFile.startsWith(classpath)) {
-                reader = new PEMReader(new InputStreamReader(this.getClass().getResourceAsStream(caCrtFile.replace(classpath, ""))));
-            } else {
-                reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(Paths.get(caCrtFile)))));
-            }
-            X509Certificate caCert = (X509Certificate) reader.readObject();
-            reader.close();
-
-            // load client certificate
-            if (crtFile.startsWith(classpath)) {
-                reader = new PEMReader(new InputStreamReader(this.getClass().getResourceAsStream(crtFile.replace(classpath, ""))));
-            } else {
-                reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(Paths.get(crtFile)))));
-            }
-            X509Certificate cert = (X509Certificate) reader.readObject();
-            reader.close();
-
-            // load client private key
-            if (keyFile.startsWith(classpath)) {
-                reader = new PEMReader(new InputStreamReader(this.getClass().getResourceAsStream(keyFile.replace(classpath, ""))), password::toCharArray);
-            } else {
-                reader = new PEMReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(Paths.get(keyFile)))), password::toCharArray);
-            }
-            KeyPair key = (KeyPair) reader.readObject();
-            reader.close();
-
-            // CA certificate is used to authenticate server
-            KeyStore caKs = KeyStore.getInstance(KeyStore.getDefaultType());
-            caKs.load(null, null);
-            caKs.setCertificateEntry("cacertfile", caCert);
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(caKs);
-
-            // client key and certificates are sent to server so it can authenticate us
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            ks.load(null, null);
-            ks.setCertificateEntry("certfile", cert);
-            ks.setKeyEntry("keyfile", key.getPrivate(), password.toCharArray(), new java.security.cert.Certificate[]{cert});
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(ks, password.toCharArray());
-
-            // finally, create SSL socket factory
-            SSLContext context = SSLContext.getInstance("TLSv1.2");
-            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-
-            return context.getSocketFactory();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
     }
 
 }

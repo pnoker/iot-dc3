@@ -20,7 +20,7 @@ import com.dc3.common.model.Point;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
-import com.dc3.common.sdk.util.DriverUtils;
+import com.dc3.common.sdk.utils.DriverUtil;
 import com.dc3.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -70,8 +70,8 @@ public class NettyServerHandler {
         for (Long pointId : pointInfoMap.keySet()) {
             Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);
-            int start = DriverUtils.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
-            int end = DriverUtils.value(infoMap.get("end").getType(), infoMap.get("end").getValue());
+            int start = DriverUtil.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
+            int end = DriverUtil.value(infoMap.get("end").getType(), infoMap.get("end").getValue());
 
             if (infoMap.get("key").getValue().equals(hexKey)) {
                 PointValue pointValue = null;

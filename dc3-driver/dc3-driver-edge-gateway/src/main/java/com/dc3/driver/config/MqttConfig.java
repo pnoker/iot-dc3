@@ -62,7 +62,7 @@ public class MqttConfig {
     private MqttProperties mqttProperties;
 
     @Bean
-    public MessageChannel mqttValueInputChannel() {
+    public MessageChannel mqttInputChannel() {
         return new DirectChannel();
     }
 
@@ -72,7 +72,7 @@ public class MqttConfig {
     }
 
     @Bean
-    public MessageProducer valueInbound() {
+    public MessageProducer mqttInbound() {
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
                 mqttProperties.getClient() + "_vin",
                 mqttClientFactory(),
@@ -80,7 +80,7 @@ public class MqttConfig {
         adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(mqttProperties.getReceiveTopics().stream().mapToInt(MqttProperties.Topic::getQos).toArray());
-        adapter.setOutputChannel(mqttValueInputChannel());
+        adapter.setOutputChannel(mqttInputChannel());
         return adapter;
     }
 

@@ -37,8 +37,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static com.dc3.common.sdk.util.DriverUtils.attribute;
-import static com.dc3.common.sdk.util.DriverUtils.value;
+import static com.dc3.common.sdk.utils.DriverUtil.attribute;
+import static com.dc3.common.sdk.utils.DriverUtil.value;
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
 
 /**
