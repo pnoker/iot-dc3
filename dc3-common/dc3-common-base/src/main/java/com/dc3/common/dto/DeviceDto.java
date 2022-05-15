@@ -38,13 +38,12 @@ public class DeviceDto extends Device implements Converter<Device, DeviceDto> {
     private Pages page;
 
     @Override
-    public void convertToDo(Device device) {
+    public void convertDtoToDo(Device device) {
         BeanUtils.copyProperties(this, device);
     }
 
     @Override
-    public DeviceDto convert(Device device) {
+    public void convertDoToDto(Device device) {
         BeanUtils.copyProperties(device, this);
-        return this;
     }
 }

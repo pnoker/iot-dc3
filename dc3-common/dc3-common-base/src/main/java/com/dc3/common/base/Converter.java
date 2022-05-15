@@ -18,18 +18,18 @@ package com.dc3.common.base;
  *
  * @author pnoker
  */
-public interface Converter<D,T> {
+public interface Converter<DO, DTO> {
     /**
      * DTO 转 DO
      *
      * @param d Do对象
      */
-    void convertToDo(D d);
+    void convertDtoToDo(DO d);
 
     /**
      * DO 转 DTO
      *
      * @param d Do对象
      */
-    T convert(D d);
+    void convertDoToDto(DO d);
 }

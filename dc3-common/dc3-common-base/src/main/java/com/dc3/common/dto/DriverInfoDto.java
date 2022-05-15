@@ -38,13 +38,12 @@ public class DriverInfoDto extends DriverInfo implements Converter<DriverInfo, D
     private Pages page;
 
     @Override
-    public void convertToDo(DriverInfo info) {
+    public void convertDtoToDo(DriverInfo info) {
         BeanUtils.copyProperties(this, info);
     }
 
     @Override
-    public DriverInfoDto convert(DriverInfo info) {
+    public void convertDoToDto(DriverInfo info) {
         BeanUtils.copyProperties(info, this);
-        return this;
     }
 }

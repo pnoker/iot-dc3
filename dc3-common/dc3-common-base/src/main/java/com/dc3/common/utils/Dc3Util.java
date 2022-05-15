@@ -15,8 +15,8 @@ package com.dc3.common.utils;
 
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.crypto.digest.MD5;
+import com.dc3.common.bean.TreeNode;
 import com.dc3.common.constant.Common;
-import com.dc3.common.dto.NodeDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -326,7 +326,7 @@ public class Dc3Util {
      * @param treeNodes 传入的树节点列表
      * @return T Array
      */
-    public <T extends NodeDto> List<T> buildByLoop(List<T> treeNodes, Object root) {
+    public <T extends TreeNode> List<T> buildByLoop(List<T> treeNodes, Object root) {
         List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
@@ -350,7 +350,7 @@ public class Dc3Util {
      * @param treeNodes 传入的树节点列表
      * @return T Array
      */
-    public <T extends NodeDto> List<T> buildByRecursive(List<T> treeNodes, Object root) {
+    public <T extends TreeNode> List<T> buildByRecursive(List<T> treeNodes, Object root) {
         List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
@@ -366,7 +366,7 @@ public class Dc3Util {
      * @param treeNodes 传入的树节点列表
      * @return T
      */
-    public <T extends NodeDto> T findChildren(T treeNode, List<T> treeNodes) {
+    public <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
         for (T it : treeNodes) {
             if (treeNode.getId() == it.getParentId()) {
                 if (treeNode.getChildren() == null) {

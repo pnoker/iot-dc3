@@ -13,6 +13,7 @@
 
 package com.dc3.common.dto;
 
+import com.dc3.common.base.Converter;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.point.PointValue;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,7 +34,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class PointValueDto implements Serializable {
+public class PointValueDto implements Serializable, Converter<PointValue, PointValueDto> {
     private static final long serialVersionUID = 1L;
 
     private Long deviceId;
@@ -42,12 +43,13 @@ public class PointValueDto implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    public void convertToDo(PointValue pointValue) {
+    @Override
+    public void convertDtoToDo(PointValue pointValue) {
         BeanUtils.copyProperties(this, pointValue);
     }
 
-    public PointValueDto convert(PointValue pointValue) {
+    @Override
+    public void convertDoToDto(PointValue pointValue) {
         BeanUtils.copyProperties(pointValue, this);
-        return this;
     }
 }

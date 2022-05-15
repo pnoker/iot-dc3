@@ -36,13 +36,12 @@ public class GroupDto extends Group implements Converter<Group, GroupDto> {
     private Pages page;
 
     @Override
-    public void convertToDo(Group group) {
+    public void convertDtoToDo(Group group) {
         BeanUtils.copyProperties(this, group);
     }
 
     @Override
-    public GroupDto convert(Group group) {
+    public void convertDoToDto(Group group) {
         BeanUtils.copyProperties(group, this);
-        return this;
     }
 }

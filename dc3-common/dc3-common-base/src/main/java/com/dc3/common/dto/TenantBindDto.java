@@ -36,13 +36,12 @@ public class TenantBindDto extends TenantBind implements Converter<TenantBind, T
     private Pages page;
 
     @Override
-    public void convertToDo(TenantBind bind) {
+    public void convertDtoToDo(TenantBind bind) {
         BeanUtils.copyProperties(this, bind);
     }
 
     @Override
-    public TenantBindDto convert(TenantBind bind) {
+    public void convertDoToDto(TenantBind bind) {
         BeanUtils.copyProperties(bind, this);
-        return this;
     }
 }

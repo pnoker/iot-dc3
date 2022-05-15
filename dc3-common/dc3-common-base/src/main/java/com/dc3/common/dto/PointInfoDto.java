@@ -38,13 +38,12 @@ public class PointInfoDto extends PointInfo implements Converter<PointInfo, Poin
     private Pages page;
 
     @Override
-    public void convertToDo(PointInfo info) {
+    public void convertDtoToDo(PointInfo info) {
         BeanUtils.copyProperties(this, info);
     }
 
     @Override
-    public PointInfoDto convert(PointInfo info) {
+    public void convertDoToDto(PointInfo info) {
         BeanUtils.copyProperties(info, this);
-        return this;
     }
 }

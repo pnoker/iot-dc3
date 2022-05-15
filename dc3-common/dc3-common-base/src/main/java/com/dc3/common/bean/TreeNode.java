@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.common.dto;
+package com.dc3.common.bean;
 
 import lombok.Data;
 
@@ -20,19 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- *
  * @author pnoker
  */
 @Data
-public class NodeDto implements Serializable {
+public class TreeNode implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected int id;
     protected int parentId;
-    protected List<NodeDto> children = new ArrayList<>(16);
+    protected List<TreeNode> children = new ArrayList<>(16);
 
-    public void add(NodeDto node) {
+    public void add(TreeNode node) {
         children.add(node);
     }
 }

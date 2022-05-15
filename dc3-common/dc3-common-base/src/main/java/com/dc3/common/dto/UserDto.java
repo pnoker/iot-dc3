@@ -34,13 +34,12 @@ public class UserDto extends User implements Converter<User, UserDto> {
     private Pages page;
 
     @Override
-    public void convertToDo(User user) {
+    public void convertDtoToDo(User user) {
         BeanUtils.copyProperties(this, user);
     }
 
     @Override
-    public UserDto convert(User user) {
+    public void convertDoToDto(User user) {
         BeanUtils.copyProperties(user, this);
-        return this;
     }
 }

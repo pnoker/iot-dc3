@@ -13,10 +13,10 @@
 
 package com.dc3.common.dto;
 
+import com.dc3.common.base.Converter;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.model.Label;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.dc3.common.base.Converter;
 import lombok.*;
 import org.springframework.beans.BeanUtils;
 
@@ -36,13 +36,12 @@ public class LabelDto extends Label implements Converter<Label, LabelDto> {
     private Pages page;
 
     @Override
-    public void convertToDo(Label label) {
+    public void convertDtoToDo(Label label) {
         BeanUtils.copyProperties(this, label);
     }
 
     @Override
-    public LabelDto convert(Label label) {
+    public void convertDoToDto(Label label) {
         BeanUtils.copyProperties(label, this);
-        return this;
     }
 }

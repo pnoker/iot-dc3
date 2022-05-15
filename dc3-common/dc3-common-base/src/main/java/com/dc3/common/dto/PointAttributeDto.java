@@ -13,10 +13,10 @@
 
 package com.dc3.common.dto;
 
+import com.dc3.common.base.Converter;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.model.PointAttribute;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.dc3.common.base.Converter;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
@@ -38,13 +38,12 @@ public class PointAttributeDto extends PointAttribute implements Converter<Point
     private Pages page;
 
     @Override
-    public void convertToDo(PointAttribute info) {
+    public void convertDtoToDo(PointAttribute info) {
         BeanUtils.copyProperties(this, info);
     }
 
     @Override
-    public PointAttributeDto convert(PointAttribute info) {
+    public void convertDoToDto(PointAttribute info) {
         BeanUtils.copyProperties(info, this);
-        return this;
     }
 }

@@ -36,13 +36,12 @@ public class DriverDto extends Driver implements Converter<Driver, DriverDto> {
     private Pages page;
 
     @Override
-    public void convertToDo(Driver driver) {
+    public void convertDtoToDo(Driver driver) {
         BeanUtils.copyProperties(this, driver);
     }
 
     @Override
-    public DriverDto convert(Driver driver) {
+    public void convertDoToDto(Driver driver) {
         BeanUtils.copyProperties(driver, this);
-        return this;
     }
 }
