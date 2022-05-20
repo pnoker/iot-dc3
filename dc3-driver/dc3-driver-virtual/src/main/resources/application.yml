@@ -58,6 +58,7 @@ spring:
       - rabbitmq
       - quartz
       - driver
+      - feign
       - ${NODE_ENV:dev}
 
 logging:

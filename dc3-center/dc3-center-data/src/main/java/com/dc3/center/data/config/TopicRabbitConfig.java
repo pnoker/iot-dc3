@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
 
 package com.dc3.center.data.config;
 
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -61,15 +61,15 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange valueExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_VALUE, true, false);
+        return new TopicExchange(CommonConstant.Rabbit.TOPIC_EXCHANGE_VALUE, true, false);
     }
 
     @Bean
     Queue pointValueQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 30天： 30 * 24 * 60 * 60 * 1000 = 2592000000L
-        arguments.put("x-message-ttl", 2592000000L);
-        return new Queue(Common.Rabbit.QUEUE_POINT_VALUE, true, false, false, arguments);
+        arguments.put(CommonConstant.Rabbit.MESSAGE_TTL, 2592000000L);
+        return new Queue(CommonConstant.Rabbit.QUEUE_POINT_VALUE, true, false, false, arguments);
     }
 
     @Bean
@@ -77,7 +77,7 @@ public class TopicRabbitConfig {
         return BindingBuilder
                 .bind(pointValueQueue())
                 .to(valueExchange())
-                .with(Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + "*");
+                .with(CommonConstant.Rabbit.ROUTING_POINT_VALUE_PREFIX + CommonConstant.Symbol.ASTERISK);
     }
 
 }

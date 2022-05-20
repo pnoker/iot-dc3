@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,11 @@
 package com.dc3.api.center.data.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.data.hystrix.PointValueClientHystrix;
+import com.dc3.api.center.data.fallback.PointValueClientFallback;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
-import com.dc3.common.dto.PointValueDto;
 import com.dc3.common.bean.point.PointValue;
+import com.dc3.common.constant.ServiceConstant;
+import com.dc3.common.dto.PointValueDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_DATA_POINT_VALUE_URL_PREFIX, name = Common.Service.DC3_DATA_SERVICE_NAME, fallbackFactory = PointValueClientHystrix.class)
+@FeignClient(path = ServiceConstant.Data.VALUE_URL_PREFIX, name = ServiceConstant.Data.SERVICE_NAME, fallbackFactory = PointValueClientFallback.class)
 public interface PointValueClient {
 
     /**

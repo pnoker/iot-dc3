@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,8 @@
 package com.dc3.center.manager.service.rabbit;
 
 import com.dc3.center.manager.service.EventService;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
@@ -57,17 +58,17 @@ public class DeviceEventReceiver {
 
             switch (deviceEvent.getType()) {
                 // Save device heartbeat to Redis
-                case Common.Device.Event.HEARTBEAT:
+                case CommonConstant.Device.Event.HEARTBEAT:
                     redisUtil.setKey(
-                            Common.Cache.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
+                            CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
                             deviceEvent.getContent(),
                             deviceEvent.getTimeOut(),
                             deviceEvent.getTimeUnit()
                     );
                     break;
-                case Common.Device.Event.ERROR:
-                case Common.Device.Event.OVER_UPPER_LIMIT:
-                case Common.Device.Event.OVER_LOWER_LIMIT:
+                case CommonConstant.Device.Event.ERROR:
+                case CommonConstant.Device.Event.OVER_UPPER_LIMIT:
+                case CommonConstant.Device.Event.OVER_LOWER_LIMIT:
                     //TODO 去重
                     threadPoolExecutor.execute(() -> eventService.addDeviceEvent(deviceEvent));
                     break;

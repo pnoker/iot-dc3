@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.PointAttributeMapper;
 import com.dc3.center.manager.service.PointAttributeService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.PointAttributeDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -51,13 +51,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#pointAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#pointAttribute.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public PointAttribute add(PointAttribute pointAttribute) {
@@ -75,11 +75,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -90,13 +90,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#pointAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#pointAttribute.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public PointAttribute update(PointAttribute pointAttribute) {
@@ -111,7 +111,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public PointAttribute selectById(Long id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
         if (null == pointAttribute) {
@@ -121,7 +121,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.NAME + Common.Cache.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
     public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         queryWrapper.eq(PointAttribute::getName, name);
@@ -134,7 +134,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DRIVER_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, key = "#driverId", unless = "#result==null")
     public List<PointAttribute> selectByDriverId(Long driverId) {
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setDriverId(driverId);
@@ -146,7 +146,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<PointAttribute> list(PointAttributeDto pointAttributeDto) {
         if (!Optional.ofNullable(pointAttributeDto.getPage()).isPresent()) {
             pointAttributeDto.setPage(new Pages());

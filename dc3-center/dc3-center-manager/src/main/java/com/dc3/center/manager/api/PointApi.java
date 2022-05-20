@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@ import com.dc3.api.center.manager.feign.PointClient;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ import java.util.Set;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_POINT_URL_PREFIX)
+@RequestMapping(ServiceConstant.Manager.POINT_URL_PREFIX)
 public class PointApi implements PointClient {
 
     @Resource
@@ -50,7 +51,7 @@ public class PointApi implements PointClient {
         try {
             Point add = pointService.add(point.setTenantId(tenantId));
             if (null != add) {
-                notifyService.notifyDriverPoint(Common.Driver.Point.ADD, add);
+                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -64,7 +65,7 @@ public class PointApi implements PointClient {
         try {
             Point point = pointService.selectById(id);
             if (null != point && pointService.delete(id)) {
-                notifyService.notifyDriverPoint(Common.Driver.Point.DELETE, point);
+                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.DELETE, point);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -78,7 +79,7 @@ public class PointApi implements PointClient {
         try {
             Point update = pointService.update(point.setTenantId(tenantId));
             if (null != update) {
-                notifyService.notifyDriverPoint(Common.Driver.Point.UPDATE, update);
+                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

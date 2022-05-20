@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -67,13 +68,13 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#device.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Device add(Device device) {
@@ -94,11 +95,11 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -110,13 +111,13 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DEVICE + Common.Cache.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#device.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DEVICE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Device update(Device device) {
@@ -145,7 +146,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Device selectById(Long id) {
         Device device = deviceMapper.selectById(id);
         if (null == device) {
@@ -155,7 +156,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
     public Device selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getName, name);
@@ -168,7 +169,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DEVICE_ID + Common.Cache.LIST, key = "#driverId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, key = "#driverId", unless = "#result==null")
     public List<Device> selectByDriverId(Long driverId) {
         DeviceDto deviceDto = new DeviceDto();
         deviceDto.setDriverId(driverId);
@@ -186,7 +187,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Device> selectByIds(Set<Long> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);
         if (CollectionUtil.isEmpty(devices)) {
@@ -197,7 +198,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Device> list(DeviceDto deviceDto) {
         if (!Optional.ofNullable(deviceDto.getPage()).isPresent()) {
             deviceDto.setPage(new Pages());
@@ -234,12 +235,12 @@ public class DeviceServiceImpl implements DeviceService {
                 profileBindService.add(new ProfileBind(profile.getId(), deviceId));
 
                 // Notify Driver Profile
-                notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
+                notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.ADD, profile);
 
                 // Notify Driver Point
                 try {
                     List<Point> points = pointService.selectByProfileId(profile.getId());
-                    points.forEach(point -> notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point));
+                    points.forEach(point -> notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, point));
                 } catch (Exception ignored) {
                 }
             });

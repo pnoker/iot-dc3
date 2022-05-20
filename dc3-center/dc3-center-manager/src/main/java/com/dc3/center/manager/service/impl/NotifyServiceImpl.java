@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@ package com.dc3.center.manager.service.impl;
 import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.driver.DriverConfiguration;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -44,7 +44,7 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             List<Driver> drivers = driverService.selectByProfileId(profile.getId());
             drivers.forEach(driver -> {
-                DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.PROFILE).setCommand(command).setContent(profile);
+                DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.PROFILE).setCommand(command).setContent(profile);
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             List<Driver> drivers = driverService.selectByProfileId(point.getProfileId());
             drivers.forEach(driver -> {
-                DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.POINT).setCommand(command).setContent(point);
+                DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.POINT).setCommand(command).setContent(point);
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
@@ -69,7 +69,7 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverDevice(String command, Device device) {
         try {
             Driver driver = driverService.selectById(device.getDriverId());
-            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DEVICE).setCommand(command).setContent(device);
+            DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.DEVICE).setCommand(command).setContent(device);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.warn("Notify Driver Device: {}", e.getMessage());
@@ -80,7 +80,7 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverDriverInfo(String command, DriverInfo driverInfo) {
         try {
             Driver driver = driverService.selectByDeviceId(driverInfo.getDeviceId());
-            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.DRIVER_INFO).setCommand(command).setContent(driverInfo);
+            DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.DRIVER_INFO).setCommand(command).setContent(driverInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.warn("Notify Driver DriverInfo: {}", e.getMessage());
@@ -91,7 +91,7 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverPointInfo(String command, PointInfo pointInfo) {
         try {
             Driver driver = driverService.selectByDeviceId(pointInfo.getDeviceId());
-            DriverConfiguration operation = new DriverConfiguration().setType(Common.Driver.Type.POINT_INFO).setCommand(command).setContent(pointInfo);
+            DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.POINT_INFO).setCommand(command).setContent(pointInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.warn("Notify Driver PointInfo: {}", e.getMessage());
@@ -106,7 +106,7 @@ public class NotifyServiceImpl implements NotifyService {
      */
     private void notifyDriver(Driver driver, DriverConfiguration driverConfiguration) {
         log.debug("Notify Driver {} : {}", driver.getServiceName(), driverConfiguration);
-        rabbitTemplate.convertAndSend(Common.Rabbit.TOPIC_EXCHANGE_METADATA, Common.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driver.getServiceName(), driverConfiguration);
+        rabbitTemplate.convertAndSend(CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA, CommonConstant.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driver.getServiceName(), driverConfiguration);
     }
 
 }

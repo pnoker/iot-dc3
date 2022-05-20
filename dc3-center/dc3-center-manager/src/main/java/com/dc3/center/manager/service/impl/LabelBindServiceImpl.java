@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.LabelBindMapper;
 import com.dc3.center.manager.service.LabelBindService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.LabelBindDto;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
@@ -48,10 +48,10 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.LABEL_BIND + Common.Cache.ID, key = "#labelBind.id", condition = "#result!=null")},
+            put = {@CachePut(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#labelBind.id", condition = "#result!=null")},
             evict = {
-                    @CacheEvict(value = Common.Cache.LABEL_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.LABEL_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public LabelBind add(LabelBind labelBind) {
@@ -64,9 +64,9 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.LABEL_BIND + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.LABEL_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.LABEL_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -76,10 +76,10 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.LABEL_BIND + Common.Cache.ID, key = "#labelBind.id", condition = "#result!=null")},
+            put = {@CachePut(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#labelBind.id", condition = "#result!=null")},
             evict = {
-                    @CacheEvict(value = Common.Cache.LABEL_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.LABEL_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public LabelBind update(LabelBind labelBind) {
@@ -92,7 +92,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.LABEL_BIND + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public LabelBind selectById(Long id) {
         LabelBind labelBind = labelBindMapper.selectById(id);
         if (null == labelBind) {
@@ -102,7 +102,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.LABEL_BIND + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<LabelBind> list(LabelBindDto labelBindDto) {
         if (!Optional.ofNullable(labelBindDto.getPage()).isPresent()) {
             labelBindDto.setPage(new Pages());

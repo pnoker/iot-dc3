@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package com.dc3.gateway.config;
 
 import com.dc3.gateway.filter.BlackIpGlobalFilter;
 import com.dc3.gateway.filter.factory.AuthenticGatewayFilterFactory;
-import com.dc3.gateway.hystrix.GatewayHystrix;
+import com.dc3.gateway.fallback.GatewayFallback;
 import feign.codec.Decoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -46,10 +46,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Configuration
 public class GatewayConfig {
-    private final GatewayHystrix gatewayHystrix;
+    private final GatewayFallback gatewayFallback;
 
-    public GatewayConfig(GatewayHystrix gatewayHystrix) {
-        this.gatewayHystrix = gatewayHystrix;
+    public GatewayConfig(GatewayFallback gatewayFallback) {
+        this.gatewayFallback = gatewayFallback;
     }
 
     @Bean
@@ -95,7 +95,7 @@ public class GatewayConfig {
 
     @Bean
     public RouterFunction<ServerResponse> routerFunction() {
-        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), gatewayHystrix);
+        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), gatewayFallback);
     }
 
 }

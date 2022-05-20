@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,10 @@
 
 package com.dc3.api.center.manager.feign;
 
-import com.dc3.api.center.manager.hystrix.DictionaryClientHystrix;
+import com.dc3.api.center.manager.fallback.DictionaryClientFallback;
 import com.dc3.common.bean.Dictionary;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_DICTIONARY_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = DictionaryClientHystrix.class)
+@FeignClient(path = ServiceConstant.Manager.DICTIONARY_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = DictionaryClientFallback.class)
 public interface DictionaryClient {
 
     /**
@@ -39,7 +39,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/driver")
-    R<List<Dictionary>> driverDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> driverDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 查询驱动属性 Dictionary
@@ -47,7 +47,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/driver_attribute")
-    R<List<Dictionary>> driverAttributeDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> driverAttributeDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 查询位号属性 Dictionary
@@ -55,7 +55,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/point_attribute")
-    R<List<Dictionary>> pointAttributeDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> pointAttributeDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 查询模板 Dictionary
@@ -63,7 +63,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/profile")
-    R<List<Dictionary>> profileDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> profileDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 查询设备 Dictionary
@@ -71,7 +71,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/device")
-    R<List<Dictionary>> deviceDictionary(@RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> deviceDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 查询位号 Dictionary
@@ -80,6 +80,6 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/point/{parent}")
-    R<List<Dictionary>> pointDictionary(@NotNull @PathVariable("parent") String parent, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> pointDictionary(@NotNull @PathVariable("parent") String parent, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }

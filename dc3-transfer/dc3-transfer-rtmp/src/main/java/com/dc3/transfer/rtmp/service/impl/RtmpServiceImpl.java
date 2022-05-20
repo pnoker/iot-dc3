@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
@@ -62,11 +62,11 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#rtmp.id", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Rtmp add(Rtmp rtmp) {
@@ -83,9 +83,9 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -106,11 +106,11 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.RTMP + Common.Cache.ID, key = "#rtmp.id", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#rtmp.id", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Rtmp update(Rtmp rtmp) {
@@ -133,13 +133,13 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Rtmp selectById(Long id) {
         return rtmpMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = Common.Cache.RTMP + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Rtmp> list(RtmpDto rtmpDto) {
         return rtmpMapper.selectPage(rtmpDto.getPage().convert(), fuzzyQuery(rtmpDto));
     }
@@ -147,9 +147,9 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean start(Long id) {
@@ -228,9 +228,9 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.RTMP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean stop(Long id) {

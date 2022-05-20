@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@ import com.dc3.center.auth.mapper.TenantMapper;
 import com.dc3.center.auth.mapper.UserMapper;
 import com.dc3.center.auth.service.DictionaryService;
 import com.dc3.common.bean.Dictionary;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.model.BlackIp;
 import com.dc3.common.model.Tenant;
 import com.dc3.common.model.User;
@@ -47,7 +47,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     private BlackIpMapper blackIpMapper;
 
     @Override
-    @Cacheable(value = Common.Cache.TENANT + Common.Cache.DIC, key = "'dic'", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.TENANT + CacheConstant.Suffix.DIC, key = "'dic'", unless = "#result==null")
     public List<Dictionary> tenantDictionary() {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
@@ -60,7 +60,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> userDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
@@ -73,7 +73,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> blackIpDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();

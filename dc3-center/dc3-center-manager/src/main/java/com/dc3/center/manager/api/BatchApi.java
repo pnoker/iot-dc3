@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@ import com.dc3.api.center.manager.feign.BatchClient;
 import com.dc3.center.manager.service.BatchService;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.batch.BatchDriver;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_BATCH_URL_PREFIX)
+@RequestMapping(ServiceConstant.Manager.BATCH_URL_PREFIX)
 public class BatchApi implements BatchClient {
 
     @Resource

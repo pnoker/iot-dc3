@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@ import com.dc3.center.auth.bean.TokenValid;
 import com.dc3.center.auth.service.TokenService;
 import com.dc3.common.bean.Login;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.exception.UnAuthorizedException;
 import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_AUTH_TOKEN_URL_PREFIX)
+@RequestMapping(ServiceConstant.Auth.TOKEN_URL_PREFIX)
 public class TokenApi implements TokenClient {
 
     @Resource
@@ -56,7 +56,7 @@ public class TokenApi implements TokenClient {
     public R<Long> checkTokenValid(Login login) {
         TokenValid tokenValid = tokenService.checkTokenValid(login.getName(), login.getSalt(), login.getToken());
         if (tokenValid.isValid()) {
-            return R.ok(tokenValid.getExpireTime().getTime(), "The token will expire in " + Dc3Util.formatData(tokenValid.getExpireTime()));
+            return R.ok(tokenValid.getExpireTime().getTime(), "The token will expire in " + Dc3Util.formatCompleteData(tokenValid.getExpireTime()));
         }
         throw new UnAuthorizedException("Token invalid");
     }

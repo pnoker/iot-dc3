@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package com.dc3.common.sdk.utils;
 
 import cn.hutool.core.convert.Convert;
 import com.dc3.common.bean.driver.AttributeInfo;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ValueConstant;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
@@ -280,22 +280,22 @@ public class DriverUtil {
     public static String getTypeClassName(String type) {
         String className = String.class.getName();
         switch (type.toLowerCase()) {
-            case Common.ValueType.SHORT:
+            case ValueConstant.Type.SHORT:
                 className = Short.class.getName();
                 break;
-            case Common.ValueType.INT:
+            case ValueConstant.Type.INT:
                 className = Integer.class.getName();
                 break;
-            case Common.ValueType.LONG:
+            case ValueConstant.Type.LONG:
                 className = Long.class.getName();
                 break;
-            case Common.ValueType.FLOAT:
+            case ValueConstant.Type.FLOAT:
                 className = Float.class.getName();
                 break;
-            case Common.ValueType.DOUBLE:
+            case ValueConstant.Type.DOUBLE:
                 className = Double.class.getName();
                 break;
-            case Common.ValueType.BOOLEAN:
+            case ValueConstant.Type.BOOLEAN:
                 className = Boolean.class.getName();
                 break;
             default:

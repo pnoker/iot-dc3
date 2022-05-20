@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ import com.dc3.center.manager.mapper.ProfileMapper;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -66,12 +66,12 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#profile.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Profile add(Profile profile) {
@@ -95,10 +95,10 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -114,12 +114,12 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#profile.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Profile update(Profile profile) {
@@ -138,7 +138,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Profile selectById(Long id) {
         Profile profile = profileMapper.selectById(id);
         if (null == profile) {
@@ -152,7 +152,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.NAME + Common.Cache.TYPE, key = "#name+'.'+#type+'.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, key = "#name+'.'+#type+'.'+#tenantId", unless = "#result==null")
     public Profile selectByNameAndType(String name, Short type, Long tenantId) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getName, name);
@@ -170,7 +170,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Profile> selectByIds(Set<Long> ids) {
         List<Profile> profiles = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(ids)) {
@@ -195,7 +195,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Profile> list(ProfileDto profileDto) {
         if (!Optional.ofNullable(profileDto.getPage()).isPresent()) {
             profileDto.setPage(new Pages());

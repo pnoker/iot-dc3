@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package com.dc3.driver.config;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.sdk.bean.mqtt.MqttProperties;
 import com.dc3.common.sdk.utils.X509Util;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ import java.util.ArrayList;
 @EnableConfigurationProperties({MqttProperties.class})
 public class MqttConfig {
 
-    private static final String RANDOM_ID = Common.Cache.UNDERSCORE + RandomUtil.randomString(8);
+    private static final String RANDOM_ID = CommonConstant.Symbol.UNDERSCORE + RandomUtil.randomString(8);
 
     @Resource
     private MqttProperties mqttProperties;

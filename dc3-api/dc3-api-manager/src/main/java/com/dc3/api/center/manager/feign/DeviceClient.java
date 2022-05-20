@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,9 @@
 package com.dc3.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.manager.hystrix.DeviceClientHystrix;
+import com.dc3.api.center.manager.fallback.DeviceClientFallback;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
 import com.dc3.common.valid.Insert;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_DEVICE_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = DeviceClientHystrix.class)
+@FeignClient(path = ServiceConstant.Manager.DEVICE_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = DeviceClientFallback.class)
 public interface DeviceClient {
 
     /**
@@ -43,7 +43,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @PostMapping("/add")
-    R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Device
@@ -61,7 +61,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @PostMapping("/update")
-    R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Device
@@ -97,6 +97,6 @@ public interface DeviceClient {
      * @return R<Page < Device>>
      */
     @PostMapping("/list")
-    R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }

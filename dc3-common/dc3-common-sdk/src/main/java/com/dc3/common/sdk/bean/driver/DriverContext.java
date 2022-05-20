@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package com.dc3.common.sdk.bean.driver;
 
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.bean.driver.DriverMetadata;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
@@ -44,7 +44,7 @@ public class DriverContext {
     /**
      * 驱动 状态，默认为 未注册 状态
      */
-    private String driverStatus = Common.Driver.Status.UNREGISTERED;
+    private String driverStatus = CommonConstant.Status.UNREGISTERED;
 
     public synchronized void setDriverStatus(String driverStatus) {
         this.driverStatus = driverStatus;

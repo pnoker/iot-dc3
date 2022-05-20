@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,8 @@ import com.dc3.center.auth.mapper.UserMapper;
 import com.dc3.center.auth.service.UserService;
 import com.dc3.common.annotation.Logs;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.dto.UserDto;
 import com.dc3.common.exception.*;
 import com.dc3.common.model.User;
@@ -54,14 +55,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.USER + Common.Cache.ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.PHONE, key = "#user.phone", condition = "#result!=null&&#user.phone!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.EMAIL, key = "#user.email", condition = "#result!=null&&#user.email!=null")
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#user.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, key = "#user.name", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, key = "#user.phone", condition = "#result!=null&&#user.phone!=null"),
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, key = "#user.email", condition = "#result!=null&&#user.email!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     @Logs("Add user")
@@ -101,12 +102,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.PHONE, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.EMAIL, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     @Transactional
@@ -121,16 +122,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.USER + Common.Cache.ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.NAME, key = "#user.name", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.PHONE, key = "#user.phone", condition = "#result!=null&&#user.phone!=null"),
-                    @CachePut(value = Common.Cache.USER + Common.Cache.EMAIL, key = "#user.email", condition = "#result!=null&&#user.email!=null")
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#user.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, key = "#user.name", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, key = "#user.phone", condition = "#result!=null&&#user.phone!=null"),
+                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, key = "#user.email", condition = "#result!=null&&#user.email!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.PHONE, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.EMAIL, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.USER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     @Transactional
@@ -168,13 +169,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public User selectById(Long id) {
         return userMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.NAME, key = "#name", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, key = "#name", unless = "#result==null")
     // 2022-03-13 检查：通过
     public User selectByName(String name, boolean isEx) {
         if (StrUtil.isEmpty(name)) {
@@ -188,7 +189,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.PHONE, key = "#phone", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, key = "#phone", unless = "#result==null")
     // 2022-03-13 检查：通过
     public User selectByPhone(String phone, boolean isEx) {
         if (StrUtil.isEmpty(phone)) {
@@ -202,7 +203,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.EMAIL, key = "#email", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, key = "#email", unless = "#result==null")
     // 2022-03-13 检查：通过
     public User selectByEmail(String email, boolean isEx) {
         if (StrUtil.isEmpty(email)) {
@@ -216,7 +217,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.USER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<User> list(UserDto userDto) {
         if (!Optional.ofNullable(userDto.getPage()).isPresent()) {
             userDto.setPage(new Pages());
@@ -248,7 +249,7 @@ public class UserServiceImpl implements UserService {
     public boolean restPassword(Long id) {
         User user = selectById(id);
         if (null != user) {
-            user.setPassword(Dc3Util.md5(Common.DEFAULT_PASSWORD));
+            user.setPassword(Dc3Util.md5(CommonConstant.Algorithm.DEFAULT_PASSWORD));
             return null != update(user);
         }
         return false;

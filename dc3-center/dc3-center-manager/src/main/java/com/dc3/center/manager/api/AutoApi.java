@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,7 @@ import com.dc3.api.center.manager.feign.AutoClient;
 import com.dc3.center.manager.service.AutoService;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.point.PointDetail;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +31,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_AUTO_URL_PREFIX)
+@RequestMapping(ServiceConstant.Manager.AUTO_URL_PREFIX)
 public class AutoApi implements AutoClient {
 
     @Resource

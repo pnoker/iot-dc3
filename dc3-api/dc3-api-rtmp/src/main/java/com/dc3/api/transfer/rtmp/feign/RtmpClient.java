@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,10 @@
 package com.dc3.api.transfer.rtmp.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.transfer.rtmp.hystrix.RtmpClientHystrix;
+import com.dc3.api.transfer.rtmp.fallback.RtmpClientFallback;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.RtmpDto;
-import com.dc3.common.model.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +29,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_RTMP_URL_PREFIX, name = Common.Service.DC3_RTMP_SERVICE_NAME, fallbackFactory = RtmpClientHystrix.class)
+@FeignClient(path = ServiceConstant.Rtmp.URL_PREFIX, name = ServiceConstant.Rtmp.SERVICE_NAME, fallbackFactory = RtmpClientFallback.class)
 public interface RtmpClient {
 
     /**
@@ -40,7 +39,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/add")
-    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<com.dc3.common.model.Rtmp> add(@Validated @RequestBody com.dc3.common.model.Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Rtmp
@@ -58,7 +57,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/update")
-    R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<com.dc3.common.model.Rtmp> update(@RequestBody com.dc3.common.model.Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Rtmp
@@ -67,7 +66,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @GetMapping("/id/{id}")
-    R<Rtmp> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<com.dc3.common.model.Rtmp> selectById(@NotNull @PathVariable(value = "id") Long id);
 
     /**
      * 分页查询 Rtmp
@@ -76,7 +75,7 @@ public interface RtmpClient {
      * @return R<Page < Rtmp>>
      */
     @PostMapping("/list")
-    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<com.dc3.common.model.Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 启动 Rtmp 转码任务

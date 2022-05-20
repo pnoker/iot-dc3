@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,12 +13,12 @@
 
 package org.openscada.opc.dcom.da.impl;
 
-import java.net.UnknownHostException;
-
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.openscada.opc.dcom.common.impl.BaseCOMObject;
 import org.openscada.opc.dcom.da.Constants;
+
+import java.net.UnknownHostException;
 
 public class OPCBrowse extends BaseCOMObject
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.auth.mapper.TenantBindMapper;
 import com.dc3.center.auth.service.TenantBindService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.TenantBindDto;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
@@ -48,12 +48,12 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.ID, key = "#tenantBind.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.userId+'.'+#tenantBind.type", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.ID, key = "#tenantBind.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.TENANT_ID + CacheConstant.Suffix.USER_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.userId+'.'+#tenantBind.type", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public TenantBind add(TenantBind tenantBind) {
@@ -66,10 +66,10 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.TENANT_ID + CacheConstant.Suffix.USER_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -80,12 +80,12 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.ID, key = "#tenantBind.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.userId+'.'+#tenantBind.type", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.ID, key = "#tenantBind.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.TENANT_ID + CacheConstant.Suffix.USER_ID, key = "#tenantBind.tenantId+'.'+#tenantBind.userId+'.'+#tenantBind.type", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.TENANT_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public TenantBind update(TenantBind tenantBind) {
@@ -98,7 +98,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.TENANT_BIND + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public TenantBind selectById(Long id) {
         TenantBind tenantBind = tenantBindMapper.selectById(id);
         if (null == tenantBind) {
@@ -108,7 +108,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.TENANT_BIND + Common.Cache.TENANT_ID + Common.Cache.USER_ID, key = "#tenantId+'.'+#userId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.TENANT_ID + CacheConstant.Suffix.USER_ID, key = "#tenantId+'.'+#userId", unless = "#result==null")
     public TenantBind selectByTenantIdAndUserId(Long tenantId, Long userId) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
         queryWrapper.eq(TenantBind::getTenantId, tenantId);
@@ -121,7 +121,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.TENANT_BIND + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<TenantBind> list(TenantBindDto tenantBindDto) {
         if (!Optional.ofNullable(tenantBindDto.getPage()).isPresent()) {
             tenantBindDto.setPage(new Pages());

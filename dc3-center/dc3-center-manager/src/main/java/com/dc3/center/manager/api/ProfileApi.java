@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@ import com.dc3.api.center.manager.feign.ProfileClient;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_PROFILE_URL_PREFIX)
+@RequestMapping(ServiceConstant.Manager.PROFILE_URL_PREFIX)
 public class ProfileApi implements ProfileClient {
 
     @Resource
@@ -61,7 +62,7 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile profile = profileService.selectById(id);
             if (null != profile && profileService.delete(id)) {
-                notifyService.notifyDriverProfile(Common.Driver.Profile.DELETE, profile);
+                notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.DELETE, profile);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -75,7 +76,7 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile update = profileService.update(profile.setTenantId(tenantId));
             if (null != update) {
-                notifyService.notifyDriverProfile(Common.Driver.Profile.UPDATE, update);
+                notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

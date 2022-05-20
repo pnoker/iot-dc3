@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package com.dc3.common.model;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ValueConstant;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -91,7 +91,7 @@ public class Point extends Description {
     }
 
     public Point setDefault() {
-        this.type = Common.ValueType.STRING;
+        this.type = ValueConstant.Type.STRING;
         this.rw = 0;
         this.base = 0F;
         this.minimum = -999999F;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,16 @@
 
 package com.dc3.driver.service.impl;
 
-import com.dc3.common.utils.JsonUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ValueConstant;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverCustomService;
 import com.dc3.common.sdk.service.DriverService;
+import com.dc3.common.utils.JsonUtil;
 import com.dc3.driver.bean.PlcS7PointVariable;
 import com.github.s7connector.api.S7Connector;
 import com.github.s7connector.api.S7Serializer;
@@ -118,7 +119,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, Common.Device.Event.HEARTBEAT, Common.Device.Status.ONLINE));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, CommonConstant.Device.Event.HEARTBEAT, CommonConstant.Status.ONLINE));
     }
 
     /**
@@ -171,27 +172,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
         switch (type.toLowerCase()) {
-            case Common.ValueType.INT:
+            case ValueConstant.Type.INT:
                 int intValue = value(type, value);
                 serializer.store(intValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case Common.ValueType.LONG:
+            case ValueConstant.Type.LONG:
                 long longValue = value(type, value);
                 serializer.store(longValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case Common.ValueType.FLOAT:
+            case ValueConstant.Type.FLOAT:
                 float floatValue = value(type, value);
                 serializer.store(floatValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case Common.ValueType.DOUBLE:
+            case ValueConstant.Type.DOUBLE:
                 double doubleValue = value(type, value);
                 serializer.store(doubleValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case Common.ValueType.BOOLEAN:
+            case ValueConstant.Type.BOOLEAN:
                 boolean booleanValue = value(type, value);
                 serializer.store(booleanValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case Common.ValueType.STRING:
+            case ValueConstant.Type.STRING:
                 serializer.store(value, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             default:

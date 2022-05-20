@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@ import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.center.manager.service.StatusService;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.model.Device;
@@ -51,9 +52,9 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public String driver(String serviceName) {
-        String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + serviceName;
+        String key = CacheConstant.Prefix.DRIVER_STATUS_KEY_PREFIX + serviceName;
         String status = redisUtil.getKey(key, String.class);
-        status = null != status ? status : Common.Driver.Status.OFFLINE;
+        status = null != status ? status : CommonConstant.Status.OFFLINE;
         return status;
     }
 
@@ -63,9 +64,9 @@ public class StatusServiceImpl implements StatusService {
 
         Page<Driver> page = driverService.list(driverDto);
         page.getRecords().forEach(driver -> {
-            String key = Common.Cache.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
+            String key = CacheConstant.Prefix.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
             String status = redisUtil.getKey(key, String.class);
-            status = null != status ? status : Common.Driver.Status.OFFLINE;
+            status = null != status ? status : CommonConstant.Status.OFFLINE;
             statusMap.put(driver.getId(), status);
         });
         return statusMap;
@@ -73,9 +74,9 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public String device(Long id) {
-        String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + id;
+        String key = CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + id;
         String status = redisUtil.getKey(key, String.class);
-        status = null != status ? status : Common.Driver.Status.OFFLINE;
+        status = null != status ? status : CommonConstant.Status.OFFLINE;
         return status;
     }
 
@@ -85,9 +86,9 @@ public class StatusServiceImpl implements StatusService {
 
         Page<Device> page = deviceService.list(deviceDto);
         page.getRecords().forEach(device -> {
-            String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + device.getId();
+            String key = CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + device.getId();
             String status = redisUtil.getKey(key, String.class);
-            status = null != status ? status : Common.Driver.Status.OFFLINE;
+            status = null != status ? status : CommonConstant.Status.OFFLINE;
             statusMap.put(device.getId(), status);
         });
         return statusMap;
@@ -98,9 +99,9 @@ public class StatusServiceImpl implements StatusService {
         Map<Long, String> statusMap = new HashMap<>(16);
 
         profileBindService.selectDeviceIdByProfileId(profileId).forEach(id -> {
-            String key = Common.Cache.DEVICE_STATUS_KEY_PREFIX + id;
+            String key = CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisUtil.getKey(key, String.class);
-            status = null != status ? status : Common.Driver.Status.OFFLINE;
+            status = null != status ? status : CommonConstant.Status.OFFLINE;
             statusMap.put(id, status);
         });
         return statusMap;

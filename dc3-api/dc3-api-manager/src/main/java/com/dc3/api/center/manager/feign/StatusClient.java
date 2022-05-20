@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,9 +13,9 @@
 
 package com.dc3.api.center.manager.feign;
 
-import com.dc3.api.center.manager.hystrix.StatusClientHystrix;
+import com.dc3.api.center.manager.fallback.StatusClientFallback;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.dto.DriverDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_STATUS_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = StatusClientHystrix.class)
+@FeignClient(path = ServiceConstant.Manager.STATUS_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = StatusClientFallback.class)
 public interface StatusClient {
 
     /**
@@ -40,7 +40,7 @@ public interface StatusClient {
      * @return Map<Long, String>
      */
     @PostMapping("/driver")
-    R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 查询 Device 服务状态
@@ -50,7 +50,7 @@ public interface StatusClient {
      * @return Map<Long, String>
      */
     @PostMapping("/device")
-    R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 驱动ID 查询 Device 服务状态

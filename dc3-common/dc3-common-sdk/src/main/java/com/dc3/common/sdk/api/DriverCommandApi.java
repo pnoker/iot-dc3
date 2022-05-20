@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,17 +13,15 @@
 
 package com.dc3.common.sdk.api;
 
+import com.dc3.api.transfer.rtmp.feign.DriverCommandClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.bean.driver.command.CmdParameter;
 import com.dc3.common.bean.point.PointValue;
-import com.dc3.common.sdk.bean.command.CmdParameter;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.sdk.service.DriverCommandService;
-import com.dc3.common.valid.Read;
 import com.dc3.common.valid.ValidatableList;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,24 +37,18 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_DRIVER_URL_PREFIX)
-public class DriverCommandApi {
+@RequestMapping(ServiceConstant.Driver.COMMAND_URL_PREFIX)
+public class DriverCommandApi implements DriverCommandClient {
 
     @Resource
     private DriverCommandService driverCommandService;
 
-    /**
-     * 读
-     *
-     * @param cmdParameters list<{deviceId,pointId}>
-     * @return R<List < PointValue>>
-     */
-    @PostMapping("/read")
-    public R<List<PointValue>> readPoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters) {
+    @Override
+    public R<List<PointValue>> readPoint(ValidatableList<CmdParameter> cmdParameters) {
         List<PointValue> pointValues = new ArrayList<>(16);
         try {
-            if (cmdParameters.size() > Common.Driver.MAX_REQUEST_SIZE) {
-                return R.fail("point request size are limited to " + Common.Driver.MAX_REQUEST_SIZE);
+            if (cmdParameters.size() > CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE) {
+                return R.fail("point request size are limited to " + CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE);
             }
             cmdParameters.forEach(cmdParameter -> {
                 PointValue pointValue = driverCommandService.read(cmdParameter.getDeviceId(), cmdParameter.getPointId());
@@ -68,17 +60,11 @@ public class DriverCommandApi {
         return R.ok(pointValues);
     }
 
-    /**
-     * 写
-     *
-     * @param cmdParameters list<{deviceId,pointId,stringValue}>
-     * @return R<Boolean>
-     */
-    @PostMapping("/write")
-    public R<Boolean> writePoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters) {
+    @Override
+    public R<Boolean> writePoint(ValidatableList<CmdParameter> cmdParameters) {
         try {
-            if (cmdParameters.size() > Common.Driver.MAX_REQUEST_SIZE) {
-                return R.fail("point request size are limited to " + Common.Driver.MAX_REQUEST_SIZE);
+            if (cmdParameters.size() > CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE) {
+                return R.fail("point request size are limited to " + CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE);
             }
             cmdParameters.forEach(cmdParameter -> driverCommandService.write(cmdParameter.getDeviceId(), cmdParameter.getPointId(), cmdParameter.getValue()));
         } catch (Exception e) {

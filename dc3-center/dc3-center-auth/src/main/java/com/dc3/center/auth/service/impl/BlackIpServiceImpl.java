@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.auth.mapper.BlackIpMapper;
 import com.dc3.center.auth.service.BlackIpService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.BlackIpDto;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.BlackIp;
@@ -48,11 +48,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#blackIp.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.ID, key = "#blackIp.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.IP, key = "#blackIp.ip", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public BlackIp add(BlackIp blackIp) {
@@ -69,9 +69,9 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.IP, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.IP, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -85,11 +85,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#blackIp.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#blackIp.ip", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.ID, key = "#blackIp.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.IP, key = "#blackIp.ip", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.BLACK_IP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public BlackIp update(BlackIp blackIp) {
@@ -103,13 +103,13 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public BlackIp selectById(Long id) {
         return blackIpMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.IP, key = "#ip", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.IP, key = "#ip", unless = "#result==null")
     public BlackIp selectByIp(String ip) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         queryWrapper.eq(BlackIp::getIp, ip);
@@ -117,7 +117,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.BLACK_IP + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<BlackIp> list(BlackIpDto blackIpDto) {
         if (null == blackIpDto.getPage()) {
             blackIpDto.setPage(new Pages());
