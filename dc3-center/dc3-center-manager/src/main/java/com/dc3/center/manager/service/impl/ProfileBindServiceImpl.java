@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import com.dc3.center.manager.mapper.ProfileBindMapper;
 import com.dc3.center.manager.mapper.ProfileMapper;
 import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.ProfileBindDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -58,13 +58,13 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#profileBind.id", condition = "#result!=null")},
+            put = {@CachePut(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.ID, key = "#profileBind.id", condition = "#result!=null")},
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public ProfileBind add(ProfileBind profileBind) {
@@ -97,12 +97,12 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -113,12 +113,12 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean deleteByDeviceId(Long deviceId) {
@@ -130,12 +130,12 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean deleteByProfileIdAndDeviceId(Long deviceId, Long profileId) {
@@ -147,13 +147,13 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#profileBind.id", condition = "#result!=null")},
+            put = {@CachePut(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.ID, key = "#profileBind.id", condition = "#result!=null")},
             evict = {
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public ProfileBind update(ProfileBind profileBind) {
@@ -166,7 +166,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public ProfileBind selectById(Long id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
         if (null == profileBind) {
@@ -176,7 +176,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID + Common.Cache.PROFILE_ID, key = "#deviceId+'.'+#profileId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.PROFILE_ID, key = "#deviceId+'.'+#profileId", unless = "#result==null")
     public ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setDeviceId(deviceId);
@@ -189,7 +189,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.PROFILE_ID, key = "#profileId", unless = "#result==null")
     public Set<Long> selectDeviceIdByProfileId(Long profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setProfileId(profileId);
@@ -198,7 +198,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.DEVICE_ID, key = "#deviceId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID, key = "#deviceId", unless = "#result==null")
     public Set<Long> selectProfileIdByDeviceId(Long deviceId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setDeviceId(deviceId);
@@ -207,7 +207,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE_BIND + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<ProfileBind> list(ProfileBindDto profileBindDto) {
         if (!Optional.ofNullable(profileBindDto.getPage()).isPresent()) {
             profileBindDto.setPage(new Pages());

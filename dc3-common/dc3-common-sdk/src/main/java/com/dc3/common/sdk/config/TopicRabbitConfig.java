@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
 
 package com.dc3.common.sdk.config;
 
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -65,15 +65,15 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange metadataExchange() {
-        return new TopicExchange(Common.Rabbit.TOPIC_EXCHANGE_METADATA, true, false);
+        return new TopicExchange(CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA, true, false);
     }
 
     @Bean
     Queue driverMetadataQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 15秒：15 * 1000 = 15000L
-        arguments.put("x-message-ttl", 15000L);
-        return new Queue(Common.Rabbit.QUEUE_DRIVER_METADATA_PREFIX + this.serviceName, false, false, false, arguments);
+        arguments.put(CommonConstant.Rabbit.MESSAGE_TTL, 15000L);
+        return new Queue(CommonConstant.Rabbit.QUEUE_DRIVER_METADATA_PREFIX + this.serviceName, false, false, false, arguments);
     }
 
     @Bean
@@ -81,7 +81,7 @@ public class TopicRabbitConfig {
         return BindingBuilder
                 .bind(driverMetadataQueue())
                 .to(metadataExchange())
-                .with(Common.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + this.serviceName);
+                .with(CommonConstant.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + this.serviceName);
     }
 
 }

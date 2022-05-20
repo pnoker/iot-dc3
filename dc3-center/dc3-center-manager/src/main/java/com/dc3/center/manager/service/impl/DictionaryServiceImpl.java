@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dc3.center.manager.mapper.*;
 import com.dc3.center.manager.service.DictionaryService;
 import com.dc3.common.bean.Dictionary;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -49,7 +49,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     private PointMapper pointMapper;
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> driverDictionary(Long tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
@@ -60,7 +60,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER_ATTRIBUTE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER_ATTRIBUTE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> driverAttributeDictionary(Long tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
@@ -78,7 +78,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT_ATTRIBUTE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> pointAttributeDictionary(Long tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
@@ -96,7 +96,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.PROFILE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> profileDictionary(Long tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
@@ -107,7 +107,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DEVICE + Common.Cache.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> deviceDictionary(Long tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
@@ -124,7 +124,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.DIC, key = "'dic.'+#parent+'.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.DIC, key = "'dic.'+#parent+'.'+#tenantId", unless = "#result==null")
     public List<Dictionary> pointDictionary(String parent, Long tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         switch (parent) {

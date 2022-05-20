@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,9 @@
 package com.dc3.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.manager.hystrix.DriverAttributeClientHystrix;
+import com.dc3.api.center.manager.fallback.DriverAttributeClientFallback;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.DriverAttributeDto;
 import com.dc3.common.model.DriverAttribute;
 import com.dc3.common.valid.Insert;
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_DRIVER_ATTRIBUTE_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = DriverAttributeClientHystrix.class)
+@FeignClient(path = ServiceConstant.Manager.DRIVER_ATTRIBUTE_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = DriverAttributeClientFallback.class)
 public interface DriverAttributeClient {
 
     /**

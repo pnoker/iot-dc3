@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.auth.feign.TenantClient;
 import com.dc3.center.auth.service.TenantService;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.TenantDto;
 import com.dc3.common.model.Tenant;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_AUTH_TENANT_URL_PREFIX)
+@RequestMapping(ServiceConstant.Auth.TENANT_URL_PREFIX)
 public class TenantApi implements TenantClient {
     @Resource
     private TenantService tenantService;

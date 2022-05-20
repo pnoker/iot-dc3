@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,8 @@ import com.dc3.center.manager.mapper.DriverMapper;
 import com.dc3.center.manager.service.DriverService;
 import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.dto.DriverDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -62,15 +63,15 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#driver.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, key = "#driver.serviceName", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.type+'.'+#driver.host+'.'+#driver.port+'.'+#driver.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.ID, key = "#driver.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.SERVICE_NAME, key = "#driver.serviceName", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.HOST_PORT, key = "#driver.type+'.'+#driver.host+'.'+#driver.port+'.'+#driver.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Driver add(Driver driver) {
@@ -88,13 +89,13 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=true"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=true"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result!=true"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result!=true"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.SERVICE_NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.HOST_PORT, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -105,15 +106,15 @@ public class DriverServiceImpl implements DriverService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#driver.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, key = "#driver.serviceName", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#driver.type+'.'+#driver.host+'.'+#driver.port+'.'+#driver.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.ID, key = "#driver.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.SERVICE_NAME, key = "#driver.serviceName", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.HOST_PORT, key = "#driver.type+'.'+#driver.host+'.'+#driver.port+'.'+#driver.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.DRIVER + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Driver update(Driver driver) {
@@ -128,7 +129,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Driver selectById(Long id) {
         Driver driver = driverMapper.selectById(id);
         if (null == driver) {
@@ -138,7 +139,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.DEVICE_ID, key = "#deviceId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DEVICE_ID, key = "#deviceId", unless = "#result==null")
     public Driver selectByDeviceId(Long deviceId) {
         Device device = deviceMapper.selectById(deviceId);
         if (ObjectUtil.isNotNull(device)) {
@@ -148,7 +149,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.SERVICE_NAME, key = "#serviceName", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.SERVICE_NAME, key = "#serviceName", unless = "#result==null")
     public Driver selectByServiceName(String serviceName) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getServiceName, serviceName);
@@ -160,7 +161,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.HOST_PORT, key = "#type+'.'+#host+'.'+#port+'.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.HOST_PORT, key = "#type+'.'+#host+'.'+#port+'.'+#tenantId", unless = "#result==null")
     public Driver selectByHostPort(String type, String host, Integer port, Long tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getType, type);
@@ -175,7 +176,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Driver> selectByIds(Set<Long> ids) {
         List<Driver> drivers = driverMapper.selectBatchIds(ids);
         if (CollectionUtil.isEmpty(drivers)) {
@@ -185,7 +186,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.PROFILE_ID, key = "#profileId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.PROFILE_ID, key = "#profileId", unless = "#result==null")
     public List<Driver> selectByProfileId(Long profileId) {
         Set<Long> deviceIds = profileBindService.selectDeviceIdByProfileId(profileId);
         List<Device> devices = deviceMapper.selectBatchIds(deviceIds);
@@ -197,7 +198,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.DRIVER + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Driver> list(DriverDto driverDto) {
         if (null == driverDto.getPage()) {
             driverDto.setPage(new Pages());
@@ -222,7 +223,7 @@ public class DriverServiceImpl implements DriverService {
                 queryWrapper.eq(Driver::getPort, driverDto.getPort());
             }
             if (StrUtil.isBlank(driverDto.getType())) {
-                driverDto.setType(Common.Driver.Type.DRIVER);
+                driverDto.setType(CommonConstant.Driver.Type.DRIVER);
             }
             queryWrapper.like(Driver::getType, driverDto.getType());
             if (null != driverDto.getEnable()) {

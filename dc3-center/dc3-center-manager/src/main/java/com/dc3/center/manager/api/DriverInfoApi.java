@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@ import com.dc3.api.center.manager.feign.DriverInfoClient;
 import com.dc3.center.manager.service.DriverInfoService;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.DriverInfoDto;
 import com.dc3.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_DRIVER_INFO_URL_PREFIX)
+@RequestMapping(ServiceConstant.Manager.DRIVER_INFO_URL_PREFIX)
 public class DriverInfoApi implements DriverInfoClient {
 
     @Resource
@@ -48,7 +49,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo add = driverInfoService.add(driverInfo);
             if (null != add) {
-                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.ADD, add);
+                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -62,7 +63,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo driverInfo = driverInfoService.selectById(id);
             if (null != driverInfo && driverInfoService.delete(id)) {
-                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.DELETE, driverInfo);
+                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.DELETE, driverInfo);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -76,7 +77,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo update = driverInfoService.update(driverInfo);
             if (null != update) {
-                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.UPDATE, update);
+                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

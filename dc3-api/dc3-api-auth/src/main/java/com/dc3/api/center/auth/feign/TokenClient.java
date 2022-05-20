@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,10 @@
 
 package com.dc3.api.center.auth.feign;
 
-import com.dc3.api.center.auth.hystrix.TokenClientHystrix;
+import com.dc3.api.center.auth.fallback.TokenClientFallback;
 import com.dc3.common.bean.Login;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.valid.Auth;
 import com.dc3.common.valid.Check;
 import com.dc3.common.valid.Update;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_AUTH_TOKEN_URL_PREFIX, name = Common.Service.DC3_AUTH_SERVICE_NAME, fallbackFactory = TokenClientHystrix.class)
+@FeignClient(path = ServiceConstant.Auth.TOKEN_URL_PREFIX, name = ServiceConstant.Auth.SERVICE_NAME, fallbackFactory = TokenClientFallback.class)
 public interface TokenClient {
 
     /**

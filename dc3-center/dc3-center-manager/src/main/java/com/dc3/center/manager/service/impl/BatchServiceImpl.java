@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@ import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.batch.*;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.bean.driver.DriverMetadata;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
@@ -163,12 +163,12 @@ public class BatchServiceImpl implements BatchService {
             profile.setShare(batchProfile.getShare());
             profile.setDescription("批量导入：更新操作");
             profile = profileService.update(profile);
-            notifyService.notifyDriverProfile(Common.Driver.Profile.UPDATE, profile);
+            notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.UPDATE, profile);
         } catch (NotFoundException notFoundException) {
             profile = new Profile(batchProfile.getName(), batchProfile.getShare(), driver.getId(), driver.getTenantId());
             profile.setDescription("批量导入：新增操作");
             profile = profileService.add(profile);
-            notifyService.notifyDriverProfile(Common.Driver.Profile.ADD, profile);
+            notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.ADD, profile);
         }
 
         return profile;
@@ -198,12 +198,12 @@ public class BatchServiceImpl implements BatchService {
                 DriverInfo driverInfo = driverInfoService.selectByAttributeIdAndDeviceId(driverAttribute.getId(), device.getId());
                 driverInfo.setDescription("批量导入：更新操作");
                 driverInfo = driverInfoService.update(driverInfo.setValue(value));
-                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.UPDATE, driverInfo);
+                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.UPDATE, driverInfo);
             } catch (NotFoundException notFoundException) {
                 DriverInfo driverInfo = new DriverInfo(driverAttribute.getId(), value, device.getId());
                 driverInfo.setDescription("批量导入：新增操作");
                 driverInfo = driverInfoService.add(driverInfo);
-                notifyService.notifyDriverDriverInfo(Common.Driver.DriverInfo.ADD, driverInfo);
+                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.ADD, driverInfo);
             }
         });
     }
@@ -232,7 +232,7 @@ public class BatchServiceImpl implements BatchService {
                         .setUnit(importPoint.getUnit());
                 point.setDescription("批量导入：更新操作");
                 pointService.update(point);
-                notifyService.notifyDriverPoint(Common.Driver.Point.UPDATE, point);
+                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.UPDATE, point);
             } catch (NotFoundException notFoundException) {
                 Point point = new Point(
                         importPoint.getName(),
@@ -250,7 +250,7 @@ public class BatchServiceImpl implements BatchService {
                 );
                 point.setDescription("批量导入：新增操作");
                 point = pointService.add(point);
-                notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point);
+                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, point);
             }
         });
     }
@@ -283,7 +283,7 @@ public class BatchServiceImpl implements BatchService {
                     device.setMulti(batchDevice.getMulti());
                     device.setDescription("批量导入：更新操作");
                     deviceService.update(device);
-                    notifyService.notifyDriverDevice(Common.Driver.Device.UPDATE, device);
+                    notifyService.notifyDriverDevice(CommonConstant.Driver.Device.UPDATE, device);
                 } catch (NotFoundException notFoundException) {
                     device = new Device(batchDevice.getName(), profile.getId(), group.getId());
                     if (batchDevice.getMulti()) {
@@ -291,7 +291,7 @@ public class BatchServiceImpl implements BatchService {
                     }
                     device.setDescription("批量导入：新增操作");
                     device = deviceService.add(device);
-                    notifyService.notifyDriverDevice(Common.Driver.Device.ADD, device);
+                    notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, device);
                 }
 
                 // Upsert Point Info
@@ -329,12 +329,12 @@ public class BatchServiceImpl implements BatchService {
                     PointInfo pointInfo = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(pointAttribute.getId(), device.getId(), point.getId());
                     pointInfo.setDescription("批量导入：更新操作");
                     pointInfo = pointInfoService.update(pointInfo.setValue(value));
-                    notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.UPDATE, pointInfo);
+                    notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.UPDATE, pointInfo);
                 } catch (NotFoundException notFoundException) {
                     PointInfo pointInfo = new PointInfo(pointAttribute.getId(), value, device.getId(), point.getId());
                     pointInfo.setDescription("批量导入：新增操作");
                     pointInfo = pointInfoService.add(pointInfo);
-                    notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, pointInfo);
+                    notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.ADD, pointInfo);
                 }
             });
         });

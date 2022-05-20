@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,8 @@ import com.dc3.center.manager.service.DriverSdkService;
 import com.dc3.center.manager.service.EventService;
 import com.dc3.common.bean.driver.DriverConfiguration;
 import com.dc3.common.bean.driver.DriverRegister;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.model.DriverEvent;
 import com.dc3.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
@@ -72,28 +73,28 @@ public class DriverEventReceiver {
             }
 
             log.debug("Driver {} event, From: {}, Received: {}", driverEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
-            String routingKey = Common.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName();
+            String routingKey = CommonConstant.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName();
 
             switch (driverEvent.getType()) {
-                case Common.Driver.Event.DRIVER_HANDSHAKE:
+                case CommonConstant.Driver.Event.DRIVER_HANDSHAKE:
                     DriverConfiguration driverConfiguration = new DriverConfiguration(
-                            Common.Driver.Type.DRIVER,
-                            Common.Driver.Event.DRIVER_HANDSHAKE_BACK,
+                            CommonConstant.Driver.Type.DRIVER,
+                            CommonConstant.Driver.Event.DRIVER_HANDSHAKE_BACK,
                             null,
-                            Common.Response.OK
+                            CommonConstant.Response.OK
                     );
                     rabbitTemplate.convertAndSend(
-                            Common.Rabbit.TOPIC_EXCHANGE_METADATA,
+                            CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA,
                             routingKey,
                             driverConfiguration
                     );
                     break;
-                case Common.Driver.Event.DRIVER_REGISTER:
+                case CommonConstant.Driver.Event.DRIVER_REGISTER:
                     driverConfiguration = new DriverConfiguration(
-                            Common.Driver.Type.DRIVER,
-                            Common.Driver.Event.DRIVER_REGISTER_BACK,
+                            CommonConstant.Driver.Type.DRIVER,
+                            CommonConstant.Driver.Event.DRIVER_REGISTER_BACK,
                             null,
-                            Common.Response.OK
+                            CommonConstant.Response.OK
                     );
                     try {
                         driverSdkService.driverRegister(Convert.convert(DriverRegister.class, driverEvent.getContent()));
@@ -101,17 +102,17 @@ public class DriverEventReceiver {
                         driverConfiguration.setResponse(e.getMessage());
                     }
                     rabbitTemplate.convertAndSend(
-                            Common.Rabbit.TOPIC_EXCHANGE_METADATA,
+                            CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA,
                             routingKey,
                             driverConfiguration
                     );
                     break;
-                case Common.Driver.Event.DRIVER_METADATA_SYNC:
+                case CommonConstant.Driver.Event.DRIVER_METADATA_SYNC:
                     driverConfiguration = new DriverConfiguration(
-                            Common.Driver.Type.DRIVER,
-                            Common.Driver.Event.DRIVER_METADATA_SYNC_BACK,
+                            CommonConstant.Driver.Type.DRIVER,
+                            CommonConstant.Driver.Event.DRIVER_METADATA_SYNC_BACK,
                             null,
-                            Common.Response.OK
+                            CommonConstant.Response.OK
                     );
                     try {
                         driverConfiguration.setContent(batchService.batchDriverMetadata(driverEvent.getServiceName()));
@@ -119,20 +120,20 @@ public class DriverEventReceiver {
                         driverConfiguration.setResponse(e.getMessage());
                     }
                     rabbitTemplate.convertAndSend(
-                            Common.Rabbit.TOPIC_EXCHANGE_METADATA,
+                            CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA,
                             routingKey,
                             driverConfiguration
                     );
                     break;
-                case Common.Driver.Event.HEARTBEAT:
+                case CommonConstant.Driver.Event.DRIVER_HEARTBEAT:
                     redisUtil.setKey(
-                            Common.Cache.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
+                            CacheConstant.Prefix.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
                             driverEvent.getContent(),
                             driverEvent.getTimeOut(),
                             driverEvent.getTimeUnit()
                     );
                     break;
-                case Common.Driver.Event.ERROR:
+                case CommonConstant.Driver.Event.ERROR:
                     //TODO 去重
                     threadPoolExecutor.execute(() -> eventService.addDriverEvent(driverEvent));
                 default:

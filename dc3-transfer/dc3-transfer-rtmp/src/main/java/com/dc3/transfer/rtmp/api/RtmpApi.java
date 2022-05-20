@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@ package com.dc3.transfer.rtmp.api;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.transfer.rtmp.feign.RtmpClient;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.model.Rtmp;
 import com.dc3.transfer.rtmp.service.RtmpService;
@@ -33,15 +33,15 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_RTMP_URL_PREFIX)
+@RequestMapping(ServiceConstant.Rtmp.URL_PREFIX)
 public class RtmpApi implements RtmpClient {
     @Resource
     private RtmpService rtmpService;
 
     @Override
-    public R<Rtmp> add(Rtmp rtmp, Long tenantId) {
+    public R<com.dc3.common.model.Rtmp> add(Rtmp rtmp, Long tenantId) {
         try {
-            Rtmp add = rtmpService.add(rtmp.setTenantId(tenantId));
+            com.dc3.common.model.Rtmp add = rtmpService.add(rtmp.setTenantId(tenantId));
             if (null != add) {
                 return R.ok(add);
             }
@@ -61,9 +61,9 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Rtmp> update(Rtmp rtmp, Long tenantId) {
+    public R<com.dc3.common.model.Rtmp> update(Rtmp rtmp, Long tenantId) {
         try {
-            Rtmp update = rtmpService.update(rtmp.setTenantId(tenantId));
+            com.dc3.common.model.Rtmp update = rtmpService.update(rtmp.setTenantId(tenantId));
             if (null != update) {
                 return R.ok(update);
             }
@@ -74,9 +74,9 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Rtmp> selectById(Long id) {
+    public R<com.dc3.common.model.Rtmp> selectById(Long id) {
         try {
-            Rtmp select = rtmpService.selectById(id);
+            com.dc3.common.model.Rtmp select = rtmpService.selectById(id);
             if (null != select) {
                 return R.ok(select);
             }
@@ -87,10 +87,10 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Page<Rtmp>> list(RtmpDto rtmpDto, Long tenantId) {
+    public R<Page<com.dc3.common.model.Rtmp>> list(RtmpDto rtmpDto, Long tenantId) {
         try {
             rtmpDto.setTenantId(tenantId);
-            Page<Rtmp> page = rtmpService.list(rtmpDto);
+            Page<com.dc3.common.model.Rtmp> page = rtmpService.list(rtmpDto);
             if (null != page) {
                 return R.ok(page);
             }

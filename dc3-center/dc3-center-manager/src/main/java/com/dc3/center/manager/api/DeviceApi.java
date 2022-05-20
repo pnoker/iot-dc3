@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@ import com.dc3.api.center.manager.feign.DeviceClient;
 import com.dc3.center.manager.service.DeviceService;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.model.Device;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_DEVICE_URL_PREFIX)
+@RequestMapping(ServiceConstant.Manager.DEVICE_URL_PREFIX)
 public class DeviceApi implements DeviceClient {
 
     @Resource
@@ -48,7 +49,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device add = deviceService.add(device.setTenantId(tenantId));
             if (null != add) {
-                notifyService.notifyDriverDevice(Common.Driver.Device.ADD, add);
+                notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -62,7 +63,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device device = deviceService.selectById(id);
             if (null != device && deviceService.delete(id)) {
-                notifyService.notifyDriverDevice(Common.Driver.Device.DELETE, device);
+                notifyService.notifyDriverDevice(CommonConstant.Driver.Device.DELETE, device);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -76,7 +77,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device update = deviceService.update(device.setTenantId(tenantId));
             if (null != update) {
-                notifyService.notifyDriverDevice(Common.Driver.Device.UPDATE, update);
+                notifyService.notifyDriverDevice(CommonConstant.Driver.Device.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

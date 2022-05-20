@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,8 @@ package com.dc3.common.utils;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.dc3.common.bean.TreeNode;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ServiceConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -43,10 +44,16 @@ public class Dc3Util {
     /**
      * SimpleDateFormat ThreadLocal 保证线程安全
      */
-    private static final ThreadLocal<SimpleDateFormat> completeDateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
+    private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected synchronized SimpleDateFormat initialValue() {
-            return new SimpleDateFormat(Common.COMPLETE_DATE_FORMAT);
+            return new SimpleDateFormat(CommonConstant.Time.DEFAULT_DATE_FORMAT);
+        }
+    };
+    private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected synchronized SimpleDateFormat initialValue() {
+            return new SimpleDateFormat(CommonConstant.Time.COMPLETE_DATE_FORMAT);
         }
     };
 
@@ -145,19 +152,43 @@ public class Dc3Util {
      * @param date Date
      * @return String
      */
-    public static String formatData(Date date) {
-        return completeDateFormatThreadLocal.get().format(date);
+    public static String formatDefaultData(Date date) {
+        return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().format(date);
     }
 
     /**
-     * 将字符串转为时间类型
+     * 将时间字符串 yyyy-MM-dd HH:mm:ss 转为时间类型
      *
      * @param dateString Date String
      * @return Date
      */
-    public static Date stringToDate(String dateString) {
+    public static Date stringToDefaultDate(String dateString) {
         try {
-            return completeDateFormatThreadLocal.get().parse(dateString);
+            return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 使用 yyyy-MM-dd HH:mm:ss.SSS 格式化时间
+     *
+     * @param date Date
+     * @return String
+     */
+    public static String formatCompleteData(Date date) {
+        return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().format(date);
+    }
+
+    /**
+     * 将时间字符串 yyyy-MM-dd HH:mm:ss.SSS 转为时间类型
+     *
+     * @param dateString Date String
+     * @return Date
+     */
+    public static Date stringToCompleteDate(String dateString) {
+        try {
+            return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
         } catch (ParseException e) {
             return null;
         }
@@ -510,7 +541,7 @@ public class Dc3Util {
      */
     public static long getRequestUserId(HttpServletRequest httpServletRequest) {
         long userId = -1L;
-        String header = getRequestHeader(httpServletRequest, Common.Service.DC3_AUTH_USER_ID);
+        String header = getRequestHeader(httpServletRequest, ServiceConstant.Header.X_AUTH_USER_ID);
         try {
             userId = Long.parseLong(header.trim());
             return userId;
@@ -527,7 +558,7 @@ public class Dc3Util {
      */
     public static long getRequestTenantId(HttpServletRequest httpServletRequest) {
         long tenantId = -1L;
-        String header = getRequestHeader(httpServletRequest, Common.Service.DC3_AUTH_TENANT_ID);
+        String header = getRequestHeader(httpServletRequest, ServiceConstant.Header.X_AUTH_TENANT_ID);
         try {
             tenantId = Long.parseLong(header.trim());
             return tenantId;

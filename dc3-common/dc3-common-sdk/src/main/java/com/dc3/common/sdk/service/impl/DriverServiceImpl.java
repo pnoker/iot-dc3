@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,15 +15,16 @@ package com.dc3.common.sdk.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import com.dc3.common.utils.JsonUtil;
-import com.dc3.common.constant.Common;
+import com.dc3.common.bean.point.PointValue;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ValueConstant;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DeviceEvent;
 import com.dc3.common.model.DriverEvent;
 import com.dc3.common.model.Point;
-import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
+import com.dc3.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,27 +56,27 @@ public class DriverServiceImpl implements DriverService {
         String value;
         Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
         switch (point.getType()) {
-            case Common.ValueType.STRING:
+            case ValueConstant.Type.STRING:
                 value = rawValue;
                 break;
-            case Common.ValueType.BYTE:
-            case Common.ValueType.SHORT:
-            case Common.ValueType.INT:
-            case Common.ValueType.LONG:
-            case Common.ValueType.DOUBLE:
-            case Common.ValueType.FLOAT:
+            case ValueConstant.Type.BYTE:
+            case ValueConstant.Type.SHORT:
+            case ValueConstant.Type.INT:
+            case ValueConstant.Type.LONG:
+            case ValueConstant.Type.DOUBLE:
+            case ValueConstant.Type.FLOAT:
                 try {
                     float base = null != point.getBase() ? point.getBase() : 0;
                     float multiple = null != point.getMultiple() ? point.getMultiple() : 1;
                     double temp = (Convert.convert(Double.class, rawValue.trim()) + base) * multiple;
                     if (null != point.getMinimum() && temp < point.getMinimum()) {
                         log.info("Device({}) point({}) value({}) is lower than lower limit({})", deviceId, pointId, temp, point.getMinimum());
-                        deviceEventSender(deviceId, pointId, Common.Device.Event.OVER_LOWER_LIMIT,
+                        deviceEventSender(deviceId, pointId, CommonConstant.Device.Event.OVER_LOWER_LIMIT,
                                 String.format("Value(%s) is lower than lower limit %s", temp, point.getMinimum()));
                     }
                     if (null != point.getMaximum() && temp > point.getMaximum()) {
                         log.info("Device({}) point({}) value({}) is greater than upper limit({})", deviceId, pointId, temp, point.getMaximum());
-                        deviceEventSender(deviceId, pointId, Common.Device.Event.OVER_UPPER_LIMIT,
+                        deviceEventSender(deviceId, pointId, CommonConstant.Device.Event.OVER_UPPER_LIMIT,
                                 String.format("Value(%s) is greater than upper limit %s", temp, point.getMaximum()));
                     }
                     if (StrUtil.isNotBlank(point.getFormat())) {
@@ -87,7 +88,7 @@ public class DriverServiceImpl implements DriverService {
                     throw new ServiceException("Invalid device({}) point({}) value({}), error: {}", deviceId, pointId, rawValue, e.getMessage());
                 }
                 break;
-            case Common.ValueType.BOOLEAN:
+            case ValueConstant.Type.BOOLEAN:
                 try {
                     try {
                         Double booleanValue = Convert.convert(Double.class, rawValue.trim());
@@ -115,8 +116,8 @@ public class DriverServiceImpl implements DriverService {
         if (null != driverEvent) {
             log.debug("Send driver event: {}", JsonUtil.toJsonString(driverEvent));
             rabbitTemplate.convertAndSend(
-                    Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                    Common.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName,
+                    CommonConstant.Rabbit.TOPIC_EXCHANGE_EVENT,
+                    CommonConstant.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName,
                     driverEvent
             );
         }
@@ -126,8 +127,8 @@ public class DriverServiceImpl implements DriverService {
         if (null != deviceEvent) {
             log.debug("Send device event: {}", JsonUtil.toJsonString(deviceEvent));
             rabbitTemplate.convertAndSend(
-                    Common.Rabbit.TOPIC_EXCHANGE_EVENT,
-                    Common.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName,
+                    CommonConstant.Rabbit.TOPIC_EXCHANGE_EVENT,
+                    CommonConstant.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName,
                     deviceEvent
             );
         }
@@ -145,8 +146,8 @@ public class DriverServiceImpl implements DriverService {
         if (null != pointValue) {
             log.debug("Send point value: {}", JsonUtil.toJsonString(pointValue));
             rabbitTemplate.convertAndSend(
-                    Common.Rabbit.TOPIC_EXCHANGE_VALUE,
-                    Common.Rabbit.ROUTING_POINT_VALUE_PREFIX + serviceName,
+                    CommonConstant.Rabbit.TOPIC_EXCHANGE_VALUE,
+                    CommonConstant.Rabbit.ROUTING_POINT_VALUE_PREFIX + serviceName,
                     pointValue
             );
         }

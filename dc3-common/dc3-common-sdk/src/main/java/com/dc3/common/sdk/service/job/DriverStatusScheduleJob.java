@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
 
 package com.dc3.common.sdk.service.job;
 
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.model.DriverEvent;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
@@ -45,7 +45,7 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        DriverEvent driverEvent = new DriverEvent(serviceName, Common.Driver.Event.HEARTBEAT, driverContext.getDriverStatus(), 10, TimeUnit.SECONDS);
+        DriverEvent driverEvent = new DriverEvent(serviceName, CommonConstant.Driver.Event.DRIVER_HEARTBEAT, driverContext.getDriverStatus(), 10, TimeUnit.SECONDS);
         driverService.driverEventSender(driverEvent);
     }
 }

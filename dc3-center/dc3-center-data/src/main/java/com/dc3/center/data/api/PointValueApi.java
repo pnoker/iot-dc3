@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,9 +18,10 @@ import com.dc3.api.center.data.feign.PointValueClient;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
-import com.dc3.common.dto.PointValueDto;
 import com.dc3.common.bean.point.PointValue;
+import com.dc3.common.constant.ServiceConstant;
+import com.dc3.common.constant.ValueConstant;
+import com.dc3.common.dto.PointValueDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_DATA_POINT_VALUE_URL_PREFIX)
+@RequestMapping(ServiceConstant.Data.VALUE_URL_PREFIX)
 public class PointValueApi implements PointValueClient {
 
     @Resource
@@ -51,7 +52,7 @@ public class PointValueApi implements PointValueClient {
                 // 返回最近100个非字符类型的历史值
                 if (history) {
                     pointValues.forEach(pointValue -> {
-                        if (!pointValue.getType().equals(Common.ValueType.STRING)) {
+                        if (!pointValue.getType().equals(ValueConstant.Type.STRING)) {
                             PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100));
                             Page<PointValue> page = pointValueService.list(pointValueDto);
                             if (null != page) {

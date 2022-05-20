@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
 
 package com.dc3.common.bean;
 
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +37,7 @@ public class R<T> implements Serializable {
     private int code = Code.OK.getCode();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String message = Common.Response.ERROR;
+    private String message = CommonConstant.Response.ERROR;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
@@ -163,7 +163,7 @@ public class R<T> implements Serializable {
     private R success() {
         this.ok = true;
         this.code = Code.OK.getCode();
-        this.message = Common.Response.OK;
+        this.message = CommonConstant.Response.OK;
         return this;
     }
 
@@ -202,7 +202,7 @@ public class R<T> implements Serializable {
     private R failure() {
         this.ok = false;
         this.code = Code.FAILURE.getCode();
-        this.message = Common.Response.ERROR;
+        this.message = CommonConstant.Response.ERROR;
         return this;
     }
 

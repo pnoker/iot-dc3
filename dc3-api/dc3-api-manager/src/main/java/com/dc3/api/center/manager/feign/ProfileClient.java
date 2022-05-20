@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,9 @@
 package com.dc3.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.manager.hystrix.ProfileClientHystrix;
+import com.dc3.api.center.manager.fallback.ProfileClientFallback;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.model.Profile;
 import com.dc3.common.valid.Insert;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_MANAGER_PROFILE_URL_PREFIX, name = Common.Service.DC3_MANAGER_SERVICE_NAME, fallbackFactory = ProfileClientHystrix.class)
+@FeignClient(path = ServiceConstant.Manager.PROFILE_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = ProfileClientFallback.class)
 public interface ProfileClient {
 
     /**
@@ -43,7 +43,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/add")
-    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 删除 Profile
@@ -61,7 +61,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/update")
-    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
     /**
      * 根据 ID 查询 Profile
@@ -88,6 +88,6 @@ public interface ProfileClient {
      * @return Page<Profile>
      */
     @PostMapping("/list")
-    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = Common.Service.DC3_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
 
 }

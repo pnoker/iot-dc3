@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,8 @@
 package com.dc3.common.utils;
 
 import com.dc3.common.bean.Keys;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -50,7 +51,7 @@ public class KeyUtil {
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
     public static Keys.Aes genAesKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(Common.ALGORITHM_AES);
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(CommonConstant.Algorithm.ALGORITHM_AES);
         keyGenerator.init(128);
         SecretKey secretKey = keyGenerator.generateKey();
         return new Keys.Aes(Dc3Util.encode(secretKey.getEncoded()));
@@ -67,9 +68,9 @@ public class KeyUtil {
     public static String encryptAes(String str, String privateKey) throws Exception {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
-        Key key = new SecretKeySpec(keyBytes, Common.ALGORITHM_AES);
+        Key key = new SecretKeySpec(keyBytes, CommonConstant.Algorithm.ALGORITHM_AES);
         //AES加密
-        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_AES);
+        Cipher cipher = Cipher.getInstance(CommonConstant.Algorithm.ALGORITHM_AES);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return Dc3Util.encode(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
     }
@@ -85,9 +86,9 @@ public class KeyUtil {
     public static String decryptAes(String str, String privateKey) throws Exception {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
-        Key key = new SecretKeySpec(keyBytes, Common.ALGORITHM_AES);
+        Key key = new SecretKeySpec(keyBytes, CommonConstant.Algorithm.ALGORITHM_AES);
         //AES解密
-        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_AES);
+        Cipher cipher = Cipher.getInstance(CommonConstant.Algorithm.ALGORITHM_AES);
         cipher.init(Cipher.DECRYPT_MODE, key);
         //64位解码加密后的字符串
         byte[] inputByte = Dc3Util.decode(str.getBytes(StandardCharsets.UTF_8));
@@ -101,7 +102,7 @@ public class KeyUtil {
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
     public static Keys.Rsa genRsaKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(Common.ALGORITHM_RSA);
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(CommonConstant.Algorithm.ALGORITHM_RSA);
         keyPairGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
@@ -123,9 +124,9 @@ public class KeyUtil {
         //base64编码的公钥
         byte[] keyBytes = Dc3Util.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(Common.ALGORITHM_RSA).generatePublic(keySpec);
+        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(CommonConstant.Algorithm.ALGORITHM_RSA).generatePublic(keySpec);
         //RSA加密
-        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(CommonConstant.Algorithm.ALGORITHM_RSA);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         return Dc3Util.encode(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
     }
@@ -142,9 +143,9 @@ public class KeyUtil {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(Common.ALGORITHM_RSA).generatePrivate(keySpec);
+        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(CommonConstant.Algorithm.ALGORITHM_RSA).generatePrivate(keySpec);
         //RSA解密
-        Cipher cipher = Cipher.getInstance(Common.ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(CommonConstant.Algorithm.ALGORITHM_RSA);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
         //64位解码加密后的字符串
         byte[] inputByte = Dc3Util.decode(str.getBytes(StandardCharsets.UTF_8));
@@ -159,11 +160,11 @@ public class KeyUtil {
      */
     public static String generateToken(String username, String salt) {
         JwtBuilder builder = Jwts.builder()
-                .setIssuer(Common.KEY)
+                .setIssuer(CommonConstant.Algorithm.DEFAULT_KEY)
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, salt.getBytes(StandardCharsets.UTF_8))
-                .setExpiration(Dc3Util.expireTime(Common.Cache.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
+                .setExpiration(Dc3Util.expireTime(CacheConstant.Timeout.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
         return builder.compact();
     }
 
@@ -177,7 +178,7 @@ public class KeyUtil {
      */
     public static Claims parserToken(String username, String salt, String token) {
         return Jwts.parser()
-                .requireIssuer(Common.KEY)
+                .requireIssuer(CommonConstant.Algorithm.DEFAULT_KEY)
                 .requireSubject(username)
                 .setSigningKey(salt.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(token)

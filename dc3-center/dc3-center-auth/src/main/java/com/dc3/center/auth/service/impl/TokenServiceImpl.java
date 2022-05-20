@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,8 @@ import com.dc3.center.auth.service.TenantBindService;
 import com.dc3.center.auth.service.TenantService;
 import com.dc3.center.auth.service.TokenService;
 import com.dc3.center.auth.service.UserService;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Tenant;
 import com.dc3.common.model.User;
@@ -59,11 +60,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateSalt(String username) {
-        String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + username;
+        String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username;
         String salt = redisUtil.getKey(redisSaltKey, String.class);
         if (StrUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
-            redisUtil.setKey(redisSaltKey, salt, Common.Cache.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
+            redisUtil.setKey(redisSaltKey, salt, CacheConstant.Timeout.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
         }
         return salt;
     }
@@ -75,13 +76,13 @@ public class TokenServiceImpl implements TokenService {
         User tempUser = userService.selectByName(name, false);
         if (tempTenant.getEnable() && tempUser.getEnable()) {
             tenantBindService.selectByTenantIdAndUserId(tempTenant.getId(), tempUser.getId());
-            String redisSaltKey = Common.Cache.USER + Common.Cache.SALT + Common.Cache.SEPARATOR + name;
+            String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + name;
             String tempSalt = redisUtil.getKey(redisSaltKey, String.class);
             if (StrUtil.isNotBlank(tempSalt) && tempSalt.equals(salt)) {
                 if (Dc3Util.md5(tempUser.getPassword() + tempSalt).equals(password)) {
-                    String redisTokenKey = Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + name;
+                    String redisTokenKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + name;
                     String token = KeyUtil.generateToken(name, tempSalt);
-                    redisUtil.setKey(redisTokenKey, token, Common.Cache.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+                    redisUtil.setKey(redisTokenKey, token, CacheConstant.Timeout.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
                     return token;
                 }
             }
@@ -92,7 +93,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public TokenValid checkTokenValid(String username, String salt, String token) {
-        String redisToken = redisUtil.getKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username, String.class);
+        String redisToken = redisUtil.getKey(CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username, String.class);
         if (StrUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
@@ -106,7 +107,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public boolean cancelToken(String username) {
-        redisUtil.deleteKey(Common.Cache.USER + Common.Cache.TOKEN + Common.Cache.SEPARATOR + username);
+        redisUtil.deleteKey(CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username);
         return true;
     }
 
@@ -116,14 +117,14 @@ public class TokenServiceImpl implements TokenService {
      * @param username Username
      */
     private void checkUserLimit(String username) {
-        String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
+        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.LIMIT + CommonConstant.Symbol.SEPARATOR + username;
         UserLimit limit = redisUtil.getKey(redisKey, UserLimit.class);
         if (null != limit && limit.getTimes() >= 5) {
             Date now = new Date();
             long interval = limit.getExpireTime().getTime() - now.getTime();
             if (interval > 0) {
                 limit = updateUserLimit(username, false);
-                throw new ServiceException("Access restricted，Please try again after {}", Dc3Util.formatData(limit.getExpireTime()));
+                throw new ServiceException("Access restricted，Please try again after {}", Dc3Util.formatCompleteData(limit.getExpireTime()));
             }
         }
     }
@@ -135,15 +136,15 @@ public class TokenServiceImpl implements TokenService {
      * @return UserLimit
      */
     private UserLimit updateUserLimit(String username, boolean expireTime) {
-        int amount = Common.Cache.USER_LIMIT_TIMEOUT;
-        String redisKey = Common.Cache.USER + Common.Cache.LIMIT + Common.Cache.SEPARATOR + username;
+        int amount = CacheConstant.Timeout.USER_LIMIT_TIMEOUT;
+        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.LIMIT + CommonConstant.Symbol.SEPARATOR + username;
         UserLimit limit = Optional.ofNullable(redisUtil.getKey(redisKey, UserLimit.class)).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
         if (limit.getTimes() > 20) {
             //TODO 拉黑IP和锁定用户操作，然后通过Gateway进行拦截
             amount = 24 * 60;
         } else if (limit.getTimes() > 5) {
-            amount = limit.getTimes() * Common.Cache.USER_LIMIT_TIMEOUT;
+            amount = limit.getTimes() * CacheConstant.Timeout.USER_LIMIT_TIMEOUT;
         }
         if (expireTime) {
             limit.setExpireTime(Dc3Util.expireTime(amount, Calendar.MINUTE));

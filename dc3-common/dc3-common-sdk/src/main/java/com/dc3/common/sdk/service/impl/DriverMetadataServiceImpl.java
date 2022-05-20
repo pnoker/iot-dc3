@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@ package com.dc3.common.sdk.service.impl;
 import cn.hutool.core.thread.ThreadUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
 import com.dc3.common.bean.driver.DriverRegister;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.*;
 import com.dc3.common.sdk.bean.driver.DriverContext;
@@ -71,7 +71,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         registerHandshake();
         driverService.driverEventSender(new DriverEvent(
                 serviceName,
-                Common.Driver.Event.DRIVER_REGISTER,
+                CommonConstant.Driver.Event.DRIVER_REGISTER,
                 new DriverRegister(
                         driverProperty.getTenant(),
                         driver,
@@ -189,11 +189,11 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             threadPoolExecutor.submit(() -> {
                 driverService.driverEventSender(new DriverEvent(
                         serviceName,
-                        Common.Driver.Event.DRIVER_HANDSHAKE,
+                        CommonConstant.Driver.Event.DRIVER_HANDSHAKE,
                         null
                 ));
 
-                while (!Common.Driver.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
+                while (!CommonConstant.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
                     ThreadUtil.sleep(500);
                 }
             }).get(5, TimeUnit.SECONDS);
@@ -207,11 +207,11 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             threadPoolExecutor.submit(() -> {
                 driverService.driverEventSender(new DriverEvent(
                         serviceName,
-                        Common.Driver.Event.DRIVER_METADATA_SYNC,
+                        CommonConstant.Driver.Event.DRIVER_METADATA_SYNC,
                         driver.getServiceName()
                 ));
 
-                while (!Common.Driver.Status.ONLINE.equals(driverContext.getDriverStatus())) {
+                while (!CommonConstant.Status.ONLINE.equals(driverContext.getDriverStatus())) {
                     ThreadUtil.sleep(500);
                 }
             }).get(5, TimeUnit.MINUTES);

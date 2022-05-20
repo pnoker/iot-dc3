@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@ import com.dc3.api.center.manager.feign.PointInfoClient;
 import com.dc3.center.manager.service.NotifyService;
 import com.dc3.center.manager.service.PointInfoService;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.PointInfoDto;
 import com.dc3.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(Common.Service.DC3_MANAGER_POINT_INFO_URL_PREFIX)
+@RequestMapping(ServiceConstant.Manager.POINT_INFO_URL_PREFIX)
 public class PointInfoApi implements PointInfoClient {
 
     @Resource
@@ -48,7 +49,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo add = pointInfoService.add(pointInfo);
             if (null != add) {
-                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.ADD, add);
+                notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -62,7 +63,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo pointInfo = pointInfoService.selectById(id);
             if (null != pointInfo && pointInfoService.delete(id)) {
-                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.DELETE, pointInfo);
+                notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.DELETE, pointInfo);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -76,7 +77,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo update = pointInfoService.update(pointInfo);
             if (null != update) {
-                notifyService.notifyDriverPointInfo(Common.Driver.PointInfo.UPDATE, update);
+                notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

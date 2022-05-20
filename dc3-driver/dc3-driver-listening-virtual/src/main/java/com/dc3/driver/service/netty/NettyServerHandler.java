@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,9 +15,9 @@ package com.dc3.driver.service.netty;
 
 import cn.hutool.core.util.CharsetUtil;
 import com.dc3.common.bean.driver.AttributeInfo;
+import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.sdk.bean.driver.DriverContext;
 import com.dc3.common.sdk.service.DriverService;
 import com.dc3.common.sdk.utils.DriverUtil;

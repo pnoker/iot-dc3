@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package com.dc3.center.manager.service.impl;
 
 import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.point.PointDetail;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
@@ -57,7 +57,7 @@ public class AutoServiceImpl implements AutoService {
             device = deviceService.add(device);
 
             // notify driver add device
-            notifyService.notifyDriverDevice(Common.Driver.Device.ADD, device);
+            notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, device);
         } catch (DuplicateException duplicateException) {
             device = deviceService.selectByName(deviceName, tenantId);
         } catch (Exception ignored) {
@@ -89,7 +89,7 @@ public class AutoServiceImpl implements AutoService {
                 point = pointService.add(point);
 
                 // notify driver add point
-                notifyService.notifyDriverPoint(Common.Driver.Point.ADD, point);
+                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, point);
             } catch (DuplicateException duplicateException) {
                 point = pointService.selectByNameAndProfileId(pointName, profile.getId());
             } catch (Exception ignored) {

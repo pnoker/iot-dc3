@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.GroupMapper;
 import com.dc3.center.manager.service.GroupService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.GroupDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -53,12 +53,12 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.GROUP + Common.Cache.ID, key = "#group.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#group.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Group add(Group group) {
@@ -76,10 +76,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -90,12 +90,12 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.GROUP + Common.Cache.ID, key = "#group.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#group.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.GROUP + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Group update(Group group) {
@@ -110,7 +110,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Group selectById(Long id) {
         Group group = groupMapper.selectById(id);
         if (null == group) {
@@ -120,7 +120,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP + Common.Cache.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
     public Group selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         queryWrapper.eq(Group::getName, name);
@@ -132,7 +132,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.GROUP + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Group> list(GroupDto groupDto) {
         if (!Optional.ofNullable(groupDto.getPage()).isPresent()) {
             groupDto.setPage(new Pages());

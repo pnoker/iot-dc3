@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,9 @@
 package com.dc3.api.center.auth.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.api.center.auth.hystrix.UserClientHystrix;
+import com.dc3.api.center.auth.fallback.UserClientFallback;
 import com.dc3.common.bean.R;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.UserDto;
 import com.dc3.common.model.User;
 import com.dc3.common.valid.Insert;
@@ -35,7 +35,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author pnoker
  */
-@FeignClient(path = Common.Service.DC3_AUTH_USER_URL_PREFIX, name = Common.Service.DC3_AUTH_SERVICE_NAME, fallbackFactory = UserClientHystrix.class)
+@FeignClient(path = ServiceConstant.Auth.USER_URL_PREFIX, name = ServiceConstant.Auth.SERVICE_NAME, fallbackFactory = UserClientFallback.class)
 public interface UserClient {
 
     /**

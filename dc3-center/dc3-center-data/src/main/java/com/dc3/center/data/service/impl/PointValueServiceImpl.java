@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,8 @@ import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.point.PointValue;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.dto.PointValueDto;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
@@ -131,7 +132,7 @@ public class PointValueServiceImpl implements PointValueService {
     public List<PointValue> realtime(Long deviceId) {
         R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
         if (!listR.isOk()) {
-            String prefix = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_";
+            String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE;
             List<String> keys = listR.getData().stream().map(point -> prefix + point.getId()).collect(Collectors.toList());
             if (keys.size() > 0) {
                 List<PointValue> pointValues = redisUtil.getKey(keys, PointValue.class);
@@ -146,7 +147,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public PointValue realtime(Long deviceId, Long pointId) {
-        String key = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + deviceId + "_" + pointId;
+        String key = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE + pointId;
         PointValue pointValue = redisUtil.getKey(key, PointValue.class);
         if (null != pointValue) {
             pointValue.setTimeOut(null).setTimeUnit(null);
@@ -303,9 +304,9 @@ public class PointValueServiceImpl implements PointValueService {
      * @param pointValue Point Value
      */
     private void savePointValueToRedis(final PointValue pointValue) {
-        String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
+        String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : CommonConstant.Symbol.ASTERISK;
         redisUtil.setKey(
-                Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey,
+                CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + CommonConstant.Symbol.DOT + pointIdKey,
                 pointValue,
                 pointValue.getTimeOut(),
                 pointValue.getTimeUnit()
@@ -321,8 +322,8 @@ public class PointValueServiceImpl implements PointValueService {
         Map<String, Object> valueMap = new HashMap<>(16);
         Map<String, Long> expireMap = new HashMap<>(16);
         for (PointValue pointValue : pointValues) {
-            String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : Common.Cache.ASTERISK;
-            String key = Common.Cache.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + Common.Cache.DOT + pointIdKey;
+            String pointIdKey = pointValue.getPointId() != null ? String.valueOf(pointValue.getPointId()) : CommonConstant.Symbol.ASTERISK;
+            String key = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + CommonConstant.Symbol.DOT + pointIdKey;
             valueMap.put(key, pointValue);
             expireMap.put(key, pointValue.getTimeUnit().toMillis(pointValue.getTimeOut()));
         }

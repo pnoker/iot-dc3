@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Pnoker. All Rights Reserved.
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import com.dc3.center.manager.mapper.PointMapper;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.Common;
+import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.PointDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -55,18 +55,18 @@ public class PointServiceImpl implements PointService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.POINT + Common.Cache.ID, key = "#point.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#point.name+'.'+#point.profileId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.ID, key = "#point.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.NAME + CacheConstant.Suffix.PROFILE_ID, key = "#point.name+'.'+#point.profileId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.UNIT, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.PROFILE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.UNIT, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Point add(Point point) {
@@ -84,16 +84,16 @@ public class PointServiceImpl implements PointService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.UNIT, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result==true")
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.NAME + CacheConstant.Suffix.PROFILE_ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.PROFILE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.UNIT, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
     public boolean delete(Long id) {
@@ -104,18 +104,18 @@ public class PointServiceImpl implements PointService {
     @Override
     @Caching(
             put = {
-                    @CachePut(value = Common.Cache.POINT + Common.Cache.ID, key = "#point.id", condition = "#result!=null"),
-                    @CachePut(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#point.name+'.'+#point.profileId", condition = "#result!=null")
+                    @CachePut(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.ID, key = "#point.id", condition = "#result!=null"),
+                    @CachePut(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.NAME + CacheConstant.Suffix.PROFILE_ID, key = "#point.name+'.'+#point.profileId", condition = "#result!=null")
             },
             evict = {
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.POINT + Common.Cache.UNIT, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.ID, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.NAME, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = Common.Cache.PROFILE + Common.Cache.LIST, allEntries = true, condition = "#result!=null")
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.PROFILE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.UNIT, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
+                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
             }
     )
     public Point update(Point point) {
@@ -137,7 +137,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.ID, key = "#id", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Point selectById(Long id) {
         Point point = pointMapper.selectById(id);
         if (null == point) {
@@ -147,7 +147,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.NAME + Common.Cache.PROFILE_ID, key = "#name+'.'+#profileId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.NAME + CacheConstant.Suffix.PROFILE_ID, key = "#name+'.'+#profileId", unless = "#result==null")
     public Point selectByNameAndProfileId(String name, Long profileId) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         queryWrapper.eq(Point::getName, name);
@@ -166,7 +166,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.PROFILE_ID + Common.Cache.LIST, key = "#profileId", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.PROFILE_ID + CacheConstant.Suffix.LIST, key = "#profileId", unless = "#result==null")
     public List<Point> selectByProfileId(Long profileId) {
         PointDto pointDto = new PointDto();
         pointDto.setProfileId(profileId);
@@ -178,7 +178,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Point> selectByProfileIds(Set<Long> profileIds) {
         List<Point> points = new ArrayList<>(16);
         profileIds.forEach(profileId -> {
@@ -196,7 +196,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Point> list(PointDto pointDto) {
         if (!Optional.ofNullable(pointDto.getPage()).isPresent()) {
             pointDto.setPage(new Pages());
@@ -205,7 +205,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    @Cacheable(value = Common.Cache.POINT + Common.Cache.UNIT, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.UNIT, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Map<Long, String> unit(Set<Long> pointIds) {
         List<Point> points = pointMapper.selectBatchIds(pointIds);
         return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
