@@ -61,7 +61,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> userDictionary(Long tenantId) {
+    public List<Dictionary> userDictionary(String tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         List<User> userList = userMapper.selectList(queryWrapper);
@@ -74,7 +74,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> blackIpDictionary(Long tenantId) {
+    public List<Dictionary> blackIpDictionary(String tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         List<BlackIp> blackIpList = blackIpMapper.selectList(queryWrapper);

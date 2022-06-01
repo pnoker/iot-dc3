@@ -1,0 +1,60 @@
+#
+# Copyright (c) 2022. Pnoker. All Rights Reserved.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dc3net
+  namespace: dc3
+  labels:
+    dc3.version: 2022.1.0
+spec:
+  podSelector:
+    matchLabels:
+      dc3.network/dc3net: "true"
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              dc3.network/dc3net: "true"
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8100
+        - protocol: TCP
+          port: 8200
+        - protocol: TCP
+          port: 8300
+        - protocol: TCP
+          port: 8400
+        - protocol: TCP
+          port: 8500
+        - protocol: TCP
+          port: 3306
+        - protocol: TCP
+          port: 6379
+        - protocol: TCP
+          port: 1883
+        - protocol: TCP
+          port: 5672
+        - protocol: TCP
+          port: 15672
+        - protocol: TCP
+          port: 27017
+        - protocol: TCP
+          port: 61613
+  egress:
+    - { }

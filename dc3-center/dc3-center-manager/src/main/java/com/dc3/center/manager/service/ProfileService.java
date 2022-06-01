@@ -34,7 +34,7 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
      * @param type Profile Type
      * @return Profile
      */
-    Profile selectByNameAndType(String name, Short type, Long tenantId);
+    Profile selectByNameAndType(String name, Short type, String tenantId);
 
     /**
      * 根据 模版Id集 查询模版
@@ -42,7 +42,7 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
      * @param ids Profile Id Set
      * @return Profile Array
      */
-    List<Profile> selectByIds(Set<Long> ids);
+    List<Profile> selectByIds(Set<String> ids);
 
     /**
      * 根据 设备Id 查询模版
@@ -50,6 +50,6 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
      * @param deviceId Device Id
      * @return Profile Array
      */
-    List<Profile> selectByDeviceId(Long deviceId);
+    List<Profile> selectByDeviceId(String deviceId);
 
 }

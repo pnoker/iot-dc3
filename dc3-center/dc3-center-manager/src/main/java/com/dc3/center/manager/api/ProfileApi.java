@@ -45,7 +45,7 @@ public class ProfileApi implements ProfileClient {
     private ProfileService profileService;
 
     @Override
-    public R<Profile> add(Profile profile, Long tenantId) {
+    public R<Profile> add(Profile profile, String tenantId) {
         try {
             Profile add = profileService.add(profile.setTenantId(tenantId));
             if (null != add) {
@@ -58,7 +58,7 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             Profile profile = profileService.selectById(id);
             if (null != profile && profileService.delete(id)) {
@@ -72,7 +72,7 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<Profile> update(Profile profile, Long tenantId) {
+    public R<Profile> update(Profile profile, String tenantId) {
         try {
             Profile update = profileService.update(profile.setTenantId(tenantId));
             if (null != update) {
@@ -86,7 +86,7 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<Profile> selectById(Long id) {
+    public R<Profile> selectById(String id) {
         try {
             Profile select = profileService.selectById(id);
             if (null != select) {
@@ -99,7 +99,7 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<List<Profile>> selectByDeviceId(Long deviceId) {
+    public R<List<Profile>> selectByDeviceId(String deviceId) {
         try {
             List<Profile> select = profileService.selectByDeviceId(deviceId);
             if (null != select) {
@@ -112,7 +112,7 @@ public class ProfileApi implements ProfileClient {
     }
 
     @Override
-    public R<Page<Profile>> list(ProfileDto profileDto, Long tenantId) {
+    public R<Page<Profile>> list(ProfileDto profileDto, String tenantId) {
         try {
             profileDto.setTenantId(tenantId);
             Page<Profile> page = profileService.list(profileDto);

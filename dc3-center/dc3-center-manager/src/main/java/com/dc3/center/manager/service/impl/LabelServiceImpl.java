@@ -80,7 +80,7 @@ public class LabelServiceImpl implements LabelService {
                     @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         LabelBindDto labelBindDto = new LabelBindDto();
         labelBindDto.setLabelId(id);
         Page<LabelBind> labelBindPage = labelBindService.list(labelBindDto);
@@ -118,7 +118,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Label selectById(Long id) {
+    public Label selectById(String id) {
         Label label = labelMapper.selectById(id);
         if (null == label) {
             throw new NotFoundException("The label does not exist");
@@ -128,7 +128,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
-    public Label selectByName(String name, Long tenantId) {
+    public Label selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         queryWrapper.eq(Label::getName, name);
         queryWrapper.eq(Label::getTenantId, tenantId);

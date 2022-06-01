@@ -37,8 +37,8 @@ import java.io.Serializable;
 public class DeviceEventDto implements Serializable, Converter<DeviceEvent, DeviceEventDto> {
     private static final long serialVersionUID = 1L;
 
-    private Long deviceId;
-    private Long pointId;
+    private String deviceId;
+    private String pointId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

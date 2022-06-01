@@ -94,7 +94,7 @@ public class PointInfoServiceImpl implements PointInfoService {
                     @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return pointInfoMapper.deleteById(id) > 0;
     }
@@ -133,7 +133,7 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public PointInfo selectById(Long id) {
+    public PointInfo selectById(String id) {
         PointInfo pointInfo = pointInfoMapper.selectById(id);
         if (null == pointInfo) {
             throw new NotFoundException("The point info does not exist");
@@ -143,7 +143,7 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID, key = "#pointAttributeId+'.'+#deviceId+'.'+#pointId", unless = "#result==null")
-    public PointInfo selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId) {
+    public PointInfo selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
@@ -157,7 +157,7 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, key = "#pointAttributeId", unless = "#result==null")
-    public List<PointInfo> selectByAttributeId(Long pointAttributeId) {
+    public List<PointInfo> selectByAttributeId(String pointAttributeId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
@@ -169,10 +169,10 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, key = "#deviceId", unless = "#result==null")
-    public List<PointInfo> selectByDeviceId(Long deviceId) {
+    public List<PointInfo> selectByDeviceId(String deviceId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         List<Point> points = pointService.selectByDeviceId(deviceId);
-        Set<Long> pointIds = points.stream().map(Point::getId).collect(Collectors.toSet());
+        Set<String> pointIds = points.stream().map(Point::getId).collect(Collectors.toSet());
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
         queryWrapper.in(PointInfo::getPointId, pointIds);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
@@ -184,7 +184,7 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID + CacheConstant.Suffix.LIST, key = "#deviceId+'.'+#pointId", unless = "#result==null")
-    public List<PointInfo> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+    public List<PointInfo> selectByDeviceIdAndPointId(String deviceId, String pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
         queryWrapper.eq(PointInfo::getPointId, pointId);

@@ -35,7 +35,7 @@ public interface PointService extends Service<Point, PointDto> {
      * @param profileId Profile Id
      * @return Point
      */
-    Point selectByNameAndProfileId(String name, Long profileId);
+    Point selectByNameAndProfileId(String name, String profileId);
 
     /**
      * 根据 设备Id 查询位号
@@ -43,7 +43,7 @@ public interface PointService extends Service<Point, PointDto> {
      * @param deviceId Device Id
      * @return Point Array
      */
-    List<Point> selectByDeviceId(Long deviceId);
+    List<Point> selectByDeviceId(String deviceId);
 
     /**
      * 根据 模板Id 查询位号
@@ -51,7 +51,7 @@ public interface PointService extends Service<Point, PointDto> {
      * @param profileId Profile Id
      * @return Point Array
      */
-    List<Point> selectByProfileId(Long profileId);
+    List<Point> selectByProfileId(String profileId);
 
     /**
      * 根据 模板Id 集查询位号
@@ -59,7 +59,7 @@ public interface PointService extends Service<Point, PointDto> {
      * @param profileIds Profile Id Set
      * @return Point Array
      */
-    List<Point> selectByProfileIds(Set<Long> profileIds);
+    List<Point> selectByProfileIds(Set<String> profileIds);
 
     /**
      * 查询 位号单位
@@ -67,5 +67,5 @@ public interface PointService extends Service<Point, PointDto> {
      * @param pointIds Point Id Set
      * @return Map<Long, String>
      */
-    Map<Long, String> unit(Set<Long> pointIds);
+    Map<String, String> unit(Set<String> pointIds);
 }

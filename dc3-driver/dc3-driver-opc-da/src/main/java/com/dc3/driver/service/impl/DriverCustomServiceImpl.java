@@ -55,7 +55,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * Opc Da Server Map
      */
-    private final Map<Long, Server> serverMap = new ConcurrentHashMap<>(64);
+    private final Map<String, Server> serverMap = new ConcurrentHashMap<>(64);
 
     @Override
     public void initial() {
@@ -112,7 +112,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws JIException
      * @throws UnknownHostException
      */
-    private Server getServer(Long deviceId, Map<String, AttributeInfo> driverInfo) throws JIException, UnknownHostException {
+    private Server getServer(String deviceId, Map<String, AttributeInfo> driverInfo) throws JIException, UnknownHostException {
         Server server = serverMap.get(deviceId);
         if (null == server) {
             ConnectionInformation connectionInformation = new ConnectionInformation(attribute(driverInfo, "host"), attribute(driverInfo, "clsId"), attribute(driverInfo, "username"), attribute(driverInfo, "password"));

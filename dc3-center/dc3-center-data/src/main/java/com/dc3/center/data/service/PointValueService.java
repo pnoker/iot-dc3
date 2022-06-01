@@ -44,7 +44,7 @@ public interface PointValueService {
      * @param deviceId Device Id
      * @return PointValue Array
      */
-    List<PointValue> realtime(Long deviceId);
+    List<PointValue> realtime(String deviceId);
 
     /**
      * 获取实时数据
@@ -53,7 +53,7 @@ public interface PointValueService {
      * @param pointId  Point Id
      * @return PointValue
      */
-    PointValue realtime(Long deviceId, Long pointId);
+    PointValue realtime(String deviceId, String pointId);
 
     /**
      * 获取一个设备最新的位号数据集合
@@ -61,7 +61,7 @@ public interface PointValueService {
      * @param deviceId Device Id
      * @return PointValue Array
      */
-    List<PointValue> latest(Long deviceId);
+    List<PointValue> latest(String deviceId);
 
     /**
      * 获取最新的一个位号数据
@@ -70,7 +70,7 @@ public interface PointValueService {
      * @param pointId  Point Id
      * @return PointValue
      */
-    PointValue latest(Long deviceId, Long pointId);
+    PointValue latest(String deviceId, String pointId);
 
     /**
      * 获取带分页、排序

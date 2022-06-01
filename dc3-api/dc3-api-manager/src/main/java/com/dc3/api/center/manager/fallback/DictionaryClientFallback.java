@@ -39,32 +39,32 @@ public class DictionaryClientFallback implements FallbackFactory<DictionaryClien
         return new DictionaryClient() {
 
             @Override
-            public R<List<Dictionary>> driverDictionary(Long tenantId) {
+            public R<List<Dictionary>> driverDictionary(String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> driverAttributeDictionary(Long tenantId) {
+            public R<List<Dictionary>> driverAttributeDictionary(String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> pointAttributeDictionary(Long tenantId) {
+            public R<List<Dictionary>> pointAttributeDictionary(String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> profileDictionary(Long tenantId) {
+            public R<List<Dictionary>> profileDictionary(String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> deviceDictionary(Long tenantId) {
+            public R<List<Dictionary>> deviceDictionary(String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> pointDictionary(String parent, Long tenantId) {
+            public R<List<Dictionary>> pointDictionary(String parent, String tenantId) {
                 return R.fail(message);
             }
         };

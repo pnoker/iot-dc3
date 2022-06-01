@@ -40,22 +40,22 @@ public class StatusClientFallback implements FallbackFactory<StatusClient> {
         return new StatusClient() {
 
             @Override
-            public R<Map<Long, String>> driverStatus(DriverDto driverDto, Long tenantId) {
+            public R<Map<String, String>> driverStatus(DriverDto driverDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto, Long tenantId) {
+            public R<Map<String, String>> deviceStatus(DeviceDto deviceDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Map<Long, String>> deviceStatusByDriverId(Long driverId) {
+            public R<Map<String, String>> deviceStatusByDriverId(String driverId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Map<Long, String>> deviceStatusByProfileId(Long profileId) {
+            public R<Map<String, String>> deviceStatusByProfileId(String profileId) {
                 return R.fail(message);
             }
         };

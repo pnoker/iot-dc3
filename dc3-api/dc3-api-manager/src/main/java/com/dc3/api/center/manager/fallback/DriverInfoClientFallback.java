@@ -46,7 +46,7 @@ public class DriverInfoClientFallback implements FallbackFactory<DriverInfoClien
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
@@ -56,17 +56,17 @@ public class DriverInfoClientFallback implements FallbackFactory<DriverInfoClien
             }
 
             @Override
-            public R<DriverInfo> selectById(Long id) {
+            public R<DriverInfo> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<DriverInfo> selectByAttributeIdAndDeviceId(Long attributeId, Long deviceId) {
+            public R<DriverInfo> selectByAttributeIdAndDeviceId(String attributeId, String deviceId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<DriverInfo>> selectByDeviceId(Long deviceId) {
+            public R<List<DriverInfo>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }
 

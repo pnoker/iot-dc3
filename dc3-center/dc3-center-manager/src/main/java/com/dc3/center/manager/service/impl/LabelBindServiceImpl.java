@@ -69,7 +69,7 @@ public class LabelBindServiceImpl implements LabelBindService {
                     @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return labelBindMapper.deleteById(id) > 0;
     }
@@ -93,7 +93,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public LabelBind selectById(Long id) {
+    public LabelBind selectById(String id) {
         LabelBind labelBind = labelBindMapper.selectById(id);
         if (null == labelBind) {
             throw new NotFoundException("The label bind does not exist");

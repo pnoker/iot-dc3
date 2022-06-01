@@ -55,7 +55,7 @@ public interface PointInfoClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 PointInfo
@@ -73,7 +73,7 @@ public interface PointInfoClient {
      * @return PointInfo
      */
     @GetMapping("/id/{id}")
-    R<PointInfo> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<PointInfo> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 属性ID、设备ID 和 位号ID 查询 PointInfo
@@ -84,7 +84,7 @@ public interface PointInfoClient {
      * @return PointInfo
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
-    R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+    R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") String attributeId, @NotNull @PathVariable(value = "deviceId") String deviceId, @NotNull @PathVariable(value = "pointId") String pointId);
 
     /**
      * 根据 设备ID 和 位号ID 查询 PointInfo
@@ -94,7 +94,7 @@ public interface PointInfoClient {
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
-    R<List<PointInfo>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @PathVariable(value = "pointId") Long pointId);
+    R<List<PointInfo>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") String deviceId, @NotNull @PathVariable(value = "pointId") String pointId);
 
     /**
      * 根据 设备ID 查询 PointInfo
@@ -103,7 +103,7 @@ public interface PointInfoClient {
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}")
-    R<List<PointInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<List<PointInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
      * 分页查询 PointInfo

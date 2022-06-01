@@ -54,7 +54,7 @@ if (!db.getUser("dc3")) {
     });
 }
 
-if (db.createCollection("pointValue")) {
+if (db.createCollection("point_value")) {
     db.pointValue.createIndex(
         {
             deviceId: 1,
@@ -78,7 +78,7 @@ if (db.createCollection("pointValue")) {
     );
 }
 
-if (db.createCollection("driverEvent")) {
+if (db.createCollection("driver_event")) {
     db.driverEvent.createIndex(
         {
             serviceName: 1,
@@ -101,7 +101,7 @@ if (db.createCollection("driverEvent")) {
     );
 }
 
-if (db.createCollection("deviceEvent")) {
+if (db.createCollection("device_event")) {
     db.deviceEvent.createIndex(
         {
             deviceId: 1,

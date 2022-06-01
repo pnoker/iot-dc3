@@ -27,7 +27,7 @@ public final class RealConverter implements S7Serializable {
      */
     @Override
     public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
-        final int iValue = ((buffer[byteOffset + OFFSET_POS4] & 0xFF) << 0)
+        final int iValue = ((buffer[byteOffset + OFFSET_POS4] & 0xFF))
                 | ((buffer[byteOffset + OFFSET_POS3] & 0xFF) << 8) | ((buffer[byteOffset + OFFSET_POS2] & 0xFF) << 16)
                 | ((buffer[byteOffset + OFFSET_POS1] & 0xFF) << 24);
 
@@ -76,7 +76,7 @@ public final class RealConverter implements S7Serializable {
 
         final int iValue = Float.floatToIntBits(fValue);
 
-        buffer[byteOffset + OFFSET_POS4] = (byte) ((iValue >> 0) & 0xFF);
+        buffer[byteOffset + OFFSET_POS4] = (byte) ((iValue) & 0xFF);
         buffer[byteOffset + OFFSET_POS3] = (byte) ((iValue >> 8) & 0xFF);
         buffer[byteOffset + OFFSET_POS2] = (byte) ((iValue >> 16) & 0xFF);
         buffer[byteOffset + OFFSET_POS1] = (byte) ((iValue >> 24) & 0xFF);

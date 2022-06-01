@@ -52,7 +52,7 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private ApplicationContext applicationContext;
 
-    public String convertValue(Long deviceId, Long pointId, String rawValue) {
+    public String convertValue(String deviceId, String pointId, String rawValue) {
         String value;
         Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
         switch (point.getType()) {
@@ -134,11 +134,11 @@ public class DriverServiceImpl implements DriverService {
         }
     }
 
-    public void deviceEventSender(Long deviceId, String type, String content) {
+    public void deviceEventSender(String deviceId, String type, String content) {
         deviceEventSender(new DeviceEvent(deviceId, type, content));
     }
 
-    public void deviceEventSender(Long deviceId, Long pointId, String type, String content) {
+    public void deviceEventSender(String deviceId, String pointId, String type, String content) {
         deviceEventSender(new DeviceEvent(deviceId, pointId, type, content));
     }
 

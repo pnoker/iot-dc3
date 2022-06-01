@@ -54,7 +54,7 @@ public interface TenantClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 Tenant
@@ -75,7 +75,7 @@ public interface TenantClient {
      * @return Tenant
      */
     @GetMapping("/id/{id}")
-    R<Tenant> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<Tenant> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 Name 查询 Tenant

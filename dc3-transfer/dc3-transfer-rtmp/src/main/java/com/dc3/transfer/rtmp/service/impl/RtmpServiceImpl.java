@@ -52,7 +52,7 @@ public class RtmpServiceImpl implements RtmpService {
     /**
      * 转码任务Map
      */
-    public volatile Map<Long, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
+    public volatile Map<String, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
 
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
@@ -88,7 +88,7 @@ public class RtmpServiceImpl implements RtmpService {
                     @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         Rtmp select = selectById(id);
         if (null != select) {
             Transcode transcode = transcodeMap.get(id);
@@ -134,7 +134,7 @@ public class RtmpServiceImpl implements RtmpService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Rtmp selectById(Long id) {
+    public Rtmp selectById(String id) {
         return rtmpMapper.selectById(id);
     }
 
@@ -152,7 +152,7 @@ public class RtmpServiceImpl implements RtmpService {
                     @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean start(Long id) {
+    public boolean start(String id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null == select) {
             throw new NotFoundException("The rtmp task does not exist");
@@ -233,7 +233,7 @@ public class RtmpServiceImpl implements RtmpService {
                     @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean stop(Long id) {
+    public boolean stop(String id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null != select) {
             Transcode transcode = transcodeMap.get(id);

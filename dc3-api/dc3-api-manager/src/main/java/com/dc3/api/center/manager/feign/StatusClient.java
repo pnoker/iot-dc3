@@ -37,39 +37,39 @@ public interface StatusClient {
      * ONLINE, OFFLINE
      *
      * @param driverDto Driver Dto
-     * @return Map<Long, String>
+     * @return Map<String, String>
      */
     @PostMapping("/driver")
-    R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param deviceDto Device Dto
-     * @return Map<Long, String>
+     * @return Map<String, String>
      */
     @PostMapping("/device")
-    R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Map<String, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 驱动ID 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param driverId Driver Id
-     * @return Map<Long, String>
+     * @return Map<String, String>
      */
     @GetMapping("/device/driver_id/{driverId}")
-    R<Map<Long, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId);
+    R<Map<String, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") String driverId);
 
     /**
      * 根据 模板ID 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param profileId Profile Id
-     * @return Map<Long, String>
+     * @return Map<String, String>
      */
     @GetMapping("/device/profile_id/{profileId}")
-    R<Map<Long, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
+    R<Map<String, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") String profileId);
 
 }

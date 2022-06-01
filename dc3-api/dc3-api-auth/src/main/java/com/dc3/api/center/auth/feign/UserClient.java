@@ -54,7 +54,7 @@ public interface UserClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 User
@@ -75,7 +75,7 @@ public interface UserClient {
      * @return Boolean
      */
     @PostMapping("/reset/{id}")
-    R<Boolean> restPassword(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> restPassword(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 ID 查询 User
@@ -84,7 +84,7 @@ public interface UserClient {
      * @return User
      */
     @GetMapping("/id/{id}")
-    R<User> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<User> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 Name 查询 User

@@ -29,5 +29,5 @@ public interface LabelService extends Service<Label, LabelDto> {
      * @param name
      * @return
      */
-    Label selectByName(String name, Long tenantId);
+    Label selectByName(String name, String tenantId);
 }

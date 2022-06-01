@@ -160,6 +160,16 @@ public interface CommonConstant {
     }
 
     /**
+     * 存储相关
+     */
+    interface Storage {
+        /**
+         * 设备数据存储集合前缀
+         */
+        String POINT_VALUE_PREFIX = "point_value_";
+    }
+
+    /**
      * 状态相关
      */
     interface Status {
@@ -214,6 +224,9 @@ public interface CommonConstant {
             String ERROR = "error";
         }
 
+        /**
+         * 类型
+         */
         interface Type {
             String DRIVER = "driver";
             String GATEWAY = "gateway";
@@ -256,7 +269,7 @@ public interface CommonConstant {
     }
 
     /**
-     * 设备常量
+     * 设备相关
      */
     interface Device {
 
@@ -286,4 +299,13 @@ public interface CommonConstant {
         }
     }
 
+    /**
+     * 策略工厂相关
+     */
+    interface StrategyService {
+        String POINT_VALUE_SAVE_STRATEGY = "saving" + Symbol.SEPARATOR;
+        String POINT_VALUE_SAVE_STRATEGY_INFLUXDB = "influxdb";
+        String POINT_VALUE_SAVE_STRATEGY_OPENTSDB = "opentsdb";
+        String POINT_VALUE_SAVE_STRATEGY_ELASTICSEARCH = "elasticsearch";
+    }
 }

@@ -11,37 +11,34 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.config;
+package com.dc3.center.data.save.opentsdb.config;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Ok Http Client Config
+ * OpenTsdb Configuration
  *
  * @author pnoker
  */
 @Slf4j
 @Configuration
-public class OkHttpClientConfig {
+@ConditionalOnProperty(name = "data.point.sava.opentsdb.enable", havingValue = "true")
+public class OpenTsdbConfig {
 
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient.Builder()
-                .retryOnConnectionFailure(false)
-                .connectionPool(connectionPool())
+                .retryOnConnectionFailure(true)
+                .connectionPool(new ConnectionPool(1024, 5, TimeUnit.SECONDS))
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .build();
-    }
-
-    @Bean
-    public ConnectionPool connectionPool() {
-        return new ConnectionPool(1024, 5, TimeUnit.SECONDS);
     }
 }

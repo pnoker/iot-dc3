@@ -24,9 +24,9 @@ public final class TimeConverter extends ByteConverter {
         final byte b1 = super.extract(Byte.class, buffer, byteOffset + 3, bitOffset);
         final byte b2 = super.extract(Byte.class, buffer, byteOffset + 2, bitOffset);
         final byte b3 = super.extract(Byte.class, buffer, byteOffset + 1, bitOffset);
-        final byte b4 = super.extract(Byte.class, buffer, byteOffset + 0, bitOffset);
+        final byte b4 = super.extract(Byte.class, buffer, byteOffset, bitOffset);
 
-        final long l = ((long) b1 & 0xFF) << 0 | ((long) b2 & 0xFF) << 8 | ((long) b3 & 0xFF) << 16
+        final long l = ((long) b1 & 0xFF) | ((long) b2 & 0xFF) << 8 | ((long) b3 & 0xFF) << 16
                 | ((long) b4 & 0xFF) << 24;
 
         return targetClass.cast(l);
@@ -56,7 +56,7 @@ public final class TimeConverter extends ByteConverter {
                        final int size) {
         final long l = (Long) javaType;
 
-        final byte b1 = (byte) ((byte) (l >> 0) & 0xFF);
+        final byte b1 = (byte) ((byte) (l) & 0xFF);
         final byte b2 = (byte) ((byte) (l >> 8) & 0xFF);
         final byte b3 = (byte) ((byte) (l >> 16) & 0xFF);
         final byte b4 = (byte) ((byte) (l >> 24) & 0xFF);
@@ -64,7 +64,7 @@ public final class TimeConverter extends ByteConverter {
         super.insert(b1, buffer, byteOffset + 3, bitOffset, 1);
         super.insert(b2, buffer, byteOffset + 2, bitOffset, 1);
         super.insert(b3, buffer, byteOffset + 1, bitOffset, 1);
-        super.insert(b4, buffer, byteOffset + 0, bitOffset, 1);
+        super.insert(b4, buffer, byteOffset, bitOffset, 1);
     }
 
 }

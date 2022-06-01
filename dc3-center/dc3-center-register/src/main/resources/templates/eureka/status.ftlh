@@ -17,10 +17,10 @@
     <base href="<@spring.url basePath/>">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Eureka</title>
+    <title>DC3 Register Center</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-
+    <link rel="icon" href="eureka/images/favicon.ico">
     <link rel="stylesheet" href="eureka/css/wro.css">
 
 </head>

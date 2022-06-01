@@ -11,12 +11,30 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.service.elastic;
+package com.dc3.center.data.save.strategy;
 
-import com.dc3.common.bean.point.EsPointValue;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import org.springframework.stereotype.Repository;
+import com.dc3.common.bean.point.PointValue;
 
-@Repository
-public interface PointValueRepository extends ElasticsearchRepository<EsPointValue, String> {
+import java.util.List;
+
+/**
+ * Point Value 存储策略服务接口
+ *
+ * @author pnoker
+ */
+public interface SaveStrategyService {
+
+    /**
+     * 保存 PointValue
+     *
+     * @param pointValue PointValue
+     */
+    void savePointValue(PointValue pointValue);
+
+    /**
+     * 保存 PointValue 集合
+     *
+     * @param pointValues PointValue Array
+     */
+    void savePointValues(List<PointValue> pointValues);
 }

@@ -47,12 +47,12 @@ public class EsPointValue implements Serializable {
     /**
      * 设备ID，同MySQl中等 设备ID 一致
      */
-    private Long deviceId;
+    private String deviceId;
 
     /**
      * 位号ID，同MySQl中等 位号ID 一致
      */
-    private Long pointId;
+    private String pointId;
 
     /**
      * 处理值，进行过缩放、格式化等操作
@@ -81,13 +81,13 @@ public class EsPointValue implements Serializable {
     @JsonFormat(pattern = CommonConstant.Time.COMPLETE_DATE_FORMAT, timezone = CommonConstant.Time.TIMEZONE)
     private Date createTime;
 
-    public EsPointValue(Long pointId, String rawValue, String value) {
+    public EsPointValue(String pointId, String rawValue, String value) {
         this.pointId = pointId;
         this.rawValue = rawValue;
         this.value = value;
     }
 
-    public EsPointValue(Long deviceId, Long pointId, String rawValue, String value) {
+    public EsPointValue(String deviceId, String pointId, String rawValue, String value) {
         this.deviceId = deviceId;
         this.pointId = pointId;
         this.rawValue = rawValue;
@@ -95,7 +95,7 @@ public class EsPointValue implements Serializable {
         this.originTime = new Date();
     }
 
-    public EsPointValue(Long deviceId, List<EsPointValue> children) {
+    public EsPointValue(String deviceId, List<EsPointValue> children) {
         this.deviceId = deviceId;
         this.children = children;
         this.originTime = new Date();

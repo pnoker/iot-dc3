@@ -45,7 +45,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/user")
-    R<List<Dictionary>> userDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> userDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询 Ip 黑名单 Dictionary
@@ -53,6 +53,6 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/black_ip")
-    R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

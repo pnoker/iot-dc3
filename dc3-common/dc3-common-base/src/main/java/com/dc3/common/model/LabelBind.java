@@ -15,8 +15,6 @@ package com.dc3.common.model;
 
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -35,13 +33,11 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 public class LabelBind extends Description {
 
-    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "label id can't be empty", groups = {Insert.class, Update.class})
-    private Long labelId;
+    private String labelId;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "entity id can't be empty", groups = {Insert.class, Update.class})
-    private Long entityId;
+    private String entityId;
 
     private String type;
 }

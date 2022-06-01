@@ -42,7 +42,7 @@ public interface GroupClient {
      * @return Group
      */
     @PostMapping("/add")
-    R<Group> add(@Validated(Insert.class) @RequestBody Group group, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Group> add(@Validated(Insert.class) @RequestBody Group group, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Group
@@ -51,7 +51,7 @@ public interface GroupClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 Group
@@ -60,7 +60,7 @@ public interface GroupClient {
      * @return Group
      */
     @PostMapping("/update")
-    R<Group> update(@Validated(Update.class) @RequestBody Group group, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Group> update(@Validated(Update.class) @RequestBody Group group, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Group
@@ -69,7 +69,7 @@ public interface GroupClient {
      * @return Group
      */
     @GetMapping("/id/{id}")
-    R<Group> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<Group> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 分页查询 Group
@@ -78,6 +78,6 @@ public interface GroupClient {
      * @return Page<Group>
      */
     @PostMapping("/list")
-    R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

@@ -40,10 +40,10 @@ public class StatusApi implements StatusClient {
     private StatusService statusService;
 
     @Override
-    public R<Map<Long, String>> driverStatus(DriverDto driverDto, Long tenantId) {
+    public R<Map<String, String>> driverStatus(DriverDto driverDto, String tenantId) {
         try {
             driverDto.setTenantId(tenantId);
-            Map<Long, String> statuses = statusService.driver(driverDto);
+            Map<String, String> statuses = statusService.driver(driverDto);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -51,10 +51,10 @@ public class StatusApi implements StatusClient {
     }
 
     @Override
-    public R<Map<Long, String>> deviceStatus(DeviceDto deviceDto, Long tenantId) {
+    public R<Map<String, String>> deviceStatus(DeviceDto deviceDto, String tenantId) {
         try {
             deviceDto.setTenantId(tenantId);
-            Map<Long, String> statuses = statusService.device(deviceDto);
+            Map<String, String> statuses = statusService.device(deviceDto);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -62,11 +62,11 @@ public class StatusApi implements StatusClient {
     }
 
     @Override
-    public R<Map<Long, String>> deviceStatusByDriverId(Long driverId) {
+    public R<Map<String, String>> deviceStatusByDriverId(String driverId) {
         try {
             DeviceDto deviceDto = new DeviceDto();
             deviceDto.setDriverId(driverId);
-            Map<Long, String> statuses = statusService.device(deviceDto);
+            Map<String, String> statuses = statusService.device(deviceDto);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -74,9 +74,9 @@ public class StatusApi implements StatusClient {
     }
 
     @Override
-    public R<Map<Long, String>> deviceStatusByProfileId(Long profileId) {
+    public R<Map<String, String>> deviceStatusByProfileId(String profileId) {
         try {
-            Map<Long, String> statuses = statusService.deviceByProfileId(profileId);
+            Map<String, String> statuses = statusService.deviceByProfileId(profileId);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());

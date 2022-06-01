@@ -98,7 +98,7 @@ public class DriverServiceImpl implements DriverService {
                     @CacheEvict(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return driverMapper.deleteById(id) > 0;
     }
@@ -130,7 +130,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Driver selectById(Long id) {
+    public Driver selectById(String id) {
         Driver driver = driverMapper.selectById(id);
         if (null == driver) {
             throw new NotFoundException("The driver does not exist");
@@ -140,7 +140,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DEVICE_ID, key = "#deviceId", unless = "#result==null")
-    public Driver selectByDeviceId(Long deviceId) {
+    public Driver selectByDeviceId(String deviceId) {
         Device device = deviceMapper.selectById(deviceId);
         if (ObjectUtil.isNotNull(device)) {
             return selectById(device.getDriverId());
@@ -162,7 +162,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.HOST_PORT, key = "#type+'.'+#host+'.'+#port+'.'+#tenantId", unless = "#result==null")
-    public Driver selectByHostPort(String type, String host, Integer port, Long tenantId) {
+    public Driver selectByHostPort(String type, String host, Integer port, String tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getType, type);
         queryWrapper.eq(Driver::getHost, host);
@@ -177,7 +177,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public List<Driver> selectByIds(Set<Long> ids) {
+    public List<Driver> selectByIds(Set<String> ids) {
         List<Driver> drivers = driverMapper.selectBatchIds(ids);
         if (CollectionUtil.isEmpty(drivers)) {
             throw new NotFoundException("The driver does not exist");
@@ -187,13 +187,13 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.PROFILE_ID, key = "#profileId", unless = "#result==null")
-    public List<Driver> selectByProfileId(Long profileId) {
-        Set<Long> deviceIds = profileBindService.selectDeviceIdByProfileId(profileId);
+    public List<Driver> selectByProfileId(String profileId) {
+        Set<String> deviceIds = profileBindService.selectDeviceIdByProfileId(profileId);
         List<Device> devices = deviceMapper.selectBatchIds(deviceIds);
         if (CollectionUtil.isEmpty(devices)) {
             throw new NotFoundException("The devices does not exist");
         }
-        Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
+        Set<String> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
         return selectByIds(driverIds);
     }
 

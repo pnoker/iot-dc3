@@ -20,21 +20,21 @@ eureka:
 spring:
   datasource:
     # Customize MySQL configuration
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
   rabbitmq:
     # Customize Rabbitmq configuration
-    host: ${RABBITMQ_HOST:localhost}
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
     port: ${RABBITMQ_PORT:5672}
   redis:
     # Customize Redis configuration
-    host: ${REDIS_HOST:localhost}
+    host: ${REDIS_HOST:dc3-redis}
     port: ${REDIS_PORT:6379}
   data:
     mongodb:
       # Customize Mongo configuration
-      host: ${MONGO_HOST:localhost}
+      host: ${MONGO_HOST:dc3-mongo}
       port: ${MONGO_PORT:27017}
   cache:
     redis:
       # Customize Cache configuration
-      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5M}
+      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}

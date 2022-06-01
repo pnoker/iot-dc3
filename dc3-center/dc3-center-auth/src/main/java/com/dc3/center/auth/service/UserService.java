@@ -65,5 +65,5 @@ public interface UserService extends Service<User, UserDto> {
      * @param id Id
      * @return boolean
      */
-    boolean restPassword(Long id);
+    boolean restPassword(String id);
 }

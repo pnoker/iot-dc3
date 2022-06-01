@@ -12,7 +12,7 @@
 #
 
 server:
-  port: 8100
+  port: ${EUREKA_PORT:8100}
 
 spring:
   application:

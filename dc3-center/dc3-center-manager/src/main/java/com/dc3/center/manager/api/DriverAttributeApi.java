@@ -55,7 +55,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return driverAttributeService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     }
 
     @Override
-    public R<DriverAttribute> selectById(Long id) {
+    public R<DriverAttribute> selectById(String id) {
         try {
             DriverAttribute select = driverAttributeService.selectById(id);
             if (null != select) {
@@ -90,7 +90,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     }
 
     @Override
-    public R<List<DriverAttribute>> selectByDriverId(Long id) {
+    public R<List<DriverAttribute>> selectByDriverId(String id) {
         try {
             List<DriverAttribute> select = driverAttributeService.selectByDriverId(id);
             if (null != select) {

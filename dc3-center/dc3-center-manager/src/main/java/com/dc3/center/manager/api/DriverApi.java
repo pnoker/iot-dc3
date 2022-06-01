@@ -39,7 +39,7 @@ public class DriverApi implements DriverClient {
     private DriverService driverService;
 
     @Override
-    public R<Driver> add(Driver driver, Long tenantId) {
+    public R<Driver> add(Driver driver, String tenantId) {
         try {
             Driver add = driverService.add(driver.setTenantId(tenantId));
             if (null != add) {
@@ -52,7 +52,7 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return driverService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> update(Driver driver, Long tenantId) {
+    public R<Driver> update(Driver driver, String tenantId) {
         try {
             Driver update = driverService.update(driver.setTenantId(tenantId));
             if (null != update) {
@@ -74,7 +74,7 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> selectById(Long id) {
+    public R<Driver> selectById(String id) {
         try {
             Driver select = driverService.selectById(id);
             return R.ok(select);
@@ -94,7 +94,7 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Driver> selectByHostPort(String type, String host, Integer port, Long tenantId) {
+    public R<Driver> selectByHostPort(String type, String host, Integer port, String tenantId) {
         try {
             Driver select = driverService.selectByHostPort(type, host, port, tenantId);
             return R.ok(select);
@@ -104,7 +104,7 @@ public class DriverApi implements DriverClient {
     }
 
     @Override
-    public R<Page<Driver>> list(DriverDto driverDto, Long tenantId) {
+    public R<Page<Driver>> list(DriverDto driverDto, String tenantId) {
         try {
             driverDto.setTenantId(tenantId);
             Page<Driver> page = driverService.list(driverDto);

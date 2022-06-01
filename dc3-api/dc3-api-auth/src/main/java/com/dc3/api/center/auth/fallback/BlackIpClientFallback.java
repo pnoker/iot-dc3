@@ -44,7 +44,7 @@ public class BlackIpClientFallback implements FallbackFactory<BlackIpClient> {
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
@@ -54,7 +54,7 @@ public class BlackIpClientFallback implements FallbackFactory<BlackIpClient> {
             }
 
             @Override
-            public R<BlackIp> selectById(Long id) {
+            public R<BlackIp> selectById(String id) {
                 return R.fail(message);
             }
 

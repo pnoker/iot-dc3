@@ -34,7 +34,7 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      * @param tenantId Tenant Id
      * @return Device
      */
-    Device selectByName(String name, Long tenantId);
+    Device selectByName(String name, String tenantId);
 
     /**
      * 根据 驱动Id 查询该驱动下的全部设备
@@ -42,7 +42,7 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      * @param driverId Driver Id
      * @return Device Array
      */
-    List<Device> selectByDriverId(Long driverId);
+    List<Device> selectByDriverId(String driverId);
 
     /**
      * 根据 模板Id 查询该驱动下的全部设备
@@ -50,7 +50,7 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      * @param profileId Profile Id
      * @return Device Array
      */
-    List<Device> selectByProfileId(Long profileId);
+    List<Device> selectByProfileId(String profileId);
 
     /**
      * 根据 设备Id集 查询设备
@@ -58,6 +58,6 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      * @param ids Device Id Set
      * @return Device Array
      */
-    List<Device> selectByIds(Set<Long> ids);
+    List<Device> selectByIds(Set<String> ids);
 
 }

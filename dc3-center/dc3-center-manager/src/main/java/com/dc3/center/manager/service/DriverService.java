@@ -43,7 +43,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
      * @param port Driver Service Port
      * @return Driver
      */
-    Driver selectByHostPort(String type, String host, Integer port, Long tenantId);
+    Driver selectByHostPort(String type, String host, Integer port, String tenantId);
 
     /**
      * 根据 驱动Id 查询 驱动
@@ -51,7 +51,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
      * @param deviceId Device Id
      * @return Driver
      */
-    Driver selectByDeviceId(Long deviceId);
+    Driver selectByDeviceId(String deviceId);
 
     /**
      * 根据 驱动Id集 查询 驱动集
@@ -59,7 +59,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
      * @param ids Driver Id Array
      * @return Driver Array
      */
-    List<Driver> selectByIds(Set<Long> ids);
+    List<Driver> selectByIds(Set<String> ids);
 
     /**
      * 根据 模版Id 查询 驱动集
@@ -67,6 +67,6 @@ public interface DriverService extends Service<Driver, DriverDto> {
      * @param profileId Profile Id
      * @return Driver Array
      */
-    List<Driver> selectByProfileId(Long profileId);
+    List<Driver> selectByProfileId(String profileId);
 
 }

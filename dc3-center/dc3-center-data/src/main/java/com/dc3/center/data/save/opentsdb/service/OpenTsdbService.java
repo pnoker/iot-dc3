@@ -11,22 +11,28 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.service.impl;
+package com.dc3.center.data.save.opentsdb.service;
 
-import com.dc3.center.data.service.DataCustomService;
-import com.dc3.center.data.service.elastic.PointValueRepository;
+import com.dc3.center.data.save.strategy.SaveStrategyFactory;
+import com.dc3.center.data.save.strategy.SaveStrategyService;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.bean.point.TsPointValue;
+import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.utils.JsonUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import okhttp3.internal.annotations.EverythingIsNonNull;
+import org.apache.http.entity.ContentType;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,61 +40,46 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DataCustomServiceImpl implements DataCustomService {
+@ConditionalOnProperty(name = "data.point.sava.opentsdb.enable", havingValue = "true")
+public class OpenTsdbService implements SaveStrategyService, InitializingBean {
 
-    private static final boolean details = false;
-    private static final String putUrl = "http://dc3-opentsdb:4242/api/put";
+    @Value("${data.point.sava.opentsdb.host}")
+    private String host;
+    @Value("${data.point.sava.opentsdb.port}")
+    private Integer port;
 
     @Resource
     private OkHttpClient okHttpClient;
 
-    @Resource
-    private PointValueRepository pointValueRepository;
-
     @Override
-    public void preHandle(PointValue pointValue) {
-        // TODO 接收数据之后，存储数据之前的操作
+    public void savePointValue(PointValue pointValue) {
+        savePointValues(Collections.singletonList(pointValue));
     }
 
     @Override
-    public void postHandle(PointValue pointValue) {
-        String metric = pointValue.getDeviceId().toString();
-        List<TsPointValue> tsPointValues = convertToTsPointValues(metric, pointValue);
-        savePointValueToOpenTsdb(tsPointValues);
-    }
-
-    @Override
-    public void postHandle(Long deviceId, List<PointValue> pointValues) {
-        String metric = deviceId.toString();
-
+    public void savePointValues(List<PointValue> pointValues) {
         List<TsPointValue> tsPointValues = pointValues.stream()
-                .map(pointValue -> convertToTsPointValues(metric, pointValue))
+                .map(pointValue -> convertPointValues(pointValue.getDeviceId(), pointValue))
                 .reduce(new ArrayList<>(), (first, second) -> {
                     first.addAll(second);
                     return first;
                 });
+
         List<List<TsPointValue>> partition = Lists.partition(tsPointValues, 100);
-        partition.forEach(this::savePointValueToOpenTsdb);
+        partition.forEach(this::putPointValues);
     }
 
     @Override
-    public void afterHandle(PointValue pointValue) {
-        // TODO 接收数据之后，存储数据的时候的操作，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
+    public void afterPropertiesSet() throws Exception {
+        SaveStrategyFactory.put(CommonConstant.StrategyService.POINT_VALUE_SAVE_STRATEGY_OPENTSDB, this);
     }
 
-    /**
-     * convert point value to opentsdb point value
-     *
-     * @param metric     Metric Name
-     * @param pointValue Point Value
-     * @return TsPointValue Array
-     */
-    private List<TsPointValue> convertToTsPointValues(String metric, PointValue pointValue) {
-        String point = pointValue.getPointId().toString();
+    private List<TsPointValue> convertPointValues(String metric, PointValue pointValue) {
+        String point = pointValue.getPointId();
         String value = pointValue.getValue();
-        Long timestamp = pointValue.getOriginTime().getTime();
+        long timestamp = pointValue.getOriginTime().getTime();
 
-        List<TsPointValue> tsPointValues = new ArrayList<>(4);
+        List<TsPointValue> tsPointValues = new ArrayList<>(2);
 
         TsPointValue tsValue = new TsPointValue(metric, value);
         tsValue.setTimestamp(timestamp)
@@ -105,29 +96,24 @@ public class DataCustomServiceImpl implements DataCustomService {
         return tsPointValues;
     }
 
-    /**
-     * send point value to opentsdb
-     *
-     * @param tsPointValues TsPointValue Array
-     */
-    private void savePointValueToOpenTsdb(List<TsPointValue> tsPointValues) {
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), JsonUtil.toJsonString(tsPointValues));
+    private void putPointValues(List<TsPointValue> tsPointValues) {
+        String putUrl = String.format("http://%s:%s/api/put?details", host, port);
+        RequestBody requestBody = RequestBody.create(JsonUtil.toJsonString(tsPointValues), MediaType.parse(ContentType.APPLICATION_JSON.toString()));
         Request request = new Request.Builder()
-                .url(details ? putUrl + "?details" : putUrl)
+                .url(putUrl)
                 .post(requestBody)
                 .build();
 
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
-            @EverythingIsNonNull
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                // TODO 没有处理存储失败的情况，此处可以考虑队列，将失败的数据放入队列中
                 log.error("send pointValue to opentsdb error: {}", e.getMessage());
             }
 
             @Override
-            @EverythingIsNonNull
-            public void onResponse(Call call, Response response) throws IOException {
-                if (details && null != response.body()) {
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (null != response.body()) {
                     log.debug("send pointValue to opentsdb {}: {}", response.message(), response.body().string());
                 }
             }

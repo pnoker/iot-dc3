@@ -53,7 +53,7 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return userService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -75,7 +75,7 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Boolean> restPassword(Long id) {
+    public R<Boolean> restPassword(String id) {
         try {
             return userService.restPassword(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -84,7 +84,7 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<User> selectById(Long id) {
+    public R<User> selectById(String id) {
         try {
             User select = userService.selectById(id);
             if (null != select) {

@@ -46,7 +46,7 @@ public class PointInfoClientFallback implements FallbackFactory<PointInfoClient>
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
@@ -56,22 +56,22 @@ public class PointInfoClientFallback implements FallbackFactory<PointInfoClient>
             }
 
             @Override
-            public R<PointInfo> selectById(Long id) {
+            public R<PointInfo> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId) {
+            public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(String attributeId, String deviceId, String pointId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<PointInfo>> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+            public R<List<PointInfo>> selectByDeviceIdAndPointId(String deviceId, String pointId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<PointInfo>> selectByDeviceId(Long deviceId) {
+            public R<List<PointInfo>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }
 

@@ -39,22 +39,22 @@ public class DriverClientFallback implements FallbackFactory<DriverClient> {
         return new DriverClient() {
 
             @Override
-            public R<Driver> add(Driver driver, Long tenantId) {
+            public R<Driver> add(Driver driver, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Driver> update(Driver driver, Long tenantId) {
+            public R<Driver> update(Driver driver, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Driver> selectById(Long id) {
+            public R<Driver> selectById(String id) {
                 return R.fail(message);
             }
 
@@ -64,12 +64,12 @@ public class DriverClientFallback implements FallbackFactory<DriverClient> {
             }
 
             @Override
-            public R<Driver> selectByHostPort(String type, String host, Integer port, Long tenantId) {
+            public R<Driver> selectByHostPort(String type, String host, Integer port, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Driver>> list(DriverDto driverDto, Long tenantId) {
+            public R<Page<Driver>> list(DriverDto driverDto, String tenantId) {
                 return R.fail(message);
             }
 

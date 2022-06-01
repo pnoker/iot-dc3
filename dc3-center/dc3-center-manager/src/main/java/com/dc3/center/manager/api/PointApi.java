@@ -47,7 +47,7 @@ public class PointApi implements PointClient {
     private NotifyService notifyService;
 
     @Override
-    public R<Point> add(Point point, Long tenantId) {
+    public R<Point> add(Point point, String tenantId) {
         try {
             Point add = pointService.add(point.setTenantId(tenantId));
             if (null != add) {
@@ -61,7 +61,7 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             Point point = pointService.selectById(id);
             if (null != point && pointService.delete(id)) {
@@ -75,7 +75,7 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Point> update(Point point, Long tenantId) {
+    public R<Point> update(Point point, String tenantId) {
         try {
             Point update = pointService.update(point.setTenantId(tenantId));
             if (null != update) {
@@ -89,7 +89,7 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Point> selectById(Long id) {
+    public R<Point> selectById(String id) {
         try {
             Point select = pointService.selectById(id);
             if (null != select) {
@@ -102,7 +102,7 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<List<Point>> selectByProfileId(Long profileId) {
+    public R<List<Point>> selectByProfileId(String profileId) {
         try {
             List<Point> select = pointService.selectByProfileId(profileId);
             if (null != select) {
@@ -115,7 +115,7 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<List<Point>> selectByDeviceId(Long deviceId) {
+    public R<List<Point>> selectByDeviceId(String deviceId) {
         try {
             List<Point> select = pointService.selectByDeviceId(deviceId);
             if (null != select) {
@@ -128,7 +128,7 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Page<Point>> list(PointDto pointDto, Long tenantId) {
+    public R<Page<Point>> list(PointDto pointDto, String tenantId) {
         try {
             pointDto.setTenantId(tenantId);
             Page<Point> page = pointService.list(pointDto);
@@ -142,9 +142,9 @@ public class PointApi implements PointClient {
     }
 
     @Override
-    public R<Map<Long, String>> unit(Set<Long> pointIds) {
+    public R<Map<String, String>> unit(Set<String> pointIds) {
         try {
-            Map<Long, String> units = pointService.unit(pointIds);
+            Map<String, String> units = pointService.unit(pointIds);
             if (null != units) {
                 return R.ok(units);
             }

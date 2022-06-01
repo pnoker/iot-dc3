@@ -42,7 +42,7 @@ public class PointValueApi implements PointValueClient {
     private PointValueService pointValueService;
 
     @Override
-    public R<List<PointValue>> latest(Long deviceId, Boolean history) {
+    public R<List<PointValue>> latest(String deviceId, Boolean history) {
         try {
             List<PointValue> pointValues = pointValueService.realtime(deviceId);
             if (null == pointValues) {
@@ -71,7 +71,7 @@ public class PointValueApi implements PointValueClient {
     }
 
     @Override
-    public R<PointValue> latest(Long deviceId, Long pointId, Boolean history) {
+    public R<PointValue> latest(String deviceId, String pointId, Boolean history) {
         try {
             PointValue pointValue = pointValueService.realtime(deviceId, pointId);
             if (null == pointValue) {

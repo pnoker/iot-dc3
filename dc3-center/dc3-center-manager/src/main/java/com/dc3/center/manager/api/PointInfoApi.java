@@ -59,7 +59,7 @@ public class PointInfoApi implements PointInfoClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             PointInfo pointInfo = pointInfoService.selectById(id);
             if (null != pointInfo && pointInfoService.delete(id)) {
@@ -87,7 +87,7 @@ public class PointInfoApi implements PointInfoClient {
     }
 
     @Override
-    public R<PointInfo> selectById(Long id) {
+    public R<PointInfo> selectById(String id) {
         try {
             PointInfo select = pointInfoService.selectById(id);
             if (null != select) {
@@ -100,7 +100,7 @@ public class PointInfoApi implements PointInfoClient {
     }
 
     @Override
-    public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId) {
+    public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(String attributeId, String deviceId, String pointId) {
         try {
             PointInfo select = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
             if (null != select) {
@@ -113,7 +113,7 @@ public class PointInfoApi implements PointInfoClient {
     }
 
     @Override
-    public R<List<PointInfo>> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+    public R<List<PointInfo>> selectByDeviceIdAndPointId(String deviceId, String pointId) {
         try {
             List<PointInfo> select = pointInfoService.selectByDeviceIdAndPointId(deviceId, pointId);
             if (null != select) {
@@ -126,7 +126,7 @@ public class PointInfoApi implements PointInfoClient {
     }
 
     @Override
-    public R<List<PointInfo>> selectByDeviceId(Long deviceId) {
+    public R<List<PointInfo>> selectByDeviceId(String deviceId) {
         try {
             List<PointInfo> select = pointInfoService.selectByDeviceId(deviceId);
             if (null != select) {

@@ -36,13 +36,13 @@ public interface DictionaryService {
      *
      * @return
      */
-    List<Dictionary> userDictionary(Long tenantId);
+    List<Dictionary> userDictionary(String tenantId);
 
     /**
      * 获取 Ip 黑名单字典
      *
      * @return
      */
-    List<Dictionary> blackIpDictionary(Long tenantId);
+    List<Dictionary> blackIpDictionary(String tenantId);
 
 }

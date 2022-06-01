@@ -65,8 +65,4 @@ public class TokenApi implements TokenClient {
     public R<Boolean> cancelToken(Login login) {
         return tokenService.cancelToken(login.getName()) ? R.ok() : R.fail();
     }
-
-    /*static void main(String[] args) {
-        System.out.println(Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6" + "dsb785i4ikx0h4wt"));
-    }*/
 }

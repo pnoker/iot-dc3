@@ -43,42 +43,42 @@ public class PointClientFallback implements FallbackFactory<PointClient> {
         return new PointClient() {
 
             @Override
-            public R<Point> add(Point point, Long tenantId) {
+            public R<Point> add(Point point, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Point> update(Point point, Long tenantId) {
+            public R<Point> update(Point point, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Point> selectById(Long id) {
+            public R<Point> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Point>> selectByDeviceId(Long deviceId) {
+            public R<List<Point>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Point>> selectByProfileId(Long profileId) {
+            public R<List<Point>> selectByProfileId(String profileId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Point>> list(PointDto pointDto, Long tenantId) {
+            public R<Page<Point>> list(PointDto pointDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Map<Long, String>> unit(Set<Long> pointIds) {
+            public R<Map<String, String>> unit(Set<String> pointIds) {
                 return R.fail(message);
             }
 

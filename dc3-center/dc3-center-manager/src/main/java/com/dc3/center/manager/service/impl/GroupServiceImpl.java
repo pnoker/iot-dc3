@@ -82,7 +82,7 @@ public class GroupServiceImpl implements GroupService {
                     @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return groupMapper.deleteById(id) > 0;
     }
@@ -111,7 +111,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Group selectById(Long id) {
+    public Group selectById(String id) {
         Group group = groupMapper.selectById(id);
         if (null == group) {
             throw new NotFoundException("The group does not exist");
@@ -121,7 +121,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
-    public Group selectByName(String name, Long tenantId) {
+    public Group selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         queryWrapper.eq(Group::getName, name);
         Group group = groupMapper.selectOne(queryWrapper);

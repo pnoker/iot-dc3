@@ -29,35 +29,35 @@ public interface DictionaryService {
      *
      * @return Dictionary Array
      */
-    List<Dictionary> driverDictionary(Long tenantId);
+    List<Dictionary> driverDictionary(String tenantId);
 
     /**
      * 获取驱动配置属性字典
      *
      * @return Dictionary Array
      */
-    List<Dictionary> driverAttributeDictionary(Long tenantId);
+    List<Dictionary> driverAttributeDictionary(String tenantId);
 
     /**
      * 获取位号配置属性字典
      *
      * @return Dictionary Array
      */
-    List<Dictionary> pointAttributeDictionary(Long tenantId);
+    List<Dictionary> pointAttributeDictionary(String tenantId);
 
     /**
      * 获取租户模板字典
      *
      * @return Dictionary Array
      */
-    List<Dictionary> profileDictionary(Long tenantId);
+    List<Dictionary> profileDictionary(String tenantId);
 
     /**
      * 获取租户驱动下设备字典
      *
      * @return Dictionary Array
      */
-    List<Dictionary> deviceDictionary(Long tenantId);
+    List<Dictionary> deviceDictionary(String tenantId);
 
     /**
      * 获取租户模板、设备位号字典
@@ -66,6 +66,6 @@ public interface DictionaryService {
      * @param parent
      * @return Dictionary Array
      */
-    List<Dictionary> pointDictionary(String parent, Long tenantId);
+    List<Dictionary> pointDictionary(String parent, String tenantId);
 
 }

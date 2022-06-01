@@ -17,8 +17,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -54,21 +52,18 @@ public class Device extends Description {
     private Boolean enable;
 
     @TableField(exist = false)
-    private Set<Long> profileIds = new HashSet<>(8);
+    private Set<String> profileIds = new HashSet<>(8);
 
-    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
-    private Long driverId;
+    private String driverId;
 
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long groupId;
+    private String groupId;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long tenantId;
+    private String tenantId;
 
-    public Device(String name, Long profileId, Long groupId) {
+    public Device(String name, String profileId, String groupId) {
         super();
         this.name = name;
         //this.profileId = profileId;

@@ -22,13 +22,33 @@ import java.util.List;
  *
  * @author pnoker
  */
-public interface DataCustomService {
+public interface PointValueHandleService {
 
+    /**
+     * 自定义数据处理前
+     *
+     * @param pointValue PointValue
+     */
     void preHandle(PointValue pointValue);
 
+    /**
+     * 自定义数据处理中
+     *
+     * @param pointValue PointValue
+     */
     void postHandle(PointValue pointValue);
 
-    void postHandle(Long deviceId, List<PointValue> pointValues);
+    /**
+     * 自定义数据处理中
+     *
+     * @param pointValues PointValue Array
+     */
+    void postHandle(List<PointValue> pointValues);
 
+    /**
+     * 自定义数据处理后
+     *
+     * @param pointValue PointValue
+     */
     void afterHandle(PointValue pointValue);
 }

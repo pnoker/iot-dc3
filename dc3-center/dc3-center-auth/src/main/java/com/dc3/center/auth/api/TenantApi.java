@@ -52,7 +52,7 @@ public class TenantApi implements TenantClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return tenantService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class TenantApi implements TenantClient {
     }
 
     @Override
-    public R<Tenant> selectById(Long id) {
+    public R<Tenant> selectById(String id) {
         try {
             Tenant select = tenantService.selectById(id);
             if (null != select) {

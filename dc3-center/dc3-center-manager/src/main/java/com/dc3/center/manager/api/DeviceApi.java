@@ -45,7 +45,7 @@ public class DeviceApi implements DeviceClient {
     private NotifyService notifyService;
 
     @Override
-    public R<Device> add(Device device, Long tenantId) {
+    public R<Device> add(Device device, String tenantId) {
         try {
             Device add = deviceService.add(device.setTenantId(tenantId));
             if (null != add) {
@@ -59,7 +59,7 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             Device device = deviceService.selectById(id);
             if (null != device && deviceService.delete(id)) {
@@ -73,7 +73,7 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<Device> update(Device device, Long tenantId) {
+    public R<Device> update(Device device, String tenantId) {
         try {
             Device update = deviceService.update(device.setTenantId(tenantId));
             if (null != update) {
@@ -87,7 +87,7 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<Device> selectById(Long id) {
+    public R<Device> selectById(String id) {
         try {
             Device select = deviceService.selectById(id);
             if (null != select) {
@@ -100,7 +100,7 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<List<Device>> selectByDriverId(Long driverId) {
+    public R<List<Device>> selectByDriverId(String driverId) {
         try {
             List<Device> select = deviceService.selectByDriverId(driverId);
             if (null != select) {
@@ -113,7 +113,7 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<List<Device>> selectByProfileId(Long profileId) {
+    public R<List<Device>> selectByProfileId(String profileId) {
         try {
             List<Device> select = deviceService.selectByProfileId(profileId);
             if (null != select) {
@@ -126,7 +126,7 @@ public class DeviceApi implements DeviceClient {
     }
 
     @Override
-    public R<Page<Device>> list(DeviceDto deviceDto, Long tenantId) {
+    public R<Page<Device>> list(DeviceDto deviceDto, String tenantId) {
         try {
             deviceDto.setTenantId(tenantId);
             Page<Device> page = deviceService.list(deviceDto);
