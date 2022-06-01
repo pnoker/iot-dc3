@@ -50,7 +50,7 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> userDictionary(Long tenantId) {
+    public R<List<Dictionary>> userDictionary(String tenantId) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.userDictionary(tenantId);
             if (null != dictionaryList) {
@@ -63,7 +63,7 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> blackIpDictionary(Long tenantId) {
+    public R<List<Dictionary>> blackIpDictionary(String tenantId) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.blackIpDictionary(tenantId);
             if (null != dictionaryList) {

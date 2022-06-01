@@ -21,8 +21,6 @@ import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,9 +45,8 @@ public class Description implements Serializable {
      */
     @TableId(type = IdType.ASSIGN_ID)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "Id can't be empty", groups = {Update.class})
-    private Long id;
+    private String id;
 
     /**
      * 描述信息

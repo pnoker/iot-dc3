@@ -44,7 +44,7 @@ public class TenantClientFallback implements FallbackFactory<TenantClient> {
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
@@ -54,7 +54,7 @@ public class TenantClientFallback implements FallbackFactory<TenantClient> {
             }
 
             @Override
-            public R<Tenant> selectById(Long id) {
+            public R<Tenant> selectById(String id) {
                 return R.fail(message);
             }
 

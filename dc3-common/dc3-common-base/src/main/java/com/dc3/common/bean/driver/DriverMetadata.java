@@ -38,31 +38,30 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DriverMetadata implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long driverId;
-    private Long tenantId;
-
-    private Map<Long, DriverAttribute> driverAttributeMap;
-    private Map<Long, PointAttribute> pointAttributeMap;
+    private String driverId;
+    private String tenantId;
+    private Map<String, DriverAttribute> driverAttributeMap;
+    private Map<String, PointAttribute> pointAttributeMap;
 
     /**
      * deviceId(driverAttribute.name,(driverInfo.value,driverAttribute.type))
      */
-    private Map<Long, Map<String, AttributeInfo>> driverInfoMap;
+    private Map<String, Map<String, AttributeInfo>> driverInfoMap;
 
     /**
      * deviceId(pointId(pointAttribute.name,(pointInfo.value,pointAttribute.type)))
      */
-    private Map<Long, Map<Long, Map<String, AttributeInfo>>> pointInfoMap;
+    private Map<String, Map<String, Map<String, AttributeInfo>>> pointInfoMap;
 
     /**
      * deviceId,device
      */
-    private Map<Long, Device> deviceMap;
+    private Map<String, Device> deviceMap;
 
     /**
      * profileId(pointId,point)
      */
-    private Map<Long, Map<Long, Point>> profilePointMap;
+    private Map<String, Map<String, Point>> profilePointMap;
 
     public DriverMetadata() {
         this.driverAttributeMap = new ConcurrentHashMap<>(16);

@@ -54,7 +54,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
 
-    private static Map<Long, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
+    private static Map<String, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
 
 
     @Override
@@ -103,7 +103,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return OpcUaClient
      * @throws UaException UaException
      */
-    private OpcUaClient getOpcUaClient(Long deviceId, Map<String, AttributeInfo> driverInfo) {
+    private OpcUaClient getOpcUaClient(String deviceId, Map<String, AttributeInfo> driverInfo) {
         OpcUaClient opcUaClient = clientMap.get(deviceId);
         if (null == opcUaClient) {
             try {
@@ -139,7 +139,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws ExecutionException   ExecutionException
      * @throws InterruptedException InterruptedException
      */
-    private void writeItem(Long deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo values) {
+    private void writeItem(String deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo values) {
         OpcUaClient client;
         try {
             int namespace = attribute(pointInfo, "namespace");

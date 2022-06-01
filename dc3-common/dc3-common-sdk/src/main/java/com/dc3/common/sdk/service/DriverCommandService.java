@@ -27,7 +27,7 @@ public interface DriverCommandService {
      * @param pointId  Point Id
      * @return PointValue
      */
-    PointValue read(Long deviceId, Long pointId);
+    PointValue read(String deviceId, String pointId);
 
     /**
      * 写操作
@@ -37,6 +37,6 @@ public interface DriverCommandService {
      * @param value    String Value
      * @return Boolean
      */
-    Boolean write(Long deviceId, Long pointId, String value);
+    Boolean write(String deviceId, String pointId, String value);
 
 }

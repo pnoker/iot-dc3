@@ -37,7 +37,7 @@ public interface DriverMetadataService {
      *
      * @param id Id
      */
-    void deleteProfile(Long id);
+    void deleteProfile(String id);
 
     /**
      * 向 DeviceDriver 中添加设备
@@ -51,7 +51,7 @@ public interface DriverMetadataService {
      *
      * @param id Id
      */
-    void deleteDevice(Long id);
+    void deleteDevice(String id);
 
     /**
      * 向 DeviceDriver 中添加位号
@@ -66,7 +66,7 @@ public interface DriverMetadataService {
      * @param profileId Profile Id
      * @param id        Id
      */
-    void deletePoint(Long profileId, Long id);
+    void deletePoint(String profileId, String id);
 
     /**
      * 向 DeviceDriver 中添加驱动配置信息
@@ -81,7 +81,7 @@ public interface DriverMetadataService {
      * @param deviceId    Device Id
      * @param attributeId Attribute Id
      */
-    void deleteDriverInfo(Long deviceId, Long attributeId);
+    void deleteDriverInfo(String deviceId, String attributeId);
 
     /**
      * 向 DeviceDriver 中添加位号配置信息
@@ -97,5 +97,5 @@ public interface DriverMetadataService {
      * @param pointId     Point Id
      * @param attributeId Attribute Id
      */
-    void deletePointInfo(Long deviceId, Long pointId, Long attributeId);
+    void deletePointInfo(String deviceId, String pointId, String attributeId);
 }

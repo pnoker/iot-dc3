@@ -99,9 +99,9 @@ public class EventServiceImpl implements EventService {
         long count = mongoTemplate.count(query, DeviceEvent.class);
 
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
-        int size = (int) pages.getSize();
+        long size = pages.getSize();
         long page = pages.getCurrent();
-        query.limit(size).skip(size * (page - 1));
+        query.limit((int) size).skip(size * (page - 1));
 
         List<DeviceEvent> deviceEvents = mongoTemplate.find(query, DeviceEvent.class);
 

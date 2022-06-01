@@ -40,7 +40,7 @@ public class GroupApi implements GroupClient {
     private GroupService groupService;
 
     @Override
-    public R<Group> add(Group group, Long tenantId) {
+    public R<Group> add(Group group, String tenantId) {
         try {
             Group add = groupService.add(group.setTenantId(tenantId));
             if (null != add) {
@@ -53,7 +53,7 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return groupService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> update(Group group, Long tenantId) {
+    public R<Group> update(Group group, String tenantId) {
         try {
             Group update = groupService.update(group.setTenantId(tenantId));
             if (null != update) {
@@ -75,7 +75,7 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Group> selectById(Long id) {
+    public R<Group> selectById(String id) {
         try {
             Group select = groupService.selectById(id);
             if (null != select) {
@@ -88,7 +88,7 @@ public class GroupApi implements GroupClient {
     }
 
     @Override
-    public R<Page<Group>> list(GroupDto groupDto, Long tenantId) {
+    public R<Page<Group>> list(GroupDto groupDto, String tenantId) {
         try {
             groupDto.setTenantId(tenantId);
             Page<Group> page = groupService.list(groupDto);

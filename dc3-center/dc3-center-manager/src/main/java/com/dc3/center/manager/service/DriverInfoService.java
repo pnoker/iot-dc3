@@ -33,7 +33,7 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
      * @param deviceId          Device Id
      * @return DriverInfo
      */
-    DriverInfo selectByAttributeIdAndDeviceId(Long driverAttributeId, Long deviceId);
+    DriverInfo selectByAttributeIdAndDeviceId(String driverAttributeId, String deviceId);
 
     /**
      * 根据驱动属性配置 ID 查询
@@ -41,7 +41,7 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
      * @param driverAttributeId Driver Attribute Id
      * @return DriverInfo Array
      */
-    List<DriverInfo> selectByAttributeId(Long driverAttributeId);
+    List<DriverInfo> selectByAttributeId(String driverAttributeId);
 
     /**
      * 根据设备 ID 查询
@@ -49,5 +49,5 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
      * @param deviceId Device Id
      * @return DriverInfo Array
      */
-    List<DriverInfo> selectByDeviceId(Long deviceId);
+    List<DriverInfo> selectByDeviceId(String deviceId);
 }

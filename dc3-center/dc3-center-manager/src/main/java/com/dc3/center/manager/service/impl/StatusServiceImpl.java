@@ -59,8 +59,8 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Map<Long, String> driver(DriverDto driverDto) {
-        Map<Long, String> statusMap = new HashMap<>(16);
+    public Map<String, String> driver(DriverDto driverDto) {
+        Map<String, String> statusMap = new HashMap<>(16);
 
         Page<Driver> page = driverService.list(driverDto);
         page.getRecords().forEach(driver -> {
@@ -73,7 +73,7 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public String device(Long id) {
+    public String device(String id) {
         String key = CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + id;
         String status = redisUtil.getKey(key, String.class);
         status = null != status ? status : CommonConstant.Status.OFFLINE;
@@ -81,8 +81,8 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Map<Long, String> device(DeviceDto deviceDto) {
-        Map<Long, String> statusMap = new HashMap<>(16);
+    public Map<String, String> device(DeviceDto deviceDto) {
+        Map<String, String> statusMap = new HashMap<>(16);
 
         Page<Device> page = deviceService.list(deviceDto);
         page.getRecords().forEach(device -> {
@@ -95,8 +95,8 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Map<Long, String> deviceByProfileId(Long profileId) {
-        Map<Long, String> statusMap = new HashMap<>(16);
+    public Map<String, String> deviceByProfileId(String profileId) {
+        Map<String, String> statusMap = new HashMap<>(16);
 
         profileBindService.selectDeviceIdByProfileId(profileId).forEach(id -> {
             String key = CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + id;

@@ -39,7 +39,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/add")
-    R<com.dc3.common.model.Rtmp> add(@Validated @RequestBody com.dc3.common.model.Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<com.dc3.common.model.Rtmp> add(@Validated @RequestBody com.dc3.common.model.Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Rtmp
@@ -48,7 +48,7 @@ public interface RtmpClient {
      * @return R<Boolean>
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 Rtmp
@@ -57,7 +57,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/update")
-    R<com.dc3.common.model.Rtmp> update(@RequestBody com.dc3.common.model.Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<com.dc3.common.model.Rtmp> update(@RequestBody com.dc3.common.model.Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Rtmp
@@ -66,7 +66,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @GetMapping("/id/{id}")
-    R<com.dc3.common.model.Rtmp> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<com.dc3.common.model.Rtmp> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 分页查询 Rtmp
@@ -75,7 +75,7 @@ public interface RtmpClient {
      * @return R<Page < Rtmp>>
      */
     @PostMapping("/list")
-    R<Page<com.dc3.common.model.Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<com.dc3.common.model.Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 启动 Rtmp 转码任务
@@ -84,7 +84,7 @@ public interface RtmpClient {
      * @return R<Boolean>
      */
     @PostMapping("/start/{id}")
-    R<Boolean> start(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> start(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 停止 Rtmp 转码任务
@@ -93,6 +93,6 @@ public interface RtmpClient {
      * @return R<Boolean>
      */
     @PostMapping("/stop/{id}")
-    R<Boolean> stop(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> stop(@NotNull @PathVariable(value = "id") String id);
 
 }

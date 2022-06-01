@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Data
 @Slf4j
 public class Transcode {
-    private Long id;
+    private String id;
 
     private boolean run;
     private String command;

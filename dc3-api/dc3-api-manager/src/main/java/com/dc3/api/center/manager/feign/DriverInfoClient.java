@@ -55,7 +55,7 @@ public interface DriverInfoClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 DriverInfo
@@ -73,7 +73,7 @@ public interface DriverInfoClient {
      * @return DriverInfo
      */
     @GetMapping("/id/{id}")
-    R<DriverInfo> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<DriverInfo> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 属性ID 和 设备ID 查询 DriverInfo
@@ -83,7 +83,7 @@ public interface DriverInfoClient {
      * @return DriverInfo
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}")
-    R<DriverInfo> selectByAttributeIdAndDeviceId(@NotNull @PathVariable(value = "attributeId") Long attributeId, @NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<DriverInfo> selectByAttributeIdAndDeviceId(@NotNull @PathVariable(value = "attributeId") String attributeId, @NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
      * 根据 设备ID 查询 DriverInfo
@@ -92,7 +92,7 @@ public interface DriverInfoClient {
      * @return DriverInfo Array
      */
     @GetMapping("/device_id/{deviceId}")
-    R<List<DriverInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<List<DriverInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
      * 分页查询 DriverInfo

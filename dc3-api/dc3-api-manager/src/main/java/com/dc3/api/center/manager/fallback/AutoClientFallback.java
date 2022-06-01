@@ -37,7 +37,7 @@ public class AutoClientFallback implements FallbackFactory<AutoClient> {
         return new AutoClient() {
 
             @Override
-            public R<PointDetail> autoCreateDeviceAndPoint(PointDetail pointDetail, Long tenantId) {
+            public R<PointDetail> autoCreateDeviceAndPoint(PointDetail pointDetail, String tenantId) {
                 return R.fail(message);
             }
         };

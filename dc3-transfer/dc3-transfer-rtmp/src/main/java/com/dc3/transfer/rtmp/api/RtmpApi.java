@@ -39,7 +39,7 @@ public class RtmpApi implements RtmpClient {
     private RtmpService rtmpService;
 
     @Override
-    public R<com.dc3.common.model.Rtmp> add(Rtmp rtmp, Long tenantId) {
+    public R<com.dc3.common.model.Rtmp> add(Rtmp rtmp, String tenantId) {
         try {
             com.dc3.common.model.Rtmp add = rtmpService.add(rtmp.setTenantId(tenantId));
             if (null != add) {
@@ -52,7 +52,7 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return rtmpService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<com.dc3.common.model.Rtmp> update(Rtmp rtmp, Long tenantId) {
+    public R<com.dc3.common.model.Rtmp> update(Rtmp rtmp, String tenantId) {
         try {
             com.dc3.common.model.Rtmp update = rtmpService.update(rtmp.setTenantId(tenantId));
             if (null != update) {
@@ -74,7 +74,7 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<com.dc3.common.model.Rtmp> selectById(Long id) {
+    public R<com.dc3.common.model.Rtmp> selectById(String id) {
         try {
             com.dc3.common.model.Rtmp select = rtmpService.selectById(id);
             if (null != select) {
@@ -87,7 +87,7 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Page<com.dc3.common.model.Rtmp>> list(RtmpDto rtmpDto, Long tenantId) {
+    public R<Page<com.dc3.common.model.Rtmp>> list(RtmpDto rtmpDto, String tenantId) {
         try {
             rtmpDto.setTenantId(tenantId);
             Page<com.dc3.common.model.Rtmp> page = rtmpService.list(rtmpDto);
@@ -101,7 +101,7 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Boolean> start(Long id) {
+    public R<Boolean> start(String id) {
         try {
             return rtmpService.start(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -110,7 +110,7 @@ public class RtmpApi implements RtmpClient {
     }
 
     @Override
-    public R<Boolean> stop(Long id) {
+    public R<Boolean> stop(String id) {
         try {
             return rtmpService.stop(id) ? R.ok() : R.fail();
         } catch (Exception e) {

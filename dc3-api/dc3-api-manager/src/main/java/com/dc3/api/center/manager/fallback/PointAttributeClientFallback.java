@@ -47,7 +47,7 @@ public class PointAttributeClientFallback implements FallbackFactory<PointAttrib
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
@@ -57,12 +57,12 @@ public class PointAttributeClientFallback implements FallbackFactory<PointAttrib
             }
 
             @Override
-            public R<PointAttribute> selectById(Long id) {
+            public R<PointAttribute> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<PointAttribute>> selectByDriverId(@NotNull Long id) {
+            public R<List<PointAttribute>> selectByDriverId(@NotNull String id) {
                 return R.fail(message);
             }
 

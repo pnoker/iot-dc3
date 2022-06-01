@@ -41,37 +41,37 @@ public class DeviceClientFallback implements FallbackFactory<DeviceClient> {
         return new DeviceClient() {
 
             @Override
-            public R<Device> add(Device device, Long tenantId) {
+            public R<Device> add(Device device, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Device> update(Device device, Long tenantId) {
+            public R<Device> update(Device device, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Device> selectById(Long id) {
+            public R<Device> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Device>> selectByDriverId(Long driverId) {
+            public R<List<Device>> selectByDriverId(String driverId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Device>> selectByProfileId(Long profileId) {
+            public R<List<Device>> selectByProfileId(String profileId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Device>> list(DeviceDto deviceDto, Long tenantId) {
+            public R<Page<Device>> list(DeviceDto deviceDto, String tenantId) {
                 return R.fail(message);
             }
 

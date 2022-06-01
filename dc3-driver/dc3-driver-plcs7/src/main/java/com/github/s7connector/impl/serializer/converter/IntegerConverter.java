@@ -64,7 +64,7 @@ public class IntegerConverter implements S7Serializable {
     public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
                        final int size) {
         final Integer value = (Integer) javaType;
-        final byte lower = (byte) ((value >> 0) & 0xFF);
+        final byte lower = (byte) ((value) & 0xFF);
         final byte higher = (byte) ((value >> 8) & 0xFF);
         buffer[byteOffset + OFFSET_LOW_BYTE] = lower;
         buffer[byteOffset + OFFSET_HIGH_BYTE] = higher;

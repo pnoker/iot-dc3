@@ -81,7 +81,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
                     @CacheEvict(value = CacheConstant.Entity.DRIVER_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return driverAttributeMapper.deleteById(id) > 0;
     }
@@ -111,7 +111,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public DriverAttribute selectById(Long id) {
+    public DriverAttribute selectById(String id) {
         DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
         if (null == driverAttribute) {
             throw new NotFoundException("The driver attribute does not exist");
@@ -121,7 +121,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
-    public DriverAttribute selectByNameAndDriverId(String name, Long driverId) {
+    public DriverAttribute selectByNameAndDriverId(String name, String driverId) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         queryWrapper.eq(DriverAttribute::getName, name);
         queryWrapper.eq(DriverAttribute::getDriverId, driverId);
@@ -134,7 +134,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, key = "#driverId", unless = "#result==null")
-    public List<DriverAttribute> selectByDriverId(Long driverId) {
+    public List<DriverAttribute> selectByDriverId(String driverId) {
         DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
         driverAttributeDto.setDriverId(driverId);
         List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributeDto));

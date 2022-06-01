@@ -16,7 +16,7 @@ package com.dc3.center.data.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.api.center.manager.feign.DeviceClient;
 import com.dc3.api.center.manager.feign.PointClient;
-import com.dc3.center.data.service.DataCustomService;
+import com.dc3.center.data.service.PointValueHandleService;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
@@ -58,7 +58,7 @@ public class PointValueServiceImpl implements PointValueService {
     @Resource
     private MongoTemplate mongoTemplate;
     @Resource
-    private DataCustomService dataCustomService;
+    private PointValueHandleService pointValueHandleService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
@@ -68,7 +68,7 @@ public class PointValueServiceImpl implements PointValueService {
             pointValue.setCreateTime(new Date());
             threadPoolExecutor.execute(() -> {
                 try {
-                    dataCustomService.postHandle(pointValue);
+                    pointValueHandleService.postHandle(pointValue);
                 } catch (Exception e) {
                     log.error("Save point values to post handle error {}", e.getMessage());
                 }
@@ -96,11 +96,11 @@ public class PointValueServiceImpl implements PointValueService {
             if (pointValues.size() > 0) {
 
                 final List<PointValue> saveValues = pointValues.stream().map(pointValue -> pointValue.setCreateTime(new Date())).collect(Collectors.toList());
-                final Map<Long, List<PointValue>> listMap = saveValues.stream().collect(Collectors.groupingBy(PointValue::getDeviceId));
+                final Map<String, List<PointValue>> listMap = saveValues.stream().collect(Collectors.groupingBy(PointValue::getDeviceId));
 
                 threadPoolExecutor.execute(() -> {
                     try {
-                        listMap.forEach((deviceId, list) -> dataCustomService.postHandle(deviceId, list));
+                        listMap.values().forEach((list) -> pointValueHandleService.postHandle(list));
                     } catch (Exception e) {
                         log.error("Save point values to post handle error {}", e.getMessage());
                     }
@@ -129,7 +129,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public List<PointValue> realtime(Long deviceId) {
+    public List<PointValue> realtime(String deviceId) {
         R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
         if (!listR.isOk()) {
             String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE;
@@ -146,7 +146,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public PointValue realtime(Long deviceId, Long pointId) {
+    public PointValue realtime(String deviceId, String pointId) {
         String key = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE + pointId;
         PointValue pointValue = redisUtil.getKey(key, PointValue.class);
         if (null != pointValue) {
@@ -156,7 +156,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public List<PointValue> latest(Long deviceId) {
+    public List<PointValue> latest(String deviceId) {
         List<PointValue> pointValues = new ArrayList<>();
 
         R<Device> deviceR = deviceClient.selectById(deviceId);
@@ -179,7 +179,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public PointValue latest(Long deviceId, Long pointId) {
+    public PointValue latest(String deviceId, String pointId) {
         R<Device> deviceR = deviceClient.selectById(deviceId);
         if (!deviceR.isOk()) {
             return null;
@@ -237,7 +237,7 @@ public class PointValueServiceImpl implements PointValueService {
             criteria.and("originTime").gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
-        final String collection = null != pointValueDto.getDeviceId() ? pointValueDto.getDeviceId().toString() : "pointValue";
+        final String collection = null != pointValueDto.getDeviceId() ? pointValueDto.getDeviceId() : "pointValue";
         Future<Long> count = threadPoolExecutor.submit(() -> {
             Query query = new Query(criteria);
             return mongoTemplate.count(query, PointValue.class, collection);
@@ -245,7 +245,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
             Query query = new Query(criteria);
-            query.limit(pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
+            query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
             query.with(Sort.by(Sort.Direction.DESC, "originTime"));
             return mongoTemplate.find(query, PointValue.class, collection);
         });
@@ -280,8 +280,8 @@ public class PointValueServiceImpl implements PointValueService {
      * @param deviceId   Device Id
      * @param pointValue Point Value
      */
-    private void savePointValueToMongo(final Long deviceId, final PointValue pointValue) {
-        String collection = deviceId.toString();
+    private void savePointValueToMongo(final String deviceId, final PointValue pointValue) {
+        String collection = CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId;
         ensurePointValueIndex(collection);
         mongoTemplate.insert(pointValue, collection);
     }
@@ -292,8 +292,8 @@ public class PointValueServiceImpl implements PointValueService {
      * @param deviceId    Device Id
      * @param pointValues Point Value Array
      */
-    private void savePointValuesToMongo(final Long deviceId, final List<PointValue> pointValues) {
-        String collection = deviceId.toString();
+    private void savePointValuesToMongo(final String deviceId, final List<PointValue> pointValues) {
+        String collection = CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId;
         ensurePointValueIndex(collection);
         mongoTemplate.insert(pointValues, collection);
     }
@@ -330,7 +330,7 @@ public class PointValueServiceImpl implements PointValueService {
         redisUtil.setKey(valueMap, expireMap);
     }
 
-    private PointValue latestPointValue(Long deviceId, Long pointId) {
+    private PointValue latestPointValue(String deviceId, String pointId) {
         PointValue pointValue;
 
         Criteria criteria = new Criteria();
@@ -338,7 +338,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         Query query = new Query(criteria);
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
-        pointValue = mongoTemplate.findOne(query, PointValue.class, deviceId.toString());
+        pointValue = mongoTemplate.findOne(query, PointValue.class, deviceId);
 
         if (null != pointValue) {
             pointValue.setTimeOut(null).setTimeUnit(null);

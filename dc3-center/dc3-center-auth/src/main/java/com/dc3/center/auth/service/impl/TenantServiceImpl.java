@@ -79,7 +79,7 @@ public class TenantServiceImpl implements TenantService {
                     @CacheEvict(value = CacheConstant.Entity.TENANT + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         Tenant tenant = selectById(id);
         if (null == tenant) {
             throw new NotFoundException("The tenant does not exist");
@@ -110,7 +110,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.TENANT + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Tenant selectById(Long id) {
+    public Tenant selectById(String id) {
         return tenantMapper.selectById(id);
     }
 

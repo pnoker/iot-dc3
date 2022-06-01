@@ -17,8 +17,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -61,8 +59,7 @@ public class Driver extends Description {
     private Boolean enable;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long tenantId;
+    private String tenantId;
 
     @TableField(exist = false)
     private String status;

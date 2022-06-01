@@ -15,16 +15,16 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kube-dc3
+  name: dc3
   labels:
-    dc3.version: develop
+    dc3.version: 2022.1.0
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: dc3net
-  namespace: kube-dc3
+  namespace: dc3
 spec:
   podSelector:
     matchLabels:
@@ -71,17 +71,17 @@ apiVersion: v1
 kind: Secret
 metadata:
   labels:
-    k8s-app: kube-dc3
-  name: kube-dc3-certs
-  namespace: kube-dc3
+    k8s-app: dc3
+  name: dc3-secret
+  namespace: dc3
 type: Opaque
 
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dc3-ingress
-  namespace: kube-dc3
+  namespace: dc3
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -89,36 +89,54 @@ spec:
     - http:
         paths:
           - path: /dc3/demo
+            pathType: Prefix
             backend:
-              serviceName: dc3-web
-              servicePort: 80
+              service:
+                name: dc3-web
+                port:
+                  number: 80
           - path: /dc3/gateway
+            pathType: Prefix
             backend:
-              serviceName: dc3-center-monitor
-              servicePort: 8000
+              service:
+                name: dc3-center-monitor
+                port:
+                  number: 8000
           - path: /dc3/register
+            pathType: Prefix
             backend:
-              serviceName: dc3-center-register
-              servicePort: 8100
+              service:
+                name: dc3-center-register
+                port:
+                  number: 8100
           - path: /dc3/monitor
+            pathType: Prefix
             backend:
-              serviceName: dc3-center-monitor
-              servicePort: 8200
+              service:
+                name: dc3-center-monitor
+                port:
+                  number: 8200
           - path: /eureka/
+            pathType: Prefix
             backend:
-              serviceName: dc3-center-register
-              servicePort: 8100
+              service:
+                name: dc3-center-register
+                port:
+                  number: 8100
           - path: /monitor/
+            pathType: Prefix
             backend:
-              serviceName: dc3-center-monitor
-              servicePort: 8200
+              service:
+                name: dc3-center-monitor
+                port:
+                  number: 8200
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: dc3-web
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-web
 spec:
@@ -137,7 +155,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-center-register
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-register
 spec:
@@ -153,7 +171,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-center-monitor
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-monitor
 spec:
@@ -169,7 +187,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-gateway
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-gateway
 spec:
@@ -185,7 +203,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-center-auth
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-auth
 spec:
@@ -201,7 +219,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-center-manager
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-manager
 spec:
@@ -217,7 +235,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-center-data
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-data
 spec:
@@ -233,7 +251,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-mysql
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-mysql
 spec:
@@ -249,7 +267,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-redis
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-redis
 spec:
@@ -265,7 +283,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-rabbitmq
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-rabbitmq
 spec:
@@ -290,7 +308,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dc3-mongo
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-mongo
 spec:
@@ -306,7 +324,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-web
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-web
 spec:
@@ -332,13 +350,16 @@ spec:
           ports:
             - containerPort: 80
             - containerPort: 443
+          env:
+            - name: NODE_ENV
+              value: "test"
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-center-register
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-register
 spec:
@@ -364,6 +385,8 @@ spec:
           ports:
             - containerPort: 8100
           env:
+            - name: NODE_ENV
+              value: "test"
             - name: EUREKA_DASHBOARD_PATH
               value: "/dc3/register"
 
@@ -372,7 +395,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-center-monitor
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-monitor
 spec:
@@ -398,6 +421,8 @@ spec:
           ports:
             - containerPort: 8200
           env:
+            - name: NODE_ENV
+              value: "test"
             - name: MONITOR_CONTEXT_PATH
               value: "/dc3/monitor"
             - name: MONITOR_PUBLIC_URL
@@ -408,7 +433,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-gateway
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-gateway
 spec:
@@ -433,13 +458,16 @@ spec:
           image: dc3.local/dc3-gateway:1.0.0
           ports:
             - containerPort: 8000
+          env:
+            - name: NODE_ENV
+              value: "test"
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-center-auth
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-auth
 spec:
@@ -464,13 +492,16 @@ spec:
           image: dc3.local/dc3-center-auth:1.0.0
           ports:
             - containerPort: 8300
+          env:
+            - name: NODE_ENV
+              value: "test"
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-center-manager
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-manager
 spec:
@@ -495,13 +526,16 @@ spec:
           image: dc3.local/dc3-center-manager:1.0.0
           ports:
             - containerPort: 8400
+          env:
+            - name: NODE_ENV
+              value: "test"
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-center-data
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-center-data
 spec:
@@ -526,13 +560,16 @@ spec:
           image: dc3.local/dc3-center-data:1.0.0
           ports:
             - containerPort: 8500
+          env:
+            - name: NODE_ENV
+              value: "test"
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-mysql
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-mysql
 spec:
@@ -563,7 +600,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-redis
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-redis
 spec:
@@ -594,7 +631,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-rabbitmq
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-rabbitmq
 spec:
@@ -628,7 +665,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-mongo
-  namespace: kube-dc3
+  namespace: dc3
   labels:
     dc3.service: dc3-mongo
 spec:

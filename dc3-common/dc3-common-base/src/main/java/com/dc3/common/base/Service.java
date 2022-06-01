@@ -36,7 +36,7 @@ public interface Service<T, D> {
      * @param id Object Id
      * @return Boolean
      */
-    boolean delete(Long id);
+    boolean delete(String id);
 
     /**
      * 更新
@@ -52,7 +52,7 @@ public interface Service<T, D> {
      * @param id Object Id
      * @return Object
      */
-    T selectById(Long id);
+    T selectById(String id);
 
     /**
      * 获取带分页、排序

@@ -96,7 +96,7 @@ public class PointServiceImpl implements PointService {
                     @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return pointMapper.deleteById(id) > 0;
     }
@@ -138,7 +138,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Point selectById(Long id) {
+    public Point selectById(String id) {
         Point point = pointMapper.selectById(id);
         if (null == point) {
             throw new NotFoundException("The point does not exist");
@@ -148,7 +148,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.NAME + CacheConstant.Suffix.PROFILE_ID, key = "#name+'.'+#profileId", unless = "#result==null")
-    public Point selectByNameAndProfileId(String name, Long profileId) {
+    public Point selectByNameAndProfileId(String name, String profileId) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         queryWrapper.eq(Point::getName, name);
         queryWrapper.eq(Point::getProfileId, profileId);
@@ -160,14 +160,14 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<Point> selectByDeviceId(Long deviceId) {
-        Set<Long> profileIds = profileBindService.selectProfileIdByDeviceId(deviceId);
+    public List<Point> selectByDeviceId(String deviceId) {
+        Set<String> profileIds = profileBindService.selectProfileIdByDeviceId(deviceId);
         return selectByProfileIds(profileIds);
     }
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.PROFILE_ID + CacheConstant.Suffix.LIST, key = "#profileId", unless = "#result==null")
-    public List<Point> selectByProfileId(Long profileId) {
+    public List<Point> selectByProfileId(String profileId) {
         PointDto pointDto = new PointDto();
         pointDto.setProfileId(profileId);
         List<Point> points = pointMapper.selectList(fuzzyQuery(pointDto));
@@ -179,7 +179,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public List<Point> selectByProfileIds(Set<Long> profileIds) {
+    public List<Point> selectByProfileIds(Set<String> profileIds) {
         List<Point> points = new ArrayList<>(16);
         profileIds.forEach(profileId -> {
             PointDto pointDto = new PointDto();
@@ -206,7 +206,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.UNIT, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public Map<Long, String> unit(Set<Long> pointIds) {
+    public Map<String, String> unit(Set<String> pointIds) {
         List<Point> points = pointMapper.selectBatchIds(pointIds);
         return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
     }

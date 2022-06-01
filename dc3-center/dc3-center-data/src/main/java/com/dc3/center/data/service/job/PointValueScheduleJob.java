@@ -16,6 +16,7 @@ package com.dc3.center.data.service.job;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.common.bean.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +52,7 @@ public class PointValueScheduleJob extends QuartzJobBean {
     public static AtomicLong valueCount = new AtomicLong(0), valueSpeed = new AtomicLong(0);
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    protected void executeInternal(@NotNull JobExecutionContext jobExecutionContext) throws JobExecutionException {
         // Statistical point value receive rate
         long speed = valueCount.getAndSet(0);
         valueSpeed.set(speed);

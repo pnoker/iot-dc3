@@ -49,12 +49,12 @@ public class PointValue implements Serializable {
     /**
      * 设备ID，同MySQl中等 设备ID 一致
      */
-    private Long deviceId;
+    private String deviceId;
 
     /**
      * 位号ID，同MySQl中等 位号ID 一致
      */
-    private Long pointId;
+    private String pointId;
 
     /**
      * 处理值，进行过缩放、格式化等操作
@@ -98,13 +98,13 @@ public class PointValue implements Serializable {
     @JsonFormat(pattern = CommonConstant.Time.COMPLETE_DATE_FORMAT, timezone = CommonConstant.Time.TIMEZONE)
     private Date createTime;
 
-    public PointValue(Long pointId, String rawValue, String value) {
+    public PointValue(String pointId, String rawValue, String value) {
         this.pointId = pointId;
         this.rawValue = rawValue;
         this.value = value;
     }
 
-    public PointValue(Long deviceId, Long pointId, String rawValue, String value) {
+    public PointValue(String deviceId, String pointId, String rawValue, String value) {
         this.deviceId = deviceId;
         this.pointId = pointId;
         this.rawValue = rawValue;
@@ -112,7 +112,7 @@ public class PointValue implements Serializable {
         this.originTime = new Date();
     }
 
-    public PointValue(Long deviceId, Long pointId, String rawValue, String value, int timeOut, TimeUnit timeUnit) {
+    public PointValue(String deviceId, String pointId, String rawValue, String value, int timeOut, TimeUnit timeUnit) {
         this.deviceId = deviceId;
         this.pointId = pointId;
         this.rawValue = rawValue;
@@ -122,13 +122,13 @@ public class PointValue implements Serializable {
         this.originTime = new Date();
     }
 
-    public PointValue(Long deviceId, List<PointValue> children) {
+    public PointValue(String deviceId, List<PointValue> children) {
         this.deviceId = deviceId;
         this.children = children;
         this.originTime = new Date();
     }
 
-    public PointValue(Long deviceId, List<PointValue> children, int timeOut, TimeUnit timeUnit) {
+    public PointValue(String deviceId, List<PointValue> children, int timeOut, TimeUnit timeUnit) {
         this.deviceId = deviceId;
         this.children = children;
         this.timeOut = timeOut;

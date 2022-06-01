@@ -32,10 +32,10 @@ import javax.validation.constraints.NotNull;
 @Accessors(chain = true)
 public class CmdParameter {
     @NotNull(message = "device id can't be empty", groups = {Read.class, Write.class})
-    private Long deviceId;
+    private String deviceId;
 
     @NotNull(message = "point id can't be empty", groups = {Read.class, Write.class})
-    private Long pointId;
+    private String pointId;
 
     @NotBlank(message = "value can't be empty", groups = {Write.class})
     private String value;

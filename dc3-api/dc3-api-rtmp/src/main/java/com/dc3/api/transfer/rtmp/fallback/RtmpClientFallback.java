@@ -38,37 +38,37 @@ public class RtmpClientFallback implements FallbackFactory<RtmpClient> {
 
         return new RtmpClient() {
             @Override
-            public R<Rtmp> add(Rtmp rtmp, Long tenantId) {
+            public R<Rtmp> add(Rtmp rtmp, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Rtmp> update(Rtmp rtmp, Long tenantId) {
+            public R<Rtmp> update(Rtmp rtmp, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Rtmp> selectById(Long id) {
+            public R<Rtmp> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Rtmp>> list(RtmpDto rtmpDto, Long tenantId) {
+            public R<Page<Rtmp>> list(RtmpDto rtmpDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> start(Long id) {
+            public R<Boolean> start(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> stop(Long id) {
+            public R<Boolean> stop(String id) {
                 return R.fail(message);
             }
         };

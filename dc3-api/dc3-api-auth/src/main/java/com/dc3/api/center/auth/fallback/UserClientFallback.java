@@ -44,7 +44,7 @@ public class UserClientFallback implements FallbackFactory<UserClient> {
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
@@ -54,12 +54,12 @@ public class UserClientFallback implements FallbackFactory<UserClient> {
             }
 
             @Override
-            public R<Boolean> restPassword(Long id) {
+            public R<Boolean> restPassword(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<User> selectById(Long id) {
+            public R<User> selectById(String id) {
                 return R.fail(message);
             }
 

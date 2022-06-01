@@ -50,7 +50,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> driverDictionary(Long tenantId) {
+    public List<Dictionary> driverDictionary(String tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getTenantId, tenantId);
@@ -61,7 +61,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_ATTRIBUTE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> driverAttributeDictionary(Long tenantId) {
+    public List<Dictionary> driverAttributeDictionary(String tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
             List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
@@ -71,7 +71,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             driverAttributeList.forEach(driverAttribute -> driverAttributeDictionaryList.add(new Dictionary().setLabel(driverAttribute.getDisplayName()).setValue(driverAttribute.getId())));
 
             driverDictionary.setDisabled(true);
-            driverDictionary.setValue(RandomUtil.randomLong());
+            driverDictionary.setValue(RandomUtil.randomString(8));
             driverDictionary.setChildren(driverAttributeDictionaryList);
         });
         return dictionaries;
@@ -79,7 +79,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> pointAttributeDictionary(Long tenantId) {
+    public List<Dictionary> pointAttributeDictionary(String tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
             List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
@@ -89,7 +89,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             pointAttributeList.forEach(pointAttribute -> driverAttributeDictionaryList.add(new Dictionary().setLabel(pointAttribute.getDisplayName()).setValue(pointAttribute.getId())));
 
             driverDictionary.setDisabled(true);
-            driverDictionary.setValue(RandomUtil.randomLong());
+            driverDictionary.setValue(RandomUtil.randomString(8));
             driverDictionary.setChildren(driverAttributeDictionaryList);
         });
         return dictionaries;
@@ -97,7 +97,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> profileDictionary(Long tenantId) {
+    public List<Dictionary> profileDictionary(String tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getTenantId, tenantId);
@@ -108,7 +108,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> deviceDictionary(Long tenantId) {
+    public List<Dictionary> deviceDictionary(String tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
             LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
@@ -125,7 +125,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.DIC, key = "'dic.'+#parent+'.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> pointDictionary(String parent, Long tenantId) {
+    public List<Dictionary> pointDictionary(String parent, String tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         switch (parent) {
             case "profile":

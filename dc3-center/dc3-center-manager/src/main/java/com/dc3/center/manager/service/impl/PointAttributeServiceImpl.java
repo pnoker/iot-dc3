@@ -82,7 +82,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
                     @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return pointAttributeMapper.deleteById(id) > 0;
     }
@@ -112,7 +112,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public PointAttribute selectById(Long id) {
+    public PointAttribute selectById(String id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
         if (null == pointAttribute) {
             throw new NotFoundException("The point attribute does not exist");
@@ -122,7 +122,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
-    public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
+    public PointAttribute selectByNameAndDriverId(String name, String driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         queryWrapper.eq(PointAttribute::getName, name);
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
@@ -135,7 +135,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, key = "#driverId", unless = "#result==null")
-    public List<PointAttribute> selectByDriverId(Long driverId) {
+    public List<PointAttribute> selectByDriverId(String driverId) {
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setDriverId(driverId);
         List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributeDto));

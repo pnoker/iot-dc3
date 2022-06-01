@@ -33,7 +33,7 @@ public interface DriverAttributeService extends Service<DriverAttribute, DriverA
      * @param driverId 驱动ID
      * @return DriverAttribute
      */
-    DriverAttribute selectByNameAndDriverId(String name, Long driverId);
+    DriverAttribute selectByNameAndDriverId(String name, String driverId);
 
     /**
      * 根据驱动 ID 查询
@@ -41,5 +41,5 @@ public interface DriverAttributeService extends Service<DriverAttribute, DriverA
      * @param driverId 驱动ID
      * @return DriverAttribute Array
      */
-    List<DriverAttribute> selectByDriverId(Long driverId);
+    List<DriverAttribute> selectByDriverId(String driverId);
 }

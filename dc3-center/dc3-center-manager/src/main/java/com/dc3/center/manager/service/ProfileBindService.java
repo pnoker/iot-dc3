@@ -34,7 +34,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param profileIds Profile Id Set
      * @return ProfileBind Array
      */
-    List<ProfileBind> addByDeviceId(Long deviceId, Set<Long> profileIds);
+    List<ProfileBind> addByDeviceId(String deviceId, Set<String> profileIds);
 
     /**
      * 根据 设备ID 删除关联的模版映射
@@ -42,7 +42,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param deviceId Device Id
      * @return boolean
      */
-    boolean deleteByDeviceId(Long deviceId);
+    boolean deleteByDeviceId(String deviceId);
 
     /**
      * 根据 设备ID 和 模版ID 删除关联的模版映射
@@ -51,7 +51,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param profileId Profile Id
      * @return boolean
      */
-    boolean deleteByProfileIdAndDeviceId(Long deviceId, Long profileId);
+    boolean deleteByProfileIdAndDeviceId(String deviceId, String profileId);
 
     /**
      * 根据 设备ID 和 模版ID 查询关联的模版映射
@@ -60,7 +60,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param profileId Profile Id
      * @return ProfileBind
      */
-    ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
+    ProfileBind selectByDeviceIdAndProfileId(String deviceId, String profileId);
 
     /**
      * 根据 模版ID 查询关联的 设备ID 集合
@@ -68,7 +68,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param profileId Profile Id
      * @return Device Id Set
      */
-    Set<Long> selectDeviceIdByProfileId(Long profileId);
+    Set<String> selectDeviceIdByProfileId(String profileId);
 
     /**
      * 根据 设备ID 查询关联的 模版ID 集合
@@ -76,6 +76,6 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param deviceId Device Id
      * @return Profile Id Set
      */
-    Set<Long> selectProfileIdByDeviceId(Long deviceId);
+    Set<String> selectProfileIdByDeviceId(String deviceId);
 
 }

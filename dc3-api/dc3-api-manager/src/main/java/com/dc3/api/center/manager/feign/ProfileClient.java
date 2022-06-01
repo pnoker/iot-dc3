@@ -43,7 +43,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/add")
-    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Profile
@@ -52,7 +52,7 @@ public interface ProfileClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 Profile
@@ -61,7 +61,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/update")
-    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Profile
@@ -70,7 +70,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @GetMapping("/id/{id}")
-    R<Profile> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<Profile> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 设备 ID 查询 Profile 集合
@@ -79,7 +79,7 @@ public interface ProfileClient {
      * @return Profile Array
      */
     @GetMapping("/device_id/{deviceId}")
-    R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
      * 分页查询 Profile
@@ -88,6 +88,6 @@ public interface ProfileClient {
      * @return Page<Profile>
      */
     @PostMapping("/list")
-    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

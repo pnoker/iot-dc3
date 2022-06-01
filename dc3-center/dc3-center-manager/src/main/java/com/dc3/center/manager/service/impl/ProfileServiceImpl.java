@@ -101,7 +101,7 @@ public class ProfileServiceImpl implements ProfileService {
                     @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         try {
             pointService.selectByProfileId(id);
             throw new ServiceException("The profile already bound by the point");
@@ -139,7 +139,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Profile selectById(Long id) {
+    public Profile selectById(String id) {
         Profile profile = profileMapper.selectById(id);
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
@@ -153,7 +153,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, key = "#name+'.'+#type+'.'+#tenantId", unless = "#result==null")
-    public Profile selectByNameAndType(String name, Short type, Long tenantId) {
+    public Profile selectByNameAndType(String name, Short type, String tenantId) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getName, name);
         queryWrapper.eq(Profile::getType, type);
@@ -171,7 +171,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public List<Profile> selectByIds(Set<Long> ids) {
+    public List<Profile> selectByIds(Set<String> ids) {
         List<Profile> profiles = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(ids)) {
             profiles = profileMapper.selectBatchIds(ids);
@@ -186,7 +186,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<Profile> selectByDeviceId(Long deviceId) {
+    public List<Profile> selectByDeviceId(String deviceId) {
         Device device = deviceMapper.selectById(deviceId);
         if (ObjectUtil.isNotNull(device)) {
             return selectByIds(device.getProfileIds());

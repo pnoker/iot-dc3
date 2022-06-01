@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
             }
     )
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         User user = selectById(id);
         if (null == user) {
             throw new NotFoundException("The user does not exist");
@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public User selectById(Long id) {
+    public User selectById(String id) {
         return userMapper.selectById(id);
     }
 
@@ -246,7 +246,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean restPassword(Long id) {
+    public boolean restPassword(String id) {
         User user = selectById(id);
         if (null != user) {
             user.setPassword(Dc3Util.md5(CommonConstant.Algorithm.DEFAULT_PASSWORD));

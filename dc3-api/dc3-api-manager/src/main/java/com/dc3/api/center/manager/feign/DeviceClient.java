@@ -43,7 +43,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @PostMapping("/add")
-    R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Device
@@ -52,7 +52,7 @@ public interface DeviceClient {
      * @return R<Boolean>
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 Device
@@ -61,7 +61,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @PostMapping("/update")
-    R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Device
@@ -70,7 +70,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @GetMapping("/id/{id}")
-    R<Device> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<Device> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 驱动ID 查询 Device
@@ -79,7 +79,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @GetMapping("/driver_id/{driverId}")
-    R<List<Device>> selectByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId);
+    R<List<Device>> selectByDriverId(@NotNull @PathVariable(value = "driverId") String driverId);
 
     /**
      * 根据 模板ID 查询 Device
@@ -88,7 +88,7 @@ public interface DeviceClient {
      * @return R<Device>
      */
     @GetMapping("/profile_id/{profileId}")
-    R<List<Device>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
+    R<List<Device>> selectByProfileId(@NotNull @PathVariable(value = "profileId") String profileId);
 
     /**
      * 分页查询 Device
@@ -97,6 +97,6 @@ public interface DeviceClient {
      * @return R<Page < Device>>
      */
     @PostMapping("/list")
-    R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

@@ -84,7 +84,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
                     @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return driverInfoMapper.deleteById(id) > 0;
     }
@@ -122,7 +122,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public DriverInfo selectById(Long id) {
+    public DriverInfo selectById(String id) {
         DriverInfo driverInfo = driverInfoMapper.selectById(id);
         if (null == driverInfo) {
             throw new NotFoundException("The driver info does not exist");
@@ -132,7 +132,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID, key = "#driverAttributeId+'.'+#deviceId", unless = "#result==null")
-    public DriverInfo selectByAttributeIdAndDeviceId(Long driverAttributeId, Long deviceId) {
+    public DriverInfo selectByAttributeIdAndDeviceId(String driverAttributeId, String deviceId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDriverAttributeId(driverAttributeId);
         driverInfoDto.setDeviceId(deviceId);
@@ -145,7 +145,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, key = "#driverAttributeId", unless = "#result==null")
-    public List<DriverInfo> selectByAttributeId(Long driverAttributeId) {
+    public List<DriverInfo> selectByAttributeId(String driverAttributeId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDriverAttributeId(driverAttributeId);
         List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));
@@ -157,7 +157,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, key = "#deviceId", unless = "#result==null")
-    public List<DriverInfo> selectByDeviceId(Long deviceId) {
+    public List<DriverInfo> selectByDeviceId(String deviceId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDeviceId(deviceId);
         List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));

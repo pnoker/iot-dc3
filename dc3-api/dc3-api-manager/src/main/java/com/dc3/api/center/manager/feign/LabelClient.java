@@ -42,7 +42,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/add")
-    R<Label> add(@Validated(Insert.class) @RequestBody Label label, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Label> add(@Validated(Insert.class) @RequestBody Label label, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Label
@@ -51,7 +51,7 @@ public interface LabelClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 Label
@@ -60,7 +60,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/update")
-    R<Label> update(@Validated(Update.class) @RequestBody Label label, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Label> update(@Validated(Update.class) @RequestBody Label label, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Label
@@ -69,7 +69,7 @@ public interface LabelClient {
      * @return Label
      */
     @GetMapping("/id/{id}")
-    R<Label> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<Label> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 分页查询 Label
@@ -78,6 +78,6 @@ public interface LabelClient {
      * @return Page<Label>
      */
     @PostMapping("/list")
-    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

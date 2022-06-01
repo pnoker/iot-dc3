@@ -44,12 +44,12 @@ public class DictionaryClientFallback implements FallbackFactory<DictionaryClien
             }
 
             @Override
-            public R<List<Dictionary>> userDictionary(Long tenantId) {
+            public R<List<Dictionary>> userDictionary(String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> blackIpDictionary(Long tenantId) {
+            public R<List<Dictionary>> blackIpDictionary(String tenantId) {
                 return R.fail(message);
             }
 

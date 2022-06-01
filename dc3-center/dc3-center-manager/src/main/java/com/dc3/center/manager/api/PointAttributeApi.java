@@ -55,7 +55,7 @@ public class PointAttributeApi implements PointAttributeClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return pointAttributeService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class PointAttributeApi implements PointAttributeClient {
     }
 
     @Override
-    public R<PointAttribute> selectById(Long id) {
+    public R<PointAttribute> selectById(String id) {
         try {
             PointAttribute select = pointAttributeService.selectById(id);
             if (null != select) {
@@ -90,7 +90,7 @@ public class PointAttributeApi implements PointAttributeClient {
     }
 
     @Override
-    public R<List<PointAttribute>> selectByDriverId(Long id) {
+    public R<List<PointAttribute>> selectByDriverId(String id) {
         try {
             List<PointAttribute> select = pointAttributeService.selectByDriverId(id);
             if (null != select) {

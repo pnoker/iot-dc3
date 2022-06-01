@@ -72,7 +72,7 @@ public class TenantBindServiceImpl implements TenantBindService {
                     @CacheEvict(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return tenantBindMapper.deleteById(id) > 0;
     }
@@ -99,7 +99,7 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public TenantBind selectById(Long id) {
+    public TenantBind selectById(String id) {
         TenantBind tenantBind = tenantBindMapper.selectById(id);
         if (null == tenantBind) {
             throw new NotFoundException("The tenant bind does not exist");
@@ -109,7 +109,7 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.TENANT_BIND + CacheConstant.Suffix.TENANT_ID + CacheConstant.Suffix.USER_ID, key = "#tenantId+'.'+#userId", unless = "#result==null")
-    public TenantBind selectByTenantIdAndUserId(Long tenantId, Long userId) {
+    public TenantBind selectByTenantIdAndUserId(String tenantId, String userId) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
         queryWrapper.eq(TenantBind::getTenantId, tenantId);
         queryWrapper.eq(TenantBind::getUserId, userId);

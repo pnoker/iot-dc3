@@ -77,16 +77,4 @@ public class GatewayUtil {
         }
         return cookie.getValue();
     }
-
-    /**
-     * 获取 Request Tenant
-     *
-     * @param request ServerHttpRequest
-     * @return 租户
-     */
-    public static String getTenant(ServerHttpRequest request) {
-        String path = request.getURI().getPath();
-        //TODO
-        return path;
-    }
 }

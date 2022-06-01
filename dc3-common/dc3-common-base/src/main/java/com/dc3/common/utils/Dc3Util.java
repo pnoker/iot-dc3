@@ -537,13 +537,13 @@ public class Dc3Util {
      * 从 Request 中获取指定 User ID 的 Header 值
      *
      * @param httpServletRequest HttpServletRequest
-     * @return Long
+     * @return String
      */
-    public static long getRequestUserId(HttpServletRequest httpServletRequest) {
-        long userId = -1L;
+    public static String getRequestUserId(HttpServletRequest httpServletRequest) {
+        String userId = Long.toString(-1L);
         String header = getRequestHeader(httpServletRequest, ServiceConstant.Header.X_AUTH_USER_ID);
         try {
-            userId = Long.parseLong(header.trim());
+            userId = header.trim();
             return userId;
         } catch (Exception e) {
             return userId;
@@ -554,13 +554,13 @@ public class Dc3Util {
      * 从 Request 中获取指定 Tenant ID 的 Header 值
      *
      * @param httpServletRequest HttpServletRequest
-     * @return Long
+     * @return String
      */
-    public static long getRequestTenantId(HttpServletRequest httpServletRequest) {
-        long tenantId = -1L;
+    public static String getRequestTenantId(HttpServletRequest httpServletRequest) {
+        String tenantId = Long.toString(-1L);
         String header = getRequestHeader(httpServletRequest, ServiceConstant.Header.X_AUTH_TENANT_ID);
         try {
-            tenantId = Long.parseLong(header.trim());
+            tenantId = header.trim();
             return tenantId;
         } catch (Exception e) {
             return tenantId;

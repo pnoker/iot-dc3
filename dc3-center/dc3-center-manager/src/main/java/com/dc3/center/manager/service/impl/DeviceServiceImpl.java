@@ -102,7 +102,7 @@ public class DeviceServiceImpl implements DeviceService {
                     @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         profileBindService.deleteByDeviceId(id);
         return deviceMapper.deleteById(id) > 0;
@@ -123,13 +123,13 @@ public class DeviceServiceImpl implements DeviceService {
     public Device update(Device device) {
         selectById(device.getId());
 
-        Set<Long> newProfileIds = null != device.getProfileIds() ? device.getProfileIds() : new HashSet<>();
-        Set<Long> oldProfileIds = profileBindService.selectProfileIdByDeviceId(device.getId());
+        Set<String> newProfileIds = null != device.getProfileIds() ? device.getProfileIds() : new HashSet<>();
+        Set<String> oldProfileIds = profileBindService.selectProfileIdByDeviceId(device.getId());
 
-        Set<Long> add = new HashSet<>(newProfileIds);
+        Set<String> add = new HashSet<>(newProfileIds);
         add.removeAll(oldProfileIds);
 
-        Set<Long> delete = new HashSet<>(oldProfileIds);
+        Set<String> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
 
         addProfileBind(device.getId(), add);
@@ -147,7 +147,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public Device selectById(Long id) {
+    public Device selectById(String id) {
         Device device = deviceMapper.selectById(id);
         if (null == device) {
             throw new NotFoundException("The device does not exist");
@@ -157,7 +157,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
-    public Device selectByName(String name, Long tenantId) {
+    public Device selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getName, name);
         queryWrapper.eq(Device::getTenantId, tenantId);
@@ -170,7 +170,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, key = "#driverId", unless = "#result==null")
-    public List<Device> selectByDriverId(Long driverId) {
+    public List<Device> selectByDriverId(String driverId) {
         DeviceDto deviceDto = new DeviceDto();
         deviceDto.setDriverId(driverId);
         List<Device> devices = deviceMapper.selectList(fuzzyQuery(deviceDto));
@@ -182,13 +182,13 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<Device> selectByProfileId(Long profileId) {
+    public List<Device> selectByProfileId(String profileId) {
         return selectByIds(profileBindService.selectDeviceIdByProfileId(profileId));
     }
 
     @Override
     @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
-    public List<Device> selectByIds(Set<Long> ids) {
+    public List<Device> selectByIds(Set<String> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);
         if (CollectionUtil.isEmpty(devices)) {
             throw new NotFoundException("The devices does not exist");
@@ -228,7 +228,7 @@ public class DeviceServiceImpl implements DeviceService {
         return queryWrapper;
     }
 
-    private void addProfileBind(Long deviceId, Set<Long> profileIds) {
+    private void addProfileBind(String deviceId, Set<String> profileIds) {
         if (null != profileIds) {
             profileIds.forEach(profileId -> {
                 Profile profile = profileService.selectById(profileId);

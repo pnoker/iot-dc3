@@ -18,9 +18,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.constant.ValueConstant;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -63,19 +60,16 @@ public class Point extends Description {
 
     private Boolean enable;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
-    private Long profileId;
+    private String profileId;
 
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long groupId;
+    private String groupId;
 
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private Long tenantId;
+    private String tenantId;
 
     public Point(String name, String type, Short rw, Float base, Float minimum, Float maximum, Float multiple,
-                 Boolean accrue, String format, String unit, Long profileId, Long tenantId) {
+                 Boolean accrue, String format, String unit, String profileId, String tenantId) {
         this.name = name;
         this.type = type;
         this.rw = rw;

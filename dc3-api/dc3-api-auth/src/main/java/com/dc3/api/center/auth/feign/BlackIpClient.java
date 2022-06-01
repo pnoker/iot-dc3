@@ -54,7 +54,7 @@ public interface BlackIpClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 BlackIp
@@ -75,7 +75,7 @@ public interface BlackIpClient {
      * @return BlackIp
      */
     @GetMapping("/id/{id}")
-    R<BlackIp> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<BlackIp> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 Ip 查询 BlackIp

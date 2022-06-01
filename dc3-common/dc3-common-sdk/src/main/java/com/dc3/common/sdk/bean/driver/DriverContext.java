@@ -56,7 +56,7 @@ public class DriverContext {
      * @param deviceId Device Id
      * @return Map<String, AttributeInfo>
      */
-    public Map<String, AttributeInfo> getDriverInfoByDeviceId(Long deviceId) {
+    public Map<String, AttributeInfo> getDriverInfoByDeviceId(String deviceId) {
         return this.driverMetadata.getDriverInfoMap().get(deviceId);
     }
 
@@ -64,10 +64,10 @@ public class DriverContext {
      * 根据 设备Id 获取连接设备的全部位号配置信息
      *
      * @param deviceId Device Id
-     * @return Map<Long, Map < String, AttributeInfo>>
+     * @return Map<String, Map < String, AttributeInfo>>
      */
-    public Map<Long, Map<String, AttributeInfo>> getPointInfoByDeviceId(Long deviceId) {
-        Map<Long, Map<String, AttributeInfo>> tmpMap = this.driverMetadata.getPointInfoMap().get(deviceId);
+    public Map<String, Map<String, AttributeInfo>> getPointInfoByDeviceId(String deviceId) {
+        Map<String, Map<String, AttributeInfo>> tmpMap = this.driverMetadata.getPointInfoMap().get(deviceId);
         if (null == tmpMap || tmpMap.size() < 1) {
             //todo 提示信息需要统一替换
             throw new NotFoundException("Device(" + deviceId + ") does not exist");
@@ -82,7 +82,7 @@ public class DriverContext {
      * @param pointId  Point Id
      * @return Map<String, AttributeInfo>
      */
-    public Map<String, AttributeInfo> getPointInfoByDeviceIdAndPointId(Long deviceId, Long pointId) {
+    public Map<String, AttributeInfo> getPointInfoByDeviceIdAndPointId(String deviceId, String pointId) {
         Map<String, AttributeInfo> tmpMap = getPointInfoByDeviceId(deviceId).get(pointId);
         if (null == tmpMap || tmpMap.size() < 1) {
             throw new NotFoundException("Point(" + pointId + ") info does not exist");
@@ -96,7 +96,7 @@ public class DriverContext {
      * @param deviceId Device Id
      * @return Device
      */
-    public Device getDeviceByDeviceId(Long deviceId) {
+    public Device getDeviceByDeviceId(String deviceId) {
         Device device = this.driverMetadata.getDeviceMap().get(deviceId);
         if (null == device) {
             throw new NotFoundException("Device(" + deviceId + ") does not exist");
@@ -110,7 +110,7 @@ public class DriverContext {
      * @param deviceId Device Id
      * @return Point Array
      */
-    public List<Point> getPointByDeviceId(Long deviceId) {
+    public List<Point> getPointByDeviceId(String deviceId) {
         Device device = getDeviceByDeviceId(deviceId);
         return this.driverMetadata.getProfilePointMap().entrySet().stream()
                 .filter(entry -> device.getProfileIds().contains(entry.getKey()))
@@ -128,9 +128,9 @@ public class DriverContext {
      * @param pointId  Point Id
      * @return Point
      */
-    public Point getPointByDeviceIdAndPointId(Long deviceId, Long pointId) {
+    public Point getPointByDeviceIdAndPointId(String deviceId, String pointId) {
         Device device = getDeviceByDeviceId(deviceId);
-        Optional<Map<Long, Point>> optional = this.driverMetadata.getProfilePointMap().entrySet().stream()
+        Optional<Map<String, Point>> optional = this.driverMetadata.getProfilePointMap().entrySet().stream()
                 .filter(entry -> device.getProfileIds().contains(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .filter(entry -> entry.containsKey(pointId))

@@ -55,7 +55,7 @@ public interface PointAttributeClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 PointAttribute
@@ -73,7 +73,7 @@ public interface PointAttributeClient {
      * @return PointAttribute
      */
     @GetMapping("/id/{id}")
-    R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 驱动ID 查询 PointAttribute
@@ -82,7 +82,7 @@ public interface PointAttributeClient {
      * @return PointAttribute Array
      */
     @GetMapping("/driver_id/{id}")
-    R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id);
+    R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 分页查询 PointAttribute

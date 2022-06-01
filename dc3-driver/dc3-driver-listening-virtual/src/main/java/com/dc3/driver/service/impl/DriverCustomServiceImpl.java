@@ -78,7 +78,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        Long deviceId = device.getId();
+        String deviceId = device.getId();
 
         // TODO 获取设备的Channel，并向下发送数据
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);

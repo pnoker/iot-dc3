@@ -92,7 +92,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
                 ServerHttpRequest build = request.mutate().headers(
                         httpHeader -> {
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT_ID, tenant.getId().toString());
+                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT_ID, tenant.getId());
                             httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT, login.getTenant());
                             httpHeader.set(ServiceConstant.Header.X_AUTH_USER, login.getName());
                         }

@@ -28,7 +28,7 @@ public interface RtmpService extends Service<Rtmp, RtmpDto> {
      * @param id Id
      * @return boolean
      */
-    boolean start(Long id);
+    boolean start(String id);
 
     /**
      * 停止
@@ -36,5 +36,5 @@ public interface RtmpService extends Service<Rtmp, RtmpDto> {
      * @param id Id
      * @return boolean
      */
-    boolean stop(Long id);
+    boolean stop(String id);
 }

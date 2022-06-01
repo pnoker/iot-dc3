@@ -32,7 +32,7 @@ public interface PointAttributeService extends Service<PointAttribute, PointAttr
      * @param driverId
      * @return PointAttribute
      */
-    PointAttribute selectByNameAndDriverId(String name, Long driverId);
+    PointAttribute selectByNameAndDriverId(String name, String driverId);
 
     /**
      * 根据驱动 ID 查询
@@ -40,5 +40,5 @@ public interface PointAttributeService extends Service<PointAttribute, PointAttr
      * @param driverId
      * @return PointAttribute Array
      */
-    List<PointAttribute> selectByDriverId(Long driverId);
+    List<PointAttribute> selectByDriverId(String driverId);
 }

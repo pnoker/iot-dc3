@@ -59,7 +59,7 @@ public class DriverInfoApi implements DriverInfoClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             DriverInfo driverInfo = driverInfoService.selectById(id);
             if (null != driverInfo && driverInfoService.delete(id)) {
@@ -87,7 +87,7 @@ public class DriverInfoApi implements DriverInfoClient {
     }
 
     @Override
-    public R<DriverInfo> selectById(Long id) {
+    public R<DriverInfo> selectById(String id) {
         try {
             DriverInfo select = driverInfoService.selectById(id);
             if (null != select) {
@@ -100,7 +100,7 @@ public class DriverInfoApi implements DriverInfoClient {
     }
 
     @Override
-    public R<DriverInfo> selectByAttributeIdAndDeviceId(Long attributeId, Long deviceId) {
+    public R<DriverInfo> selectByAttributeIdAndDeviceId(String attributeId, String deviceId) {
         try {
             DriverInfo select = driverInfoService.selectByAttributeIdAndDeviceId(attributeId, deviceId);
             if (null != select) {
@@ -113,7 +113,7 @@ public class DriverInfoApi implements DriverInfoClient {
     }
 
     @Override
-    public R<List<DriverInfo>> selectByDeviceId(Long deviceId) {
+    public R<List<DriverInfo>> selectByDeviceId(String deviceId) {
         try {
             List<DriverInfo> select = driverInfoService.selectByDeviceId(deviceId);
             if (null != select) {

@@ -60,7 +60,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         modbusFactory = new ModbusFactory();
     }
 
-    private volatile Map<Long, ModbusMaster> masterMap = new HashMap<>(64);
+    private volatile Map<String, ModbusMaster> masterMap = new HashMap<>(64);
 
     @Override
     public void initial() {
@@ -103,7 +103,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return ModbusMaster
      * @throws ModbusInitException ModbusInitException
      */
-    public ModbusMaster getMaster(Long deviceId, Map<String, AttributeInfo> driverInfo) throws ModbusInitException {
+    public ModbusMaster getMaster(String deviceId, Map<String, AttributeInfo> driverInfo) throws ModbusInitException {
         log.debug("Modbus Tcp Connection Info {}", JsonUtil.toJsonString(driverInfo));
         ModbusMaster modbusMaster = masterMap.get(deviceId);
         if (null == modbusMaster) {

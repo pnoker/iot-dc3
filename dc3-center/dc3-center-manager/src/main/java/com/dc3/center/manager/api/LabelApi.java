@@ -40,7 +40,7 @@ public class LabelApi implements LabelClient {
     private LabelService labelService;
 
     @Override
-    public R<Label> add(Label label, Long tenantId) {
+    public R<Label> add(Label label, String tenantId) {
         try {
             Label add = labelService.add(label.setTenantId(tenantId));
             if (null != add) {
@@ -53,7 +53,7 @@ public class LabelApi implements LabelClient {
     }
 
     @Override
-    public R<Boolean> delete(Long id) {
+    public R<Boolean> delete(String id) {
         try {
             return labelService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class LabelApi implements LabelClient {
     }
 
     @Override
-    public R<Label> update(Label label, Long tenantId) {
+    public R<Label> update(Label label, String tenantId) {
         try {
             Label update = labelService.update(label.setTenantId(tenantId));
             if (null != update) {
@@ -75,7 +75,7 @@ public class LabelApi implements LabelClient {
     }
 
     @Override
-    public R<Label> selectById(Long id) {
+    public R<Label> selectById(String id) {
         try {
             Label select = labelService.selectById(id);
             if (null != select) {
@@ -88,7 +88,7 @@ public class LabelApi implements LabelClient {
     }
 
     @Override
-    public R<Page<Label>> list(LabelDto labelDto, Long tenantId) {
+    public R<Page<Label>> list(LabelDto labelDto, String tenantId) {
         try {
             labelDto.setTenantId(tenantId);
             Page<Label> page = labelService.list(labelDto);

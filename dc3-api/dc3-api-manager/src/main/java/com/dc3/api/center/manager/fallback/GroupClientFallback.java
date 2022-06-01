@@ -39,27 +39,27 @@ public class GroupClientFallback implements FallbackFactory<GroupClient> {
         return new GroupClient() {
 
             @Override
-            public R<Group> add(Group group, Long tenantId) {
+            public R<Group> add(Group group, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Group> update(Group group, Long tenantId) {
+            public R<Group> update(Group group, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Group> selectById(Long id) {
+            public R<Group> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Group>> list(GroupDto groupDto, Long tenantId) {
+            public R<Page<Group>> list(GroupDto groupDto, String tenantId) {
                 return R.fail(message);
             }
 

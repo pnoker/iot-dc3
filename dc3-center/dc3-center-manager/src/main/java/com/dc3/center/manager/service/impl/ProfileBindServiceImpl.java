@@ -80,7 +80,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public List<ProfileBind> addByDeviceId(Long deviceId, Set<Long> profileIds) {
+    public List<ProfileBind> addByDeviceId(String deviceId, Set<String> profileIds) {
         List<ProfileBind> profileBinds = new ArrayList<>();
         if (null != profileIds) {
             profileIds.forEach(profileId -> {
@@ -105,7 +105,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
                     @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         selectById(id);
         return profileBindMapper.deleteById(id) > 0;
     }
@@ -121,7 +121,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
                     @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean deleteByDeviceId(Long deviceId) {
+    public boolean deleteByDeviceId(String deviceId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setDeviceId(deviceId);
         return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
@@ -138,7 +138,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
                     @CacheEvict(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean deleteByProfileIdAndDeviceId(Long deviceId, Long profileId) {
+    public boolean deleteByProfileIdAndDeviceId(String deviceId, String profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setProfileId(profileId);
         profileBindDto.setDeviceId(deviceId);
@@ -167,7 +167,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public ProfileBind selectById(Long id) {
+    public ProfileBind selectById(String id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
         if (null == profileBind) {
             throw new NotFoundException("The profile bind does not exist");
@@ -177,7 +177,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.PROFILE_ID, key = "#deviceId+'.'+#profileId", unless = "#result==null")
-    public ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
+    public ProfileBind selectByDeviceIdAndProfileId(String deviceId, String profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setDeviceId(deviceId);
         profileBindDto.setProfileId(profileId);
@@ -190,7 +190,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.PROFILE_ID, key = "#profileId", unless = "#result==null")
-    public Set<Long> selectDeviceIdByProfileId(Long profileId) {
+    public Set<String> selectDeviceIdByProfileId(String profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setProfileId(profileId);
         List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));
@@ -199,7 +199,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.PROFILE_BIND + CacheConstant.Suffix.DEVICE_ID, key = "#deviceId", unless = "#result==null")
-    public Set<Long> selectProfileIdByDeviceId(Long deviceId) {
+    public Set<String> selectProfileIdByDeviceId(String deviceId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setDeviceId(deviceId);
         List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));

@@ -41,32 +41,32 @@ public class ProfileClientFallback implements FallbackFactory<ProfileClient> {
         return new ProfileClient() {
 
             @Override
-            public R<Profile> add(Profile profile, Long tenantId) {
+            public R<Profile> add(Profile profile, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Profile> update(Profile profile, Long tenantId) {
+            public R<Profile> update(Profile profile, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Profile> selectById(Long id) {
+            public R<Profile> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Profile>> selectByDeviceId(Long deviceId) {
+            public R<List<Profile>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Profile>> list(ProfileDto profileDto, Long tenantId) {
+            public R<Page<Profile>> list(ProfileDto profileDto, String tenantId) {
                 return R.fail(message);
             }
 

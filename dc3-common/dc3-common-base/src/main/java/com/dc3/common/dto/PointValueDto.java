@@ -37,8 +37,8 @@ import java.io.Serializable;
 public class PointValueDto implements Serializable, Converter<PointValue, PointValueDto> {
     private static final long serialVersionUID = 1L;
 
-    private Long deviceId;
-    private Long pointId;
+    private String deviceId;
+    private String pointId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

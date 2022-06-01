@@ -39,27 +39,27 @@ public class LabelClientFallback implements FallbackFactory<LabelClient> {
         return new LabelClient() {
 
             @Override
-            public R<Label> add(Label label, Long tenantId) {
+            public R<Label> add(Label label, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Boolean> delete(Long id) {
+            public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Label> update(Label label, Long tenantId) {
+            public R<Label> update(Label label, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Label> selectById(Long id) {
+            public R<Label> selectById(String id) {
                 return R.fail(message);
             }
 
             @Override
-            public R<Page<Label>> list(LabelDto labelDto, Long tenantId) {
+            public R<Page<Label>> list(LabelDto labelDto, String tenantId) {
                 return R.fail(message);
             }
         };

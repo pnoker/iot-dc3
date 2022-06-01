@@ -45,7 +45,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/add")
-    R<Point> add(@Validated(Insert.class) @RequestBody Point point, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Point> add(@Validated(Insert.class) @RequestBody Point point, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Point
@@ -54,7 +54,7 @@ public interface PointClient {
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
-    R<Boolean> delete(@NotNull @PathVariable(value = "id") Long id);
+    R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 Point
@@ -63,7 +63,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/update")
-    R<Point> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Point> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Point
@@ -72,7 +72,7 @@ public interface PointClient {
      * @return Point
      */
     @GetMapping("/id/{id}")
-    R<Point> selectById(@NotNull @PathVariable(value = "id") Long id);
+    R<Point> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 根据 设备 ID 查询 Point
@@ -81,7 +81,7 @@ public interface PointClient {
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
-    R<List<Point>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId);
+    R<List<Point>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
      * 根据 模板 ID 查询 Point
@@ -90,7 +90,7 @@ public interface PointClient {
      * @return Point Array
      */
     @GetMapping("/profile_id/{profileId}")
-    R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId);
+    R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") String profileId);
 
     /**
      * 分页查询 Point
@@ -99,14 +99,14 @@ public interface PointClient {
      * @return Page<Point>
      */
     @PostMapping("/list")
-    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") Long tenantId);
+    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询 位号单位
      *
      * @param pointIds Point Id Set
-     * @return Map<Long, String>
+     * @return Map<String, String>
      */
     @PostMapping("/unit")
-    R<Map<Long, String>> unit(@RequestBody(required = false) Set<Long> pointIds);
+    R<Map<String, String>> unit(@RequestBody(required = false) Set<String> pointIds);
 }

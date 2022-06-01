@@ -32,7 +32,7 @@ public interface DriverService {
      * @param rawValue Raw Value
      * @return PointValue
      */
-    String convertValue(Long deviceId, Long pointId, String rawValue);
+    String convertValue(String deviceId, String pointId, String rawValue);
 
     /**
      * 发送驱动事件
@@ -55,7 +55,7 @@ public interface DriverService {
      * @param type     Event Type, STATUS、LIMIT
      * @param content  Event Content
      */
-    void deviceEventSender(Long deviceId, String type, String content);
+    void deviceEventSender(String deviceId, String type, String content);
 
     /**
      * 发送设备事件
@@ -65,7 +65,7 @@ public interface DriverService {
      * @param type     Event Type, STATUS、LIMIT
      * @param content  Event Content
      */
-    void deviceEventSender(Long deviceId, Long pointId, String type, String content);
+    void deviceEventSender(String deviceId, String pointId, String type, String content);
 
     /**
      * 发送位号值到消息组件

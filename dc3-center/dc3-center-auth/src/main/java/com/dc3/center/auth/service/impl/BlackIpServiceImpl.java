@@ -74,7 +74,7 @@ public class BlackIpServiceImpl implements BlackIpService {
                     @CacheEvict(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
             }
     )
-    public boolean delete(Long id) {
+    public boolean delete(String id) {
         BlackIp blackIp = selectById(id);
         if (null == blackIp) {
             throw new ServiceException("The ip does not exist in the blacklist");
@@ -104,7 +104,7 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     @Cacheable(value = CacheConstant.Entity.BLACK_IP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
-    public BlackIp selectById(Long id) {
+    public BlackIp selectById(String id) {
         return blackIpMapper.selectById(id);
     }
 
