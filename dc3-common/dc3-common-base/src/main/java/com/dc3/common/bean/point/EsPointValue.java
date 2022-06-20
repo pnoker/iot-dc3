@@ -21,7 +21,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -36,7 +35,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@Document(indexName = "dc3_point_value")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EsPointValue implements Serializable {
     private static final long serialVersionUID = 1L;

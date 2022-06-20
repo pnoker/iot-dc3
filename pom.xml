@@ -80,6 +80,8 @@
         <j.interop.version>2.0.4</j.interop.version>
         <bouncycastle.version>1.46</bouncycastle.version>
         <paho.mqttv3.version>1.2.5</paho.mqttv3.version>
+        <elasticsearch.version>7.17.4</elasticsearch.version>
+        <jakarta.version>2.0.1</jakarta.version>
         <guava.version>31.1-jre</guava.version>
         <hutool.version>5.8.3</hutool.version>
 
@@ -252,6 +254,18 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk16</artifactId>
                 <version>${bouncycastle.version}</version>
+            </dependency>
+
+            <!-- Elasticsearch 相关 -->
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.json</groupId>
+                <artifactId>jakarta.json-api</artifactId>
+                <version>${jakarta.version}</version>
             </dependency>
 
             <!-- Mqtt 相关 -->

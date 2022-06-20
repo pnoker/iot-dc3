@@ -25,30 +25,17 @@ import java.util.List;
 public interface PointValueHandleService {
 
     /**
-     * 自定义数据处理前
-     *
-     * @param pointValue PointValue
-     */
-    void preHandle(PointValue pointValue);
-
-    /**
-     * 自定义数据处理中
+     * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
      *
      * @param pointValue PointValue
      */
     void postHandle(PointValue pointValue);
 
     /**
-     * 自定义数据处理中
+     * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
      *
      * @param pointValues PointValue Array
      */
     void postHandle(List<PointValue> pointValues);
 
-    /**
-     * 自定义数据处理后
-     *
-     * @param pointValue PointValue
-     */
-    void afterHandle(PointValue pointValue);
 }

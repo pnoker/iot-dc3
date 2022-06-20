@@ -41,7 +41,7 @@ import java.util.List;
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "data.point.sava.opentsdb.enable", havingValue = "true")
-public class OpenTsdbService implements SaveStrategyService, InitializingBean {
+public class OpentsdbService implements SaveStrategyService, InitializingBean {
 
     @Value("${data.point.sava.opentsdb.host}")
     private String host;
@@ -59,7 +59,7 @@ public class OpenTsdbService implements SaveStrategyService, InitializingBean {
     @Override
     public void savePointValues(List<PointValue> pointValues) {
         List<TsPointValue> tsPointValues = pointValues.stream()
-                .map(pointValue -> convertPointValues(pointValue.getDeviceId(), pointValue))
+                .map(pointValue -> convertPointValues(CommonConstant.Storage.POINT_VALUE_PREFIX + pointValue.getDeviceId(), pointValue))
                 .reduce(new ArrayList<>(), (first, second) -> {
                     first.addAll(second);
                     return first;
@@ -107,14 +107,13 @@ public class OpenTsdbService implements SaveStrategyService, InitializingBean {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                // TODO 没有处理存储失败的情况，此处可以考虑队列，将失败的数据放入队列中
-                log.error("send pointValue to opentsdb error: {}", e.getMessage());
+                log.error("Send pointValue to opentsdb error: {}", e.getMessage(), e);
             }
 
             @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            public void onResponse(@NotNull Call call, @NotNull Response response) {
                 if (null != response.body()) {
-                    log.debug("send pointValue to opentsdb {}: {}", response.message(), response.body().string());
+                    log.debug("Send pointValue to opentsdb, Response: {}", response.message());
                 }
             }
         });

@@ -23,14 +23,14 @@ import org.springframework.context.annotation.Configuration;
 import java.util.concurrent.TimeUnit;
 
 /**
- * OpenTsdb Configuration
+ * Opentsdb Configuration
  *
  * @author pnoker
  */
 @Slf4j
 @Configuration
 @ConditionalOnProperty(name = "data.point.sava.opentsdb.enable", havingValue = "true")
-public class OpenTsdbConfig {
+public class OpentsdbConfig {
 
     @Bean
     public OkHttpClient okHttpClient() {

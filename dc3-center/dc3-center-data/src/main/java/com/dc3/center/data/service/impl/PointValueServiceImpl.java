@@ -68,13 +68,6 @@ public class PointValueServiceImpl implements PointValueService {
             pointValue.setCreateTime(new Date());
             threadPoolExecutor.execute(() -> {
                 try {
-                    pointValueHandleService.postHandle(pointValue);
-                } catch (Exception e) {
-                    log.error("Save point values to post handle error {}", e.getMessage());
-                }
-            });
-            threadPoolExecutor.execute(() -> {
-                try {
                     savePointValueToMongo(pointValue.getDeviceId(), pointValue);
                 } catch (Exception e) {
                     log.error("Save point values to mongo error {}", e.getMessage());
@@ -85,6 +78,13 @@ public class PointValueServiceImpl implements PointValueService {
                     savePointValueToRedis(pointValue);
                 } catch (Exception e) {
                     log.error("Save point values to redis error {}", e.getMessage());
+                }
+            });
+            threadPoolExecutor.execute(() -> {
+                try {
+                    pointValueHandleService.postHandle(pointValue);
+                } catch (Exception e) {
+                    log.error("Save point values to post handle error {}", e.getMessage());
                 }
             });
         }
@@ -98,13 +98,6 @@ public class PointValueServiceImpl implements PointValueService {
                 final List<PointValue> saveValues = pointValues.stream().map(pointValue -> pointValue.setCreateTime(new Date())).collect(Collectors.toList());
                 final Map<String, List<PointValue>> listMap = saveValues.stream().collect(Collectors.groupingBy(PointValue::getDeviceId));
 
-                threadPoolExecutor.execute(() -> {
-                    try {
-                        listMap.values().forEach((list) -> pointValueHandleService.postHandle(list));
-                    } catch (Exception e) {
-                        log.error("Save point values to post handle error {}", e.getMessage());
-                    }
-                });
                 threadPoolExecutor.execute(() -> {
                     try {
                         listMap.forEach(this::savePointValuesToMongo);
@@ -122,6 +115,13 @@ public class PointValueServiceImpl implements PointValueService {
                         savePointValuesToRedis(list);
                     } catch (Exception e) {
                         log.error("Save point values to redis error {}", e.getMessage());
+                    }
+                });
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        listMap.values().forEach((list) -> pointValueHandleService.postHandle(list));
+                    } catch (Exception e) {
+                        log.error("Save point values to post handle error {}", e.getMessage());
                     }
                 });
             }
@@ -237,7 +237,7 @@ public class PointValueServiceImpl implements PointValueService {
             criteria.and("originTime").gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
-        final String collection = null != pointValueDto.getDeviceId() ? pointValueDto.getDeviceId() : "pointValue";
+        final String collection = null != pointValueDto.getDeviceId() ? CommonConstant.Storage.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : "point_value";
         Future<Long> count = threadPoolExecutor.submit(() -> {
             Query query = new Query(criteria);
             return mongoTemplate.count(query, PointValue.class, collection);
@@ -338,7 +338,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         Query query = new Query(criteria);
         query.with(Sort.by(Sort.Direction.DESC, "originTime"));
-        pointValue = mongoTemplate.findOne(query, PointValue.class, deviceId);
+        pointValue = mongoTemplate.findOne(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
 
         if (null != pointValue) {
             pointValue.setTimeOut(null).setTimeUnit(null);
