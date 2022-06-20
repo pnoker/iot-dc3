@@ -18,7 +18,7 @@ data:
       influxdb:
         enable: false
       opentsdb:
-        enable: true
+        enable: false
         host: dc3-opentsdb
         port: 4242
       elasticsearch:

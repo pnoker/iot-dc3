@@ -62,9 +62,6 @@ public class PointValueReceiver {
             PointValueScheduleJob.valueCount.getAndIncrement();
             log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
 
-            // pre handle
-            pointValueHandleService.preHandle(pointValue);
-
             // Judge whether to process data in batch according to the data transmission speed
             if (PointValueScheduleJob.valueSpeed.get() < batchSpeed) {
                 threadPoolExecutor.execute(() -> {
@@ -77,9 +74,6 @@ public class PointValueReceiver {
                 PointValueScheduleJob.pointValues.add(pointValue);
                 PointValueScheduleJob.valueLock.writeLock().unlock();
             }
-
-            // after handle
-            pointValueHandleService.afterHandle(pointValue);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
