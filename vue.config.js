@@ -5,7 +5,7 @@ module.exports = {
     devServer: {
         proxy: {
             '/api': {
-                target: process.env.VUE_APP_API_URL,
+                target: `http://${process.env.APP_API_HOST}:${process.env.APP_API_PORT}`,
                 changeOrigin: true,
                 ws: true,
                 pathRewrite: {

@@ -20,10 +20,10 @@ MAINTAINER pnoker pnokers@icloud.com
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 COPY ./dc3/nginx/ /etc/nginx/
-COPY ./dist/ /usr/share/nginx/html/dc3/demo/
+COPY ./dist/ /usr/share/nginx/html/
 COPY ./dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
 
 EXPOSE 80 443
 VOLUME /var/log/nginx
 
-CMD /bin/wait-for dc3-auth:8300 dc3-manager:8400 dc3-data:8500 -t 5 -- nginx -g 'daemon off;'
+CMD envsubst < /etc/nginx/location/default.env > /etc/nginx/location/default.conf ; /bin/wait-for ${APP_API_HOST}:${APP_API_PORT} -t 5 --  nginx -g 'daemon off;'
