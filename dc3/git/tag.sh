@@ -17,11 +17,25 @@ set -e
 
 cd ../../
 
+type=""
+
+if `git status | grep "develop" &>/dev/null`; then
+    type="develop"
+fi
+if `git status | grep "release" &>/dev/null`; then
+    type="release"
+fi
+if [[ ${type} == "" ]]; then
+    echo -e "This branch doesn't support tagging, please switch to the \033[31mdevelop\033[0m or \033[31mrelease\033[0m branch."
+    exit
+fi
+
+
 git pull --tags
 # shellcheck disable=SC2046
 # shellcheck disable=SC2116
-develop_tag=$(echo dc3.develop.$(date +'%Y%m%d').$(git tag -l "dc3.develop.$(date +'%Y%m%d').*" | wc -l | xargs printf '%02d'))
-echo "${develop_tag}"
-git tag "${develop_tag}"
+tag=$(echo dc3.${type}.$(date +'%Y%m%d').$(git tag -l "dc3.${type}.$(date +'%Y%m%d').*" | wc -l | xargs printf '%02d'))
+echo "${tag}"
+git tag "${tag}"
 
 git push origin --tags
