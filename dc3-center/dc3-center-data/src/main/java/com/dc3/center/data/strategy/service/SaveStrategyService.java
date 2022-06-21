@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.save.strategy;
+package com.dc3.center.data.strategy.service;
 
 import com.dc3.common.bean.point.PointValue;
 

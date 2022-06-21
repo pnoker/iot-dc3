@@ -13,8 +13,8 @@
 
 package com.dc3.center.data.save.opentsdb.service;
 
-import com.dc3.center.data.save.strategy.SaveStrategyFactory;
-import com.dc3.center.data.save.strategy.SaveStrategyService;
+import com.dc3.center.data.strategy.factory.SaveStrategyFactory;
+import com.dc3.center.data.strategy.service.SaveStrategyService;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.bean.point.TsPointValue;
 import com.dc3.common.constant.CommonConstant;
