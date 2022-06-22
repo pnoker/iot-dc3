@@ -19,9 +19,13 @@ cd ../../
 
 type=""
 
+# shellcheck disable=SC2092
+# shellcheck disable=SC2006
 if `git status | grep "develop" &>/dev/null`; then
     type="develop"
 fi
+# shellcheck disable=SC2092
+# shellcheck disable=SC2006
 if `git status | grep "release" &>/dev/null`; then
     type="release"
 fi
