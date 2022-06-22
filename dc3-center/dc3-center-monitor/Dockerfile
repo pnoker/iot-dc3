@@ -18,7 +18,7 @@ ENV JAVA_OPS -server \
              -javaagent:/usr/local/java/lib/aspectjweaver.jar \
              -Xms128m \
              -Xmx2048m \
-             -Xss256k \
+             -Xss1m \
              -Djava.security.egd=file:/dev/./urandom \
              -XX:MaxDirectMemorySize=256m \
              -XX:+UseCompressedOops \

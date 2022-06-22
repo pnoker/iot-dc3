@@ -11,6 +11,7 @@ spring:
       - monitor
       - redis
       - feign
+      - ${NODE_ENV:dev}
   main:
     allow-bean-definition-overriding: true
   thymeleaf:

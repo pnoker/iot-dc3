@@ -18,9 +18,6 @@ eureka:
     ip-address: ${SERVICE_HOST:192.168.0.104}
 
 spring:
-  datasource:
-    # Customize MySQL configuration
-    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/dc3?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
   redis:
     # Customize Redis configuration
     host: ${REDIS_HOST:dc3-redis}
