@@ -18,7 +18,6 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.RtmpDto;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
@@ -27,10 +26,6 @@ import com.dc3.transfer.rtmp.bean.Transcode;
 import com.dc3.transfer.rtmp.mapper.RtmpMapper;
 import com.dc3.transfer.rtmp.service.RtmpService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,15 +55,6 @@ public class RtmpServiceImpl implements RtmpService {
     private RtmpMapper rtmpMapper;
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#rtmp.id", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Rtmp add(Rtmp rtmp) {
         if (rtmpMapper.insert(rtmp) > 0) {
             Transcode transcode = new Transcode(rtmp);
@@ -81,13 +67,6 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         Rtmp select = selectById(id);
         if (null != select) {
@@ -104,15 +83,6 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#rtmp.id", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Rtmp update(Rtmp rtmp) {
         rtmp.setUpdateTime(null);
         Rtmp select = selectById(rtmp.getId());
@@ -133,25 +103,16 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Rtmp selectById(String id) {
         return rtmpMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Rtmp> list(RtmpDto rtmpDto) {
         return rtmpMapper.selectPage(rtmpDto.getPage().convert(), fuzzyQuery(rtmpDto));
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean start(String id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null == select) {
@@ -226,13 +187,6 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.RTMP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean stop(String id) {
         Rtmp select = rtmpMapper.selectById(id);
         if (null != select) {

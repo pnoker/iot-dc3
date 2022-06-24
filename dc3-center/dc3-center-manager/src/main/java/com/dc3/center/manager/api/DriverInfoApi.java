@@ -41,6 +41,7 @@ public class DriverInfoApi implements DriverInfoClient {
 
     @Resource
     private DriverInfoService driverInfoService;
+
     @Resource
     private NotifyService notifyService;
 

@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.service.*;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.dto.DeviceDto;
 import com.dc3.common.exception.DuplicateException;
@@ -29,13 +28,8 @@ import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Device;
 import com.dc3.common.model.Point;
-import com.dc3.common.model.Profile;
 import com.dc3.common.model.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -55,28 +49,19 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Resource
     private DeviceMapper deviceMapper;
+
     @Resource
     private ProfileService profileService;
     @Resource
     private PointService pointService;
-
-    @Resource
-    private NotifyService notifyService;
     @Resource
     private ProfileBindService profileBindService;
 
+    @Resource
+    private NotifyService notifyService;
+
+    // 2022-06-23 检查：通过
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Device add(Device device) {
         try {
             selectByName(device.getName(), device.getTenantId());
@@ -92,48 +77,32 @@ public class DeviceServiceImpl implements DeviceService {
         }
     }
 
+    // 2022-06-23 检查：通过
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         selectById(id);
         profileBindService.deleteByDeviceId(id);
         return deviceMapper.deleteById(id) > 0;
     }
 
+    // 2022-06-23 检查：通过
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#device.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, key = "#device.name+'.'+#device.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Device update(Device device) {
         selectById(device.getId());
 
         Set<String> newProfileIds = null != device.getProfileIds() ? device.getProfileIds() : new HashSet<>();
-        Set<String> oldProfileIds = profileBindService.selectProfileIdByDeviceId(device.getId());
+        Set<String> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(device.getId());
 
+        // 新增的模板
         Set<String> add = new HashSet<>(newProfileIds);
         add.removeAll(oldProfileIds);
 
+        // 删除的模板
         Set<String> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
 
         addProfileBind(device.getId(), add);
-        delete.forEach(profileId -> profileBindService.deleteByProfileIdAndDeviceId(device.getId(), profileId));
+        delete.forEach(profileId -> profileBindService.deleteByDeviceIdAndProfileId(device.getId(), profileId));
 
         device.setUpdateTime(null);
         if (deviceMapper.updateById(device) > 0) {
@@ -146,17 +115,15 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Device selectById(String id) {
         Device device = deviceMapper.selectById(id);
         if (null == device) {
             throw new NotFoundException("The device does not exist");
         }
-        return device.setProfileIds(profileBindService.selectProfileIdByDeviceId(id));
+        return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
     public Device selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getName, name);
@@ -165,11 +132,10 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == device) {
             throw new NotFoundException("The device does not exist");
         }
-        return device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId()));
+        return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId()));
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, key = "#driverId", unless = "#result==null")
     public List<Device> selectByDriverId(String driverId) {
         DeviceDto deviceDto = new DeviceDto();
         deviceDto.setDriverId(driverId);
@@ -177,34 +143,32 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == devices || devices.size() < 1) {
             throw new NotFoundException("The devices does not exist");
         }
-        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));
+        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return devices;
     }
 
     @Override
     public List<Device> selectByProfileId(String profileId) {
-        return selectByIds(profileBindService.selectDeviceIdByProfileId(profileId));
+        return selectByIds(profileBindService.selectDeviceIdsByProfileId(profileId));
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public List<Device> selectByIds(Set<String> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);
         if (CollectionUtil.isEmpty(devices)) {
             throw new NotFoundException("The devices does not exist");
         }
-        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));
+        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return devices;
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Device> list(DeviceDto deviceDto) {
         if (!Optional.ofNullable(deviceDto.getPage()).isPresent()) {
             deviceDto.setPage(new Pages());
         }
         Page<Device> page = deviceMapper.selectPage(deviceDto.getPage().convert(), fuzzyQuery(deviceDto));
-        page.getRecords().forEach(device -> device.setProfileIds(profileBindService.selectProfileIdByDeviceId(device.getId())));
+        page.getRecords().forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return page;
     }
 
@@ -231,15 +195,12 @@ public class DeviceServiceImpl implements DeviceService {
     private void addProfileBind(String deviceId, Set<String> profileIds) {
         if (null != profileIds) {
             profileIds.forEach(profileId -> {
-                Profile profile = profileService.selectById(profileId);
-                profileBindService.add(new ProfileBind(profile.getId(), deviceId));
-
-                // Notify Driver Profile
-                notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.ADD, profile);
-
-                // Notify Driver Point
                 try {
-                    List<Point> points = pointService.selectByProfileId(profile.getId());
+                    profileService.selectById(profileId);
+                    profileBindService.add(new ProfileBind(profileId, deviceId));
+
+                    List<Point> points = pointService.selectByProfileId(profileId);
+                    // 通知驱动新增位号
                     points.forEach(point -> notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, point));
                 } catch (Exception ignored) {
                 }

@@ -17,7 +17,6 @@ import com.dc3.common.base.Service;
 import com.dc3.common.dto.ProfileBindDto;
 import com.dc3.common.model.ProfileBind;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,15 +25,6 @@ import java.util.Set;
  * @author pnoker
  */
 public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto> {
-
-    /**
-     * 根据 设备ID 新增关联的模版映射
-     *
-     * @param deviceId   Device Id
-     * @param profileIds Profile Id Set
-     * @return ProfileBind Array
-     */
-    List<ProfileBind> addByDeviceId(String deviceId, Set<String> profileIds);
 
     /**
      * 根据 设备ID 删除关联的模版映射
@@ -51,7 +41,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param profileId Profile Id
      * @return boolean
      */
-    boolean deleteByProfileIdAndDeviceId(String deviceId, String profileId);
+    boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId);
 
     /**
      * 根据 设备ID 和 模版ID 查询关联的模版映射
@@ -68,7 +58,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param profileId Profile Id
      * @return Device Id Set
      */
-    Set<String> selectDeviceIdByProfileId(String profileId);
+    Set<String> selectDeviceIdsByProfileId(String profileId);
 
     /**
      * 根据 设备ID 查询关联的 模版ID 集合
@@ -76,6 +66,6 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * @param deviceId Device Id
      * @return Profile Id Set
      */
-    Set<String> selectProfileIdByDeviceId(String deviceId);
+    Set<String> selectProfileIdsByDeviceId(String deviceId);
 
 }

@@ -35,7 +35,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Configuration
-public class MongoDbConfig {
+public class MongoConfig {
 
     @Resource
     private MongoDatabaseFactory factory;

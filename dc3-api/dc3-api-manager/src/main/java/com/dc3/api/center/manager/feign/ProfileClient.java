@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 模板 FeignClient
@@ -71,6 +73,15 @@ public interface ProfileClient {
      */
     @GetMapping("/id/{id}")
     R<Profile> selectById(@NotNull @PathVariable(value = "id") String id);
+
+    /**
+     * 根据 ID 集合查询 Profile
+     *
+     * @param profileIds Profile Id set
+     * @return Map<String, Profile>
+     */
+    @PostMapping("/ids")
+    R<Map<String, Profile>> selectByIds(@RequestBody Set<String> profileIds);
 
     /**
      * 根据 设备 ID 查询 Profile 集合

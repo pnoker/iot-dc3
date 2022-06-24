@@ -75,6 +75,15 @@ public interface PointClient {
     R<Point> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
+     * 根据 ID 集合查询 Point
+     *
+     * @param pointIds Point Id Set
+     * @return Map<String, Point>
+     */
+    @PostMapping("/ids")
+    R<Map<String, Point>> selectByIds(@RequestBody Set<String> pointIds);
+
+    /**
      * 根据 设备 ID 查询 Point
      *
      * @param deviceId Device Id
@@ -108,5 +117,5 @@ public interface PointClient {
      * @return Map<String, String>
      */
     @PostMapping("/unit")
-    R<Map<String, String>> unit(@RequestBody(required = false) Set<String> pointIds);
+    R<Map<String, String>> unit(@RequestBody Set<String> pointIds);
 }

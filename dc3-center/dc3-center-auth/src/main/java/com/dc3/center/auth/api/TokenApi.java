@@ -53,10 +53,11 @@ public class TokenApi implements TokenClient {
     }
 
     @Override
-    public R<Long> checkTokenValid(Login login) {
+    public R<String> checkTokenValid(Login login) {
         TokenValid tokenValid = tokenService.checkTokenValid(login.getName(), login.getSalt(), login.getToken());
         if (tokenValid.isValid()) {
-            return R.ok(tokenValid.getExpireTime().getTime(), "The token will expire in " + Dc3Util.formatCompleteData(tokenValid.getExpireTime()));
+            String expireTime = Dc3Util.formatCompleteData(tokenValid.getExpireTime());
+            return R.ok(expireTime, "The token will expire in " + expireTime);
         }
         throw new UnAuthorizedException("Token invalid");
     }

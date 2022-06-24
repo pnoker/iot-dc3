@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.save.opentsdb.config;
+package com.dc3.center.data.config;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ConnectionPool;

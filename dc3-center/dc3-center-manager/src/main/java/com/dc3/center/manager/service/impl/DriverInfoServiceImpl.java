@@ -19,17 +19,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.DriverInfoMapper;
 import com.dc3.center.manager.service.DriverInfoService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.DriverInfoDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -49,18 +44,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     private DriverInfoMapper driverInfoMapper;
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.deviceId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public DriverInfo add(DriverInfo driverInfo) {
         try {
             selectByAttributeIdAndDeviceId(driverInfo.getDriverAttributeId(), driverInfo.getDeviceId());
@@ -74,34 +57,12 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         selectById(id);
         return driverInfoMapper.deleteById(id) > 0;
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ID, key = "#driverInfo.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID, key = "#driverInfo.driverAttributeId+'.'+#driverInfo.deviceId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public DriverInfo update(DriverInfo driverInfo) {
         DriverInfo oldDriverInfo = selectById(driverInfo.getId());
         driverInfo.setUpdateTime(null);
@@ -121,7 +82,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public DriverInfo selectById(String id) {
         DriverInfo driverInfo = driverInfoMapper.selectById(id);
         if (null == driverInfo) {
@@ -131,7 +91,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID, key = "#driverAttributeId+'.'+#deviceId", unless = "#result==null")
     public DriverInfo selectByAttributeIdAndDeviceId(String driverAttributeId, String deviceId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDriverAttributeId(driverAttributeId);
@@ -144,7 +103,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, key = "#driverAttributeId", unless = "#result==null")
     public List<DriverInfo> selectByAttributeId(String driverAttributeId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDriverAttributeId(driverAttributeId);
@@ -156,7 +114,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, key = "#deviceId", unless = "#result==null")
     public List<DriverInfo> selectByDeviceId(String deviceId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDeviceId(deviceId);
@@ -168,7 +125,6 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DRIVER_INFO + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<DriverInfo> list(DriverInfoDto driverInfoDto) {
         if (!Optional.ofNullable(driverInfoDto.getPage()).isPresent()) {
             driverInfoDto.setPage(new Pages());

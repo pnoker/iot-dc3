@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * DriverClientFallback
  *
@@ -55,6 +58,11 @@ public class DriverClientFallback implements FallbackFactory<DriverClient> {
 
             @Override
             public R<Driver> selectById(String id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Map<String, Driver>> selectByIds(Set<String> driverIds) {
                 return R.fail(message);
             }
 

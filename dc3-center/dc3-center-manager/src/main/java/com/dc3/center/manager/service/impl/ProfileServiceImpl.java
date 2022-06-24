@@ -14,29 +14,21 @@
 package com.dc3.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dc3.center.manager.mapper.DeviceMapper;
 import com.dc3.center.manager.mapper.ProfileMapper;
 import com.dc3.center.manager.service.PointService;
+import com.dc3.center.manager.service.ProfileBindService;
 import com.dc3.center.manager.service.ProfileService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.ProfileDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
-import com.dc3.common.model.Device;
-import com.dc3.common.model.Point;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * ProfileService Impl
@@ -56,36 +47,22 @@ import java.util.stream.Collectors;
 public class ProfileServiceImpl implements ProfileService {
 
     @Resource
-    private PointService pointService;
-
-    @Resource
-    private DeviceMapper deviceMapper;
-    @Resource
     private ProfileMapper profileMapper;
 
+    @Resource
+    private PointService pointService;
+    @Resource
+    private ProfileBindService profileBindService;
+
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
+    // 2022-07-30 检查：不通过，新增模板是没有添加位号的，为啥还需要返回位号集合，已移除
     public Profile add(Profile profile) {
         try {
             selectByNameAndType(profile.getName(), profile.getType(), profile.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException1) {
             if (profileMapper.insert(profile) > 0) {
-                Profile select = profileMapper.selectById(profile.getId());
-                try {
-                    select.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
-                } catch (NotFoundException ignored) {
-                }
-                return select;
+                return profileMapper.selectById(profile.getId());
             }
             throw new ServiceException("The profile add failed");
         }
@@ -93,14 +70,7 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
+    // 2022-07-30 检查：通过
     public boolean delete(String id) {
         try {
             pointService.selectByProfileId(id);
@@ -112,47 +82,28 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#profile.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, key = "#profile.name+'.'+#profile.type+'.'+#profile.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
+    // 2022-07-30 检查：不通过，修改模板是没有添加位号的，为啥还需要返回位号集合，已移除
     public Profile update(Profile profile) {
         selectById(profile.getId());
         profile.setUpdateTime(null);
         if (profileMapper.updateById(profile) > 0) {
-            Profile select = profileMapper.selectById(profile.getId());
-            try {
-                select.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
-            } catch (NotFoundException ignored) {
-            }
-            profile.setName(select.getName());
-            return select;
+            return profileMapper.selectById(profile.getId());
         }
         throw new ServiceException("The profile update failed");
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
+    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public Profile selectById(String id) {
         Profile profile = profileMapper.selectById(id);
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
         }
-        try {
-            profile.setPointIds(pointService.selectByProfileId(id).stream().map(Point::getId).collect(Collectors.toSet()));
-        } catch (NotFoundException ignored) {
-        }
         return profile;
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.TYPE, key = "#name+'.'+#type+'.'+#tenantId", unless = "#result==null")
+    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public Profile selectByNameAndType(String name, Short type, String tenantId) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getName, name);
@@ -162,55 +113,40 @@ public class ProfileServiceImpl implements ProfileService {
         if (null == profile) {
             throw new NotFoundException("The profile does not exist");
         }
-        try {
-            profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
-        } catch (NotFoundException ignored) {
-        }
         return profile;
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public List<Profile> selectByIds(Set<String> ids) {
         List<Profile> profiles = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(ids)) {
             profiles = profileMapper.selectBatchIds(ids);
-            profiles.forEach(profile -> {
-                try {
-                    profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
-                } catch (NotFoundException ignored) {
-                }
-            });
         }
         return profiles;
     }
 
     @Override
+    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public List<Profile> selectByDeviceId(String deviceId) {
-        Device device = deviceMapper.selectById(deviceId);
-        if (ObjectUtil.isNotNull(device)) {
-            return selectByIds(device.getProfileIds());
+        Set<String> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
+        if (CollectionUtil.isNotEmpty(profileIds)) {
+            return selectByIds(profileIds);
         }
         return new ArrayList<>();
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
+    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public Page<Profile> list(ProfileDto profileDto) {
         if (!Optional.ofNullable(profileDto.getPage()).isPresent()) {
             profileDto.setPage(new Pages());
         }
-        Page<Profile> page = profileMapper.selectPage(profileDto.getPage().convert(), fuzzyQuery(profileDto));
-        page.getRecords().forEach(profile -> {
-            try {
-                profile.setPointIds(pointService.selectByProfileId(profile.getId()).stream().map(Point::getId).collect(Collectors.toSet()));
-            } catch (NotFoundException ignored) {
-            }
-        });
-        return page;
+        return profileMapper.selectPage(profileDto.getPage().convert(), fuzzyQuery(profileDto));
     }
 
     @Override
+    // 2022-07-30 检查：通过
     public LambdaQueryWrapper<Profile> fuzzyQuery(ProfileDto profileDto) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         if (null != profileDto) {

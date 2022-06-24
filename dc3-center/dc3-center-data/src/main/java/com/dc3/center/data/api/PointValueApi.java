@@ -20,7 +20,6 @@ import com.dc3.common.bean.Pages;
 import com.dc3.common.bean.R;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.constant.ServiceConstant;
-import com.dc3.common.constant.ValueConstant;
 import com.dc3.common.dto.PointValueDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,13 +51,11 @@ public class PointValueApi implements PointValueClient {
                 // 返回最近100个非字符类型的历史值
                 if (history) {
                     pointValues.forEach(pointValue -> {
-                        if (!pointValue.getType().equals(ValueConstant.Type.STRING)) {
-                            PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100));
-                            Page<PointValue> page = pointValueService.list(pointValueDto);
-                            if (null != page) {
-                                pointValue.setChildren(page.getRecords().stream()
-                                        .map(pointValueChild -> pointValueChild.setId(null).setDeviceId(null).setPointId(null)).collect(Collectors.toList()));
-                            }
+                        PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100));
+                        Page<PointValue> page = pointValueService.list(pointValueDto);
+                        if (null != page) {
+                            pointValue.setChildren(page.getRecords().stream()
+                                    .map(pointValueChild -> pointValueChild.setId(null).setDeviceId(null).setPointId(null)).collect(Collectors.toList()));
                         }
                     });
                 }

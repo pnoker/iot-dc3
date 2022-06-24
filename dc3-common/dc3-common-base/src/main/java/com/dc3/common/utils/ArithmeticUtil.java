@@ -14,6 +14,7 @@
 package com.dc3.common.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 提供精确的浮点数运算，包括加减乘除和四舍五入
@@ -98,7 +99,7 @@ public class ArithmeticUtil {
     public static BigDecimal divide(String value1, String value2, int scale) {
         BigDecimal bigDecimal1 = new BigDecimal(value1);
         BigDecimal bigDecimal2 = new BigDecimal(value2);
-        return bigDecimal1.divide(bigDecimal2, scale, BigDecimal.ROUND_HALF_UP);
+        return bigDecimal1.divide(bigDecimal2, scale, RoundingMode.HALF_UP);
     }
 
     public static float divide(float value1, float value2, int scale) {
@@ -127,7 +128,7 @@ public class ArithmeticUtil {
     public static BigDecimal round(String value, int scale) {
         BigDecimal bigDecimal = new BigDecimal(value);
         BigDecimal tmp = new BigDecimal("1");
-        return bigDecimal.divide(tmp, scale, BigDecimal.ROUND_HALF_UP);
+        return bigDecimal.divide(tmp, scale, RoundingMode.HALF_UP);
     }
 
     public static float round(float value, int scale) {

@@ -21,6 +21,7 @@ import com.dc3.common.bean.R;
 import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.ProfileDto;
+import com.dc3.common.model.Driver;
 import com.dc3.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 模板 Client 接口实现
@@ -40,9 +45,10 @@ import java.util.List;
 public class ProfileApi implements ProfileClient {
 
     @Resource
-    private NotifyService notifyService;
-    @Resource
     private ProfileService profileService;
+
+    @Resource
+    private NotifyService notifyService;
 
     @Override
     public R<Profile> add(Profile profile, String tenantId) {
@@ -96,6 +102,17 @@ public class ProfileApi implements ProfileClient {
             return R.fail(e.getMessage());
         }
         return R.fail();
+    }
+
+    @Override
+    public R<Map<String, Profile>> selectByIds(Set<String> profileIds) {
+        try {
+            List<Profile> profiles = profileService.selectByIds(profileIds);
+            Map<String, Profile> profileMap = profiles.stream().collect(Collectors.toMap(Profile::getId, Function.identity()));
+            return R.ok(profileMap);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
     }
 
     @Override

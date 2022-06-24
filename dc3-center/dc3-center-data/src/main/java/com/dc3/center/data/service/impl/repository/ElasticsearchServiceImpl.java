@@ -11,16 +11,17 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.save.elasticsearch.service;
+package com.dc3.center.data.service.impl.repository;
 
+import cn.hutool.core.util.StrUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import com.dc3.center.data.strategy.factory.SaveStrategyFactory;
-import com.dc3.center.data.strategy.service.SaveStrategyService;
+import com.dc3.center.data.service.RepositoryService;
+import com.dc3.center.data.strategy.RepositoryStrategyFactory;
 import com.dc3.common.bean.point.EsPointValue;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.constant.CommonConstant;
@@ -33,19 +34,27 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author pnoker
+ */
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "data.point.sava.elasticsearch.enable", havingValue = "true")
-public class ElasticsearchService implements SaveStrategyService, InitializingBean {
+public class ElasticsearchServiceImpl implements RepositoryService, InitializingBean {
 
     @Resource
     private ElasticsearchClient elasticsearchClient;
 
     @Override
     public void savePointValue(PointValue pointValue) {
+        if (!StrUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+            return;
+        }
+
+        final String index = CommonConstant.Storage.POINT_VALUE_PREFIX + pointValue.getDeviceId();
         IndexRequest<EsPointValue> indexRequest = new IndexRequest.Builder<EsPointValue>()
-                .index(CommonConstant.Storage.POINT_VALUE_PREFIX + pointValue.getDeviceId())
-                .document(new EsPointValue(pointValue.getDeviceId(), pointValue.getPointId(), pointValue.getRawValue(), pointValue.getValue()))
+                .index(index)
+                .document(new EsPointValue(pointValue))
                 .build();
         try {
             IndexResponse response = elasticsearchClient.index(indexRequest);
@@ -56,16 +65,21 @@ public class ElasticsearchService implements SaveStrategyService, InitializingBe
     }
 
     @Override
-    public void savePointValues(List<PointValue> pointValues) {
-        BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
-        for (PointValue pointValue : pointValues) {
-            bulkRequestBuilder.operations(operation -> operation
-                    .index(builder -> builder
-                            .index(CommonConstant.Storage.POINT_VALUE_PREFIX + pointValue.getDeviceId())
-                            .document(new EsPointValue(pointValue.getDeviceId(), pointValue.getPointId(), pointValue.getRawValue(), pointValue.getValue()))
-                    )
-            );
+    public void savePointValues(String deviceId, List<PointValue> pointValues) {
+        if (StrUtil.isEmpty(deviceId)) {
+            return;
         }
+
+        final String index = CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId;
+        BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
+        pointValues.stream()
+                .filter(pointValue -> StrUtil.isNotEmpty(pointValue.getPointId()))
+                .forEach(pointValue -> bulkRequestBuilder.operations(operation -> operation
+                        .index(builder -> builder
+                                .index(index)
+                                .document(new EsPointValue(pointValue))
+                        )
+                ));
 
         try {
             BulkResponse response = elasticsearchClient.bulk(bulkRequestBuilder.build());
@@ -83,8 +97,8 @@ public class ElasticsearchService implements SaveStrategyService, InitializingBe
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        SaveStrategyFactory.put(CommonConstant.StrategyService.POINT_VALUE_SAVE_STRATEGY_ELASTICSEARCH, this);
+    public void afterPropertiesSet() {
+        RepositoryStrategyFactory.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH, this);
     }
 
 }

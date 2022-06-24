@@ -104,8 +104,11 @@ public class DriverMetadataReceiver {
                 break;
             case CommonConstant.Driver.Event.DRIVER_METADATA_SYNC_BACK:
                 DriverMetadata driverMetadata = Convert.convert(DriverMetadata.class, driverConfiguration.getContent());
-                log.debug("Initialization driver metadata: {}", JsonUtil.toPrettyJsonString(driverMetadata));
                 driverContext.setDriverMetadata(driverMetadata);
+                driverMetadata.getDriverAttributeMap().values().forEach(driverAttribute -> log.info("Syncing driver attribute[{}] metadata: {}", driverAttribute.getDisplayName(), JsonUtil.toJsonString(driverAttribute)));
+                driverMetadata.getPointAttributeMap().values().forEach(pointAttribute -> log.info("Syncing point attribute[{}] metadata: {}", pointAttribute.getDisplayName(), JsonUtil.toJsonString(pointAttribute)));
+                driverMetadata.getDeviceMap().values().forEach(device -> log.info("Syncing device[{}] metadata: {}", device.getName(), JsonUtil.toJsonString(device)));
+                log.info("The metadata synced successfully");
                 break;
             default:
                 break;

@@ -11,12 +11,12 @@
 # limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:1.8.251
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:corretto-11
 MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV JAVA_OPS -server \
              -javaagent:/usr/local/java/lib/aspectjweaver.jar \
-             -Xms128m \
+             -Xms512m \
              -Xmx2048m \
              -Xss1m \
              -Djava.security.egd=file:/dev/./urandom \

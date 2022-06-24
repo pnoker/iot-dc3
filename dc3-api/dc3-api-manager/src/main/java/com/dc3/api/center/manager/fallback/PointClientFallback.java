@@ -63,6 +63,11 @@ public class PointClientFallback implements FallbackFactory<PointClient> {
             }
 
             @Override
+            public R<Map<String, Point>> selectByIds(Set<String> pointIds) {
+                return R.fail(message);
+            }
+
+            @Override
             public R<List<Point>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }

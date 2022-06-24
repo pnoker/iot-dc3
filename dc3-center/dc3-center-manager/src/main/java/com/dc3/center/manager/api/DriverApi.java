@@ -19,12 +19,18 @@ import com.dc3.center.manager.service.DriverService;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.ServiceConstant;
 import com.dc3.common.dto.DriverDto;
+import com.dc3.common.model.Device;
 import com.dc3.common.model.Driver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 驱动 Client 接口实现
@@ -78,6 +84,17 @@ public class DriverApi implements DriverClient {
         try {
             Driver select = driverService.selectById(id);
             return R.ok(select);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @Override
+    public R<Map<String, Driver>> selectByIds(Set<String> driverIds) {
+        try {
+            List<Driver> drivers = driverService.selectByIds(driverIds);
+            Map<String, Driver> driverMap = drivers.stream().collect(Collectors.toMap(Driver::getId, Function.identity()));
+            return R.ok(driverMap);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

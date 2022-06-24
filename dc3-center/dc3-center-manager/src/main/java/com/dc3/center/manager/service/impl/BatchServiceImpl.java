@@ -649,7 +649,7 @@ public class BatchServiceImpl implements BatchService {
     public Map<String, Map<String, Point>> getProfilePointMap(Set<String> deviceIds) {
         Map<String, Map<String, Point>> profilePointMap = new ConcurrentHashMap<>(16);
         deviceIds.forEach(deviceId -> {
-            Set<String> profileIds = profileBindService.selectProfileIdByDeviceId(deviceId);
+            Set<String> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
             profileIds.forEach(profileId -> profilePointMap.put(profileId, getPointMap(profileId)));
         });
         return profilePointMap;

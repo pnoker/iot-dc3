@@ -452,6 +452,33 @@ CREATE TABLE `dc3_black_ip`
   ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for dc3_code_bind
+-- ----------------------------
+DROP TABLE IF EXISTS `dc3_code_bind`;
+CREATE TABLE `dc3_code_bind`
+(
+    `id`          varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '主键ID',
+    `code_id`     varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '编码ID，全局唯一',
+    `entity_id`   varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '实体ID，可为设备、用户',
+    `type`        tinyint(4)                                              NOT NULL COMMENT '关联实体类型，device、user',
+    `enable`      tinyint(4)                                              NULL DEFAULT 1 COMMENT '是否可用',
+    `tenant_id`   varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '租户ID',
+    `description` varchar(380) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '描述',
+    `create_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+    `update_time` datetime(0)                                             NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
+    `deleted`     tinyint(4)                                              NULL DEFAULT 0 COMMENT '逻辑删标识',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `code_id` (`code_id`) USING BTREE,
+    INDEX `entity_id` (`entity_id`) USING BTREE,
+    INDEX `tenant_id` (`tenant_id`) USING BTREE,
+    CONSTRAINT `dc3_code_bind_ibfk_1` FOREIGN KEY (`code_id`) REFERENCES `dc3_label` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT `dc3_code_bind_ibfk_2` FOREIGN KEY (`tenant_id`) REFERENCES `dc3_tenant` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '编码关联表'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Records of dc3_tenant
 -- ----------------------------
 INSERT INTO `dc3_tenant`

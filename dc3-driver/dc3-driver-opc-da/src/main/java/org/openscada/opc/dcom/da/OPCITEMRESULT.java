@@ -77,10 +77,10 @@ public class OPCITEMRESULT {
     public static OPCITEMRESULT fromStruct(final JIStruct struct) {
         OPCITEMRESULT result = new OPCITEMRESULT();
 
-        result.setServerHandle(new Integer((Integer) struct.getMember(0)));
-        result.setCanonicalDataType(new Short((Short) struct.getMember(1)));
-        result.setReserved(new Short((Short) struct.getMember(2)));
-        result.setAccessRights(new Integer((Integer) struct.getMember(3)));
+        result.setServerHandle((Integer) struct.getMember(0));
+        result.setCanonicalDataType((Short) struct.getMember(1));
+        result.setReserved((Short) struct.getMember(2));
+        result.setAccessRights((Integer) struct.getMember(3));
 
         return result;
     }

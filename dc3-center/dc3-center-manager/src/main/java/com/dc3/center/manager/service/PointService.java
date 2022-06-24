@@ -62,6 +62,14 @@ public interface PointService extends Service<Point, PointDto> {
     List<Point> selectByProfileIds(Set<String> profileIds);
 
     /**
+     * 根据 设备Id集 查询设备
+     *
+     * @param ids Point Id Set
+     * @return Point Array
+     */
+    List<Point> selectByIds(Set<String> ids);
+
+    /**
      * 查询 位号单位
      *
      * @param pointIds Point Id Set

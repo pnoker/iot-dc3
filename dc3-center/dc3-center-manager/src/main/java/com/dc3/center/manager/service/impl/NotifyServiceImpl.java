@@ -36,9 +36,11 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Resource
     private DriverService driverService;
+
     @Resource
     private RabbitTemplate rabbitTemplate;
 
+    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverProfile(String command, Profile profile) {
         try {
@@ -48,10 +50,11 @@ public class NotifyServiceImpl implements NotifyService {
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
-            log.warn("Notify Driver Profile: {}", e.getMessage());
+            log.warn("Notify driver {} profile error: {}", command, e.getMessage());
         }
     }
 
+    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverPoint(String command, Point point) {
         try {
@@ -61,10 +64,11 @@ public class NotifyServiceImpl implements NotifyService {
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
-            log.warn("Notify Driver Point: {}", e.getMessage());
+            log.error("Notify driver {} point: {}", command, e.getMessage());
         }
     }
 
+    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverDevice(String command, Device device) {
         try {
@@ -72,10 +76,11 @@ public class NotifyServiceImpl implements NotifyService {
             DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.DEVICE).setCommand(command).setContent(device);
             notifyDriver(driver, operation);
         } catch (Exception e) {
-            log.warn("Notify Driver Device: {}", e.getMessage());
+            log.error("Notify driver {} device: {}", command, e.getMessage());
         }
     }
 
+    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverDriverInfo(String command, DriverInfo driverInfo) {
         try {
@@ -83,10 +88,11 @@ public class NotifyServiceImpl implements NotifyService {
             DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.DRIVER_INFO).setCommand(command).setContent(driverInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
-            log.warn("Notify Driver DriverInfo: {}", e.getMessage());
+            log.error("Notify driver {} driverInfo: {}", command, e.getMessage());
         }
     }
 
+    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverPointInfo(String command, PointInfo pointInfo) {
         try {
@@ -94,7 +100,7 @@ public class NotifyServiceImpl implements NotifyService {
             DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.POINT_INFO).setCommand(command).setContent(pointInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
-            log.warn("Notify Driver PointInfo: {}", e.getMessage());
+            log.error("Notify driver {} pointInfo: {}", command, e.getMessage());
         }
     }
 
@@ -104,8 +110,9 @@ public class NotifyServiceImpl implements NotifyService {
      * @param driver              Driver
      * @param driverConfiguration DriverConfiguration
      */
+    // 2022-06-24 检查：通过
     private void notifyDriver(Driver driver, DriverConfiguration driverConfiguration) {
-        log.debug("Notify Driver {} : {}", driver.getServiceName(), driverConfiguration);
+        log.info("Notify driver[{}] : {}", driver.getServiceName(), driverConfiguration);
         rabbitTemplate.convertAndSend(CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA, CommonConstant.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driver.getServiceName(), driverConfiguration);
     }
 

@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 设备 FeignClient
@@ -40,7 +42,7 @@ public interface DeviceClient {
      * 新增 Device
      *
      * @param device Device
-     * @return R<Device>
+     * @return Device
      */
     @PostMapping("/add")
     R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -49,7 +51,7 @@ public interface DeviceClient {
      * 根据 ID 删除 Device
      *
      * @param id Device Id
-     * @return R<Boolean>
+     * @return Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -58,7 +60,7 @@ public interface DeviceClient {
      * 修改 Device
      *
      * @param device Device
-     * @return R<Device>
+     * @return Device
      */
     @PostMapping("/update")
     R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -67,16 +69,25 @@ public interface DeviceClient {
      * 根据 ID 查询 Device
      *
      * @param id Device Id
-     * @return R<Device>
+     * @return Device
      */
     @GetMapping("/id/{id}")
     R<Device> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
+     * 根据 ID 集合查询 Device
+     *
+     * @param deviceIds Device Id Set
+     * @return Map<String, Device>
+     */
+    @PostMapping("/ids")
+    R<Map<String, Device>> selectByIds(@RequestBody Set<String> deviceIds);
+
+    /**
      * 根据 驱动ID 查询 Device
      *
      * @param driverId Driver Id
-     * @return R<Device>
+     * @return Device
      */
     @GetMapping("/driver_id/{driverId}")
     R<List<Device>> selectByDriverId(@NotNull @PathVariable(value = "driverId") String driverId);
@@ -85,7 +96,7 @@ public interface DeviceClient {
      * 根据 模板ID 查询 Device
      *
      * @param profileId Profile Id
-     * @return R<Device>
+     * @return Device
      */
     @GetMapping("/profile_id/{profileId}")
     R<List<Device>> selectByProfileId(@NotNull @PathVariable(value = "profileId") String profileId);
@@ -94,7 +105,7 @@ public interface DeviceClient {
      * 分页查询 Device
      *
      * @param deviceDto Device Dto
-     * @return R<Page < Device>>
+     * @return Page < Device>
      */
     @PostMapping("/list")
     R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

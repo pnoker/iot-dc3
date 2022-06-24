@@ -19,7 +19,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 /**
  * MongoDB 位号数据
@@ -27,16 +28,17 @@ import org.springframework.data.annotation.Id;
  * @author pnoker
  */
 @Data
+@Document
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EsPointValue extends PointValue {
+public class MgPointValue extends PointValue {
 
-    @Id
+    @MongoId
     private String id;
 
-    public EsPointValue(PointValue pointValue) {
+    public MgPointValue(PointValue pointValue) {
         BeanUtils.copyProperties(pointValue, this);
     }
 }

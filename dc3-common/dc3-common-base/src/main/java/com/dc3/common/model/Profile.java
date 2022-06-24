@@ -13,7 +13,6 @@
 
 package com.dc3.common.model;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.dc3.common.valid.Insert;
 import com.dc3.common.valid.Update;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,8 +21,6 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 设备变量表
@@ -47,9 +44,6 @@ public class Profile extends Description {
     private Short type = 1;
 
     private Boolean enable;
-
-    @TableField(exist = false)
-    private Set<String> pointIds = new HashSet<>(8);
 
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
     private String groupId;

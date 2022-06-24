@@ -16,7 +16,7 @@ MAINTAINER pnoker <pnokers.icloud.com>
 
 ENV JAVA_OPS -server \
              -javaagent:/usr/local/java/lib/aspectjweaver.jar \
-             -Xms128m \
+             -Xms512m \
              -Xmx2048m \
              -Xss1m \
              -Djava.security.egd=file:/dev/./urandom \

@@ -779,7 +779,7 @@ services:
       - 9200:9200
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms128m -Xmx2048m
+      - ES_JAVA_OPTS=-Xms512m -Xmx2048m
     container_name: dc3-elasticsearch
     hostname: dc3-elasticsearch
     #volumes:

@@ -56,7 +56,7 @@ public final class BeanParser {
         entry.size = plcs7PointVariable.getSize();
         entry.s7type = plcs7PointVariable.getType();
         entry.type = getWrapperForPrimitiveType(plcs7PointVariable.getFieldType());
-        entry.serializer = entry.s7type.getSerializer().newInstance();
+        entry.serializer = entry.s7type.getSerializer().getDeclaredConstructor().newInstance();
 
         return entry;
     }
@@ -119,7 +119,7 @@ public final class BeanParser {
                 }
 
                 // Create new serializer
-                final S7Serializable s = entry.s7type.getSerializer().newInstance();
+                final S7Serializable s = entry.s7type.getSerializer().getDeclaredConstructor().newInstance();
                 entry.serializer = s;
 
                 res.blockSize += (s.getSizeInBytes() * dataAnnotation.arraySize());

@@ -20,14 +20,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * MongoDB 位号数据
@@ -43,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 public class PointValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @MongoId
     private String id;
 
     /**
@@ -66,29 +62,7 @@ public class PointValue implements Serializable {
      */
     private String rawValue;
 
-    /**
-     * 计算值
-     */
-    private Object calculateValue;
-
     private List<PointValue> children;
-
-    @Transient
-    private Short rw;
-
-    @Transient
-    private String unit;
-
-    @Transient
-    private String type;
-
-    @Transient
-    private Integer timeOut = 15;
-
-    @Transient
-    private TimeUnit timeUnit = TimeUnit.MINUTES;
-
-    private Boolean multi;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = CommonConstant.Time.COMPLETE_DATE_FORMAT, timezone = CommonConstant.Time.TIMEZONE)
@@ -98,41 +72,11 @@ public class PointValue implements Serializable {
     @JsonFormat(pattern = CommonConstant.Time.COMPLETE_DATE_FORMAT, timezone = CommonConstant.Time.TIMEZONE)
     private Date createTime;
 
-    public PointValue(String pointId, String rawValue, String value) {
-        this.pointId = pointId;
-        this.rawValue = rawValue;
-        this.value = value;
-    }
-
     public PointValue(String deviceId, String pointId, String rawValue, String value) {
         this.deviceId = deviceId;
         this.pointId = pointId;
         this.rawValue = rawValue;
         this.value = value;
-        this.originTime = new Date();
-    }
-
-    public PointValue(String deviceId, String pointId, String rawValue, String value, int timeOut, TimeUnit timeUnit) {
-        this.deviceId = deviceId;
-        this.pointId = pointId;
-        this.rawValue = rawValue;
-        this.value = value;
-        this.timeOut = timeOut;
-        this.timeUnit = timeUnit;
-        this.originTime = new Date();
-    }
-
-    public PointValue(String deviceId, List<PointValue> children) {
-        this.deviceId = deviceId;
-        this.children = children;
-        this.originTime = new Date();
-    }
-
-    public PointValue(String deviceId, List<PointValue> children, int timeOut, TimeUnit timeUnit) {
-        this.deviceId = deviceId;
-        this.children = children;
-        this.timeOut = timeOut;
-        this.timeUnit = timeUnit;
         this.originTime = new Date();
     }
 }

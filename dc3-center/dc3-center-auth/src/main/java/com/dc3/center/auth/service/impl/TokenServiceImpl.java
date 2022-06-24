@@ -51,9 +51,9 @@ public class TokenServiceImpl implements TokenService {
     @Resource
     private TenantService tenantService;
     @Resource
-    private TenantBindService tenantBindService;
-    @Resource
     private UserService userService;
+    @Resource
+    private TenantBindService tenantBindService;
 
     @Resource
     private RedisUtil redisUtil;

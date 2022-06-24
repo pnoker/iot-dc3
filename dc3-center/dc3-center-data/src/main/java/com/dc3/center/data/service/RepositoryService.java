@@ -18,24 +18,24 @@ import com.dc3.common.bean.point.PointValue;
 import java.util.List;
 
 /**
- * 用户自定义数据处理服务接口
+ * Point Value 存储策略服务接口
  *
  * @author pnoker
  */
-public interface PointValueHandleService {
+public interface RepositoryService {
 
     /**
-     * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
+     * 保存 PointValue
      *
      * @param pointValue PointValue
      */
-    void postHandle(PointValue pointValue);
+    void savePointValue(PointValue pointValue);
 
     /**
-     * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
+     * 保存 PointValue 集合
      *
+     * @param deviceId    Device Id
      * @param pointValues PointValue Array
      */
-    void postHandle(List<PointValue> pointValues);
-
+    void savePointValues(String deviceId, List<PointValue> pointValues);
 }

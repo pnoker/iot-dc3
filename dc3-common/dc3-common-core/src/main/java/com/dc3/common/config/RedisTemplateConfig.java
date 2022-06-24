@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -35,7 +34,6 @@ import javax.annotation.Resource;
  *
  * @author pnoker
  */
-@EnableCaching
 @Configuration
 @AllArgsConstructor
 @AutoConfigureBefore(RedisAutoConfiguration.class)

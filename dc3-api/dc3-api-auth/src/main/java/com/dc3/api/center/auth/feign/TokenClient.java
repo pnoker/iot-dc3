@@ -58,7 +58,7 @@ public interface TokenClient {
      * @return R<Boolean>
      */
     @PostMapping("/check")
-    R<Long> checkTokenValid(@Validated(Check.class) @RequestBody Login login);
+    R<String> checkTokenValid(@Validated(Check.class) @RequestBody Login login);
 
     /**
      * 注销用户的Token令牌

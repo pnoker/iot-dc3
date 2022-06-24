@@ -13,12 +13,14 @@
 
 package com.dc3.gateway.filter.factory;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.dc3.api.center.auth.feign.TenantClient;
 import com.dc3.api.center.auth.feign.TokenClient;
 import com.dc3.common.bean.Login;
 import com.dc3.common.bean.R;
 import com.dc3.common.constant.ServiceConstant;
-import com.dc3.common.exception.ServiceException;
+import com.dc3.common.exception.UnAuthorizedException;
 import com.dc3.common.model.Tenant;
 import com.dc3.common.utils.Dc3Util;
 import com.dc3.common.utils.JsonUtil;
@@ -76,19 +78,22 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
             try {
                 String cookieToken = GatewayUtil.getRequestCookie(request, ServiceConstant.Header.X_AUTH_TOKEN);
                 Login login = JsonUtil.parseObject(Dc3Util.decode(cookieToken), Login.class);
-                log.debug("Request cookies: {}", login);
+
+                if (ObjectUtil.isEmpty(login) || StrUtil.isEmpty(login.getTenant())) {
+                    throw new UnAuthorizedException("Invalid cookie");
+                }
 
                 R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(login.getTenant());
                 if (!tenantR.isOk() || !tenantR.getData().getEnable()) {
-                    throw new ServiceException("Invalid tenant");
+                    throw new UnAuthorizedException("Invalid tenant");
                 }
 
-                R<Long> validR = gatewayFilter.tokenClient.checkTokenValid(login);
+                R<String> validR = gatewayFilter.tokenClient.checkTokenValid(login);
                 if (!validR.isOk()) {
-                    throw new ServiceException("Invalid token");
+                    throw new UnAuthorizedException("Invalid token");
                 }
+
                 Tenant tenant = tenantR.getData();
-                log.debug("Request tenant: {}", tenant);
 
                 ServerHttpRequest build = request.mutate().headers(
                         httpHeader -> {
@@ -101,7 +106,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
             } catch (Exception e) {
                 ServerHttpResponse response = exchange.getResponse();
                 response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-                response.setStatusCode(HttpStatus.FORBIDDEN);
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 log.error(e.getMessage(), e);
 
                 DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));

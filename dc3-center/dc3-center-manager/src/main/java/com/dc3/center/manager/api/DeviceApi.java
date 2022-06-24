@@ -28,6 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static net.sf.jsqlparser.parser.feature.Feature.select;
 
 /**
  * 设备 Client 接口实现
@@ -41,6 +47,7 @@ public class DeviceApi implements DeviceClient {
 
     @Resource
     private DeviceService deviceService;
+
     @Resource
     private NotifyService notifyService;
 
@@ -49,6 +56,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device add = deviceService.add(device.setTenantId(tenantId));
             if (null != add) {
+                // 通知驱动新增设备
                 notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, add);
                 return R.ok(add);
             }
@@ -63,6 +71,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device device = deviceService.selectById(id);
             if (null != device && deviceService.delete(id)) {
+                // 通知驱动删除设备
                 notifyService.notifyDriverDevice(CommonConstant.Driver.Device.DELETE, device);
                 return R.ok();
             }
@@ -77,6 +86,7 @@ public class DeviceApi implements DeviceClient {
         try {
             Device update = deviceService.update(device.setTenantId(tenantId));
             if (null != update) {
+                // 通知驱动更新设备
                 notifyService.notifyDriverDevice(CommonConstant.Driver.Device.UPDATE, update);
                 return R.ok(update);
             }
@@ -97,6 +107,17 @@ public class DeviceApi implements DeviceClient {
             return R.fail(e.getMessage());
         }
         return R.fail();
+    }
+
+    @Override
+    public R<Map<String, Device>> selectByIds(Set<String> deviceIds) {
+        try {
+            List<Device> devices = deviceService.selectByIds(deviceIds);
+            Map<String, Device> deviceMap = devices.stream().collect(Collectors.toMap(Device::getId, Function.identity()));
+            return R.ok(deviceMap);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
     }
 
     @Override

@@ -13,7 +13,7 @@
 
 package com.dc3.center.data.service.rabbit;
 
-import com.dc3.center.data.service.PointValueHandleService;
+import com.dc3.center.data.service.RepositoryHandleService;
 import com.dc3.center.data.service.PointValueService;
 import com.dc3.center.data.service.job.PointValueScheduleJob;
 import com.dc3.common.bean.point.PointValue;
@@ -46,7 +46,7 @@ public class PointValueReceiver {
     @Resource
     private PointValueService pointValueService;
     @Resource
-    private PointValueHandleService pointValueHandleService;
+    private RepositoryHandleService repositoryHandleService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
