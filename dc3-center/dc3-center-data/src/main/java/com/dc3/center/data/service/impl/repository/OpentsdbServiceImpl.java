@@ -11,10 +11,11 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.save.opentsdb.service;
+package com.dc3.center.data.service.impl.repository;
 
-import com.dc3.center.data.strategy.factory.SaveStrategyFactory;
-import com.dc3.center.data.strategy.service.SaveStrategyService;
+import cn.hutool.core.util.StrUtil;
+import com.dc3.center.data.service.RepositoryService;
+import com.dc3.center.data.strategy.RepositoryStrategyFactory;
 import com.dc3.common.bean.point.PointValue;
 import com.dc3.common.bean.point.TsPointValue;
 import com.dc3.common.constant.CommonConstant;
@@ -32,8 +33,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -41,7 +44,7 @@ import java.util.List;
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "data.point.sava.opentsdb.enable", havingValue = "true")
-public class OpentsdbService implements SaveStrategyService, InitializingBean {
+public class OpentsdbServiceImpl implements RepositoryService, InitializingBean {
 
     @Value("${data.point.sava.opentsdb.host}")
     private String host;
@@ -53,25 +56,32 @@ public class OpentsdbService implements SaveStrategyService, InitializingBean {
 
     @Override
     public void savePointValue(PointValue pointValue) {
-        savePointValues(Collections.singletonList(pointValue));
+        if (!StrUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+            return;
+        }
+
+        savePointValues(pointValue.getDeviceId(), Collections.singletonList(pointValue));
     }
 
     @Override
-    public void savePointValues(List<PointValue> pointValues) {
+    public void savePointValues(String deviceId, List<PointValue> pointValues) {
+        if (StrUtil.isEmpty(deviceId)) {
+            return;
+        }
+
         List<TsPointValue> tsPointValues = pointValues.stream()
-                .map(pointValue -> convertPointValues(CommonConstant.Storage.POINT_VALUE_PREFIX + pointValue.getDeviceId(), pointValue))
-                .reduce(new ArrayList<>(), (first, second) -> {
-                    first.addAll(second);
-                    return first;
-                });
+                .filter(pointValue -> StrUtil.isNotEmpty(pointValue.getPointId()))
+                .map(pointValue -> convertPointValues(CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId, pointValue))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
 
         List<List<TsPointValue>> partition = Lists.partition(tsPointValues, 100);
         partition.forEach(this::putPointValues);
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        SaveStrategyFactory.put(CommonConstant.StrategyService.POINT_VALUE_SAVE_STRATEGY_OPENTSDB, this);
+    public void afterPropertiesSet() {
+        RepositoryStrategyFactory.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB, this);
     }
 
     private List<TsPointValue> convertPointValues(String metric, PointValue pointValue) {

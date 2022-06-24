@@ -23,6 +23,8 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * ProfileClientFallback
@@ -57,6 +59,11 @@ public class ProfileClientFallback implements FallbackFactory<ProfileClient> {
 
             @Override
             public R<Profile> selectById(String id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Map<String, Profile>> selectByIds(Set<String> profileIds) {
                 return R.fail(message);
             }
 

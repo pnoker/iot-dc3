@@ -44,7 +44,7 @@ public class DriverUtil {
     /**
      * 通过类型转换数据
      *
-     * @param type  String Type, short/int/long/float/double/boolean/string
+     * @param type  String Type, byte/short/int/long/float/double/boolean/string
      * @param value String Value
      * @param <T>   T
      * @return T
@@ -272,14 +272,17 @@ public class DriverUtil {
     }
 
     /**
-     * 获取基本类型 Class Name
+     * 获取基本类型 Class Name，默认：java.lang.String
      *
-     * @param type String Type, short/int/long/float/double/boolean/string
+     * @param type String Type, byte/short/int/long/float/double/boolean/string
      * @return Class Name
      */
     public static String getTypeClassName(String type) {
         String className = String.class.getName();
         switch (type.toLowerCase()) {
+            case ValueConstant.Type.BYTE:
+                className = Byte.class.getName();
+                break;
             case ValueConstant.Type.SHORT:
                 className = Short.class.getName();
                 break;

@@ -23,17 +23,12 @@ import com.dc3.center.auth.mapper.UserMapper;
 import com.dc3.center.auth.service.UserService;
 import com.dc3.common.annotation.Logs;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.constant.CommonConstant;
 import com.dc3.common.dto.UserDto;
 import com.dc3.common.exception.*;
 import com.dc3.common.model.User;
 import com.dc3.common.utils.Dc3Util;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,18 +48,6 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, key = "#user.name", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, key = "#user.phone", condition = "#result!=null&&#user.phone!=null"),
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, key = "#user.email", condition = "#result!=null&&#user.email!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     @Logs("Add user")
     @Transactional
     // 2022-03-13 检查：不通过，会返回密码数据
@@ -100,16 +83,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     @Transactional
     public boolean delete(String id) {
         User user = selectById(id);
@@ -120,20 +93,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#user.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, key = "#user.name", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, key = "#user.phone", condition = "#result!=null&&#user.phone!=null"),
-                    @CachePut(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, key = "#user.email", condition = "#result!=null&&#user.email!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     @Transactional
     public User update(User user) {
         User byId = selectById(user.getId());
@@ -169,13 +128,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public User selectById(String id) {
         return userMapper.selectById(id);
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.NAME, key = "#name", unless = "#result==null")
     // 2022-03-13 检查：通过
     public User selectByName(String name, boolean isEx) {
         if (StrUtil.isEmpty(name)) {
@@ -189,7 +146,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.PHONE, key = "#phone", unless = "#result==null")
     // 2022-03-13 检查：通过
     public User selectByPhone(String phone, boolean isEx) {
         if (StrUtil.isEmpty(phone)) {
@@ -203,7 +159,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.EMAIL, key = "#email", unless = "#result==null")
     // 2022-03-13 检查：通过
     public User selectByEmail(String email, boolean isEx) {
         if (StrUtil.isEmpty(email)) {
@@ -217,7 +172,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.USER + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<User> list(UserDto userDto) {
         if (!Optional.ofNullable(userDto.getPage()).isPresent()) {
             userDto.setPage(new Pages());

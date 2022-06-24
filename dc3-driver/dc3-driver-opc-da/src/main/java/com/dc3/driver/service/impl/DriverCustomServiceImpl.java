@@ -106,8 +106,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 获取 Opc Da Server
      *
-     * @param deviceId
-     * @param driverInfo
+     * @param deviceId   Device Id
+     * @param driverInfo Driver Info
      * @return
      * @throws JIException
      * @throws UnknownHostException

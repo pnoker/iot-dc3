@@ -20,17 +20,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.GroupMapper;
 import com.dc3.center.manager.service.GroupService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.GroupDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -51,16 +46,6 @@ public class GroupServiceImpl implements GroupService {
 
     //todo 分组逻辑需要调整，同时支持驱动、模版、位号、设备，分组只是一种UI上的显示逻辑，不影响实际数据采集
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#group.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Group add(Group group) {
         try {
             selectByName(group.getName(), group.getTenantId());
@@ -74,30 +59,12 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         selectById(id);
         return groupMapper.deleteById(id) > 0;
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#group.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, key = "#group.name+'.'+#group.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Group update(Group group) {
         selectById(group.getId());
         group.setUpdateTime(null);
@@ -110,7 +77,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Group selectById(String id) {
         Group group = groupMapper.selectById(id);
         if (null == group) {
@@ -120,7 +86,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
     public Group selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         queryWrapper.eq(Group::getName, name);
@@ -132,7 +97,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.GROUP + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Group> list(GroupDto groupDto) {
         if (!Optional.ofNullable(groupDto.getPage()).isPresent()) {
             groupDto.setPage(new Pages());

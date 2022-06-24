@@ -41,6 +41,7 @@ public class PointInfoApi implements PointInfoClient {
 
     @Resource
     private PointInfoService pointInfoService;
+
     @Resource
     private NotifyService notifyService;
 

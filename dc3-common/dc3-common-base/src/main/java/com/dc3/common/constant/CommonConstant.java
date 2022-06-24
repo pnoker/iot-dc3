@@ -166,7 +166,7 @@ public interface CommonConstant {
         /**
          * 设备数据存储集合前缀
          */
-        String POINT_VALUE_PREFIX = "point_value_";
+        String POINT_VALUE_PREFIX = CacheConstant.Entity.POINT + CacheConstant.Suffix.VALUE + Symbol.UNDERSCORE;
     }
 
     /**
@@ -302,10 +302,13 @@ public interface CommonConstant {
     /**
      * 策略工厂相关
      */
-    interface StrategyService {
-        String POINT_VALUE_SAVE_STRATEGY = "saving" + Symbol.SEPARATOR;
-        String POINT_VALUE_SAVE_STRATEGY_INFLUXDB = "influxdb";
-        String POINT_VALUE_SAVE_STRATEGY_OPENTSDB = "opentsdb";
-        String POINT_VALUE_SAVE_STRATEGY_ELASTICSEARCH = "elasticsearch";
+    interface RepositoryStrategy {
+        String REPOSITORY_STRATEGY = "repository" + Symbol.SEPARATOR;
+
+        String REPOSITORY_STRATEGY_REDIS = "redis";
+        String REPOSITORY_STRATEGY_MONGO = "mongo";
+        String REPOSITORY_STRATEGY_INFLUXDB = "influxdb";
+        String REPOSITORY_STRATEGY_OPENTSDB = "opentsdb";
+        String REPOSITORY_STRATEGY_ELASTICSEARCH = "elasticsearch";
     }
 }

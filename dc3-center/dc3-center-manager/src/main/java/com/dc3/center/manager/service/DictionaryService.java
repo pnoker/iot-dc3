@@ -53,13 +53,6 @@ public interface DictionaryService {
     List<Dictionary> profileDictionary(String tenantId);
 
     /**
-     * 获取租户驱动下设备字典
-     *
-     * @return Dictionary Array
-     */
-    List<Dictionary> deviceDictionary(String tenantId);
-
-    /**
      * 获取租户模板、设备位号字典
      * profile/device
      *
@@ -68,4 +61,10 @@ public interface DictionaryService {
      */
     List<Dictionary> pointDictionary(String parent, String tenantId);
 
+    /**
+     * 获取租户驱动下设备字典
+     *
+     * @return Dictionary Array
+     */
+    List<Dictionary> deviceDictionary(String tenantId);
 }

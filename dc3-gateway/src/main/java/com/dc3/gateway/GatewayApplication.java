@@ -15,14 +15,12 @@ package com.dc3.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * 平台网关服务入口
  *
  * @author pnoker
  */
-@EnableCaching
 @SpringBootApplication
 public class GatewayApplication {
 

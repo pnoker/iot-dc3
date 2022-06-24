@@ -40,30 +40,30 @@ public class AutoServiceImpl implements AutoService {
     @Resource
     private ProfileService profileService;
     @Resource
-    private ProfileBindService profileBindService;
-    @Resource
     private PointService pointService;
+    @Resource
+    private ProfileBindService profileBindService;
 
     @Resource
     private NotifyService notifyService;
 
-
+    // 2022-06-24 检查：通过
     @Override
     public PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, String driverId, String tenantId) {
-        // add device
+        // 新增设备
         Device device = new Device();
         device.setName(deviceName).setDriverId(driverId).setTenantId(tenantId).setDescription("auto create by driver");
         try {
             device = deviceService.add(device);
 
-            // notify driver add device
+            // 通知驱动新增设备
             notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, device);
         } catch (DuplicateException duplicateException) {
             device = deviceService.selectByName(deviceName, tenantId);
         } catch (Exception ignored) {
         }
 
-        // add private profile for device
+        // 新增私有模板
         Profile profile = new Profile();
         profile.setName(deviceName).setShare(false).setType((short) 2).setTenantId(tenantId);
         try {
@@ -73,7 +73,7 @@ public class AutoServiceImpl implements AutoService {
         } catch (Exception ignored) {
         }
 
-        // add profile bind
+        // 绑定模板
         if (null != device.getId() && null != profile.getId()) {
             try {
                 ProfileBind profileBind = new ProfileBind();
@@ -82,13 +82,13 @@ public class AutoServiceImpl implements AutoService {
             } catch (Exception ignored) {
             }
 
-            // add point
+            // 新增位号
             Point point = new Point();
             point.setName(pointName).setProfileId(profile.getId()).setTenantId(tenantId).setDefault();
             try {
                 point = pointService.add(point);
 
-                // notify driver add point
+                // 同时驱动新增位号
                 notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, point);
             } catch (DuplicateException duplicateException) {
                 point = pointService.selectByNameAndProfileId(pointName, profile.getId());

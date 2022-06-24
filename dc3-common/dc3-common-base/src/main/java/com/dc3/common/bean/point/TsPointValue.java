@@ -44,43 +44,9 @@ public class TsPointValue implements Serializable {
         return this;
     }
 
-    public TsPointValue(String metric, Integer value) {
-        this.metric = metric;
-        this.timestamp = System.currentTimeMillis();
-        this.value = value;
-    }
-
-    public TsPointValue(String metric, Float value) {
-        this.metric = metric;
-        this.timestamp = System.currentTimeMillis();
-        this.value = value;
-    }
-
     public TsPointValue(String metric, String value) {
         this.metric = metric;
         this.timestamp = System.currentTimeMillis();
         this.value = value;
     }
-
-    public TsPointValue(String metric, Integer value, String tagName, String tagValue) {
-        this.metric = metric;
-        this.timestamp = System.currentTimeMillis();
-        this.value = value;
-        addTag(tagName, tagValue);
-    }
-
-    public TsPointValue(String metric, Float value, String tagName, String tagValue) {
-        this.metric = metric;
-        this.timestamp = System.currentTimeMillis();
-        this.value = value;
-        addTag(tagName, tagValue);
-    }
-
-    public TsPointValue(String metric, String value, String tagName, String tagValue) {
-        this.metric = metric;
-        this.timestamp = System.currentTimeMillis();
-        this.value = value;
-        addTag(tagName, tagValue);
-    }
-
 }

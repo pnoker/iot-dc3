@@ -19,10 +19,12 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "name": "测试设备",
-  "profileId": -1,
-  "groupId": -1,
-  "description": "测试设备"
+  "multi": false,
+  "profileIds": [
+    "1538467573683765249"
+  ],
+  "driverId": "1519329568578621442",
+  "name": "虚拟设备"
 }
 
 

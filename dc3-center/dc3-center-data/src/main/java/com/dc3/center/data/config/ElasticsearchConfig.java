@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.save.elasticsearch.config;
+package com.dc3.center.data.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;

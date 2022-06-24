@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 
-package com.dc3.center.data.strategy.factory;
+package com.dc3.center.data.strategy;
 
-import com.dc3.center.data.strategy.service.SaveStrategyService;
+import com.dc3.center.data.service.RepositoryService;
 import com.dc3.common.constant.CommonConstant;
 
 import java.util.ArrayList;
@@ -26,18 +26,18 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author pnoker
  */
-public class SaveStrategyFactory {
-    private static final Map<String, SaveStrategyService> savingStrategyServiceMap = new ConcurrentHashMap<>();
+public class RepositoryStrategyFactory {
+    private static final Map<String, RepositoryService> savingStrategyServiceMap = new ConcurrentHashMap<>();
 
-    public static List<SaveStrategyService> getAll() {
+    public static List<RepositoryService> getAll() {
         return new ArrayList<>(savingStrategyServiceMap.values());
     }
 
-    public static SaveStrategyService get(String name) {
-        return savingStrategyServiceMap.get(CommonConstant.StrategyService.POINT_VALUE_SAVE_STRATEGY + name);
+    public static RepositoryService get(String name) {
+        return savingStrategyServiceMap.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY + name);
     }
 
-    public static void put(String name, SaveStrategyService printParamStrategyService) {
-        savingStrategyServiceMap.put(CommonConstant.StrategyService.POINT_VALUE_SAVE_STRATEGY + name, printParamStrategyService);
+    public static void put(String name, RepositoryService service) {
+        savingStrategyServiceMap.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY + name, service);
     }
 }

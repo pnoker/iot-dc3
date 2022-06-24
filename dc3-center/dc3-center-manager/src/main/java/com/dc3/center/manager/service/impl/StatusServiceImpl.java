@@ -43,6 +43,7 @@ public class StatusServiceImpl implements StatusService {
 
     @Resource
     private RedisUtil redisUtil;
+
     @Resource
     private DriverService driverService;
     @Resource
@@ -98,7 +99,7 @@ public class StatusServiceImpl implements StatusService {
     public Map<String, String> deviceByProfileId(String profileId) {
         Map<String, String> statusMap = new HashMap<>(16);
 
-        profileBindService.selectDeviceIdByProfileId(profileId).forEach(id -> {
+        profileBindService.selectDeviceIdsByProfileId(profileId).forEach(id -> {
             String key = CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisUtil.getKey(key, String.class);
             status = null != status ? status : CommonConstant.Status.OFFLINE;

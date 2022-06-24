@@ -19,10 +19,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dc3.center.manager.mapper.*;
 import com.dc3.center.manager.service.DictionaryService;
 import com.dc3.common.bean.Dictionary;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.model.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,12 +42,11 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Resource
     private ProfileMapper profileMapper;
     @Resource
-    private DeviceMapper deviceMapper;
-    @Resource
     private PointMapper pointMapper;
+    @Resource
+    private DeviceMapper deviceMapper;
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DRIVER + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> driverDictionary(String tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
@@ -60,7 +57,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DRIVER_ATTRIBUTE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> driverAttributeDictionary(String tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
@@ -78,7 +74,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> pointAttributeDictionary(String tenantId) {
         List<Dictionary> dictionaries = driverDictionary(tenantId);
         dictionaries.forEach(driverDictionary -> {
@@ -96,7 +91,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.PROFILE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
     public List<Dictionary> profileDictionary(String tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
@@ -107,24 +101,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.DEVICE + CacheConstant.Suffix.DIC, key = "'dic.'+#tenantId", unless = "#result==null")
-    public List<Dictionary> deviceDictionary(String tenantId) {
-        List<Dictionary> dictionaries = driverDictionary(tenantId);
-        dictionaries.forEach(driverDictionary -> {
-            LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-            queryWrapper.eq(Device::getDriverId, driverDictionary.getValue());
-            queryWrapper.eq(Device::getTenantId, tenantId);
-            List<Device> deviceList = deviceMapper.selectList(queryWrapper);
-            List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
-            deviceList.forEach(device -> deviceDictionaryList.add(new Dictionary().setLabel(device.getName()).setValue(device.getId())));
-            driverDictionary.setChildren(deviceDictionaryList);
-        });
-
-        return dictionaries;
-    }
-
-    @Override
-    @Cacheable(value = CacheConstant.Entity.POINT + CacheConstant.Suffix.DIC, key = "'dic.'+#parent+'.'+#tenantId", unless = "#result==null")
     public List<Dictionary> pointDictionary(String parent, String tenantId) {
         List<Dictionary> dictionaries = new ArrayList<>(16);
         switch (parent) {
@@ -195,6 +171,22 @@ public class DictionaryServiceImpl implements DictionaryService {
             default:
                 break;
         }
+        return dictionaries;
+    }
+
+    @Override
+    public List<Dictionary> deviceDictionary(String tenantId) {
+        List<Dictionary> dictionaries = driverDictionary(tenantId);
+        dictionaries.forEach(driverDictionary -> {
+            LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
+            queryWrapper.eq(Device::getDriverId, driverDictionary.getValue());
+            queryWrapper.eq(Device::getTenantId, tenantId);
+            List<Device> deviceList = deviceMapper.selectList(queryWrapper);
+            List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
+            deviceList.forEach(device -> deviceDictionaryList.add(new Dictionary().setLabel(device.getName()).setValue(device.getId())));
+            driverDictionary.setChildren(deviceDictionaryList);
+        });
+
         return dictionaries;
     }
 }

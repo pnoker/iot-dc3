@@ -20,7 +20,6 @@ import com.dc3.center.manager.mapper.PointInfoMapper;
 import com.dc3.center.manager.service.PointInfoService;
 import com.dc3.center.manager.service.PointService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.PointInfoDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
@@ -28,10 +27,6 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Point;
 import com.dc3.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -50,26 +45,12 @@ import java.util.stream.Collectors;
 public class PointInfoServiceImpl implements PointInfoService {
 
     @Resource
-    private PointService pointService;
-
-    @Resource
     private PointInfoMapper pointInfoMapper;
 
+    @Resource
+    private PointService pointService;
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public PointInfo add(PointInfo pointInfo) {
         try {
             selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
@@ -83,36 +64,12 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         selectById(id);
         return pointInfoMapper.deleteById(id) > 0;
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ID, key = "#pointInfo.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID, key = "#pointInfo.pointAttributeId+'.'+#pointInfo.deviceId+'.'+#pointInfo.pointId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public PointInfo update(PointInfo pointInfo) {
         PointInfo old = selectById(pointInfo.getId());
         pointInfo.setUpdateTime(null);
@@ -132,7 +89,6 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public PointInfo selectById(String id) {
         PointInfo pointInfo = pointInfoMapper.selectById(id);
         if (null == pointInfo) {
@@ -142,7 +98,6 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID, key = "#pointAttributeId+'.'+#deviceId+'.'+#pointId", unless = "#result==null")
     public PointInfo selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
@@ -156,7 +111,6 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.ATTRIBUTE_ID + CacheConstant.Suffix.LIST, key = "#pointAttributeId", unless = "#result==null")
     public List<PointInfo> selectByAttributeId(String pointAttributeId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
@@ -168,7 +122,6 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.LIST, key = "#deviceId", unless = "#result==null")
     public List<PointInfo> selectByDeviceId(String deviceId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         List<Point> points = pointService.selectByDeviceId(deviceId);
@@ -183,7 +136,6 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.DEVICE_ID + CacheConstant.Suffix.POINT_ID + CacheConstant.Suffix.LIST, key = "#deviceId+'.'+#pointId", unless = "#result==null")
     public List<PointInfo> selectByDeviceIdAndPointId(String deviceId, String pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
@@ -196,7 +148,6 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_INFO + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<PointInfo> list(PointInfoDto pointInfoDto) {
         if (!Optional.ofNullable(pointInfoDto.getPage()).isPresent()) {
             pointInfoDto.setPage(new Pages());

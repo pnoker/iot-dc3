@@ -21,7 +21,6 @@ import com.dc3.center.manager.mapper.LabelMapper;
 import com.dc3.center.manager.service.LabelBindService;
 import com.dc3.center.manager.service.LabelService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.LabelBindDto;
 import com.dc3.common.dto.LabelDto;
 import com.dc3.common.exception.NotFoundException;
@@ -29,10 +28,6 @@ import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.Label;
 import com.dc3.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -48,21 +43,12 @@ import java.util.Optional;
 public class LabelServiceImpl implements LabelService {
 
     @Resource
-    private LabelBindService labelBindService;
-    @Resource
     private LabelMapper labelMapper;
 
+    @Resource
+    private LabelBindService labelBindService;
+
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.ID, key = "#label.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.NAME, key = "#label.name+'.'+#label.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Label add(Label label) {
         selectByName(label.getName(), label.getTenantId());
         if (labelMapper.insert(label) > 0) {
@@ -72,14 +58,6 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.NAME, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         LabelBindDto labelBindDto = new LabelBindDto();
         labelBindDto.setLabelId(id);
@@ -95,16 +73,6 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.ID, key = "#label.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.NAME, key = "#label.name+'.'+#label.tenantId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public Label update(Label label) {
         selectById(label.getId());
         label.setUpdateTime(null);
@@ -117,7 +85,6 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public Label selectById(String id) {
         Label label = labelMapper.selectById(id);
         if (null == label) {
@@ -127,7 +94,6 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.NAME, key = "#name+'.'+#tenantId", unless = "#result==null")
     public Label selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         queryWrapper.eq(Label::getName, name);
@@ -140,7 +106,6 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.LABEL + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<Label> list(LabelDto labelDto) {
         if (!Optional.ofNullable(labelDto.getPage()).isPresent()) {
             labelDto.setPage(new Pages());

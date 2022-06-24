@@ -30,6 +30,8 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 位号 Client 接口实现
@@ -43,6 +45,7 @@ public class PointApi implements PointClient {
 
     @Resource
     private PointService pointService;
+
     @Resource
     private NotifyService notifyService;
 
@@ -99,6 +102,17 @@ public class PointApi implements PointClient {
             return R.fail(e.getMessage());
         }
         return R.fail();
+    }
+
+    @Override
+    public R<Map<String, Point>> selectByIds(Set<String> pointIds) {
+        try {
+            List<Point> points = pointService.selectByIds(pointIds);
+            Map<String, Point> pointMap = points.stream().collect(Collectors.toMap(Point::getId, Function.identity()));
+            return R.ok(pointMap);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
     }
 
     @Override

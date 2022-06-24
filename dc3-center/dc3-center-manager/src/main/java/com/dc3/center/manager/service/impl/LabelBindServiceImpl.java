@@ -20,16 +20,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.LabelBindMapper;
 import com.dc3.center.manager.service.LabelBindService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.LabelBindDto;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -47,13 +42,6 @@ public class LabelBindServiceImpl implements LabelBindService {
     private LabelBindMapper labelBindMapper;
 
     @Override
-    @Caching(
-            put = {@CachePut(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#labelBind.id", condition = "#result!=null")},
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public LabelBind add(LabelBind labelBind) {
         if (labelBindMapper.insert(labelBind) > 0) {
             return labelBindMapper.selectById(labelBind.getId());
@@ -62,26 +50,12 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         selectById(id);
         return labelBindMapper.deleteById(id) > 0;
     }
 
     @Override
-    @Caching(
-            put = {@CachePut(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#labelBind.id", condition = "#result!=null")},
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public LabelBind update(LabelBind labelBind) {
         selectById(labelBind.getId());
         labelBind.setUpdateTime(null);
@@ -92,7 +66,6 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public LabelBind selectById(String id) {
         LabelBind labelBind = labelBindMapper.selectById(id);
         if (null == labelBind) {
@@ -102,7 +75,6 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.LABEL_BIND + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<LabelBind> list(LabelBindDto labelBindDto) {
         if (!Optional.ofNullable(labelBindDto.getPage()).isPresent()) {
             labelBindDto.setPage(new Pages());

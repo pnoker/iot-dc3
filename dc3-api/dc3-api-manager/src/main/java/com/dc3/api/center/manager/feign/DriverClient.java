@@ -26,6 +26,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 驱动 FeignClient
@@ -70,6 +72,15 @@ public interface DriverClient {
      */
     @GetMapping("/id/{id}")
     R<Driver> selectById(@NotNull @PathVariable(value = "id") String id);
+
+    /**
+     * 根据 ID 集合查询 Driver
+     *
+     * @param driverIds Driver Id Set
+     * @return Map<String, Driver>
+     */
+    @PostMapping("/ids")
+    R<Map<String, Driver>> selectByIds(@RequestBody Set<String> driverIds);
 
     /**
      * 根据 SERVICENAME 查询 Driver

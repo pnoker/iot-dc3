@@ -23,6 +23,8 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DeviceClientFallback
@@ -57,6 +59,11 @@ public class DeviceClientFallback implements FallbackFactory<DeviceClient> {
 
             @Override
             public R<Device> selectById(String id) {
+                return R.fail(message);
+            }
+
+            @Override
+            public R<Map<String, Device>> selectByIds(Set<String> deviceIds) {
                 return R.fail(message);
             }
 

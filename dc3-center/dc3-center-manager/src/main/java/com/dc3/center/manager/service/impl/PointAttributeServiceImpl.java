@@ -20,17 +20,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dc3.center.manager.mapper.PointAttributeMapper;
 import com.dc3.center.manager.service.PointAttributeService;
 import com.dc3.common.bean.Pages;
-import com.dc3.common.constant.CacheConstant;
 import com.dc3.common.dto.PointAttributeDto;
 import com.dc3.common.exception.DuplicateException;
 import com.dc3.common.exception.NotFoundException;
 import com.dc3.common.exception.ServiceException;
 import com.dc3.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -49,17 +44,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     private PointAttributeMapper pointAttributeMapper;
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#pointAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public PointAttribute add(PointAttribute pointAttribute) {
         try {
             selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId());
@@ -73,32 +57,12 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#id", condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result==true")
-            }
-    )
     public boolean delete(String id) {
         selectById(id);
         return pointAttributeMapper.deleteById(id) > 0;
     }
 
     @Override
-    @Caching(
-            put = {
-                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#pointAttribute.id", condition = "#result!=null"),
-                    @CachePut(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#pointAttribute.name+'.'+#pointAttribute.driverId", condition = "#result!=null")
-            },
-            evict = {
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DIC, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null"),
-                    @CacheEvict(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, allEntries = true, condition = "#result!=null")
-            }
-    )
     public PointAttribute update(PointAttribute pointAttribute) {
         selectById(pointAttribute.getId());
         pointAttribute.setUpdateTime(null);
@@ -111,7 +75,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.ID, key = "#id", unless = "#result==null")
     public PointAttribute selectById(String id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
         if (null == pointAttribute) {
@@ -121,7 +84,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.NAME + CacheConstant.Suffix.DRIVER_ID, key = "#name+'.'+#driverId", unless = "#result==null")
     public PointAttribute selectByNameAndDriverId(String name, String driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         queryWrapper.eq(PointAttribute::getName, name);
@@ -134,7 +96,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.DRIVER_ID + CacheConstant.Suffix.LIST, key = "#driverId", unless = "#result==null")
     public List<PointAttribute> selectByDriverId(String driverId) {
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setDriverId(driverId);
@@ -146,7 +107,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    @Cacheable(value = CacheConstant.Entity.POINT_ATTRIBUTE + CacheConstant.Suffix.LIST, keyGenerator = "commonKeyGenerator", unless = "#result==null")
     public Page<PointAttribute> list(PointAttributeDto pointAttributeDto) {
         if (!Optional.ofNullable(pointAttributeDto.getPage()).isPresent()) {
             pointAttributeDto.setPage(new Pages());

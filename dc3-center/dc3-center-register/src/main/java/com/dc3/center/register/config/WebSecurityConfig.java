@@ -13,11 +13,11 @@
 
 package com.dc3.center.register.config;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * 注册中心安全配置
@@ -26,19 +26,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Slf4j
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
-    @Override
-    @SneakyThrows
-    protected void configure(HttpSecurity http) {
-        try {
-            http.csrf().disable()
-                    .authorizeRequests()
-                    .antMatchers("/actuator/**").permitAll()
-                    .anyRequest()
-                    .authenticated().and().httpBasic();
-        } catch (Exception e) {
-            log.error("{}", e.getMessage(), e);
-        }
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.authorizeRequests().antMatchers("/actuator/**").permitAll();
+        http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
+        return http.build();
     }
 }
