@@ -1,8 +1,21 @@
+<!--
+  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
 <template>
     <div class="title-card">
         <el-card shadow="hover">
             <div slot="header">
-                <span class="title-card__header">{{title}}</span>
+                <span class="title-card__header">{{ title }}</span>
             </div>
             <slot/>
         </el-card>
@@ -10,43 +23,43 @@
 </template>
 
 <script>
-    export default {
-        name: "title-card",
-        props: {
-            title: {
-                type: String,
-                default: ''
-            }
+export default {
+    name: "title-card",
+    props: {
+        title: {
+            type: String,
+            default: ""
         }
-    };
+    }
+};
 </script>
 
 <style lang="scss">
-    .title-card {
-        border-radius: 5px;
-        box-sizing: border-box;
+.title-card {
+    border-radius: 5px;
+    box-sizing: border-box;
 
-        .title-card__header {
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .el-card {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .el-card__header {
-            padding: 10px;
-        }
-
-        .el-card__body {
-            padding: 10px;
-        }
-
-        &:first-child {
-            padding-top: 0;
-            padding-left: 0;
-        }
+    .title-card__header {
+        font-size: 14px;
+        font-weight: bold;
     }
+
+    .el-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .el-card__header {
+        padding: 10px;
+    }
+
+    .el-card__body {
+        padding: 10px;
+    }
+
+    &:first-child {
+        padding-top: 0;
+        padding-left: 0;
+    }
+}
 </style>

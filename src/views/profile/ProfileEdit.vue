@@ -1,3 +1,16 @@
+<!--
+  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
 <template>
     <div class="edit-card">
         <el-card shadow="hover">
@@ -13,7 +26,7 @@
             <div class="edit-content">
                 <el-divider content-position="left">模板信息编辑</el-divider>
                 <div class="content-edit-profile">
-                    <el-form :inline="true" :model="profileFormData" :rules="profileFormRule" ref="profileFormData" size="small">
+                    <el-form :inline="true" :model="profileFormData" :rules="profileFormRule" ref="profileFormData" >
                         <div class="edit-profile-form">
                             <el-form-item label="模板名称" prop="name">
                                 <el-input clearable
@@ -57,10 +70,10 @@
             <div class="edit-content">
                 <el-divider content-position="left">模板位号配置</el-divider>
                 <point-list
-                        :pre="true"
-                        :profileId="id"
-                        @pre-handle="pre"
-                        @next-handle="next"
+                    :pre="true"
+                    :profileId="id"
+                    @pre-handle="pre"
+                    @next-handle="next"
                 ></point-list>
             </div>
         </el-card>
@@ -68,101 +81,101 @@
 </template>
 
 <script>
-    import pointList from '../point/PointList';
-    import {profileById, profileUpdate} from "@/api/profile";
+import pointList from "../point/PointList";
+import {profileById, profileUpdate} from "@/api/profile";
 
-    export default {
-        components: {pointList},
-        data() {
-            return {
-                id: this.$route.query.id,
-                active: +this.$route.query.active,
-                oldProfileFormData: {},
-                profileFormData: {
-                    pointIds: []
-                },
-                profileFormRule: {
-                    name: [
-                        {
-                            required: true,
-                            message: '请输入模板名称',
-                            trigger: 'blur'
-                        }, {
-                            min: 2,
-                            max: 32,
-                            message: '请输入 2~32 位字长的模板名称',
-                            trigger: 'blur'
-                        }, {
-                            pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                            message: '请输入正确格式的模板名称'
-                        }
-                    ],
-                    enable: [
-                        {
-                            required: true,
-                            message: '请选择使能',
-                            trigger: 'change'
-                        }
-                    ],
-                    description: [
-                        {
-                            max: 300,
-                            message: '最多输入300个字符',
-                            trigger: 'blur'
-                        }
-                    ]
-                }
-            }
-        },
-        created() {
-            this.profile();
-        },
-        methods: {
-            profile() {
-                let id = this.$route.query.id;
-                profileById(id).then(res => {
-                    this.profileFormData = res.data;
-                    this.oldProfileFormData = {...res.data};
-                }).catch(() => {
-                });
+export default {
+    components: {pointList},
+    data() {
+        return {
+            id: this.$route.query.id,
+            active: +this.$route.query.active,
+            oldProfileFormData: {},
+            profileFormData: {
+                pointIds: []
             },
-            profileUpdate() {
-                this.$refs['profileFormData'].validate((valid) => {
-                    if (valid) {
-                        profileUpdate(this.profileFormData).then(res => {
-                            this.oldProfileFormData = {...res.data};
-                        }).catch(() => {
-                        });
+            profileFormRule: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入模板名称",
+                        trigger: "blur"
+                    }, {
+                        min: 2,
+                        max: 32,
+                        message: "请输入 2~32 位字长的模板名称",
+                        trigger: "blur"
+                    }, {
+                        pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
+                        message: "请输入正确格式的模板名称"
                     }
-                });
-            },
-            pre() {
-                this.active--;
-                this.changeActive(this.active);
-            },
-            next() {
-                this.active++;
-                if (this.active > 1) {
-                    this.$router.push({name: 'profile'})
-                        .catch(() => {
-                        });
-                } else {
-                    this.changeActive(this.active);
-                }
-            },
-            profileReset() {
-                this.profileFormData = {...this.oldProfileFormData};
-            },
-            changeActive(step) {
-                let query = this.$route.query;
-                this.$router.push({query: {...query, active: step}})
-                    .catch(() => {
-                    });
+                ],
+                enable: [
+                    {
+                        required: true,
+                        message: "请选择使能",
+                        trigger: "change"
+                    }
+                ],
+                description: [
+                    {
+                        max: 300,
+                        message: "最多输入300个字符",
+                        trigger: "blur"
+                    }
+                ]
             }
         }
-    };
+    },
+    created() {
+        this.profile();
+    },
+    methods: {
+        profile() {
+            let id = this.$route.query.id;
+            profileById(id).then(res => {
+                this.profileFormData = res.data;
+                this.oldProfileFormData = {...res.data};
+            }).catch(() => {
+            });
+        },
+        profileUpdate() {
+            this.$refs["profileFormData"].validate((valid) => {
+                if (valid) {
+                    profileUpdate(this.profileFormData).then(res => {
+                        this.oldProfileFormData = {...res.data};
+                    }).catch(() => {
+                    });
+                }
+            });
+        },
+        pre() {
+            this.active--;
+            this.changeActive(this.active);
+        },
+        next() {
+            this.active++;
+            if (this.active > 1) {
+                this.$router.push({name: "profile"})
+                    .catch(() => {
+                    });
+            } else {
+                this.changeActive(this.active);
+            }
+        },
+        profileReset() {
+            this.profileFormData = {...this.oldProfileFormData};
+        },
+        changeActive(step) {
+            let query = this.$route.query;
+            this.$router.push({query: {...query, active: step}})
+                .catch(() => {
+                });
+        }
+    }
+};
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/edit-card.scss";
+@import "~@/components/card/styles/edit-card.scss";
 </style>

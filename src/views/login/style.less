@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.login-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #fff, #1296DB);
+}
+
+.login-wrapper-left {
+    margin: 0 0 0 auto;
+    width: 500px;
+    border-radius: 5px;
+    box-shadow: -1px 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+.login-wrapper-right {
+    margin: 0 auto 0 0;
+    width: 500px;
+    border-radius: 5px;
+    box-shadow: 1px 5px 10px rgba(0, 0, 0, 0.4);
+
+    .el-input-group__append {
+        border: none;
+    }
+}
+
+.login-left,
+.login-border {
+    display: flex;
+    position: relative;
+    min-height: 500px;
+    align-items: center;
+}
+
+.login-left {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #55b5e5;
+    color: #fff;
+    float: left;
+    width: 100%;
+    position: relative;
+}
+
+.login-left .img {
+    width: 350px;
+}
+
+.login-border {
+    border-left: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    color: #fff;
+    background-color: #fff;
+    width: 100%;
+    float: left;
+    box-sizing: border-box;
+}
+
+.login-main {
+    margin: 0 auto;
+    width: 65%;
+    box-sizing: border-box;
+}
+
+.login-title {
+    color: #333;
+    margin-bottom: 40px;
+    font-weight: 500;
+    font-size: 25px;
+    text-align: center;
+    letter-spacing: 4px;
+}
+
+.login-submit {
+    width: 100%;
+    height: 45px;
+    background: none;
+    font-size: 18px;
+    letter-spacing: 2px;
+    font-weight: 300;
+    color: #1296DB;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: 0.25s;
+}
+
+.login-form {
+    margin: 10px 0;
+
+    i {
+        color: #1296DB;
+    }
+}

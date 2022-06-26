@@ -1,3 +1,16 @@
+<!--
+  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
 <template>
     <div class="edit-card">
         <el-card shadow="hover">
@@ -12,7 +25,7 @@
             <div class="edit-content">
                 <el-divider content-position="left">位号信息编辑</el-divider>
                 <div class="content-edit-point">
-                    <el-form :inline="true" :model="pointFormData" :rules="pointFormRule" ref="pointFormData" size="small">
+                    <el-form :inline="true" :model="pointFormData" :rules="pointFormRule" ref="pointFormData" >
                         <div class="edit-point-form">
                             <el-form-item label="位号名称" prop="name">
                                 <el-input clearable
@@ -37,7 +50,6 @@
                                            class="edit-form-medium"
                                            placeholder="请选择数据类型"
                                            v-model="pointFormData.type">
-                                    <el-option label="字符串(string)" value="string"></el-option>
                                     <el-option label="字节(byte)" value="byte"></el-option>
                                     <el-option label="短整数(short)" value="short"></el-option>
                                     <el-option label="整数(int)" value="int"></el-option>
@@ -140,101 +152,101 @@
 </template>
 
 <script>
-    import pointList from '../point/PointList'
-    import {pointById, pointUpdate} from "@/api/point";
+import pointList from "../point/PointList"
+import {pointById, pointUpdate} from "@/api/point";
 
-    export default {
-        components: {pointList},
-        data() {
-            return {
-                id: this.$route.query.id,
-                active: +this.$route.query.active,
-                oldPointFormData: {},
-                pointFormData: {
-                    pointIds: []
-                },
-                pointFormRule: {
-                    name: [
-                        {
-                            required: true,
-                            message: '请输入位号名称',
-                            trigger: 'blur'
-                        }, {
-                            min: 2,
-                            max: 32,
-                            message: '请输入 2~32 位字长的位号名称',
-                            trigger: 'blur'
-                        }, {
-                            pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                            message: '请输入正确格式的位号名称'
-                        }
-                    ],
-                    enable: [
-                        {
-                            required: true,
-                            message: '请选择使能',
-                            trigger: 'change'
-                        }
-                    ],
-                    description: [
-                        {
-                            max: 300,
-                            message: '最多输入300个字符',
-                            trigger: 'blur'
-                        }
-                    ]
-                }
-            }
-        },
-        created() {
-            this.point();
-        },
-        methods: {
-            point() {
-                let id = this.$route.query.id;
-                pointById(id).then(res => {
-                    this.pointFormData = res.data;
-                    this.oldPointFormData = {...res.data};
-                }).catch(() => {
-                });
+export default {
+    components: {pointList},
+    data() {
+        return {
+            id: this.$route.query.id,
+            active: +this.$route.query.active,
+            oldPointFormData: {},
+            pointFormData: {
+                pointIds: []
             },
-            pointUpdate() {
-                this.$refs['pointFormData'].validate((valid) => {
-                    if (valid) {
-                        pointUpdate(this.pointFormData).then(res => {
-                            this.oldPointFormData = {...res.data};
-                        }).catch(() => {
-                        });
+            pointFormRule: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入位号名称",
+                        trigger: "blur"
+                    }, {
+                        min: 2,
+                        max: 32,
+                        message: "请输入 2~32 位字长的位号名称",
+                        trigger: "blur"
+                    }, {
+                        pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
+                        message: "请输入正确格式的位号名称"
                     }
-                });
-            },
-            pre() {
-                this.active--;
-                this.changeActive(this.active);
-            },
-            next() {
-                this.active++;
-                if (this.active > 0) {
-                    this.$router.push({name: 'profileEdit', query: {id: this.$route.query.profileId, active: '1'}})
-                        .catch(() => {
-                        });
-                } else {
-                    this.changeActive(this.active);
-                }
-            },
-            pointReset() {
-                this.pointFormData = {...this.oldPointFormData};
-            },
-            changeActive(step) {
-                let query = this.$route.query;
-                this.$router.push({query: {...query, active: step}})
-                    .catch(() => {
-                    });
+                ],
+                enable: [
+                    {
+                        required: true,
+                        message: "请选择使能",
+                        trigger: "change"
+                    }
+                ],
+                description: [
+                    {
+                        max: 300,
+                        message: "最多输入300个字符",
+                        trigger: "blur"
+                    }
+                ]
             }
         }
-    };
+    },
+    created() {
+        this.point();
+    },
+    methods: {
+        point() {
+            let id = this.$route.query.id;
+            pointById(id).then(res => {
+                this.pointFormData = res.data;
+                this.oldPointFormData = {...res.data};
+            }).catch(() => {
+            });
+        },
+        pointUpdate() {
+            this.$refs["pointFormData"].validate((valid) => {
+                if (valid) {
+                    pointUpdate(this.pointFormData).then(res => {
+                        this.oldPointFormData = {...res.data};
+                    }).catch(() => {
+                    });
+                }
+            });
+        },
+        pre() {
+            this.active--;
+            this.changeActive(this.active);
+        },
+        next() {
+            this.active++;
+            if (this.active > 0) {
+                this.$router.push({name: "profileEdit", query: {id: this.$route.query.profileId, active: "1"}})
+                    .catch(() => {
+                    });
+            } else {
+                this.changeActive(this.active);
+            }
+        },
+        pointReset() {
+            this.pointFormData = {...this.oldPointFormData};
+        },
+        changeActive(step) {
+            let query = this.$route.query;
+            this.$router.push({query: {...query, active: step}})
+                .catch(() => {
+                });
+        }
+    }
+};
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/edit-card.scss";
+@import "~@/components/card/styles/edit-card.scss";
 </style>

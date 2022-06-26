@@ -26,7 +26,7 @@ if `git status | grep "release" &>/dev/null`; then
     type="release"
 fi
 if [[ ${type} == "" ]]; then
-    echo -e "This branch doesn't support tagging, please switch to the \033[31mdevelop\033[0m or \033[31mrelease\033[0m branch."
+    echo -e "This branch doesn"t support tagging, please switch to the \033[31mdevelop\033[0m or \033[31mrelease\033[0m branch."
     exit
 fi
 
@@ -34,7 +34,7 @@ fi
 git pull --tags
 # shellcheck disable=SC2046
 # shellcheck disable=SC2116
-tag=$(echo dc3.${type}.$(date +'%Y%m%d').$(git tag -l "dc3.${type}.$(date +'%Y%m%d').*" | wc -l | xargs printf '%02d'))
+tag=$(echo dc3.${type}.$(date +"%Y%m%d").$(git tag -l "dc3.${type}.$(date +"%Y%m%d").*" | wc -l | xargs printf "%02d"))
 echo "${tag}"
 git tag "${tag}"
 

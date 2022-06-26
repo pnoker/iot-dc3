@@ -1,6 +1,19 @@
+<!--
+  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
 <template>
     <el-skeleton :loading="loading" animated>
-        <template slot="template">
+        <template v-slot:template>
             <div class="things-card">
                 <el-card shadow="hover">
                     <div class="things-card-content">
@@ -44,64 +57,64 @@
 </template>
 
 <script>
-    export default {
-        name: "skeleton-card",
-        props: {
-            loading: {
-                type: Boolean,
-                default: () => {
-                    return false;
-                }
-            },
-            header: {
-                type: Boolean,
-                default: () => {
-                    return false;
-                }
-            },
-            footer: {
-                type: Boolean,
-                default: () => {
-                    return false;
-                }
+export default {
+    name: "skeleton-card",
+    props: {
+        loading: {
+            type: Boolean,
+            default: () => {
+                return false;
+            }
+        },
+        header: {
+            type: Boolean,
+            default: () => {
+                return false;
+            }
+        },
+        footer: {
+            type: Boolean,
+            default: () => {
+                return false;
             }
         }
-    };
+    }
+}
 </script>
 
 <style lang="scss">
-    @import "~@/components/card/styles/things-card.scss";
+@import "~@/components/card/styles/things-card.scss";
 
-    .things-card-header-icon.skeleton {
-        width: 55px !important;
-    }
+.things-card-header-icon.skeleton {
+    width: 55px !important;
+}
 
-    .things-card-header-name.skeleton {
-        margin-top: 10px;
-        height: 28px !important;
-    }
+.things-card-header-name.skeleton {
+    margin-top: 10px;
+    height: 28px !important;
+}
 
-    .nowrap-item.skeleton {
-        margin-bottom: 12px;
-    }
+.nowrap-item.skeleton {
+    margin-bottom: 12px;
+}
 
-    .nowrap-description.skeleton {
-        margin-top: 10px;
-        margin-bottom: 17px;
-    }
+.nowrap-description.skeleton {
+    margin-top: 10px;
+    margin-bottom: 17px;
+}
 
-    .things-card-body-content.center {
-        justify-content: center !important;
-    }
+.things-card-body-content.center {
+    justify-content: center !important;
+}
 
-    .things-card-body-content.left {
-        margin-left: 30px;
-        justify-content: left !important;
-    }
+.things-card-body-content.left {
+    margin-left: 30px;
+    justify-content: left !important;
+}
 
-    .operation-tooltip.skeleton {
-        width: 28px;
-        height: 20px;
-        margin-top: 15px;
-    }
+.operation-tooltip.skeleton {
+    width: 28px;
+    height: 20px;
+    margin-top: 15px;
+}
 </style>

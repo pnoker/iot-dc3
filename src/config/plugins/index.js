@@ -1,14 +1,38 @@
-import '@/config/plugins/element/element.js';
-import '@/config/plugins/highlight/highlight.js';
-import '@/config/plugins/map/baidu-map.js';
+/*
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-console.log(
-    '.___     ___________ ________  _________ ________\n' +
-    '|   | ___\\__    ___/ \\______ \\ \\_   ___ \\\\_____  \\\n' +
-    '|   |/  _ \\|    |     |    |  \\/    \\  \\/  _(__  <\n' +
-    '|   (  <_> )    |     |    `   \\     \\____/       \\\n' +
-    '|___|\\____/|____|    /_______  /\\______  /______  /\n' +
-    '                             \\/        \\/       \\/\n' +
-    'https://doc.dc3.site\n' +
-    '${AnsiColor.BRIGHT_CYAN}DC3 IOT Platform V2022.1.0 ${AnsiColor.BRIGHT_YELLOW}Pnoker${AnsiColor.BRIGHT_CYAN} Authors'
-);
+import ElementPlugins from "@/config/plugins/element/element.js";
+import VueHighlightJSPlugins from "@/config/plugins/highlight/highlight.js";
+import SparklinesPlugins from "@/config/plugins/sparklines/sparklines.js";
+import BaiduMapPlugins from "@/config/plugins/map/baidu-map.js";
+
+
+export default (app) => {
+    ElementPlugins(app)
+    VueHighlightJSPlugins(app)
+    SparklinesPlugins(app)
+    //BaiduMapPlugins(app)
+
+    console.log(
+        ".___     ___________ ________  _________ ________\n" +
+        "|   | ___\\__    ___/ \\______ \\ \\_   ___ \\\\_____  \\\n" +
+        "|   |/  _ \\|    |     |    |  \\/    \\  \\/  _(__  <\n" +
+        "|   (  <_> )    |     |    `   \\     \\____/       \\\n" +
+        "|___|\\____/|____|    /_______  /\\______  /______  /\n" +
+        "                             \\/        \\/       \\/\n" +
+        "https://doc.dc3.site\n" +
+        "DC3 IOT Platform V2022.1.0 Pnoker Authors"
+    )
+}
+
+

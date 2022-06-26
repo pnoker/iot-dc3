@@ -1,12 +1,25 @@
+<!--
+  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
 <template>
-    <el-dialog title="编辑位号值" :visible.sync="formVisible"
+    <el-dialog title="编辑位号值" v-model:visible="formVisible"
                class="things-dialog"
                :show-close="false"
                :append-to-body="true"
                :model-append-to-body="false"
                :close-on-click-modal="false"
                :close-on-press-escape="false">
-        <el-form ref="formData" size="small" :model="formData" :rules="formRule">
+        <el-form ref="formData"  :model="formData" :rules="formRule">
             <el-form-item class="things-dialog-form-item" label="位号值" prop="value">
                 <el-input clearable
                           placeholder="请输入位号值"
@@ -24,73 +37,73 @@
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button @click="cancel" size="small">取消</el-button>
-            <el-button @click="reset" type="success" size="small" plain>重置</el-button>
-            <el-button type="primary" @click="updateThing" size="small">确定</el-button>
+            <el-button @click="cancel" >取消</el-button>
+            <el-button @click="reset" type="success"  plain>重置</el-button>
+            <el-button type="primary" @click="updateThing" >确定</el-button>
         </div>
     </el-dialog>
 </template>
 
 <script>
-    import {successMessage} from "@/util/util";
+import {successMessage} from "@/util/utils";
 
-    export default {
-        name: "point-value-edit-form",
-        props: {
-            formData: {
-                type: Object,
-                default: () => {
-                    return {}
-                }
+export default {
+    name: "point-value-edit-form",
+    props: {
+        formData: {
+            type: Object,
+            default: () => {
+                return {}
             }
-        },
-        data() {
-            return {
-                formRule: {
-                    value: [
-                        {
-                            required: true,
-                            message: '请输入位号值',
-                            trigger: 'blur'
-                        }
-                    ],
-                    description: [
-                        {
-                            max: 300,
-                            message: '最多输入300个字符',
-                            trigger: 'blur'
-                        }
-                    ]
-                },
-                formVisible: false
-            }
-        },
-        methods: {
-            show() {
-                this.formVisible = true;
-            },
-            cancel() {
-                this.formVisible = false;
-            },
-            reset() {
-                this.$refs['formData'].resetFields();
-            },
-            updateThing() {
-                this.$refs['formData'].validate((valid) => {
-                    if (valid) {
-                        this.$emit('update-thing', this.formData, () => {
-                            this.cancel();
-                            this.reset();
-                            successMessage();
-                        });
-                    }
-                });
-            }
-
         }
-    };
+    },
+    data() {
+        return {
+            formRule: {
+                value: [
+                    {
+                        required: true,
+                        message: "请输入位号值",
+                        trigger: "blur"
+                    }
+                ],
+                description: [
+                    {
+                        max: 300,
+                        message: "最多输入300个字符",
+                        trigger: "blur"
+                    }
+                ]
+            },
+            formVisible: false
+        }
+    },
+    methods: {
+        show() {
+            this.formVisible = true;
+        },
+        cancel() {
+            this.formVisible = false;
+        },
+        reset() {
+            this.$refs["formData"].resetFields();
+        },
+        updateThing() {
+            this.$refs["formData"].validate((valid) => {
+                if (valid) {
+                    this.$emit("update-thing", this.formData, () => {
+                        this.cancel();
+                        this.reset();
+                        successMessage();
+                    });
+                }
+            });
+        }
+
+    }
+};
 </script>
 
 <style lang="scss">
-    @import "~@/components/dialog/styles/things-dialog.scss";
+@import "~@/components/dialog/styles/things-dialog.scss";
 </style>
