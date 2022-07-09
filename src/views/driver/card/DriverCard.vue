@@ -60,11 +60,7 @@
     </div>
 </template>
 
-<script lang="ts">
-import DriverCard from "@/views/driver/card"
-
-export default DriverCard
-</script>
+<script src="./index.ts" lang="ts"/>
 
 <style lang="less">
 @import "~@/components/card/styles/things-card.scss";

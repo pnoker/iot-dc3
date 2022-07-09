@@ -91,12 +91,8 @@
     </div>
 </template>
 
-<script lang="ts">
-import DriverTool from "@/views/driver/tool"
+<script src="./index.ts" lang="ts"/>
 
-export default DriverTool
-</script>
-
-<style lang="scss">
+<style lang="less">
 @import "~@/components/card/styles/tool-card.less";
 </style>

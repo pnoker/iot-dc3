@@ -93,11 +93,7 @@
     </div>
 </template>
 
-<script lang="ts">
-import DriverDetail from "@/views/driver/detail"
-
-export default DriverDetail
-</script>
+<script src="./index.ts" lang="ts"/>
 
 <style lang="less">
 </style>
