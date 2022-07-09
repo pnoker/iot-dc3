@@ -11,17 +11,12 @@
  * limitations under the License.
  */
 
-import ElementPlugins from "@/config/plugins/element/element.js";
-import VueHighlightJSPlugins from "@/config/plugins/highlight/highlight.js";
-import SparklinesPlugins from "@/config/plugins/sparklines/sparklines.js";
-import BaiduMapPlugins from "@/config/plugins/map/baidu-map.js";
-
+import ElementPlugins from "@/config/plugins/element/element.js"
+import VueHighlightJSPlugins from "@/config/plugins/highlight/highlight.js"
 
 export default (app) => {
     ElementPlugins(app)
     VueHighlightJSPlugins(app)
-    SparklinesPlugins(app)
-    //BaiduMapPlugins(app)
 
     console.log(
         ".___     ___________ ________  _________ ________\n" +

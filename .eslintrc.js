@@ -17,9 +17,10 @@ module.exports = {
         node: true
     },
     extends: [
-        "plugin:vue/vue3-essential",
+        "plugin:vue/vue3-recommended",
+        "@vue/typescript/recommended",
         "eslint:recommended",
-        "@vue/typescript/recommended"
+        "prettier"
     ],
     parserOptions: {
         ecmaVersion: 2020
@@ -27,7 +28,16 @@ module.exports = {
     rules: {
         "vue/multi-word-component-names": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "brace-style": [2, "1tbs", {"allowSingleLine": true}],
+        "@typescript-eslint/no-empty-function": [
+            "error", {
+                "allow": ["arrowFunctions"]
+            }
+        ],
+        "brace-style": [
+            2,
+            "1tbs",
+            { "allowSingleLine": true }
+        ],
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off"
     }

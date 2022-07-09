@@ -12,14 +12,14 @@
  */
 
 import request from "@/config/axios"
-import { R } from "@/config/type/types";
+import { R } from "@/config/type/types"
 
-export const driverAttributeByDriverId = (id: string) => request<R>({
+export const driverAttributeByDriverIdApi = (id: string) => request<R>({
     url: `api/v3/manager/driver_attribute/driver_id/${id}`,
     method: "get"
-}).then(res => res)
+})
 
-export const pointAttributeByDriverId = (id: string) => request<R>({
+export const pointAttributeByDriverIdApi = (id: string) => request<R>({
     url: `api/v3/manager/point_attribute/driver_id/${id}`,
     method: "get"
-}).then(res => res)
+})

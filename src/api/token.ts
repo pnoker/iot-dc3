@@ -12,7 +12,7 @@
  */
 
 import request from "@/config/axios"
-import { LoginType, R } from "@/config/type/types";
+import { LoginType, R } from "@/config/type/types"
 
 /**
  * 通过用户名获取 Salt
@@ -20,10 +20,10 @@ import { LoginType, R } from "@/config/type/types";
  * @param name 用户名
  * @returns {AxiosPromise}
  */
-export const generateSalt = (name: string) => request<R>({
+export const generateSaltApi = (name: string) => request<R>({
     url: `api/v3/token/salt`,
     method: "post",
-    data: {name}
+    data: { name }
 })
 
 /**
@@ -32,7 +32,7 @@ export const generateSalt = (name: string) => request<R>({
  * @param login {tenant, name, salt, password}
  * @returns {AxiosPromise}
  */
-export const generateToken = (login: LoginType) => request<R>({
+export const generateTokenApi = (login: LoginType) => request<R>({
     url: `api/v3/token/generate`,
     method: "post",
     data: login
@@ -44,10 +44,10 @@ export const generateToken = (login: LoginType) => request<R>({
  * @param name 用户名
  * @returns {AxiosPromise}
  */
-export const cancelToken = (name: string) => request<R>({
+export const cancelTokenApi = (name: string) => request<R>({
     url: `api/v3/token/cancel`,
     method: "post",
-    data: {name}
+    data: { name }
 })
 
 /**
@@ -56,7 +56,7 @@ export const cancelToken = (name: string) => request<R>({
  * @param login {name, salt, token}
  * @returns {Promise}
  */
-export const checkTokenValid = (login: LoginType) => request<R>({
+export const checkTokenValidApi = (login: LoginType) => request<R>({
     url: `api/v3/token/check`,
     method: "post",
     data: login

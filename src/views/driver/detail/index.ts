@@ -11,27 +11,30 @@
  * limitations under the License.
  */
 
-import { reactive } from "vue"
+import { defineComponent, reactive, computed } from "vue"
+import { Connection, Edit, Management, Monitor, Position, Promotion, Sunset } from "@element-plus/icons-vue"
+
 import { useRoute } from 'vue-router'
 import router from "@/config/router"
 
-import blankCard from "@/components/card/blank-card.vue"
-import baseCard from "@/components/card/base-card.vue"
-import detailCard from "@/components/card/detail-card.vue"
-import skeletonCard from "@/components/card/skeleton-card.vue"
-import driverTool from "../tool/DriverTool.vue"
-import deviceList from "../../device/DeviceList.vue"
-import driverCard from "../card/DriverCard.vue"
-import deviceCard from "../../device/DeviceCard.vue"
-import pointCard from "../../point/PointCard.vue"
+import { Order } from "@/config/type/types"
 
-import { deviceByDriverId, deviceStatusByDriverId } from "@/api/device"
-import { driverDictionary, profileDictionary } from "@/api/dictionary"
-import { driverById, driverList, driverStatus } from "@/api/driver"
+import blankCard from "@/components/card/blank/BlankCard.vue"
+import baseCard from "@/components/card/base/BaseCard.vue"
+import detailCard from "@/components/card/detail/DetailCard.vue"
+import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
+import driverTool from "@/views/driver/tool/DriverTool.vue"
+import deviceList from "@/views/device/Device.vue"
+import driverCard from "@/views/driver/card/DriverCard.vue"
+import deviceCard from "@/views/device/card/DeviceCard.vue"
+import pointCard from "@/views/point/card/PointCard.vue"
 
-import { dateFormat, setCopyContent } from "@/util/utils"
+import { deviceByDriverIdApi, deviceStatusByDriverIdApi } from "@/api/device"
+import { driverByIdApi, driverListApi, driverStatusApi, driverByIdsApi } from "@/api/driver"
+import { profileByIdsApi } from "@/api/profile"
+import { timestamp } from "@/util/CommonUtils"
 
-export default {
+export default defineComponent({
     name: "DriverDetail",
     components: {
         blankCard,
@@ -42,12 +45,20 @@ export default {
         deviceList,
         driverCard,
         deviceCard,
-        pointCard
+        pointCard,
+        Position,
+        Promotion,
+        Edit,
+        Sunset,
+        Management,
+        Connection,
+        Monitor
     },
     setup() {
         const route = useRoute()
 
-        let reactiveData = reactive({
+        // 定义响应式数据
+        const reactiveData = reactive({
             id: route.query.id as string,
             active: route.query.active,
             driverLoading: true,
@@ -57,8 +68,8 @@ export default {
             profileTable: {} as any,
             driverStatusTable: {} as any,
             deviceStatusTable: {} as any,
-            listDriverData: [{} as any],
-            listDeviceData: [{} as any],
+            listDriverData: [] as any[],
+            listDeviceData: [] as any[],
             query: {
                 type: "driver"
             },
@@ -67,52 +78,65 @@ export default {
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [{} as any]
+                orders: [] as Order[]
             }
         })
 
+        const hasDriverData = computed(() => {
+            return !reactiveData.driverLoading && reactiveData.listDriverData?.length < 1
+        })
+
+        const deviceName = computed(() => {
+            return reactiveData.listDeviceData.map(device => device.name).join(", ") || "-"
+        })
+
+        const hasDeviceData = computed(() => {
+            return !reactiveData.deviceLoading && reactiveData.listDeviceData?.length < 1
+        })
+
         const driver = () => {
-            driverById(reactiveData.id).then(res => {
+            driverByIdApi(reactiveData.id).then(res => {
                 reactiveData.data = res.data.data
             })
         }
 
         const device = () => {
-            deviceByDriverId(reactiveData.id).then(res => {
+            deviceByDriverIdApi(reactiveData.id).then(res => {
                 reactiveData.listDeviceData = res.data.data
+
+                // driver 
+                const driverIds = Array.from(new Set(reactiveData.listDeviceData.map(device => device.driverId)))
+                driverByIdsApi(driverIds).then(res => {
+                    reactiveData.driverTable = res.data.data
+                }).catch(() => {
+                    // nothing to do
+                })
+
+                // profile
+                const profileIds = Array.from(new Set(reactiveData.listDeviceData.reduce((pre, cur) => {
+                    pre.push(...cur.profileIds)
+                    return pre
+                }, [])))
+                profileByIdsApi(profileIds).then(res => {
+                    reactiveData.profileTable = res.data.data
+                }).catch(() => {
+                    // nothing to do
+                })
             }).catch(() => {
                 reactiveData.listDeviceData = []
             }).finally(() => {
                 reactiveData.deviceLoading = false
             })
 
-            deviceStatusByDriverId(reactiveData.id).then(res => {
+            deviceStatusByDriverIdApi(reactiveData.id).then(res => {
                 reactiveData.deviceStatusTable = res.data.data
             }).catch(() => {
                 reactiveData.deviceStatusTable = {}
             })
         }
 
-        const drivers = () => {
-            driverDictionary().then(res => {
-                reactiveData.driverTable = res.data.data.reduce((pre, cur) => {
-                    pre[cur.value] = cur.label
-                    return pre
-                }, {})
-            })
-        }
-
-        const profiles = () => {
-            profileDictionary().then(res => {
-                reactiveData.profileTable = res.data.data.reduce((pre, cur) => {
-                    pre[cur.value] = cur.label
-                    return pre
-                }, {})
-            })
-        }
-
         const list = () => {
-            driverList({
+            driverListApi({
                 page: reactiveData.page,
                 ...reactiveData.query
             }).then(res => {
@@ -120,11 +144,13 @@ export default {
                 reactiveData.page.total = data.total
                 data.records.forEach(driver => driver.active = reactiveData.id === driver.id)
                 reactiveData.listDriverData = data.records
+            }).catch(() => {
+                // nothing to do
             }).finally(() => {
                 reactiveData.driverLoading = false
             })
 
-            driverStatus({
+            driverStatusApi({
                 page: reactiveData.page,
                 ...reactiveData.query
             }).then(res => {
@@ -133,12 +159,12 @@ export default {
         }
 
         const search = (params) => {
-            reactiveData.query = {...params, type: "driver"}
+            reactiveData.query = { ...params, type: "driver" }
             list()
         }
 
         const reset = () => {
-            reactiveData.query = {type: "driver"}
+            reactiveData.query = { type: "driver" }
             list()
         }
 
@@ -149,9 +175,9 @@ export default {
         const sort = () => {
             reactiveData.order = !reactiveData.order;
             if (reactiveData.order) {
-                reactiveData.page.orders = [{column: "create_time", asc: true}]
+                reactiveData.page.orders = [{ column: "create_time", asc: true }]
             } else {
-                reactiveData.page.orders = [{column: "create_time", asc: false}]
+                reactiveData.page.orders = [{ column: "create_time", asc: false }]
             }
             list()
         }
@@ -166,58 +192,42 @@ export default {
             list()
         }
 
-        const deviceName = () => {
-            return reactiveData.listDeviceData.map(device => device.name).join(", ")
-        }
-
         const changeActive = (tab) => {
             reactiveData.active = tab.name
-            let query = route.query;
-            router.push({query: {...query, active: tab.name}})
+            const query = route.query;
+            router.push({ query: { ...query, active: tab.props.name } })
         }
 
         const selectChange = (data) => {
             reactiveData.listDriverData.forEach(driver => driver.active = data.id === driver.id)
 
             reactiveData.id = data.id
-            let query = route.query
-            router.push({query: {...query, id: data.id}})
+            const query = route.query
+            router.push({ query: { ...query, id: data.id } })
                 .then(() => {
                     driver()
                     device()
                 })
         }
 
-        // 复制ID
-        const copyId = (content) => {
-            setCopyContent(content, true, "驱动ID")
-        }
-
-        // 格式化时间
-        const timestamp = (timestamp) => {
-            return dateFormat(new Date(timestamp))
-        }
-
-        // 加载数据
         driver()
         device()
-        drivers()
-        profiles()
         list()
 
         return {
             reactiveData,
+            hasDriverData,
+            deviceName,
+            hasDeviceData,
             search,
             reset,
             refresh,
             sort,
             sizeChange,
             currentChange,
-            deviceName,
             changeActive,
             selectChange,
-            copyId,
             timestamp
         }
     }
-}
+})

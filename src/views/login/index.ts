@@ -11,18 +11,20 @@
  * limitations under the License.
  */
 
-import { reactive, ref } from "vue"
+import { defineComponent, reactive, ref, unref } from "vue"
 import { FormInstance, FormRules } from "element-plus"
 import { Box, Lock, User } from "@element-plus/icons-vue"
 
 import Particles from "@/components/particles/particles.vue"
 import { useStore } from "vuex"
 
-export default {
+export default defineComponent({
     name: "Login",
-    components: {Particles},
+    components: { Particles },
     setup() {
         const store = useStore()
+
+        // 定义表单引用
         const formDataRef = ref<FormInstance>()
 
         // 图标
@@ -33,52 +35,51 @@ export default {
         }
 
         // 定义响应式数据
-        let common = reactive({
+        const reactiveData = reactive({
             isHide: "View",
             passwordType: "password",
-        })
-        let formData = reactive({
-            tenant: "default",
-            name: "pnoker",
-            password: "dc3dc3dc3",
+            formData: {
+                tenant: "default",
+                name: "pnoker",
+                password: "dc3dc3dc3",
+            }
         })
 
-        // 定义Form规则
-        let formRule = reactive<FormRules>({
-            tenant: [{required: true, message: "请输入租户名", trigger: "blur"}],
-            name: [{required: true, message: "请输入用户名", trigger: "blur"}],
+        // 定义表单校验规则
+        const formRule = reactive<FormRules>({
+            tenant: [{ required: true, message: "请输入租户名", trigger: "blur" }],
+            name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
             password: [
-                {required: true, message: "请输入密码", trigger: "blur"},
-                {min: 6, message: "密码长度最少为6位", trigger: "blur"},
+                { required: true, message: "请输入密码", trigger: "blur" },
+                { min: 6, message: "密码长度最少为6位", trigger: "blur" },
             ],
         })
 
         // 显示、隐藏密码
         const showPassword = () => {
-            common.passwordType === ""
-                ? (common.passwordType = "password")
-                : (common.passwordType = "")
-            common.isHide === "View"
-                ? (common.isHide = "Hide")
-                : (common.isHide = "View")
+            reactiveData.passwordType === ""
+                ? (reactiveData.passwordType = "password")
+                : (reactiveData.passwordType = "")
+            reactiveData.isHide === "View"
+                ? (reactiveData.isHide = "Hide")
+                : (reactiveData.isHide = "View")
         }
 
         // 登录
-        const handleLogin = (formInstance: FormInstance) => {
-            formInstance.validate((valid) => {
-                if (valid) store.dispatch("auth/login", formData)
+        const handleLogin = () => {
+            const form = unref(formDataRef)
+            form?.validate((valid) => {
+                if (valid) store.dispatch("auth/login", reactiveData.formData)
             })
         }
 
         return {
-            store,
             formDataRef,
-            common,
-            formData,
+            reactiveData,
             formRule,
             showPassword,
             handleLogin,
             ...Icon
         }
     }
-}
+})

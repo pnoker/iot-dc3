@@ -11,25 +11,25 @@
  * limitations under the License.
  */
 
-import request from "@/config/axios";
-import { R } from "@/config/type/types";
+import request from "@/config/axios"
+import { R } from "@/config/type/types"
 
-export const driverDictionary = () => request<R>({
+export const driverDictionaryApi = () => request<R>({
     url: `api/v3/manager/dictionary/driver`,
     method: "get"
-}).then(res => res)
+})
 
-export const profileDictionary = () => request<R>({
+export const profileDictionaryApi = () => request<R>({
     url: `api/v3/manager/dictionary/profile`,
     method: "get"
-}).then(res => res)
+})
 
-export const deviceDictionary = () => request<R>({
+export const deviceDictionaryApi = () => request<R>({
     url: `api/v3/manager/dictionary/device`,
     method: "get"
-}).then(res => res)
+})
 
-export const pointDictionary = (parent: string) => request<R>({
+export const pointDictionaryApi = (parent: string) => request<R>({
     url: `api/v3/manager/dictionary/point/${parent}`,
     method: "get"
-}).then(res => res)
+})

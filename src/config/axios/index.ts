@@ -11,49 +11,32 @@
  * limitations under the License.
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponseHeaders } from "axios"
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios"
 
 import router from "@/config/router"
 import store from "@/config/store"
 
 import NProgress from "nprogress"
 import "nprogress/nprogress.css"
-import { ElMessage } from "element-plus"
+
 import { getStore } from "@/util/store";
 import common from "@/util/common";
-
-declare module "axios" {
-    interface AxiosResponse<T = any, D = any> {
-        data: T
-        status: number
-        statusText: string
-        headers: AxiosResponseHeaders
-        config: AxiosRequestConfig<D>
-        request?: any
-    }
-
-    interface AxiosPromise<T = any> extends Promise<AxiosResponse<T>> {
-    }
-
-    interface AxiosInstance extends Axios {
-        <T>(config: AxiosRequestConfig): AxiosPromise<T>
-
-        <T>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
-    }
-}
+import { isNull } from "@/util/utils";
+import { warning } from "@/util/MessageUtils";
 
 NProgress.configure({
     easing: "ease",
     showSpinner: false
 })
 
+const noAuthMessage = "检测到您未登录或登陆凭证已失效，请重新登录"
+
 const request: AxiosInstance = axios.create({
     timeout: 15000,
     withCredentials: true,
     headers: {
         "Accept": "application/json",
-        "Content-Type": "application/json",
-        "X-Auth-Token": getStore(common.TOKEN_HEADER, false)
+        "Content-Type": "application/json"
     },
     validateStatus(status): boolean {
         return status >= 200 && status <= 500
@@ -61,54 +44,42 @@ const request: AxiosInstance = axios.create({
 })
 
 request.interceptors.request.use((config: AxiosRequestConfig) => {
-        NProgress.start()
+    NProgress.start()
 
-        return config
-    },
+    const token = getStore(common.TOKEN_HEADER, false)
+    if (!isNull(token)) {
+        const headers = config.headers
+        if (headers) headers[common.TOKEN_HEADER] = token
+    }
+
+    return config
+},
     (error: any) => {
-        const {response} = error
-        if (response) {
-            return Promise.reject(response.data)
-        } else {
-            ElMessage({
-                type: "warning",
-                grouping: true,
-                showClose: true,
-                message: "网络连接异常,请稍后再试",
-            })
-        }
+        NProgress.done()
+        return Promise.reject(error)
     })
 
 request.interceptors.response.use((response) => {
-        const ok = response.data.ok || false
-        const status = response.status || 200
-        const message = response.data.message || "网络连接异常,请稍后再试"
+    NProgress.done()
 
-        if (!ok) {
-            if (status === 401) {
-                ElMessage({
-                    type: "warning",
-                    grouping: true,
-                    showClose: true,
-                    message: "未登录或登陆凭证已失效，请重新登录",
-                })
-                store.dispatch("clearToken").then(() => router.push({path: "/login"}))
-            }
-            return Promise.reject(new Error(message))
+    const ok = response.data.ok || false
+    const status = response.status || 401
+
+    if (!ok && status === 401) {
+        warning(noAuthMessage)
+        store.dispatch("auth/logout").then(() => router.push({ path: "/login" }))
+        return Promise.reject(noAuthMessage)
+    }
+
+    return response
+},
+    (error: any) => {
+        NProgress.done()
+
+        if (!axios.isCancel(error)) {
+            console.log("Response error:", error)
         }
 
-        NProgress.done()
-        return response
-    },
-    (error: any) => {
-        ElMessage({
-            type: "error",
-            grouping: true,
-            showClose: true,
-            message: error.message,
-        })
-
-        NProgress.done()
         return Promise.reject(error)
     })
 

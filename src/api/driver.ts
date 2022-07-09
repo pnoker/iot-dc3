@@ -11,22 +11,28 @@
  * limitations under the License.
  */
 
-import request from "@/config/axios";
-import { R } from "@/config/type/types";
+import request from "@/config/axios"
+import { R } from "@/config/type/types"
 
-export const driverById = (id: string) => request<R>({
+export const driverByIdApi = (id: string) => request<R>({
     url: `api/v3/manager/driver/id/${id}`,
     method: "get"
-}).then(res => res)
+})
 
-export const driverList = (driver: any) => request<R>({
+export const driverByIdsApi = (driverIds: any) => request<R>({
+    url: `api/v3/manager/driver/ids`,
+    method: "post",
+    data: driverIds
+})
+
+export const driverListApi = (driver: any) => request<R>({
     url: `api/v3/manager/driver/list`,
     method: "post",
     data: driver
-}).then(res => res)
+})
 
-export const driverStatus = (driver: any) => request<R>({
+export const driverStatusApi = (driver: any) => request<R>({
     url: `api/v3/manager/status/driver`,
     method: "post",
     data: driver
-}).then(res => res)
+})

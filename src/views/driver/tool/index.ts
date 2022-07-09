@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref } from "vue"
+import { defineComponent, reactive, ref, unref } from "vue"
 import { FormInstance, FormRules } from "element-plus"
-import { Refresh, RefreshRight, Search, Sort } from "@element-plus/icons-vue"
+import { Plus, Refresh, RefreshRight, Search, Sort } from "@element-plus/icons-vue"
 
 import { useStore } from "vuex"
 
@@ -31,62 +31,68 @@ export default defineComponent({
             default: () => false
         }
     },
-    setup(props, context) {
+    emits: ["search", "reset", "refresh", "sort", "size-change", "current-change"],
+    setup(props, { emit }) {
         const store = useStore()
+
+        // 定义表单引用
         const formDataRef = ref<FormInstance>()
+
+        // 定义响应式数据
+        const reactiveData = reactive({})
+
+        // 定义表单校验规则
+        const formRule = reactive<FormRules>({
+            port: [
+                { type: "number", message: "端口必须为数字值" }
+            ]
+        })
 
         // 图标
         const Icon = {
+            Plus,
             Search,
             RefreshRight,
             Refresh,
             Sort,
         }
 
-        // 定义响应式数据
-        let formData = reactive({})
-
-        // 定义Form规则
-        let formRule = reactive<FormRules>({
-            port: [
-                {type: "number", message: "端口必须为数字值"}
-            ]
-        })
-
-        const search = (formInstance: FormInstance) => {
-            formInstance.validate((valid) => {
+        const search = () => {
+            const form = unref(formDataRef)
+            form?.validate((valid) => {
                 if (valid) {
-                    context.emit("search", formData)
+                    emit("search", reactiveData)
                 }
             });
         }
 
-        const reset = (formInstance: FormInstance) => {
-            formInstance.resetFields();
-            context.emit("reset");
+        const reset = () => {
+            const form = unref(formDataRef)
+            form?.resetFields();
+            emit("reset");
         }
 
         const refresh = () => {
-            context.emit("refresh");
+            emit("refresh");
         }
 
         const sort = () => {
-            context.emit("sort");
+            emit("sort");
         }
 
         const sizeChange = (size) => {
-            context.emit("size-change", size);
+            emit("size-change", size);
         }
 
         const currentChange = (current) => {
-            context.emit("current-change", current);
+            emit("current-change", current);
         }
 
         return {
             store,
             formDataRef,
-            formData,
             formRule,
+            reactiveData,
             search,
             reset,
             refresh,

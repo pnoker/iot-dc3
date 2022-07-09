@@ -31,11 +31,11 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
         document.title = to.meta.title as string
     }
 
-    if (from.name === "login") {
+    if (from.name === "login" || to.name === "login") {
         next()
     } else {
         if (!getStore(common.TOKEN_HEADER, false)) {
-            next({path: "/login"})
+            next({ path: "/login" })
         } else {
             next()
         }

@@ -11,12 +11,21 @@
  * limitations under the License.
  */
 
+import { computed, defineComponent } from "vue"
+import { CircleCheck, CircleClose, Connection, Edit, Monitor, Promotion, Sunset, SwitchButton } from "@element-plus/icons-vue"
+
 import router from "@/config/router"
+import { copyId, timestamp } from "@/util/CommonUtils"
 
-import { dateFormat, setCopyContent } from "@/util/utils"
-
-export default {
+export default defineComponent({
     name: "DriverCard",
+    components: {
+        Promotion,
+        Edit,
+        Sunset,
+        Connection,
+        Monitor
+    },
     props: {
         icon: {
             type: String,
@@ -31,16 +40,7 @@ export default {
         data: {
             type: Object,
             default: () => {
-                return {
-                    name: "",
-                    serviceName: "",
-                    host: "",
-                    port: "",
-                    enable: "",
-                    description: "",
-                    createTime: "",
-                    updateTime: ""
-                }
+                return {}
             }
         },
         footer: {
@@ -48,37 +48,39 @@ export default {
             default: () => false
         }
     },
-    setup(props, context) {
-        // 驱动状态
-        const status = (id) => props.statusTable[id]
+    emits: ["select-change"],
+    setup(props, { emit }) {
+        // 图标
+        const Icon = {
+            SwitchButton,
+            CircleCheck,
+            CircleClose
+        }
 
         // 驱动详情
-        const detail = (id) => {
-            router.push({name: "driverDetail", query: {id, active: "detail"}})
+        const detail = () => {
+            const id = props.data.id
+            if (id) router.push({ name: "driverDetail", query: { id, active: "detail" } })
         }
 
         // 选中驱动
-        const select = (data) => {
-            context.emit("select-change", data)
+        const select = () => {
+            emit("select-change", props.data)
         }
 
-        // 复制ID
-        const copyId = (content) => {
-            setCopyContent(content, true, "驱动ID")
-        }
-
-        // 格式化时间
-        const timestamp = (timestamp) => {
-            return dateFormat(new Date(timestamp))
-        }
+        // 驱动状态
+        const status = computed(() => {
+            const id = props.data.id
+            return id && props.statusTable[id] ? props.statusTable[id] : ""
+        })
 
         return {
             status,
             detail,
             select,
             copyId,
-            timestamp
+            timestamp,
+            ...Icon
         }
     }
-}
-;
+})

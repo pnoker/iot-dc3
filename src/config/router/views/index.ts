@@ -53,7 +53,7 @@ const routes: RouteRecordRaw = {
                 icon: "Management",
                 title: "设备"
             },
-            component: () => import("@/views/device/DeviceList.vue")
+            component: () => import("@/views/device/Device.vue")
         },
         {
             name: "pointValue",
@@ -62,7 +62,7 @@ const routes: RouteRecordRaw = {
                 icon: "Histogram",
                 title: "数据"
             },
-            component: () => import("@/views/point/value/PointValueList.vue")
+            component: () => import("@/views/point/value/PointValue.vue")
         }
     ]
 }

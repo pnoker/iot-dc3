@@ -17,7 +17,7 @@ import common from "@/util/common"
 import { getStore, removeCookies, removeStore, setCookies, setStore } from "@/util/store"
 
 import router from "@/config/router";
-import { cancelToken, generateSalt, generateToken } from "@/api/token"
+import { cancelTokenApi, generateSaltApi, generateTokenApi } from "@/api/token"
 
 import { ElLoading } from "element-plus";
 
@@ -41,12 +41,12 @@ const auth = {
         }
     },
     actions: {
-        login({commit}, form) {
+        login({ commit }, form) {
             const loading = ElLoading.service({
                 lock: true,
                 text: "登录中,请稍后。。。",
             })
-            generateSalt(form.name).then(res => {
+            generateSaltApi(form.name).then(res => {
                 const salt = res.data.data
                 const login = {
                     tenant: form.tenant,
@@ -55,7 +55,7 @@ const auth = {
                     password: md5(md5(form.password) + salt)
                 }
 
-                generateToken(login).then(res => {
+                generateTokenApi(login).then(res => {
                     commit("setToken",
                         {
                             tenant: login.tenant,
@@ -64,14 +64,14 @@ const auth = {
                             token: res.data.data
                         }
                     )
-                    router.push({path: "/"}).then(() => loading.close())
+                    router.push({ path: "/" }).then(() => loading.close())
                 }).catch(() => loading.close())
             }).catch(() => loading.close())
         },
-        logout({commit}) {
+        logout({ commit }) {
             const token = getStore(common.TOKEN_HEADER, false)
             if (token && token.name) {
-                cancelToken(token.name)
+                cancelTokenApi(token.name)
             }
             commit("removeToken")
         }

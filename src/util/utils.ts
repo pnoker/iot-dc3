@@ -39,7 +39,7 @@ export const setCopyContent = (content: any, detail: any, message: any) => {
                 tip = `已复制 ${content} 到剪切板！`;
             }
         }
-        ElMessage.success({message: tip, center: true});
+        ElMessage.success({ message: tip, center: true });
     }
 
     document.body.removeChild(document.getElementById("copy-id-input") as Node);
@@ -304,7 +304,7 @@ export const calcDate = (date1, date2) => {
  * @param date
  * @returns {string}
  */
-export function dateFormat(date) {
+export function dateFormat(date: any): string {
     let format = "yyyy-MM-dd hh:mm:ss";
     if (date !== "Invalid Date") {
         const o = {

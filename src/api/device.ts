@@ -11,60 +11,66 @@
  * limitations under the License.
  */
 
-import request from "@/config/axios";
-import { R } from "@/config/type/types";
+import request from "@/config/axios"
+import { R } from "@/config/type/types"
 
-export const deviceAdd = (device: any) => request<R>({
+export const deviceAddApi = (device: any) => request<R>({
     url: `api/v3/manager/device/add`,
     method: "post",
     data: device
-}).then(res => res)
+})
 
-export const deviceDelete = (id: string) => request<R>({
+export const deviceDeleteApi = (id: string) => request<R>({
     url: `api/v3/manager/device/delete/${id}`,
     method: "post"
-}).then(res => res)
+})
 
-export const deviceUpdate = (device: any) => request<R>({
+export const deviceUpdateApi = (device: any) => request<R>({
     url: `api/v3/manager/device/update`,
     method: "post",
     data: device
-}).then(res => res)
+})
 
-export const deviceById = (id: string) => request<R>({
+export const deviceByIdApi = (id: string) => request<R>({
     url: `api/v3/manager/device/id/${id}`,
     method: "get"
-}).then(res => res)
+})
 
-export const deviceByDriverId = (driverId: string) => request<R>({
+export const deviceByIdsApi = (deviceIds: any) => request<R>({
+    url: `api/v3/manager/device/ids`,
+    method: "post",
+    data: deviceIds
+})
+
+export const deviceByDriverIdApi = (driverId: string) => request<R>({
     url: `api/v3/manager/device/driver_id/${driverId}`,
     method: "get"
-}).then(res => res)
+})
 
-export const deviceByProfileId = (profileId: string) => request<R>({
+export const deviceByProfileIdApi = (profileId: string) => request<R>({
     url: `api/v3/manager/device/profile_id/${profileId}`,
     method: "get"
-}).then(res => res)
+})
 
-export const deviceList = (device: any) => request<R>({
+export const deviceListApi = (device: any) => request<R>({
     url: `api/v3/manager/device/list`,
     method: "post",
     data: device
-}).then(res => res)
+})
 
 // device status
-export const deviceStatus = (device) => request<R>({
+export const deviceStatusApi = (device) => request<R>({
     url: `api/v3/manager/status/device`,
     method: "post",
     data: device
-}).then(res => res)
+})
 
-export const deviceStatusByDriverId = (driverId: string) => request<R>({
+export const deviceStatusByDriverIdApi = (driverId: string) => request<R>({
     url: `api/v3/manager/status/device/driver_id/${driverId}`,
     method: "get"
-}).then(res => res)
+})
 
-export const deviceStatusByProfileId = (profileId: string) => request<R>({
+export const deviceStatusByProfileIdApi = (profileId: string) => request<R>({
     url: `api/v3/manager/status/device/profile_id/${profileId}`,
     method: "get"
-}).then(res => res)
+})

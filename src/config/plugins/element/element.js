@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import {Hide, Histogram, List, Management, Promotion, View} from "@element-plus/icons-vue"
+import { Hide, Histogram, List, Management, Promotion, View } from "@element-plus/icons-vue"
 import element from "element-plus"
 import "element-plus/dist/index.css"
 import './element-variables.less'
@@ -29,5 +29,5 @@ export default (app) => {
     Icons.forEach(icon => {
         app.component(icon.name, icon)
     })
-    app.use(element, {locale})
+    app.use(element, { locale })
 }

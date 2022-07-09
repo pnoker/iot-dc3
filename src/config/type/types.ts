@@ -30,3 +30,23 @@ export interface LoginType {
     salt: string
     password: string
 }
+
+/**
+ * 字典
+ */
+export interface Dictionary {
+    type: string
+    value: string
+    disabled: boolean
+    expand: boolean
+    label: string
+    children: Array<Dictionary>
+}
+
+/**
+ * 排序
+ */
+export interface Order {
+    column: string
+    asc: boolean
+}

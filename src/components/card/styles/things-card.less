@@ -1,0 +1,229 @@
+/*
+ * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.things-card {
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-bottom: 6px;
+    border-radius: 5px;
+    box-sizing: border-box;
+
+    .things-card-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .things-card__header {
+            width: 100%;
+            height: 55px;
+            display: flex;
+
+            .things-card-header-icon {
+                width: 48px;
+                height: 48px;
+                margin-right: 12px;
+                border-radius: 10px;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            .things-card-header-name {
+                height: 48px;
+                line-height: 48px;
+                font-size: 14px;
+                font-weight: bold;
+                color: rgba(0, 0, 0, .85);
+                cursor: pointer;
+
+                &:hover {
+                    color: #1890ff;
+                }
+            }
+
+            .things-card-header-status {
+                height: 48px;
+                line-height: 48px;
+                text-align: right;
+                flex: 1;
+            }
+        }
+
+        .things-card__body {
+            display: flex;
+            flex-direction: column;
+
+            ul {
+                padding-inline-start: 5px;
+                list-style: none;
+
+                li {
+                    font-size: 13px;
+                    margin-top: 8px;
+                }
+            }
+
+            .things-card-body-content {
+                display: flex;
+                justify-content: space-around;
+
+                p.nowrap-description {
+                    text-align: center;
+                }
+            }
+
+            .things-card-body-content-time {
+                display: flex;
+                justify-content: center;
+                margin-top: 5px;
+            }
+
+            .things-card-body-content-value {
+                display: flex;
+                flex-direction: column;
+                list-style: none;
+                text-align: center;
+
+                .value {
+                    font-weight: bold;
+                    font-size: xx-large;
+                    animation: hue 1s ease-in;
+                    cursor: pointer;
+                }
+
+                .value-edit {
+                    cursor: pointer;
+                    color: #1296DB;
+                }
+
+                .value-detail {
+                    margin-top: 8px;
+                    margin-bottom: -4px;
+                    cursor: pointer;
+                    color: #1296DB;
+                    font-size: 18px;
+                }
+
+                .value-point {
+                    height: 17px;
+                }
+
+                @keyframes hue {
+                    0% {
+                        color: #1296DB;
+                    }
+
+                    50% {
+                        color: #f3f4fe;
+                    }
+
+                    100% {
+                        color: #1296DB;
+                    }
+                }
+            }
+
+            .things-body-content-item-column-2 {
+                width: 200px;
+            }
+
+        }
+
+        .things-card__footer {
+            height: 35px;
+            margin-top: 2px;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #dcdfe6;
+
+            .things-card-footer-title {
+                text-align: center;
+                font-size: 14px;
+                font-weight: bold;
+                width: 100%;
+                margin-top: 5px;
+            }
+
+            .things-card-footer-copy-id {
+                height: 35px;
+                line-height: 35px;
+                text-align: center;
+            }
+
+            .things-card-footer-operation {
+                height: 35px;
+                display: flex;
+
+                .operation-tooltip {
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+
+
+    .nowrap-name {
+        display: block;
+        width: 200px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .nowrap-item {
+        display: block;
+        width: 300px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .nowrap-description {
+        display: block;
+        width: 350px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .el-card {
+        width: 100%;
+        min-width: 300px;
+        min-height: 230px;
+        box-sizing: border-box;
+    }
+
+    .el-card__body {
+        padding: 10px;
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.header-enable {
+    border-bottom: 1px solid #c2e7b0;
+}
+
+.header-disable {
+    border-bottom: 1px solid #fbc4c4;
+}
+
+.el-popover.el-popper {
+    width: 300px;
+}

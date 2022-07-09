@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-const {semver, error} = require("@vue/cli-shared-utils")
+const { semver, error } = require("@vue/cli-shared-utils")
 const requiredVersion = require("@vue/cli-service/package.json").engines.node
 
-if (!semver.satisfies(process.version, requiredVersion, {includePrerelease: true})) {
+if (!semver.satisfies(process.version, requiredVersion, { includePrerelease: true })) {
     error(
         `You are using Node ${process.version}, but vue-cli-service ` +
         `requires Node ${requiredVersion}.\nPlease upgrade your Node version.`
@@ -74,7 +74,7 @@ function loadEnv(env) {
         })
         dotenvExpand.expand(localEnvConfig)
         // 加载env文件
-        const envConfig = dotenv.config({path: envPath, debug: process.env.DEBUG})
+        const envConfig = dotenv.config({ path: envPath, debug: process.env.DEBUG })
         dotenvExpand.expand(envConfig)
     } catch (err) {
         // 忽略文件不存在错误

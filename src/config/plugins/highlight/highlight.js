@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import VueHighlightJS from 'vue-highlightjs'
+import VueHighlightJS from 'vue3-highlightjs'
 import 'highlight.js/styles/atom-one-dark.css'
 
 export default (app) => {

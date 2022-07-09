@@ -12,7 +12,7 @@
  */
 
 import { createApp } from "vue"
-import App from "./App.vue"
+import App from "@/App.vue"
 
 import axios from "@/config/axios"
 import vueAxios from "vue-axios"

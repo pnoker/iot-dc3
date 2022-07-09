@@ -16,7 +16,7 @@ const interval = {
         pointValueInterval: null
     },
     actions: {
-        ClearPointValueInterval({commit}, interval) {
+        ClearPointValueInterval({ commit }, interval) {
             commit("CLEAR_POINT_VALUE_INTERVAL", interval);
         }
     },

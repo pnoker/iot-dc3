@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-const {defineConfig} = require("@vue/cli-service")
+const { defineConfig } = require("@vue/cli-service")
 module.exports = defineConfig({
     publicPath: "./",
     lintOnSave: true,
