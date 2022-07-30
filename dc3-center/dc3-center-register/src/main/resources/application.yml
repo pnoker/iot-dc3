@@ -26,7 +26,7 @@ spring:
 
 logging:
   level:
-    com.dc3: DEBUG
+    io.github.pnoker: DEBUG
   file:
     name: dc3/logs/center/register/${spring.application.name}.log
 

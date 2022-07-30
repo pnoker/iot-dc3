@@ -182,17 +182,17 @@
     },
     {
       "name": "driver.mqtt.auth-type",
-      "type": "com.dc3.common.sdk.bean.mqtt.MqttProperties.AuthTypeEnum",
+      "type": "io.github.pnoker.common.sdk.bean.mqtt.MqttProperties.AuthTypeEnum",
       "description": "mqtt auth type."
     },
     {
       "name": "driver.mqtt.receive-topics",
-      "type": "java.util.List<com.dc3.common.sdk.bean.mqtt.MqttProperties.Topic>",
+      "type": "java.util.List<io.github.pnoker.common.sdk.bean.mqtt.MqttProperties.Topic>",
       "description": "driver receive topics(string list) for mqtt server."
     },
     {
       "name": "driver.mqtt.default-send-topic",
-      "type": "com.dc3.common.sdk.bean.mqtt.MqttProperties.Topic",
+      "type": "io.github.pnoker.common.sdk.bean.mqtt.MqttProperties.Topic",
       "description": "driver default sent topic for mqtt server."
     },
     {
