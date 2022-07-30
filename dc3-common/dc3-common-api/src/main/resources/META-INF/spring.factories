@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.dc3.common.config.OpenFeignConfig
+  io.github.pnoker.common.config.OpenFeignConfig

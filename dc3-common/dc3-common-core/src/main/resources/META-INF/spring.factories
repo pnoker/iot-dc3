@@ -1,9 +1,9 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.dc3.common.config.RestTemplateConfig,\
-  com.dc3.common.config.MybatisPlusConfig,\
-  com.dc3.common.config.RedisTemplateConfig,\
-  com.dc3.common.config.RedisCacheConfig,\
-  com.dc3.common.config.ThreadPoolConfig,\
-  com.dc3.common.config.WebMvcConfig,\
-  com.dc3.common.utils.RedisUtil,\
-  com.dc3.common.annotation.LogsAspect
+  io.github.pnoker.common.config.RestTemplateConfig,\
+  io.github.pnoker.common.config.MybatisPlusConfig,\
+  io.github.pnoker.common.config.RedisTemplateConfig,\
+  io.github.pnoker.common.config.RedisCacheConfig,\
+  io.github.pnoker.common.config.ThreadPoolConfig,\
+  io.github.pnoker.common.config.WebMvcConfig,\
+  io.github.pnoker.common.utils.RedisUtil,\
+  io.github.pnoker.common.annotation.LogsAspect

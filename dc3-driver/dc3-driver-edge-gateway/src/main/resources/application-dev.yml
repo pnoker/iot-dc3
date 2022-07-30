@@ -7,5 +7,5 @@ eureka:
 # Log config
 logging:
   level:
-    com.dc3: DEBUG
-    com.dc3.common.sdk: DEBUG
+    io.github.pnoker: DEBUG
+    io.github.pnoker.common.sdk: DEBUG

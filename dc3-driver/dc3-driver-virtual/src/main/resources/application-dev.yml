@@ -12,8 +12,8 @@ eureka:
 # Log config
 logging:
   level:
-    com.dc3: DEBUG
-    com.dc3.common.sdk: DEBUG
-    com.dc3.common.sdk.service: DEBUG
-    com.dc3.common.sdk.service.job: DEBUG
-    com.dc3.common.sdk.service.rabbit: DEBUG
+    io.github.pnoker: DEBUG
+    io.github.pnoker.common.sdk: DEBUG
+    io.github.pnoker.common.sdk.service: DEBUG
+    io.github.pnoker.common.sdk.service.job: DEBUG
+    io.github.pnoker.common.sdk.service.rabbit: DEBUG

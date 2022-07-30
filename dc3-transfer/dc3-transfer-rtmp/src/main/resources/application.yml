@@ -33,6 +33,6 @@ spring:
 
 logging:
   level:
-    com.dc3: DEBUG
+    io.github.pnoker: DEBUG
   file:
     name: dc3/logs/transfer/rtmp/${spring.application.name}.log

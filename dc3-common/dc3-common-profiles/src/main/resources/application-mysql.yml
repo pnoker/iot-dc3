@@ -30,7 +30,7 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-  mapper-locations: classpath*:/mapping
+  mapper-locations: classpath*:/mapping/*Mapper.xml
   global-config:
     banner: false
     db-config:
