@@ -1,9 +1,12 @@
 <!--
-  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Copyright 2022 Pnoker All Rights Reserved
+  -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
   - You may obtain a copy of the License at
-  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
   - Unless required by applicable law or agreed to in writing, software
   - distributed under the License is distributed on an "AS IS" BASIS,
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,7 +16,7 @@
 
 <template>
     <div class="tool-card">
-        <el-card shadow="hover">
+        <el-card :shadow="embedded == '' ? 'hover' : 'never'">
             <el-form
                 ref="formDataRef"
                 class="tool-card-body"
@@ -22,29 +25,103 @@
                 :inline="true"
             >
                 <div class="tool-card-body-form">
-                    <el-form-item prop="deviceId" label="设备">
-                        <el-cascader
+                    <el-form-item v-if="embedded == ''" prop="deviceId" label="设备">
+                        <el-select
                             v-model="reactiveData.formData.deviceId"
-                            class="edit-form-large"
+                            class="edit-form-special"
                             placeholder="请选择设备"
-                            :options="deviceDictionary"
-                            :show-all-levels="false"
-                            filterable
                             clearable
+                            @change="pointDictionaryChange"
+                            @visible-change="deviceDictionaryVisible"
                         >
-                        </el-cascader>
+                            <div class="tool-select">
+                                <el-form-item class="tool-select-input">
+                                    <el-input
+                                        v-model="reactiveData.deviceQuery"
+                                        placeholder="请输入设备名称"
+                                        clearable
+                                        @input="deviceDictionary"
+                                    />
+                                </el-form-item>
+                                <el-pagination
+                                    class="tool-select-pagination"
+                                    :hide-on-single-page="true"
+                                    layout="prev, pager, next"
+                                    :pager-count="5"
+                                    :page-size="+reactiveData.devicePage.size"
+                                    :current-page="+reactiveData.devicePage.current"
+                                    :total="+reactiveData.devicePage.total"
+                                    small
+                                    background
+                                    @current-change="deviceCurrentChange"
+                                ></el-pagination>
+                            </div>
+                            <el-option
+                                v-for="dictionary in reactiveData.deviceDictionary"
+                                :key="dictionary.value"
+                                :label="dictionary.label"
+                                :value="dictionary.value"
+                            ></el-option>
+                        </el-select>
                     </el-form-item>
-                    <el-form-item prop="pointId" label="位号">
-                        <el-cascader
+                    <el-form-item v-if="embedded == ''" prop="pointId" label="位号">
+                        <el-select
                             v-model="reactiveData.formData.pointId"
-                            class="edit-form-large"
+                            class="edit-form-special"
                             placeholder="请选择位号"
-                            :options="pointDictionary"
-                            :show-all-levels="false"
-                            filterable
+                            clearable
+                            @visible-change="pointDictionaryVisible"
+                        >
+                            <div class="tool-select">
+                                <el-form-item class="tool-select-input">
+                                    <el-input
+                                        v-model="reactiveData.pointQuery"
+                                        placeholder="请输入位号名称"
+                                        clearable
+                                        @input="pointDictionary"
+                                    />
+                                </el-form-item>
+                                <el-pagination
+                                    class="tool-select-pagination"
+                                    :hide-on-single-page="true"
+                                    layout="prev, pager, next"
+                                    :pager-count="5"
+                                    :page-size="+reactiveData.pointPage.size"
+                                    :current-page="+reactiveData.pointPage.current"
+                                    :total="+reactiveData.pointPage.total"
+                                    small
+                                    background
+                                    @current-change="pointCurrentChange"
+                                ></el-pagination>
+                            </div>
+                            <el-option
+                                v-for="dictionary in reactiveData.pointDictionary"
+                                :key="dictionary.value"
+                                :label="dictionary.label"
+                                :value="dictionary.value"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="embedded == 'device'" prop="name" label="位号名称">
+                        <el-input
+                            v-model="reactiveData.formData.name"
+                            class="edit-form-default"
+                            placeholder="请输入位号名称"
+                            clearable
+                            @keyup.enter="search"
+                        >
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item v-if="embedded == 'device'" prop="enable" label="使能">
+                        <el-select
+                            v-model="reactiveData.formData.enable"
+                            class="edit-form-small"
+                            placeholder="请选择使能"
                             clearable
                         >
-                        </el-cascader>
+                            <el-option label="启用" :value="true"></el-option>
+                            <el-option label="停用" :value="false"></el-option>
+                        </el-select>
                     </el-form-item>
                 </div>
                 <el-form-item class="tool-card-body-button">
@@ -54,7 +131,7 @@
             </el-form>
             <div class="tool-card-footer">
                 <div class="tool-card-footer-button">
-                    <el-button type="success" :icon="Plus" disabled>新增</el-button>
+                    <el-button v-if="embedded == ''" type="success" :icon="Plus" disabled>新增</el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination

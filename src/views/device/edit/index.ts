@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from 'vue'
+import { defineComponent, reactive, ref, unref, computed } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Back, Check, Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
 
@@ -35,6 +38,7 @@ import { Dictionary } from '@/config/type/types'
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue'
+import { isNull } from '@/util/utils'
 
 export default defineComponent({
     name: 'DeviceEdit',
@@ -71,11 +75,11 @@ export default defineComponent({
             profileTable: {},
             pointTable: {},
             oldDeviceFormData: {},
-            deviceFormData: {},
+            deviceFormData: {} as any,
             driverAttributes: [] as any[],
             driverAttributeTable: {},
             oldDriverFormData: {},
-            driverFormData: {},
+            driverFormData: {} as any,
             pointAttributes: [] as any[],
             pointAttributeTable: {},
             oldPointFormData: {},
@@ -112,7 +116,7 @@ export default defineComponent({
             profileIds: [
                 {
                     required: true,
-                    message: '请选择包含模板',
+                    message: '请选择关联模板',
                     trigger: 'change',
                 },
             ],
@@ -139,6 +143,10 @@ export default defineComponent({
             ],
         })
 
+        const hasPointFormData = computed(() => {
+            return !isNull(reactiveData.pointFormData)
+        })
+
         const device = () => {
             const id = route.query.id as string
             deviceByIdApi(id)
@@ -154,7 +162,7 @@ export default defineComponent({
         }
 
         const driver = () => {
-            driverDictionaryApi()
+            driverDictionaryApi('')
                 .then((res) => {
                     reactiveData.driverDictionary = res.data.data
                     reactiveData.driverTable = reactiveData.driverDictionary.reduce((pre, cur) => {
@@ -168,7 +176,7 @@ export default defineComponent({
         }
 
         const profile = () => {
-            profileDictionaryApi()
+            profileDictionaryApi('')
                 .then((res) => {
                     reactiveData.profileDictionary = res.data.data
                     reactiveData.profileTable = reactiveData.profileDictionary.reduce((pre, cur) => {
@@ -223,10 +231,6 @@ export default defineComponent({
                 .finally(() => {
                     reactiveData.loading = false
                 })
-        }
-
-        const profileName = (profileId) => {
-            return reactiveData.profileTable[profileId]
         }
 
         const changeDriver = (driverId) => {
@@ -417,11 +421,22 @@ export default defineComponent({
         }
 
         const pre = () => {
-            reactiveData.active--
+            let step = 1
+            if (reactiveData.active === 2 && reactiveData.driverAttributes?.length < 1) {
+                step = 2
+            }
+            reactiveData.active -= step
             changeActive(reactiveData.active)
         }
 
         const next = () => {
+            if (reactiveData.active === 0) {
+                deviceUpdate()
+            }
+            if (reactiveData.active === 1) {
+                driverUpdate()
+            }
+
             let step = 1
             if (reactiveData.active === 0 && reactiveData.driverAttributes?.length < 1) {
                 step = 2
@@ -440,11 +455,11 @@ export default defineComponent({
             reactiveData.deviceFormData = { ...reactiveData.oldDeviceFormData }
         }
 
-        const driverReset = () => {
+        const driverInfoReset = () => {
             reactiveData.driverFormData = JSON.parse(JSON.stringify(reactiveData.oldDriverFormData))
         }
 
-        const pointReset = () => {
+        const pointInfoReset = () => {
             const form = unref(pointFormRef)
             form?.resetFields()
         }
@@ -467,18 +482,14 @@ export default defineComponent({
             pointFormRef,
             deviceFormRule,
             reactiveData,
-            profileName,
-            changeDriver,
-            changePoint,
+            hasPointFormData,
             changePointInfo,
-            deviceUpdate,
-            driverUpdate,
             pointUpdate,
             pre,
             next,
             deviceReset,
-            driverReset,
-            pointReset,
+            driverInfoReset,
+            pointInfoReset,
             changeActive,
             ...Icon,
         }

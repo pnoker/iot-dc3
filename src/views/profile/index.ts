@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,20 +14,20 @@
  * limitations under the License.
  */
 
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, defineComponent } from 'vue'
 
-import { pointDictionaryApi } from '@/api/dictionary'
 import { profileAddApi, profileDeleteApi, profileListApi } from '@/api/profile'
 
 import { Dictionary, Order } from '@/config/type/types'
 
-import blankCard from '@/components/card/blank/BlankCard.vue'
-import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import profileTool from '@/views/profile/tool/ProfileTool.vue'
+import blankCard from '@/components/card/blank/BlankCard.vue'
 import profileAddForm from '@/views/profile/add/ProfileAddForm.vue'
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import profileCard from '@/views/profile/card/ProfileCard.vue'
+import { isNull } from '@/util/utils'
 
-export default {
+export default defineComponent({
     components: {
         blankCard,
         skeletonCard,
@@ -32,7 +35,21 @@ export default {
         profileAddForm,
         profileCard,
     },
-    setup() {
+    props: {
+        embedded: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
+        deviceId: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
+    },
+    setup(props) {
         const profileAddFormRef: any = ref<InstanceType<typeof profileAddForm>>()
 
         // 定义响应式数据
@@ -56,6 +73,13 @@ export default {
         })
 
         const list = () => {
+            if (!isNull(props.deviceId)) {
+                reactiveData.query = {
+                    ...reactiveData.query,
+                    deviceId: props.deviceId,
+                }
+            }
+
             profileListApi({
                 page: reactiveData.page,
                 ...reactiveData.query,
@@ -73,23 +97,25 @@ export default {
                 })
         }
 
-        const point = () => {
-            pointDictionaryApi('point').then((res) => {
-                reactiveData.pointDictionary = res.data.data
-                reactiveData.pointTable = reactiveData.pointDictionary.reduce((pre, cur) => {
-                    pre[cur.value] = cur.label
-                    return pre
-                }, {})
-            })
-        }
-
         const search = (params) => {
+            if (!isNull(props.deviceId)) {
+                params = {
+                    ...params,
+                    deviceId: props.deviceId,
+                }
+            }
+
             reactiveData.query = params
             list()
         }
 
         const reset = () => {
-            reactiveData.query = {}
+            let params = {}
+            if (!isNull(props.deviceId)) {
+                params = { deviceId: props.deviceId }
+            }
+
+            reactiveData.query = params
             list()
         }
         const showAdd = () => {
@@ -134,7 +160,6 @@ export default {
             list()
         }
 
-        point()
         list()
 
         return {
@@ -152,4 +177,4 @@ export default {
             currentChange,
         }
     },
-}
+})

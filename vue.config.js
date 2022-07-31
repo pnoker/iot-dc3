@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,22 +14,28 @@
  * limitations under the License.
  */
 
-const { defineConfig } = require("@vue/cli-service")
+const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
-    publicPath: "./",
+    publicPath: './',
     lintOnSave: true,
     productionSourceMap: false,
     transpileDependencies: true,
+    pluginOptions: {
+        'style-resources-loader': {
+            preProcessor: 'less',
+            patterns: [],
+        },
+    },
     devServer: {
         proxy: {
-            "/api": {
+            '/api': {
                 target: `http://${process.env.APP_API_HOST}:${process.env.APP_API_PORT}`,
                 changeOrigin: true,
                 ws: true,
                 pathRewrite: {
-                    "^/api": "/api"
-                }
-            }
-        }
-    }
+                    '^/api': '/api',
+                },
+            },
+        },
+    },
 })

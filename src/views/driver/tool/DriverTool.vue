@@ -1,9 +1,12 @@
 <!--
-  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Copyright 2022 Pnoker All Rights Reserved
+  -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
   - You may obtain a copy of the License at
-  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
   - Unless required by applicable law or agreed to in writing, software
   - distributed under the License is distributed on an "AS IS" BASIS,
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,11 +17,17 @@
 <template>
     <div class="tool-card">
         <el-card shadow="hover">
-            <el-form ref="formDataRef" class="tool-card-body" :rules="formRule" :model="reactiveData" :inline="true">
+            <el-form
+                ref="formDataRef"
+                class="tool-card-body"
+                :rules="formRule"
+                :model="reactiveData.formData"
+                :inline="true"
+            >
                 <div class="tool-card-body-form">
                     <el-form-item prop="name" label="驱动名称">
                         <el-input
-                            v-model="reactiveData.name"
+                            v-model="reactiveData.formData.name"
                             class="edit-form-default"
                             placeholder="请输入驱动名称"
                             clearable
@@ -27,7 +36,7 @@
                     </el-form-item>
                     <el-form-item prop="serviceName" label="服务名称">
                         <el-input
-                            v-model="reactiveData.serviceName"
+                            v-model="reactiveData.formData.serviceName"
                             class="edit-form-default"
                             placeholder="请输入服务名称"
                             clearable
@@ -36,7 +45,7 @@
                     </el-form-item>
                     <el-form-item prop="host" label="主机">
                         <el-input
-                            v-model="reactiveData.host"
+                            v-model="reactiveData.formData.host"
                             class="edit-form-default"
                             placeholder="请输入主机"
                             clearable
@@ -45,7 +54,7 @@
                     </el-form-item>
                     <el-form-item prop="port" label="端口">
                         <el-input
-                            v-model.number="reactiveData.port"
+                            v-model.number="reactiveData.formData.port"
                             class="edit-form-small"
                             placeholder="请输入端口"
                             autocomplete="off"
@@ -55,7 +64,7 @@
                     </el-form-item>
                     <el-form-item prop="enable" label="使能">
                         <el-select
-                            v-model="reactiveData.enable"
+                            v-model="reactiveData.formData.enable"
                             class="edit-form-small"
                             placeholder="请选择使能"
                             clearable

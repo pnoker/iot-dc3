@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,7 +14,7 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, onMounted } from 'vue'
+import { defineComponent, reactive, onMounted } from 'vue'
 import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from '@element-plus/icons-vue'
 
 import { TinyArea } from '@antv/g2plot'
@@ -31,18 +34,12 @@ export default defineComponent({
     },
     props: {
         embedded: {
-            type: Boolean,
+            type: String,
             default: () => {
-                return false
+                return ''
             },
         },
         data: {
-            type: Object,
-            default: () => {
-                return {}
-            },
-        },
-        historyData: {
             type: Object,
             default: () => {
                 return {}
@@ -64,6 +61,12 @@ export default defineComponent({
             type: String,
             default: '',
         },
+        historyData: {
+            type: Array<number>,
+            default: () => {
+                return []
+            },
+        },
         icon: {
             type: String,
             default: 'images/common/point.png',
@@ -83,11 +86,6 @@ export default defineComponent({
             },
         })
 
-        const line = computed(() => {
-            const data = props.embedded ? props.historyData[props.data.pointId] : []
-            return data || []
-        })
-
         // 图标
         const Icon = {
             CircleClose,
@@ -95,27 +93,6 @@ export default defineComponent({
 
         const showEdit = (pointValue) => {
             emit('show-edit', pointValue)
-        }
-
-        const showDetail = () => {
-            const data = props.data
-            let dataValue = data.value
-            try {
-                dataValue = JSON.parse(data.value)
-            } catch (ignore) {
-                // nothing to do
-            }
-
-            const content = {
-                deviceId: data.deviceId,
-                pointId: data.pointId,
-                type: data.type,
-                value: dataValue,
-                calculateValue: data.calculateValue,
-                rawValue: data.rawValue,
-            }
-
-            emit('show-detail', content)
         }
 
         const copyValue = (data) => {
@@ -128,24 +105,23 @@ export default defineComponent({
         }
 
         onMounted(() => {
-            const data = props.embedded ? props.historyData[props.data.pointId] : []
-            if (props.embedded && data) {
-                const tinyArea = new TinyArea(props.data.id, {
-                    height: 60,
-                    data,
-                    autoFit: true,
-                    smooth: true,
-                })
-
-                tinyArea.render()
+            if (props.embedded == '') {
+                return
             }
+
+            const tinyArea = new TinyArea(props.data.id, {
+                height: 60,
+                data: props.historyData,
+                autoFit: true,
+                smooth: true,
+            })
+
+            tinyArea.render()
         })
 
         return {
             reactiveData,
-            line,
             showEdit,
-            showDetail,
             copyId,
             copyValue,
             timestamp,

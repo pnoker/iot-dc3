@@ -1,9 +1,12 @@
 <!--
-  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Copyright 2022 Pnoker All Rights Reserved
+  -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
   - You may obtain a copy of the License at
-  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
   - Unless required by applicable law or agreed to in writing, software
   - distributed under the License is distributed on an "AS IS" BASIS,
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,7 +16,7 @@
 
 <template>
     <div class="tool-card">
-        <el-card shadow="hover">
+        <el-card :shadow="embedded == '' ? 'hover' : 'never'">
             <el-form
                 ref="formDataRef"
                 class="tool-card-body"
@@ -31,6 +34,45 @@
                             @keyup.enter="search"
                         >
                         </el-input>
+                    </el-form-item>
+                    <el-form-item v-if="embedded != 'profile'" prop="profileId" label="所属模板">
+                        <el-select
+                            v-model="reactiveData.formData.profileId"
+                            class="edit-form-special"
+                            placeholder="请选择所属模板"
+                            clearable
+                            @visible-change="profileDictionaryVisible"
+                        >
+                            <div class="tool-select">
+                                <el-form-item class="tool-select-input">
+                                    <el-input
+                                        v-model="reactiveData.profileQuery"
+                                        placeholder="请输入模板名称"
+                                        clearable
+                                        @input="profileDictionary"
+                                    />
+                                </el-form-item>
+                                <el-pagination
+                                    class="tool-select-pagination"
+                                    :hide-on-single-page="true"
+                                    layout="prev, pager, next"
+                                    :pager-count="5"
+                                    :page-size="+reactiveData.profilePage.size"
+                                    :current-page="+reactiveData.profilePage.current"
+                                    :total="+reactiveData.profilePage.total"
+                                    small
+                                    background
+                                    @current-change="profileCurrentChange"
+                                ></el-pagination>
+                            </div>
+                            <el-option
+                                v-for="dictionary in reactiveData.profileDictionary"
+                                :key="dictionary.value"
+                                :label="dictionary.label"
+                                :value="dictionary.value"
+                            >
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item prop="enable" label="使能">
                         <el-select
@@ -53,7 +95,7 @@
             </el-form>
             <div class="tool-card-footer">
                 <div class="tool-card-footer-button">
-                    <el-button type="success" :icon="Plus" @click="showAdd">新增</el-button>
+                    <el-button v-if="embedded == ''" type="success" :icon="Plus" @click="showAdd">新增</el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination

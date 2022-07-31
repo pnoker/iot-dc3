@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +16,9 @@
 
 import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi } from '@/api/device'
-import { profileByIdsApi } from '@/api/profile'
 import { driverByIdsApi } from '@/api/driver'
-import { driverDictionaryApi, profileDictionaryApi } from '@/api/dictionary'
+import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi } from '@/api/device'
+import { driverDictionaryApi } from '@/api/dictionary'
 
 import { Dictionary, Order } from '@/config/type/types'
 
@@ -38,12 +40,18 @@ export default defineComponent({
     },
     props: {
         embedded: {
-            type: Boolean,
+            type: String,
             default: () => {
-                return false
+                return ''
             },
         },
         driverId: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
+        profileId: {
             type: String,
             default: () => {
                 return ''
@@ -83,6 +91,12 @@ export default defineComponent({
                     driverId: props.driverId,
                 }
             }
+            if (!isNull(props.profileId)) {
+                reactiveData.query = {
+                    ...reactiveData.query,
+                    profileId: props.profileId,
+                }
+            }
 
             deviceListApi({
                 page: reactiveData.page,
@@ -98,23 +112,6 @@ export default defineComponent({
                     driverByIdsApi(driverIds)
                         .then((res) => {
                             reactiveData.driverTable = res.data.data
-                        })
-                        .catch(() => {
-                            // nothing to do
-                        })
-
-                    // profile
-                    const profileIds = Array.from(
-                        new Set(
-                            reactiveData.listData.reduce((pre, cur) => {
-                                pre.push(...cur.profileIds)
-                                return pre
-                            }, [])
-                        )
-                    )
-                    profileByIdsApi(profileIds)
-                        .then((res) => {
-                            reactiveData.profileTable = res.data.data
                         })
                         .catch(() => {
                             // nothing to do
@@ -140,19 +137,12 @@ export default defineComponent({
         }
 
         const driver = () => {
-            driverDictionaryApi()
+            driverDictionaryApi({
+                page: reactiveData.page,
+            })
                 .then((res) => {
-                    reactiveData.driverDictionary = res.data.data
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
-
-        const profile = () => {
-            profileDictionaryApi()
-                .then((res) => {
-                    reactiveData.profileDictionary = res.data.data
+                    const data = res.data.data
+                    reactiveData.driverDictionary = data.records
                 })
                 .catch(() => {
                     // nothing to do
@@ -166,6 +156,12 @@ export default defineComponent({
                     driverId: props.driverId,
                 }
             }
+            if (!isNull(props.profileId)) {
+                params = {
+                    ...params,
+                    profileId: props.profileId,
+                }
+            }
 
             reactiveData.query = params
             list()
@@ -175,6 +171,9 @@ export default defineComponent({
             let params = {}
             if (!isNull(props.driverId)) {
                 params = { driverId: props.driverId }
+            }
+            if (!isNull(props.profileId)) {
+                params = { profileId: props.profileId }
             }
 
             reactiveData.query = params
@@ -232,7 +231,6 @@ export default defineComponent({
         }
 
         driver()
-        profile()
         list()
 
         return {

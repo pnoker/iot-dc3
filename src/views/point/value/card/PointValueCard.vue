@@ -1,9 +1,12 @@
 <!--
-  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Copyright 2022 Pnoker All Rights Reserved
+  -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
   - You may obtain a copy of the License at
-  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
   - Unless required by applicable law or agreed to in writing, software
   - distributed under the License is distributed on an "AS IS" BASIS,
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,10 +49,10 @@
                             <li class="nowrap-item">
                                 <el-icon><Sunrise /></el-icon> 原始值: {{ data.rawValue }}
                             </li>
-                            <li v-if="!embedded" class="nowrap-item value-point">
+                            <li v-if="embedded == ''" class="nowrap-item value-point">
                                 <el-icon> <Management /> </el-icon> 所属设备: {{ device.name }}
                             </li>
-                            <li v-if="!embedded" class="nowrap-item">
+                            <li class="nowrap-item">
                                 <el-icon><Timer /></el-icon> 数据延时: {{ data.interval }} ms
                             </li>
                             <li class="nowrap-item">
@@ -58,16 +61,13 @@
                             <li class="nowrap-item">
                                 <el-icon><Sunset /></el-icon> 保存日期: {{ timestamp(data.createTime) }}
                             </li>
-                            <li v-if="embedded" title="详细内容" class="value-detail nowrap-item">
-                                <el-icon> <ZoomIn @click="showDetail" /> </el-icon>
-                            </li>
                         </ul>
                     </div>
-                    <div v-if="embedded" class="things-card-body-content-time">
+                    <div v-if="embedded != ''" class="things-card-body-content-time">
                         <div :id="data.id"></div>
                     </div>
                 </div>
-                <div v-if="!embedded" class="things-card__footer">
+                <div v-if="embedded == ''" class="things-card__footer">
                     <div class="things-card-footer-operation">
                         <el-popconfirm
                             title="是否确定删除该数据？该数据下的配置将会被全部删除，且该操作不可恢复！"
@@ -91,20 +91,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="less">
-@import '~@/components/card/styles/things-card.less';
-
-.things-card-body-content-time {
-    #value-line {
-        width: 100%;
-        height: 50px;
-    }
-
-    .sparkline-wrap {
-        width: 100%;
-
-        svg {
-            width: 100% !important;
-        }
-    }
-}
+@import '~@/components/card/styles/things-card';
 </style>

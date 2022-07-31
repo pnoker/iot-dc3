@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +18,24 @@ import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshLeft, Search, Sort, Back, Check } from '@element-plus/icons-vue'
 
+import { Dictionary, Order } from '@/config/type/types'
+import { profileDictionaryApi } from '@/api/dictionary'
+
 export default defineComponent({
     name: 'PointTool',
     props: {
+        embedded: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
+        page: {
+            type: Object,
+            default: () => {
+                return {}
+            },
+        },
         pre: {
             type: Boolean,
             default: () => {
@@ -28,12 +46,6 @@ export default defineComponent({
             type: Boolean,
             default: () => {
                 return false
-            },
-        },
-        page: {
-            type: Object,
-            default: () => {
-                return {}
             },
         },
     },
@@ -65,13 +77,53 @@ export default defineComponent({
 
         // 定义响应式数据
         const reactiveData = reactive({
-            formData: {},
+            formData: {} as any,
+            profileQuery: '',
+            profileLoading: false,
+            profileDictionary: [] as Dictionary[],
+            profilePage: {
+                total: 0,
+                size: 5,
+                current: 1,
+                orders: [] as Order[],
+            },
         })
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
             port: [{ type: 'number', message: '端口必须为数字值' }],
         })
+
+        const profileDictionary = () => {
+            reactiveData.profileLoading = true
+            profileDictionaryApi({
+                page: reactiveData.profilePage,
+                label: reactiveData.profileQuery,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.profilePage.total = data.total
+                    reactiveData.profileDictionary = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+                .finally(() => {
+                    reactiveData.profileLoading = false
+                })
+        }
+
+        const profileCurrentChange = (current) => {
+            reactiveData.profilePage.current = current
+            profileDictionary()
+        }
+
+        const profileDictionaryVisible = (visible: boolean) => {
+            if (visible) {
+                reactiveData.profileQuery = ''
+                profileDictionary()
+            }
+        }
 
         const search = () => {
             const form = unref(formDataRef)
@@ -108,10 +160,15 @@ export default defineComponent({
             emit('next-handle')
         }
 
+        profileDictionary()
+
         return {
             formDataRef,
             reactiveData,
             formRule,
+            profileDictionary,
+            profileCurrentChange,
+            profileDictionaryVisible,
             search,
             reset,
             showAdd,

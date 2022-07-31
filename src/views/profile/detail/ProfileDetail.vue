@@ -1,9 +1,12 @@
 <!--
-  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Copyright 2022 Pnoker All Rights Reserved
+  -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
   - You may obtain a copy of the License at
-  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
   - Unless required by applicable law or agreed to in writing, software
   - distributed under the License is distributed on an "AS IS" BASIS,
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,13 +31,13 @@
                                 <el-icon>
                                     <CollectionTag />
                                 </el-icon>
-                                包含位号: {{ reactiveData.listPointData.length }} 个
+                                关联位号: {{ pointLength }} 个
                             </li>
                             <li>
                                 <el-icon>
                                     <Management />
                                 </el-icon>
-                                关联设备: {{ reactiveData.listDeviceData.length }} 个
+                                关联设备: {{ deviceLength }} 个
                             </li>
                             <li>
                                 <el-icon>
@@ -51,15 +54,15 @@
                         </ul>
                     </detail-card>
                 </el-tab-pane>
-                <el-tab-pane label="包含位号" name="point">
-                    <point></point>
+                <el-tab-pane label="关联位号" name="point">
+                    <point ref="pointViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></point>
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
-                    <device></device>
+                    <device ref="deviceViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></device>
                 </el-tab-pane>
-                <el-tab-pane label="模板模型" name="model">
+                <!-- <el-tab-pane label="模板模型" name="model">
                     <el-empty description="暂无模板模型数据！"></el-empty>
-                </el-tab-pane>
+                </el-tab-pane> -->
             </el-tabs>
         </base-card>
     </div>

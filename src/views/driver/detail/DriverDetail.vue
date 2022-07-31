@@ -1,9 +1,12 @@
 <!--
-  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Copyright 2022 Pnoker All Rights Reserved
+  -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
   - You may obtain a copy of the License at
-  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
   - Unless required by applicable law or agreed to in writing, software
   - distributed under the License is distributed on an "AS IS" BASIS,
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,14 +67,27 @@
                     </detail-card>
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
-                    <device ref="deviceViewRef" :embedded="true" :driver-id="reactiveData.id"></device>
+                    <device ref="deviceViewRef" :embedded="'driver'" :driver-id="reactiveData.id"></device>
                 </el-tab-pane>
-                <el-tab-pane label="驱动模型" name="model">
+                <!-- <el-tab-pane label="驱动模型" name="model">
                     <el-empty description="暂无驱动模型数据！"></el-empty>
                 </el-tab-pane>
                 <el-tab-pane label="驱动事件" name="event">
-                    <el-empty description="暂无驱动事件数据！"></el-empty>
-                </el-tab-pane>
+                    <el-timeline>
+                        <el-timeline-item timestamp="2021/7/30" placement="top">
+                            <el-card>
+                                <h4>驱动上线</h4>
+                                <p>该驱动于 2021/7/30 20:46 上线</p>
+                            </el-card>
+                        </el-timeline-item>
+                        <el-timeline-item timestamp="2021/7/30" placement="top">
+                            <el-card>
+                                <h4>驱动注册</h4>
+                                <p>该驱动于 2021/7/30 20:46 注册成功</p>
+                            </el-card>
+                        </el-timeline-item>
+                    </el-timeline>
+                </el-tab-pane> -->
             </el-tabs>
         </base-card>
     </div>

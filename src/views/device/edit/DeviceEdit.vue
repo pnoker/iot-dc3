@@ -1,9 +1,12 @@
 <!--
-  - Copyright (c) 2022. Pnoker. All Rights Reserved.
+  - Copyright 2022 Pnoker All Rights Reserved
+  -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
   - You may obtain a copy of the License at
-  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
   - Unless required by applicable law or agreed to in writing, software
   - distributed under the License is distributed on an "AS IS" BASIS,
   - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +18,7 @@
     <div class="edit-card">
         <div class="edit-card-header">
             <el-card shadow="hover">
-                <el-steps :active="reactiveData.active" align-center>
+                <el-steps :active="reactiveData.active" finish-status="success" align-center>
                     <el-step title="设备信息编辑"></el-step>
                     <el-step title="设备驱动编辑"></el-step>
                     <el-step title="设备位号编辑"></el-step>
@@ -39,7 +42,6 @@
                                 class="edit-form-default"
                                 placeholder="请输入设备名称"
                                 clearable
-                                @keyup.enter="deviceUpdate"
                             ></el-input>
                         </el-form-item>
                         <el-form-item label="所属驱动" prop="driverId">
@@ -81,11 +83,11 @@
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="包含模板" prop="profileIds">
+                        <el-form-item label="关联模板" prop="profileIds">
                             <el-select
                                 v-model="reactiveData.deviceFormData.profileIds"
                                 class="edit-form-large"
-                                placeholder="请选择包含模板"
+                                placeholder="请选择关联模板"
                                 :multiple="true"
                                 filterable
                                 clearable
@@ -113,7 +115,6 @@
                         </el-form-item>
                     </div>
                     <el-form-item class="edit-form-button">
-                        <el-button type="primary" :icon="Edit" @click="deviceUpdate"> 修改</el-button>
                         <el-button :icon="RefreshLeft" @click="deviceReset">恢复</el-button>
                         <el-button type="warning" :icon="Right" plain @click="next">下一步</el-button>
                     </el-form-item>
@@ -156,15 +157,13 @@
                                     class="edit-form-default"
                                     :placeholder="'请输入' + attribute.displayName"
                                     clearable
-                                    @keyup.enter="driverUpdate"
                                 ></el-input>
                             </el-form-item>
                         </el-row>
                     </div>
                     <el-form-item class="edit-form-button">
                         <el-button type="success" :icon="Back" plain @click="pre">上一步</el-button>
-                        <el-button type="primary" :icon="Edit" @click="driverUpdate">修改</el-button>
-                        <el-button :icon="RefreshLeft" @click="driverReset">恢复</el-button>
+                        <el-button :icon="RefreshLeft" @click="driverInfoReset">恢复</el-button>
                         <el-button type="warning" :icon="Right" plain @click="next">下一步</el-button>
                     </el-form-item>
                 </el-form>
@@ -185,15 +184,16 @@
                     :v-if="reactiveData.pointFormData.length > 0"
                 >
                     <div class="edit-form-item">
+                        <el-form-item label="位号名称" prop="name">
+                            <el-input
+                                v-model="reactiveData.pointFormData.name"
+                                class="edit-form-default"
+                                disabled
+                            ></el-input>
+                        </el-form-item>
+                    </div>
+                    <div class="edit-form-item">
                         <el-row>
-                            <el-form-item label="位号名称" prop="name">
-                                <el-input
-                                    v-model="reactiveData.pointFormData.name"
-                                    class="edit-form-default"
-                                    clearable
-                                    disabled
-                                ></el-input>
-                            </el-form-item>
                             <el-form-item
                                 v-for="attribute in reactiveData.pointAttributes"
                                 :key="attribute.id"
@@ -209,29 +209,23 @@
                                     clearable
                                     @keyup.enter="pointUpdate"
                                 ></el-input>
+                                <el-input v-else class="edit-form-default" disabled></el-input>
                             </el-form-item>
                         </el-row>
                     </div>
                     <el-form-item class="edit-form-button">
                         <el-button type="success" :icon="Back" plain @click="pre">上一步</el-button>
-                        <el-button
-                            type="primary"
-                            :icon="Edit"
-                            :disabled="!Object.keys(reactiveData.pointFormData).length > 0"
-                            @click="pointUpdate"
-                            >修改</el-button
-                        >
-                        <el-button
-                            :icon="RefreshLeft"
-                            :disabled="!Object.keys(reactiveData.pointFormData).length > 0"
-                            @click="pointReset"
-                            >恢复</el-button
-                        >
+                        <el-button type="primary" :icon="Edit" :disabled="!hasPointFormData" @click="pointUpdate">
+                            修改
+                        </el-button>
+                        <el-button :icon="RefreshLeft" :disabled="!hasPointFormData" @click="pointInfoReset">
+                            恢复
+                        </el-button>
                         <el-button type="warning" :icon="Check" plain @click="next">完成</el-button>
                     </el-form-item>
                 </el-form>
                 <el-row>
-                    <el-col v-for="data in 12" :key="data.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
+                    <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
                         <skeleton-card :loading="reactiveData.loading" :footer="true"></skeleton-card>
                     </el-col>
                     <el-col

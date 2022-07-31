@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,21 +18,16 @@ import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
 
-import { Dictionary } from '@/config/type/types'
+import { Dictionary, Order } from '@/config/type/types'
+import { driverDictionaryApi } from '@/api/dictionary'
 
 export default defineComponent({
     name: 'DeviceTool',
     props: {
         embedded: {
-            type: Boolean,
+            type: String,
             default: () => {
-                return false
-            },
-        },
-        driverDictionary: {
-            type: Array<Dictionary>,
-            default: () => {
-                return []
+                return ''
             },
         },
         page: {
@@ -47,6 +45,15 @@ export default defineComponent({
         // 定义响应式数据
         const reactiveData = reactive({
             formData: {} as any,
+            driverQuery: '',
+            driverLoading: false,
+            driverDictionary: [] as Dictionary[],
+            driverPage: {
+                total: 0,
+                size: 5,
+                current: 1,
+                orders: [] as Order[],
+            },
         })
 
         // 定义表单校验规则
@@ -59,6 +66,37 @@ export default defineComponent({
             RefreshRight,
             Refresh,
             Sort,
+        }
+
+        const driverDictionary = () => {
+            reactiveData.driverLoading = true
+            driverDictionaryApi({
+                page: reactiveData.driverPage,
+                label: reactiveData.driverQuery,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.driverPage.total = data.total
+                    reactiveData.driverDictionary = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+                .finally(() => {
+                    reactiveData.driverLoading = false
+                })
+        }
+
+        const driverCurrentChange = (current) => {
+            reactiveData.driverPage.current = current
+            driverDictionary()
+        }
+
+        const driverDictionaryVisible = (visible: boolean) => {
+            if (visible) {
+                reactiveData.driverQuery = ''
+                driverDictionary()
+            }
         }
 
         const search = () => {
@@ -100,6 +138,9 @@ export default defineComponent({
             formDataRef,
             formRule,
             reactiveData,
+            driverDictionary,
+            driverCurrentChange,
+            driverDictionaryVisible,
             search,
             reset,
             showAdd,

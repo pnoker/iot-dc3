@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useRoute } from 'vue-router'
-import { decode } from 'js-base64'
-
-export default defineComponent({
-    props: {
-        url: {
-            type: String,
-            default: 'http://zhb_nyx.gitee.io/data-view',
-        },
-    },
-    setup() {
-        const route = useRoute()
-
-        const iframeUrl = () => {
-            return decode(route.query.id as string)
-        }
-
-        return {
-            iframeUrl,
-        }
-    },
-})
+/* eslint-disable */
+declare module '*.vue' {
+    import type { DefineComponent } from 'vue'
+    const component: DefineComponent<{}, {}, any>
+    export default component
+}

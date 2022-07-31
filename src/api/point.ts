@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,11 +78,11 @@ export const pointByDeviceIdApi = (deviceId: string) =>
     })
 
 // point value
-export const pointValueByDeviceIdApi = (deviceId: string, history: any) =>
+export const pointValueLatestApi = (pointValue: any) =>
     request<R>({
-        url: `api/v3/data/point_value/latest/device_id/${deviceId}`,
-        method: 'get',
-        params: { history },
+        url: `api/v3/data/point_value/latest`,
+        method: 'post',
+        data: pointValue,
     })
 
 export const pointValueListApi = (pointValue: any) =>

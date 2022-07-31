@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,24 +20,22 @@ import { CollectionTag, Edit, List, Management, Promotion, Sunset } from '@eleme
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { deviceByIdApi } from '@/api/device'
 import { driverByIdApi } from '@/api/driver'
-import { profileByIdsApi } from '@/api/profile'
-import { pointDictionaryApi, profileDictionaryApi } from '@/api/dictionary'
 import { profileByDeviceIdApi } from '@/api/profile'
-import { pointUnitApi, pointByDeviceIdApi, pointValueByDeviceIdApi, pointByIdsApi } from '@/api/point'
-
-import { Dictionary } from '@/config/type/types'
+import { deviceByIdApi } from '@/api/device'
+import { profileByIdsApi } from '@/api/profile'
 
 import baseCard from '@/components/card/base/BaseCard.vue'
 import detailCard from '@/components/card/detail/DetailCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import deviceCard from '@/views/device/card/DeviceCard.vue'
 import profileCard from '@/views/profile/card/ProfileCard.vue'
+import profile from '@/views/profile/Profile.vue'
 import pointCard from '@/views/point/card/PointCard.vue'
+import point from '@/views/point/Point.vue'
 import pointValueCard from '@/views/point/value/card/PointValueCard.vue'
+import pointValue from '@/views/point/value/PointValue.vue'
 import pointValueEditForm from '@/views/point/value/edit/PointValueEditForm.vue'
-import pointValueDetail from '@/views/point/value/detail/PointValueDetail.vue'
 
 import { timestamp } from '@/util/CommonUtils'
 
@@ -48,8 +49,10 @@ export default defineComponent({
         profileCard,
         pointCard,
         pointValueCard,
+        pointValue,
         pointValueEditForm,
-        pointValueDetail,
+        point,
+        profile,
         Promotion,
         List,
         Management,
@@ -66,7 +69,9 @@ export default defineComponent({
     setup() {
         const route = useRoute()
 
-        const pointValueDetailRef: any = ref<InstanceType<typeof pointValueDetail>>()
+        const profileViewRef: any = ref<InstanceType<typeof profile>>()
+        const pointViewRef: any = ref<InstanceType<typeof point>>()
+        const pointValueViewRef: any = ref<InstanceType<typeof pointValue>>()
 
         // 定义响应式数据
         const reactiveData = reactive({
@@ -77,8 +82,6 @@ export default defineComponent({
             pointValueLoading: true,
             data: {} as any,
             driver: {} as any,
-            profileDictionary: [] as Dictionary[],
-            pointDictionary: [] as Dictionary[],
             profileTable: {},
             pointTable: {},
             deviceTable: {},
@@ -90,12 +93,12 @@ export default defineComponent({
             pointValueDetailData: {},
         })
 
-        const hasProfileData = computed(() => {
-            return !reactiveData.profileLoading && reactiveData.listProfileData?.length < 1
+        const profileLength = computed(() => {
+            return profileViewRef.value?.reactiveData.page.total || 0
         })
 
-        const hasPointData = computed(() => {
-            return !reactiveData.pointLoading && reactiveData.listPointData?.length < 1
+        const pointLength = computed(() => {
+            return pointViewRef.value?.reactiveData.page.total || 0
         })
 
         const hasPointValueData = computed(() => {
@@ -146,97 +149,6 @@ export default defineComponent({
                 })
         }
 
-        const points = () => {
-            pointByDeviceIdApi(reactiveData.id)
-                .then((res) => {
-                    reactiveData.listPointData = res.data.data
-
-                    // point
-                    const pointIds = Array.from(new Set(reactiveData.listPointData.map((pointValue) => pointValue.id)))
-                    if (pointIds.length > 0) {
-                        pointByIdsApi(pointIds)
-                            .then((res) => {
-                                reactiveData.pointTable = res.data.data
-                            })
-                            .catch(() => {
-                                // nothing to do
-                            })
-                    }
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-                .finally(() => {
-                    reactiveData.pointLoading = false
-                })
-        }
-
-        const pointValues = () => {
-            pointValueByDeviceIdApi(reactiveData.id, true)
-                .then((res) => {
-                    reactiveData.listPointValueData = res.data.data
-
-                    // unit
-                    const pointIds = Array.from(
-                        new Set(reactiveData.listPointValueData.map((pointValue) => pointValue.pointId))
-                    )
-                    if (pointIds.length > 0) {
-                        pointUnitApi(pointIds)
-                            .then((res) => {
-                                reactiveData.unitTable = res.data.data
-                            })
-                            .catch(() => {
-                                // nothing to do
-                            })
-                    }
-
-                    reactiveData.listPointValueData.forEach((pointValue) => {
-                        if (pointValue.type === 'string') {
-                            reactiveData.listPointValueHistoryData[pointValue.pointId] = []
-                        } else if (pointValue.type === 'boolean') {
-                            reactiveData.listPointValueHistoryData[pointValue.pointId] = pointValue.children
-                                .reverse()
-                                .map((pointValue) => (pointValue.value === 'true' ? 1 : 0))
-                        } else {
-                            reactiveData.listPointValueHistoryData[pointValue.pointId] = pointValue.children
-                                .reverse()
-                                .map((pointValue) => +pointValue.value)
-                        }
-                    })
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-                .finally(() => {
-                    reactiveData.pointValueLoading = false
-                })
-        }
-
-        const profile = () => {
-            profileDictionaryApi()
-                .then((res) => {
-                    reactiveData.profileDictionary = res.data.data
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
-
-        const point = () => {
-            pointDictionaryApi('point')
-                .then((res) => {
-                    reactiveData.pointDictionary = res.data.data
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
-
-        const showPointValueDetail = (pointValue) => {
-            reactiveData.pointValueDetailData = pointValue
-            pointValueDetailRef.value.detailVisible = true
-        }
-
         const updateThing = (pointValue) => {
             console.log('update things', pointValue)
         }
@@ -249,13 +161,12 @@ export default defineComponent({
 
             switch (tab.props.name) {
                 case 'profile':
-                    profile()
                     break
                 case 'point':
-                    point()
+                    pointViewRef.value?.refresh()
                     break
                 case 'pointValue':
-                    pointValues()
+                    pointValueViewRef.value?.refresh()
                     break
                 default:
                     break
@@ -263,19 +174,16 @@ export default defineComponent({
         }
 
         device()
-        profile()
-        point()
-        pointValues()
         profiles()
-        points()
 
         return {
-            pointValueDetailRef,
+            profileViewRef,
+            pointViewRef,
+            pointValueViewRef,
             reactiveData,
-            hasProfileData,
-            hasPointData,
+            profileLength,
+            pointLength,
             hasPointValueData,
-            showPointValueDetail,
             updateThing,
             changeActive,
             timestamp,
