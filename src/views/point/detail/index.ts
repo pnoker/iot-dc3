@@ -17,14 +17,15 @@ import { CollectionTag, Edit, Management, Sunset } from '@element-plus/icons-vue
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import baseCard from '@/components/card/base/BaseCard.vue'
-import detailCard from '@/components/card/detail/DetailCard.vue'
-import deviceCard from '@/views/device/card/DeviceCard.vue'
-import pointCard from '@/views/point/card/PointCard.vue'
 import { deviceByDriverIdApi, deviceStatusByDriverIdApi } from '@/api/device'
 import { profileByIdsApi } from '@/api/profile'
 import { driverByIdsApi } from '@/api/driver'
 import { driverByIdApi } from '@/api/driver'
+
+import baseCard from '@/components/card/base/BaseCard.vue'
+import detailCard from '@/components/card/detail/DetailCard.vue'
+import deviceCard from '@/views/device/card/DeviceCard.vue'
+import pointCard from '@/views/point/card/PointCard.vue'
 
 import { timestamp } from '@/util/CommonUtils'
 

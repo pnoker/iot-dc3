@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 
-import { decode } from 'js-base64'
 import { defineComponent } from 'vue'
 import { useRoute } from 'vue-router'
+import { decode } from 'js-base64'
 
 export default defineComponent({
     props: {

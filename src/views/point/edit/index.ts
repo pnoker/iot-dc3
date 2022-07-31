@@ -11,14 +11,16 @@
  * limitations under the License.
  */
 
-import pointList from '@/views/point/Point.vue'
-import { pointByIdApi, pointUpdateApi } from '@/api/point'
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
 
 import router from '@/config/router'
 import { useRoute } from 'vue-router'
+
+import { pointByIdApi, pointUpdateApi } from '@/api/point'
+
+import pointList from '@/views/point/Point.vue'
 
 export default defineComponent({
     components: { pointList },

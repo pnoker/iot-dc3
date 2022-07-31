@@ -15,8 +15,9 @@ import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Box, Lock, User } from '@element-plus/icons-vue'
 
-import Particles from '@/components/particles/particles.vue'
 import { useStore } from 'vuex'
+
+import Particles from '@/components/particles/particles.vue'
 
 export default defineComponent({
     name: 'Login',

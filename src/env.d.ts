@@ -12,16 +12,16 @@
  */
 
 /* eslint-disable */
-declare module "*.vue" {
-    import type { DefineComponent } from "vue"
+declare module '*.vue' {
+    import type { DefineComponent } from 'vue'
     const component: DefineComponent<{}, {}, any>
     export default component
 }
 
+/* eslint-disable */
+declare module 'axios' {
+    import { AxiosRequestConfig, AxiosResponseHeaders } from 'axios'
 
-import { AxiosRequestConfig, AxiosResponseHeaders } from "axios"
-
-declare module "axios" {
     interface AxiosResponse<T = any, D = any> {
         data: T
         status: number

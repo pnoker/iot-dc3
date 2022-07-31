@@ -13,11 +13,11 @@
 
 import { defineComponent, onMounted, reactive, ref } from 'vue'
 
+import * as echarts from 'echarts'
+
 import TitleCard from '@/components/card/title/TitleCard.vue'
 import ApplicationCard from '@/views/application/card/ApplicationCard.vue'
 import DashboardCard from '@/views/dashboard/card/DashboardCard.vue'
-
-import * as echarts from 'echarts'
 
 export default defineComponent({
     components: {
