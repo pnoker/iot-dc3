@@ -11,111 +11,92 @@
  * limitations under the License.
  */
 
-import { defineComponent, computed } from "vue";
-import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchButton } from "@element-plus/icons-vue"
+import { defineComponent } from 'vue'
+import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchButton } from '@element-plus/icons-vue'
 
-import router from "@/config/router";
+import router from '@/config/router'
 
-import { successMessage } from "@/util/utils"
-import { copyId, timestamp } from "@/util/CommonUtils"
+import { successMessage } from '@/util/utils'
+import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
-    name: "DeviceCard",
+    name: 'DeviceCard',
     components: {
         Promotion,
         List,
         Coin,
         Edit,
-        Sunset
+        Sunset,
     },
     props: {
         embedded: {
             type: Boolean,
             default: () => {
-                return false;
-            }
-        },
-        profileTable: {
-            type: Object,
-            default: () => {
-                return {}
-            }
+                return false
+            },
         },
         statusTable: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         driver: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         icon: {
             type: String,
-            default: "images/common/device.png"
-        }
+            default: 'images/common/device.png',
+        },
     },
-    emits: ["delete-thing"],
+    emits: ['delete-thing'],
     setup(props, { emit }) {
         // 图标
         const Icon = {
             SwitchButton,
             CircleCheck,
-            CircleClose
+            CircleClose,
         }
-
-        const profileName = computed(() => {
-            let profileIds = props.data.profileIds || []
-            if (profileIds) {
-                if (profileIds.length > 10) {
-                    profileIds = profileIds.slice(0, 10);
-                }
-            }
-            return profileIds.map(profileId => props.profileTable[profileId]?.name).join(", ")
-        })
 
         const status = (id) => {
             return props.statusTable[id]
         }
 
         const deleteThing = (id) => {
-            emit("delete-thing", id, () => {
+            emit('delete-thing', id, () => {
                 successMessage(null)
-            });
+            })
         }
 
         const edit = (id, driverId) => {
-            router.push({ name: "deviceEdit", query: { id, driverId, active: "0" } })
-                .catch(() => {
-                    // nothing to do
-                })
+            router.push({ name: 'deviceEdit', query: { id, driverId, active: '0' } }).catch(() => {
+                // nothing to do
+            })
         }
 
         const detail = (id, driverId) => {
-            router.push({ name: "deviceDetail", query: { id, driverId, active: "detail" } })
-                .catch(() => {
-                    // nothing to do
-                })
+            router.push({ name: 'deviceDetail', query: { id, driverId, active: 'detail' } }).catch(() => {
+                // nothing to do
+            })
         }
 
         return {
-            profileName,
             status,
             deleteThing,
             edit,
             detail,
             copyId,
             timestamp,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

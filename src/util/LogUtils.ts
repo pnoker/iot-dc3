@@ -11,23 +11,22 @@
  * limitations under the License.
  */
 
-import moment from "moment"
-import "moment/locale/zh-cn"
+import moment from 'moment'
+import 'moment/locale/zh-cn'
 
-moment.locale("zh-cn")
+moment.locale('zh-cn')
 
 export const log = {
     info(message: string) {
         const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
-        console.log(now, "%cINFO%c  ---  :", "color:#F00", message)
+        console.log(now, '%cINFO%c  ---  :', 'color:#F00', message)
     },
     warn(message: string) {
         const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
-        console.log(now, "%cWARN%c  ---  :", "color:#F00", message)
+        console.log(now, '%cWARN%c  ---  :', 'color:#F00', message)
     },
     error(message: string) {
         const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
-        console.log(now, "%cERROR%c  ---  :", "color:#F00", message)
-
-    }
+        console.log(now, '%cERROR%c  ---  :', 'color:#F00', message)
+    },
 }

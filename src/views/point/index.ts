@@ -11,47 +11,47 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, computed } from "vue"
+import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { pointAddApi, pointDeleteApi, pointListApi } from "@/api/point"
-import { profileByIdsApi } from "@/api/profile"
-import { profileDictionaryApi } from "@/api/dictionary"
+import { pointAddApi, pointDeleteApi, pointListApi } from '@/api/point'
+import { profileByIdsApi } from '@/api/profile'
+import { profileDictionaryApi } from '@/api/dictionary'
 
-import { Dictionary, Order } from "@/config/type/types"
+import { Dictionary, Order } from '@/config/type/types'
 
-import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
-import pointTool from "./tool/PointTool.vue"
-import pointAddForm from "./add/PointAddForm.vue"
-import pointCard from "./card/PointCard.vue"
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
+import pointTool from './tool/PointTool.vue'
+import pointAddForm from './add/PointAddForm.vue'
+import pointCard from './card/PointCard.vue'
 
 export default defineComponent({
     components: {
         skeletonCard,
         pointTool,
         pointAddForm,
-        pointCard
+        pointCard,
     },
     props: {
         pre: {
             type: Boolean,
             default: () => {
                 return false
-            }
+            },
         },
         next: {
             type: Boolean,
             default: () => {
                 return false
-            }
+            },
         },
         profileId: {
             type: String,
             default: () => {
-                return ""
-            }
-        }
+                return ''
+            },
+        },
     },
-    emits: ["pre-handle", "next-handle"],
+    emits: ['pre-handle', 'next-handle'],
     setup(props, { emit }) {
         const pointAddFormRef: any = ref<InstanceType<typeof pointAddForm>>()
 
@@ -67,8 +67,8 @@ export default defineComponent({
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[]
-            }
+                orders: [] as Order[],
+            },
         })
 
         const hasData = computed(() => {
@@ -79,39 +79,46 @@ export default defineComponent({
             pointListApi({
                 page: reactiveData.page,
                 ...reactiveData.query,
-                profileId: props.profileId
-            }).then(res => {
-                const data = res.data.data
-                reactiveData.page.total = data.total
-                reactiveData.listData = data.records
+                profileId: props.profileId,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.page.total = data.total
+                    reactiveData.listData = data.records
 
-                // profile
-                const profileIds = Array.from(new Set(reactiveData.listData.map(point => point.profileId)))
-                profileByIdsApi(profileIds).then(res => {
-                    reactiveData.profileTable = res.data.data
-                }).catch(() => {
+                    // profile
+                    const profileIds = Array.from(new Set(reactiveData.listData.map((point) => point.profileId)))
+                    profileByIdsApi(profileIds)
+                        .then((res) => {
+                            reactiveData.profileTable = res.data.data
+                        })
+                        .catch(() => {
+                            // nothing to do
+                        })
+                })
+                .catch(() => {
                     // nothing to do
                 })
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.loading = false
-            })
+                .finally(() => {
+                    reactiveData.loading = false
+                })
         }
 
         const profile = () => {
-            profileDictionaryApi().then(res => {
-                reactiveData.profileDictionary = res.data.data
-            }).catch(() => {
-                // nothing to do
-            });
+            profileDictionaryApi()
+                .then((res) => {
+                    reactiveData.profileDictionary = res.data.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const search = (params) => {
             reactiveData.query = {
                 ...params,
-                profileId: props.profileId
-            };
+                profileId: props.profileId,
+            }
             list()
         }
 
@@ -125,21 +132,25 @@ export default defineComponent({
         }
 
         const addThing = (form, done) => {
-            pointAddApi(form).then(() => {
-                list()
-                done()
-            }).catch(() => {
-                // nothing to do
-            });
+            pointAddApi(form)
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const deleteThing = (id, done) => {
-            pointDeleteApi(id).then(() => {
-                list()
-                done()
-            }).catch(() => {
-                // nothing to do
-            });
+            pointDeleteApi(id)
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const refresh = () => {
@@ -149,9 +160,9 @@ export default defineComponent({
         const sort = () => {
             reactiveData.order = !reactiveData.order
             if (reactiveData.order) {
-                reactiveData.page.orders = [{ column: "create_time", asc: true }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: true }]
             } else {
-                reactiveData.page.orders = [{ column: "create_time", asc: false }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: false }]
             }
             list()
         }
@@ -167,11 +178,11 @@ export default defineComponent({
         }
 
         const preHandle = () => {
-            emit("pre-handle")
+            emit('pre-handle')
         }
 
         const nextHandle = () => {
-            emit("next-handle")
+            emit('next-handle')
         }
 
         profile()
@@ -193,5 +204,5 @@ export default defineComponent({
             preHandle,
             nextHandle,
         }
-    }
+    },
 })

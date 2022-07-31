@@ -11,8 +11,8 @@
  * limitations under the License.
  */
 
-import request from "@/config/axios"
-import { LoginType, R } from "@/config/type/types"
+import request from '@/config/axios'
+import { LoginType, R } from '@/config/type/types'
 
 /**
  * 通过用户名获取 Salt
@@ -20,11 +20,12 @@ import { LoginType, R } from "@/config/type/types"
  * @param name 用户名
  * @returns {AxiosPromise}
  */
-export const generateSaltApi = (name: string) => request<R>({
-    url: `api/v3/token/salt`,
-    method: "post",
-    data: { name }
-})
+export const generateSaltApi = (name: string) =>
+    request<R>({
+        url: `api/v3/token/salt`,
+        method: 'post',
+        data: { name },
+    })
 
 /**
  * 登录
@@ -32,11 +33,12 @@ export const generateSaltApi = (name: string) => request<R>({
  * @param login {tenant, name, salt, password}
  * @returns {AxiosPromise}
  */
-export const generateTokenApi = (login: LoginType) => request<R>({
-    url: `api/v3/token/generate`,
-    method: "post",
-    data: login
-})
+export const generateTokenApi = (login: LoginType) =>
+    request<R>({
+        url: `api/v3/token/generate`,
+        method: 'post',
+        data: login,
+    })
 
 /**
  * 注销
@@ -44,11 +46,12 @@ export const generateTokenApi = (login: LoginType) => request<R>({
  * @param name 用户名
  * @returns {AxiosPromise}
  */
-export const cancelTokenApi = (name: string) => request<R>({
-    url: `api/v3/token/cancel`,
-    method: "post",
-    data: { name }
-})
+export const cancelTokenApi = (name: string) =>
+    request<R>({
+        url: `api/v3/token/cancel`,
+        method: 'post',
+        data: { name },
+    })
 
 /**
  * 校验 Token
@@ -56,8 +59,9 @@ export const cancelTokenApi = (name: string) => request<R>({
  * @param login {name, salt, token}
  * @returns {Promise}
  */
-export const checkTokenValidApi = (login: LoginType) => request<R>({
-    url: `api/v3/token/check`,
-    method: "post",
-    data: login
-})
+export const checkTokenValidApi = (login: LoginType) =>
+    request<R>({
+        url: `api/v3/token/check`,
+        method: 'post',
+        data: login,
+    })

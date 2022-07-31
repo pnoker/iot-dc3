@@ -12,47 +12,76 @@
   -->
 
 <template>
-	<el-dialog
-		v-model="reactiveData.formVisible"
-		custom-class="things-dialog"
-		title="新增设备"
-		:show-close="false"
-		:append-to-body="true"
-		:close-on-click-modal="false"
-		:close-on-press-escape="false"
-	>
-		<el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-			<el-form-item class="things-dialog-form-item" label="设备名称" prop="name">
-				<el-input v-model="reactiveData.formData.name" placeholder="请输入设备名称" clearable></el-input>
-			</el-form-item>
-			<el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
-				<el-select v-if="driverDictionary.length > 0" v-model="reactiveData.formData.driverId" placeholder="请选择所属驱动 | 网关" filterable clearable>
-					<el-option v-for="dictionary in driverDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
-				</el-select>
-			</el-form-item>
-			<el-form-item class="things-dialog-form-item" label="包含模板" prop="profileIds">
-				<el-select v-model="reactiveData.formData.profileIds" placeholder="请选择包含模板" :multiple="true" filterable clearable>
-					<el-option v-for="dictionary in profileDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
-				</el-select>
-			</el-form-item>
-			<el-form-item class="things-dialog-form-item" label="存储类型" prop="multi">
-				<el-select v-model="reactiveData.formData.multi" placeholder="请选择存储类型" clearable>
-					<el-option label="单点数据" :value="false"></el-option>
-					<el-option label="结构数据" :value="true"></el-option>
-				</el-select>
-			</el-form-item>
-			<el-form-item class="things-dialog-form-item" label="描述" prop="description">
-				<el-input v-model="reactiveData.formData.description" placeholder="请输入设备描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
-			</el-form-item>
-		</el-form>
-		<div class="things-dialog-footer">
-			<slot name="footer">
-				<el-button @click="cancel">取消</el-button>
-				<el-button type="success" plain @click="reset">重置</el-button>
-				<el-button type="primary" @click="addThing">确定</el-button>
-			</slot>
-		</div>
-	</el-dialog>
+    <el-dialog
+        v-model="reactiveData.formVisible"
+        custom-class="things-dialog"
+        title="新增设备"
+        :show-close="false"
+        :append-to-body="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+    >
+        <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
+            <el-form-item class="things-dialog-form-item" label="设备名称" prop="name">
+                <el-input v-model="reactiveData.formData.name" placeholder="请输入设备名称" clearable></el-input>
+            </el-form-item>
+            <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
+                <el-select
+                    v-if="driverDictionary.length > 0"
+                    v-model="reactiveData.formData.driverId"
+                    placeholder="请选择所属驱动 | 网关"
+                    filterable
+                    clearable
+                >
+                    <el-option
+                        v-for="dictionary in driverDictionary"
+                        :key="dictionary.value"
+                        :label="dictionary.label"
+                        :value="dictionary.value"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item class="things-dialog-form-item" label="包含模板" prop="profileIds">
+                <el-select
+                    v-model="reactiveData.formData.profileIds"
+                    placeholder="请选择包含模板"
+                    :multiple="true"
+                    filterable
+                    clearable
+                >
+                    <el-option
+                        v-for="dictionary in profileDictionary"
+                        :key="dictionary.value"
+                        :label="dictionary.label"
+                        :value="dictionary.value"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item class="things-dialog-form-item" label="存储类型" prop="multi">
+                <el-select v-model="reactiveData.formData.multi" placeholder="请选择存储类型" clearable>
+                    <el-option label="单点数据" :value="false"></el-option>
+                    <el-option label="结构数据" :value="true"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item class="things-dialog-form-item" label="描述" prop="description">
+                <el-input
+                    v-model="reactiveData.formData.description"
+                    placeholder="请输入设备描述"
+                    type="textarea"
+                    maxlength="300"
+                    show-word-limit
+                    clearable
+                ></el-input>
+            </el-form-item>
+        </el-form>
+        <div class="things-dialog-footer">
+            <slot name="footer">
+                <el-button @click="cancel">取消</el-button>
+                <el-button type="success" plain @click="reset">重置</el-button>
+                <el-button type="primary" @click="addThing">确定</el-button>
+            </slot>
+        </div>
+    </el-dialog>
 </template>
 
 <script src="./index.ts" lang="ts" />

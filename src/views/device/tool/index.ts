@@ -11,37 +11,42 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from "vue"
-import { FormInstance, FormRules } from "element-plus"
-import { Plus, Refresh, RefreshRight, Search, Sort } from "@element-plus/icons-vue"
+import { defineComponent, reactive, ref, unref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
+import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
 
-import { Dictionary } from "@/config/type/types"
+import { Dictionary } from '@/config/type/types'
 
 export default defineComponent({
-    name: "DeviceTool",
+    name: 'DeviceTool',
     props: {
+        embedded: {
+            type: Boolean,
+            default: () => {
+                return false
+            },
+        },
         driverDictionary: {
             type: Array<Dictionary>,
             default: () => {
                 return []
-            }
+            },
         },
         page: {
             type: Object,
             default: () => {
                 return {}
-            }
-        }
+            },
+        },
     },
-    emits: ["search", "reset", "show-add", "refresh", "sort", "size-change", "current-change"],
+    emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change'],
     setup(props, { emit }) {
         // 定义表单引用
         const formDataRef = ref<FormInstance>()
 
         // 定义响应式数据
         const reactiveData = reactive({
-            formData: {}
-
+            formData: {} as any,
         })
 
         // 定义表单校验规则
@@ -60,35 +65,35 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    emit("search", reactiveData.formData);
+                    emit('search', reactiveData.formData)
                 }
-            });
+            })
         }
 
         const reset = () => {
             const form = unref(formDataRef)
-            form?.resetFields();
-            emit("reset");
+            form?.resetFields()
+            emit('reset')
         }
 
         const showAdd = () => {
-            emit("show-add");
+            emit('show-add')
         }
 
         const refresh = () => {
-            emit("refresh");
+            emit('refresh')
         }
 
         const sort = () => {
-            emit("sort");
+            emit('sort')
         }
 
         const sizeChange = (size) => {
-            emit("size-change", size);
+            emit('size-change', size)
         }
 
         const currentChange = (current) => {
-            emit("current-change", current);
+            emit('current-change', current)
         }
 
         return {
@@ -102,7 +107,7 @@ export default defineComponent({
             sort,
             sizeChange,
             currentChange,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

@@ -11,25 +11,25 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, computed } from "vue"
+import { defineComponent, reactive, computed } from 'vue'
 
-import { pointUnitApi, pointValueListApi, pointByIdsApi } from "@/api/point"
-import { deviceByIdsApi } from "@/api/device"
-import { deviceDictionaryApi, pointDictionaryApi } from "@/api/dictionary"
+import { pointUnitApi, pointValueListApi, pointByIdsApi } from '@/api/point'
+import { deviceByIdsApi } from '@/api/device'
+import { deviceDictionaryApi, pointDictionaryApi } from '@/api/dictionary'
 
-import { Dictionary } from "@/config/type/types"
+import { Dictionary } from '@/config/type/types'
 
-import blankCard from "@/components/card/blank/BlankCard.vue"
-import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
-import pointValueTool from "./tool/PointValueTool.vue"
-import pointValueCard from "./card/PointValueCard.vue"
+import blankCard from '@/components/card/blank/BlankCard.vue'
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
+import pointValueTool from './tool/PointValueTool.vue'
+import pointValueCard from './card/PointValueCard.vue'
 
 export default defineComponent({
     components: {
         blankCard,
         skeletonCard,
         pointValueTool,
-        pointValueCard
+        pointValueCard,
     },
 
     setup() {
@@ -46,8 +46,8 @@ export default defineComponent({
             page: {
                 total: 0,
                 size: 12,
-                current: 1
-            }
+                current: 1,
+            },
         })
 
         const hasData = computed(() => {
@@ -57,62 +57,77 @@ export default defineComponent({
         const list = () => {
             pointValueListApi({
                 page: reactiveData.page,
-                ...reactiveData.query
-            }).then(res => {
-                reactiveData.listData = res.data.data.records.map(record => {
-                    const tempDate1 = new Date(record.createTime)
-                    const tempDate2 = new Date(record.originTime)
-                    record.interval = tempDate1.getTime() - tempDate2.getTime()
-                    return record
-                })
-                reactiveData.page.total = res.data.data.total
-
-                // device
-                const deviceIds = Array.from(new Set(reactiveData.listData.map(pointValue => pointValue.deviceId)));
-                if (deviceIds.length > 0) {
-                    deviceByIdsApi(deviceIds).then(res => {
-                        reactiveData.deviceTable = res.data.data
-                    }).catch(() => {
-                        // nothing to do
-                    })
-                }
-
-                // point & unit
-                const pointIds = Array.from(new Set(reactiveData.listData.map(pointValue => pointValue.pointId)));
-                if (pointIds.length > 0) {
-                    pointByIdsApi(pointIds).then(res => {
-                        reactiveData.pointTable = res.data.data
-                    }).catch(() => {
-                        // nothing to do
-                    })
-
-                    pointUnitApi(pointIds).then(res => {
-                        reactiveData.unitTable = res.data.data
-                    }).catch(() => {
-                        // nothing to do
-                    })
-                }
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.loading = false
+                ...reactiveData.query,
             })
+                .then((res) => {
+                    reactiveData.listData = res.data.data.records.map((record) => {
+                        const tempDate1 = new Date(record.createTime)
+                        const tempDate2 = new Date(record.originTime)
+                        record.interval = tempDate1.getTime() - tempDate2.getTime()
+                        return record
+                    })
+                    reactiveData.page.total = res.data.data.total
+
+                    // device
+                    const deviceIds = Array.from(
+                        new Set(reactiveData.listData.map((pointValue) => pointValue.deviceId))
+                    )
+                    if (deviceIds.length > 0) {
+                        deviceByIdsApi(deviceIds)
+                            .then((res) => {
+                                reactiveData.deviceTable = res.data.data
+                            })
+                            .catch(() => {
+                                // nothing to do
+                            })
+                    }
+
+                    // point & unit
+                    const pointIds = Array.from(new Set(reactiveData.listData.map((pointValue) => pointValue.pointId)))
+                    if (pointIds.length > 0) {
+                        pointByIdsApi(pointIds)
+                            .then((res) => {
+                                reactiveData.pointTable = res.data.data
+                            })
+                            .catch(() => {
+                                // nothing to do
+                            })
+
+                        pointUnitApi(pointIds)
+                            .then((res) => {
+                                reactiveData.unitTable = res.data.data
+                            })
+                            .catch(() => {
+                                // nothing to do
+                            })
+                    }
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+                .finally(() => {
+                    reactiveData.loading = false
+                })
         }
 
         const device = () => {
-            deviceDictionaryApi().then(res => {
-                reactiveData.deviceDictionary = res.data.data
-            }).catch(() => {
-                // nothing to do
-            });
+            deviceDictionaryApi()
+                .then((res) => {
+                    reactiveData.deviceDictionary = res.data.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const point = () => {
-            pointDictionaryApi("profile").then(res => {
-                reactiveData.pointDictionary = res.data.data
-            }).catch(() => {
-                // nothing to do
-            });
+            pointDictionaryApi('profile')
+                .then((res) => {
+                    reactiveData.pointDictionary = res.data.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const search = (params) => {
@@ -152,5 +167,5 @@ export default defineComponent({
             sizeChange,
             currentChange,
         }
-    }
+    },
 })

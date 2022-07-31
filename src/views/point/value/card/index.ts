@@ -11,76 +11,76 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, onMounted } from "vue"
-import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from "@element-plus/icons-vue"
+import { computed, defineComponent, reactive, onMounted } from 'vue'
+import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from '@element-plus/icons-vue'
 
 import { TinyArea } from '@antv/g2plot'
 
-import { setCopyContent } from "@/util/utils"
-import { copyId, timestamp } from "@/util/CommonUtils"
+import { setCopyContent } from '@/util/utils'
+import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
-    name: "PointValueCard",
+    name: 'PointValueCard',
     components: {
         Edit,
         Sunset,
         Timer,
         Management,
         Sunrise,
-        ZoomIn
+        ZoomIn,
     },
     props: {
         embedded: {
             type: Boolean,
             default: () => {
                 return false
-            }
+            },
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         historyData: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         device: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         point: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         unit: {
             type: String,
-            default: ""
+            default: '',
         },
         icon: {
             type: String,
-            default: "images/common/point.png"
-        }
+            default: 'images/common/point.png',
+        },
     },
-    emits: ["show-edit", "show-detail"],
+    emits: ['show-edit', 'show-detail'],
     setup(props, { emit }) {
         // 定义响应式数据
         const reactiveData = reactive({
             spRefLineStyles: {
-                stroke: "#54a5ff",
+                stroke: '#54a5ff',
                 strokeOpacity: 0.5,
-                strokeDasharray: "2, 2"
+                strokeDasharray: '2, 2',
             },
             spCurveStyles: {
-                stroke: "#54a5ff"
-            }
+                stroke: '#54a5ff',
+            },
         })
 
         const line = computed(() => {
@@ -90,11 +90,11 @@ export default defineComponent({
 
         // 图标
         const Icon = {
-            CircleClose
+            CircleClose,
         }
 
         const showEdit = (pointValue) => {
-            emit("show-edit", pointValue)
+            emit('show-edit', pointValue)
         }
 
         const showDetail = () => {
@@ -112,19 +112,19 @@ export default defineComponent({
                 type: data.type,
                 value: dataValue,
                 calculateValue: data.calculateValue,
-                rawValue: data.rawValue
-            };
+                rawValue: data.rawValue,
+            }
 
-            emit("show-detail", content)
+            emit('show-detail', content)
         }
 
         const copyValue = (data) => {
             const content = {
                 deviceId: data.deviceId,
                 pointId: data.pointId,
-                value: data.value
-            };
-            setCopyContent(JSON.stringify(content, null, 2), true, "位号值")
+                value: data.value,
+            }
+            setCopyContent(JSON.stringify(content, null, 2), true, '位号值')
         }
 
         onMounted(() => {
@@ -134,7 +134,7 @@ export default defineComponent({
                     height: 60,
                     data,
                     autoFit: true,
-                    smooth: true
+                    smooth: true,
                 })
 
                 tinyArea.render()
@@ -149,7 +149,7 @@ export default defineComponent({
             copyId,
             copyValue,
             timestamp,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

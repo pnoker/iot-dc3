@@ -11,49 +11,57 @@
  * limitations under the License.
  */
 
-import request from "@/config/axios"
-import { R } from "@/config/type/types"
+import request from '@/config/axios'
+import { R } from '@/config/type/types'
 
-export const driverInfoAddApi = (driverInfo: any) => request<R>({
-    url: `api/v3/manager/driver_info/add`,
-    method: "post",
-    data: driverInfo
-})
+export const driverInfoAddApi = (driverInfo: any) =>
+    request<R>({
+        url: `api/v3/manager/driver_info/add`,
+        method: 'post',
+        data: driverInfo,
+    })
 
-export const driverInfoUpdateApi = (driverInfo: any) => request<R>({
-    url: `api/v3/manager/driver_info/update`,
-    method: "post",
-    data: driverInfo
-})
+export const driverInfoUpdateApi = (driverInfo: any) =>
+    request<R>({
+        url: `api/v3/manager/driver_info/update`,
+        method: 'post',
+        data: driverInfo,
+    })
 
-export const driverInfoByAttributeIdAndDeviceIdApi = (attributeId: string, deviceId: string) => request<R>({
-    url: `api/v3/manager/driver_info/attributeId/${attributeId}/device_id/${deviceId}`,
-    method: "get"
-})
+export const driverInfoByAttributeIdAndDeviceIdApi = (attributeId: string, deviceId: string) =>
+    request<R>({
+        url: `api/v3/manager/driver_info/attributeId/${attributeId}/device_id/${deviceId}`,
+        method: 'get',
+    })
 
-export const driverInfoByDeviceIdApi = (deviceId: string) => request<R>({
-    url: `api/v3/manager/driver_info/device_id/${deviceId}`,
-    method: "get"
-})
+export const driverInfoByDeviceIdApi = (deviceId: string) =>
+    request<R>({
+        url: `api/v3/manager/driver_info/device_id/${deviceId}`,
+        method: 'get',
+    })
 
-export const pointInfoAddApi = (pointInfo: any) => request<R>({
-    url: `api/v3/manager/point_info/add`,
-    method: "post",
-    data: pointInfo
-})
+export const pointInfoAddApi = (pointInfo: any) =>
+    request<R>({
+        url: `api/v3/manager/point_info/add`,
+        method: 'post',
+        data: pointInfo,
+    })
 
-export const pointInfoUpdateApi = (pointInfo: any) => request<R>({
-    url: `api/v3/manager/point_info/update`,
-    method: "post",
-    data: pointInfo
-})
+export const pointInfoUpdateApi = (pointInfo: any) =>
+    request<R>({
+        url: `api/v3/manager/point_info/update`,
+        method: 'post',
+        data: pointInfo,
+    })
 
-export const pointInfoByDeviceIdAndPointIdApi = (deviceId: string, pointId: string) => request<R>({
-    url: `api/v3/manager/point_info/device_id/${deviceId}/pointId/${pointId}`,
-    method: "get"
-})
+export const pointInfoByDeviceIdAndPointIdApi = (deviceId: string, pointId: string) =>
+    request<R>({
+        url: `api/v3/manager/point_info/device_id/${deviceId}/pointId/${pointId}`,
+        method: 'get',
+    })
 
-export const pointInfoByDeviceIdApi = (deviceId: string) => request<R>({
-    url: `api/v3/manager/point_info/device_id/${deviceId}`,
-    method: "get"
-})
+export const pointInfoByDeviceIdApi = (deviceId: string) =>
+    request<R>({
+        url: `api/v3/manager/point_info/device_id/${deviceId}`,
+        method: 'get',
+    })

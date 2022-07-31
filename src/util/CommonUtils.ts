@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-import { dateFormat, setCopyContent } from "@/util/utils";
+import { dateFormat, setCopyContent } from '@/util/utils'
 
 export const copyId = (content: string, message: string) => {
     setCopyContent(content, true, message)

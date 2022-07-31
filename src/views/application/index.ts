@@ -12,8 +12,8 @@
  */
 
 import { decode } from 'js-base64'
-import { defineComponent } from "vue";
-import { useRoute } from "vue-router";
+import { defineComponent } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
     props: {
@@ -30,7 +30,7 @@ export default defineComponent({
         }
 
         return {
-            iframeUrl
+            iframeUrl,
         }
     },
 })

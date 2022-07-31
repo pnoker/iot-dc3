@@ -11,14 +11,14 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from "vue"
-import { FormInstance, FormRules } from "element-plus"
+import { defineComponent, reactive, ref, unref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
 
-import { successMessage } from "@/util/utils"
+import { successMessage } from '@/util/utils'
 
 export default defineComponent({
-    name: "ProfileAddForm",
-    emits: ["add-thing"],
+    name: 'ProfileAddForm',
+    emits: ['add-thing'],
     setup(props, { emit }) {
         // 定义表单引用
         const formDataRef = ref<FormInstance>()
@@ -28,31 +28,33 @@ export default defineComponent({
             name: [
                 {
                     required: true,
-                    message: "请输入模板名称",
-                    trigger: "blur"
-                }, {
+                    message: '请输入模板名称',
+                    trigger: 'blur',
+                },
+                {
                     min: 2,
                     max: 32,
-                    message: "请输入 2~32 位字长的模板名称",
-                    trigger: "blur"
-                }, {
+                    message: '请输入 2~32 位字长的模板名称',
+                    trigger: 'blur',
+                },
+                {
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: "请输入正确格式的模板名称"
-                }
+                    message: '请输入正确格式的模板名称',
+                },
             ],
             description: [
                 {
                     max: 300,
-                    message: "最多输入300个字符",
-                    trigger: "blur"
-                }
-            ]
+                    message: '最多输入300个字符',
+                    trigger: 'blur',
+                },
+            ],
         })
 
         // 定义响应式数据
         const reactiveData = reactive({
             formData: {},
-            formVisible: false
+            formVisible: false,
         })
 
         const show = () => {
@@ -72,13 +74,13 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    emit("add-thing", reactiveData.formData, () => {
+                    emit('add-thing', reactiveData.formData, () => {
                         cancel()
                         reset()
                         successMessage(null)
                     })
                 }
-            });
+            })
         }
 
         return {
@@ -88,7 +90,7 @@ export default defineComponent({
             show,
             cancel,
             reset,
-            addThing
+            addThing,
         }
-    }
+    },
 })

@@ -11,69 +11,80 @@
  * limitations under the License.
  */
 
-import request from "@/config/axios"
-import { R } from "@/config/type/types"
+import request from '@/config/axios'
+import { R } from '@/config/type/types'
 
 // point
-export const pointAddApi = (point: any) => request<R>({
-    url: `api/v3/manager/point/add`,
-    method: "post",
-    data: point
-})
+export const pointAddApi = (point: any) =>
+    request<R>({
+        url: `api/v3/manager/point/add`,
+        method: 'post',
+        data: point,
+    })
 
-export const pointDeleteApi = (id: string) => request<R>({
-    url: `api/v3/manager/point/delete/${id}`,
-    method: "post"
-})
+export const pointDeleteApi = (id: string) =>
+    request<R>({
+        url: `api/v3/manager/point/delete/${id}`,
+        method: 'post',
+    })
 
-export const pointUpdateApi = (point: any) => request<R>({
-    url: `api/v3/manager/point/update`,
-    method: "post",
-    data: point
-})
+export const pointUpdateApi = (point: any) =>
+    request<R>({
+        url: `api/v3/manager/point/update`,
+        method: 'post',
+        data: point,
+    })
 
-export const pointByIdApi = (id: string) => request<R>({
-    url: `api/v3/manager/point/id/${id}`,
-    method: "get"
-})
+export const pointByIdApi = (id: string) =>
+    request<R>({
+        url: `api/v3/manager/point/id/${id}`,
+        method: 'get',
+    })
 
-export const pointByIdsApi = (pointIds: any) => request<R>({
-    url: `api/v3/manager/point/ids`,
-    method: "post",
-    data: pointIds
-})
+export const pointByIdsApi = (pointIds: any) =>
+    request<R>({
+        url: `api/v3/manager/point/ids`,
+        method: 'post',
+        data: pointIds,
+    })
 
-export const pointListApi = (point: any) => request<R>({
-    url: `api/v3/manager/point/list`,
-    method: "post",
-    data: point
-})
+export const pointListApi = (point: any) =>
+    request<R>({
+        url: `api/v3/manager/point/list`,
+        method: 'post',
+        data: point,
+    })
 
-export const pointUnitApi = (pointIds: any) => request<R>({
-    url: `api/v3/manager/point/unit`,
-    method: "post",
-    data: pointIds
-})
+export const pointUnitApi = (pointIds: any) =>
+    request<R>({
+        url: `api/v3/manager/point/unit`,
+        method: 'post',
+        data: pointIds,
+    })
 
-export const pointByProfileIdApi = (profileId: string) => request<R>({
-    url: `api/v3/manager/point/profile_id/${profileId}`,
-    method: "get"
-})
+export const pointByProfileIdApi = (profileId: string) =>
+    request<R>({
+        url: `api/v3/manager/point/profile_id/${profileId}`,
+        method: 'get',
+    })
 
-export const pointByDeviceIdApi = (deviceId: string) => request<R>({
-    url: `api/v3/manager/point/device_id/${deviceId}`,
-    method: "get"
-})
+export const pointByDeviceIdApi = (deviceId: string) =>
+    request<R>({
+        url: `api/v3/manager/point/device_id/${deviceId}`,
+        method: 'get',
+    })
 
 // point value
-export const pointValueByDeviceIdApi = (deviceId: string, history: any) => request<R>({
-    url: `api/v3/data/point_value/latest/device_id/${deviceId}`,
-    method: "get",
-    params: { history }
-})
+export const pointValueByDeviceIdApi = (deviceId: string, history: any) =>
+    request<R>({
+        url: `api/v3/data/point_value/latest/device_id/${deviceId}`,
+        method: 'get',
+        params: { history },
+    })
 
-export const pointValueListApi = (pointValue: any) => request<R>({
-    url: `api/v3/data/point_value/list`,
-    method: "post",
-    data: pointValue
-})
+export const pointValueListApi = (pointValue: any) =>
+    request<R>({
+        url: `api/v3/data/point_value/list`,
+        method: 'post',
+        data: pointValue,
+    })

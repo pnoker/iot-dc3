@@ -11,18 +11,18 @@
  * limitations under the License.
  */
 
-import { createRouter, createWebHashHistory, NavigationGuardNext, RouteLocationNormalized } from "vue-router"
+import { createRouter, createWebHashHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
-import commonRouters from "./common"
-import viewsRouters from "./views"
-import operateRouters from "./operate"
+import commonRouters from './common'
+import viewsRouters from './views'
+import operateRouters from './operate'
 
-import common from "@/util/common"
-import { getStore } from "@/util/store"
+import common from '@/util/common'
+import { getStore } from '@/util/store'
 
 const router = createRouter({
     history: createWebHashHistory(process.env.BASE_URL),
-    routes: [...commonRouters, viewsRouters, ...operateRouters]
+    routes: [...commonRouters, viewsRouters, ...operateRouters],
 })
 
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
@@ -31,11 +31,11 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
         document.title = to.meta.title as string
     }
 
-    if (from.name === "login" || to.name === "login") {
+    if (from.name === 'login' || to.name === 'login') {
         next()
     } else {
         if (!getStore(common.TOKEN_HEADER, false)) {
-            next({ path: "/login" })
+            next({ path: '/login' })
         } else {
             next()
         }

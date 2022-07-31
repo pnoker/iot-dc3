@@ -11,9 +11,10 @@
  * limitations under the License.
  */
 
-import { ElMessage, ElNotification } from "element-plus";
+import { ElMessage, ElNotification } from 'element-plus'
 
-let failNotify = true, failNotifyText = "";
+let failNotify = true,
+    failNotifyText = ''
 
 /**
  *  向剪切板写入指定内容
@@ -24,26 +25,26 @@ let failNotify = true, failNotifyText = "";
  * @returns {boolean}
  */
 export const setCopyContent = (content: any, detail: any, message: any) => {
-    const input = document.createElement("input");
-    input.setAttribute("id", "copy-id-input");
-    input.setAttribute("value", content);
-    document.body.appendChild(input);
+    const input = document.createElement('input')
+    input.setAttribute('id', 'copy-id-input')
+    input.setAttribute('value', content)
+    document.body.appendChild(input)
 
-    input.select();
-    if (document.execCommand("copy")) {
-        let tip = "已复制该内容到剪切板！";
+    input.select()
+    if (document.execCommand('copy')) {
+        let tip = '已复制该内容到剪切板！'
         if (detail) {
             if (message) {
-                tip = `已复制 ${message} 到剪切板！`;
+                tip = `已复制 ${message} 到剪切板！`
             } else {
-                tip = `已复制 ${content} 到剪切板！`;
+                tip = `已复制 ${content} 到剪切板！`
             }
         }
-        ElMessage.success({ message: tip, center: true });
+        ElMessage.success({ message: tip, center: true })
     }
 
-    document.body.removeChild(document.getElementById("copy-id-input") as Node);
-};
+    document.body.removeChild(document.getElementById('copy-id-input') as Node)
+}
 
 /**
  * 表单序列化
@@ -52,12 +53,12 @@ export const setCopyContent = (content: any, detail: any, message: any) => {
  * @returns {string}
  */
 export const serialize = (data: any) => {
-    const list: string[] = [];
-    Object.keys(data).forEach(ele => {
+    const list: string[] = []
+    Object.keys(data).forEach((ele) => {
         list.push(`${ele}=${data[ele]}`)
-    });
-    return list.join("&");
-};
+    })
+    return list.join('&')
+}
 
 /**
  * 获取对象类型
@@ -66,24 +67,24 @@ export const serialize = (data: any) => {
  * @returns {string|*}
  */
 export const getObjType = (obj: any) => {
-    const toString = Object.prototype.toString;
+    const toString = Object.prototype.toString
     const map: any = {
-        "[object Boolean]": "boolean",
-        "[object Number]": "number",
-        "[object String]": "string",
-        "[object Function]": "function",
-        "[object Array]": "array",
-        "[object Date]": "date",
-        "[object RegExp]": "regExp",
-        "[object Undefined]": "undefined",
-        "[object Null]": "null",
-        "[object Object]": "object"
-    };
-    if (obj instanceof Element) {
-        return "element";
+        '[object Boolean]': 'boolean',
+        '[object Number]': 'number',
+        '[object String]': 'string',
+        '[object Function]': 'function',
+        '[object Array]': 'array',
+        '[object Date]': 'date',
+        '[object RegExp]': 'regExp',
+        '[object Undefined]': 'undefined',
+        '[object Null]': 'null',
+        '[object Object]': 'object',
     }
-    return map[toString.call(obj)];
-};
+    if (obj instanceof Element) {
+        return 'element'
+    }
+    return map[toString.call(obj)]
+}
 
 /**
  * 对象深拷贝
@@ -92,27 +93,27 @@ export const getObjType = (obj: any) => {
  * @returns {{}|*}
  */
 export const deepClone = (data: any) => {
-    const type = getObjType(data);
-    let obj: any;
-    if (type === "array") {
-        obj = [];
-    } else if (type === "object") {
-        obj = {};
+    const type = getObjType(data)
+    let obj: any
+    if (type === 'array') {
+        obj = []
+    } else if (type === 'object') {
+        obj = {}
     } else {
         //不再具有下一层次
-        return data;
+        return data
     }
-    if (type === "array") {
+    if (type === 'array') {
         for (let i = 0, len = data.length; i < len; i++) {
-            obj.push(deepClone(data[i]));
+            obj.push(deepClone(data[i]))
         }
-    } else if (type === "object") {
+    } else if (type === 'object') {
         for (const key in data) {
-            obj[key] = deepClone(data[key]);
+            obj[key] = deepClone(data[key])
         }
     }
-    return obj;
-};
+    return obj
+}
 
 /**
  * 设置灰度模式
@@ -121,11 +122,11 @@ export const deepClone = (data: any) => {
  */
 export const toggleGrayMode = (status: any) => {
     if (status) {
-        document.body.className = document.body.className + " grayMode";
+        document.body.className = document.body.className + ' grayMode'
     } else {
-        document.body.className = document.body.className.replace(" grayMode", "");
+        document.body.className = document.body.className.replace(' grayMode', '')
     }
-};
+}
 
 /**
  * 设置主题
@@ -133,8 +134,8 @@ export const toggleGrayMode = (status: any) => {
  * @param name
  */
 export const setTheme = (name: any) => {
-    document.body.className = name;
-};
+    document.body.className = name
+}
 
 /**
  * 递归寻找子类的父类
@@ -148,30 +149,30 @@ export const findParent = (menu, id) => {
         if (menu[i].children.length !== 0) {
             for (let j = 0; j < menu[i].children.length; j++) {
                 if (menu[i].children[j].id === id) {
-                    return menu[i];
+                    return menu[i]
                 } else {
                     if (menu[i].children[j].children.length !== 0) {
-                        return findParent(menu[i].children[j].children, id);
+                        return findParent(menu[i].children[j].children, id)
                     }
                 }
             }
         }
     }
-};
+}
 
 /**
  * 动态插入css
  *
  * @param url
  */
-export const loadStyle = url => {
-    const link = document.createElement("link");
-    link.type = "text/css";
-    link.rel = "stylesheet";
-    link.href = url;
-    const head = document.getElementsByTagName("head")[0];
-    head.appendChild(link);
-};
+export const loadStyle = (url) => {
+    const link = document.createElement('link')
+    link.type = 'text/css'
+    link.rel = 'stylesheet'
+    link.href = url
+    const head = document.getElementsByTagName('head')[0]
+    head.appendChild(link)
+}
 
 /**
  * 判断2个对象属性和值是否相等
@@ -181,28 +182,28 @@ export const loadStyle = url => {
  * @returns {boolean}
  */
 export const diff = (obj1, obj2) => {
-    delete obj1.close;
-    const o1 = obj1 instanceof Object;
-    const o2 = obj2 instanceof Object;
+    delete obj1.close
+    const o1 = obj1 instanceof Object
+    const o2 = obj2 instanceof Object
     if (!o1 || !o2) {
-        return obj1 === obj2;
+        return obj1 === obj2
     }
 
     if (Object.keys(obj1).length !== Object.keys(obj2).length) {
-        return false;
+        return false
     }
 
     for (const attr in obj1) {
-        const t1 = obj1[attr] instanceof Object;
-        const t2 = obj2[attr] instanceof Object;
+        const t1 = obj1[attr] instanceof Object
+        const t2 = obj2[attr] instanceof Object
         if (t1 && t2) {
-            return diff(obj1[attr], obj2[attr]);
+            return diff(obj1[attr], obj2[attr])
         } else if (obj1[attr] !== obj2[attr]) {
-            return false;
+            return false
         }
     }
-    return true;
-};
+    return true
+}
 
 /**
  * 根据字典的value显示label
@@ -212,31 +213,31 @@ export const diff = (obj1, obj2) => {
  * @returns {string|*}
  */
 export const findDicLabel = (dic, value) => {
-    let result: any = "";
-    if (isNull(dic)) return value;
-    if (typeof (value) == "string" || typeof (value) == "number" || typeof (value) == "boolean") {
-        let index = 0;
-        index = findDicIndex(dic, value);
+    let result: any = ''
+    if (isNull(dic)) return value
+    if (typeof value == 'string' || typeof value == 'number' || typeof value == 'boolean') {
+        let index = 0
+        index = findDicIndex(dic, value)
         if (index !== -1) {
-            result = dic[index].label;
+            result = dic[index].label
         } else {
-            result = value;
+            result = value
         }
     } else if (value instanceof Array) {
-        result = [];
-        let index = 0;
-        value.forEach(ele => {
-            index = findDicIndex(dic, ele);
+        result = []
+        let index = 0
+        value.forEach((ele) => {
+            index = findDicIndex(dic, ele)
             if (index !== -1) {
-                result.push(dic[index].label);
+                result.push(dic[index].label)
             } else {
-                result.push(value);
+                result.push(value)
             }
-        });
-        result = result.toString();
+        })
+        result = result.toString()
     }
-    return result;
-};
+    return result
+}
 
 /**
  * 根据字典的value查找对应的index
@@ -248,11 +249,11 @@ export const findDicLabel = (dic, value) => {
 export const findDicIndex = (dic, value) => {
     for (let i = 0; i < dic.length; i++) {
         if (dic[i].value === value) {
-            return i;
+            return i
         }
     }
-    return -1;
-};
+    return -1
+}
 
 /**
  * 生成随机len位数字
@@ -262,11 +263,13 @@ export const findDicIndex = (dic, value) => {
  * @returns {string}
  */
 export const randomLenNum = (len, date) => {
-    let random = "";
-    random = Math.ceil(Math.random() * 100000000000000).toString().substr(0, len ? len : 4);
-    if (date) random = random + Date.now();
-    return random;
-};
+    let random = ''
+    random = Math.ceil(Math.random() * 100000000000000)
+        .toString()
+        .substr(0, len ? len : 4)
+    if (date) random = random + Date.now()
+    return random
+}
 
 /**
  *
@@ -275,18 +278,18 @@ export const randomLenNum = (len, date) => {
  * @returns {{leave1: number, hours: number, seconds: number, leave2: number, leave3: number, minutes: number, days: number}}
  */
 export const calcDate = (date1, date2) => {
-    const date3 = date2 - date1;
+    const date3 = date2 - date1
 
-    const days = Math.floor(date3 / (24 * 3600 * 1000));
+    const days = Math.floor(date3 / (24 * 3600 * 1000))
 
-    const leave1 = date3 % (24 * 3600 * 1000);//计算天数后剩余的毫秒数
-    const hours = Math.floor(leave1 / (3600 * 1000));
+    const leave1 = date3 % (24 * 3600 * 1000) //计算天数后剩余的毫秒数
+    const hours = Math.floor(leave1 / (3600 * 1000))
 
-    const leave2 = leave1 % (3600 * 1000);//计算小时数后剩余的毫秒数
-    const minutes = Math.floor(leave2 / (60 * 1000));
+    const leave2 = leave1 % (3600 * 1000) //计算小时数后剩余的毫秒数
+    const minutes = Math.floor(leave2 / (60 * 1000))
 
-    const leave3 = leave2 % (60 * 1000);//计算分钟数后剩余的毫秒数
-    const seconds = Math.round(date3 / 1000);
+    const leave3 = leave2 % (60 * 1000) //计算分钟数后剩余的毫秒数
+    const seconds = Math.round(date3 / 1000)
     return {
         leave1,
         leave2,
@@ -296,7 +299,7 @@ export const calcDate = (date1, date2) => {
         minutes: minutes,
         seconds: seconds,
     }
-};
+}
 
 /**
  * 日期格式化
@@ -305,27 +308,28 @@ export const calcDate = (date1, date2) => {
  * @returns {string}
  */
 export function dateFormat(date: any): string {
-    let format = "yyyy-MM-dd hh:mm:ss";
-    if (date !== "Invalid Date") {
+    let format = 'yyyy-MM-dd hh:mm:ss'
+    if (date !== 'Invalid Date') {
         const o = {
-            "M+": date.getMonth() + 1, //month
-            "d+": date.getDate(), //day
-            "h+": date.getHours(), //hour
-            "m+": date.getMinutes(), //minute
-            "s+": date.getSeconds(), //second
-            "q+": Math.floor((date.getMonth() + 3) / 3), //quarter
-            "S": date.getMilliseconds() //millisecond
-        };
-        if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
-            (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+            'M+': date.getMonth() + 1, //month
+            'd+': date.getDate(), //day
+            'h+': date.getHours(), //hour
+            'm+': date.getMinutes(), //minute
+            's+': date.getSeconds(), //second
+            'q+': Math.floor((date.getMonth() + 3) / 3), //quarter
+            S: date.getMilliseconds(), //millisecond
+        }
+        if (/(y+)/.test(format))
+            format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
         for (const k in o)
-            if (new RegExp("(" + k + ")").test(format))
-                format = format.replace(RegExp.$1,
-                    RegExp.$1.length === 1 ? o[k] :
-                        ("00" + o[k]).substr(("" + o[k]).length));
-        return format;
+            if (new RegExp('(' + k + ')').test(format))
+                format = format.replace(
+                    RegExp.$1,
+                    RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length)
+                )
+        return format
     }
-    return "";
+    return ''
 }
 
 /**
@@ -338,19 +342,19 @@ export const listenFullscreen = (callback) => {
         callback()
     }
 
-    document.addEventListener("fullscreenchange", function () {
-        listen();
-    });
-    document.addEventListener("mozfullscreenchange", function () {
-        listen();
-    });
-    document.addEventListener("webkitfullscreenchange", function () {
-        listen();
-    });
-    document.addEventListener("msfullscreenchange", function () {
-        listen();
-    });
-};
+    document.addEventListener('fullscreenchange', function () {
+        listen()
+    })
+    document.addEventListener('mozfullscreenchange', function () {
+        listen()
+    })
+    document.addEventListener('webkitfullscreenchange', function () {
+        listen()
+    })
+    document.addEventListener('msfullscreenchange', function () {
+        listen()
+    })
+}
 
 /**
  * 判断是否为Url
@@ -358,7 +362,7 @@ export const listenFullscreen = (callback) => {
  * @returns {boolean}
  */
 export function isUrl(url: any) {
-    return /^http[s]?:\/\/.*/.test(url);
+    return /^http[s]?:\/\/.*/.test(url)
 }
 
 /**
@@ -367,7 +371,7 @@ export function isUrl(url: any) {
  * @returns {boolean}
  */
 export function isEmail(email: any) {
-    return /^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$/.test(email);
+    return /^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$/.test(email)
 }
 
 /**
@@ -376,7 +380,7 @@ export function isEmail(email: any) {
  * @returns {boolean}
  */
 export function isPhone(phone: any) {
-    return /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$/.test(phone);
+    return /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$/.test(phone)
 }
 
 /**
@@ -386,14 +390,14 @@ export function isPhone(phone: any) {
  * @returns {boolean}
  */
 export function isNum(num: any, type: any) {
-    let regName = /[^\d.]/g;
+    let regName = /[^\d.]/g
     if (type == 1) {
-        if (!regName.test(num)) return false;
+        if (!regName.test(num)) return false
     } else if (type == 2) {
-        regName = /[^\d]/g;
-        if (!regName.test(num)) return false;
+        regName = /[^\d]/g
+        if (!regName.test(num)) return false
     }
-    return true;
+    return true
 }
 
 /**
@@ -403,14 +407,14 @@ export function isNum(num: any, type: any) {
  * @returns {boolean}
  */
 export function isNumord(num: any, type: any) {
-    let regName = /[^\d.]/g;
+    let regName = /[^\d.]/g
     if (type == 1) {
-        if (!regName.test(num)) return false;
+        if (!regName.test(num)) return false
     } else if (type == 2) {
-        regName = /[^\d.]/g;
-        if (!regName.test(num)) return false;
+        regName = /[^\d.]/g
+        if (!regName.test(num)) return false
     }
-    return true;
+    return true
 }
 
 /**
@@ -419,14 +423,14 @@ export function isNumord(num: any, type: any) {
  * @returns {boolean}
  */
 export function isNull(val: any) {
-    if (typeof val == "boolean") return false
-    if (typeof val == "number") return false
+    if (typeof val == 'boolean') return false
+    if (typeof val == 'number') return false
     if (val instanceof Array) {
         if (val.length === 0) return true
     } else if (val instanceof Object) {
-        if (JSON.stringify(val) === "{}") return true
+        if (JSON.stringify(val) === '{}') return true
     } else {
-        return val === "null" || val == null || val === "undefined" || val === undefined || val === ""
+        return val === 'null' || val == null || val === 'undefined' || val === undefined || val === ''
     }
     return false
 }
@@ -437,16 +441,16 @@ export function isNull(val: any) {
  * @param message
  */
 export const successMessage = (message: string | null) => {
-    if (message === "" || message == null) {
-        message = "操作成功!"
+    if (message === '' || message == null) {
+        message = '操作成功!'
     }
     ElNotification.success({
-        title: "成功",
+        title: '成功',
         message: message,
         onClose: () => {
             failNotify = false
-            failNotifyText = ""
-        }
+            failNotifyText = ''
+        },
     })
 }
 
@@ -458,26 +462,26 @@ export const successMessage = (message: string | null) => {
  */
 export const failMessage = (message: string | null, error: any) => {
     let show = true
-    if (message === "" || message == null) {
-        message = "操作失败!"
+    if (message === '' || message == null) {
+        message = '操作失败!'
     }
     if (failNotify && failNotifyText === message) {
         show = false
     }
     if (error) {
-        console.error(error);
+        console.error(error)
     }
     if (show) {
         failNotify = true
         failNotifyText = message
         ElNotification.error({
-            title: "错误",
+            title: '错误',
             dangerouslyUseHTMLString: true,
             message: `${message}`,
             onClose: () => {
-                failNotify = false;
-                failNotifyText = ""
-            }
+                failNotify = false
+                failNotifyText = ''
+            },
         })
     }
 }

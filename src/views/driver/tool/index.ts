@@ -11,27 +11,27 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from "vue"
-import { FormInstance, FormRules } from "element-plus"
-import { Plus, Refresh, RefreshRight, Search, Sort } from "@element-plus/icons-vue"
+import { defineComponent, reactive, ref, unref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
+import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
 
-import { useStore } from "vuex"
+import { useStore } from 'vuex'
 
 export default defineComponent({
-    name: "DriverTool",
+    name: 'DriverTool',
     props: {
         page: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         add: {
             type: Boolean,
-            default: () => false
-        }
+            default: () => false,
+        },
     },
-    emits: ["search", "reset", "refresh", "sort", "size-change", "current-change"],
+    emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],
     setup(props, { emit }) {
         const store = useStore()
 
@@ -43,9 +43,7 @@ export default defineComponent({
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            port: [
-                { type: "number", message: "端口必须为数字值" }
-            ]
+            port: [{ type: 'number', message: '端口必须为数字值' }],
         })
 
         // 图标
@@ -61,31 +59,31 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    emit("search", reactiveData)
+                    emit('search', reactiveData)
                 }
-            });
+            })
         }
 
         const reset = () => {
             const form = unref(formDataRef)
-            form?.resetFields();
-            emit("reset");
+            form?.resetFields()
+            emit('reset')
         }
 
         const refresh = () => {
-            emit("refresh");
+            emit('refresh')
         }
 
         const sort = () => {
-            emit("sort");
+            emit('sort')
         }
 
         const sizeChange = (size) => {
-            emit("size-change", size);
+            emit('size-change', size)
         }
 
         const currentChange = (current) => {
-            emit("current-change", current);
+            emit('current-change', current)
         }
 
         return {
@@ -99,7 +97,7 @@ export default defineComponent({
             sort,
             sizeChange,
             currentChange,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

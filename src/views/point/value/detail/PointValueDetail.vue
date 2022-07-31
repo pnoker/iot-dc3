@@ -12,25 +12,25 @@
   -->
 
 <template>
-	<el-dialog
-		v-model="detailVisible"
-		custom-class="things-dialog"
-		title="数据详情"
-		:show-close="false"
-		:append-to-body="true"
-		:close-on-click-modal="false"
-		:close-on-press-escape="false"
-	>
-		<pre v-highlightjs>
+    <el-dialog
+        v-model="detailVisible"
+        custom-class="things-dialog"
+        title="数据详情"
+        :show-close="false"
+        :append-to-body="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+    >
+        <pre v-highlightjs>
             <code class="json">{{ detailData }}</code>
         </pre>
-		<div>
-			<el-button type="success" @click="detailVisible = false">关闭</el-button>
-		</div>
-	</el-dialog>
+        <div>
+            <el-button type="success" @click="detailVisible = false">关闭</el-button>
+        </div>
+    </el-dialog>
 </template>
 
-<script src="./index.ts" lang="ts"/>
+<script src="./index.ts" lang="ts" />
 
 <style lang="less">
 @import '~@/components/dialog/styles/things-dialog.less';

@@ -12,39 +12,39 @@
   -->
 
 <template>
-	<div class="things-card cursor-pointer" @click="select(data)">
-		<el-card :shadow="data.shadow">
-			<div class="things-card-content">
-				<div
-					class="things-card__header"
-					:class="{
-						'header-enable': isConfig,
-						'header-disable': !isConfig,
-					}"
-				>
-					<div class="things-card-header-icon">
-						<img :src="isSelect" :alt="data.name" />
-					</div>
-					<div class="things-card-header-name nowrap-name">{{ data.name }}</div>
-				</div>
-				<div class="things-card__body">
-					<div class="things-card-body-content">
-						<ul>
-							<li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
-								<el-icon>
-									<Goblet />
-								</el-icon>
-								{{ attribute.displayName }}: {{ data[attribute.name].value }}
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</el-card>
-	</div>
+    <div class="things-card cursor-pointer" @click="select(data)">
+        <el-card :shadow="data.shadow">
+            <div class="things-card-content">
+                <div
+                    class="things-card__header"
+                    :class="{
+                        'header-enable': isConfig,
+                        'header-disable': !isConfig,
+                    }"
+                >
+                    <div class="things-card-header-icon">
+                        <img :src="isSelect" :alt="data.name" />
+                    </div>
+                    <div class="things-card-header-name nowrap-name">{{ data.name }}</div>
+                </div>
+                <div class="things-card__body">
+                    <div class="things-card-body-content">
+                        <ul>
+                            <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
+                                <el-icon>
+                                    <Goblet />
+                                </el-icon>
+                                {{ attribute.displayName }}: {{ data[attribute.name].value }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </el-card>
+    </div>
 </template>
 
-<script src="./index.ts" lang="ts"/>
+<script src="./index.ts" lang="ts" />
 
 <style lang="less">
 @import '~@/components/card/styles/things-card.less';

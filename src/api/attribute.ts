@@ -11,15 +11,17 @@
  * limitations under the License.
  */
 
-import request from "@/config/axios"
-import { R } from "@/config/type/types"
+import request from '@/config/axios'
+import { R } from '@/config/type/types'
 
-export const driverAttributeByDriverIdApi = (id: string) => request<R>({
-    url: `api/v3/manager/driver_attribute/driver_id/${id}`,
-    method: "get"
-})
+export const driverAttributeByDriverIdApi = (id: string) =>
+    request<R>({
+        url: `api/v3/manager/driver_attribute/driver_id/${id}`,
+        method: 'get',
+    })
 
-export const pointAttributeByDriverIdApi = (id: string) => request<R>({
-    url: `api/v3/manager/point_attribute/driver_id/${id}`,
-    method: "get"
-})
+export const pointAttributeByDriverIdApi = (id: string) =>
+    request<R>({
+        url: `api/v3/manager/point_attribute/driver_id/${id}`,
+        method: 'get',
+    })

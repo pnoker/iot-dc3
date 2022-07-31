@@ -11,92 +11,78 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent } from "vue"
-import { CircleCheck, CircleClose, CollectionTag, Edit, IceCreamSquare, Right, Sunset, SwitchButton } from "@element-plus/icons-vue"
+import { defineComponent } from 'vue'
+import {
+    CircleCheck,
+    CircleClose,
+    CollectionTag,
+    Edit,
+    IceCreamSquare,
+    Right,
+    Sunset,
+    SwitchButton,
+} from '@element-plus/icons-vue'
 
-import router from "@/config/router"
+import router from '@/config/router'
 
-import { successMessage } from "@/util/utils"
-import { copyId, timestamp } from "@/util/CommonUtils"
+import { successMessage } from '@/util/utils'
+import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
-    name: "ProfileCard",
+    name: 'ProfileCard',
     components: {
         Edit,
         Sunset,
         IceCreamSquare,
-        CollectionTag
+        CollectionTag,
     },
     props: {
         embedded: {
             type: Boolean,
-            default: () => false
-        },
-        pointTable: {
-            type: Object,
-            default: () => {
-                return {}
-            }
+            default: () => false,
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         icon: {
             type: String,
-            default: () => "images/common/profile.png"
-        }
+            default: () => 'images/common/profile.png',
+        },
     },
-    emits: ["delete-thing"],
+    emits: ['delete-thing'],
     setup(props, { emit }) {
-        const pointName = computed(() => {
-            let ids = props.data.pointIds || []
-            if (ids) {
-                if (ids.length > 10) {
-                    ids = ids.slice(0, 10);
-                }
-            }
-            return ids.map(id => props.pointTable[id]?.name).join(", ")
-        })
-
-        const pointLength = computed(() => {
-            const ids = props.data.pointIds || []
-            return ids.length
-        })
-
         // 图标
         const Icon = {
             SwitchButton,
             CircleCheck,
             Right,
-            CircleClose
+            CircleClose,
         }
 
         const deleteThing = (id) => {
-            emit("delete-thing", id, () => {
+            emit('delete-thing', id, () => {
                 successMessage(null)
-            });
+            })
         }
 
         const edit = (id) => {
-            router.push({ name: "profileEdit", query: { id, active: "0" } })
+            router.push({ name: 'profileEdit', query: { id, active: '0' } })
         }
 
         const detail = (id) => {
-            router.push({ name: "profileDetail", query: { id, active: "detail" } })
+            router.push({ name: 'profileDetail', query: { id, active: 'detail' } })
         }
 
         return {
-            pointName,
-            pointLength,
             deleteThing,
             edit,
             detail,
             copyId,
             timestamp,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

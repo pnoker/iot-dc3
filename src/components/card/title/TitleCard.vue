@@ -12,17 +12,17 @@
   -->
 
 <template>
-	<div class="title-card">
-		<el-card shadow="hover">
-			<slot name="header">
-				<span class="title-card__header">{{ title }}</span>
-			</slot>
-			<slot />
-		</el-card>
-	</div>
+    <div class="title-card">
+        <el-card shadow="hover">
+            <slot name="header">
+                <span class="title-card__header">{{ title }}</span>
+            </slot>
+            <slot />
+        </el-card>
+    </div>
 </template>
 
-<script src="./index.ts" lang="ts"/>
+<script src="./index.ts" lang="ts" />
 
 <style lang="less">
 @import './style.less';

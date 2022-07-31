@@ -12,61 +12,77 @@
   -->
 
 <template>
-	<div class="edit-card">
-		<div class="edit-card-header">
-			<el-card shadow="hover">
-				<el-steps :active="reactiveData.active" align-center>
-					<el-step title="模板信息编辑"></el-step>
-					<el-step title="模板位号编辑"></el-step>
-				</el-steps>
-			</el-card>
-		</div>
+    <div class="edit-card">
+        <div class="edit-card-header">
+            <el-card shadow="hover">
+                <el-steps :active="reactiveData.active" align-center>
+                    <el-step title="模板信息编辑"></el-step>
+                    <el-step title="模板位号编辑"></el-step>
+                </el-steps>
+            </el-card>
+        </div>
 
-		<div class="edit-card-body">
-			<el-card v-if="reactiveData.active === 0" shadow="hover">
-				<el-divider content-position="left">模板信息编辑</el-divider>
-				<el-form ref="formDataRef" :inline="true" :model="reactiveData.profileFormData" :rules="formRule">
-					<div class="edit-form-item">
-						<el-form-item label="模板名称" prop="name">
-							<el-input v-model="reactiveData.profileFormData.name" clearable class="edit-form-default" placeholder="请输入模板名称" @keyup.enter="profileUpdate"></el-input>
-						</el-form-item>
-						<el-form-item label="使能" prop="enable">
-							<el-select v-model="reactiveData.profileFormData.enable" clearable class="edit-form-small" placeholder="请选择使能">
-								<el-option label="启用" :value="true"></el-option>
-								<el-option label="停用" :value="false"></el-option>
-							</el-select>
-						</el-form-item>
-					</div>
-					<div class="edit-form-item">
-						<el-form-item label="模板描述" prop="description">
-							<el-input
-								v-model="reactiveData.profileFormData.description"
-								clearable
-								class="edit-form-large"
-								type="textarea"
-								maxlength="300"
-								show-word-limit
-								placeholder="请输入模板描述"
-							>
-							</el-input>
-						</el-form-item>
-					</div>
-					<el-form-item class="edit-form-button">
-						<el-button type="primary" :icon="Edit" @click="profileUpdate">修改</el-button>
-						<el-button :icon="RefreshLeft" @click="profileReset">恢复</el-button>
-						<el-button type="warning" :icon="Right" plain @click="next">下一步</el-button>
-					</el-form-item>
-				</el-form>
-			</el-card>
-			<el-card v-if="reactiveData.active === 1" shadow="hover">
-				<el-divider content-position="left">模板位号配置</el-divider>
-				<point-list :pre="true" :profile-id="reactiveData.id" @pre-handle="pre" @next-handle="next"></point-list>
-			</el-card>
-		</div>
-	</div>
+        <div class="edit-card-body">
+            <el-card v-if="reactiveData.active === 0" shadow="hover">
+                <el-divider content-position="left">模板信息编辑</el-divider>
+                <el-form ref="formDataRef" :inline="true" :model="reactiveData.profileFormData" :rules="formRule">
+                    <div class="edit-form-item">
+                        <el-form-item label="模板名称" prop="name">
+                            <el-input
+                                v-model="reactiveData.profileFormData.name"
+                                clearable
+                                class="edit-form-default"
+                                placeholder="请输入模板名称"
+                                @keyup.enter="profileUpdate"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item label="使能" prop="enable">
+                            <el-select
+                                v-model="reactiveData.profileFormData.enable"
+                                clearable
+                                class="edit-form-small"
+                                placeholder="请选择使能"
+                            >
+                                <el-option label="启用" :value="true"></el-option>
+                                <el-option label="停用" :value="false"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </div>
+                    <div class="edit-form-item">
+                        <el-form-item label="模板描述" prop="description">
+                            <el-input
+                                v-model="reactiveData.profileFormData.description"
+                                clearable
+                                class="edit-form-large"
+                                type="textarea"
+                                maxlength="300"
+                                show-word-limit
+                                placeholder="请输入模板描述"
+                            >
+                            </el-input>
+                        </el-form-item>
+                    </div>
+                    <el-form-item class="edit-form-button">
+                        <el-button type="primary" :icon="Edit" @click="profileUpdate">修改</el-button>
+                        <el-button :icon="RefreshLeft" @click="profileReset">恢复</el-button>
+                        <el-button type="warning" :icon="Right" plain @click="next">下一步</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-card>
+            <el-card v-if="reactiveData.active === 1" shadow="hover">
+                <el-divider content-position="left">模板位号配置</el-divider>
+                <point-list
+                    :pre="true"
+                    :profile-id="reactiveData.id"
+                    @pre-handle="pre"
+                    @next-handle="next"
+                ></point-list>
+            </el-card>
+        </div>
+    </div>
 </template>
 
-<script src="./index.ts" lang="ts"/>
+<script src="./index.ts" lang="ts" />
 
 <style lang="less">
 @import '~@/components/card/styles/edit-card.less';

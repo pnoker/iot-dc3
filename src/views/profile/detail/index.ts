@@ -11,24 +11,26 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, computed } from "vue"
-import { CollectionTag, Edit, List, Management, Sunset } from "@element-plus/icons-vue"
+import { defineComponent, reactive, computed } from 'vue'
+import { CollectionTag, Edit, List, Management, Sunset } from '@element-plus/icons-vue'
 
-import { profileByIdApi, profileByIdsApi } from "@/api/profile"
-import { pointByProfileIdApi } from "@/api/point"
-import { deviceByProfileIdApi, deviceStatusByProfileIdApi } from "@/api/device"
-import { driverByIdsApi } from "@/api/driver"
+import { profileByIdApi, profileByIdsApi } from '@/api/profile'
+import { pointByProfileIdApi } from '@/api/point'
+import { deviceByProfileIdApi, deviceStatusByProfileIdApi } from '@/api/device'
+import { driverByIdsApi } from '@/api/driver'
 
-import router from "@/config/router";
-import { useRoute } from "vue-router";
+import router from '@/config/router'
+import { useRoute } from 'vue-router'
 
-import baseCard from "@/components/card/base/BaseCard.vue"
-import detailCard from "@/components/card/detail/DetailCard.vue"
-import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
-import deviceCard from "@/views/device/card/DeviceCard.vue"
-import pointCard from "@/views/point/card/PointCard.vue"
+import baseCard from '@/components/card/base/BaseCard.vue'
+import detailCard from '@/components/card/detail/DetailCard.vue'
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
+import deviceCard from '@/views/device/card/DeviceCard.vue'
+import pointCard from '@/views/point/card/PointCard.vue'
+import device from '@/views/device/Device.vue'
+import point from '@/views/point/Point.vue'
 
-import { timestamp } from "@/util/CommonUtils"
+import { timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
     components: {
@@ -36,12 +38,14 @@ export default defineComponent({
         detailCard,
         skeletonCard,
         deviceCard,
+        device,
         pointCard,
+        point,
         List,
         CollectionTag,
         Management,
         Edit,
-        Sunset
+        Sunset,
     },
     setup() {
         const route = useRoute()
@@ -57,19 +61,11 @@ export default defineComponent({
             statusTable: {} as any,
             data: {} as any,
             listDeviceData: [] as any[],
-            listPointData: [] as any[]
-        })
-
-        const pointName = computed(() => {
-            return reactiveData.listPointData.map(point => point.name).join(", ") || "-"
+            listPointData: [] as any[],
         })
 
         const hasPointData = computed(() => {
             return !reactiveData.pointLoading && reactiveData.listPointData?.length < 1
-        })
-
-        const deviceName = computed(() => {
-            return reactiveData.listDeviceData.map(device => device.name).join(", ") || "-"
         })
 
         const hasDeviceData = computed(() => {
@@ -77,62 +73,76 @@ export default defineComponent({
         })
 
         const profile = () => {
-            profileByIdApi(reactiveData.id).then(res => {
+            profileByIdApi(reactiveData.id).then((res) => {
                 reactiveData.data = res.data.data
             })
         }
 
         const device = () => {
-            deviceByProfileIdApi(reactiveData.id).then(res => {
-                reactiveData.listDeviceData = res.data.data
+            deviceByProfileIdApi(reactiveData.id)
+                .then((res) => {
+                    reactiveData.listDeviceData = res.data.data
 
-                // driver 
-                const driverIds = Array.from(new Set(reactiveData.listDeviceData.map(device => device.driverId)))
-                driverByIdsApi(driverIds).then(res => {
-                    reactiveData.driverTable = res.data.data
-                }).catch(() => {
+                    // driver
+                    const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId)))
+                    driverByIdsApi(driverIds)
+                        .then((res) => {
+                            reactiveData.driverTable = res.data.data
+                        })
+                        .catch(() => {
+                            // nothing to do
+                        })
+
+                    // profile
+                    const profileIds = Array.from(
+                        new Set(
+                            reactiveData.listDeviceData.reduce((pre, cur) => {
+                                pre.push(...cur.profileIds)
+                                return pre
+                            }, [])
+                        )
+                    )
+                    profileByIdsApi(profileIds)
+                        .then((res) => {
+                            reactiveData.profileTable = res.data.data
+                        })
+                        .catch(() => {
+                            // nothing to do
+                        })
+                })
+                .catch(() => {
                     // nothing to do
                 })
-
-                // profile
-                const profileIds = Array.from(new Set(reactiveData.listDeviceData.reduce((pre, cur) => {
-                    pre.push(...cur.profileIds)
-                    return pre
-                }, [])))
-                profileByIdsApi(profileIds).then(res => {
-                    reactiveData.profileTable = res.data.data
-                }).catch(() => {
-                    // nothing to do
+                .finally(() => {
+                    reactiveData.deviceLoading = false
                 })
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.deviceLoading = false
-            })
 
-            deviceStatusByProfileIdApi(reactiveData.id).then(res => {
+            deviceStatusByProfileIdApi(reactiveData.id).then((res) => {
                 reactiveData.statusTable = res.data.data
             })
         }
 
         const point = () => {
-            pointByProfileIdApi(reactiveData.id).then(res => {
-                reactiveData.listPointData = res.data.data
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.pointLoading = false
-            })
+            pointByProfileIdApi(reactiveData.id)
+                .then((res) => {
+                    reactiveData.listPointData = res.data.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+                .finally(() => {
+                    reactiveData.pointLoading = false
+                })
         }
 
         const changeActive = (tab) => {
             const query = route.query
             router.push({ query: { ...query, active: tab.props.name } })
             switch (tab.props.name) {
-                case "device":
+                case 'device':
                     device()
                     break
-                case "point":
+                case 'point':
                     point()
                     break
                 default:
@@ -146,12 +156,10 @@ export default defineComponent({
 
         return {
             reactiveData,
-            pointName,
             hasPointData,
-            deviceName,
             hasDeviceData,
             changeActive,
-            timestamp
+            timestamp,
         }
-    }
+    },
 })

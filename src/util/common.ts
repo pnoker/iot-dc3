@@ -12,5 +12,5 @@
  */
 
 export default {
-    TOKEN_HEADER: "X-Auth-Token"
+    TOKEN_HEADER: 'X-Auth-Token',
 }

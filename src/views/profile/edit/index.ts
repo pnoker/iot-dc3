@@ -11,13 +11,13 @@
  * limitations under the License.
  */
 
-import pointList from "@/views/point/Point.vue";
-import { profileByIdApi, profileUpdateApi } from "@/api/profile";
-import { defineComponent, reactive, ref, unref } from "vue";
-import router from "@/config/router";
-import { useRoute } from "vue-router";
-import { FormInstance, FormRules } from "element-plus";
-import { Edit, RefreshLeft, Right } from "@element-plus/icons-vue"
+import pointList from '@/views/point/Point.vue'
+import { profileByIdApi, profileUpdateApi } from '@/api/profile'
+import { defineComponent, reactive, ref, unref } from 'vue'
+import router from '@/config/router'
+import { useRoute } from 'vue-router'
+import { FormInstance, FormRules } from 'element-plus'
+import { Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
 
 export default defineComponent({
     components: { pointList },
@@ -31,7 +31,7 @@ export default defineComponent({
         const Icon = {
             Edit,
             RefreshLeft,
-            Right
+            Right,
         }
 
         // 定义响应式数据
@@ -39,7 +39,7 @@ export default defineComponent({
             id: route.query.id,
             active: +(route.query.active || 0),
             oldProfileFormData: {},
-            profileFormData: {}
+            profileFormData: {} as any,
         })
 
         // 定义表单校验规则
@@ -47,37 +47,39 @@ export default defineComponent({
             name: [
                 {
                     required: true,
-                    message: "请输入模板名称",
-                    trigger: "blur"
-                }, {
+                    message: '请输入模板名称',
+                    trigger: 'blur',
+                },
+                {
                     min: 2,
                     max: 32,
-                    message: "请输入 2~32 位字长的模板名称",
-                    trigger: "blur"
-                }, {
+                    message: '请输入 2~32 位字长的模板名称',
+                    trigger: 'blur',
+                },
+                {
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: "请输入正确格式的模板名称"
-                }
+                    message: '请输入正确格式的模板名称',
+                },
             ],
             enable: [
                 {
                     required: true,
-                    message: "请选择使能",
-                    trigger: "change"
-                }
+                    message: '请选择使能',
+                    trigger: 'change',
+                },
             ],
             description: [
                 {
                     max: 300,
-                    message: "最多输入300个字符",
-                    trigger: "blur"
-                }
-            ]
+                    message: '最多输入300个字符',
+                    trigger: 'blur',
+                },
+            ],
         })
 
         const profile = () => {
             const id = route.query.id as string
-            profileByIdApi(id).then(res => {
+            profileByIdApi(id).then((res) => {
                 reactiveData.profileFormData = res.data.data
                 reactiveData.oldProfileFormData = { ...res.data.data }
             })
@@ -87,11 +89,11 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    profileUpdateApi(reactiveData.profileFormData).then(res => {
+                    profileUpdateApi(reactiveData.profileFormData).then((res) => {
                         reactiveData.oldProfileFormData = { ...res.data.data }
                     })
                 }
-            });
+            })
         }
 
         const pre = () => {
@@ -100,20 +102,20 @@ export default defineComponent({
         }
 
         const next = () => {
-            reactiveData.active++;
+            reactiveData.active++
             if (reactiveData.active > 1) {
-                router.push({ name: "profile" })
+                router.push({ name: 'profile' })
             } else {
                 changeActive(reactiveData.active)
             }
         }
 
         const profileReset = () => {
-            reactiveData.profileFormData = { ...reactiveData.oldProfileFormData };
+            reactiveData.profileFormData = { ...reactiveData.oldProfileFormData }
         }
 
         const changeActive = (step) => {
-            const query = route.query;
+            const query = route.query
             router.push({ query: { ...query, active: step } })
         }
 
@@ -128,7 +130,7 @@ export default defineComponent({
             next,
             profileReset,
             changeActive,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

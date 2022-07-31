@@ -11,18 +11,18 @@
  * limitations under the License.
  */
 
-import { reactive, ref, computed } from "vue"
+import { reactive, ref, computed } from 'vue'
 
-import { pointDictionaryApi } from "@/api/dictionary"
-import { profileAddApi, profileDeleteApi, profileListApi } from "@/api/profile"
+import { pointDictionaryApi } from '@/api/dictionary'
+import { profileAddApi, profileDeleteApi, profileListApi } from '@/api/profile'
 
-import { Dictionary, Order } from "@/config/type/types"
+import { Dictionary, Order } from '@/config/type/types'
 
-import blankCard from "@/components/card/blank/BlankCard.vue"
-import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
-import profileTool from "@/views/profile/tool/ProfileTool.vue"
-import profileAddForm from "@/views/profile/add/ProfileAddForm.vue"
-import profileCard from "@/views/profile/card/ProfileCard.vue"
+import blankCard from '@/components/card/blank/BlankCard.vue'
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
+import profileTool from '@/views/profile/tool/ProfileTool.vue'
+import profileAddForm from '@/views/profile/add/ProfileAddForm.vue'
+import profileCard from '@/views/profile/card/ProfileCard.vue'
 
 export default {
     components: {
@@ -30,7 +30,7 @@ export default {
         skeletonCard,
         profileTool,
         profileAddForm,
-        profileCard
+        profileCard,
     },
     setup() {
         const profileAddFormRef: any = ref<InstanceType<typeof profileAddForm>>()
@@ -47,8 +47,8 @@ export default {
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[]
-            }
+                orders: [] as Order[],
+            },
         })
 
         const hasData = computed(() => {
@@ -58,20 +58,23 @@ export default {
         const list = () => {
             profileListApi({
                 page: reactiveData.page,
-                ...reactiveData.query
-            }).then(res => {
-                const data = res.data.data
-                reactiveData.page.total = data.total
-                reactiveData.listData = data.records
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.loading = false
+                ...reactiveData.query,
             })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.page.total = data.total
+                    reactiveData.listData = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+                .finally(() => {
+                    reactiveData.loading = false
+                })
         }
 
         const point = () => {
-            pointDictionaryApi("point").then(res => {
+            pointDictionaryApi('point').then((res) => {
                 reactiveData.pointDictionary = res.data.data
                 reactiveData.pointTable = reactiveData.pointDictionary.reduce((pre, cur) => {
                     pre[cur.value] = cur.label
@@ -114,9 +117,9 @@ export default {
         const sort = () => {
             reactiveData.order = !reactiveData.order
             if (reactiveData.order) {
-                reactiveData.page.orders = [{ column: "create_time", asc: true }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: true }]
             } else {
-                reactiveData.page.orders = [{ column: "create_time", asc: false }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: false }]
             }
             list()
         }
@@ -146,7 +149,7 @@ export default {
             refresh,
             sort,
             sizeChange,
-            currentChange
+            currentChange,
         }
-    }
+    },
 }

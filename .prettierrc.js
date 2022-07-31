@@ -11,28 +11,10 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-    name: 'SkeletonCard',
-    props: {
-        loading: {
-            type: Boolean,
-            default: () => {
-                return false
-            },
-        },
-        header: {
-            type: Boolean,
-            default: () => {
-                return false
-            },
-        },
-        footer: {
-            type: Boolean,
-            default: () => {
-                return false
-            },
-        },
-    },
-})
+module.exports = {
+    tabWidth: 4,
+    printWidth: 120,
+    semi: false,
+    singleQuote: true,
+    endOfLine: 'auto',
+}

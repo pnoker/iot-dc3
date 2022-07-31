@@ -11,42 +11,42 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from "vue"
-import { FormInstance, FormRules } from "element-plus"
-import { Plus, RefreshRight, Search, Refresh } from "@element-plus/icons-vue"
+import { defineComponent, reactive, ref, unref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
+import { Plus, RefreshRight, Search, Refresh } from '@element-plus/icons-vue'
 
-import { Dictionary } from "@/config/type/types"
+import { Dictionary } from '@/config/type/types'
 
 export default defineComponent({
-    name: "PointValueTool",
+    name: 'PointValueTool',
     props: {
         deviceDictionary: {
             type: Array<Dictionary>,
             default: () => {
-                return [];
-            }
+                return []
+            },
         },
         pointDictionary: {
             type: Array<Dictionary>,
             default: () => {
-                return [];
-            }
+                return []
+            },
         },
         page: {
             type: Object,
             default: () => {
                 return {}
-            }
-        }
+            },
+        },
     },
-    emits: ["search", "reset", "refresh", "size-change", "current-change"],
+    emits: ['search', 'reset', 'refresh', 'size-change', 'current-change'],
     setup(props, { emit }) {
         // 定义表单引用
         const formDataRef = ref<FormInstance>()
 
         // 定义响应式数据
         const reactiveData = reactive({
-            formData: {} as any
+            formData: {} as any,
         })
 
         // 定义表单校验规则
@@ -57,39 +57,38 @@ export default defineComponent({
             Plus,
             RefreshRight,
             Search,
-            Refresh
+            Refresh,
         }
-
 
         const search = () => {
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
                     const formData = {} as any
-                    const data = reactiveData.formData;
+                    const data = reactiveData.formData
                     if (data.deviceId && data.deviceId[1]) {
-                        formData.deviceId = data.deviceId[1];
+                        formData.deviceId = data.deviceId[1]
                     }
                     if (data.pointId && data.pointId[1]) {
-                        formData.pointId = data.pointId[1];
+                        formData.pointId = data.pointId[1]
                     }
-                    emit("search", formData);
+                    emit('search', formData)
                 }
-            });
+            })
         }
         const reset = () => {
             const form = unref(formDataRef)
-            form?.resetFields();
-            emit("reset");
+            form?.resetFields()
+            emit('reset')
         }
         const refresh = () => {
-            emit("refresh");
+            emit('refresh')
         }
         const sizeChange = (size) => {
-            emit("size-change", size);
+            emit('size-change', size)
         }
         const currentChange = (current) => {
-            emit("current-change", current);
+            emit('current-change', current)
         }
 
         return {
@@ -101,7 +100,7 @@ export default defineComponent({
             refresh,
             sizeChange,
             currentChange,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

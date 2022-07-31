@@ -11,11 +11,11 @@
  * limitations under the License.
  */
 
-import { ElMessage } from "element-plus";
+import { ElMessage } from 'element-plus'
 
 export const warning = (message: string, grouping = true, showClose = true) => {
     ElMessage({
-        type: "warning",
+        type: 'warning',
         grouping: grouping,
         showClose: showClose,
         message: message,

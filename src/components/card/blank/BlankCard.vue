@@ -12,14 +12,14 @@
   -->
 
 <template>
-	<div class="blank-card">
-		<el-card class="blank-card-body" shadow="hover">
-			<slot />
-		</el-card>
-	</div>
+    <div class="blank-card">
+        <el-card class="blank-card-body" shadow="hover">
+            <slot />
+        </el-card>
+    </div>
 </template>
 
-<script src="./index.ts" lang="ts"/>
+<script src="./index.ts" lang="ts" />
 
 <style lang="less">
 @import './style.less';

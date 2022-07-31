@@ -11,21 +11,21 @@
  * limitations under the License.
  */
 
-import md5 from "js-md5"
+import md5 from 'js-md5'
 
-import common from "@/util/common"
-import { getStore, removeCookies, removeStore, setCookies, setStore } from "@/util/store"
+import common from '@/util/common'
+import { getStore, removeCookies, removeStore, setCookies, setStore } from '@/util/store'
 
-import router from "@/config/router";
-import { cancelTokenApi, generateSaltApi, generateTokenApi } from "@/api/token"
+import router from '@/config/router'
+import { cancelTokenApi, generateSaltApi, generateTokenApi } from '@/api/token'
 
-import { ElLoading } from "element-plus";
+import { ElLoading } from 'element-plus'
 
 const auth = {
     namespaced: true,
     state: {
-        name: "pnoker",
-        tenant: "default"
+        name: 'pnoker',
+        tenant: 'default',
     },
     mutations: {
         setToken: (state, token) => {
@@ -38,44 +38,46 @@ const auth = {
         removeToken: () => {
             removeCookies(common.TOKEN_HEADER)
             removeStore(common.TOKEN_HEADER, false)
-        }
+        },
     },
     actions: {
         login({ commit }, form) {
             const loading = ElLoading.service({
                 lock: true,
-                text: "登录中,请稍后。。。",
+                text: '登录中,请稍后...',
             })
-            generateSaltApi(form.name).then(res => {
-                const salt = res.data.data
-                const login = {
-                    tenant: form.tenant,
-                    name: form.name,
-                    salt: salt,
-                    password: md5(md5(form.password) + salt)
-                }
+            generateSaltApi(form.name)
+                .then((res) => {
+                    const salt = res.data.data
+                    const login = {
+                        tenant: form.tenant,
+                        name: form.name,
+                        salt: salt,
+                        password: md5(md5(form.password) + salt),
+                    }
 
-                generateTokenApi(login).then(res => {
-                    commit("setToken",
-                        {
-                            tenant: login.tenant,
-                            name: login.name,
-                            salt: login.salt,
-                            token: res.data.data
-                        }
-                    )
-                    router.push({ path: "/" }).then(() => loading.close())
-                }).catch(() => loading.close())
-            }).catch(() => loading.close())
+                    generateTokenApi(login)
+                        .then((res) => {
+                            commit('setToken', {
+                                tenant: login.tenant,
+                                name: login.name,
+                                salt: login.salt,
+                                token: res.data.data,
+                            })
+                            router.push({ path: '/' }).then(() => loading.close())
+                        })
+                        .catch(() => loading.close())
+                })
+                .catch(() => loading.close())
         },
         logout({ commit }) {
             const token = getStore(common.TOKEN_HEADER, false)
             if (token && token.name) {
                 cancelTokenApi(token.name)
             }
-            commit("removeToken")
-        }
-    }
+            commit('removeToken')
+        },
+    },
 }
 
 export default auth
