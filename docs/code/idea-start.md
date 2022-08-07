@@ -80,9 +80,9 @@ docker-compose up -d mysql redis mongo rabbitmq register auth
 
  Main函数为位置：
 
- `dc3-center-manager`：dc3-center/dc3-center-manager/src/main/java/com/dc3/center/manager/ManagerApplication.java
+ `dc3-center-manager`：dc3-center/dc3-center-manager/src/main/java/io/github/pnoker/center/manager/ManagerApplication.java
 
- `dc3-center-data`：dc3-center/dc3-center-data/src/main/java/com/dc3/center/data/DataApplication.java
+ `dc3-center-data`：dc3-center/dc3-center-data/src/main/java/io/github/pnoker/center/data/DataApplication.java
 
 
  注意：在启动 `dc3-center-manager` 、 `dc3-center-data` 的时候由于开启了 `ASPECTJ` ，所以需要配置 `-javaagent:dc3/lib/aspectjweaver-1.9.5.jar`

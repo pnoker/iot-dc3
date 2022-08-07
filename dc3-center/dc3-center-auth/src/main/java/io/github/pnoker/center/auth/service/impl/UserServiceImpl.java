@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         User byId = selectById(user.getId());
         // 判断 phone 是否修改
-        if (StrUtil.isNotBlank(user.getPhone())) {
+        if (StrUtil.isNotEmpty(user.getPhone())) {
             if (null == byId.getPhone() || !byId.getPhone().equals(user.getPhone())) {
                 if (null != selectByPhone(user.getPhone(), false)) {
                     throw new DuplicateException("The user already exists with phone {}", user.getPhone());
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 判断 email 是否修改
-        if (StrUtil.isNotBlank(user.getEmail())) {
+        if (StrUtil.isNotEmpty(user.getEmail())) {
             if (null == byId.getEmail() || !byId.getEmail().equals(user.getEmail())) {
                 if (null != selectByEmail(user.getEmail(), false)) {
                     throw new DuplicateException("The user already exists with email {}", user.getEmail());
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> list(UserDto userDto) {
-        if (!Optional.ofNullable(userDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(userDto.getPage())) {
             userDto.setPage(new Pages());
         }
         return userMapper.selectPage(userDto.getPage().convert(), fuzzyQuery(userDto));
@@ -185,17 +185,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean checkUserValid(String name) {
         User user = selectByName(name, false);
-        if (null != user) {
+        if (ObjectUtil.isNotNull(user)) {
             return user.getEnable();
         }
 
         user = selectByPhone(name, false);
-        if (null != user) {
+        if (ObjectUtil.isNotNull(user)) {
             return user.getEnable();
         }
 
         user = selectByEmail(name, false);
-        if (null != user) {
+        if (ObjectUtil.isNotNull(user)) {
             return user.getEnable();
         }
 
@@ -205,7 +205,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean restPassword(String id) {
         User user = selectById(id);
-        if (null != user) {
+        if (ObjectUtil.isNotNull(user)) {
             user.setPassword(Dc3Util.md5(CommonConstant.Algorithm.DEFAULT_PASSWORD));
             return null != update(user);
         }
@@ -215,10 +215,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public LambdaQueryWrapper<User> fuzzyQuery(UserDto userDto) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        if (null != userDto) {
-            if (StrUtil.isNotBlank(userDto.getName())) {
-                queryWrapper.like(User::getName, userDto.getName());
-            }
+        if (ObjectUtil.isNotNull(userDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(userDto.getName()), User::getName, userDto.getName());
         }
         return queryWrapper;
     }

@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DeviceClient;
 import io.github.pnoker.center.manager.service.DeviceService;
@@ -56,7 +57,7 @@ public class DeviceApi implements DeviceClient {
     public R<Device> add(Device device, String tenantId) {
         try {
             Device add = deviceService.add(device.setTenantId(tenantId));
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 // 通知驱动新增设备
                 notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, add);
                 return R.ok(add);
@@ -86,7 +87,7 @@ public class DeviceApi implements DeviceClient {
     public R<Device> update(Device device, String tenantId) {
         try {
             Device update = deviceService.update(device.setTenantId(tenantId));
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 // 通知驱动更新设备
                 notifyService.notifyDriverDevice(CommonConstant.Driver.Device.UPDATE, update);
                 return R.ok(update);
@@ -101,7 +102,7 @@ public class DeviceApi implements DeviceClient {
     public R<Device> selectById(String id) {
         try {
             Device select = deviceService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -124,9 +125,12 @@ public class DeviceApi implements DeviceClient {
     @Override
     public R<Page<Device>> list(DeviceDto deviceDto, String tenantId) {
         try {
+            if (ObjectUtil.isEmpty(deviceDto)) {
+                deviceDto = new DeviceDto();
+            }
             deviceDto.setTenantId(tenantId);
             Page<Device> page = deviceService.list(deviceDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

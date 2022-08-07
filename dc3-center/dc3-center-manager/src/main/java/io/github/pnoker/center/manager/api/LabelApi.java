@@ -16,11 +16,13 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.LabelClient;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.dto.GroupDto;
 import io.github.pnoker.common.dto.LabelDto;
 import io.github.pnoker.common.model.Label;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +48,7 @@ public class LabelApi implements LabelClient {
     public R<Label> add(Label label, String tenantId) {
         try {
             Label add = labelService.add(label.setTenantId(tenantId));
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -68,7 +70,7 @@ public class LabelApi implements LabelClient {
     public R<Label> update(Label label, String tenantId) {
         try {
             Label update = labelService.update(label.setTenantId(tenantId));
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -81,7 +83,7 @@ public class LabelApi implements LabelClient {
     public R<Label> selectById(String id) {
         try {
             Label select = labelService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -93,9 +95,12 @@ public class LabelApi implements LabelClient {
     @Override
     public R<Page<Label>> list(LabelDto labelDto, String tenantId) {
         try {
+            if (ObjectUtil.isEmpty(labelDto)) {
+                labelDto = new LabelDto();
+            }
             labelDto.setTenantId(tenantId);
             Page<Label> page = labelService.list(labelDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

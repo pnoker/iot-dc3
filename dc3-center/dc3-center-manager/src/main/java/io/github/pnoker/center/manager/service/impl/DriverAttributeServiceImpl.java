@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -42,6 +43,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class DriverAttributeServiceImpl implements DriverAttributeService {
+
     @Resource
     private DriverAttributeMapper driverAttributeMapper;
 
@@ -119,19 +121,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        if (null != driverAttributeDto) {
-            if (StrUtil.isNotBlank(driverAttributeDto.getName())) {
-                queryWrapper.like(DriverAttribute::getName, driverAttributeDto.getName());
-            }
-            if (StrUtil.isNotBlank(driverAttributeDto.getDisplayName())) {
-                queryWrapper.like(DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
-            }
-            if (StrUtil.isNotBlank(driverAttributeDto.getType())) {
-                queryWrapper.eq(DriverAttribute::getType, driverAttributeDto.getType());
-            }
-            if (StrUtil.isNotBlank(driverAttributeDto.getDriverId())) {
-                queryWrapper.eq(DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
-            }
+        if (ObjectUtil.isNotNull(driverAttributeDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(driverAttributeDto.getName()), DriverAttribute::getName, driverAttributeDto.getName());
+            queryWrapper.like(StrUtil.isNotEmpty(driverAttributeDto.getDisplayName()), DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
+            queryWrapper.eq(StrUtil.isNotEmpty(driverAttributeDto.getType()), DriverAttribute::getType, driverAttributeDto.getType());
+            queryWrapper.eq(StrUtil.isNotEmpty(driverAttributeDto.getDriverId()), DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
         }
         return queryWrapper;
     }

@@ -16,14 +16,14 @@
 
 package io.github.pnoker.api.center.manager.fallback;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DictionaryClient;
 import io.github.pnoker.common.bean.Dictionary;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.dto.DictionaryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * DictionaryClientFallback
@@ -42,32 +42,22 @@ public class DictionaryClientFallback implements FallbackFactory<DictionaryClien
         return new DictionaryClient() {
 
             @Override
-            public R<List<Dictionary>> driverDictionary(String tenantId) {
+            public R<Page<Dictionary>> driverDictionary(DictionaryDto dictionaryDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> driverAttributeDictionary(String tenantId) {
+            public R<Page<Dictionary>> profileDictionary(DictionaryDto dictionaryDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> pointAttributeDictionary(String tenantId) {
+            public R<Page<Dictionary>> deviceDictionary(DictionaryDto dictionaryDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<List<Dictionary>> profileDictionary(String tenantId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<List<Dictionary>> deviceDictionary(String tenantId) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<List<Dictionary>> pointDictionary(String parent, String tenantId) {
+            public R<Page<Dictionary>> pointDictionary(DictionaryDto dictionaryDto, String tenantId) {
                 return R.fail(message);
             }
         };

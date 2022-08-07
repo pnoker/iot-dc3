@@ -16,17 +16,16 @@
 
 package io.github.pnoker.api.center.manager.feign;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.DictionaryClientFallback;
 import io.github.pnoker.common.bean.Dictionary;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.dto.DictionaryDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * 字典 FeignClient
@@ -39,50 +38,36 @@ public interface DictionaryClient {
     /**
      * 查询驱动 Dictionary
      *
-     * @return List<Dictionary>
+     * @param dictionaryDto DictionaryDto
+     * @return Page<Dictionary>
      */
-    @GetMapping("/driver")
-    R<List<Dictionary>> driverDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
-
-    /**
-     * 查询驱动属性 Dictionary
-     *
-     * @return List<Dictionary>
-     */
-    @GetMapping("/driver_attribute")
-    R<List<Dictionary>> driverAttributeDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
-
-    /**
-     * 查询位号属性 Dictionary
-     *
-     * @return List<Dictionary>
-     */
-    @GetMapping("/point_attribute")
-    R<List<Dictionary>> pointAttributeDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    @PostMapping("/driver")
+    R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询模板 Dictionary
      *
-     * @return List<Dictionary>
+     * @return Page<Dictionary>
      */
-    @GetMapping("/profile")
-    R<List<Dictionary>> profileDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    @PostMapping("/profile")
+    R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询设备 Dictionary
      *
-     * @return List<Dictionary>
+     * @param dictionaryDto DictionaryDto
+     * @return Page<Dictionary>
      */
-    @GetMapping("/device")
-    R<List<Dictionary>> deviceDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    @PostMapping("/device")
+    R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询位号 Dictionary
      *
-     * @param parent profile/device
-     * @return List<Dictionary>
+     * @param dictionaryDto DictionaryDto
+     * @return Page<Dictionary>
      */
-    @GetMapping("/point/{parent}")
-    R<List<Dictionary>> pointDictionary(@NotNull @PathVariable("parent") String parent, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    @PostMapping("/point")
+    R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

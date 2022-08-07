@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.sdk.bean.mqtt;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,10 +44,10 @@ public class MessageHeader implements Serializable {
     private Long timestamp;
 
     public MessageHeader(MessageHeaders messageHeaders) {
-        if (null != messageHeaders) {
+        if (ObjectUtil.isNotNull(messageHeaders)) {
             try {
                 UUID id = messageHeaders.get("id", UUID.class);
-                if (null != id) {
+                if (ObjectUtil.isNotNull(id)) {
                     this.id = id.toString();
                 }
             } catch (Exception ignored) {

@@ -16,12 +16,15 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointAttributeClient;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
 import io.github.pnoker.common.dto.PointAttributeDto;
+import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ServiceConstant.Manager.POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeApi implements PointAttributeClient {
+
     @Resource
     private PointAttributeService pointAttributeService;
 
@@ -48,7 +52,7 @@ public class PointAttributeApi implements PointAttributeClient {
     public R<PointAttribute> add(PointAttribute pointAttribute) {
         try {
             PointAttribute add = pointAttributeService.add(pointAttribute);
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -70,7 +74,7 @@ public class PointAttributeApi implements PointAttributeClient {
     public R<PointAttribute> update(PointAttribute pointAttribute) {
         try {
             PointAttribute update = pointAttributeService.update(pointAttribute);
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -83,7 +87,7 @@ public class PointAttributeApi implements PointAttributeClient {
     public R<PointAttribute> selectById(String id) {
         try {
             PointAttribute select = pointAttributeService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -96,7 +100,7 @@ public class PointAttributeApi implements PointAttributeClient {
     public R<List<PointAttribute>> selectByDriverId(String id) {
         try {
             List<PointAttribute> select = pointAttributeService.selectByDriverId(id);
-            if (null != select) {
+            if (CollectionUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
         } catch (NotFoundException ne) {
@@ -110,8 +114,11 @@ public class PointAttributeApi implements PointAttributeClient {
     @Override
     public R<Page<PointAttribute>> list(PointAttributeDto pointAttributeDto) {
         try {
+            if (ObjectUtil.isEmpty(pointAttributeDto)) {
+                pointAttributeDto = new PointAttributeDto();
+            }
             Page<PointAttribute> page = pointAttributeService.list(pointAttributeDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

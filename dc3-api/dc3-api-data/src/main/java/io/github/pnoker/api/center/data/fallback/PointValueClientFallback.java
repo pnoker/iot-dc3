@@ -25,8 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
  * PointValueClientFallback
  *
@@ -44,17 +42,12 @@ public class PointValueClientFallback implements FallbackFactory<PointValueClien
         return new PointValueClient() {
 
             @Override
-            public R<List<PointValue>> latest(String deviceId, Boolean history) {
+            public R<Page<PointValue>> latest(PointValueDto pointValueDto, String tenantId) {
                 return R.fail(message);
             }
 
             @Override
-            public R<PointValue> latest(String deviceId, String pointId, Boolean history) {
-                return R.fail(message);
-            }
-
-            @Override
-            public R<Page<PointValue>> list(PointValueDto pointValueDto) {
+            public R<Page<PointValue>> list(PointValueDto pointValueDto, String tenantId) {
                 return R.fail(message);
             }
 

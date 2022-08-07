@@ -35,10 +35,10 @@ import java.util.List;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dictionary {
+    private String type;
     private String label;
     private String value;
     private boolean disabled;
     private boolean expand = true;
-    private String type;
     private List<Dictionary> children;
 }

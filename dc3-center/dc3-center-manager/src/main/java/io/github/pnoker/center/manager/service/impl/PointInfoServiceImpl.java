@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -153,7 +154,7 @@ public class PointInfoServiceImpl implements PointInfoService {
 
     @Override
     public Page<PointInfo> list(PointInfoDto pointInfoDto) {
-        if (!Optional.ofNullable(pointInfoDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(pointInfoDto.getPage())) {
             pointInfoDto.setPage(new Pages());
         }
         return pointInfoMapper.selectPage(pointInfoDto.getPage().convert(), fuzzyQuery(pointInfoDto));
@@ -162,16 +163,10 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Override
     public LambdaQueryWrapper<PointInfo> fuzzyQuery(PointInfoDto pointInfoDto) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        if (null != pointInfoDto) {
-            if (StrUtil.isNotBlank(pointInfoDto.getPointAttributeId())) {
-                queryWrapper.eq(PointInfo::getPointAttributeId, pointInfoDto.getPointAttributeId());
-            }
-            if (StrUtil.isNotBlank(pointInfoDto.getDeviceId())) {
-                queryWrapper.eq(PointInfo::getDeviceId, pointInfoDto.getDeviceId());
-            }
-            if (StrUtil.isNotBlank(pointInfoDto.getPointId())) {
-                queryWrapper.eq(PointInfo::getPointId, pointInfoDto.getPointId());
-            }
+        if (ObjectUtil.isNotNull(pointInfoDto)) {
+            queryWrapper.eq(StrUtil.isNotEmpty(pointInfoDto.getPointAttributeId()), PointInfo::getPointAttributeId, pointInfoDto.getPointAttributeId());
+            queryWrapper.eq(StrUtil.isNotEmpty(pointInfoDto.getDeviceId()), PointInfo::getDeviceId, pointInfoDto.getDeviceId());
+            queryWrapper.eq(StrUtil.isNotEmpty(pointInfoDto.getPointId()), PointInfo::getPointId, pointInfoDto.getPointId());
         }
         return queryWrapper;
     }

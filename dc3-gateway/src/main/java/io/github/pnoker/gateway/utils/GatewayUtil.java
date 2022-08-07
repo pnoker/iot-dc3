@@ -60,7 +60,7 @@ public class GatewayUtil {
      */
     public static String getRequestHeader(ServerHttpRequest request, String key) {
         String header = request.getHeaders().getFirst(key);
-        if (!StrUtil.isNotBlank(header)) {
+        if (!StrUtil.isNotEmpty(header)) {
             throw new NotFoundException("Invalid request header of " + key);
         }
         return header;
@@ -75,7 +75,7 @@ public class GatewayUtil {
      */
     public static String getRequestCookie(ServerHttpRequest request, String key) {
         HttpCookie cookie = request.getCookies().getFirst(key);
-        if (null == cookie || !StrUtil.isNotBlank(cookie.getValue())) {
+        if (null == cookie || !StrUtil.isNotEmpty(cookie.getValue())) {
             throw new NotFoundException("Invalid request cookie of " + key);
         }
         return cookie.getValue();

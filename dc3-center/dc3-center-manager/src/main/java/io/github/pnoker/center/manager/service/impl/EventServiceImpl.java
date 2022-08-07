@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.service.EventService;
@@ -46,7 +47,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addDriverEvent(DriverEvent driverEvent) {
-        if (null != driverEvent) {
+        if (ObjectUtil.isNotNull(driverEvent)) {
             mongoTemplate.insert(driverEvent);
         }
     }
@@ -62,7 +63,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addDeviceEvent(DeviceEvent deviceEvent) {
-        if (null != deviceEvent) {
+        if (ObjectUtil.isNotNull(deviceEvent)) {
             mongoTemplate.insert(deviceEvent);
         }
     }
@@ -87,22 +88,22 @@ public class EventServiceImpl implements EventService {
         if (null == deviceEventDto) {
             deviceEventDto = new DeviceEventDto();
         }
-        if (StrUtil.isNotBlank(deviceEventDto.getDeviceId())) {
+        if (StrUtil.isNotEmpty(deviceEventDto.getDeviceId())) {
             criteria.and("deviceId").is(deviceEventDto.getDeviceId());
         }
-        if (StrUtil.isNotBlank(deviceEventDto.getPointId())) {
+        if (StrUtil.isNotEmpty(deviceEventDto.getPointId())) {
             criteria.and("pointId").is(deviceEventDto.getPointId());
         }
 
         Pages pages = null == deviceEventDto.getPage() ? new Pages() : deviceEventDto.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
-            criteria.and("originTime").gte(pages.getStartTime()).lte(pages.getEndTime());
+            criteria.and("createTime").gte(pages.getStartTime()).lte(pages.getEndTime());
         }
 
         Query query = new Query(criteria);
         long count = mongoTemplate.count(query, DeviceEvent.class);
 
-        query.with(Sort.by(Sort.Direction.DESC, "originTime"));
+        query.with(Sort.by(Sort.Direction.DESC, "createTime"));
         long size = pages.getSize();
         long page = pages.getCurrent();
         query.limit((int) size).skip(size * (page - 1));

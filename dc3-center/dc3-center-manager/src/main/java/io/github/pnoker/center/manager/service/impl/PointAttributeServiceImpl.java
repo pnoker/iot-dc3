@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -43,6 +44,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class PointAttributeServiceImpl implements PointAttributeService {
+
     @Resource
     private PointAttributeMapper pointAttributeMapper;
 
@@ -111,7 +113,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     public Page<PointAttribute> list(PointAttributeDto pointAttributeDto) {
-        if (!Optional.ofNullable(pointAttributeDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(pointAttributeDto.getPage())) {
             pointAttributeDto.setPage(new Pages());
         }
         return pointAttributeMapper.selectPage(pointAttributeDto.getPage().convert(), fuzzyQuery(pointAttributeDto));
@@ -120,19 +122,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        if (null != pointAttributeDto) {
-            if (StrUtil.isNotBlank(pointAttributeDto.getName())) {
-                queryWrapper.like(PointAttribute::getName, pointAttributeDto.getName());
-            }
-            if (StrUtil.isNotBlank(pointAttributeDto.getDisplayName())) {
-                queryWrapper.like(PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
-            }
-            if (StrUtil.isNotBlank(pointAttributeDto.getType())) {
-                queryWrapper.eq(PointAttribute::getType, pointAttributeDto.getType());
-            }
-            Optional.ofNullable(pointAttributeDto.getDriverId()).ifPresent(driverId -> {
-                queryWrapper.eq(PointAttribute::getDriverId, driverId);
-            });
+        if (ObjectUtil.isNotNull(pointAttributeDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(pointAttributeDto.getName()), PointAttribute::getName, pointAttributeDto.getName());
+            queryWrapper.like(StrUtil.isNotEmpty(pointAttributeDto.getDisplayName()), PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
+            queryWrapper.eq(StrUtil.isNotEmpty(pointAttributeDto.getType()), PointAttribute::getType, pointAttributeDto.getType());
+            queryWrapper.eq(StrUtil.isNotEmpty(pointAttributeDto.getDriverId()), PointAttribute::getDriverId, pointAttributeDto.getDriverId());
         }
         return queryWrapper;
     }

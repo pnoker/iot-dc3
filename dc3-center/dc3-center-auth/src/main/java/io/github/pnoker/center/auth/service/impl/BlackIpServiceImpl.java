@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -46,7 +47,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     public BlackIp add(BlackIp blackIp) {
         BlackIp select = selectByIp(blackIp.getIp());
-        if (null != select) {
+        if (ObjectUtil.isNotNull(select)) {
             throw new ServiceException("The ip already exists in the blacklist");
         }
         if (blackIpMapper.insert(blackIp) > 0) {
@@ -98,7 +99,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     public boolean checkBlackIpValid(String ip) {
         BlackIp blackIp = selectByIp(ip);
-        if (null != blackIp) {
+        if (ObjectUtil.isNotNull(blackIp)) {
             return blackIp.getEnable();
         }
         return false;
@@ -107,10 +108,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpDto blackIpDto) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
-        if (null != blackIpDto) {
-            if (StrUtil.isNotBlank(blackIpDto.getIp())) {
-                queryWrapper.like(BlackIp::getIp, blackIpDto.getIp());
-            }
+        if (ObjectUtil.isNotNull(blackIpDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(blackIpDto.getIp()), BlackIp::getIp, blackIpDto.getIp());
         }
         return queryWrapper;
     }

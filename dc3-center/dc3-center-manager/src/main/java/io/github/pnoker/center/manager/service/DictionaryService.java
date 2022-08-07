@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.bean.Dictionary;
-
-import java.util.List;
+import io.github.pnoker.common.dto.DictionaryDto;
 
 /**
  * Dictionary Interface
@@ -28,46 +28,36 @@ import java.util.List;
 public interface DictionaryService {
 
     /**
-     * 获取租户驱动字典
+     * 获取驱动字典
      *
-     * @return Dictionary Array
+     * @param dictionaryDto DictionaryDto
+     * @return Dictionary Page
      */
-    List<Dictionary> driverDictionary(String tenantId);
+    Page<Dictionary> driverDictionary(DictionaryDto dictionaryDto);
 
     /**
-     * 获取驱动配置属性字典
+     * 获取设备字典
      *
-     * @return Dictionary Array
+     * @param dictionaryDto DictionaryDto
+     * @return Dictionary Page
      */
-    List<Dictionary> driverAttributeDictionary(String tenantId);
+    Page<Dictionary> deviceDictionary(DictionaryDto dictionaryDto);
 
     /**
-     * 获取位号配置属性字典
+     * 获取模板字典
      *
-     * @return Dictionary Array
+     * @param dictionaryDto DictionaryDto
+     * @return Dictionary Page
      */
-    List<Dictionary> pointAttributeDictionary(String tenantId);
+    Page<Dictionary> profileDictionary(DictionaryDto dictionaryDto);
 
     /**
-     * 获取租户模板字典
-     *
-     * @return Dictionary Array
-     */
-    List<Dictionary> profileDictionary(String tenantId);
-
-    /**
-     * 获取租户模板、设备位号字典
+     * 获取位号字典
      * profile/device
      *
-     * @param parent
-     * @return Dictionary Array
+     * @param dictionaryDto DictionaryDto
+     * @return Dictionary Page
      */
-    List<Dictionary> pointDictionary(String parent, String tenantId);
+    Page<Dictionary> pointDictionary(DictionaryDto dictionaryDto);
 
-    /**
-     * 获取租户驱动下设备字典
-     *
-     * @return Dictionary Array
-     */
-    List<Dictionary> deviceDictionary(String tenantId);
 }

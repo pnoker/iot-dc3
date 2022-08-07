@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.BlackIpClient;
 import io.github.pnoker.center.auth.service.BlackIpService;
@@ -46,7 +47,7 @@ public class BlackIpApi implements BlackIpClient {
     public R<BlackIp> add(BlackIp blackIp) {
         try {
             BlackIp add = blackIpService.add(blackIp);
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -68,7 +69,7 @@ public class BlackIpApi implements BlackIpClient {
     public R<BlackIp> update(BlackIp blackIp) {
         try {
             BlackIp update = blackIpService.update(blackIp);
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -81,7 +82,7 @@ public class BlackIpApi implements BlackIpClient {
     public R<BlackIp> selectById(String id) {
         try {
             BlackIp select = blackIpService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -94,7 +95,7 @@ public class BlackIpApi implements BlackIpClient {
     public R<BlackIp> selectByIp(String ip) {
         try {
             BlackIp select = blackIpService.selectByIp(ip);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -106,8 +107,11 @@ public class BlackIpApi implements BlackIpClient {
     @Override
     public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
         try {
+            if (ObjectUtil.isEmpty(blackIpDto)) {
+                blackIpDto = new BlackIpDto();
+            }
             Page<BlackIp> page = blackIpService.list(blackIpDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

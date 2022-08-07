@@ -42,38 +42,12 @@ public interface PointValueService {
     void savePointValues(List<PointValue> pointValues);
 
     /**
-     * 获取实时数据
+     * 获取带分页、排序
      *
-     * @param deviceId Device Id
-     * @return PointValue Array
+     * @param pointValueDto PointValueDto
+     * @return Page<PointValue>
      */
-    List<PointValue> realtime(String deviceId);
-
-    /**
-     * 获取实时数据
-     *
-     * @param deviceId Device Id
-     * @param pointId  Point Id
-     * @return PointValue
-     */
-    PointValue realtime(String deviceId, String pointId);
-
-    /**
-     * 获取一个设备最新的位号数据集合
-     *
-     * @param deviceId Device Id
-     * @return PointValue Array
-     */
-    List<PointValue> latest(String deviceId);
-
-    /**
-     * 获取最新的一个位号数据
-     *
-     * @param deviceId Device Id
-     * @param pointId  Point Id
-     * @return PointValue
-     */
-    PointValue latest(String deviceId, String pointId);
+    Page<PointValue> latest(PointValueDto pointValueDto,String tenantId);
 
     /**
      * 获取带分页、排序
@@ -81,6 +55,6 @@ public interface PointValueService {
      * @param pointValueDto PointValueDto
      * @return Page<PointValue>
      */
-    Page<PointValue> list(PointValueDto pointValueDto);
+    Page<PointValue> list(PointValueDto pointValueDto,String tenantId);
 
 }

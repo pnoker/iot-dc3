@@ -17,8 +17,10 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.mapper.PointMapper;
@@ -156,10 +158,10 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public Page<Point> list(PointDto pointDto) {
-        if (!Optional.ofNullable(pointDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(pointDto.getPage())) {
             pointDto.setPage(new Pages());
         }
-        return pointMapper.selectPage(pointDto.getPage().convert(), fuzzyQuery(pointDto));
+        return pointMapper.selectPageWithDevice(pointDto.getPage().convert(), customFuzzyQuery(pointDto), pointDto.getDeviceId());
     }
 
     @Override
@@ -172,29 +174,30 @@ public class PointServiceImpl implements PointService {
     public LambdaQueryWrapper<Point> fuzzyQuery(PointDto pointDto) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (null != pointDto) {
-            if (StrUtil.isNotBlank(pointDto.getName())) {
-                queryWrapper.like(Point::getName, pointDto.getName());
-            }
-            if (StrUtil.isNotBlank(pointDto.getType())) {
-                queryWrapper.eq(Point::getType, pointDto.getType());
-            }
-            if (null != pointDto.getRw()) {
-                queryWrapper.eq(Point::getRw, pointDto.getRw());
-            }
-            if (null != pointDto.getAccrue()) {
-                queryWrapper.eq(Point::getAccrue, pointDto.getAccrue());
-            }
-            if (StrUtil.isNotBlank(pointDto.getProfileId())) {
-                queryWrapper.eq(Point::getProfileId, pointDto.getProfileId());
-            }
-            if (null != pointDto.getEnable()) {
-                queryWrapper.eq(Point::getEnable, pointDto.getEnable());
-            }
-            if (StrUtil.isNotBlank(pointDto.getTenantId())) {
-                queryWrapper.eq(Point::getTenantId, pointDto.getTenantId());
-            }
+            queryWrapper.like(StrUtil.isNotBlank(pointDto.getName()), Point::getName, pointDto.getName());
+            queryWrapper.eq(StrUtil.isNotBlank(pointDto.getType()), Point::getType, pointDto.getType());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getRw()), Point::getRw, pointDto.getRw());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getAccrue()), Point::getAccrue, pointDto.getAccrue());
+            queryWrapper.eq(StrUtil.isNotBlank(pointDto.getProfileId()), Point::getProfileId, pointDto.getProfileId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getEnable()), Point::getEnable, pointDto.getEnable());
+            queryWrapper.eq(StrUtil.isNotBlank(pointDto.getTenantId()), Point::getTenantId, pointDto.getTenantId());
         }
         return queryWrapper;
+    }
+
+    public LambdaQueryWrapper<Point> customFuzzyQuery(PointDto pointDto) {
+        QueryWrapper<Point> queryWrapper = Wrappers.query();
+        queryWrapper.eq("dp.deleted", 0);
+        if (ObjectUtil.isNotNull(pointDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(pointDto.getName()), "dp.name", pointDto.getName());
+            queryWrapper.eq(StrUtil.isNotEmpty(pointDto.getType()), "dp.type", pointDto.getType());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getRw()), "dp.rw", pointDto.getRw());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getAccrue()), "dp.accrue", pointDto.getAccrue());
+            queryWrapper.eq(StrUtil.isNotEmpty(pointDto.getProfileId()), "dp.profile_id", pointDto.getProfileId());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getEnable()), "dp.enable", pointDto.getEnable());
+            queryWrapper.eq(StrUtil.isNotEmpty(pointDto.getTenantId()), "dp.tenant_id", pointDto.getTenantId());
+        }
+        return queryWrapper.lambda();
     }
 
 }

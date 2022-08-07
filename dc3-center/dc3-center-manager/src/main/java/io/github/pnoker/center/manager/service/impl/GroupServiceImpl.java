@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -32,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * GroupService Impl
@@ -101,7 +101,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Page<Group> list(GroupDto groupDto) {
-        if (!Optional.ofNullable(groupDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(groupDto.getPage())) {
             groupDto.setPage(new Pages());
         }
         return groupMapper.selectPage(groupDto.getPage().convert(), fuzzyQuery(groupDto));
@@ -110,13 +110,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public LambdaQueryWrapper<Group> fuzzyQuery(GroupDto groupDto) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        if (null != groupDto) {
-            if (StrUtil.isNotBlank(groupDto.getName())) {
-                queryWrapper.like(Group::getName, groupDto.getName());
-            }
-            if (StrUtil.isNotBlank(groupDto.getTenantId())) {
-                queryWrapper.eq(Group::getTenantId, groupDto.getTenantId());
-            }
+        if (ObjectUtil.isNotNull(groupDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(groupDto.getName()), Group::getName, groupDto.getName());
+            queryWrapper.eq(StrUtil.isNotEmpty(groupDto.getTenantId()), Group::getTenantId, groupDto.getTenantId());
         }
         return queryWrapper;
     }

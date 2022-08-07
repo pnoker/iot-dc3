@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.feign.AutoClient;
 import io.github.pnoker.center.manager.service.AutoService;
 import io.github.pnoker.common.bean.R;
@@ -44,7 +45,7 @@ public class AutoApi implements AutoClient {
     public R<PointDetail> autoCreateDeviceAndPoint(PointDetail pointDetail, String tenantId) {
         try {
             PointDetail createDeviceAndPoint = autoService.autoCreateDeviceAndPoint(pointDetail.getDeviceName(), pointDetail.getPointName(), pointDetail.getDriverId(), tenantId);
-            if (null != createDeviceAndPoint) {
+            if (ObjectUtil.isNotNull(createDeviceAndPoint)) {
                 return R.ok(createDeviceAndPoint);
             }
         } catch (Exception e) {

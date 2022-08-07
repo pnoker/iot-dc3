@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -31,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * TenantBindService Impl
@@ -41,6 +41,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class TenantBindServiceImpl implements TenantBindService {
+
     @Resource
     private TenantBindMapper tenantBindMapper;
 
@@ -91,7 +92,7 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public Page<TenantBind> list(TenantBindDto tenantBindDto) {
-        if (!Optional.ofNullable(tenantBindDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(tenantBindDto.getPage())) {
             tenantBindDto.setPage(new Pages());
         }
         return tenantBindMapper.selectPage(tenantBindDto.getPage().convert(), fuzzyQuery(tenantBindDto));
@@ -100,13 +101,9 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Override
     public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindDto tenantBindDto) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
-        if (null != tenantBindDto) {
-            if (StrUtil.isNotBlank(tenantBindDto.getTenantId())) {
-                queryWrapper.eq(TenantBind::getTenantId, tenantBindDto.getTenantId());
-            }
-            if (StrUtil.isNotBlank(tenantBindDto.getUserId())) {
-                queryWrapper.eq(TenantBind::getUserId, tenantBindDto.getUserId());
-            }
+        if (ObjectUtil.isNotNull(tenantBindDto)) {
+            queryWrapper.eq(StrUtil.isNotEmpty(tenantBindDto.getTenantId()), TenantBind::getTenantId, tenantBindDto.getTenantId());
+            queryWrapper.eq(StrUtil.isNotEmpty(tenantBindDto.getUserId()), TenantBind::getUserId, tenantBindDto.getUserId());
         }
         return queryWrapper;
     }

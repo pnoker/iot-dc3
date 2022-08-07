@@ -16,9 +16,13 @@
 
 package io.github.pnoker.center.manager.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.model.Point;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Mapper
@@ -27,4 +31,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface PointMapper extends BaseMapper<Point> {
+
+    Page<Point> selectPageWithDevice(Page<Point> page, @Param(Constants.WRAPPER) Wrapper<Point> queryWrapper, @Param("deviceId") String deviceId);
 }

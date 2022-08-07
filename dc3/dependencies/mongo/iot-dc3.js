@@ -71,10 +71,10 @@ if (db.createCollection("point_value")) {
     );
     db.pointValue.createIndex(
         {
-            originTime: 1,
+            createTime: 1,
         },
         {
-            name: "IX_origin_time",
+            name: "IX_create_time",
             unique: false,
             background: true,
         }
@@ -94,10 +94,10 @@ if (db.createCollection("driver_event")) {
     );
     db.driverEvent.createIndex(
         {
-            originTime: 1,
+            createTime: 1,
         },
         {
-            name: "IX_origin_time",
+            name: "IX_create_time",
             unique: false,
             background: true,
         }
@@ -118,10 +118,10 @@ if (db.createCollection("device_event")) {
     );
     db.deviceEvent.createIndex(
         {
-            originTime: 1,
+            createTime: 1,
         },
         {
-            name: "IX_origin_time",
+            name: "IX_create_time",
             unique: false,
             background: true,
         }

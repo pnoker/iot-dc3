@@ -16,10 +16,10 @@
 
 package io.github.pnoker.center.data.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.data.feign.PointValueClient;
 import io.github.pnoker.center.data.service.PointValueService;
-import io.github.pnoker.common.bean.Pages;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.ServiceConstant;
@@ -29,8 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -44,25 +42,14 @@ public class PointValueApi implements PointValueClient {
     private PointValueService pointValueService;
 
     @Override
-    public R<List<PointValue>> latest(String deviceId, Boolean history) {
+    public R<Page<PointValue>> latest(PointValueDto pointValueDto, String tenantId) {
         try {
-            List<PointValue> pointValues = pointValueService.realtime(deviceId);
-            if (null == pointValues) {
-                pointValues = pointValueService.latest(deviceId);
+            if (ObjectUtil.isEmpty(pointValueDto)) {
+                pointValueDto = new PointValueDto();
             }
-            if (null != pointValues) {
-                // 返回最近100个非字符类型的历史值
-                if (history) {
-                    pointValues.forEach(pointValue -> {
-                        PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointValue.getPointId()).setPage((new Pages()).setSize(100));
-                        Page<PointValue> page = pointValueService.list(pointValueDto);
-                        if (null != page) {
-                            pointValue.setChildren(page.getRecords().stream()
-                                    .map(pointValueChild -> pointValueChild.setId(null).setDeviceId(null).setPointId(null)).collect(Collectors.toList()));
-                        }
-                    });
-                }
-                return R.ok(pointValues);
+            Page<PointValue> page = pointValueService.latest(pointValueDto, tenantId);
+            if (ObjectUtil.isNotNull(page)) {
+                return R.ok(page);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -71,35 +58,13 @@ public class PointValueApi implements PointValueClient {
     }
 
     @Override
-    public R<PointValue> latest(String deviceId, String pointId, Boolean history) {
+    public R<Page<PointValue>> list(PointValueDto pointValueDto, String tenantId) {
         try {
-            PointValue pointValue = pointValueService.realtime(deviceId, pointId);
-            if (null == pointValue) {
-                pointValue = pointValueService.latest(deviceId, pointId);
+            if (ObjectUtil.isEmpty(pointValueDto)) {
+                pointValueDto = new PointValueDto();
             }
-            if (null != pointValue) {
-                // 返回最近100个非字符类型的历史值
-                if (history) {
-                    PointValueDto pointValueDto = (new PointValueDto()).setDeviceId(deviceId).setPointId(pointId).setPage((new Pages()).setSize(100));
-                    Page<PointValue> page = pointValueService.list(pointValueDto);
-                    if (null != page) {
-                        pointValue.setChildren(page.getRecords().stream()
-                                .map(pointValueChild -> pointValueChild.setId(null).setDeviceId(null).setPointId(null)).collect(Collectors.toList()));
-                    }
-                }
-                return R.ok(pointValue);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
-    public R<Page<PointValue>> list(PointValueDto pointValueDto) {
-        try {
-            Page<PointValue> page = pointValueService.list(pointValueDto);
-            if (null != page) {
+            Page<PointValue> page = pointValueService.list(pointValueDto, tenantId);
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

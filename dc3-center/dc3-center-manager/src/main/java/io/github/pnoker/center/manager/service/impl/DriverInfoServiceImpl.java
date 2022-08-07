@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -33,7 +34,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * DriverInfoService Impl
@@ -130,7 +130,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
 
     @Override
     public Page<DriverInfo> list(DriverInfoDto driverInfoDto) {
-        if (!Optional.ofNullable(driverInfoDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(driverInfoDto.getPage())) {
             driverInfoDto.setPage(new Pages());
         }
         return driverInfoMapper.selectPage(driverInfoDto.getPage().convert(), fuzzyQuery(driverInfoDto));
@@ -139,13 +139,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        if (null != driverInfoDto) {
-            if (StrUtil.isNotBlank(driverInfoDto.getDriverAttributeId())) {
-                queryWrapper.eq(DriverInfo::getDriverAttributeId, driverInfoDto.getDriverAttributeId());
-            }
-            if (StrUtil.isNotBlank(driverInfoDto.getDeviceId())) {
-                queryWrapper.eq(DriverInfo::getDeviceId, driverInfoDto.getDeviceId());
-            }
+        if (ObjectUtil.isNotNull(driverInfoDto)) {
+            queryWrapper.eq(StrUtil.isNotEmpty(driverInfoDto.getDriverAttributeId()), DriverInfo::getDriverAttributeId, driverInfoDto.getDriverAttributeId());
+            queryWrapper.eq(StrUtil.isNotEmpty(driverInfoDto.getDeviceId()), DriverInfo::getDeviceId, driverInfoDto.getDeviceId());
         }
         return queryWrapper;
     }

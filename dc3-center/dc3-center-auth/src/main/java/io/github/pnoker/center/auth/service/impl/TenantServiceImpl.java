@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -49,7 +50,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public Tenant add(Tenant tenant) {
         Tenant select = selectByName(tenant.getName());
-        if (null != select) {
+        if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
         if (tenantMapper.insert(tenant) > 0) {
@@ -96,7 +97,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Page<Tenant> list(TenantDto tenantDto) {
-        if (!Optional.ofNullable(tenantDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(tenantDto.getPage())) {
             tenantDto.setPage(new Pages());
         }
         return tenantMapper.selectPage(tenantDto.getPage().convert(), fuzzyQuery(tenantDto));
@@ -105,10 +106,8 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantDto tenantDto) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        if (null != tenantDto) {
-            if (StrUtil.isNotBlank(tenantDto.getName())) {
-                queryWrapper.like(Tenant::getName, tenantDto.getName());
-            }
+        if (ObjectUtil.isNotNull(tenantDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(tenantDto.getName()), Tenant::getName, tenantDto.getName());
         }
         return queryWrapper;
     }

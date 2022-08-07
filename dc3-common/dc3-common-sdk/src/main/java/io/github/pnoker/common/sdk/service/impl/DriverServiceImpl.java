@@ -82,7 +82,7 @@ public class DriverServiceImpl implements DriverService {
                         deviceEventSender(deviceId, pointId, CommonConstant.Device.Event.OVER_UPPER_LIMIT,
                                 String.format("Value(%s) is greater than upper limit %s", temp, point.getMaximum()));
                     }
-                    if (StrUtil.isNotBlank(point.getFormat())) {
+                    if (StrUtil.isNotEmpty(point.getFormat())) {
                         value = String.format(point.getFormat(), temp);
                     } else {
                         value = String.valueOf(temp);
