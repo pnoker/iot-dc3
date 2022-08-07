@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.point.PointDetail;
 import io.github.pnoker.common.constant.CommonConstant;
@@ -77,7 +78,7 @@ public class AutoServiceImpl implements AutoService {
         }
 
         // 绑定模板
-        if (null != device.getId() && null != profile.getId()) {
+        if (StrUtil.isAllNotEmpty(device.getId(), profile.getId())) {
             try {
                 ProfileBind profileBind = new ProfileBind();
                 profileBind.setDeviceId(device.getId()).setProfileId(profile.getId());

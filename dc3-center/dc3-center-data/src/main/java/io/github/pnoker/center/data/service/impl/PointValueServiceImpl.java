@@ -20,7 +20,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.feign.DeviceClient;
 import io.github.pnoker.api.center.manager.feign.PointClient;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
@@ -29,8 +28,9 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.CacheConstant;
 import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.dto.PointValueDto;
-import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.model.Description;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.SneakyThrows;
@@ -42,7 +42,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -56,8 +59,6 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Resource
     private PointClient pointClient;
-    @Resource
-    private DeviceClient deviceClient;
 
     @Resource
     private RepositoryHandleService repositoryHandleService;
@@ -90,135 +91,107 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public List<PointValue> realtime(String deviceId) {
-        R<List<Point>> listR = pointClient.selectByDeviceId(deviceId);
-        if (!listR.isOk()) {
-            String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE;
-            List<String> keys = listR.getData().stream().map(point -> prefix + point.getId()).collect(Collectors.toList());
-            if (keys.size() > 0) {
-                List<PointValue> pointValues = redisUtil.getKey(keys, PointValue.class);
-                pointValues = pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
-                if (pointValues.size() > 0) {
-                    return pointValues;
-                }
-            }
+    public Page<PointValue> latest(PointValueDto pointValueDto, String tenantId) {
+        Page<PointValue> pointValuePage = new Page<>();
+        if (ObjectUtil.isEmpty(pointValueDto.getPage())) pointValueDto.setPage(new Pages());
+        pointValuePage.setCurrent(pointValueDto.getPage().getCurrent()).setSize(pointValueDto.getPage().getSize());
+
+        PointDto pointDto = (new PointDto()).setDeviceId(pointValueDto.getDeviceId()).setPage(pointValueDto.getPage());
+        pointDto.setName(pointValueDto.getName()).setEnable(pointValueDto.getEnable());
+        R<Page<Point>> pageR = pointClient.list(pointDto, tenantId);
+        if (!pageR.isOk()) return pointValuePage;
+
+        List<Point> points = pageR.getData().getRecords();
+        List<String> pointIds = points.stream().map(Description::getId).collect(Collectors.toList());
+        List<PointValue> pointValues = realtime(pointValueDto.getDeviceId(), pointIds);
+        if (CollectionUtil.isEmpty(pointValues)) pointValues = latest(pointValueDto.getDeviceId(), pointIds);
+        pointValuePage.setCurrent(pageR.getData().getCurrent()).setSize(pageR.getData().getSize()).setTotal(pageR.getData().getTotal()).setRecords(pointValues);
+
+        // 返回最近100个非字符类型的历史值
+        if (pointValueDto.getHistory()) {
+            pointValues.parallelStream().forEach(pointValue -> pointValue.setChildren(historyPointValue(pointValueDto.getDeviceId(), pointValue.getPointId(), 50)));
         }
-        return null;
+
+        return pointValuePage;
     }
 
     @Override
+    @SneakyThrows
+    public Page<PointValue> list(PointValueDto pointValueDto, String tenantId) {
+        long start = System.currentTimeMillis();
+        Page<PointValue> pointValuePage = new Page<>();
+        if (ObjectUtil.isEmpty(pointValueDto.getPage())) pointValueDto.setPage(new Pages());
+
+        Criteria criteria = new Criteria();
+        Query query = new Query(criteria);
+        if (StrUtil.isNotEmpty(pointValueDto.getDeviceId())) criteria.and("deviceId").is(pointValueDto.getDeviceId());
+        if (StrUtil.isNotEmpty(pointValueDto.getPointId())) criteria.and("pointId").is(pointValueDto.getPointId());
+
+        Pages pages = pointValueDto.getPage();
+        if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
+            criteria.and("createTime").gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
+        }
+
+        final String collection = StrUtil.isNotEmpty(pointValueDto.getDeviceId()) ? CommonConstant.Storage.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : CacheConstant.Entity.POINT + CacheConstant.Suffix.VALUE;
+        Future<Long> count = threadPoolExecutor.submit(() -> mongoTemplate.count(query, collection));
+
+        Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
+            query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
+            query.with(Sort.by(Sort.Direction.DESC, "createTime"));
+            return mongoTemplate.find(query, PointValue.class, collection);
+        });
+
+        pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count.get()).setRecords(pointValues.get());
+        long end = System.currentTimeMillis();
+        log.info("end:{}", end - start);
+        return pointValuePage;
+    }
+
+    public List<PointValue> realtime(String deviceId, List<String> pointIds) {
+        if (CollectionUtil.isEmpty(pointIds)) {
+            return Collections.emptyList();
+        }
+
+        String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE;
+        List<String> keys = pointIds.stream().map(pointId -> prefix + pointId).collect(Collectors.toList());
+        List<PointValue> pointValues = redisUtil.getKey(keys, PointValue.class);
+        return pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public List<PointValue> latest(String deviceId, List<String> pointIds) {
+        if (CollectionUtil.isEmpty(pointIds)) {
+            return Collections.emptyList();
+        }
+
+        return pointIds.stream().map(pointId -> latestPointValue(deviceId, pointId)).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
     public PointValue realtime(String deviceId, String pointId) {
         String key = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE + pointId;
         return redisUtil.getKey(key, PointValue.class);
     }
 
-    @Override
-    public List<PointValue> latest(String deviceId) {
-        List<PointValue> pointValues = new ArrayList<>();
-
-        R<Device> deviceR = deviceClient.selectById(deviceId);
-        if (!deviceR.isOk()) {
-            return pointValues;
-        }
-
-        R<List<Point>> pointsR = pointClient.selectByDeviceId(deviceId);
-        if (!pointsR.isOk()) {
-            return pointValues;
-        }
-
-        pointsR.getData().forEach(point -> {
-            PointValue pointValue = latestPointValue(deviceId, point.getId());
-            if (null != pointValue) {
-                pointValues.add(pointValue);
-            }
-        });
-        return pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    @Override
     public PointValue latest(String deviceId, String pointId) {
-        R<Device> deviceR = deviceClient.selectById(deviceId);
-        if (!deviceR.isOk()) {
-            return null;
-        }
-
-        R<Point> pointR = pointClient.selectById(pointId);
-        if (!pointR.isOk()) {
-            return null;
-        }
-
-        Point point = pointR.getData();
-        return latestPointValue(deviceId, point.getId());
-    }
-
-    @Override
-    @SneakyThrows
-    public Page<PointValue> list(PointValueDto pointValueDto) {
-        Criteria criteria = new Criteria();
-        pointValueDto = Optional.ofNullable(pointValueDto).orElse(new PointValueDto());
-
-        if (StrUtil.isNotBlank(pointValueDto.getDeviceId())) {
-            R<Device> deviceR = deviceClient.selectById(pointValueDto.getDeviceId());
-            if (deviceR.isOk()) {
-                Device device = deviceR.getData();
-                criteria.and("deviceId").is(pointValueDto.getDeviceId());
-                if (!device.getMulti()) {
-                    if (StrUtil.isNotBlank(pointValueDto.getPointId())) {
-                        criteria.and("pointId").is(pointValueDto.getPointId());
-                    }
-                } else if (StrUtil.isNotBlank(pointValueDto.getPointId())) {
-                    criteria.and("multi").is(true);
-                    if (StrUtil.isNotBlank(pointValueDto.getPointId())) {
-                        criteria.and("children").elemMatch((new Criteria()).and("pointId").is(pointValueDto.getPointId()));
-                    }
-                }
-            }
-        } else if (StrUtil.isNotBlank(pointValueDto.getPointId())) {
-            R<Point> pointR = pointClient.selectById(pointValueDto.getPointId());
-            if (pointR.isOk()) {
-                criteria.orOperator(
-                        (new Criteria()).and("pointId").is(pointValueDto.getPointId()),
-                        (new Criteria()).and("children").elemMatch((new Criteria()).and("pointId").is(pointValueDto.getPointId()))
-                );
-            }
-        }
-
-        Pages pages = Optional.ofNullable(pointValueDto.getPage()).orElse(new Pages());
-        if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
-            criteria.and("originTime").gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
-        }
-
-        final String collection = null != pointValueDto.getDeviceId() ? CommonConstant.Storage.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : "point_value";
-        Future<Long> count = threadPoolExecutor.submit(() -> {
-            Query query = new Query(criteria);
-            return mongoTemplate.count(query, PointValue.class, collection);
-        });
-
-        Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
-            Query query = new Query(criteria);
-            query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
-            query.with(Sort.by(Sort.Direction.DESC, "originTime"));
-            return mongoTemplate.find(query, PointValue.class, collection);
-        });
-
-        Page<PointValue> pointValuePage = new Page<>();
-        List<PointValue> values = pointValues.get().stream().filter(Objects::nonNull).collect(Collectors.toList());
-        pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count.get()).setRecords(values);
-
-        return pointValuePage;
+        return latestPointValue(deviceId, pointId);
     }
 
     private PointValue latestPointValue(String deviceId, String pointId) {
-        PointValue pointValue;
-
         Criteria criteria = new Criteria();
-        criteria.and("pointId").is(pointId);
-
         Query query = new Query(criteria);
-        query.with(Sort.by(Sort.Direction.DESC, "originTime"));
-        pointValue = mongoTemplate.findOne(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
+        criteria.and("pointId").is(pointId);
+        query.with(Sort.by(Sort.Direction.DESC, "createTime"));
 
-        return pointValue;
+        return mongoTemplate.findOne(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
     }
 
+    private List<String> historyPointValue(String deviceId, String pointId, int count) {
+        Criteria criteria = new Criteria();
+        Query query = new Query(criteria);
+        criteria.and("deviceId").is(deviceId).and("pointId").is(pointId);
+        query.fields().include("value").exclude("id");
+        query.limit(count).with(Sort.by(Sort.Direction.DESC, "createTime"));
+
+        List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
+        return pointValues.stream().map(PointValue::getValue).collect(Collectors.toList());
+    }
 }

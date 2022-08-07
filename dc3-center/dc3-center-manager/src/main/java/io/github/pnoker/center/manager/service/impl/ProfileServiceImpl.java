@@ -17,8 +17,10 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
@@ -142,31 +144,35 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public Page<Profile> list(ProfileDto profileDto) {
-        if (!Optional.ofNullable(profileDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(profileDto.getPage())) {
             profileDto.setPage(new Pages());
         }
-        return profileMapper.selectPage(profileDto.getPage().convert(), fuzzyQuery(profileDto));
+        return profileMapper.selectPageWithDevice(profileDto.getPage().convert(), customFuzzyQuery(profileDto), profileDto.getDeviceId());
     }
 
     @Override
     // 2022-07-30 检查：通过
     public LambdaQueryWrapper<Profile> fuzzyQuery(ProfileDto profileDto) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        if (null != profileDto) {
-            if (StrUtil.isNotBlank(profileDto.getName())) {
-                queryWrapper.like(Profile::getName, profileDto.getName());
-            }
-            if (null != profileDto.getShare()) {
-                queryWrapper.eq(Profile::getShare, profileDto.getShare());
-            }
-            if (null != profileDto.getEnable()) {
-                queryWrapper.eq(Profile::getEnable, profileDto.getEnable());
-            }
-            if (StrUtil.isNotBlank(profileDto.getTenantId())) {
-                queryWrapper.eq(Profile::getTenantId, profileDto.getTenantId());
-            }
+        if (ObjectUtil.isNotEmpty(profileDto)) {
+            queryWrapper.like(StrUtil.isNotBlank(profileDto.getName()), Profile::getName, profileDto.getName());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getShare()), Profile::getShare, profileDto.getShare());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getEnable()), Profile::getEnable, profileDto.getEnable());
+            queryWrapper.eq(StrUtil.isNotBlank(profileDto.getTenantId()), Profile::getTenantId, profileDto.getTenantId());
         }
         return queryWrapper;
+    }
+
+    public LambdaQueryWrapper<Profile> customFuzzyQuery(ProfileDto profileDto) {
+        QueryWrapper<Profile> queryWrapper = Wrappers.query();
+        queryWrapper.eq("dp.deleted", 0);
+        if (ObjectUtil.isNotNull(profileDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(profileDto.getName()), "dp.name", profileDto.getName());
+            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getShare()), "dp.share", profileDto.getShare());
+            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getEnable()), "dp.enable", profileDto.getEnable());
+            queryWrapper.eq(StrUtil.isNotEmpty(profileDto.getTenantId()), "dp.tenant_id", profileDto.getTenantId());
+        }
+        return queryWrapper.lambda();
     }
 
 }

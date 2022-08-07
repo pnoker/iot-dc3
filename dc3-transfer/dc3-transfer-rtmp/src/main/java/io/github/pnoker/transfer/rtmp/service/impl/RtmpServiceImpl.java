@@ -16,6 +16,7 @@
 
 package io.github.pnoker.transfer.rtmp.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -72,9 +73,9 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public boolean delete(String id) {
         Rtmp select = selectById(id);
-        if (null != select) {
+        if (ObjectUtil.isNotNull(select)) {
             Transcode transcode = transcodeMap.get(id);
-            if (null != transcode) {
+            if (ObjectUtil.isNotNull(transcode)) {
                 if (transcode.isRun()) {
                     throw new ServiceException("The rmp task is running");
                 }
@@ -93,7 +94,7 @@ public class RtmpServiceImpl implements RtmpService {
             throw new NotFoundException("The rtmp task does not exist");
         }
         Transcode transcode = transcodeMap.get(rtmp.getId());
-        if (null != transcode) {
+        if (ObjectUtil.isNotNull(transcode)) {
             if (transcode.isRun()) {
                 throw new ServiceException("The rtmp task is running");
             }
@@ -192,9 +193,9 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public boolean stop(String id) {
         Rtmp select = rtmpMapper.selectById(id);
-        if (null != select) {
+        if (ObjectUtil.isNotNull(select)) {
             Transcode transcode = transcodeMap.get(id);
-            if (null != transcode) {
+            if (ObjectUtil.isNotNull(transcode)) {
                 if (transcode.isRun()) {
                     transcode.quit();
                     if (rtmpMapper.updateById(select.setRun(false)) > 0) {
@@ -211,16 +212,10 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public LambdaQueryWrapper<Rtmp> fuzzyQuery(RtmpDto rtmpDto) {
         LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
-        if (null != rtmpDto) {
-            if (StrUtil.isNotBlank(rtmpDto.getName())) {
-                queryWrapper.like(Rtmp::getName, rtmpDto.getName());
-            }
-            if (null != rtmpDto.getAutoStart()) {
-                queryWrapper.eq(Rtmp::getAutoStart, rtmpDto.getAutoStart());
-            }
-            if (StrUtil.isNotBlank(rtmpDto.getTenantId())) {
-                queryWrapper.eq(Rtmp::getTenantId, rtmpDto.getTenantId());
-            }
+        if (ObjectUtil.isNotNull(rtmpDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(rtmpDto.getName()), Rtmp::getName, rtmpDto.getName());
+            queryWrapper.eq(ObjectUtil.isNotNull(rtmpDto.getAutoStart()), Rtmp::getAutoStart, rtmpDto.getAutoStart());
+            queryWrapper.eq(StrUtil.isNotEmpty(rtmpDto.getTenantId()), Rtmp::getTenantId, rtmpDto.getTenantId());
         }
         return queryWrapper;
     }

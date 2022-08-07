@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -33,7 +34,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -132,7 +132,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     public Page<ProfileBind> list(ProfileBindDto profileBindDto) {
-        if (!Optional.ofNullable(profileBindDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(profileBindDto.getPage())) {
             profileBindDto.setPage(new Pages());
         }
         return profileBindMapper.selectPage(profileBindDto.getPage().convert(), fuzzyQuery(profileBindDto));
@@ -141,13 +141,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Override
     public LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindDto profileBindDto) {
         LambdaQueryWrapper<ProfileBind> queryWrapper = Wrappers.<ProfileBind>query().lambda();
-        if (null != profileBindDto) {
-            if (StrUtil.isNotBlank(profileBindDto.getProfileId())) {
-                queryWrapper.eq(ProfileBind::getProfileId, profileBindDto.getProfileId());
-            }
-            if (StrUtil.isNotBlank(profileBindDto.getDeviceId())) {
-                queryWrapper.eq(ProfileBind::getDeviceId, profileBindDto.getDeviceId());
-            }
+        if (ObjectUtil.isNotNull(profileBindDto)) {
+            queryWrapper.eq(StrUtil.isNotEmpty(profileBindDto.getProfileId()), ProfileBind::getProfileId, profileBindDto.getProfileId());
+            queryWrapper.eq(StrUtil.isNotEmpty(profileBindDto.getDeviceId()), ProfileBind::getDeviceId, profileBindDto.getDeviceId());
         }
         return queryWrapper;
     }

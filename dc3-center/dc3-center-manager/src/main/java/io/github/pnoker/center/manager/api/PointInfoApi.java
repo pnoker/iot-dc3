@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointInfoClient;
 import io.github.pnoker.center.manager.service.NotifyService;
@@ -23,6 +24,7 @@ import io.github.pnoker.center.manager.service.PointInfoService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.dto.PointAttributeDto;
 import io.github.pnoker.common.dto.PointInfoDto;
 import io.github.pnoker.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +54,7 @@ public class PointInfoApi implements PointInfoClient {
     public R<PointInfo> add(PointInfo pointInfo) {
         try {
             PointInfo add = pointInfoService.add(pointInfo);
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.ADD, add);
                 return R.ok(add);
             }
@@ -66,7 +68,7 @@ public class PointInfoApi implements PointInfoClient {
     public R<Boolean> delete(String id) {
         try {
             PointInfo pointInfo = pointInfoService.selectById(id);
-            if (null != pointInfo && pointInfoService.delete(id)) {
+            if (ObjectUtil.isNotNull(pointInfo) && pointInfoService.delete(id)) {
                 notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.DELETE, pointInfo);
                 return R.ok();
             }
@@ -145,6 +147,9 @@ public class PointInfoApi implements PointInfoClient {
     @Override
     public R<Page<PointInfo>> list(PointInfoDto pointInfoDto) {
         try {
+            if (ObjectUtil.isEmpty(pointInfoDto)) {
+                pointInfoDto = new PointInfoDto();
+            }
             Page<PointInfo> page = pointInfoService.list(pointInfoDto);
             if (null != page) {
                 return R.ok(page);

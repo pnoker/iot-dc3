@@ -16,9 +16,9 @@
 
 package io.github.pnoker.common.bean.point;
 
-import io.github.pnoker.common.constant.CommonConstant;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.constant.CommonConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -65,7 +65,7 @@ public class PointValue implements Serializable {
      */
     private String rawValue;
 
-    private List<PointValue> children;
+    private List<String> children;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = CommonConstant.Time.COMPLETE_DATE_FORMAT, timezone = CommonConstant.Time.TIMEZONE)

@@ -90,8 +90,8 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
         // ensure time index
         Index timeIndex = new Index();
         timeIndex.background()
-                .on("originTime", Sort.Direction.DESC)
-                .named("IX_origin_time");
+                .on("createTime", Sort.Direction.DESC)
+                .named("IX_create_time");
         mongoTemplate.indexOps(collection).ensureIndex(timeIndex);
     }
 

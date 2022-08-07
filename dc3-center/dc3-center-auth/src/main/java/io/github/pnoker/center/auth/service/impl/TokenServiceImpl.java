@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import io.github.pnoker.center.auth.bean.TokenValid;
@@ -81,7 +82,7 @@ public class TokenServiceImpl implements TokenService {
             tenantBindService.selectByTenantIdAndUserId(tempTenant.getId(), tempUser.getId());
             String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + name;
             String tempSalt = redisUtil.getKey(redisSaltKey, String.class);
-            if (StrUtil.isNotBlank(tempSalt) && tempSalt.equals(salt)) {
+            if (StrUtil.isNotEmpty(tempSalt) && tempSalt.equals(salt)) {
                 if (Dc3Util.md5(tempUser.getPassword() + tempSalt).equals(password)) {
                     String redisTokenKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + name;
                     String token = KeyUtil.generateToken(name, tempSalt);
@@ -122,7 +123,7 @@ public class TokenServiceImpl implements TokenService {
     private void checkUserLimit(String username) {
         String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.LIMIT + CommonConstant.Symbol.SEPARATOR + username;
         UserLimit limit = redisUtil.getKey(redisKey, UserLimit.class);
-        if (null != limit && limit.getTimes() >= 5) {
+        if (ObjectUtil.isNotNull(limit) && limit.getTimes() >= 5) {
             Date now = new Date();
             long interval = limit.getExpireTime().getTime() - now.getTime();
             if (interval > 0) {

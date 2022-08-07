@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -110,7 +111,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public Page<Label> list(LabelDto labelDto) {
-        if (!Optional.ofNullable(labelDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(labelDto.getPage())) {
             labelDto.setPage(new Pages());
         }
         return labelMapper.selectPage(labelDto.getPage().convert(), fuzzyQuery(labelDto));
@@ -119,16 +120,10 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public LambdaQueryWrapper<Label> fuzzyQuery(LabelDto labelDto) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        if (null != labelDto) {
-            if (StrUtil.isNotBlank(labelDto.getName())) {
-                queryWrapper.like(Label::getName, labelDto.getName());
-            }
-            if (StrUtil.isNotBlank(labelDto.getColor())) {
-                queryWrapper.eq(Label::getColor, labelDto.getColor());
-            }
-            if (StrUtil.isNotBlank(labelDto.getTenantId())) {
-                queryWrapper.eq(Label::getTenantId, labelDto.getTenantId());
-            }
+        if (ObjectUtil.isNotNull(labelDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(labelDto.getName()), Label::getName, labelDto.getName());
+            queryWrapper.eq(StrUtil.isNotEmpty(labelDto.getColor()), Label::getColor, labelDto.getColor());
+            queryWrapper.eq(StrUtil.isNotEmpty(labelDto.getTenantId()), Label::getTenantId, labelDto.getTenantId());
         }
         return queryWrapper;
     }

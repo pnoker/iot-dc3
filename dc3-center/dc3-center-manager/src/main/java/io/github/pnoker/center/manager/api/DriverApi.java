@@ -16,12 +16,14 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DriverClient;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
 import io.github.pnoker.common.dto.DriverDto;
+import io.github.pnoker.common.dto.PointValueDto;
 import io.github.pnoker.common.model.Driver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(ServiceConstant.Manager.DRIVER_URL_PREFIX)
 public class DriverApi implements DriverClient {
+
     @Resource
     private DriverService driverService;
 
@@ -50,7 +53,7 @@ public class DriverApi implements DriverClient {
     public R<Driver> add(Driver driver, String tenantId) {
         try {
             Driver add = driverService.add(driver.setTenantId(tenantId));
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -72,7 +75,7 @@ public class DriverApi implements DriverClient {
     public R<Driver> update(Driver driver, String tenantId) {
         try {
             Driver update = driverService.update(driver.setTenantId(tenantId));
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -125,9 +128,12 @@ public class DriverApi implements DriverClient {
     @Override
     public R<Page<Driver>> list(DriverDto driverDto, String tenantId) {
         try {
+            if (ObjectUtil.isEmpty(driverDto)) {
+                driverDto = new DriverDto();
+            }
             driverDto.setTenantId(tenantId);
             Page<Driver> page = driverService.list(driverDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

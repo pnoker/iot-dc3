@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.UserClient;
 import io.github.pnoker.center.auth.service.UserService;
@@ -46,7 +47,7 @@ public class UserApi implements UserClient {
     public R<User> add(User user) {
         try {
             User add = userService.add(user);
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -68,7 +69,7 @@ public class UserApi implements UserClient {
     public R<User> update(User user) {
         try {
             User update = userService.update(user.setName(null));
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -90,7 +91,7 @@ public class UserApi implements UserClient {
     public R<User> selectById(String id) {
         try {
             User select = userService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -103,7 +104,7 @@ public class UserApi implements UserClient {
     public R<User> selectByName(String name) {
         try {
             User select = userService.selectByName(name, false);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -115,8 +116,11 @@ public class UserApi implements UserClient {
     @Override
     public R<Page<User>> list(UserDto userDto) {
         try {
+            if (ObjectUtil.isEmpty(userDto)) {
+                userDto = new UserDto();
+            }
             Page<User> page = userService.list(userDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

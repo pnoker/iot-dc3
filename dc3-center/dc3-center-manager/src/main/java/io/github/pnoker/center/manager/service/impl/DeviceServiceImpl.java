@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -33,7 +34,6 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.model.ProfileBind;
-import io.github.pnoker.center.manager.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -169,20 +169,32 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public Page<Device> list(DeviceDto deviceDto) {
-        if (!Optional.ofNullable(deviceDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(deviceDto.getPage())) {
             deviceDto.setPage(new Pages());
         }
-        return deviceMapper.selectPageWithProfile(deviceDto.getPage().convert(), fuzzyQuery(deviceDto), deviceDto.getProfileId());
+        return deviceMapper.selectPageWithProfile(deviceDto.getPage().convert(), customFuzzyQuery(deviceDto), deviceDto.getProfileId());
     }
 
     @Override
     public LambdaQueryWrapper<Device> fuzzyQuery(DeviceDto deviceDto) {
+        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
+        if (ObjectUtil.isNotEmpty(deviceDto)) {
+            queryWrapper.like(StrUtil.isNotBlank(deviceDto.getName()), Device::getName, deviceDto.getName());
+            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getDriverId()), Device::getDriverId, deviceDto.getDriverId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(deviceDto.getEnable()), Device::getEnable, deviceDto.getEnable());
+            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getTenantId()), Device::getTenantId, deviceDto.getTenantId());
+        }
+        return queryWrapper;
+    }
+
+    public LambdaQueryWrapper<Device> customFuzzyQuery(DeviceDto deviceDto) {
         QueryWrapper<Device> queryWrapper = Wrappers.query();
-        if (null != deviceDto) {
-            queryWrapper.like(StrUtil.isNotBlank(deviceDto.getName()), "dd.name", deviceDto.getName());
-            queryWrapper.eq(StrUtil.isNotBlank(deviceDto.getDriverId()), "dd.driver_id", deviceDto.getDriverId());
-            queryWrapper.eq(null != deviceDto.getEnable(), "dd.enable", deviceDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotBlank(deviceDto.getTenantId()), "dd.tenant_id", deviceDto.getTenantId());
+        queryWrapper.eq("dd.deleted", 0);
+        if (ObjectUtil.isNotNull(deviceDto)) {
+            queryWrapper.like(StrUtil.isNotEmpty(deviceDto.getName()), "dd.name", deviceDto.getName());
+            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getDriverId()), "dd.driver_id", deviceDto.getDriverId());
+            queryWrapper.eq(ObjectUtil.isNotNull(deviceDto.getEnable()), "dd.enable", deviceDto.getEnable());
+            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getTenantId()), "dd.tenant_id", deviceDto.getTenantId());
         }
         return queryWrapper.lambda();
     }

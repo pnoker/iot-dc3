@@ -16,10 +16,10 @@
 
 package io.github.pnoker.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.Pages;
 import io.github.pnoker.common.bean.point.PointValue;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,6 +42,9 @@ public class PointValueDto implements Serializable, Converter<PointValue, PointV
 
     private String deviceId;
     private String pointId;
+    private String name;
+    private Boolean enable;
+    private Boolean history = false;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

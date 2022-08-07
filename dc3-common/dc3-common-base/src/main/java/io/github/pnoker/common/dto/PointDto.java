@@ -16,10 +16,10 @@
 
 package io.github.pnoker.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.Pages;
 import io.github.pnoker.common.model.Point;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +39,8 @@ public class PointDto extends Point implements Converter<Point, PointDto> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    private String deviceId;
 
     @Override
     public void convertDtoToDo(Point point) {

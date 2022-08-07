@@ -17,15 +17,15 @@
 package io.github.pnoker.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.Pages;
-import io.github.pnoker.common.model.Profile;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.springframework.beans.BeanUtils;
 
 /**
- * Profile DTO
+ * Device DTO
  *
  * @author pnoker
  */
@@ -34,21 +34,24 @@ import org.springframework.beans.BeanUtils;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class ProfileDto extends Profile implements Converter<Profile, ProfileDto> {
+public class DictionaryDto {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    private String deviceId;
+    /**
+     * 父级 Value 值1
+     */
+    private String parentValue1;
 
-    @Override
-    public void convertDtoToDo(Profile profile) {
-        BeanUtils.copyProperties(this, profile);
-    }
+    /**
+     * 父级 Value 值1
+     */
+    private String parentValue2;
 
-    @Override
-    public void convertDoToDto(Profile profile) {
-        BeanUtils.copyProperties(profile, this);
-    }
+    private String value;
+    private String label;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private String tenantId;
 }

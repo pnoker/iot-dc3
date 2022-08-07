@@ -16,11 +16,13 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.GroupClient;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.dto.DriverInfoDto;
 import io.github.pnoker.common.dto.GroupDto;
 import io.github.pnoker.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +48,7 @@ public class GroupApi implements GroupClient {
     public R<Group> add(Group group, String tenantId) {
         try {
             Group add = groupService.add(group.setTenantId(tenantId));
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -68,7 +70,7 @@ public class GroupApi implements GroupClient {
     public R<Group> update(Group group, String tenantId) {
         try {
             Group update = groupService.update(group.setTenantId(tenantId));
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -93,6 +95,9 @@ public class GroupApi implements GroupClient {
     @Override
     public R<Page<Group>> list(GroupDto groupDto, String tenantId) {
         try {
+            if (ObjectUtil.isEmpty(groupDto)) {
+                groupDto = new GroupDto();
+            }
             groupDto.setTenantId(tenantId);
             Page<Group> page = groupService.list(groupDto);
             if (null != page) {

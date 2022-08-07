@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.ProfileClient;
 import io.github.pnoker.center.manager.service.NotifyService;
@@ -23,6 +24,7 @@ import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.dto.PointInfoDto;
 import io.github.pnoker.common.dto.ProfileDto;
 import io.github.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +58,7 @@ public class ProfileApi implements ProfileClient {
     public R<Profile> add(Profile profile, String tenantId) {
         try {
             Profile add = profileService.add(profile.setTenantId(tenantId));
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -69,7 +71,7 @@ public class ProfileApi implements ProfileClient {
     public R<Boolean> delete(String id) {
         try {
             Profile profile = profileService.selectById(id);
-            if (null != profile && profileService.delete(id)) {
+            if (ObjectUtil.isNotNull(profile) && profileService.delete(id)) {
                 notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.DELETE, profile);
                 return R.ok();
             }
@@ -83,7 +85,7 @@ public class ProfileApi implements ProfileClient {
     public R<Profile> update(Profile profile, String tenantId) {
         try {
             Profile update = profileService.update(profile.setTenantId(tenantId));
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.UPDATE, update);
                 return R.ok(update);
             }
@@ -97,7 +99,7 @@ public class ProfileApi implements ProfileClient {
     public R<Profile> selectById(String id) {
         try {
             Profile select = profileService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -133,9 +135,12 @@ public class ProfileApi implements ProfileClient {
     @Override
     public R<Page<Profile>> list(ProfileDto profileDto, String tenantId) {
         try {
+            if (ObjectUtil.isEmpty(profileDto)) {
+                profileDto = new ProfileDto();
+            }
             profileDto.setTenantId(tenantId);
             Page<Profile> page = profileService.list(profileDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

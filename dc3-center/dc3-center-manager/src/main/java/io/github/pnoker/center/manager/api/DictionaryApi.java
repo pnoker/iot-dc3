@@ -16,17 +16,19 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DictionaryClient;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.common.bean.Dictionary;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.dto.DictionaryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @author pnoker
@@ -40,11 +42,15 @@ public class DictionaryApi implements DictionaryClient {
     private DictionaryService dictionaryService;
 
     @Override
-    public R<List<Dictionary>> driverDictionary(String tenantId) {
+    public R<Page<Dictionary>> driverDictionary(DictionaryDto dictionaryDto, String tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.driverDictionary(tenantId);
-            if (null != dictionaryList) {
-                return R.ok(dictionaryList);
+            if (ObjectUtil.isEmpty(dictionaryDto)) {
+                dictionaryDto = new DictionaryDto();
+            }
+            dictionaryDto.setTenantId(tenantId);
+            Page<Dictionary> page = dictionaryService.driverDictionary(dictionaryDto);
+            if (ObjectUtil.isNotNull(page)) {
+                return R.ok(page);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -53,11 +59,15 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> driverAttributeDictionary(String tenantId) {
+    public R<Page<Dictionary>> profileDictionary(DictionaryDto dictionaryDto, String tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.driverAttributeDictionary(tenantId);
-            if (null != dictionaryList) {
-                return R.ok(dictionaryList);
+            if (ObjectUtil.isEmpty(dictionaryDto)) {
+                dictionaryDto = new DictionaryDto();
+            }
+            dictionaryDto.setTenantId(tenantId);
+            Page<Dictionary> page = dictionaryService.profileDictionary(dictionaryDto);
+            if (ObjectUtil.isNotNull(page)) {
+                return R.ok(page);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -66,11 +76,15 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> pointAttributeDictionary(String tenantId) {
+    public R<Page<Dictionary>> deviceDictionary(DictionaryDto dictionaryDto, String tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.pointAttributeDictionary(tenantId);
-            if (null != dictionaryList) {
-                return R.ok(dictionaryList);
+            if (ObjectUtil.isEmpty(dictionaryDto)) {
+                dictionaryDto = new DictionaryDto();
+            }
+            dictionaryDto.setTenantId(tenantId);
+            Page<Dictionary> page = dictionaryService.deviceDictionary(dictionaryDto);
+            if (ObjectUtil.isNotNull(page)) {
+                return R.ok(page);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -79,37 +93,15 @@ public class DictionaryApi implements DictionaryClient {
     }
 
     @Override
-    public R<List<Dictionary>> profileDictionary(String tenantId) {
+    public R<Page<Dictionary>> pointDictionary(DictionaryDto dictionaryDto, String tenantId) {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.profileDictionary(tenantId);
-            if (null != dictionaryList) {
-                return R.ok(dictionaryList);
+            if (ObjectUtil.isEmpty(dictionaryDto)) {
+                dictionaryDto = new DictionaryDto();
             }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
-    public R<List<Dictionary>> deviceDictionary(String tenantId) {
-        try {
-            List<Dictionary> dictionaryList = dictionaryService.deviceDictionary(tenantId);
-            if (null != dictionaryList) {
-                return R.ok(dictionaryList);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    @Override
-    public R<List<Dictionary>> pointDictionary(String parent, String tenantId) {
-        try {
-            List<Dictionary> dictionaryList = dictionaryService.pointDictionary(parent, tenantId);
-            if (null != dictionaryList) {
-                return R.ok(dictionaryList);
+            dictionaryDto.setTenantId(tenantId);
+            Page<Dictionary> page = dictionaryService.pointDictionary(dictionaryDto);
+            if (ObjectUtil.isNotNull(page)) {
+                return R.ok(page);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());

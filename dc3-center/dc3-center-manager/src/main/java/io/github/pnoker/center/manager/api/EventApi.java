@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.EventClient;
 import io.github.pnoker.center.manager.service.EventService;
@@ -45,8 +46,11 @@ public class EventApi implements EventClient {
     @Override
     public R<Page<DriverEvent>> driverEvent(DriverEventDto driverEventDto) {
         try {
+            if (ObjectUtil.isEmpty(driverEventDto)) {
+                driverEventDto = new DriverEventDto();
+            }
             Page<DriverEvent> page = eventService.driverEvent(driverEventDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {
@@ -58,8 +62,11 @@ public class EventApi implements EventClient {
     @Override
     public R<Page<DeviceEvent>> deviceEvent(DeviceEventDto deviceEventDto) {
         try {
+            if (ObjectUtil.isEmpty(deviceEventDto)) {
+                deviceEventDto = new DeviceEventDto();
+            }
             Page<DeviceEvent> page = eventService.deviceEvent(deviceEventDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

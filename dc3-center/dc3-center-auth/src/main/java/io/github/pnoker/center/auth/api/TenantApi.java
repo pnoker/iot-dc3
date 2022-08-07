@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.center.auth.service.TenantService;
@@ -38,6 +39,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping(ServiceConstant.Auth.TENANT_URL_PREFIX)
 public class TenantApi implements TenantClient {
+
     @Resource
     private TenantService tenantService;
 
@@ -45,7 +47,7 @@ public class TenantApi implements TenantClient {
     public R<Tenant> add(Tenant tenant) {
         try {
             Tenant add = tenantService.add(tenant);
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -67,7 +69,7 @@ public class TenantApi implements TenantClient {
     public R<Tenant> update(Tenant tenant) {
         try {
             Tenant update = tenantService.update(tenant.setName(null));
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -80,7 +82,7 @@ public class TenantApi implements TenantClient {
     public R<Tenant> selectById(String id) {
         try {
             Tenant select = tenantService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -93,7 +95,7 @@ public class TenantApi implements TenantClient {
     public R<Tenant> selectByName(String name) {
         try {
             Tenant select = tenantService.selectByName(name);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -105,8 +107,11 @@ public class TenantApi implements TenantClient {
     @Override
     public R<Page<Tenant>> list(TenantDto tenantDto) {
         try {
+            if (ObjectUtil.isEmpty(tenantDto)) {
+                tenantDto = new TenantDto();
+            }
             Page<Tenant> page = tenantService.list(tenantDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

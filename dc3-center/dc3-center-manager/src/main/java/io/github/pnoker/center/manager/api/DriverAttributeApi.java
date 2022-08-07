@@ -16,12 +16,15 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DriverAttributeClient;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
 import io.github.pnoker.common.dto.DriverAttributeDto;
+import io.github.pnoker.common.dto.DriverDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ServiceConstant.Manager.DRIVER_ATTRIBUTE_URL_PREFIX)
 public class DriverAttributeApi implements DriverAttributeClient {
+
     @Resource
     private DriverAttributeService driverAttributeService;
 
@@ -48,7 +52,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     public R<DriverAttribute> add(DriverAttribute driverAttribute) {
         try {
             DriverAttribute add = driverAttributeService.add(driverAttribute);
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -70,7 +74,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     public R<DriverAttribute> update(DriverAttribute driverAttribute) {
         try {
             DriverAttribute update = driverAttributeService.update(driverAttribute);
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -83,7 +87,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     public R<DriverAttribute> selectById(String id) {
         try {
             DriverAttribute select = driverAttributeService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -96,7 +100,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     public R<List<DriverAttribute>> selectByDriverId(String id) {
         try {
             List<DriverAttribute> select = driverAttributeService.selectByDriverId(id);
-            if (null != select) {
+            if (CollectionUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
         } catch (NotFoundException ne) {
@@ -110,8 +114,11 @@ public class DriverAttributeApi implements DriverAttributeClient {
     @Override
     public R<Page<DriverAttribute>> list(DriverAttributeDto driverAttributeDto) {
         try {
+            if (ObjectUtil.isEmpty(driverAttributeDto)) {
+                driverAttributeDto = new DriverAttributeDto();
+            }
             Page<DriverAttribute> page = driverAttributeService.list(driverAttributeDto);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

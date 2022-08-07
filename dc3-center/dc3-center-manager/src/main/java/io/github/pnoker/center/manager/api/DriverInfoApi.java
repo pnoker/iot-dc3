@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.api;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DriverInfoClient;
 import io.github.pnoker.center.manager.service.DriverInfoService;
@@ -23,6 +24,7 @@ import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.dto.DriverAttributeDto;
 import io.github.pnoker.common.dto.DriverInfoDto;
 import io.github.pnoker.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -132,6 +134,9 @@ public class DriverInfoApi implements DriverInfoClient {
     @Override
     public R<Page<DriverInfo>> list(DriverInfoDto driverInfoDto) {
         try {
+            if (ObjectUtil.isEmpty(driverInfoDto)) {
+                driverInfoDto = new DriverInfoDto();
+            }
             Page<DriverInfo> page = driverInfoService.list(driverInfoDto);
             if (null != page) {
                 return R.ok(page);

@@ -13,43 +13,38 @@
 
 ### 查询 Driver Dictionary
 #/manager/dictionary/driver
-GET http://localhost:8400/manager/dictionary/driver
+POST http://localhost:8400/manager/dictionary/driver
 Accept: */*
+Content-Type: application/json
 Cache-Control: no-cache
 
-
-### 查询 PointAttribute Dictionary
-#/manager/dictionary/point_attribute
-GET http://localhost:8400/manager/dictionary/point_attribute
-Accept: */*
-Cache-Control: no-cache
-
+{}
 
 ### 查询 Profile Dictionary
 #/manager/dictionary/profile
-GET http://localhost:8400/manager/dictionary/profile
+POST http://localhost:8400/manager/dictionary/profile
 Accept: */*
+Content-Type: application/json
 Cache-Control: no-cache
 
+{}
 
 ### 查询 Device/driver Dictionary
-#/manager/dictionary/device/driver
-GET http://localhost:8400/manager/dictionary/device/driver
+#/manager/dictionary/device
+POST http://localhost:8400/manager/dictionary/device
 Accept: */*
+Content-Type: application/json
 Cache-Control: no-cache
 
+{}
 
 ### 查询 Point/profile Dictionary
-#/manager/dictionary/point/profile
-GET http://localhost:8400/manager/dictionary/point/profile
+#/manager/dictionary/point
+POST http://localhost:8400/manager/dictionary/point
 Accept: */*
+Content-Type: application/json
 Cache-Control: no-cache
 
-
-### 查询 Point/device Dictionary
-#/manager/dictionary/point/device
-GET http://localhost:8400/manager/dictionary/point/device
-Accept: */*
-Cache-Control: no-cache
+{}
 
 ###

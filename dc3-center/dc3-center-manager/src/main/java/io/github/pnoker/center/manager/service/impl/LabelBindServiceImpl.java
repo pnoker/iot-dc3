@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -41,6 +42,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class LabelBindServiceImpl implements LabelBindService {
+
     @Resource
     private LabelBindMapper labelBindMapper;
 
@@ -79,7 +81,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     public Page<LabelBind> list(LabelBindDto labelBindDto) {
-        if (!Optional.ofNullable(labelBindDto.getPage()).isPresent()) {
+        if (ObjectUtil.isNull(labelBindDto.getPage())) {
             labelBindDto.setPage(new Pages());
         }
         return labelBindMapper.selectPage(labelBindDto.getPage().convert(), fuzzyQuery(labelBindDto));
@@ -88,16 +90,10 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindDto labelBindDto) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
-        if (null != labelBindDto) {
-            if (StrUtil.isNotBlank(labelBindDto.getLabelId())) {
-                queryWrapper.eq(LabelBind::getLabelId, labelBindDto.getLabelId());
-            }
-            if (StrUtil.isNotBlank(labelBindDto.getEntityId())) {
-                queryWrapper.eq(LabelBind::getEntityId, labelBindDto.getEntityId());
-            }
-            if (StrUtil.isNotBlank(labelBindDto.getType())) {
-                queryWrapper.eq(LabelBind::getType, labelBindDto.getType());
-            }
+        if (ObjectUtil.isNotNull(labelBindDto)) {
+            queryWrapper.eq(StrUtil.isNotEmpty(labelBindDto.getLabelId()), LabelBind::getLabelId, labelBindDto.getLabelId());
+            queryWrapper.eq(StrUtil.isNotEmpty(labelBindDto.getEntityId()), LabelBind::getEntityId, labelBindDto.getEntityId());
+            queryWrapper.eq(StrUtil.isNotEmpty(labelBindDto.getType()), LabelBind::getType, labelBindDto.getType());
         }
         return queryWrapper;
     }

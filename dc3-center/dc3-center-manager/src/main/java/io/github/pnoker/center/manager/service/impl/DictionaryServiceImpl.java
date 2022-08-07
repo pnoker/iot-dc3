@@ -16,20 +16,29 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import io.github.pnoker.center.manager.mapper.*;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.mapper.*;
 import io.github.pnoker.center.manager.service.DictionaryService;
+import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.bean.Dictionary;
-import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.bean.Pages;
+import io.github.pnoker.common.dto.DictionaryDto;
+import io.github.pnoker.common.dto.PointDto;
+import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -37,6 +46,10 @@ import java.util.List;
 @Slf4j
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
+
+    @Resource
+    private PointService pointService;
+
     @Resource
     private DriverMapper driverMapper;
     @Resource
@@ -46,151 +59,71 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Resource
     private ProfileMapper profileMapper;
     @Resource
-    private PointMapper pointMapper;
-    @Resource
     private DeviceMapper deviceMapper;
 
     @Override
-    public List<Dictionary> driverDictionary(String tenantId) {
-        List<Dictionary> dictionaries = new ArrayList<>(16);
-        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.eq(Driver::getTenantId, tenantId);
-        List<Driver> drivers = driverMapper.selectList(queryWrapper);
-        drivers.forEach(driver -> dictionaries.add(new Dictionary().setLabel(driver.getName()).setValue(driver.getId())));
-        return dictionaries;
-    }
-
-    @Override
-    public List<Dictionary> driverAttributeDictionary(String tenantId) {
-        List<Dictionary> dictionaries = driverDictionary(tenantId);
-        dictionaries.forEach(driverDictionary -> {
-            List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
-            LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-            queryWrapper.eq(DriverAttribute::getDriverId, driverDictionary.getValue());
-            List<DriverAttribute> driverAttributeList = driverAttributeMapper.selectList(queryWrapper);
-            driverAttributeList.forEach(driverAttribute -> driverAttributeDictionaryList.add(new Dictionary().setLabel(driverAttribute.getDisplayName()).setValue(driverAttribute.getId())));
-
-            driverDictionary.setDisabled(true);
-            driverDictionary.setValue(RandomUtil.randomString(8));
-            driverDictionary.setChildren(driverAttributeDictionaryList);
-        });
-        return dictionaries;
-    }
-
-    @Override
-    public List<Dictionary> pointAttributeDictionary(String tenantId) {
-        List<Dictionary> dictionaries = driverDictionary(tenantId);
-        dictionaries.forEach(driverDictionary -> {
-            List<Dictionary> driverAttributeDictionaryList = new ArrayList<>(16);
-            LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-            queryWrapper.eq(PointAttribute::getDriverId, driverDictionary.getValue());
-            List<PointAttribute> pointAttributeList = pointAttributeMapper.selectList(queryWrapper);
-            pointAttributeList.forEach(pointAttribute -> driverAttributeDictionaryList.add(new Dictionary().setLabel(pointAttribute.getDisplayName()).setValue(pointAttribute.getId())));
-
-            driverDictionary.setDisabled(true);
-            driverDictionary.setValue(RandomUtil.randomString(8));
-            driverDictionary.setChildren(driverAttributeDictionaryList);
-        });
-        return dictionaries;
-    }
-
-    @Override
-    public List<Dictionary> profileDictionary(String tenantId) {
-        List<Dictionary> dictionaries = new ArrayList<>(16);
-        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.eq(Profile::getTenantId, tenantId);
-        List<Profile> profiles = profileMapper.selectList(queryWrapper);
-        profiles.forEach(profile -> dictionaries.add(new Dictionary().setLabel(profile.getName()).setValue(profile.getId())));
-        return dictionaries;
-    }
-
-    @Override
-    public List<Dictionary> pointDictionary(String parent, String tenantId) {
-        List<Dictionary> dictionaries = new ArrayList<>(16);
-        switch (parent) {
-            case "profile":
-                List<Dictionary> profileDictionaryList = new ArrayList<>(16);
-
-                LambdaQueryWrapper<Profile> profileQueryWrapper = Wrappers.<Profile>query().lambda();
-                profileQueryWrapper.eq(Profile::getTenantId, tenantId);
-                List<Profile> profileList = profileMapper.selectList(profileQueryWrapper);
-                profileList.forEach(profile -> {
-                    List<Dictionary> pointDictionaryList = new ArrayList<>(16);
-                    LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-                    queryWrapper.eq(Point::getProfileId, profile.getId());
-                    queryWrapper.eq(Point::getTenantId, tenantId);
-                    List<Point> pointList = pointMapper.selectList(queryWrapper);
-                    pointList.forEach(point -> pointDictionaryList.add(new Dictionary().setLabel(point.getName()).setValue(point.getId())));
-
-                    Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profile.getId());
-                    profileDictionary.setChildren(pointDictionaryList);
-
-                    profileDictionaryList.add(profileDictionary);
-                });
-
-                dictionaries = profileDictionaryList;
-                break;
-            case "device":
-                List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
-
-                LambdaQueryWrapper<Device> deviceQueryWrapper = Wrappers.<Device>query().lambda();
-                deviceQueryWrapper.eq(Device::getTenantId, tenantId);
-                List<Device> deviceList = deviceMapper.selectList(deviceQueryWrapper);
-                deviceList.forEach(device -> {
-                    List<Dictionary> profileDictionaryLists = new ArrayList<>(16);
-                    device.getProfileIds().forEach(profileId -> {
-                        Profile profile = profileMapper.selectById(profileId);
-
-                        LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-                        queryWrapper.eq(Point::getProfileId, profileId);
-                        queryWrapper.eq(Point::getTenantId, tenantId);
-                        List<Point> pointList = pointMapper.selectList(queryWrapper);
-                        List<Dictionary> pointDictionaryList = new ArrayList<>(16);
-                        pointList.forEach(point -> pointDictionaryList.add(new Dictionary().setLabel(point.getName()).setValue(point.getId())));
-
-                        Dictionary profileDictionary = new Dictionary().setLabel(profile.getName()).setValue(profileId);
-                        profileDictionary.setChildren(pointDictionaryList);
-
-                        profileDictionaryLists.add(profileDictionary);
-                    });
-
-                    Dictionary deviceDictionary = new Dictionary().setLabel(device.getName()).setValue(device.getId());
-                    deviceDictionary.setChildren(profileDictionaryLists);
-
-                    deviceDictionaryList.add(deviceDictionary);
-                });
-
-                dictionaries = deviceDictionaryList;
-                break;
-            case "point":
-                List<Dictionary> pointDictionaryList = new ArrayList<>(16);
-
-                LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-                queryWrapper.eq(Point::getTenantId, tenantId);
-                List<Point> pointList = pointMapper.selectList(queryWrapper);
-                pointList.forEach(point -> pointDictionaryList.add(new Dictionary().setLabel(point.getName()).setValue(point.getId())));
-
-                dictionaries = pointDictionaryList;
-                break;
-            default:
-                break;
+    public Page<Dictionary> driverDictionary(DictionaryDto dictionaryDto) {
+        if (ObjectUtil.isNull(dictionaryDto.getPage())) {
+            dictionaryDto.setPage(new Pages());
         }
-        return dictionaries;
+        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
+        queryWrapper.like(StrUtil.isNotEmpty(dictionaryDto.getLabel()), Driver::getName, dictionaryDto.getLabel());
+        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getTenantId()), Driver::getTenantId, dictionaryDto.getTenantId());
+        Page<Driver> driverPage = driverMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
+        List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> new Dictionary().setLabel(driver.getName()).setValue(driver.getId())).collect(Collectors.toList());
+        Page<Dictionary> page = new Page<>();
+        BeanUtils.copyProperties(driverPage, page);
+        page.setRecords(dictionaryList);
+        return page;
     }
 
     @Override
-    public List<Dictionary> deviceDictionary(String tenantId) {
-        List<Dictionary> dictionaries = driverDictionary(tenantId);
-        dictionaries.forEach(driverDictionary -> {
-            LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-            queryWrapper.eq(Device::getDriverId, driverDictionary.getValue());
-            queryWrapper.eq(Device::getTenantId, tenantId);
-            List<Device> deviceList = deviceMapper.selectList(queryWrapper);
-            List<Dictionary> deviceDictionaryList = new ArrayList<>(16);
-            deviceList.forEach(device -> deviceDictionaryList.add(new Dictionary().setLabel(device.getName()).setValue(device.getId())));
-            driverDictionary.setChildren(deviceDictionaryList);
-        });
-
-        return dictionaries;
+    public Page<Dictionary> deviceDictionary(DictionaryDto dictionaryDto) {
+        if (ObjectUtil.isNull(dictionaryDto.getPage())) {
+            dictionaryDto.setPage(new Pages());
+        }
+        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
+        queryWrapper.like(StrUtil.isNotEmpty(dictionaryDto.getLabel()), Device::getName, dictionaryDto.getLabel());
+        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getParentValue1()), Device::getDriverId, dictionaryDto.getParentValue1());
+        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getTenantId()), Device::getTenantId, dictionaryDto.getTenantId());
+        Page<Device> devicePage = deviceMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
+        List<Dictionary> dictionaryList = devicePage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getName()).setValue(profile.getId())).collect(Collectors.toList());
+        Page<Dictionary> page = new Page<>();
+        BeanUtils.copyProperties(devicePage, page);
+        page.setRecords(dictionaryList);
+        return page;
     }
+
+    @Override
+    public Page<Dictionary> profileDictionary(DictionaryDto dictionaryDto) {
+        if (ObjectUtil.isNull(dictionaryDto.getPage())) {
+            dictionaryDto.setPage(new Pages());
+        }
+        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
+        queryWrapper.like(StrUtil.isNotEmpty(dictionaryDto.getLabel()), Profile::getName, dictionaryDto.getLabel());
+        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getTenantId()), Profile::getTenantId, dictionaryDto.getTenantId());
+        Page<Profile> profilePage = profileMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
+        List<Dictionary> dictionaryList = profilePage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getName()).setValue(profile.getId())).collect(Collectors.toList());
+        Page<Dictionary> page = new Page<>();
+        BeanUtils.copyProperties(profilePage, page);
+        page.setRecords(dictionaryList);
+        return page;
+    }
+
+    @Override
+    public Page<Dictionary> pointDictionary(DictionaryDto dictionaryDto) {
+        if (ObjectUtil.isNull(dictionaryDto.getPage())) {
+            dictionaryDto.setPage(new Pages());
+        }
+        PointDto pointDto = (new PointDto()).setPage(dictionaryDto.getPage());
+        pointDto.setDeviceId(dictionaryDto.getParentValue2());
+        pointDto.setName(dictionaryDto.getLabel()).setProfileId(dictionaryDto.getParentValue1()).setTenantId(dictionaryDto.getTenantId());
+        Page<Point> pointPage = pointService.list(pointDto);
+        List<Dictionary> dictionaryList = pointPage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getName()).setValue(profile.getId())).collect(Collectors.toList());
+        Page<Dictionary> page = new Page<>();
+        BeanUtils.copyProperties(pointPage, page);
+        page.setRecords(dictionaryList);
+        return page;
+    }
+
 }
