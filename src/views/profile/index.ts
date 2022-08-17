@@ -18,7 +18,7 @@ import { reactive, ref, computed, defineComponent } from 'vue'
 
 import { profileAddApi, profileDeleteApi, profileListApi } from '@/api/profile'
 
-import { Dictionary, Order } from '@/config/type/types'
+import { Order } from '@/config/type/types'
 
 import profileTool from '@/views/profile/tool/ProfileTool.vue'
 import blankCard from '@/components/card/blank/BlankCard.vue'
@@ -55,7 +55,6 @@ export default defineComponent({
         // 定义响应式数据
         const reactiveData = reactive({
             loading: true,
-            pointDictionary: [] as Dictionary[],
             pointTable: {},
             listData: [] as any[],
             query: {},

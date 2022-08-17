@@ -35,7 +35,7 @@
                         >
                         </el-input>
                     </el-form-item>
-                    <el-form-item v-if="embedded != 'profile'" prop="profileId" label="所属模板">
+                    <el-form-item v-if="embedded != 'profile' && embedded != 'edit'" prop="profileId" label="所属模板">
                         <el-select
                             v-model="reactiveData.formData.profileId"
                             class="edit-form-special"
@@ -90,12 +90,14 @@
                     <el-button v-if="pre" type="success" :icon="Back" plain @click="preHandle">上一步</el-button>
                     <el-button type="primary" :icon="Search" @click="search">搜索</el-button>
                     <el-button :icon="RefreshLeft" @click="reset">重置</el-button>
-                    <el-button v-if="pre" type="warning" :icon="Check" plain @click="nextHandle">完成</el-button>
+                    <el-button v-if="pre" type="warning" :icon="Check" plain @click="nextHandle">下一步</el-button>
                 </el-form-item>
             </el-form>
             <div class="tool-card-footer">
                 <div class="tool-card-footer-button">
-                    <el-button v-if="embedded == ''" type="success" :icon="Plus" @click="showAdd">新增</el-button>
+                    <el-button v-if="embedded == '' || embedded == 'edit'" type="success" :icon="Plus" @click="showAdd"
+                        >新增</el-button
+                    >
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination

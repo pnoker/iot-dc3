@@ -80,14 +80,14 @@ export default defineComponent({
             })
         }
 
-        const edit = (id, driverId) => {
-            router.push({ name: 'deviceEdit', query: { id, driverId, active: '0' } }).catch(() => {
+        const edit = (id) => {
+            router.push({ name: 'deviceEdit', query: { id, active: '0' } }).catch(() => {
                 // nothing to do
             })
         }
 
-        const detail = (id, driverId) => {
-            router.push({ name: 'deviceDetail', query: { id, driverId, active: 'detail' } }).catch(() => {
+        const detail = (id) => {
+            router.push({ name: 'deviceDetail', query: { id, active: 'detail' } }).catch(() => {
                 // nothing to do
             })
         }

@@ -30,14 +30,36 @@
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
                 <el-select
-                    v-if="driverDictionary.length > 0"
                     v-model="reactiveData.formData.driverId"
-                    placeholder="请选择所属驱动 | 网关"
-                    filterable
+                    class="edit-form-special"
+                    placeholder="请选择所属驱动"
                     clearable
+                    @visible-change="driverDictionaryVisible"
                 >
+                    <div class="tool-select">
+                        <el-form-item class="tool-select-input">
+                            <el-input
+                                v-model="reactiveData.driverQuery"
+                                placeholder="请选择所属驱动"
+                                clearable
+                                @input="driverDictionary"
+                            />
+                        </el-form-item>
+                        <el-pagination
+                            class="tool-select-pagination"
+                            :hide-on-single-page="true"
+                            layout="prev, pager, next"
+                            :pager-count="5"
+                            :page-size="+reactiveData.driverPage.size"
+                            :current-page="+reactiveData.driverPage.current"
+                            :total="+reactiveData.driverPage.total"
+                            small
+                            background
+                            @current-change="driverCurrentChange"
+                        ></el-pagination>
+                    </div>
                     <el-option
-                        v-for="dictionary in driverDictionary"
+                        v-for="dictionary in reactiveData.driverDictionary"
                         :key="dictionary.value"
                         :label="dictionary.label"
                         :value="dictionary.value"
@@ -47,13 +69,36 @@
             <el-form-item class="things-dialog-form-item" label="关联模板" prop="profileIds">
                 <el-select
                     v-model="reactiveData.formData.profileIds"
+                    class="edit-form-special"
                     placeholder="请选择关联模板"
                     :multiple="true"
-                    filterable
                     clearable
+                    @visible-change="profileDictionaryVisible"
                 >
+                    <div class="tool-select">
+                        <el-form-item class="tool-select-input">
+                            <el-input
+                                v-model="reactiveData.profileQuery"
+                                placeholder="请选择关联模板"
+                                clearable
+                                @input="profileDictionary"
+                            />
+                        </el-form-item>
+                        <el-pagination
+                            class="tool-select-pagination"
+                            :hide-on-single-page="true"
+                            layout="prev, pager, next"
+                            :pager-count="5"
+                            :page-size="+reactiveData.profilePage.size"
+                            :current-page="+reactiveData.profilePage.current"
+                            :total="+reactiveData.profilePage.total"
+                            small
+                            background
+                            @current-change="profileCurrentChange"
+                        ></el-pagination>
+                    </div>
                     <el-option
-                        v-for="dictionary in profileDictionary"
+                        v-for="dictionary in reactiveData.profileDictionary"
                         :key="dictionary.value"
                         :label="dictionary.label"
                         :value="dictionary.value"
@@ -90,5 +135,6 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="less">
-@import '~@/components/dialog/styles/things-dialog.less';
+@import '~@/components/dialog/styles/things-dialog';
+@import '~@/components/card/styles/tool-card';
 </style>

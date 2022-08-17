@@ -32,13 +32,15 @@ import {
     pointInfoByDeviceIdApi,
     pointInfoUpdateApi,
 } from '@/api/info'
-import { pointByDeviceIdApi } from '@/api/point'
 
-import { Dictionary } from '@/config/type/types'
+import { Dictionary, Order } from '@/config/type/types'
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue'
 import { isNull } from '@/util/utils'
+import { driverByIdApi } from '@/api/driver'
+import { profileByIdsApi } from '@/api/profile'
+import { pointByDeviceIdApi } from '@/api/point'
 
 export default defineComponent({
     name: 'DeviceEdit',
@@ -66,14 +68,8 @@ export default defineComponent({
         // 定义响应式数据
         const reactiveData = reactive({
             id: route.query.id as string,
-            driverId: route.query.driverId as string,
             active: +(route.query.active || 0),
             loading: true,
-            driverDictionary: [] as Dictionary[],
-            profileDictionary: [] as Dictionary[],
-            driverTable: {},
-            profileTable: {},
-            pointTable: {},
             oldDeviceFormData: {},
             deviceFormData: {} as any,
             driverAttributes: [] as any[],
@@ -85,6 +81,22 @@ export default defineComponent({
             oldPointFormData: {},
             pointFormData: {} as any,
             pointInfoData: [] as any[],
+            driverQuery: '',
+            driverDictionary: [] as Dictionary[],
+            driverPage: {
+                total: 0,
+                size: 5,
+                current: 1,
+                orders: [] as Order[],
+            },
+            profileQuery: '',
+            profileDictionary: [] as Dictionary[],
+            profilePage: {
+                total: 0,
+                size: 5,
+                current: 1,
+                orders: [] as Order[],
+            },
         })
 
         // 定义表单校验规则
@@ -147,83 +159,130 @@ export default defineComponent({
             return !isNull(reactiveData.pointFormData)
         })
 
+        const driverDictionary = () => {
+            driverDictionaryApi({
+                page: reactiveData.driverPage,
+                label: reactiveData.driverQuery,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.driverPage.total = data.total
+                    reactiveData.driverDictionary = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const driverCurrentChange = (current) => {
+            reactiveData.driverPage.current = current
+            driverDictionary()
+        }
+
+        const driverDictionaryVisible = (visible: boolean) => {
+            if (visible) {
+                reactiveData.driverQuery = ''
+                driverDictionary()
+            }
+        }
+
+        const profileDictionary = () => {
+            profileDictionaryApi({
+                page: reactiveData.profilePage,
+                label: reactiveData.profileQuery,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.profilePage.total = data.total
+                    reactiveData.profileDictionary = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const profileCurrentChange = (current) => {
+            reactiveData.driverPage.current = current
+            profileDictionary()
+        }
+
+        const profileDictionaryVisible = (visible: boolean) => {
+            if (visible) {
+                reactiveData.profileQuery = ''
+                profileDictionary()
+            }
+        }
+
         const device = () => {
-            const id = route.query.id as string
-            deviceByIdApi(id)
+            deviceByIdApi(reactiveData.id)
                 .then((res) => {
                     reactiveData.deviceFormData = res.data.data
-                    changeDriver(reactiveData.driverId)
-                    changePoint()
                     reactiveData.oldDeviceFormData = { ...res.data.data }
+
+                    driverByIdApi(reactiveData.deviceFormData.driverId).then((res) => {
+                        const driver = res.data.data
+                        reactiveData.driverDictionary.push({
+                            label: driver.name,
+                            value: driver.id,
+                        } as Dictionary)
+                    })
+
+                    profileByIdsApi(reactiveData.deviceFormData.profileIds).then((res) => {
+                        const profiles = res.data.data
+                        for (const key in profiles) {
+                            const profile = profiles[key]
+                            reactiveData.profileDictionary.push({
+                                label: profile.name,
+                                value: profile.id,
+                            } as Dictionary)
+                        }
+                    })
+
+                    changeAttribute(reactiveData.deviceFormData.driverId)
                 })
                 .catch(() => {
                     // nothing to do
                 })
         }
 
-        const driver = () => {
-            driverDictionaryApi('')
+        const changeAttribute = (value?) => {
+            if (isNull(value)) {
+                return
+            }
+
+            driverAttributeByDriverIdApi(value)
                 .then((res) => {
-                    reactiveData.driverDictionary = res.data.data
-                    reactiveData.driverTable = reactiveData.driverDictionary.reduce((pre, cur) => {
-                        pre[cur.value] = cur.label
-                        return pre
-                    }, {})
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
-
-        const profile = () => {
-            profileDictionaryApi('')
-                .then((res) => {
-                    reactiveData.profileDictionary = res.data.data
-                    reactiveData.profileTable = reactiveData.profileDictionary.reduce((pre, cur) => {
-                        pre[cur.value] = cur.label
-                        return pre
-                    }, {})
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
-
-        const point = () => {
-            pointByDeviceIdApi(reactiveData.id)
-                .then((res1) => {
-                    reactiveData.pointTable = res1.data.data.reduce((pre, cur) => {
+                    reactiveData.driverAttributes = res.data.data
+                    reactiveData.driverAttributeTable = reactiveData.driverAttributes.reduce((pre, cur) => {
                         pre[cur.id] = cur.name
                         return pre
                     }, {})
 
-                    pointAttributeByDriverIdApi(reactiveData.driverId)
-                        .then((res2) => {
-                            reactiveData.pointAttributes = res2.data.data
-                            reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce((pre, cur) => {
-                                pre[cur.id] = cur.name
-                                return pre
-                            }, {})
+                    const driverFormData = {}
+                    reactiveData.driverAttributes.forEach((attribute) => {
+                        driverFormData[attribute.name] = {
+                            id: null,
+                            value: '',
+                        }
+                    })
+                    reactiveData.driverFormData = JSON.parse(JSON.stringify(driverFormData))
+                    reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData))
 
-                            reactiveData.pointInfoData = res1.data.data.map((point) => {
-                                const pointInfo = {
-                                    id: point.id,
-                                    name: point.name,
-                                    shadow: 'hover',
-                                }
+                    driverInfo()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
 
-                                res2.data.data.forEach((attribute) => {
-                                    pointInfo[attribute.name] = {
-                                        id: null,
-                                        value: '',
-                                    }
-                                })
-                                return pointInfo
-                            })
-                        })
-                        .catch(() => {
-                            // nothing to do
-                        })
+            pointAttributeByDriverIdApi(value)
+                .then((res) => {
+                    reactiveData.pointAttributes = res.data.data
+                    reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce((pre, cur) => {
+                        pre[cur.id] = cur.name
+                        return pre
+                    }, {})
+
+                    pointInfo()
                 })
                 .catch(() => {
                     // nothing to do
@@ -233,60 +292,48 @@ export default defineComponent({
                 })
         }
 
-        const changeDriver = (driverId) => {
-            driverAttributeByDriverIdApi(driverId)
+        const driverInfo = () => {
+            driverInfoByDeviceIdApi(reactiveData.id)
                 .then((res) => {
-                    reactiveData.driverAttributes = res.data.data
-                    reactiveData.driverAttributeTable = res.data.data.reduce((pre, cur) => {
-                        pre[cur.id] = cur.name
-                        return pre
-                    }, {})
-
                     const formData = {}
-                    res.data.data.forEach((attribute) => {
-                        formData[attribute.name] = {
-                            id: null,
-                            value: '',
+                    res.data.data.forEach((info) => {
+                        formData[reactiveData.driverAttributeTable[info.driverAttributeId]] = {
+                            id: info.id,
+                            value: info.value,
                         }
                     })
+
                     reactiveData.driverFormData = JSON.parse(JSON.stringify(formData))
                     reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(formData))
-
-                    driverInfoByDeviceIdApi(reactiveData.id)
-                        .then((res) => {
-                            const formData = {}
-                            res.data.data.forEach((info) => {
-                                formData[reactiveData.driverAttributeTable[info.driverAttributeId]] = {
-                                    id: info.id,
-                                    value: info.value,
-                                }
-                            })
-
-                            reactiveData.driverFormData = JSON.parse(JSON.stringify(formData))
-                            reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(formData))
-                        })
-                        .catch(() => {
-                            // nothing to do
-                        })
                 })
                 .catch(() => {
                     // nothing to do
                 })
         }
 
-        const changePoint = () => {
-            pointAttributeByDriverIdApi(reactiveData.driverId)
+        const pointInfo = () => {
+            pointByDeviceIdApi(reactiveData.id)
                 .then((res) => {
-                    reactiveData.pointAttributes = res.data.data
-                    reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce((pre, cur) => {
-                        pre[cur.id] = cur.name
-                        return pre
-                    }, {})
+                    reactiveData.pointInfoData = res.data.data.map((point) => {
+                        const pointInfo = {
+                            id: point.id,
+                            name: point.name,
+                            shadow: 'hover',
+                        }
+
+                        reactiveData.pointAttributes.forEach((attribute) => {
+                            pointInfo[attribute.name] = {
+                                id: null,
+                                value: '',
+                            }
+                        })
+                        return pointInfo
+                    })
 
                     pointInfoByDeviceIdApi(reactiveData.id)
                         .then((res) => {
                             res.data.data.forEach((info) => {
-                                reactiveData.pointInfoData = reactiveData.pointInfoData.map((pointInfo) => {
+                                reactiveData.pointInfoData.forEach((pointInfo) => {
                                     if (pointInfo.id === info.pointId) {
                                         pointInfo[reactiveData.pointAttributeTable[info.pointAttributeId]] = {
                                             id: info.id,
@@ -306,33 +353,12 @@ export default defineComponent({
                 })
         }
 
-        const changePointInfo = (row) => {
-            reactiveData.pointAttributes.forEach((attribute) => {
-                if (!row[attribute.name]) {
-                    row[attribute.name] = {
-                        id: null,
-                        value: '',
-                    }
-                }
-            })
-            reactiveData.pointFormData = JSON.parse(JSON.stringify(row))
-
-            reactiveData.pointInfoData.forEach((pointInfo) => {
-                pointInfo.shadow = 'hover'
-                if (row.id === pointInfo.id) {
-                    pointInfo.shadow = 'always'
-                }
-            })
-        }
-
         const deviceUpdate = () => {
             const form = unref(deviceFormRef)
             form?.validate((valid) => {
                 if (valid) {
                     deviceUpdateApi(reactiveData.deviceFormData)
                         .then((res) => {
-                            changeDriver(reactiveData.driverId)
-                            changePoint()
                             reactiveData.oldDeviceFormData = { ...res.data.data }
                         })
                         .catch(() => {
@@ -346,7 +372,7 @@ export default defineComponent({
             const form = unref(driverFormRef)
             form?.validate((valid) => {
                 if (valid) {
-                    const formData = {}
+                    const driverFormData = {}
                     reactiveData.driverAttributes.forEach((attribute) => {
                         const driverInfo = {
                             id: reactiveData.driverFormData[attribute.name].id,
@@ -357,22 +383,22 @@ export default defineComponent({
 
                         driverInfo.id
                             ? driverInfoUpdateApi(driverInfo)
-                                  .then((res) => loadFormData(formData, res, this))
+                                  .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
                                   })
                             : driverInfoAddApi(driverInfo)
-                                  .then((res) => loadFormData(formData, res, this))
+                                  .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
                                   })
 
-                        function loadFormData(formData, res, that) {
-                            formData[attribute.name] = {
+                        function loadFormData(res) {
+                            driverFormData[attribute.name] = {
                                 id: res.data.data.id,
                                 value: res.data.data.value,
                             }
-                            that.oldDriverFormData = JSON.parse(JSON.stringify(formData))
+                            reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData))
                         }
                     })
                 }
@@ -394,28 +420,49 @@ export default defineComponent({
 
                         pointInfo.id
                             ? pointInfoUpdateApi(pointInfo)
-                                  .then((res) => loadTableData(res, attribute, this))
+                                  .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
                                   })
                             : pointInfoAddApi(pointInfo)
-                                  .then((res) => loadTableData(res, attribute, this))
+                                  .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
                                   })
 
-                        function loadTableData(res, attribute, that) {
-                            that.pointInfoData = that.pointInfoData.map((tableData) => {
-                                if (tableData.id === that.pointFormData.id) {
-                                    tableData[attribute.name] = {
+                        function loadFormData(res) {
+                            reactiveData.pointInfoData.forEach((pointInfo) => {
+                                if (pointInfo.id === reactiveData.pointFormData.id) {
+                                    pointInfo[attribute.name] = {
                                         id: res.data.data.id,
                                         value: res.data.data.value,
                                     }
+                                    reactiveData.oldPointFormData = JSON.parse(JSON.stringify(pointInfo))
                                 }
-                                return tableData
+                                return pointInfo
                             })
                         }
                     })
+                }
+            })
+        }
+
+        const selectPoint = (row) => {
+            reactiveData.pointAttributes.forEach((attribute) => {
+                if (!row[attribute.name]) {
+                    row[attribute.name] = {
+                        id: null,
+                        value: '',
+                    }
+                }
+            })
+            reactiveData.pointFormData = JSON.parse(JSON.stringify(row))
+            reactiveData.oldPointFormData = JSON.parse(JSON.stringify(row))
+
+            reactiveData.pointInfoData.forEach((pointInfo) => {
+                pointInfo.shadow = 'hover'
+                if (row.id === pointInfo.id) {
+                    pointInfo.shadow = 'always'
                 }
             })
         }
@@ -442,17 +489,15 @@ export default defineComponent({
                 step = 2
             }
             reactiveData.active += step
-            if (reactiveData.active > 2) {
-                router.push({ name: 'device' }).catch(() => {
-                    // nothing to do
-                })
-            } else {
-                changeActive(reactiveData.active)
-            }
+            changeActive(reactiveData.active)
+        }
+
+        const done = () => {
+            router.push({ name: 'device' })
         }
 
         const deviceReset = () => {
-            reactiveData.deviceFormData = { ...reactiveData.oldDeviceFormData }
+            reactiveData.deviceFormData = JSON.parse(JSON.stringify(reactiveData.oldDeviceFormData))
         }
 
         const driverInfoReset = () => {
@@ -460,8 +505,7 @@ export default defineComponent({
         }
 
         const pointInfoReset = () => {
-            const form = unref(pointFormRef)
-            form?.resetFields()
+            reactiveData.pointFormData = JSON.parse(JSON.stringify(reactiveData.oldPointFormData))
         }
 
         const changeActive = (step) => {
@@ -471,10 +515,7 @@ export default defineComponent({
             })
         }
 
-        driver()
-        profile()
         device()
-        point()
 
         return {
             deviceFormRef,
@@ -483,10 +524,18 @@ export default defineComponent({
             deviceFormRule,
             reactiveData,
             hasPointFormData,
-            changePointInfo,
+            driverDictionary,
+            driverCurrentChange,
+            driverDictionaryVisible,
+            profileDictionary,
+            profileCurrentChange,
+            profileDictionaryVisible,
+            changeAttribute,
             pointUpdate,
+            selectPoint,
             pre,
             next,
+            done,
             deviceReset,
             driverInfoReset,
             pointInfoReset,

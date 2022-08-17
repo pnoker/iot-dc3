@@ -19,15 +19,16 @@
         <div class="edit-card-header">
             <el-card shadow="hover">
                 <el-steps :active="reactiveData.active" finish-status="success" align-center>
-                    <el-step title="模板信息编辑"></el-step>
-                    <el-step title="模板位号编辑"></el-step>
+                    <el-step title="模板信息配置"></el-step>
+                    <el-step title="模板位号配置"></el-step>
+                    <el-step title="模板配置完成"></el-step>
                 </el-steps>
             </el-card>
         </div>
 
         <div class="edit-card-body">
             <el-card v-if="reactiveData.active === 0" shadow="hover">
-                <el-divider content-position="left">模板信息编辑</el-divider>
+                <el-divider content-position="left">模板信息配置</el-divider>
                 <el-form ref="formDataRef" :inline="true" :model="reactiveData.profileFormData" :rules="formRule">
                     <div class="edit-form-item">
                         <el-form-item label="模板名称" prop="name">
@@ -72,7 +73,21 @@
             </el-card>
             <el-card v-if="reactiveData.active === 1" shadow="hover">
                 <el-divider content-position="left">模板位号配置</el-divider>
-                <point :pre="true" :profile-id="reactiveData.id" @pre-handle="pre" @next-handle="next"></point>
+                <point
+                    :embedded="'edit'"
+                    :pre="true"
+                    :profile-id="reactiveData.id"
+                    @pre-handle="pre"
+                    @next-handle="next"
+                ></point>
+            </el-card>
+            <el-card v-if="reactiveData.active === 2" shadow="hover">
+                <el-divider content-position="left">模板配置完成</el-divider>
+                <el-result icon="success" title="配置完成" sub-title="您可以返回进行下一步操作">
+                    <template #extra>
+                        <el-button type="primary" @click="done">返回</el-button>
+                    </template>
+                </el-result>
             </el-card>
         </div>
     </div>

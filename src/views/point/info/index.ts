@@ -48,7 +48,7 @@ export default defineComponent({
             default: 'images/common/point-info-disable.png',
         },
     },
-    emits: ['select-change'],
+    emits: ['select'],
     setup(props, { emit }) {
         const isConfig = computed(() => {
             for (let i = 0; i < props.attributes.length; i++) {
@@ -70,7 +70,7 @@ export default defineComponent({
         })
 
         const select = (data) => {
-            emit('select-change', data)
+            emit('select', data)
         }
 
         return {

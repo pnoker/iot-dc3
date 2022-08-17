@@ -42,7 +42,7 @@
                 </el-col>
                 <el-col v-for="data in reactiveData.listData" :key="data.id" :xs="24" :sm="12" :md="12" :lg="8" :xl="6">
                     <point-card
-                        :embedded="embedded != ''"
+                        :embedded="embedded != '' && embedded != 'edit'"
                         :data="data"
                         :profile="reactiveData.profileTable[data.profileId]"
                         @delete-thing="deleteThing"

@@ -48,12 +48,7 @@
             </el-row>
         </blank-card>
 
-        <device-add-form
-            ref="deviceAddFormRef"
-            :driver-dictionary="reactiveData.driverDictionary"
-            :profile-dictionary="reactiveData.profileDictionary"
-            @add-thing="addThing"
-        />
+        <device-add-form ref="deviceAddFormRef" @add-thing="addThing" />
     </div>
 </template>
 

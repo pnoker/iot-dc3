@@ -46,7 +46,6 @@ export default defineComponent({
         const reactiveData = reactive({
             formData: {} as any,
             driverQuery: '',
-            driverLoading: false,
             driverDictionary: [] as Dictionary[],
             driverPage: {
                 total: 0,
@@ -69,7 +68,6 @@ export default defineComponent({
         }
 
         const driverDictionary = () => {
-            reactiveData.driverLoading = true
             driverDictionaryApi({
                 page: reactiveData.driverPage,
                 label: reactiveData.driverQuery,
@@ -81,9 +79,6 @@ export default defineComponent({
                 })
                 .catch(() => {
                     // nothing to do
-                })
-                .finally(() => {
-                    reactiveData.driverLoading = false
                 })
         }
 

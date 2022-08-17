@@ -17,26 +17,13 @@
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 
-import { Dictionary } from '@/config/type/types'
+import { Dictionary, Order } from '@/config/type/types'
 
 import { successMessage } from '@/util/utils'
+import { driverDictionaryApi, profileDictionaryApi } from '@/api/dictionary'
 
 export default defineComponent({
     name: 'DeviceAddForm',
-    props: {
-        driverDictionary: {
-            type: Array<Dictionary>,
-            default: () => {
-                return []
-            },
-        },
-        profileDictionary: {
-            type: Array<Dictionary>,
-            default: () => {
-                return []
-            },
-        },
-    },
     emits: ['add-thing'],
     setup(props, { emit }) {
         // 定义表单引用
@@ -48,6 +35,22 @@ export default defineComponent({
                 multi: false,
             } as any,
             formVisible: false,
+            driverQuery: '',
+            driverDictionary: [] as Dictionary[],
+            driverPage: {
+                total: 0,
+                size: 5,
+                current: 1,
+                orders: [] as Order[],
+            },
+            profileQuery: '',
+            profileDictionary: [] as Dictionary[],
+            profilePage: {
+                total: 0,
+                size: 5,
+                current: 1,
+                orders: [] as Order[],
+            },
         })
 
         // 定义表单校验规则
@@ -72,7 +75,7 @@ export default defineComponent({
             driverId: [
                 {
                     required: true,
-                    message: '请选择所属驱动 | 网关',
+                    message: '请选择所属驱动',
                     trigger: 'change',
                 },
             ],
@@ -84,6 +87,60 @@ export default defineComponent({
                 },
             ],
         })
+
+        const driverDictionary = () => {
+            driverDictionaryApi({
+                page: reactiveData.driverPage,
+                label: reactiveData.driverQuery,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.driverPage.total = data.total
+                    reactiveData.driverDictionary = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const driverCurrentChange = (current) => {
+            reactiveData.driverPage.current = current
+            driverDictionary()
+        }
+
+        const driverDictionaryVisible = (visible: boolean) => {
+            if (visible) {
+                reactiveData.driverQuery = ''
+                driverDictionary()
+            }
+        }
+
+        const profileDictionary = () => {
+            profileDictionaryApi({
+                page: reactiveData.profilePage,
+                label: reactiveData.profileQuery,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.profilePage.total = data.total
+                    reactiveData.profileDictionary = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const profileCurrentChange = (current) => {
+            reactiveData.driverPage.current = current
+            profileDictionary()
+        }
+
+        const profileDictionaryVisible = (visible: boolean) => {
+            if (visible) {
+                reactiveData.profileQuery = ''
+                profileDictionary()
+            }
+        }
 
         const show = () => {
             reactiveData.formVisible = true
@@ -112,6 +169,12 @@ export default defineComponent({
             formDataRef,
             formRule,
             reactiveData,
+            driverDictionary,
+            driverCurrentChange,
+            driverDictionaryVisible,
+            profileDictionary,
+            profileCurrentChange,
+            profileDictionaryVisible,
             show,
             cancel,
             reset,

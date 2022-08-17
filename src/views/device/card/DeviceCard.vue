@@ -107,8 +107,8 @@
                                 <el-button type="primary" link>删除</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-button type="primary" link @click="edit(data.id, data.driverId)">编辑</el-button>
-                        <el-button type="primary" link @click="detail(data.id, data.driverId)">详情</el-button>
+                        <el-button type="primary" link @click="edit(data.id)">编辑</el-button>
+                        <el-button type="primary" link @click="detail(data.id)">详情</el-button>
                     </div>
                 </div>
             </div>

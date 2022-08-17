@@ -18,9 +18,8 @@ import { defineComponent, reactive, ref, computed } from 'vue'
 
 import { driverByIdsApi } from '@/api/driver'
 import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi } from '@/api/device'
-import { driverDictionaryApi } from '@/api/dictionary'
 
-import { Dictionary, Order } from '@/config/type/types'
+import { Order } from '@/config/type/types'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
@@ -64,8 +63,6 @@ export default defineComponent({
         // 定义响应式数据
         const reactiveData = reactive({
             loading: true,
-            driverDictionary: [] as Dictionary[],
-            profileDictionary: [] as Dictionary[],
             driverTable: {},
             profileTable: {},
             statusTable: {},
@@ -130,19 +127,6 @@ export default defineComponent({
             })
                 .then((res) => {
                     reactiveData.statusTable = res.data.data
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
-
-        const driver = () => {
-            driverDictionaryApi({
-                page: reactiveData.page,
-            })
-                .then((res) => {
-                    const data = res.data.data
-                    reactiveData.driverDictionary = data.records
                 })
                 .catch(() => {
                     // nothing to do
@@ -230,7 +214,6 @@ export default defineComponent({
             list()
         }
 
-        driver()
         list()
 
         return {

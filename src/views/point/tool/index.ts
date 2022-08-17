@@ -79,7 +79,6 @@ export default defineComponent({
         const reactiveData = reactive({
             formData: {} as any,
             profileQuery: '',
-            profileLoading: false,
             profileDictionary: [] as Dictionary[],
             profilePage: {
                 total: 0,
@@ -95,7 +94,6 @@ export default defineComponent({
         })
 
         const profileDictionary = () => {
-            reactiveData.profileLoading = true
             profileDictionaryApi({
                 page: reactiveData.profilePage,
                 label: reactiveData.profileQuery,
@@ -107,9 +105,6 @@ export default defineComponent({
                 })
                 .catch(() => {
                     // nothing to do
-                })
-                .finally(() => {
-                    reactiveData.profileLoading = false
                 })
         }
 

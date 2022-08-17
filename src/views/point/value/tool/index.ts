@@ -45,7 +45,6 @@ export default defineComponent({
         const reactiveData = reactive({
             formData: {} as any,
             deviceQuery: '',
-            deviceLoading: false,
             deviceDictionary: [] as Dictionary[],
             devicePage: {
                 total: 0,
@@ -54,7 +53,6 @@ export default defineComponent({
                 orders: [] as Order[],
             },
             pointQuery: '',
-            pointLoading: false,
             pointDictionary: [] as Dictionary[],
             pointPage: {
                 total: 0,
@@ -76,7 +74,6 @@ export default defineComponent({
         }
 
         const deviceDictionary = () => {
-            reactiveData.deviceLoading = true
             deviceDictionaryApi({
                 page: reactiveData.devicePage,
                 label: reactiveData.deviceQuery,
@@ -89,9 +86,6 @@ export default defineComponent({
                 .catch(() => {
                     // nothing to do
                 })
-                .finally(() => {
-                    reactiveData.deviceLoading = false
-                })
         }
 
         const deviceCurrentChange = (current) => {
@@ -100,7 +94,6 @@ export default defineComponent({
         }
 
         const pointDictionary = () => {
-            reactiveData.pointLoading = true
             pointDictionaryApi({
                 page: reactiveData.pointPage,
                 label: reactiveData.pointQuery,
@@ -113,9 +106,6 @@ export default defineComponent({
                 })
                 .catch(() => {
                     // nothing to do
-                })
-                .finally(() => {
-                    reactiveData.pointLoading = false
                 })
         }
 

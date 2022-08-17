@@ -19,16 +19,17 @@
         <div class="edit-card-header">
             <el-card shadow="hover">
                 <el-steps :active="reactiveData.active" finish-status="success" align-center>
-                    <el-step title="设备信息编辑"></el-step>
-                    <el-step title="设备驱动编辑"></el-step>
-                    <el-step title="设备位号编辑"></el-step>
+                    <el-step title="设备信息配置"></el-step>
+                    <el-step title="设备驱动配置"></el-step>
+                    <el-step title="设备位号配置"></el-step>
+                    <el-step title="设备配置完成"></el-step>
                 </el-steps>
             </el-card>
         </div>
 
         <div class="edit-card-body">
             <el-card v-if="reactiveData.active === 0" shadow="hover">
-                <el-divider content-position="left">设备信息编辑</el-divider>
+                <el-divider content-position="left">设备信息配置</el-divider>
                 <el-form
                     ref="deviceFormRef"
                     :inline="true"
@@ -47,10 +48,34 @@
                         <el-form-item label="所属驱动" prop="driverId">
                             <el-select
                                 v-model="reactiveData.deviceFormData.driverId"
+                                class="edit-form-special"
                                 placeholder="请选择所属驱动"
-                                filterable
                                 clearable
+                                @change="changeAttribute"
+                                @visible-change="driverDictionaryVisible"
                             >
+                                <div class="tool-select">
+                                    <el-form-item class="tool-select-input">
+                                        <el-input
+                                            v-model="reactiveData.driverQuery"
+                                            placeholder="请输入驱动名称"
+                                            clearable
+                                            @input="driverDictionary"
+                                        />
+                                    </el-form-item>
+                                    <el-pagination
+                                        class="tool-select-pagination"
+                                        :hide-on-single-page="true"
+                                        layout="prev, pager, next"
+                                        :pager-count="5"
+                                        :page-size="+reactiveData.driverPage.size"
+                                        :current-page="+reactiveData.driverPage.current"
+                                        :total="+reactiveData.driverPage.total"
+                                        small
+                                        background
+                                        @current-change="driverCurrentChange"
+                                    ></el-pagination>
+                                </div>
                                 <el-option
                                     v-for="dictionary in reactiveData.driverDictionary"
                                     :key="dictionary.value"
@@ -89,9 +114,31 @@
                                 class="edit-form-large"
                                 placeholder="请选择关联模板"
                                 :multiple="true"
-                                filterable
                                 clearable
+                                @visible-change="profileDictionaryVisible"
                             >
+                                <div class="tool-select">
+                                    <el-form-item class="tool-select-input">
+                                        <el-input
+                                            v-model="reactiveData.profileQuery"
+                                            placeholder="请输入驱动名称"
+                                            clearable
+                                            @input="profileDictionary"
+                                        />
+                                    </el-form-item>
+                                    <el-pagination
+                                        class="tool-select-pagination"
+                                        :hide-on-single-page="true"
+                                        layout="prev, pager, next"
+                                        :pager-count="5"
+                                        :page-size="+reactiveData.profilePage.size"
+                                        :current-page="+reactiveData.profilePage.current"
+                                        :total="+reactiveData.profilePage.total"
+                                        small
+                                        background
+                                        @current-change="profileCurrentChange"
+                                    ></el-pagination>
+                                </div>
                                 <el-option
                                     v-for="dictionary in reactiveData.profileDictionary"
                                     :key="dictionary.value"
@@ -213,17 +260,17 @@
                             </el-form-item>
                         </el-row>
                     </div>
-                    <el-form-item class="edit-form-button">
-                        <el-button type="success" :icon="Back" plain @click="pre">上一步</el-button>
-                        <el-button type="primary" :icon="Edit" :disabled="!hasPointFormData" @click="pointUpdate">
-                            修改
-                        </el-button>
-                        <el-button :icon="RefreshLeft" :disabled="!hasPointFormData" @click="pointInfoReset">
-                            恢复
-                        </el-button>
-                        <el-button type="warning" :icon="Check" plain @click="next">完成</el-button>
-                    </el-form-item>
                 </el-form>
+                <el-form-item class="edit-form-button">
+                    <el-button type="success" :icon="Back" plain @click="pre">上一步</el-button>
+                    <el-button type="primary" :icon="Edit" :disabled="!hasPointFormData" @click="pointUpdate">
+                        修改
+                    </el-button>
+                    <el-button :icon="RefreshLeft" :disabled="!hasPointFormData" @click="pointInfoReset">
+                        恢复
+                    </el-button>
+                    <el-button type="warning" :icon="Check" plain @click="next">下一步</el-button>
+                </el-form-item>
                 <el-row>
                     <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
                         <skeleton-card :loading="reactiveData.loading" :footer="true"></skeleton-card>
@@ -240,10 +287,18 @@
                         <point-info-card
                             :data="data"
                             :attributes="reactiveData.pointAttributes"
-                            @select-change="changePointInfo"
+                            @select="selectPoint"
                         ></point-info-card>
                     </el-col>
                 </el-row>
+            </el-card>
+            <el-card v-if="reactiveData.active === 3" shadow="hover">
+                <el-divider content-position="left">设备配置完成</el-divider>
+                <el-result icon="success" title="配置完成" sub-title="您可以返回进行下一步操作">
+                    <template #extra>
+                        <el-button type="primary" @click="done">返回</el-button>
+                    </template>
+                </el-result>
             </el-card>
         </div>
     </div>
@@ -252,5 +307,6 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="less">
-@import '~@/components/card/styles/edit-card.less';
+@import '~@/components/card/styles/edit-card';
+@import '~@/components/card/styles/tool-card';
 </style>

@@ -113,11 +113,11 @@ export default defineComponent({
             }
 
             reactiveData.active++
-            if (reactiveData.active > 1) {
-                router.push({ name: 'profile' })
-            } else {
-                changeActive(reactiveData.active)
-            }
+            changeActive(reactiveData.active)
+        }
+
+        const done = () => {
+            router.push({ name: 'profile' })
         }
 
         const profileReset = () => {
@@ -137,6 +137,7 @@ export default defineComponent({
             formRule,
             pre,
             next,
+            done,
             profileReset,
             changeActive,
             ...Icon,
