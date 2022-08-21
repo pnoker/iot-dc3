@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.pnoker.common.exception.GlobalExceptionAdvice
+  io.github.pnoker.common.exception.GlobalExceptionAdvice,\
+  io.github.pnoker.common.annotation.LogsAspect

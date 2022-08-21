@@ -40,7 +40,7 @@ public class LogsAspect {
     }
 
     // 2022-03-13 检查：通过
-    @Around("logsCut()&&@annotation(logs)")
+    @Around("logsCut() && @annotation(logs)")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint, Logs logs) throws Throwable {
         String uuid = IdUtil.fastSimpleUUID();
         String className = proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName();
@@ -49,7 +49,7 @@ public class LogsAspect {
         log.info("Start => [{}].[{}.{}]: {}", uuid, className, methodName, logs.value());
         try {
             Object proceed = proceedingJoinPoint.proceed();
-            log.info("End <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName, System.currentTimeMillis() - startTime, logs.value());
+            log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName, System.currentTimeMillis() - startTime, logs.value());
             return proceed;
         } catch (Throwable throwable) {
             log.info("End   <= [{}].[{}.{}].[{}ms]: {}", uuid, className, methodName, System.currentTimeMillis() - startTime, logs.value());

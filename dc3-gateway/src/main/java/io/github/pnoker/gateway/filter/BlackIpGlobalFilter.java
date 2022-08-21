@@ -17,6 +17,7 @@
 package io.github.pnoker.gateway.filter;
 
 import io.github.pnoker.api.center.auth.feign.BlackIpClient;
+import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class BlackIpGlobalFilter implements GlobalFilter, Ordered {
     }
 
     @Override
+    @Logs("BlackIp Global Filter")
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         String remoteIp = GatewayUtil.getRemoteIp(request);
@@ -58,7 +60,6 @@ public class BlackIpGlobalFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
 
-        log.info("Remote Ip: {}; Request url: {}; Response code: {}", remoteIp, request.getURI().getRawPath(), exchange.getResponse().getStatusCode());
         return chain.filter(exchange);
     }
 }

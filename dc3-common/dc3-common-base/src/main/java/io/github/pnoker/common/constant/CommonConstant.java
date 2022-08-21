@@ -51,6 +51,11 @@ public interface CommonConstant {
          * 分隔符
          */
         String SEPARATOR = "::";
+
+        /**
+         * 斜线
+         */
+        String SLASH = "/";
     }
 
     /**
@@ -60,7 +65,7 @@ public interface CommonConstant {
         /**
          * 默认密钥
          */
-        String DEFAULT_KEY = "pnoker/dc3";
+        String DEFAULT_KEY = "io.github.pnoker.dc3";
 
         /**
          * 默认密码
