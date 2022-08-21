@@ -5,5 +5,4 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   io.github.pnoker.common.config.RedisCacheConfig,\
   io.github.pnoker.common.config.ThreadPoolConfig,\
   io.github.pnoker.common.config.WebMvcConfig,\
-  io.github.pnoker.common.utils.RedisUtil,\
-  io.github.pnoker.common.annotation.LogsAspect
+  io.github.pnoker.common.utils.RedisUtil

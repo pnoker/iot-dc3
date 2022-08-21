@@ -20,13 +20,17 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.api.center.auth.feign.TokenClient;
+import io.github.pnoker.api.center.auth.feign.UserClient;
+import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.Login;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.model.Tenant;
+import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.utils.Dc3Util;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.gateway.bean.TokenRequestHeader;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -67,6 +71,8 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
         @Resource
         private TenantClient tenantClient;
         @Resource
+        private UserClient userClient;
+        @Resource
         private TokenClient tokenClient;
 
         @PostConstruct
@@ -75,36 +81,52 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
         }
 
         @Override
+        @Logs("Authentic Gateway Filter")
         public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
             ServerHttpRequest request = exchange.getRequest();
 
             try {
-                String cookieToken = GatewayUtil.getRequestCookie(request, ServiceConstant.Header.X_AUTH_TOKEN);
-                Login login = JsonUtil.parseObject(Dc3Util.decode(cookieToken), Login.class);
-
-                if (ObjectUtil.isEmpty(login) || StrUtil.isEmpty(login.getTenant())) {
-                    throw new UnAuthorizedException("Invalid cookie");
+                String tenantHeader = GatewayUtil.getRequestHeader(request, ServiceConstant.Header.X_AUTH_TENANT);
+                String tenant = Dc3Util.decodeString(tenantHeader);
+                if (ObjectUtil.isEmpty(tenant)) {
+                    throw new UnAuthorizedException("Invalid request tenant header");
                 }
-
-                R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(login.getTenant());
+                R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(tenant);
                 if (!tenantR.isOk() || !tenantR.getData().getEnable()) {
-                    throw new UnAuthorizedException("Invalid tenant");
+                    throw new UnAuthorizedException("Invalid request tenant header");
                 }
 
-                R<String> validR = gatewayFilter.tokenClient.checkTokenValid(login);
-                if (!validR.isOk()) {
-                    throw new UnAuthorizedException("Invalid token");
+                String userHeader = GatewayUtil.getRequestHeader(request, ServiceConstant.Header.X_AUTH_USER);
+                String user = Dc3Util.decodeString(userHeader);
+                if (ObjectUtil.isEmpty(user)) {
+                    throw new UnAuthorizedException("Invalid request user header");
+                }
+                R<User> userR = gatewayFilter.userClient.selectByName(user);
+                if (!userR.isOk() || !userR.getData().getEnable()) {
+                    throw new UnAuthorizedException("Invalid request user header");
                 }
 
-                Tenant tenant = tenantR.getData();
+                String tokenHeader = GatewayUtil.getRequestHeader(request, ServiceConstant.Header.X_AUTH_TOKEN);
+                TokenRequestHeader token = JsonUtil.parseObject(Dc3Util.decode(tokenHeader), TokenRequestHeader.class);
+                if (ObjectUtil.isEmpty(token) || !StrUtil.isAllNotEmpty(token.getSalt(), token.getToken())) {
+                    throw new UnAuthorizedException("Invalid request token header");
+                }
+                Login login = new Login();
+                login.setTenant(tenantR.getData().getName()).setName(userR.getData().getName()).setSalt(token.getSalt()).setToken(token.getToken());
+                R<String> tokenR = gatewayFilter.tokenClient.checkTokenValid(login);
+                if (!tokenR.isOk()) {
+                    throw new UnAuthorizedException("Invalid request token header");
+                }
 
                 ServerHttpRequest build = request.mutate().headers(
                         httpHeader -> {
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT_ID, tenant.getId());
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT, login.getTenant());
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_USER, login.getName());
+                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT_ID, tenantR.getData().getId());
+                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT, tenantR.getData().getName());
+                            httpHeader.set(ServiceConstant.Header.X_AUTH_USER_ID, userR.getData().getId());
+                            httpHeader.set(ServiceConstant.Header.X_AUTH_USER, userR.getData().getName());
                         }
                 ).build();
+
                 exchange.mutate().request(build).build();
             } catch (Exception e) {
                 ServerHttpResponse response = exchange.getResponse();

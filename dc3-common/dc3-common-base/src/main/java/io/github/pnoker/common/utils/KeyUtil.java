@@ -161,9 +161,9 @@ public class KeyUtil {
      * @param username String
      * @return String
      */
-    public static String generateToken(String username, String salt) {
+    public static String generateToken(String username, String salt, String tenantId) {
         JwtBuilder builder = Jwts.builder()
-                .setIssuer(CommonConstant.Algorithm.DEFAULT_KEY)
+                .setIssuer(CommonConstant.Algorithm.DEFAULT_KEY + CommonConstant.Symbol.SLASH + tenantId)
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, salt.getBytes(StandardCharsets.UTF_8))
@@ -179,9 +179,9 @@ public class KeyUtil {
      * @param token    String
      * @return Claims
      */
-    public static Claims parserToken(String username, String salt, String token) {
+    public static Claims parserToken(String username, String salt, String token, String tenantId) {
         return Jwts.parser()
-                .requireIssuer(CommonConstant.Algorithm.DEFAULT_KEY)
+                .requireIssuer(CommonConstant.Algorithm.DEFAULT_KEY+ CommonConstant.Symbol.SLASH + tenantId)
                 .requireSubject(username)
                 .setSigningKey(salt.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(token)

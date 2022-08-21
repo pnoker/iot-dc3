@@ -27,12 +27,11 @@ public interface ServiceConstant {
      * 请求 Header 相关
      */
     interface Header {
-        String X_AUTH_USER = "X-Auth-User";
-        String X_AUTH_SALT = "X-Auth-Salt";
-        String X_AUTH_TOKEN = "X-Auth-Token";
-        String X_AUTH_USER_ID = "X-Auth-User-Id";
-        String X_AUTH_TENANT = "X-Auth-Tenant";
         String X_AUTH_TENANT_ID = "X-Auth-Tenant-Id";
+        String X_AUTH_TENANT = "X-Auth-Tenant";
+        String X_AUTH_USER_ID = "X-Auth-User-Id";
+        String X_AUTH_USER = "X-Auth-User";
+        String X_AUTH_TOKEN = "X-Auth-Token";
     }
 
     /**

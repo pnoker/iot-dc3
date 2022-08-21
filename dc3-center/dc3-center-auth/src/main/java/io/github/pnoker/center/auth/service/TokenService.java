@@ -27,35 +27,38 @@ public interface TokenService {
     /**
      * 生成用户的随机 salt
      *
-     * @param username Username
+     * @param username   Username
+     * @param tenantName Tenant Name
      * @return String
      */
-    String generateSalt(String username);
+    String generateSalt(String username, String tenantName);
 
     /**
      * 生成用户的Token令牌
      *
-     * @param tenant   Tenant
-     * @param name     User Name
-     * @param salt     User Salt
-     * @param password User Password
+     * @param username       User Name
+     * @param salt       User Salt
+     * @param password   User Password
+     * @param tenantName Tenant Name
      * @return String
      */
-    String generateToken(String tenant, String name, String salt, String password);
+    String generateToken(String username, String salt, String password, String tenantName);
 
     /**
      * 校验用户的Token令牌是否有效
      *
-     * @param username Username
-     * @param token    Token
+     * @param username   Username
+     * @param token      Token
+     * @param tenantName Tenant Name
      * @return TokenValid
      */
-    TokenValid checkTokenValid(String username, String salt, String token);
+    TokenValid checkTokenValid(String username, String salt, String token, String tenantName);
 
     /**
      * 注销用户的Token令牌
      *
-     * @param username Username
+     * @param username   Username
+     * @param tenantName Tenant Name
      */
-    boolean cancelToken(String username);
+    boolean cancelToken(String username, String tenantName);
 }

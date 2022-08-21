@@ -20,7 +20,6 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.crypto.digest.MD5;
 import io.github.pnoker.common.bean.TreeNode;
 import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ServiceConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -534,40 +533,6 @@ public class Dc3Util {
      */
     public static String getRequestHeader(HttpServletRequest httpServletRequest, String key) {
         return httpServletRequest.getHeader(key);
-    }
-
-    /**
-     * 从 Request 中获取指定 User ID 的 Header 值
-     *
-     * @param httpServletRequest HttpServletRequest
-     * @return String
-     */
-    public static String getRequestUserId(HttpServletRequest httpServletRequest) {
-        String userId = Long.toString(-1L);
-        String header = getRequestHeader(httpServletRequest, ServiceConstant.Header.X_AUTH_USER_ID);
-        try {
-            userId = header.trim();
-            return userId;
-        } catch (Exception e) {
-            return userId;
-        }
-    }
-
-    /**
-     * 从 Request 中获取指定 Tenant ID 的 Header 值
-     *
-     * @param httpServletRequest HttpServletRequest
-     * @return String
-     */
-    public static String getRequestTenantId(HttpServletRequest httpServletRequest) {
-        String tenantId = Long.toString(-1L);
-        String header = getRequestHeader(httpServletRequest, ServiceConstant.Header.X_AUTH_TENANT_ID);
-        try {
-            tenantId = header.trim();
-            return tenantId;
-        } catch (Exception e) {
-            return tenantId;
-        }
     }
 
 }

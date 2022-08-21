@@ -63,7 +63,9 @@ public class TokenServiceImpl implements TokenService {
     private RedisUtil redisUtil;
 
     @Override
-    public String generateSalt(String username) {
+    public String generateSalt(String username, String tenantName) {
+        // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
+        Tenant tenant = tenantService.selectByName(tenantName);
         String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username;
         String salt = redisUtil.getKey(redisSaltKey, String.class);
         if (StrUtil.isBlank(salt)) {
@@ -74,35 +76,39 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateToken(String tenant, String name, String salt, String password) {
-        checkUserLimit(name);
-        Tenant tempTenant = tenantService.selectByName(tenant);
-        User tempUser = userService.selectByName(name, false);
-        if (tempTenant.getEnable() && tempUser.getEnable()) {
-            tenantBindService.selectByTenantIdAndUserId(tempTenant.getId(), tempUser.getId());
-            String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + name;
-            String tempSalt = redisUtil.getKey(redisSaltKey, String.class);
-            if (StrUtil.isNotEmpty(tempSalt) && tempSalt.equals(salt)) {
-                if (Dc3Util.md5(tempUser.getPassword() + tempSalt).equals(password)) {
-                    String redisTokenKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + name;
-                    String token = KeyUtil.generateToken(name, tempSalt);
+    public String generateToken(String username, String salt, String password, String tenantName) {
+        checkUserLimit(username);
+        // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
+        Tenant tenant = tenantService.selectByName(tenantName);
+        User user = userService.selectByName(username, false);
+        if (tenant.getEnable() && user.getEnable()) {
+            tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
+            String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username;
+            String saltValue = redisUtil.getKey(redisSaltKey, String.class);
+            if (StrUtil.isNotEmpty(saltValue) && saltValue.equals(salt)) {
+                if (Dc3Util.md5(user.getPassword() + saltValue).equals(password)) {
+                    String redisTokenKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username;
+                    String token = KeyUtil.generateToken(username, saltValue, tenant.getId());
                     redisUtil.setKey(redisTokenKey, token, CacheConstant.Timeout.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
                     return token;
                 }
             }
         }
-        updateUserLimit(name, true);
-        throw new ServiceException("Invalid tenant、username、password");
+        updateUserLimit(username, true);
+        throw new ServiceException("Invalid username、password、tenant");
     }
 
     @Override
-    public TokenValid checkTokenValid(String username, String salt, String token) {
+    public TokenValid checkTokenValid(String username, String salt, String token, String tenantName) {
+        // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
+        Tenant tenant = tenantService.selectByName(tenantName);
         String redisToken = redisUtil.getKey(CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username, String.class);
         if (StrUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
         try {
-            Claims claims = KeyUtil.parserToken(username, salt, token);
+            // todo 需要传 tenantId
+            Claims claims = KeyUtil.parserToken(username, salt, token, tenant.getId());
             return new TokenValid(true, claims.getExpiration());
         } catch (Exception e) {
             return new TokenValid(false, null);
@@ -110,7 +116,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public boolean cancelToken(String username) {
+    public boolean cancelToken(String username, String tenantName) {
+        Tenant tenant = tenantService.selectByName(tenantName);
         redisUtil.deleteKey(CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username);
         return true;
     }

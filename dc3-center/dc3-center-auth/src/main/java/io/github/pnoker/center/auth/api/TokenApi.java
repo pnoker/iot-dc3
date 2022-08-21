@@ -45,19 +45,19 @@ public class TokenApi implements TokenClient {
 
     @Override
     public R<String> generateSalt(Login login) {
-        String salt = tokenService.generateSalt(login.getName());
+        String salt = tokenService.generateSalt(login.getName(), login.getTenant());
         return null != salt ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }
 
     @Override
     public R<String> generateToken(Login login) {
-        String token = tokenService.generateToken(login.getTenant(), login.getName(), login.getSalt(), login.getPassword());
+        String token = tokenService.generateToken(login.getName(), login.getSalt(), login.getPassword(), login.getTenant());
         return null != token ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
     }
 
     @Override
     public R<String> checkTokenValid(Login login) {
-        TokenValid tokenValid = tokenService.checkTokenValid(login.getName(), login.getSalt(), login.getToken());
+        TokenValid tokenValid = tokenService.checkTokenValid(login.getName(), login.getSalt(), login.getToken(), login.getTenant());
         if (tokenValid.isValid()) {
             String expireTime = Dc3Util.formatCompleteData(tokenValid.getExpireTime());
             return R.ok(expireTime, "The token will expire in " + expireTime);
@@ -67,6 +67,6 @@ public class TokenApi implements TokenClient {
 
     @Override
     public R<Boolean> cancelToken(Login login) {
-        return tokenService.cancelToken(login.getName()) ? R.ok() : R.fail();
+        return tokenService.cancelToken(login.getName(), login.getTenant()) ? R.ok() : R.fail();
     }
 }
