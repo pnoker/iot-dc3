@@ -18,7 +18,7 @@
     <el-dialog
         v-model="detailVisible"
         custom-class="things-dialog"
-        title="数据详情"
+        title="数据信息"
         :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"

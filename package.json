@@ -24,7 +24,7 @@
         "dotenv": "latest",
         "dotenv-expand": "latest",
         "echarts": "^5.3.3",
-        "element-plus": "^2.2.13",
+        "element-plus": "^2.2.14",
         "highlight.js": "^11.6.0",
         "js-base64": "^3.7.2",
         "js-cookie": "latest",
@@ -40,8 +40,8 @@
         "vuex": "^4.0.2"
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^5.33.0",
-        "@typescript-eslint/parser": "^5.33.0",
+        "@typescript-eslint/eslint-plugin": "^5.33.1",
+        "@typescript-eslint/parser": "^5.33.1",
         "@vue/cli-plugin-babel": "~5.0.8",
         "@vue/cli-plugin-eslint": "~5.0.8",
         "@vue/cli-plugin-router": "~5.0.8",
@@ -61,7 +61,7 @@
         "style-resources-loader": "^1.5.0",
         "typescript": "~4.7.4",
         "vue-cli-plugin-element": "^1.0.1",
-        "vue-template-compiler": "^2.7.8",
+        "vue-template-compiler": "^2.7.9",
         "webpack": "^5.74.0"
     }
 }

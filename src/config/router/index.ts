@@ -20,8 +20,11 @@ import commonRouters from './common'
 import viewsRouters from './views'
 import operateRouters from './operate'
 
-import common from '@/util/common'
-import { getStore } from '@/util/store'
+import CommonConstant from '@/util/CommonConstant'
+import { getStorage } from '@/util/StorageUtils'
+import { checkTokenValidApi } from '@/api/token'
+import { isNull } from '@/util/utils'
+import { Login } from '../type/types'
 
 const router = createRouter({
     history: createWebHashHistory(process.env.BASE_URL),
@@ -37,10 +40,26 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
     if (from.name === 'login' || to.name === 'login') {
         next()
     } else {
-        if (!getStore(common.TOKEN_HEADER, false)) {
+        const tenant = getStorage(CommonConstant.TENANT_HEADER)
+        const user = getStorage(CommonConstant.USER_HEADER)
+        const token = getStorage(CommonConstant.TOKEN_HEADER)
+        if (isNull(tenant) || isNull(user) || isNull(token)) {
             next({ path: '/login' })
         } else {
-            next()
+            const login = {
+                tenant: tenant,
+                name: user,
+                salt: token.salt,
+                token: token.token,
+            } as Login
+            checkTokenValidApi(login)
+                .then((res) => {
+                    if (!res.data.ok) next({ path: '/login' })
+                    next()
+                })
+                .catch(() => {
+                    next({ path: '/login' })
+                })
         }
     }
 })

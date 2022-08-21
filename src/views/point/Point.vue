@@ -45,6 +45,8 @@
                         :embedded="embedded != '' && embedded != 'edit'"
                         :data="data"
                         :profile="reactiveData.profileTable[data.profileId]"
+                        @disable-thing="disableThing"
+                        @enable-thing="enableThing"
                         @delete-thing="deleteThing"
                     ></point-card>
                 </el-col>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { successMessage } from '@/util/utils'
+import { successMessage } from '@/util/NotificationUtils'
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 
@@ -147,7 +147,7 @@ export default defineComponent({
                     emit('add-thing', reactiveData.formData, () => {
                         cancel()
                         reset()
-                        successMessage(null)
+                        successMessage()
                     })
                 }
             })

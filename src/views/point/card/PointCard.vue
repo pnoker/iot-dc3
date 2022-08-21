@@ -71,12 +71,12 @@
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 数据类型: </span
-                                >{{ type(data.type) }}
+                                >{{ type }}
                             </li>
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 读写类型: </span
-                                >{{ rw(data.rw) }}
+                                >{{ rw }}
                             </li>
                             <li class="nowrap-item">
                                 <span
@@ -113,6 +113,7 @@
                             placement="top"
                             :icon="SwitchButton"
                             icon-color="#e6a23c"
+                            @confirm="disableThing"
                         >
                             <template #reference>
                                 <el-button type="primary" :disabled="!data.enable" link>停用</el-button>
@@ -123,6 +124,7 @@
                             placement="top"
                             :icon="CircleCheck"
                             icon-color="#67c23a"
+                            @confirm="enableThing"
                         >
                             <template #reference>
                                 <el-button type="primary" :disabled="data.enable" link>启用</el-button>
@@ -133,14 +135,14 @@
                             placement="top"
                             :icon="CircleClose"
                             icon-color="#f56c6c"
-                            @confirm="deleteThing(data.id)"
+                            @confirm="deleteThing"
                         >
                             <template #reference>
                                 <el-button type="primary" link>删除</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-button type="primary" link @click="edit(data.id)">编辑</el-button>
-                        <el-button type="primary" link disabled @click="detail(data.id)">详情</el-button>
+                        <el-button type="primary" link @click="edit">编辑</el-button>
+                        <el-button type="primary" link disabled @click="detail">详情</el-button>
                     </div>
                 </div>
             </div>

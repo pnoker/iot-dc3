@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
-import { Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
+import { Edit, RefreshLeft, Right, Back } from '@element-plus/icons-vue'
 
 import router from '@/config/router'
 import { useRoute } from 'vue-router'
@@ -38,6 +38,7 @@ export default defineComponent({
             Edit,
             RefreshLeft,
             Right,
+            Back,
         }
 
         // 定义响应式数据
@@ -117,7 +118,9 @@ export default defineComponent({
         }
 
         const done = () => {
-            router.push({ name: 'profile' })
+            router.push({ name: 'profile' }).catch(() => {
+                // nothing to do
+            })
         }
 
         const profileReset = () => {

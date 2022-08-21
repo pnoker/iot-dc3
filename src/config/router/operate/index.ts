@@ -52,7 +52,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/driver/detail',
                 meta: {
                     icon: 'el-icon-s-promotion',
-                    title: '驱动详情',
+                    title: '驱动信息',
                 },
                 component: () => import('@/views/driver/detail/DriverDetail.vue'),
             },
@@ -67,7 +67,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/device/detail',
                 meta: {
                     icon: 'el-icon-s-finance',
-                    title: '设备详情',
+                    title: '设备信息',
                 },
                 component: () => import('@/views/device/detail/DeviceDetail.vue'),
             },
@@ -91,7 +91,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/profile/detail',
                 meta: {
                     icon: 'el-icon-s-order',
-                    title: '模板详情',
+                    title: '模板信息',
                 },
                 component: () => import('@/views/profile/detail/ProfileDetail.vue'),
             },
@@ -109,7 +109,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/profile/point/detail',
                 meta: {
                     icon: 'el-icon-s-order',
-                    title: '位号详情',
+                    title: '位号信息',
                 },
                 component: () => import('@/views/point/detail/PointDetail.vue'),
             },

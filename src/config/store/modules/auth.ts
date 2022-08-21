@@ -14,33 +14,36 @@
  * limitations under the License.
  */
 
-import md5 from 'js-md5'
-
-import common from '@/util/common'
-import { getStore, removeCookies, removeStore, setCookies, setStore } from '@/util/store'
-
 import router from '@/config/router'
+import { ElLoading } from 'element-plus'
+
 import { cancelTokenApi, generateSaltApi, generateTokenApi } from '@/api/token'
 
-import { ElLoading } from 'element-plus'
+import md5 from 'js-md5'
+import CommonConstant from '@/util/CommonConstant'
+import { getStorage, removeStorage, setStorage } from '@/util/StorageUtils'
+import { Login } from '@/config/type/types'
+import { isNull } from '@/util/utils'
 
 const auth = {
     namespaced: true,
     state: {
-        name: 'pnoker',
         tenant: 'default',
+        name: 'pnoker',
     },
     mutations: {
-        setToken: (state, token) => {
-            setCookies(common.TOKEN_HEADER, token)
-            setStore(common.TOKEN_HEADER, token, false)
+        setToken: (state, login) => {
+            setStorage(CommonConstant.TENANT_HEADER, login.tenant)
+            setStorage(CommonConstant.USER_HEADER, login.name)
+            setStorage(CommonConstant.TOKEN_HEADER, { salt: login.salt, token: login.token })
 
-            state.name = token.name
-            state.tenant = token.tenant
+            state.tenant = login.tenant
+            state.name = login.name
         },
         removeToken: () => {
-            removeCookies(common.TOKEN_HEADER)
-            removeStore(common.TOKEN_HEADER, false)
+            removeStorage(CommonConstant.TENANT_HEADER)
+            removeStorage(CommonConstant.USER_HEADER)
+            removeStorage(CommonConstant.TOKEN_HEADER)
         },
     },
     actions: {
@@ -49,7 +52,11 @@ const auth = {
                 lock: true,
                 text: '登录中,请稍后...',
             })
-            generateSaltApi(form.name)
+            const login = {
+                tenant: form.tenant,
+                name: form.name,
+            } as Login
+            generateSaltApi(login)
                 .then((res) => {
                     const salt = res.data.data
                     const login = {
@@ -57,7 +64,7 @@ const auth = {
                         name: form.name,
                         salt: salt,
                         password: md5(md5(form.password) + salt),
-                    }
+                    } as Login
 
                     generateTokenApi(login)
                         .then((res) => {
@@ -74,9 +81,14 @@ const auth = {
                 .catch(() => loading.close())
         },
         logout({ commit }) {
-            const token = getStore(common.TOKEN_HEADER, false)
-            if (token && token.name) {
-                cancelTokenApi(token.name)
+            const tenant = getStorage(CommonConstant.TENANT_HEADER)
+            const user = getStorage(CommonConstant.USER_HEADER)
+            if (!isNull(tenant) && !isNull(user)) {
+                const login = {
+                    tenant: tenant,
+                    name: user,
+                } as Login
+                cancelTokenApi(login)
             }
             commit('removeToken')
         },

@@ -17,7 +17,7 @@
 import { defineComponent, reactive, ref, computed } from 'vue'
 
 import { driverByIdsApi } from '@/api/driver'
-import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi } from '@/api/device'
+import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi, deviceUpdateApi } from '@/api/device'
 
 import { Order } from '@/config/type/types'
 
@@ -27,6 +27,7 @@ import deviceTool from './tool/DeviceTool.vue'
 import deviceAddForm from './add/DeviceAddForm.vue'
 import deviceCard from './card/DeviceCard.vue'
 import { isNull } from '@/util/utils'
+import { failMessage } from '@/util/NotificationUtils'
 
 export default defineComponent({
     name: 'Device',
@@ -179,11 +180,37 @@ export default defineComponent({
                 })
         }
 
-        const deleteThing = (id, done) => {
-            deviceDeleteApi(id)
+        const disableThing = (id, done) => {
+            deviceUpdateApi({ id: id, enable: false })
                 .then(() => {
                     list()
                     done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const enableThing = (id, done) => {
+            deviceUpdateApi({ id: id, enable: true })
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const deleteThing = (id, done) => {
+            deviceDeleteApi(id)
+                .then((res) => {
+                    if (res.data.ok) {
+                        list()
+                        done()
+                    } else {
+                        failMessage(res.data.message)
+                    }
                 })
                 .catch(() => {
                     // nothing to do
@@ -224,6 +251,8 @@ export default defineComponent({
             reset,
             showAdd,
             addThing,
+            disableThing,
+            enableThing,
             deleteThing,
             refresh,
             sort,

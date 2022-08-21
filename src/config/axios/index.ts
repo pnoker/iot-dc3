@@ -22,10 +22,12 @@ import store from '@/config/store'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-import { getStore } from '@/util/store'
-import common from '@/util/common'
+import { getStorage } from '@/util/StorageUtils'
+import CommonConstant from '@/util/CommonConstant'
 import { isNull } from '@/util/utils'
 import { warning } from '@/util/MessageUtils'
+
+import { encode } from 'js-base64'
 
 NProgress.configure({
     easing: 'ease',
@@ -50,10 +52,16 @@ request.interceptors.request.use(
     (config: AxiosRequestConfig) => {
         NProgress.start()
 
-        const token = getStore(common.TOKEN_HEADER, false)
-        if (!isNull(token)) {
+        const tenant = getStorage(CommonConstant.TENANT_HEADER)
+        const user = getStorage(CommonConstant.USER_HEADER)
+        const token = getStorage(CommonConstant.TOKEN_HEADER)
+        if (!isNull(tenant) && !isNull(user) && !isNull(token)) {
             const headers = config.headers
-            if (headers) headers[common.TOKEN_HEADER] = token
+            if (headers) {
+                headers[CommonConstant.TENANT_HEADER] = encode(tenant)
+                headers[CommonConstant.USER_HEADER] = encode(user)
+                headers[CommonConstant.TOKEN_HEADER] = encode(JSON.stringify(token))
+            }
         }
 
         return config

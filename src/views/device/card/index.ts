@@ -19,7 +19,7 @@ import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchBu
 
 import router from '@/config/router'
 
-import { successMessage } from '@/util/utils'
+import { successMessage } from '@/util/NotificationUtils'
 import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
@@ -38,10 +38,10 @@ export default defineComponent({
                 return false
             },
         },
-        statusTable: {
-            type: Object,
+        status: {
+            type: String,
             default: () => {
-                return {}
+                return ''
             },
         },
         data: {
@@ -61,7 +61,7 @@ export default defineComponent({
             default: 'images/common/device.png',
         },
     },
-    emits: ['delete-thing'],
+    emits: ['disable-thing', 'enable-thing', 'delete-thing'],
     setup(props, { emit }) {
         // 图标
         const Icon = {
@@ -70,30 +70,39 @@ export default defineComponent({
             CircleClose,
         }
 
-        const status = (id) => {
-            return props.statusTable[id]
-        }
-
-        const deleteThing = (id) => {
-            emit('delete-thing', id, () => {
-                successMessage(null)
+        const disableThing = () => {
+            emit('disable-thing', props.data.id, () => {
+                successMessage()
             })
         }
 
-        const edit = (id) => {
-            router.push({ name: 'deviceEdit', query: { id, active: '0' } }).catch(() => {
+        const enableThing = () => {
+            emit('enable-thing', props.data.id, () => {
+                successMessage()
+            })
+        }
+
+        const deleteThing = () => {
+            emit('delete-thing', props.data.id, () => {
+                successMessage()
+            })
+        }
+
+        const edit = () => {
+            router.push({ name: 'deviceEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
                 // nothing to do
             })
         }
 
-        const detail = (id) => {
-            router.push({ name: 'deviceDetail', query: { id, active: 'detail' } }).catch(() => {
+        const detail = () => {
+            router.push({ name: 'deviceDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
                 // nothing to do
             })
         }
 
         return {
-            status,
+            disableThing,
+            enableThing,
             deleteThing,
             edit,
             detail,

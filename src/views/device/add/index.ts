@@ -19,7 +19,7 @@ import { FormInstance, FormRules } from 'element-plus'
 
 import { Dictionary, Order } from '@/config/type/types'
 
-import { successMessage } from '@/util/utils'
+import { successMessage } from '@/util/NotificationUtils'
 import { driverDictionaryApi, profileDictionaryApi } from '@/api/dictionary'
 
 export default defineComponent({
@@ -159,7 +159,7 @@ export default defineComponent({
                     emit('add-thing', reactiveData.formData, () => {
                         cancel()
                         reset()
-                        successMessage(null)
+                        successMessage()
                     })
                 }
             })

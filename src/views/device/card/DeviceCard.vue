@@ -32,10 +32,10 @@
                         {{ data.name }}
                     </div>
                     <div title="状态" class="things-card-header-status">
-                        <el-tag v-if="status(data.id) === 'ONLINE'" type="success" effect="plain">在线</el-tag>
-                        <el-tag v-else-if="status(data.id) === 'MAINTAIN'" type="warning" effect="plain">维护</el-tag>
-                        <el-tag v-else-if="status(data.id) === 'FAULT'" type="danger" effect="plain">故障</el-tag>
-                        <el-tag v-else-if="status(data.id) === 'DISABLE'" type="info" effect="plain">停用</el-tag>
+                        <el-tag v-if="status === 'ONLINE'" type="success" effect="plain">在线</el-tag>
+                        <el-tag v-else-if="status === 'MAINTAIN'" type="warning" effect="plain">维护</el-tag>
+                        <el-tag v-else-if="status === 'FAULT'" type="danger" effect="plain">故障</el-tag>
+                        <el-tag v-else-if="status === 'DISABLE'" type="info" effect="plain">停用</el-tag>
                         <el-tag v-else type="info" effect="plain">离线</el-tag>
                     </div>
                 </div>
@@ -81,6 +81,7 @@
                             placement="top"
                             :icon="SwitchButton"
                             icon-color="#e6a23c"
+                            @confirm="disableThing"
                         >
                             <template #reference>
                                 <el-button type="primary" :disabled="!data.enable" link>停用</el-button>
@@ -91,6 +92,7 @@
                             placement="top"
                             :icon="CircleCheck"
                             icon-color="#67c23a"
+                            @confirm="enableThing"
                         >
                             <template #reference>
                                 <el-button type="primary" :disabled="data.enable" link>启用</el-button>
@@ -101,14 +103,14 @@
                             placement="top"
                             :icon="CircleClose"
                             icon-color="#f56c6c"
-                            @confirm="deleteThing(data.id)"
+                            @confirm="deleteThing"
                         >
                             <template #reference>
                                 <el-button type="primary" link>删除</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-button type="primary" link @click="edit(data.id)">编辑</el-button>
-                        <el-button type="primary" link @click="detail(data.id)">详情</el-button>
+                        <el-button type="primary" link @click="edit">编辑</el-button>
+                        <el-button type="primary" link @click="detail">详情</el-button>
                     </div>
                 </div>
             </div>

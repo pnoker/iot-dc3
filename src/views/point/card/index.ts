@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import {
     Bottom,
     CircleCheck,
@@ -29,7 +29,7 @@ import {
 
 import router from '@/config/router'
 
-import { successMessage } from '@/util/utils'
+import { successMessage } from '@/util/NotificationUtils'
 import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
@@ -72,7 +72,7 @@ export default defineComponent({
             default: 'images/common/point.png',
         },
     },
-    emits: ['delete-thing'],
+    emits: ['disable-thing', 'enable-thing', 'delete-thing'],
     setup(props, { emit }) {
         // 图标
         const Icon = {
@@ -81,7 +81,8 @@ export default defineComponent({
             CircleClose,
         }
 
-        const type = (type) => {
+        const type = computed(() => {
+            const type = props.data.type
             if (type === 'int') {
                 return '整数'
             } else if (type === 'double') {
@@ -97,9 +98,11 @@ export default defineComponent({
             } else if (type === 'byte') {
                 return '字节'
             }
-        }
+            return '未知'
+        })
 
-        const rw = (rw) => {
+        const rw = computed(() => {
+            const rw = props.data.rw
             if (rw === 0) {
                 return '只读'
             } else if (rw === 1) {
@@ -107,24 +110,37 @@ export default defineComponent({
             } else if (rw === 2) {
                 return '读写'
             }
-        }
+            return '未知'
+        })
 
-        const deleteThing = (id) => {
-            emit('delete-thing', id, () => {
-                successMessage(null)
+        const disableThing = () => {
+            emit('disable-thing', props.data.id, () => {
+                successMessage()
             })
         }
 
-        const edit = (id) => {
+        const enableThing = () => {
+            emit('enable-thing', props.data.id, () => {
+                successMessage()
+            })
+        }
+
+        const deleteThing = () => {
+            emit('delete-thing', props.data.id, () => {
+                successMessage()
+            })
+        }
+
+        const edit = () => {
             router
-                .push({ name: 'pointEdit', query: { id, profileId: props.data.profileId, active: '0' } })
+                .push({ name: 'pointEdit', query: { id: props.data.id, profileId: props.data.profileId, active: '0' } })
                 .catch(() => {
                     // nothing to do
                 })
         }
 
-        const detail = (id) => {
-            router.push({ name: 'pointDetail', query: { id, active: 'detail' } }).catch(() => {
+        const detail = () => {
+            router.push({ name: 'pointDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
                 // nothing to do
             })
         }
@@ -132,6 +148,8 @@ export default defineComponent({
         return {
             type,
             rw,
+            disableThing,
+            enableThing,
             deleteThing,
             edit,
             detail,

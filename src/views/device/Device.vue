@@ -41,7 +41,9 @@
                         :embedded="embedded != ''"
                         :data="data"
                         :driver="reactiveData.driverTable[data.driverId]"
-                        :status-table="reactiveData.statusTable"
+                        :status="reactiveData.statusTable[data.id]"
+                        @disable-thing="disableThing"
+                        @enable-thing="enableThing"
                         @delete-thing="deleteThing"
                     />
                 </el-col>

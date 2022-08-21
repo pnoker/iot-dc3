@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import { ElMessage, ElNotification } from 'element-plus'
-
-let failNotify = true,
-    failNotifyText = ''
+import { ElMessage } from 'element-plus'
 
 /**
  *  向剪切板写入指定内容
@@ -436,57 +433,6 @@ export function isNull(val: any) {
         return val === 'null' || val == null || val === 'undefined' || val === undefined || val === ''
     }
     return false
-}
-
-/**
- * 成功操作
- *
- * @param message
- */
-export const successMessage = (message: string | null) => {
-    if (message === '' || message == null) {
-        message = '操作成功!'
-    }
-    ElNotification.success({
-        title: '成功',
-        message: message,
-        onClose: () => {
-            failNotify = false
-            failNotifyText = ''
-        },
-    })
-}
-
-/**
- * 失败操作
- *
- * @param message
- * @param error
- */
-export const failMessage = (message: string | null, error: any) => {
-    let show = true
-    if (message === '' || message == null) {
-        message = '操作失败!'
-    }
-    if (failNotify && failNotifyText === message) {
-        show = false
-    }
-    if (error) {
-        console.error(error)
-    }
-    if (show) {
-        failNotify = true
-        failNotifyText = message
-        ElNotification.error({
-            title: '错误',
-            dangerouslyUseHTMLString: true,
-            message: `${message}`,
-            onClose: () => {
-                failNotify = false
-                failNotifyText = ''
-            },
-        })
-    }
 }
 
 export const assign = (source: any, target: any) => {

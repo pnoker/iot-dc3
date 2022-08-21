@@ -19,14 +19,15 @@
         <div class="edit-card-header">
             <el-card shadow="hover">
                 <el-steps :active="reactiveData.active" align-center>
-                    <el-step title="位号信息编辑"></el-step>
+                    <el-step title="位号信息配置"></el-step>
+                    <el-step title="位号配置完成"></el-step>
                 </el-steps>
             </el-card>
         </div>
 
         <div class="edit-card-body">
             <el-card v-if="reactiveData.active === 0" shadow="hover">
-                <el-divider content-position="left">位号信息编辑</el-divider>
+                <el-divider content-position="left">位号信息配置</el-divider>
                 <el-form ref="formDataRef" :inline="true" :model="reactiveData.pointFormData" :rules="pointFormRule">
                     <div class="edit-form-item">
                         <el-form-item label="位号名称" prop="name">
@@ -35,7 +36,6 @@
                                 class="edit-form-large"
                                 placeholder="请输入位号名称"
                                 clearable
-                                @keyup.enter="pointUpdate"
                             ></el-input>
                         </el-form-item>
                     </div>
@@ -98,7 +98,6 @@
                                 class="edit-form-default"
                                 placeholder="请输入数据格式"
                                 clearable
-                                @keyup.enter="pointUpdate"
                             ></el-input>
                         </el-form-item>
                         <el-form-item label="单位" prop="unit">
@@ -107,7 +106,6 @@
                                 class="edit-form-default"
                                 placeholder="请输入单位"
                                 clearable
-                                @keyup.enter="pointUpdate"
                             ></el-input>
                         </el-form-item>
                     </div>
@@ -118,7 +116,6 @@
                                 class="edit-form-default"
                                 placeholder="请输入基值"
                                 clearable
-                                @keyup.enter="pointUpdate"
                             ></el-input>
                         </el-form-item>
                         <el-form-item label="倍数" prop="multiple">
@@ -127,7 +124,6 @@
                                 class="edit-form-default"
                                 placeholder="请输入倍数"
                                 clearable
-                                @keyup.enter="pointUpdate"
                             ></el-input>
                         </el-form-item>
                     </div>
@@ -138,7 +134,6 @@
                                 class="edit-form-default"
                                 placeholder="请输入最小值"
                                 clearable
-                                @keyup.enter="pointUpdate"
                             ></el-input>
                         </el-form-item>
                         <el-form-item label="最大值" prop="maximum">
@@ -147,7 +142,6 @@
                                 class="edit-form-default"
                                 placeholder="请输入最大值"
                                 clearable
-                                @keyup.enter="pointUpdate"
                             ></el-input>
                         </el-form-item>
                     </div>
@@ -166,11 +160,19 @@
                         </el-form-item>
                     </div>
                     <el-form-item class="edit-form-button">
-                        <el-button type="primary" :icon="Edit" @click="pointUpdate">修改</el-button>
+                        <el-button type="success" :icon="Back" plain @click="done">返回</el-button>
                         <el-button :icon="RefreshLeft" @click="pointReset">恢复</el-button>
-                        <el-button type="warning" :icon="Right" plain @click="next">完成</el-button>
+                        <el-button type="warning" :icon="Right" plain @click="next">下一步</el-button>
                     </el-form-item>
                 </el-form>
+            </el-card>
+            <el-card v-if="reactiveData.active === 1" shadow="hover">
+                <el-divider content-position="left">位号配置完成</el-divider>
+                <el-result icon="success" title="配置完成" sub-title="您可以返回进行下一步操作">
+                    <template #extra>
+                        <el-button type="primary" plain @click="done">返回</el-button>
+                    </template>
+                </el-result>
             </el-card>
         </div>
     </div>

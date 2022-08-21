@@ -17,7 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 
-import { successMessage } from '@/util/utils'
+import { successMessage } from '@/util/NotificationUtils'
 
 export default defineComponent({
     name: 'ProfileAddForm',
@@ -80,7 +80,7 @@ export default defineComponent({
                     emit('add-thing', reactiveData.formData, () => {
                         cancel()
                         reset()
-                        successMessage(null)
+                        successMessage()
                     })
                 }
             })

@@ -19,7 +19,6 @@ import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from '@
 
 import { TinyArea } from '@antv/g2plot'
 
-import { setCopyContent } from '@/util/utils'
 import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
@@ -101,7 +100,7 @@ export default defineComponent({
                 pointId: data.pointId,
                 value: data.value,
             }
-            setCopyContent(JSON.stringify(content, null, 2), true, '位号值')
+            copyId(JSON.stringify(content, null, 2), '位号值')
         }
 
         onMounted(() => {

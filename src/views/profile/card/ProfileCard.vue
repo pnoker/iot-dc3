@@ -22,7 +22,7 @@
                     class="things-card__header"
                     :class="{
                         'header-enable': data.enable,
-                        'eader-disable': !data.enable,
+                        'header-disable': !data.enable,
                     }"
                 >
                     <div class="things-card-header-icon">
@@ -63,6 +63,7 @@
                             placement="top"
                             :icon="SwitchButton"
                             icon-color="#e6a23c"
+                            @confirm="disableThing"
                         >
                             <template #reference>
                                 <el-button type="primary" :disabled="!data.enable" link>停用</el-button>
@@ -73,6 +74,7 @@
                             placement="top"
                             :icon="CircleCheck"
                             icon-color="#67c23a"
+                            @confirm="enableThing"
                         >
                             <template #reference>
                                 <el-button type="primary" :disabled="data.enable" link>启用</el-button>
@@ -83,14 +85,14 @@
                             placement="top"
                             :icon="CircleClose"
                             icon-color="#f56c6c"
-                            @confirm="deleteThing(data.id)"
+                            @confirm="deleteThing"
                         >
                             <template #reference>
                                 <el-button type="primary" link>删除</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-button type="primary" link @click="edit(data.id)">编辑</el-button>
-                        <el-button type="primary" link @click="detail(data.id)">详情</el-button>
+                        <el-button type="primary" link @click="edit">编辑</el-button>
+                        <el-button type="primary" link @click="detail">详情</el-button>
                     </div>
                 </div>
             </div>

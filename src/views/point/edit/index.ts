@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
-import { Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
+import { Edit, RefreshLeft, Right, Back } from '@element-plus/icons-vue'
 
 import router from '@/config/router'
 import { useRoute } from 'vue-router'
@@ -38,6 +38,7 @@ export default defineComponent({
             Edit,
             RefreshLeft,
             Right,
+            Back,
         }
 
         // 定义响应式数据
@@ -94,6 +95,7 @@ export default defineComponent({
                     // nothing to do
                 })
         }
+
         const pointUpdate = () => {
             const form = unref(formDataRef)
             form?.validate((valid) => {
@@ -108,23 +110,31 @@ export default defineComponent({
                 }
             })
         }
+
         const pre = () => {
             reactiveData.active--
             changeActive(reactiveData.active)
         }
+
         const next = () => {
-            reactiveData.active++
-            if (reactiveData.active > 0) {
-                router.push({ name: 'profileEdit', query: { id: route.query.profileId, active: '1' } }).catch(() => {
-                    // nothing to do
-                })
-            } else {
-                changeActive(reactiveData.active)
+            if (reactiveData.active === 0) {
+                pointUpdate()
             }
+
+            reactiveData.active++
+            changeActive(reactiveData.active)
         }
+
+        const done = () => {
+            router.push({ name: 'profileEdit', query: { id: route.query.profileId, active: '1' } }).catch(() => {
+                // nothing to do
+            })
+        }
+
         const pointReset = () => {
             reactiveData.pointFormData = { ...reactiveData.oldPointFormData }
         }
+
         const changeActive = (step) => {
             const query = route.query
             router.push({ query: { ...query, active: step } }).catch(() => {
@@ -138,9 +148,9 @@ export default defineComponent({
             formDataRef,
             pointFormRule,
             reactiveData,
-            pointUpdate,
             pre,
             next,
+            done,
             pointReset,
             changeActive,
             ...Icon,

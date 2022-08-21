@@ -16,7 +16,7 @@
 
 import { reactive, ref, computed, defineComponent } from 'vue'
 
-import { profileAddApi, profileDeleteApi, profileListApi } from '@/api/profile'
+import { profileAddApi, profileDeleteApi, profileListApi, profileUpdateApi } from '@/api/profile'
 
 import { Order } from '@/config/type/types'
 
@@ -26,6 +26,7 @@ import profileAddForm from '@/views/profile/add/ProfileAddForm.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import profileCard from '@/views/profile/card/ProfileCard.vue'
 import { isNull } from '@/util/utils'
+import { failMessage } from '@/util/NotificationUtils'
 
 export default defineComponent({
     components: {
@@ -128,11 +129,33 @@ export default defineComponent({
             })
         }
 
-        const deleteThing = (id, done) => {
-            profileDeleteApi(id).then(() => {
+        const disableThing = (id, done) => {
+            profileUpdateApi({ id: id, enable: false }).then(() => {
                 list()
                 done()
             })
+        }
+
+        const enableThing = (id, done) => {
+            profileUpdateApi({ id: id, enable: true }).then(() => {
+                list()
+                done()
+            })
+        }
+
+        const deleteThing = (id, done) => {
+            profileDeleteApi(id)
+                .then((res) => {
+                    if (res.data.ok) {
+                        list()
+                        done()
+                    } else {
+                        failMessage(res.data.message)
+                    }
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const refresh = () => {
@@ -169,6 +192,8 @@ export default defineComponent({
             reset,
             showAdd,
             addThing,
+            disableThing,
+            enableThing,
             deleteThing,
             refresh,
             sort,

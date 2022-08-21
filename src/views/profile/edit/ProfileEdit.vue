@@ -66,6 +66,7 @@
                         </el-form-item>
                     </div>
                     <el-form-item class="edit-form-button">
+                        <el-button type="success" :icon="Back" plain @click="done">返回</el-button>
                         <el-button :icon="RefreshLeft" @click="profileReset">恢复</el-button>
                         <el-button type="warning" :icon="Right" plain @click="next">下一步</el-button>
                     </el-form-item>
@@ -85,7 +86,7 @@
                 <el-divider content-position="left">模板配置完成</el-divider>
                 <el-result icon="success" title="配置完成" sub-title="您可以返回进行下一步操作">
                     <template #extra>
-                        <el-button type="primary" @click="done">返回</el-button>
+                        <el-button type="primary" plain @click="done">返回</el-button>
                     </template>
                 </el-result>
             </el-card>

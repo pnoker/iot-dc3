@@ -493,7 +493,9 @@ export default defineComponent({
         }
 
         const done = () => {
-            router.push({ name: 'device' })
+            router.push({ name: 'device' }).catch(() => {
+                // nothing to do
+            })
         }
 
         const deviceReset = () => {

@@ -27,11 +27,12 @@ export interface R<T = any> {
 /**
  * 登录信息
  */
-export interface LoginType {
+export interface Login {
     tenant: string
     name: string
     salt: string
     password: string
+    token: string
 }
 
 /**

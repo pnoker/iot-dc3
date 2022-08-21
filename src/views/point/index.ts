@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { pointAddApi, pointDeleteApi, pointListApi } from '@/api/point'
+import { pointAddApi, pointDeleteApi, pointListApi, pointUpdateApi } from '@/api/point'
 import { profileByIdsApi } from '@/api/profile'
 
 import { Order } from '@/config/type/types'
@@ -27,6 +27,7 @@ import pointAddForm from './add/PointAddForm.vue'
 import pointCard from './card/PointCard.vue'
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import { isNull } from '@/util/utils'
+import { failMessage } from '@/util/NotificationUtils'
 
 export default defineComponent({
     components: {
@@ -178,11 +179,37 @@ export default defineComponent({
                 })
         }
 
-        const deleteThing = (id, done) => {
-            pointDeleteApi(id)
+        const disableThing = (id, done) => {
+            pointUpdateApi({ id: id, enable: false })
                 .then(() => {
                     list()
                     done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const enableThing = (id, done) => {
+            pointUpdateApi({ id: id, enable: true })
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const deleteThing = (id, done) => {
+            pointDeleteApi(id)
+                .then((res) => {
+                    if (res.data.ok) {
+                        list()
+                        done()
+                    } else {
+                        failMessage(res.data.message)
+                    }
                 })
                 .catch(() => {
                     // nothing to do
@@ -231,6 +258,8 @@ export default defineComponent({
             reset,
             showAdd,
             addThing,
+            disableThing,
+            enableThing,
             deleteThing,
             refresh,
             sort,

@@ -18,7 +18,7 @@
     <div>
         <base-card>
             <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
-                <el-tab-pane label="驱动详情" name="detail">
+                <el-tab-pane label="驱动信息" name="detail">
                     <detail-card>
                         <ul>
                             <li>

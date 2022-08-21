@@ -40,7 +40,8 @@
                     <profile-card
                         :embedded="embedded != ''"
                         :data="data"
-                        :point-table="reactiveData.pointTable"
+                        @disable-thing="disableThing"
+                        @enable-thing="enableThing"
                         @delete-thing="deleteThing"
                     ></profile-card>
                 </el-col>

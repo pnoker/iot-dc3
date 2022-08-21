@@ -72,7 +72,10 @@ export default defineComponent({
         // 驱动详情
         const detail = () => {
             const id = props.data.id
-            if (id) router.push({ name: 'driverDetail', query: { id, active: 'detail' } })
+            if (id)
+                router.push({ name: 'driverDetail', query: { id, active: 'detail' } }).catch(() => {
+                    // nothing to do
+                })
         }
 
         // 选中驱动
