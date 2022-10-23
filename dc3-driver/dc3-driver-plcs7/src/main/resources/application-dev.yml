@@ -14,8 +14,8 @@
 # Development environment, customizable configuration
 eureka:
   instance:
-    # Custom node registration IP
-    ip-address: ${SERVICE_HOST:192.168.0.101}
+    # Custom node registration ip, dedicated to the development environment
+    ip-address: ${SERVICE_HOST}
 
 # Log config
 logging:
