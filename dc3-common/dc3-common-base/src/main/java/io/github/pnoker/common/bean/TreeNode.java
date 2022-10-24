@@ -23,16 +23,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Tree node
+ *
  * @author pnoker
  */
 @Data
 public class TreeNode implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected int id;
-    protected int parentId;
-    protected List<TreeNode> children = new ArrayList<>(16);
+    private int id;
+    private int parentId;
+    private List<TreeNode> children = new ArrayList<>(16);
 
+    /**
+     * Add
+     *
+     * @param node TreeNode
+     */
     public void add(TreeNode node) {
         children.add(node);
     }
