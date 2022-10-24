@@ -48,7 +48,7 @@ import static java.lang.System.getProperty;
 @Order(10)
 @Component
 public class TranscodeRunner implements ApplicationRunner {
-    public static String ffmpeg;
+    public String ffmpeg;
 
     @Value("${rtmp.ffmpeg.window}")
     private String window;

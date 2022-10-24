@@ -60,7 +60,7 @@ public interface Service<T, D> {
     /**
      * 获取带分页、排序
      *
-     * @param dto Object Dto
+     * @param dto Dto Object
      * @return Page<Object>
      */
     Page<T> list(D dto);
@@ -68,7 +68,7 @@ public interface Service<T, D> {
     /**
      * 统一接口 模糊查询构造器
      *
-     * @param dto Object Dto
+     * @param dto Dto Object
      * @return QueryWrapper
      */
     LambdaQueryWrapper<T> fuzzyQuery(D dto);
