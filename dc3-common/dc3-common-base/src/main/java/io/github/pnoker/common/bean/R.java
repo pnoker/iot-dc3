@@ -16,8 +16,8 @@
 
 package io.github.pnoker.common.bean;
 
-import io.github.pnoker.common.constant.CommonConstant;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.constant.CommonConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private boolean ok = false;
-    private int code = Code.OK.getCode();
+    private int code = Code.OK.getValue();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message = CommonConstant.Response.ERROR;
@@ -52,7 +52,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> ok() {
-        return new R().success();
+        return new R<T>().success();
     }
 
     /**
@@ -62,7 +62,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> ok(String message) {
-        return new R().success(message);
+        return new R<T>().success(message);
     }
 
     /**
@@ -72,7 +72,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> ok(Code code, String message) {
-        return new R().success(code.getCode(), message);
+        return new R<T>().success(code.getValue(), message);
     }
 
     /**
@@ -83,7 +83,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> ok(T data) {
-        return new R(data).success();
+        return new R<T>(data).success();
     }
 
     /**
@@ -94,7 +94,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> ok(T data, String message) {
-        return new R(data).success(message);
+        return new R<T>(data).success(message);
     }
 
     /**
@@ -104,7 +104,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> fail() {
-        return new R().failure();
+        return new R<T>().failure();
     }
 
     /**
@@ -114,7 +114,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> fail(String message) {
-        return new R().failure(message);
+        return new R<T>().failure(message);
     }
 
     /**
@@ -124,7 +124,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> fail(Code code, String message) {
-        return new R().failure(code.getCode(), message);
+        return new R<T>().failure(code.getValue(), message);
     }
 
     /**
@@ -135,7 +135,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> fail(T data) {
-        return new R(data).failure();
+        return new R<T>(data).failure();
     }
 
     /**
@@ -146,7 +146,7 @@ public class R<T> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public static <T> R<T> fail(T data, String message) {
-        return new R(data).failure(message);
+        return new R<T>(data).failure(message);
     }
 
     /**
@@ -163,9 +163,9 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    private R success() {
+    private R<T> success() {
         this.ok = true;
-        this.code = Code.OK.getCode();
+        this.code = Code.OK.getValue();
         this.message = CommonConstant.Response.OK;
         return this;
     }
@@ -176,9 +176,9 @@ public class R<T> implements Serializable {
      * @param message 成功提示信息
      * @return Response
      */
-    private R success(String message) {
+    private R<T> success(String message) {
         this.ok = true;
-        this.code = Code.OK.getCode();
+        this.code = Code.OK.getValue();
         this.message = message;
         return this;
     }
@@ -190,7 +190,7 @@ public class R<T> implements Serializable {
      * @param message 成功提示信息
      * @return Response
      */
-    private R success(int code, String message) {
+    private R<T> success(int code, String message) {
         this.ok = true;
         this.code = code;
         this.message = message;
@@ -202,9 +202,9 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    private R failure() {
+    private R<T> failure() {
         this.ok = false;
-        this.code = Code.FAILURE.getCode();
+        this.code = Code.FAILURE.getValue();
         this.message = CommonConstant.Response.ERROR;
         return this;
     }
@@ -215,9 +215,9 @@ public class R<T> implements Serializable {
      * @param message 错误提示信息
      * @return Response
      */
-    private R failure(String message) {
+    private R<T> failure(String message) {
         this.ok = false;
-        this.code = Code.FAILURE.getCode();
+        this.code = Code.FAILURE.getValue();
         this.message = message;
         return this;
     }
@@ -229,21 +229,20 @@ public class R<T> implements Serializable {
      * @param message 错误提示信息
      * @return Response
      */
-    private R failure(int code, String message) {
+    private R<T> failure(int code, String message) {
         this.ok = false;
         this.code = code;
         this.message = message;
         return this;
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum Code {
-        OK(200), FAILURE(500), NotFound(3404);
+        OK(200),
+        FAILURE(500),
+        NOT_FOUND(3404);
 
-        @Getter
-        private int code;
-
-        Code(int code) {
-            this.code = code;
-        }
+        private final int value;
     }
 }

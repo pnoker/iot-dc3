@@ -17,22 +17,24 @@
 package io.github.pnoker.common.base;
 
 /**
- * Converter
+ * Converter for do\dto object interface
  *
+ * @param <D> DO
+ * @param <T> DTO
  * @author pnoker
  */
-public interface Converter<DO, DTO> {
+public interface Converter<D, T> {
     /**
      * DTO 转 DO
      *
-     * @param d Do对象
+     * @param d Do Object
      */
-    void convertDtoToDo(DO d);
+    void convertDtoToDo(D d);
 
     /**
      * DO 转 DTO
      *
-     * @param d Do对象
+     * @param d Do Object
      */
-    void convertDoToDto(DO d);
+    void convertDoToDto(D d);
 }
