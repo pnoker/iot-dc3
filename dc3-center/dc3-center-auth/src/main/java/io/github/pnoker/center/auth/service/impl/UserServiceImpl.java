@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
-        if (StrUtil.isNotEmpty(user.getPhone())) {
+        if (CharSequenceUtil.isNotBlank(user.getPhone())) {
             User selectByPhone = selectByPhone(user.getPhone(), false);
             if (ObjectUtil.isNotNull(selectByPhone)) {
                 throw new DuplicateException("The user already exists with phone: {}", user.getPhone());
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
-        if (StrUtil.isNotEmpty(user.getEmail())) {
+        if (CharSequenceUtil.isNotBlank(user.getEmail())) {
             User selectByEmail = selectByEmail(user.getEmail(), false);
             if (ObjectUtil.isNotNull(selectByEmail)) {
                 throw new DuplicateException("The user already exists with email: {}", user.getEmail());
@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         User byId = selectById(user.getId());
         // 判断 phone 是否修改
-        if (StrUtil.isNotEmpty(user.getPhone())) {
+        if (CharSequenceUtil.isNotBlank(user.getPhone())) {
             if (null == byId.getPhone() || !byId.getPhone().equals(user.getPhone())) {
                 if (null != selectByPhone(user.getPhone(), false)) {
                     throw new DuplicateException("The user already exists with phone {}", user.getPhone());
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 判断 email 是否修改
-        if (StrUtil.isNotEmpty(user.getEmail())) {
+        if (CharSequenceUtil.isNotBlank(user.getEmail())) {
             if (null == byId.getEmail() || !byId.getEmail().equals(user.getEmail())) {
                 if (null != selectByEmail(user.getEmail(), false)) {
                     throw new DuplicateException("The user already exists with email {}", user.getEmail());
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
     @Override
     // 2022-03-13 检查：通过
     public User selectByName(String name, boolean isEx) {
-        if (StrUtil.isEmpty(name)) {
+        if (CharSequenceUtil.isEmpty(name)) {
             if (isEx) {
                 throw new EmptyException("The name is empty");
             }
@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
     @Override
     // 2022-03-13 检查：通过
     public User selectByPhone(String phone, boolean isEx) {
-        if (StrUtil.isEmpty(phone)) {
+        if (CharSequenceUtil.isEmpty(phone)) {
             if (isEx) {
                 throw new EmptyException("The phone is empty");
             }
@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
     @Override
     // 2022-03-13 检查：通过
     public User selectByEmail(String email, boolean isEx) {
-        if (StrUtil.isEmpty(email)) {
+        if (CharSequenceUtil.isEmpty(email)) {
             if (isEx) {
                 throw new EmptyException("The phone is empty");
             }
@@ -216,7 +216,7 @@ public class UserServiceImpl implements UserService {
     public LambdaQueryWrapper<User> fuzzyQuery(UserDto userDto) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         if (ObjectUtil.isNotNull(userDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(userDto.getName()), User::getName, userDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(userDto.getName()), User::getName, userDto.getName());
         }
         return queryWrapper;
     }

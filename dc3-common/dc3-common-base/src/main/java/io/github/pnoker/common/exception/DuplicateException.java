@@ -16,7 +16,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 
 /**
  * 自定义 重复 异常
@@ -25,6 +25,6 @@ import cn.hutool.core.util.StrUtil;
  */
 public class DuplicateException extends RuntimeException {
     public DuplicateException(CharSequence template, Object... params) {
-        super(StrUtil.format(template, params));
+        super(CharSequenceUtil.format(template, params));
     }
 }

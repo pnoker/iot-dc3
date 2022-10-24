@@ -16,9 +16,10 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ValueConstant;
+import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
@@ -26,11 +27,11 @@ import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.S7Serializer;
 import io.github.pnoker.driver.api.factory.S7ConnectorFactory;
 import io.github.pnoker.driver.api.factory.S7SerializerFactory;
+import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -174,28 +175,33 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value              String Value
      */
     private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
-        switch (type.toLowerCase()) {
-            case ValueConstant.Type.INT:
+        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(type);
+        if (ObjectUtil.isNull(valueType)) {
+            throw new IllegalArgumentException("Unsupported type of " + type);
+        }
+
+        switch (valueType) {
+            case INT:
                 int intValue = value(type, value);
                 serializer.store(intValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case ValueConstant.Type.LONG:
+            case LONG:
                 long longValue = value(type, value);
                 serializer.store(longValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case ValueConstant.Type.FLOAT:
+            case FLOAT:
                 float floatValue = value(type, value);
                 serializer.store(floatValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case ValueConstant.Type.DOUBLE:
+            case DOUBLE:
                 double doubleValue = value(type, value);
                 serializer.store(doubleValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case ValueConstant.Type.BOOLEAN:
+            case BOOLEAN:
                 boolean booleanValue = value(type, value);
                 serializer.store(booleanValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
-            case ValueConstant.Type.STRING:
+            case STRING:
                 serializer.store(value, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             default:

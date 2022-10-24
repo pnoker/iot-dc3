@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.auth.bean.TokenValid;
 import io.github.pnoker.center.auth.bean.UserLimit;
 import io.github.pnoker.center.auth.service.TenantBindService;
@@ -68,7 +68,7 @@ public class TokenServiceImpl implements TokenService {
         Tenant tenant = tenantService.selectByName(tenantName);
         String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username;
         String salt = redisUtil.getKey(redisSaltKey, String.class);
-        if (StrUtil.isBlank(salt)) {
+        if (CharSequenceUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
             redisUtil.setKey(redisSaltKey, salt, CacheConstant.Timeout.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
         }
@@ -85,7 +85,7 @@ public class TokenServiceImpl implements TokenService {
             tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
             String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username;
             String saltValue = redisUtil.getKey(redisSaltKey, String.class);
-            if (StrUtil.isNotEmpty(saltValue) && saltValue.equals(salt)) {
+            if (CharSequenceUtil.isNotBlank(saltValue) && saltValue.equals(salt)) {
                 if (Dc3Util.md5(user.getPassword() + saltValue).equals(password)) {
                     String redisTokenKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username;
                     String token = KeyUtil.generateToken(username, saltValue, tenant.getId());
@@ -103,7 +103,7 @@ public class TokenServiceImpl implements TokenService {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
         Tenant tenant = tenantService.selectByName(tenantName);
         String redisToken = redisUtil.getKey(CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username, String.class);
-        if (StrUtil.isBlank(redisToken) || !redisToken.equals(token)) {
+        if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
         try {

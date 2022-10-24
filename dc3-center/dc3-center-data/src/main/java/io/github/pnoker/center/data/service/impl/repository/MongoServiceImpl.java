@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.service.impl.repository;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.MgPointValue;
@@ -45,7 +45,7 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public void savePointValue(PointValue pointValue) {
-        if (!StrUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+        if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;
         }
 
@@ -56,14 +56,14 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public void savePointValues(String deviceId, List<PointValue> pointValues) {
-        if (StrUtil.isEmpty(deviceId)) {
+        if (CharSequenceUtil.isEmpty(deviceId)) {
             return;
         }
 
         final String collection = CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId;
         ensurePointValueIndex(collection);
         final List<MgPointValue> batch = pointValues.stream()
-                .filter(pointValue -> StrUtil.isNotEmpty(pointValue.getPointId()))
+                .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
                 .map(MgPointValue::new)
                 .collect(Collectors.toList());
         mongoTemplate.insert(batch, collection);

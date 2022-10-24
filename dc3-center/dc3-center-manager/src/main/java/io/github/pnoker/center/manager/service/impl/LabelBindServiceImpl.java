@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -91,9 +91,9 @@ public class LabelBindServiceImpl implements LabelBindService {
     public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindDto labelBindDto) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
         if (ObjectUtil.isNotNull(labelBindDto)) {
-            queryWrapper.eq(StrUtil.isNotEmpty(labelBindDto.getLabelId()), LabelBind::getLabelId, labelBindDto.getLabelId());
-            queryWrapper.eq(StrUtil.isNotEmpty(labelBindDto.getEntityId()), LabelBind::getEntityId, labelBindDto.getEntityId());
-            queryWrapper.eq(StrUtil.isNotEmpty(labelBindDto.getType()), LabelBind::getType, labelBindDto.getType());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindDto.getLabelId()), LabelBind::getLabelId, labelBindDto.getLabelId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindDto.getEntityId()), LabelBind::getEntityId, labelBindDto.getEntityId());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(labelBindDto.getType()), LabelBind::getType, labelBindDto.getType());
         }
         return queryWrapper;
     }

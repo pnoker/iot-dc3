@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -157,16 +157,16 @@ public class DriverServiceImpl implements DriverService {
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         if (ObjectUtil.isNotNull(driverDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(driverDto.getName()), Driver::getName, driverDto.getName());
-            queryWrapper.like(StrUtil.isNotEmpty(driverDto.getServiceName()), Driver::getServiceName, driverDto.getServiceName());
-            queryWrapper.like(StrUtil.isNotEmpty(driverDto.getHost()), Driver::getHost, driverDto.getHost());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getName()), Driver::getName, driverDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceName()), Driver::getServiceName, driverDto.getServiceName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getHost()), Driver::getHost, driverDto.getHost());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getPort()), Driver::getPort, driverDto.getPort());
-            if (StrUtil.isEmpty(driverDto.getType())) {
+            if (CharSequenceUtil.isEmpty(driverDto.getType())) {
                 driverDto.setType(CommonConstant.Driver.Type.DRIVER);
             }
             queryWrapper.like(Driver::getType, driverDto.getType());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getEnable()), Driver::getEnable, driverDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotEmpty(driverDto.getTenantId()), Driver::getTenantId, driverDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverDto.getTenantId()), Driver::getTenantId, driverDto.getTenantId());
         }
         return queryWrapper;
     }

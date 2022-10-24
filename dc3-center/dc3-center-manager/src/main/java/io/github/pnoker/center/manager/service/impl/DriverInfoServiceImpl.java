@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -140,8 +140,8 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
         if (ObjectUtil.isNotNull(driverInfoDto)) {
-            queryWrapper.eq(StrUtil.isNotEmpty(driverInfoDto.getDriverAttributeId()), DriverInfo::getDriverAttributeId, driverInfoDto.getDriverAttributeId());
-            queryWrapper.eq(StrUtil.isNotEmpty(driverInfoDto.getDeviceId()), DriverInfo::getDeviceId, driverInfoDto.getDeviceId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoDto.getDriverAttributeId()), DriverInfo::getDriverAttributeId, driverInfoDto.getDriverAttributeId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoDto.getDeviceId()), DriverInfo::getDeviceId, driverInfoDto.getDeviceId());
         }
         return queryWrapper;
     }

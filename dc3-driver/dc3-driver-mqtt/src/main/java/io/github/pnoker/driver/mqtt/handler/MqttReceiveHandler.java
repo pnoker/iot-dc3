@@ -17,7 +17,7 @@
 package io.github.pnoker.driver.mqtt.handler;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.sdk.bean.mqtt.MessageHeader;
 import io.github.pnoker.common.sdk.bean.mqtt.MessagePayload;
 import io.github.pnoker.common.sdk.bean.mqtt.MessageType;
@@ -69,7 +69,7 @@ public class MqttReceiveHandler {
             if (ObjectUtil.isNull(messagePayload)) {
                 messagePayload = new MessagePayload(message.getPayload(), MessageType.DEFAULT);
             } else {
-                if (StrUtil.isEmpty(messagePayload.getPayload())) messagePayload.setPayload(message.getPayload().toString());
+                if (CharSequenceUtil.isEmpty(messagePayload.getPayload())) messagePayload.setPayload(message.getPayload().toString());
                 if (ObjectUtil.isNull(messagePayload.getMessageType())) messagePayload.setMessageType(MessageType.DEFAULT);
             }
 

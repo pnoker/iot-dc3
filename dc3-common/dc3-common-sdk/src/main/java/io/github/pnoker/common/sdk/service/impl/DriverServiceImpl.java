@@ -17,10 +17,11 @@
 package io.github.pnoker.common.sdk.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ValueConstant;
+import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.DeviceEvent;
 import io.github.pnoker.common.model.DriverEvent;
@@ -58,16 +59,22 @@ public class DriverServiceImpl implements DriverService {
     public String convertValue(String deviceId, String pointId, String rawValue) {
         String value;
         Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
-        switch (point.getType()) {
-            case ValueConstant.Type.STRING:
+
+        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(point.getType());
+        if (ObjectUtil.isNull(valueType)) {
+            throw new IllegalArgumentException("Unsupported type of " + point.getType());
+        }
+
+        switch (valueType) {
+            case STRING:
                 value = rawValue;
                 break;
-            case ValueConstant.Type.BYTE:
-            case ValueConstant.Type.SHORT:
-            case ValueConstant.Type.INT:
-            case ValueConstant.Type.LONG:
-            case ValueConstant.Type.DOUBLE:
-            case ValueConstant.Type.FLOAT:
+            case BYTE:
+            case SHORT:
+            case INT:
+            case LONG:
+            case DOUBLE:
+            case FLOAT:
                 try {
                     float base = null != point.getBase() ? point.getBase() : 0;
                     float multiple = null != point.getMultiple() ? point.getMultiple() : 1;
@@ -82,7 +89,7 @@ public class DriverServiceImpl implements DriverService {
                         deviceEventSender(deviceId, pointId, CommonConstant.Device.Event.OVER_UPPER_LIMIT,
                                 String.format("Value(%s) is greater than upper limit %s", temp, point.getMaximum()));
                     }
-                    if (StrUtil.isNotEmpty(point.getFormat())) {
+                    if (CharSequenceUtil.isNotBlank(point.getFormat())) {
                         value = String.format(point.getFormat(), temp);
                     } else {
                         value = String.valueOf(temp);
@@ -91,7 +98,7 @@ public class DriverServiceImpl implements DriverService {
                     throw new ServiceException("Invalid device({}) point({}) value({}), error: {}", deviceId, pointId, rawValue, e.getMessage());
                 }
                 break;
-            case ValueConstant.Type.BOOLEAN:
+            case BOOLEAN:
                 try {
                     try {
                         Double booleanValue = Convert.convert(Double.class, rawValue.trim());
@@ -164,7 +171,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     public void close(CharSequence template, Object... params) {
-        log.error(StrUtil.format(template, params));
+        log.error(CharSequenceUtil.format(template, params));
         ((ConfigurableApplicationContext) applicationContext).close();
         System.exit(1);
     }

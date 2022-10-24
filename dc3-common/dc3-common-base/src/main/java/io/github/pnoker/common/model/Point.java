@@ -18,7 +18,7 @@ package io.github.pnoker.common.model;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
-import io.github.pnoker.common.constant.ValueConstant;
+import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
@@ -87,8 +87,8 @@ public class Point extends Description {
         this.tenantId = tenantId;
     }
 
-    public Point setDefault() {
-        this.type = ValueConstant.Type.STRING;
+    public void setDefault() {
+        this.type = PointValueTypeEnum.STRING.getCode();
         this.rw = 0;
         this.base = 0F;
         this.minimum = -999999F;
@@ -97,6 +97,5 @@ public class Point extends Description {
         this.accrue = false;
         this.format = "%3.f";
         this.unit = "\"";
-        return this;
     }
 }

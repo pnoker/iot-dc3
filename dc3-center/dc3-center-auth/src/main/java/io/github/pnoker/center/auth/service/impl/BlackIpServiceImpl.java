@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -109,7 +109,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpDto blackIpDto) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         if (ObjectUtil.isNotNull(blackIpDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(blackIpDto.getIp()), BlackIp::getIp, blackIpDto.getIp());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(blackIpDto.getIp()), BlackIp::getIp, blackIpDto.getIp());
         }
         return queryWrapper;
     }
