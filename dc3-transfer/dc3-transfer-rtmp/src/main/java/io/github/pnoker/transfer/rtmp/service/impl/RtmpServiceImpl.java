@@ -18,7 +18,7 @@ package io.github.pnoker.transfer.rtmp.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RuntimeUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -144,7 +144,7 @@ public class RtmpServiceImpl implements RtmpService {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line;
             try {
-                while (StrUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
+                while (CharSequenceUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
                     log.debug(line);
                 }
             } catch (IOException e) {
@@ -165,7 +165,7 @@ public class RtmpServiceImpl implements RtmpService {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line;
             try {
-                while (StrUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
+                while (CharSequenceUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
                     log.error(line);
                     line = line.toLowerCase();
                     if (line.contains("fail") || line.contains("error")) {
@@ -213,9 +213,9 @@ public class RtmpServiceImpl implements RtmpService {
     public LambdaQueryWrapper<Rtmp> fuzzyQuery(RtmpDto rtmpDto) {
         LambdaQueryWrapper<Rtmp> queryWrapper = Wrappers.<Rtmp>query().lambda();
         if (ObjectUtil.isNotNull(rtmpDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(rtmpDto.getName()), Rtmp::getName, rtmpDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(rtmpDto.getName()), Rtmp::getName, rtmpDto.getName());
             queryWrapper.eq(ObjectUtil.isNotNull(rtmpDto.getAutoStart()), Rtmp::getAutoStart, rtmpDto.getAutoStart());
-            queryWrapper.eq(StrUtil.isNotEmpty(rtmpDto.getTenantId()), Rtmp::getTenantId, rtmpDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(rtmpDto.getTenantId()), Rtmp::getTenantId, rtmpDto.getTenantId());
         }
         return queryWrapper;
     }

@@ -16,9 +16,10 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ValueConstant;
+import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
@@ -198,32 +199,39 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private void writeItem(Item item, String type, String value) throws JIException {
         int writeResult = 0;
-        switch (type.toLowerCase()) {
-            case ValueConstant.Type.SHORT:
+
+        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(type);
+        if (ObjectUtil.isNull(valueType)) {
+            throw new IllegalArgumentException("Unsupported type of " + type);
+        }
+
+        // TODO 需要为每个驱动定制自己的数据类型列表，而不是公用一个数据列表，这样很不合理
+        switch (valueType) {
+            case SHORT:
                 short shortValue = value(type, value);
                 writeResult = item.write(new JIVariant(shortValue, false));
                 break;
-            case ValueConstant.Type.INT:
+            case INT:
                 int intValue = value(type, value);
                 writeResult = item.write(new JIVariant(intValue, false));
                 break;
-            case ValueConstant.Type.LONG:
+            case LONG:
                 long longValue = value(type, value);
                 writeResult = item.write(new JIVariant(longValue, false));
                 break;
-            case ValueConstant.Type.FLOAT:
+            case FLOAT:
                 float floatValue = value(type, value);
                 writeResult = item.write(new JIVariant(floatValue, false));
                 break;
-            case ValueConstant.Type.DOUBLE:
+            case DOUBLE:
                 double doubleValue = value(type, value);
                 writeResult = item.write(new JIVariant(doubleValue, false));
                 break;
-            case ValueConstant.Type.BOOLEAN:
+            case BOOLEAN:
                 boolean booleanValue = value(type, value);
                 writeResult = item.write(new JIVariant(booleanValue, false));
                 break;
-            case ValueConstant.Type.STRING:
+            case STRING:
                 writeResult = item.write(new JIVariant(value, false));
                 break;
             default:

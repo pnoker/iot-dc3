@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -111,8 +111,8 @@ public class GroupServiceImpl implements GroupService {
     public LambdaQueryWrapper<Group> fuzzyQuery(GroupDto groupDto) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         if (ObjectUtil.isNotNull(groupDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(groupDto.getName()), Group::getName, groupDto.getName());
-            queryWrapper.eq(StrUtil.isNotEmpty(groupDto.getTenantId()), Group::getTenantId, groupDto.getTenantId());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(groupDto.getName()), Group::getName, groupDto.getName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(groupDto.getTenantId()), Group::getTenantId, groupDto.getTenantId());
         }
         return queryWrapper;
     }

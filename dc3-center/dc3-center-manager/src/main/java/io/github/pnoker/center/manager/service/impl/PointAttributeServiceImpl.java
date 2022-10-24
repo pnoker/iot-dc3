@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -123,10 +123,10 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         if (ObjectUtil.isNotNull(pointAttributeDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(pointAttributeDto.getName()), PointAttribute::getName, pointAttributeDto.getName());
-            queryWrapper.like(StrUtil.isNotEmpty(pointAttributeDto.getDisplayName()), PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
-            queryWrapper.eq(StrUtil.isNotEmpty(pointAttributeDto.getType()), PointAttribute::getType, pointAttributeDto.getType());
-            queryWrapper.eq(StrUtil.isNotEmpty(pointAttributeDto.getDriverId()), PointAttribute::getDriverId, pointAttributeDto.getDriverId());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getName()), PointAttribute::getName, pointAttributeDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getDisplayName()), PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointAttributeDto.getType()), PointAttribute::getType, pointAttributeDto.getType());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributeDto.getDriverId()), PointAttribute::getDriverId, pointAttributeDto.getDriverId());
         }
         return queryWrapper;
     }

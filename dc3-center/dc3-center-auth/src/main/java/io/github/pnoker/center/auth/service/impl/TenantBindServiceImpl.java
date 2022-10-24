@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -102,8 +102,8 @@ public class TenantBindServiceImpl implements TenantBindService {
     public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindDto tenantBindDto) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
         if (ObjectUtil.isNotNull(tenantBindDto)) {
-            queryWrapper.eq(StrUtil.isNotEmpty(tenantBindDto.getTenantId()), TenantBind::getTenantId, tenantBindDto.getTenantId());
-            queryWrapper.eq(StrUtil.isNotEmpty(tenantBindDto.getUserId()), TenantBind::getUserId, tenantBindDto.getUserId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindDto.getTenantId()), TenantBind::getTenantId, tenantBindDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindDto.getUserId()), TenantBind::getUserId, tenantBindDto.getUserId());
         }
         return queryWrapper;
     }

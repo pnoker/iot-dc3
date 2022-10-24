@@ -16,9 +16,10 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ValueConstant;
+import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
@@ -57,11 +58,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
 
-    private static Map<String, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
+    private static final Map<String, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
 
 
     @Override
     public void initial() {
+        // nothing to do
     }
 
     @Override
@@ -104,7 +106,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param deviceId   Device Id
      * @param driverInfo Driver Info
      * @return OpcUaClient
-     * @throws UaException UaException
      */
     private OpcUaClient getOpcUaClient(String deviceId, Map<String, AttributeInfo> driverInfo) {
         OpcUaClient opcUaClient = clientMap.get(deviceId);
@@ -138,48 +139,55 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo Driver Info
      * @param pointInfo  Point Info
      * @param values     Value Array
-     * @throws UaException          UaException
-     * @throws ExecutionException   ExecutionException
-     * @throws InterruptedException InterruptedException
      */
     private void writeItem(String deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo values) {
         OpcUaClient client;
         try {
             int namespace = attribute(pointInfo, "namespace");
-            String tag = attribute(pointInfo, "tag"), type = values.getType(), value = values.getValue();
-            NodeId nodeId = new NodeId(namespace, tag);
+            String tag = attribute(pointInfo, "tag");
+            String type = values.getType();
+            String value = values.getValue();
 
+            PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(type);
+            if (ObjectUtil.isNull(valueType)) {
+                throw new IllegalArgumentException("Unsupported type of " + type);
+            }
+
+            NodeId nodeId = new NodeId(namespace, tag);
             client = getOpcUaClient(deviceId, driverInfo);
             client.connect().get();
 
-            switch (type.toLowerCase()) {
-                case ValueConstant.Type.INT:
+            switch (valueType) {
+                case INT:
                     int intValue = value(type, value);
                     client.writeValue(nodeId, new DataValue(new Variant(intValue)));
                     break;
-                case ValueConstant.Type.LONG:
+                case LONG:
                     long longValue = value(type, value);
                     client.writeValue(nodeId, new DataValue(new Variant(longValue)));
                     break;
-                case ValueConstant.Type.FLOAT:
+                case FLOAT:
                     float floatValue = value(type, value);
                     client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
                     break;
-                case ValueConstant.Type.DOUBLE:
+                case DOUBLE:
                     double doubleValue = value(type, value);
                     client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
                     break;
-                case ValueConstant.Type.BOOLEAN:
+                case BOOLEAN:
                     boolean booleanValue = value(type, value);
                     client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
                     break;
-                case ValueConstant.Type.STRING:
+                case STRING:
                     client.writeValue(nodeId, new DataValue(new Variant(value)));
                     break;
                 default:
                     break;
             }
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
+            log.error("Opc Ua Point Write Error: {}", e.getMessage());
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
             log.error("Opc Ua Point Write Error: {}", e.getMessage());
         }
     }
