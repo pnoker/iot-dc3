@@ -22,5 +22,5 @@ package io.github.pnoker.common.annotation;
  * @author pnoker
  */
 public enum LogsType {
-    INFO, ERROR;
+    INFO, WARN, DEBUG, ERROR;
 }
