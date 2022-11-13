@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,6 +30,7 @@ import javax.validation.constraints.NotNull;
  * Rtmp转码 FeignClient
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @FeignClient(path = ServiceConstant.Rtmp.URL_PREFIX, name = ServiceConstant.Rtmp.SERVICE_NAME, fallbackFactory = RtmpClientFallback.class)
 public interface RtmpClient {
@@ -66,7 +65,7 @@ public interface RtmpClient {
     /**
      * 根据 ID 查询 Rtmp
      *
-     * @param id Rtmp Id
+     * @param id Rtmp ID
      * @return R<Rtmp>
      */
     @GetMapping("/id/{id}")
@@ -84,7 +83,7 @@ public interface RtmpClient {
     /**
      * 启动 Rtmp 转码任务
      *
-     * @param id Rtmp Id
+     * @param id Rtmp ID
      * @return R<Boolean>
      */
     @PostMapping("/start/{id}")
@@ -93,7 +92,7 @@ public interface RtmpClient {
     /**
      * 停止 Rtmp 转码任务
      *
-     * @param id Rtmp Id
+     * @param id Rtmp ID
      * @return R<Boolean>
      */
     @PostMapping("/stop/{id}")

@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +29,7 @@ import java.util.Map;
  * 设备 FeignClient
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @FeignClient(path = ServiceConstant.Manager.STATUS_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = StatusClientFallback.class)
 public interface StatusClient {
@@ -59,7 +58,7 @@ public interface StatusClient {
      * 根据 驱动ID 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
-     * @param driverId Driver Id
+     * @param driverId Driver ID
      * @return Map<String, String>
      */
     @GetMapping("/device/driver_id/{driverId}")
@@ -69,7 +68,7 @@ public interface StatusClient {
      * 根据 模板ID 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
-     * @param profileId Profile Id
+     * @param profileId Profile ID
      * @return Map<String, String>
      */
     @GetMapping("/device/profile_id/{profileId}")

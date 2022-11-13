@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,6 +35,7 @@ import javax.validation.constraints.NotNull;
  * 用户 FeignClient
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @FeignClient(path = ServiceConstant.Auth.USER_URL_PREFIX, name = ServiceConstant.Auth.SERVICE_NAME, fallbackFactory = UserClientFallback.class)
 public interface UserClient {
@@ -53,7 +52,7 @@ public interface UserClient {
     /**
      * 根据 ID 删除 User
      *
-     * @param id User Id
+     * @param id User ID
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -74,7 +73,7 @@ public interface UserClient {
     /**
      * 根据 ID 重置 User 密码
      *
-     * @param id User Id
+     * @param id User ID
      * @return Boolean
      */
     @PostMapping("/reset/{id}")
@@ -83,7 +82,7 @@ public interface UserClient {
     /**
      * 根据 ID 查询 User
      *
-     * @param id User Id
+     * @param id User ID
      * @return User
      */
     @GetMapping("/id/{id}")
