@@ -12,21 +12,21 @@
   -->
 
 <template>
-	<div id="app">
-		<router-view />
-	</div>
+    <div id="app">
+        <router-view />
+    </div>
 </template>
  
 <script lang="ts">
 export default {
-	name: 'App',
+    name: 'App',
 }
 </script>
 
 <style lang="less">
 #app {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 </style>
