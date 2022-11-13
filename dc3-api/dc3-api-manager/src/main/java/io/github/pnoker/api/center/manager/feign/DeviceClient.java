@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,6 +34,7 @@ import java.util.Set;
  * 设备 FeignClient
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @FeignClient(path = ServiceConstant.Manager.DEVICE_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = DeviceClientFallback.class)
 public interface DeviceClient {
@@ -52,7 +51,7 @@ public interface DeviceClient {
     /**
      * 根据 ID 删除 Device
      *
-     * @param id Device Id
+     * @param id Device ID
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -70,7 +69,7 @@ public interface DeviceClient {
     /**
      * 根据 ID 查询 Device
      *
-     * @param id Device Id
+     * @param id Device ID
      * @return Device
      */
     @GetMapping("/id/{id}")
@@ -79,7 +78,7 @@ public interface DeviceClient {
     /**
      * 根据 ID 集合查询 Device
      *
-     * @param deviceIds Device Id Set
+     * @param deviceIds Device ID Set
      * @return Map<String, Device>
      */
     @PostMapping("/ids")

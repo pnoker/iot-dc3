@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,6 +35,7 @@ import java.util.Set;
  * 位号 FeignClient
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @FeignClient(path = ServiceConstant.Manager.POINT_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = PointClientFallback.class)
 public interface PointClient {
@@ -53,7 +52,7 @@ public interface PointClient {
     /**
      * 根据 ID 删除 Point
      *
-     * @param id Point Id
+     * @param id Point ID
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -71,7 +70,7 @@ public interface PointClient {
     /**
      * 根据 ID 查询 Point
      *
-     * @param id Point Id
+     * @param id Point ID
      * @return Point
      */
     @GetMapping("/id/{id}")
@@ -80,7 +79,7 @@ public interface PointClient {
     /**
      * 根据 ID 集合查询 Point
      *
-     * @param pointIds Point Id Set
+     * @param pointIds Point ID Set
      * @return Map<String, Point>
      */
     @PostMapping("/ids")
@@ -89,7 +88,7 @@ public interface PointClient {
     /**
      * 根据 设备 ID 查询 Point
      *
-     * @param deviceId Device Id
+     * @param deviceId Device ID
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
@@ -98,7 +97,7 @@ public interface PointClient {
     /**
      * 根据 模板 ID 查询 Point
      *
-     * @param profileId Profile Id
+     * @param profileId Profile ID
      * @return Point Array
      */
     @GetMapping("/profile_id/{profileId}")
@@ -116,7 +115,7 @@ public interface PointClient {
     /**
      * 查询 位号单位
      *
-     * @param pointIds Point Id Set
+     * @param pointIds Point ID Set
      * @return Map<String, String>
      */
     @PostMapping("/unit")
