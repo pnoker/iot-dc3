@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,145 +14,117 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, onMounted } from "vue"
-import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from "@element-plus/icons-vue"
+import { defineComponent, reactive, onMounted } from 'vue'
+import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from '@element-plus/icons-vue'
 
 import { TinyArea } from '@antv/g2plot'
 
-import { setCopyContent } from "@/util/utils"
-import { copyId, timestamp } from "@/util/CommonUtils"
+import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
-    name: "PointValueCard",
+    name: 'PointValueCard',
     components: {
         Edit,
         Sunset,
         Timer,
         Management,
         Sunrise,
-        ZoomIn
+        ZoomIn,
     },
     props: {
         embedded: {
-            type: Boolean,
+            type: String,
             default: () => {
-                return false
-            }
+                return ''
+            },
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            }
-        },
-        historyData: {
-            type: Object,
-            default: () => {
-                return {}
-            }
+            },
         },
         device: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         point: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         unit: {
             type: String,
-            default: ""
+            default: '',
+        },
+        historyData: {
+            type: Array<number>,
+            default: () => {
+                return []
+            },
         },
         icon: {
             type: String,
-            default: "images/common/point.png"
-        }
+            default: 'images/common/point.png',
+        },
     },
-    emits: ["show-edit", "show-detail"],
+    emits: ['show-edit', 'show-detail'],
     setup(props, { emit }) {
         // 定义响应式数据
         const reactiveData = reactive({
             spRefLineStyles: {
-                stroke: "#54a5ff",
+                stroke: '#54a5ff',
                 strokeOpacity: 0.5,
-                strokeDasharray: "2, 2"
+                strokeDasharray: '2, 2',
             },
             spCurveStyles: {
-                stroke: "#54a5ff"
-            }
-        })
-
-        const line = computed(() => {
-            const data = props.embedded ? props.historyData[props.data.pointId] : []
-            return data || []
+                stroke: '#54a5ff',
+            },
         })
 
         // 图标
         const Icon = {
-            CircleClose
+            CircleClose,
         }
 
         const showEdit = (pointValue) => {
-            emit("show-edit", pointValue)
-        }
-
-        const showDetail = () => {
-            const data = props.data
-            let dataValue = data.value
-            try {
-                dataValue = JSON.parse(data.value)
-            } catch (ignore) {
-                // nothing to do
-            }
-
-            const content = {
-                deviceId: data.deviceId,
-                pointId: data.pointId,
-                type: data.type,
-                value: dataValue,
-                calculateValue: data.calculateValue,
-                rawValue: data.rawValue
-            };
-
-            emit("show-detail", content)
+            emit('show-edit', pointValue)
         }
 
         const copyValue = (data) => {
             const content = {
                 deviceId: data.deviceId,
                 pointId: data.pointId,
-                value: data.value
-            };
-            setCopyContent(JSON.stringify(content, null, 2), true, "位号值")
+                value: data.value,
+            }
+            copyId(JSON.stringify(content, null, 2), '位号值')
         }
 
         onMounted(() => {
-            const data = props.embedded ? props.historyData[props.data.pointId] : []
-            if (props.embedded && data) {
-                const tinyArea = new TinyArea(props.data.id, {
-                    height: 60,
-                    data,
-                    autoFit: true,
-                    smooth: true
-                })
-
-                tinyArea.render()
+            if (props.embedded == '') {
+                return
             }
+
+            const tinyArea = new TinyArea(props.data.id, {
+                height: 60,
+                data: props.historyData,
+                autoFit: true,
+                smooth: true,
+            })
+
+            tinyArea.render()
         })
 
         return {
             reactiveData,
-            line,
             showEdit,
-            showDetail,
             copyId,
             copyValue,
             timestamp,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

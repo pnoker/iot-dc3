@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,54 +14,68 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, computed } from "vue"
+import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { pointAddApi, pointDeleteApi, pointListApi } from "@/api/point"
-import { profileByIdsApi } from "@/api/profile"
-import { profileDictionaryApi } from "@/api/dictionary"
+import { pointAddApi, pointDeleteApi, pointListApi, pointUpdateApi } from '@/api/point'
+import { profileByIdsApi } from '@/api/profile'
 
-import { Dictionary, Order } from "@/config/type/types"
+import { Order } from '@/config/type/types'
 
-import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
-import pointTool from "./tool/PointTool.vue"
-import pointAddForm from "./add/PointAddForm.vue"
-import pointCard from "./card/PointCard.vue"
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
+import pointTool from './tool/PointTool.vue'
+import pointAddForm from './add/PointAddForm.vue'
+import pointCard from './card/PointCard.vue'
+import blankCard from '@/components/card/blank/BlankCard.vue'
+import { isNull } from '@/util/utils'
+import { failMessage } from '@/util/NotificationUtils'
 
 export default defineComponent({
     components: {
         skeletonCard,
         pointTool,
         pointAddForm,
-        pointCard
+        pointCard,
+        blankCard,
     },
     props: {
+        embedded: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
         pre: {
             type: Boolean,
             default: () => {
                 return false
-            }
+            },
         },
         next: {
             type: Boolean,
             default: () => {
                 return false
-            }
+            },
         },
         profileId: {
             type: String,
             default: () => {
-                return ""
-            }
-        }
+                return ''
+            },
+        },
+        deviceId: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
     },
-    emits: ["pre-handle", "next-handle"],
+    emits: ['pre-handle', 'next-handle'],
     setup(props, { emit }) {
         const pointAddFormRef: any = ref<InstanceType<typeof pointAddForm>>()
 
         // 定义响应式数据
         const reactiveData = reactive({
             loading: true,
-            profileDictionary: [] as Dictionary[],
             profileTable: {},
             listData: [] as any[],
             query: {},
@@ -67,8 +84,8 @@ export default defineComponent({
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[]
-            }
+                orders: [] as Order[],
+            },
         })
 
         const hasData = computed(() => {
@@ -76,47 +93,74 @@ export default defineComponent({
         })
 
         const list = () => {
+            if (!isNull(props.profileId)) {
+                reactiveData.query = {
+                    ...reactiveData.query,
+                    profileId: props.profileId,
+                }
+            }
+            if (!isNull(props.deviceId)) {
+                reactiveData.query = {
+                    ...reactiveData.query,
+                    deviceId: props.deviceId,
+                }
+            }
+
             pointListApi({
                 page: reactiveData.page,
                 ...reactiveData.query,
-                profileId: props.profileId
-            }).then(res => {
-                const data = res.data.data
-                reactiveData.page.total = data.total
-                reactiveData.listData = data.records
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.page.total = data.total
+                    reactiveData.listData = data.records
 
-                // profile
-                const profileIds = Array.from(new Set(reactiveData.listData.map(point => point.profileId)))
-                profileByIdsApi(profileIds).then(res => {
-                    reactiveData.profileTable = res.data.data
-                }).catch(() => {
+                    // profile
+                    const profileIds = Array.from(new Set(reactiveData.listData.map((point) => point.profileId)))
+                    profileByIdsApi(profileIds)
+                        .then((res) => {
+                            reactiveData.profileTable = res.data.data
+                        })
+                        .catch(() => {
+                            // nothing to do
+                        })
+                })
+                .catch(() => {
                     // nothing to do
                 })
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.loading = false
-            })
-        }
-
-        const profile = () => {
-            profileDictionaryApi().then(res => {
-                reactiveData.profileDictionary = res.data.data
-            }).catch(() => {
-                // nothing to do
-            });
+                .finally(() => {
+                    reactiveData.loading = false
+                })
         }
 
         const search = (params) => {
-            reactiveData.query = {
-                ...params,
-                profileId: props.profileId
-            };
+            if (!isNull(props.profileId)) {
+                params = {
+                    ...params,
+                    profileId: props.profileId,
+                }
+            }
+            if (!isNull(props.deviceId)) {
+                params = {
+                    ...params,
+                    deviceId: props.deviceId,
+                }
+            }
+
+            reactiveData.query = params
             list()
         }
 
         const reset = () => {
-            reactiveData.query = {}
+            let params = {}
+            if (!isNull(props.profileId)) {
+                params = { profileId: props.profileId }
+            }
+            if (!isNull(props.deviceId)) {
+                params = { deviceId: props.deviceId }
+            }
+
+            reactiveData.query = params
             list()
         }
 
@@ -125,21 +169,51 @@ export default defineComponent({
         }
 
         const addThing = (form, done) => {
-            pointAddApi(form).then(() => {
-                list()
-                done()
-            }).catch(() => {
-                // nothing to do
-            });
+            pointAddApi(form)
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const disableThing = (id, done) => {
+            pointUpdateApi({ id: id, enable: false })
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const enableThing = (id, done) => {
+            pointUpdateApi({ id: id, enable: true })
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const deleteThing = (id, done) => {
-            pointDeleteApi(id).then(() => {
-                list()
-                done()
-            }).catch(() => {
-                // nothing to do
-            });
+            pointDeleteApi(id)
+                .then((res) => {
+                    if (res.data.ok) {
+                        list()
+                        done()
+                    } else {
+                        failMessage(res.data.message)
+                    }
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const refresh = () => {
@@ -149,9 +223,9 @@ export default defineComponent({
         const sort = () => {
             reactiveData.order = !reactiveData.order
             if (reactiveData.order) {
-                reactiveData.page.orders = [{ column: "create_time", asc: true }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: true }]
             } else {
-                reactiveData.page.orders = [{ column: "create_time", asc: false }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: false }]
             }
             list()
         }
@@ -167,14 +241,13 @@ export default defineComponent({
         }
 
         const preHandle = () => {
-            emit("pre-handle")
+            emit('pre-handle')
         }
 
         const nextHandle = () => {
-            emit("next-handle")
+            emit('next-handle')
         }
 
-        profile()
         list()
 
         return {
@@ -185,6 +258,8 @@ export default defineComponent({
             reset,
             showAdd,
             addThing,
+            disableThing,
+            enableThing,
             deleteThing,
             refresh,
             sort,
@@ -193,5 +268,5 @@ export default defineComponent({
             preHandle,
             nextHandle,
         }
-    }
+    },
 })

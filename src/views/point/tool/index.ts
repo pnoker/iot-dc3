@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,33 +14,52 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from "vue";
-import { FormInstance, FormRules } from "element-plus";
-import { Plus, Refresh, RefreshLeft, Search, Sort, Back, Check } from "@element-plus/icons-vue"
+import { defineComponent, reactive, ref, unref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
+import { Plus, Refresh, RefreshLeft, Search, Sort, Back, Check } from '@element-plus/icons-vue'
+
+import { Dictionary, Order } from '@/config/type/types'
+import { profileDictionaryApi } from '@/api/dictionary'
 
 export default defineComponent({
-    name: "PointTool",
+    name: 'PointTool',
     props: {
-        pre: {
-            type: Boolean,
+        embedded: {
+            type: String,
             default: () => {
-                return false;
-            }
-        },
-        next: {
-            type: Boolean,
-            default: () => {
-                return false;
-            }
+                return ''
+            },
         },
         page: {
             type: Object,
             default: () => {
                 return {}
-            }
-        }
+            },
+        },
+        pre: {
+            type: Boolean,
+            default: () => {
+                return false
+            },
+        },
+        next: {
+            type: Boolean,
+            default: () => {
+                return false
+            },
+        },
     },
-    emits: ["search", "reset", "show-add", "refresh", "sort", "size-change", "current-change", "pre-handle", "next-handle"],
+    emits: [
+        'search',
+        'reset',
+        'show-add',
+        'refresh',
+        'sort',
+        'size-change',
+        'current-change',
+        'pre-handle',
+        'next-handle',
+    ],
     setup(props, { emit }) {
         // 定义表单引用
         const formDataRef = ref<FormInstance>()
@@ -50,60 +72,98 @@ export default defineComponent({
             Refresh,
             Sort,
             Back,
-            Check
+            Check,
         }
 
         // 定义响应式数据
         const reactiveData = reactive({
-            formData: {}
+            formData: {} as any,
+            profileQuery: '',
+            profileDictionary: [] as Dictionary[],
+            profilePage: {
+                total: 0,
+                size: 5,
+                current: 1,
+                orders: [] as Order[],
+            },
         })
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            port: [
-                { type: "number", message: "端口必须为数字值" }
-            ]
+            port: [{ type: 'number', message: '端口必须为数字值' }],
         })
+
+        const profileDictionary = () => {
+            profileDictionaryApi({
+                page: reactiveData.profilePage,
+                label: reactiveData.profileQuery,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.profilePage.total = data.total
+                    reactiveData.profileDictionary = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const profileCurrentChange = (current) => {
+            reactiveData.profilePage.current = current
+            profileDictionary()
+        }
+
+        const profileDictionaryVisible = (visible: boolean) => {
+            if (visible) {
+                reactiveData.profileQuery = ''
+                profileDictionary()
+            }
+        }
 
         const search = () => {
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    emit("search", reactiveData.formData);
+                    emit('search', reactiveData.formData)
                 }
-            });
+            })
         }
         const reset = () => {
             const form = unref(formDataRef)
-            form?.resetFields();
-            emit("reset");
+            form?.resetFields()
+            emit('reset')
         }
         const showAdd = () => {
-            emit("show-add");
+            emit('show-add')
         }
         const refresh = () => {
-            emit("refresh");
+            emit('refresh')
         }
         const sort = () => {
-            emit("sort");
+            emit('sort')
         }
         const sizeChange = (size) => {
-            emit("size-change", size);
+            emit('size-change', size)
         }
         const currentChange = (current) => {
-            emit("current-change", current);
+            emit('current-change', current)
         }
         const preHandle = () => {
-            emit("pre-handle");
+            emit('pre-handle')
         }
         const nextHandle = () => {
-            emit("next-handle");
+            emit('next-handle')
         }
+
+        profileDictionary()
 
         return {
             formDataRef,
             reactiveData,
             formRule,
+            profileDictionary,
+            profileCurrentChange,
+            profileDictionaryVisible,
             search,
             reset,
             showAdd,
@@ -113,7 +173,7 @@ export default defineComponent({
             currentChange,
             preHandle,
             nextHandle,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

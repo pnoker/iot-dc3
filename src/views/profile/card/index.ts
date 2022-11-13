@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,92 +14,96 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent } from "vue"
-import { CircleCheck, CircleClose, CollectionTag, Edit, IceCreamSquare, Right, Sunset, SwitchButton } from "@element-plus/icons-vue"
+import { defineComponent } from 'vue'
+import {
+    CircleCheck,
+    CircleClose,
+    CollectionTag,
+    Edit,
+    IceCreamSquare,
+    Right,
+    Sunset,
+    SwitchButton,
+} from '@element-plus/icons-vue'
 
-import router from "@/config/router"
+import router from '@/config/router'
 
-import { successMessage } from "@/util/utils"
-import { copyId, timestamp } from "@/util/CommonUtils"
+import { successMessage } from '@/util/NotificationUtils'
+import { copyId, timestamp } from '@/util/CommonUtils'
 
 export default defineComponent({
-    name: "ProfileCard",
+    name: 'ProfileCard',
     components: {
         Edit,
         Sunset,
         IceCreamSquare,
-        CollectionTag
+        CollectionTag,
     },
     props: {
         embedded: {
             type: Boolean,
-            default: () => false
-        },
-        pointTable: {
-            type: Object,
-            default: () => {
-                return {}
-            }
+            default: () => false,
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         icon: {
             type: String,
-            default: () => "images/common/profile.png"
-        }
+            default: () => 'images/common/profile.png',
+        },
     },
-    emits: ["delete-thing"],
+    emits: ['disable-thing', 'enable-thing', 'delete-thing'],
     setup(props, { emit }) {
-        const pointName = computed(() => {
-            let ids = props.data.pointIds || []
-            if (ids) {
-                if (ids.length > 10) {
-                    ids = ids.slice(0, 10);
-                }
-            }
-            return ids.map(id => props.pointTable[id]?.name).join(", ")
-        })
-
-        const pointLength = computed(() => {
-            const ids = props.data.pointIds || []
-            return ids.length
-        })
-
         // 图标
         const Icon = {
             SwitchButton,
             CircleCheck,
             Right,
-            CircleClose
+            CircleClose,
         }
 
-        const deleteThing = (id) => {
-            emit("delete-thing", id, () => {
-                successMessage(null)
-            });
+        const disableThing = () => {
+            emit('disable-thing', props.data.id, () => {
+                successMessage()
+            })
         }
 
-        const edit = (id) => {
-            router.push({ name: "profileEdit", query: { id, active: "0" } })
+        const enableThing = () => {
+            emit('enable-thing', props.data.id, () => {
+                successMessage()
+            })
         }
 
-        const detail = (id) => {
-            router.push({ name: "profileDetail", query: { id, active: "detail" } })
+        const deleteThing = () => {
+            emit('delete-thing', props.data.id, () => {
+                successMessage()
+            })
+        }
+
+        const edit = () => {
+            router.push({ name: 'profileEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
+                // nothing to do
+            })
+        }
+
+        const detail = () => {
+            router.push({ name: 'profileDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+                // nothing to do
+            })
         }
 
         return {
-            pointName,
-            pointLength,
+            disableThing,
+            enableThing,
             deleteThing,
             edit,
             detail,
             copyId,
             timestamp,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

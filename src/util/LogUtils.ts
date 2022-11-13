@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,23 +14,22 @@
  * limitations under the License.
  */
 
-import moment from "moment"
-import "moment/locale/zh-cn"
+import moment from 'moment'
+import 'moment/locale/zh-cn'
 
-moment.locale("zh-cn")
+moment.locale('zh-cn')
 
 export const log = {
     info(message: string) {
         const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
-        console.log(now, "%cINFO%c  ---  :", "color:#F00", message)
+        console.log(now, '%cINFO%c  ---  :', 'color:#F00', message)
     },
     warn(message: string) {
         const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
-        console.log(now, "%cWARN%c  ---  :", "color:#F00", message)
+        console.log(now, '%cWARN%c  ---  :', 'color:#F00', message)
     },
     error(message: string) {
         const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
-        console.log(now, "%cERROR%c  ---  :", "color:#F00", message)
-
-    }
+        console.log(now, '%cERROR%c  ---  :', 'color:#F00', message)
+    },
 }

@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,44 +14,46 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent } from "vue"
-import { Goblet } from "@element-plus/icons-vue"
+import { computed, defineComponent } from 'vue'
+import { Goblet } from '@element-plus/icons-vue'
+
+import { Attribute } from '@/config/type/types'
 
 export default defineComponent({
-    name: "PointInfoCard",
+    name: 'PointInfoCard',
     components: {
-        Goblet
+        Goblet,
     },
     props: {
         data: {
             type: Object,
             default: () => {
                 return {
-                    name: "",
-                    value: "",
-                    description: "",
-                    createTime: "",
-                    updateTime: ""
+                    name: '',
+                    value: '',
+                    description: '',
+                    createTime: '',
+                    updateTime: '',
                 }
-            }
+            },
         },
         attributes: {
-            type: Array,
+            type: Array<Attribute>,
             default: () => {
                 return []
-            }
+            },
         },
         icon: {
             type: String,
-            default: "images/common/point-info-disable.png"
-        }
+            default: 'images/common/point-info-disable.png',
+        },
     },
-    emits: ["select-change"],
+    emits: ['select'],
     setup(props, { emit }) {
         const isConfig = computed(() => {
             for (let i = 0; i < props.attributes.length; i++) {
                 const attribute = props.attributes[i] as any
-                if (props.data[attribute.name].value === "") {
+                if (props.data[attribute.name].value === '') {
                     return false
                 }
             }
@@ -57,21 +62,21 @@ export default defineComponent({
         })
 
         const isSelect = computed(() => {
-            if (props.data.shadow === "always") {
-                return "images/common/point-info.png"
+            if (props.data.shadow === 'always') {
+                return 'images/common/point-info.png'
             } else {
-                return "images/common/point-info-disable.png"
+                return 'images/common/point-info-disable.png'
             }
         })
 
         const select = (data) => {
-            emit("select-change", data)
+            emit('select', data)
         }
 
         return {
             isConfig,
             isSelect,
-            select
+            select,
         }
-    }
+    },
 })

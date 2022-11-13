@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,76 +14,88 @@
  * limitations under the License.
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios"
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 
-import router from "@/config/router"
-import store from "@/config/store"
+import router from '@/config/router'
+import store from '@/config/store'
 
-import NProgress from "nprogress"
-import "nprogress/nprogress.css"
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
-import { getStore } from "@/util/store";
-import common from "@/util/common";
-import { isNull } from "@/util/utils";
-import { warning } from "@/util/MessageUtils";
+import { getStorage } from '@/util/StorageUtils'
+import CommonConstant from '@/util/CommonConstant'
+import { isNull } from '@/util/utils'
+import { warning } from '@/util/MessageUtils'
+
+import { encode } from 'js-base64'
 
 NProgress.configure({
-    easing: "ease",
-    showSpinner: false
+    easing: 'ease',
+    showSpinner: false,
 })
 
-const noAuthMessage = "检测到您未登录或登陆凭证已失效，请重新登录"
+const noAuthMessage = '检测到您未登录或登陆凭证已失效，请重新登录'
 
 const request: AxiosInstance = axios.create({
     timeout: 15000,
     withCredentials: true,
     headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
     },
     validateStatus(status): boolean {
         return status >= 200 && status <= 500
-    }
+    },
 })
 
-request.interceptors.request.use((config: AxiosRequestConfig) => {
-    NProgress.start()
+request.interceptors.request.use(
+    (config: AxiosRequestConfig) => {
+        NProgress.start()
 
-    const token = getStore(common.TOKEN_HEADER, false)
-    if (!isNull(token)) {
-        const headers = config.headers
-        if (headers) headers[common.TOKEN_HEADER] = token
-    }
+        const tenant = getStorage(CommonConstant.TENANT_HEADER)
+        const user = getStorage(CommonConstant.USER_HEADER)
+        const token = getStorage(CommonConstant.TOKEN_HEADER)
+        if (!isNull(tenant) && !isNull(user) && !isNull(token)) {
+            const headers = config.headers
+            if (headers) {
+                headers[CommonConstant.TENANT_HEADER] = encode(tenant)
+                headers[CommonConstant.USER_HEADER] = encode(user)
+                headers[CommonConstant.TOKEN_HEADER] = encode(JSON.stringify(token))
+            }
+        }
 
-    return config
-},
+        return config
+    },
     (error: any) => {
         NProgress.done()
         return Promise.reject(error)
-    })
-
-request.interceptors.response.use((response) => {
-    NProgress.done()
-
-    const ok = response.data.ok || false
-    const status = response.status || 401
-
-    if (!ok && status === 401) {
-        warning(noAuthMessage)
-        store.dispatch("auth/logout").then(() => router.push({ path: "/login" }))
-        return Promise.reject(noAuthMessage)
     }
+)
 
-    return response
-},
+request.interceptors.response.use(
+    (response) => {
+        NProgress.done()
+
+        const ok = response.data.ok || false
+        const status = response.status || 401
+
+        if (!ok && status === 401) {
+            warning(noAuthMessage)
+            store.dispatch('auth/logout').then(() => router.push({ path: '/login' }))
+            return Promise.reject(noAuthMessage)
+        }
+
+        return response
+    },
     (error: any) => {
         NProgress.done()
 
         if (!axios.isCancel(error)) {
-            console.log("Response error:", error)
+            console.log('Response error:', error)
         }
 
         return Promise.reject(error)
-    })
+    }
+)
 
 export default request

@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,27 +14,27 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from "vue"
-import { FormInstance, FormRules } from "element-plus"
-import { Plus, Refresh, RefreshRight, Search, Sort } from "@element-plus/icons-vue"
+import { defineComponent, reactive, ref, unref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
+import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
 
-import { useStore } from "vuex"
+import { useStore } from 'vuex'
 
 export default defineComponent({
-    name: "DriverTool",
+    name: 'DriverTool',
     props: {
         page: {
             type: Object,
             default: () => {
                 return {}
-            }
+            },
         },
         add: {
             type: Boolean,
-            default: () => false
-        }
+            default: () => false,
+        },
     },
-    emits: ["search", "reset", "refresh", "sort", "size-change", "current-change"],
+    emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],
     setup(props, { emit }) {
         const store = useStore()
 
@@ -39,13 +42,13 @@ export default defineComponent({
         const formDataRef = ref<FormInstance>()
 
         // 定义响应式数据
-        const reactiveData = reactive({})
+        const reactiveData = reactive({
+            formData: {} as any,
+        })
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            port: [
-                { type: "number", message: "端口必须为数字值" }
-            ]
+            port: [{ type: 'number', message: '端口必须为数字值' }],
         })
 
         // 图标
@@ -61,31 +64,31 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    emit("search", reactiveData)
+                    emit('search', reactiveData.formData)
                 }
-            });
+            })
         }
 
         const reset = () => {
             const form = unref(formDataRef)
-            form?.resetFields();
-            emit("reset");
+            form?.resetFields()
+            emit('reset')
         }
 
         const refresh = () => {
-            emit("refresh");
+            emit('refresh')
         }
 
         const sort = () => {
-            emit("sort");
+            emit('sort')
         }
 
         const sizeChange = (size) => {
-            emit("size-change", size);
+            emit('size-change', size)
         }
 
         const currentChange = (current) => {
-            emit("current-change", current);
+            emit('current-change', current)
         }
 
         return {
@@ -99,7 +102,7 @@ export default defineComponent({
             sort,
             sizeChange,
             currentChange,
-            ...Icon
+            ...Icon,
         }
-    }
+    },
 })

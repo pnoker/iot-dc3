@@ -14,26 +14,8 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { useRoute } from 'vue-router'
-import { decode } from 'js-base64'
-
-export default defineComponent({
-    props: {
-        url: {
-            type: String,
-            default: 'http://zhb_nyx.gitee.io/data-view',
-        },
-    },
-    setup() {
-        const route = useRoute()
-
-        const iframeUrl = () => {
-            return decode(route.query.id as string)
-        }
-
-        return {
-            iframeUrl,
-        }
-    },
-})
+export default {
+    TENANT_HEADER: 'X-Auth-Tenant',
+    USER_HEADER: 'X-Auth-User',
+    TOKEN_HEADER: 'X-Auth-Token',
+}

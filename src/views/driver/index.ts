@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,24 +14,24 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, computed } from "vue"
+import { defineComponent, reactive, computed } from 'vue'
 
-import { driverListApi, driverStatusApi } from "@/api/driver"
+import { driverListApi, driverStatusApi } from '@/api/driver'
 
-import { Order } from "@/config/type/types"
+import { Order } from '@/config/type/types'
 
-import blankCard from "@/components/card/blank/BlankCard.vue"
-import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
-import driverTool from "./tool/DriverTool.vue"
-import driverCard from "./card/DriverCard.vue"
+import blankCard from '@/components/card/blank/BlankCard.vue'
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
+import driverTool from './tool/DriverTool.vue'
+import driverCard from './card/DriverCard.vue'
 
 export default defineComponent({
-    name: "Driver",
+    name: 'Driver',
     components: {
         blankCard,
         skeletonCard,
         driverTool,
-        driverCard
+        driverCard,
     },
     setup() {
         // 定义响应式数据
@@ -37,14 +40,14 @@ export default defineComponent({
             statusTable: {},
             listData: [] as any[],
             query: {
-                type: "driver",
+                type: 'driver',
             },
             order: false,
             page: {
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[]
+                orders: [] as Order[],
             },
         })
 
@@ -56,33 +59,38 @@ export default defineComponent({
             driverListApi({
                 page: reactiveData.page,
                 ...reactiveData.query,
-            }).then((res) => {
-                const data = res.data.data
-                reactiveData.page.total = data.total
-                reactiveData.listData = data.records
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.loading = false
             })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.page.total = data.total
+                    reactiveData.listData = data.records
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+                .finally(() => {
+                    reactiveData.loading = false
+                })
 
             driverStatusApi({
                 page: reactiveData.page,
                 ...reactiveData.query,
-            }).then((res) => {
-                reactiveData.statusTable = res.data.data
-            }).catch(() => {
-                // nothing to do
             })
+                .then((res) => {
+                    reactiveData.statusTable = res.data.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const search = (params) => {
-            reactiveData.query = { ...params, type: "driver" }
+            reactiveData.query = { ...params, type: 'driver' }
             list()
         }
 
         const reset = () => {
-            reactiveData.query = { type: "driver" }
+            reactiveData.query = { type: 'driver' }
             list()
         }
 
@@ -93,9 +101,9 @@ export default defineComponent({
         const sort = () => {
             reactiveData.order = !reactiveData.order
             if (reactiveData.order) {
-                reactiveData.page.orders = [{ column: "create_time", asc: true }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: true }]
             } else {
-                reactiveData.page.orders = [{ column: "create_time", asc: false }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: false }]
             }
             list()
         }
@@ -120,7 +128,7 @@ export default defineComponent({
             refresh,
             sort,
             sizeChange,
-            currentChange
+            currentChange,
         }
-    }
+    },
 })

@@ -1,9 +1,12 @@
 /*
- * Copyright (c) 2022. Pnoker. All Rights Reserved.
+ * Copyright 2022 Pnoker All Rights Reserved
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,38 +14,56 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, computed } from "vue"
+import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi } from "@/api/device"
-import { profileByIdsApi } from "@/api/profile"
-import { driverByIdsApi } from "@/api/driver"
-import { driverDictionaryApi, profileDictionaryApi } from "@/api/dictionary"
+import { driverByIdsApi } from '@/api/driver'
+import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi, deviceUpdateApi } from '@/api/device'
 
-import { Dictionary, Order } from "@/config/type/types"
+import { Order } from '@/config/type/types'
 
-import blankCard from "@/components/card/blank/BlankCard.vue"
-import skeletonCard from "@/components/card/skeleton/SkeletonCard.vue"
-import deviceTool from "./tool/DeviceTool.vue"
-import deviceAddForm from "./add/DeviceAddForm.vue"
-import deviceCard from "./card/DeviceCard.vue"
+import blankCard from '@/components/card/blank/BlankCard.vue'
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
+import deviceTool from './tool/DeviceTool.vue'
+import deviceAddForm from './add/DeviceAddForm.vue'
+import deviceCard from './card/DeviceCard.vue'
+import { isNull } from '@/util/utils'
+import { failMessage } from '@/util/NotificationUtils'
 
 export default defineComponent({
-    name: "Device",
+    name: 'Device',
     components: {
         blankCard,
         skeletonCard,
         deviceTool,
         deviceAddForm,
-        deviceCard
+        deviceCard,
     },
-    setup() {
+    props: {
+        embedded: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
+        driverId: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
+        profileId: {
+            type: String,
+            default: () => {
+                return ''
+            },
+        },
+    },
+    setup(props) {
         const deviceAddFormRef: any = ref<InstanceType<typeof deviceAddForm>>()
 
         // 定义响应式数据
         const reactiveData = reactive({
             loading: true,
-            driverDictionary: [] as Dictionary[],
-            profileDictionary: [] as Dictionary[],
             driverTable: {},
             profileTable: {},
             statusTable: {},
@@ -53,8 +74,8 @@ export default defineComponent({
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[]
-            }
+                orders: [] as Order[],
+            },
         })
 
         const hasData = computed(() => {
@@ -62,71 +83,85 @@ export default defineComponent({
         })
 
         const list = () => {
+            if (!isNull(props.driverId)) {
+                reactiveData.query = {
+                    ...reactiveData.query,
+                    driverId: props.driverId,
+                }
+            }
+            if (!isNull(props.profileId)) {
+                reactiveData.query = {
+                    ...reactiveData.query,
+                    profileId: props.profileId,
+                }
+            }
+
             deviceListApi({
                 page: reactiveData.page,
-                ...reactiveData.query
-            }).then(res => {
-                const data = res.data.data
-                reactiveData.page.total = data.total
-                reactiveData.listData = data.records
+                ...reactiveData.query,
+            })
+                .then((res) => {
+                    const data = res.data.data
+                    reactiveData.page.total = data.total
+                    reactiveData.listData = data.records
 
-                // driver 
-                const driverIds = Array.from(new Set(reactiveData.listData.map(device => device.driverId)))
-                driverByIdsApi(driverIds).then(res => {
-                    reactiveData.driverTable = res.data.data
-                }).catch(() => {
+                    // driver
+                    const driverIds = Array.from(new Set(reactiveData.listData.map((device) => device.driverId)))
+                    driverByIdsApi(driverIds)
+                        .then((res) => {
+                            reactiveData.driverTable = res.data.data
+                        })
+                        .catch(() => {
+                            // nothing to do
+                        })
+                })
+                .catch(() => {
                     // nothing to do
                 })
-
-                // profile
-                const profileIds = Array.from(new Set(reactiveData.listData.reduce((pre, cur) => {
-                    pre.push(...cur.profileIds)
-                    return pre
-                }, [])))
-                profileByIdsApi(profileIds).then(res => {
-                    reactiveData.profileTable = res.data.data
-                }).catch(() => {
-                    // nothing to do
+                .finally(() => {
+                    reactiveData.loading = false
                 })
-            }).catch(() => {
-                // nothing to do
-            }).finally(() => {
-                reactiveData.loading = false
-            });
 
             deviceStatusApi({
                 page: reactiveData.page,
-                ...reactiveData.query
-            }).then(res => {
-                reactiveData.statusTable = res.data.data;
-            }).catch(() => {
-                // nothing to do
+                ...reactiveData.query,
             })
-        }
-
-        const driver = () => {
-            driverDictionaryApi().then(res => {
-                reactiveData.driverDictionary = res.data.data
-            }).catch(() => {
-                // nothing to do
-            })
-        }
-
-        const profile = () => {
-            profileDictionaryApi().then(res => {
-                reactiveData.profileDictionary = res.data.data
-            }).catch(() => {
-                // nothing to do
-            })
+                .then((res) => {
+                    reactiveData.statusTable = res.data.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const search = (params) => {
+            if (!isNull(props.driverId)) {
+                params = {
+                    ...params,
+                    driverId: props.driverId,
+                }
+            }
+            if (!isNull(props.profileId)) {
+                params = {
+                    ...params,
+                    profileId: props.profileId,
+                }
+            }
+
             reactiveData.query = params
             list()
         }
 
         const reset = () => {
-            reactiveData.query = {}
+            let params = {}
+            if (!isNull(props.driverId)) {
+                params = { driverId: props.driverId }
+            }
+            if (!isNull(props.profileId)) {
+                params = { profileId: props.profileId }
+            }
+
+            reactiveData.query = params
             list()
         }
 
@@ -135,21 +170,51 @@ export default defineComponent({
         }
 
         const addThing = (form, done) => {
-            deviceAddApi(form).then(() => {
-                list()
-                done();
-            }).catch(() => {
-                // nothing to do
-            });
+            deviceAddApi(form)
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const disableThing = (id, done) => {
+            deviceUpdateApi({ id: id, enable: false })
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const enableThing = (id, done) => {
+            deviceUpdateApi({ id: id, enable: true })
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const deleteThing = (id, done) => {
-            deviceDeleteApi(id).then(() => {
-                list()
-                done();
-            }).catch(() => {
-                // nothing to do
-            });
+            deviceDeleteApi(id)
+                .then((res) => {
+                    if (res.data.ok) {
+                        list()
+                        done()
+                    } else {
+                        failMessage(res.data.message)
+                    }
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const refresh = () => {
@@ -159,9 +224,9 @@ export default defineComponent({
         const sort = () => {
             reactiveData.order = !reactiveData.order
             if (reactiveData.order) {
-                reactiveData.page.orders = [{ column: "create_time", asc: true }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: true }]
             } else {
-                reactiveData.page.orders = [{ column: "create_time", asc: false }]
+                reactiveData.page.orders = [{ column: 'create_time', asc: false }]
             }
             list()
         }
@@ -176,8 +241,6 @@ export default defineComponent({
             list()
         }
 
-        driver()
-        profile()
         list()
 
         return {
@@ -188,11 +251,13 @@ export default defineComponent({
             reset,
             showAdd,
             addThing,
+            disableThing,
+            enableThing,
             deleteThing,
             refresh,
             sort,
             sizeChange,
             currentChange,
         }
-    }
+    },
 })
