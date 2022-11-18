@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +23,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
-import io.github.pnoker.common.bean.Pages;
+import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.dto.DriverDto;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -46,6 +44,7 @@ import java.util.stream.Collectors;
  * DriverService Impl
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @Slf4j
 @Service

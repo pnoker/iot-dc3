@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +16,7 @@ package io.github.pnoker.common.utils;
 
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.crypto.digest.MD5;
-import io.github.pnoker.common.bean.TreeNode;
+import io.github.pnoker.common.bean.common.TreeNode;
 import io.github.pnoker.common.constant.CommonConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
@@ -40,24 +38,18 @@ import java.util.stream.Collectors;
  * Dc3 平台自定义工具类集合
  *
  * @author pnoker
+ * @since 2022.1.0
  */
+// 2022-11-02 检查：通过
 @Slf4j
 public class Dc3Util {
     /**
      * SimpleDateFormat ThreadLocal 保证线程安全
      */
-    private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected synchronized SimpleDateFormat initialValue() {
-            return new SimpleDateFormat(CommonConstant.Time.DEFAULT_DATE_FORMAT);
-        }
-    };
-    private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected synchronized SimpleDateFormat initialValue() {
-            return new SimpleDateFormat(CommonConstant.Time.COMPLETE_DATE_FORMAT);
-        }
-    };
+    private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat(CommonConstant.Time.DEFAULT_DATE_FORMAT));
+    private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat(CommonConstant.Time.COMPLETE_DATE_FORMAT));
 
     /**
      * 获取 md5 加密编码
@@ -228,7 +220,7 @@ public class Dc3Util {
      * @return boolean
      */
     public static boolean isPhone(String phone) {
-        String regex = "^[1]([3-9])[0-9]{9}$";
+        String regex = "^1([3-9])\\d{9}$";
         return ReUtil.isMatch(regex, phone);
     }
 
@@ -239,7 +231,7 @@ public class Dc3Util {
      * @return boolean
      */
     public static boolean isMail(String mail) {
-        String regex = "^([a-zA-Z0-9_\\.-])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$";
+        String regex = "^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$";
         return ReUtil.isMatch(regex, mail);
     }
 
@@ -272,7 +264,7 @@ public class Dc3Util {
      * @return boolean
      */
     public static boolean isDriverPort(int port) {
-        String regex = "^8[6-7][0-9]{2}$";
+        String regex = "^8[6-7]\\d{2}$";
         return ReUtil.isMatch(regex, String.valueOf(port));
     }
 
@@ -284,28 +276,24 @@ public class Dc3Util {
      * @param inputStream InputStream
      * @return String
      */
-    public static String inputStreamToString(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream boa = new ByteArrayOutputStream();
-        try {
-            int length = 0;
+    public static String inputStreamToString(InputStream inputStream) {
+        try (ByteArrayOutputStream boa = new ByteArrayOutputStream()) {
+            int length;
             byte[] buffer = new byte[1024];
             while ((length = inputStream.read(buffer)) > -1) {
                 boa.write(buffer, 0, length);
             }
+            byte[] result = boa.toByteArray();
+            String temp = new String(result);
+            if (temp.contains("gb2312")) {
+                return new String(result, "gb2312");
+            } else {
+                return new String(result, StandardCharsets.UTF_8);
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-        } finally {
-            inputStream.close();
-            boa.close();
         }
-
-        byte[] result = boa.toByteArray();
-        String temp = new String(result);
-        if (temp.contains("gb2312")) {
-            return new String(result, "gb2312");
-        } else {
-            return new String(result, StandardCharsets.UTF_8);
-        }
+        return null;
     }
 
     /**
@@ -431,36 +419,19 @@ public class Dc3Util {
      *
      * @return Mac Array
      */
-    private List<String> localMacList() {
+    public static List<String> localMacList() {
         ArrayList<String> macList = new ArrayList<>(16);
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            StringBuilder stringBuilder = new StringBuilder();
-
             while (interfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = interfaces.nextElement();
-                List<InterfaceAddress> interfaceAddressList = networkInterface.getInterfaceAddresses();
-                for (InterfaceAddress interfaceAddress : interfaceAddressList) {
-                    InetAddress inetAddress = interfaceAddress.getAddress();
-                    NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
-                    if (network == null) {
-                        continue;
-                    }
-                    byte[] mac = network.getHardwareAddress();
-                    if (mac == null) {
-                        continue;
-                    }
-                    stringBuilder.delete(0, stringBuilder.length());
-                    for (int i = 0; i < mac.length; i++) {
-                        stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                    }
-                    macList.add(stringBuilder.toString());
-                }
+                lookupLocalMac(macList, networkInterface);
             }
-            if (macList.size() > 0) {
+            if (!macList.isEmpty()) {
                 return macList.stream().distinct().collect(Collectors.toList());
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to get local mac address");
         }
         return macList;
     }
@@ -489,25 +460,7 @@ public class Dc3Util {
             InetAddress inetAddress = InetAddress.getByName(address);
 
             if (inetAddress.isAnyLocalAddress()) {
-                try {
-                    Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
-
-                    for (NetworkInterface ni : Collections.list(nis)) {
-                        Collections.list(ni.getInetAddresses()).forEach(ia -> {
-                            if (ia instanceof Inet4Address) {
-                                boolean loopback = ia.isLoopbackAddress();
-
-                                if (!loopback || includeLoopback) {
-                                    hostNames.add(ia.getHostName());
-                                    hostNames.add(ia.getHostAddress());
-                                    hostNames.add(ia.getCanonicalHostName());
-                                }
-                            }
-                        });
-                    }
-                } catch (SocketException e) {
-                    log.warn("Failed to NetworkInterfaces for bind address: {}", address, e);
-                }
+                loopbackAddresses(hostNames, includeLoopback);
             } else {
                 boolean loopback = inetAddress.isLoopbackAddress();
 
@@ -517,8 +470,8 @@ public class Dc3Util {
                     hostNames.add(inetAddress.getCanonicalHostName());
                 }
             }
-        } catch (UnknownHostException e) {
-            log.warn("Failed to get InetAddress for bind address: {}", address, e);
+        } catch (UnknownHostException | SocketException e) {
+            log.warn("Failed to get hostname for bind address: {}", address, e);
         }
 
         return hostNames;
@@ -535,4 +488,55 @@ public class Dc3Util {
         return httpServletRequest.getHeader(key);
     }
 
+    /**
+     * Lookup local mac
+     *
+     * @param macList          Mac List
+     * @param networkInterface NetworkInterface
+     * @throws SocketException SocketException
+     */
+    private static void lookupLocalMac(ArrayList<String> macList, NetworkInterface networkInterface) throws SocketException {
+        List<InterfaceAddress> interfaceAddressList = networkInterface.getInterfaceAddresses();
+        for (InterfaceAddress interfaceAddress : interfaceAddressList) {
+            InetAddress inetAddress = interfaceAddress.getAddress();
+            NetworkInterface network = NetworkInterface.getByInetAddress(inetAddress);
+            if (network == null) {
+                continue;
+            }
+
+            byte[] mac = network.getHardwareAddress();
+            if (mac != null) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < mac.length; i++) {
+                    stringBuilder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                }
+                macList.add(stringBuilder.toString());
+            }
+        }
+    }
+
+    /**
+     * Get loopback addresses
+     *
+     * @param hostNames       HostName Set
+     * @param includeLoopback includeLoopback if {@code true} loopback addresses will be included in the returned set.
+     * @throws SocketException SocketException
+     */
+    private static void loopbackAddresses(Set<String> hostNames, boolean includeLoopback) throws SocketException {
+        Enumeration<NetworkInterface> interfaceEnumeration = NetworkInterface.getNetworkInterfaces();
+
+        for (NetworkInterface networkInterface : Collections.list(interfaceEnumeration)) {
+            Collections.list(networkInterface.getInetAddresses()).forEach(inetAddress -> {
+                if (inetAddress instanceof Inet4Address) {
+                    boolean loopback = inetAddress.isLoopbackAddress();
+
+                    if (!loopback || includeLoopback) {
+                        hostNames.add(inetAddress.getHostName());
+                        hostNames.add(inetAddress.getHostAddress());
+                        hostNames.add(inetAddress.getCanonicalHostName());
+                    }
+                }
+            });
+        }
+    }
 }

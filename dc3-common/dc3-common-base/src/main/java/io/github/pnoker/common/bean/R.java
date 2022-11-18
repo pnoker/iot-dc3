@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +27,10 @@ import java.io.Serializable;
  * Response
  *
  * @author pnoker
+ * @since 2022.1.0
  */
+
+// 2022-11-02 检查：通过
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -50,7 +51,6 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> ok() {
         return new R<T>().success();
     }
@@ -60,7 +60,6 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> ok(String message) {
         return new R<T>().success(message);
     }
@@ -70,7 +69,6 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> ok(Code code, String message) {
         return new R<T>().success(code.getValue(), message);
     }
@@ -81,7 +79,6 @@ public class R<T> implements Serializable {
      * @param data 返回结果
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> ok(T data) {
         return new R<T>(data).success();
     }
@@ -92,7 +89,6 @@ public class R<T> implements Serializable {
      * @param data 返回结果
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> ok(T data, String message) {
         return new R<T>(data).success(message);
     }
@@ -102,7 +98,6 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> fail() {
         return new R<T>().failure();
     }
@@ -112,7 +107,6 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> fail(String message) {
         return new R<T>().failure(message);
     }
@@ -122,7 +116,6 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> fail(Code code, String message) {
         return new R<T>().failure(code.getValue(), message);
     }
@@ -133,7 +126,6 @@ public class R<T> implements Serializable {
      * @param data 返回结果
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> fail(T data) {
         return new R<T>(data).failure();
     }
@@ -144,7 +136,6 @@ public class R<T> implements Serializable {
      * @param data 返回结果
      * @return Response
      */
-    @SuppressWarnings("unchecked")
     public static <T> R<T> fail(T data, String message) {
         return new R<T>(data).failure(message);
     }

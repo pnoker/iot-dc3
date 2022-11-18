@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +19,7 @@ import io.github.pnoker.common.model.*;
 
 /**
  * @author pnoker
+ * @since 2022.1.0
  */
 public interface DriverMetadataService {
 
@@ -39,7 +38,7 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中模板
      *
-     * @param id Id
+     * @param id ID
      */
     void deleteProfile(String id);
 
@@ -53,7 +52,7 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中设备
      *
-     * @param id Id
+     * @param id ID
      */
     void deleteDevice(String id);
 
@@ -67,8 +66,8 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中位号
      *
-     * @param profileId Profile Id
-     * @param id        Id
+     * @param profileId Profile ID
+     * @param id        ID
      */
     void deletePoint(String profileId, String id);
 
@@ -82,8 +81,8 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中添加驱动配置信息
      *
-     * @param deviceId    Device Id
-     * @param attributeId Attribute Id
+     * @param deviceId    Device ID
+     * @param attributeId Attribute ID
      */
     void deleteDriverInfo(String deviceId, String attributeId);
 
@@ -97,9 +96,9 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中添加位号配置信息
      *
-     * @param deviceId    Device Id
-     * @param pointId     Point Id
-     * @param attributeId Attribute Id
+     * @param deviceId    Device ID
+     * @param pointId     Point ID
+     * @param attributeId Attribute ID
      */
     void deletePointInfo(String deviceId, String pointId, String attributeId);
 }

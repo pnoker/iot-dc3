@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,34 +12,36 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.bean;
+package io.github.pnoker.common.bean.common;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Aes/Rsa 加密密钥
+ * Tree node
  *
  * @author pnoker
+ * @since 2022.1.0
  */
-public class Keys {
+
+// 2022-11-02 检查：通过
+@Data
+public class TreeNode implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private int id;
+    private int parentId;
+    private List<TreeNode> children = new ArrayList<>(16);
 
     /**
-     * Aes 密钥
+     * Add
+     *
+     * @param node TreeNode
      */
-    @Data
-    @AllArgsConstructor
-    public static class Aes {
-        private String privateKey;
-    }
-
-    /**
-     * RSA 密钥对
-     */
-    @Data
-    @AllArgsConstructor
-    public static class Rsa {
-        private String publicKey;
-        private String privateKey;
+    public void add(TreeNode node) {
+        children.add(node);
     }
 }

@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +21,7 @@ import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.ServiceConstant;
 import io.github.pnoker.common.dto.UserDto;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +33,7 @@ import javax.annotation.Resource;
  * 用户 Feign Client 接口实现
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @Slf4j
 @RestController
@@ -97,7 +97,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail("Resource does not exist");
+        return R.fail(ResponseEnum.NO_RESOURCE.getName());
     }
 
     @Override
@@ -110,7 +110,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail("Resource does not exist");
+        return R.fail(ResponseEnum.NO_RESOURCE.getName());
     }
 
     @Override
@@ -126,7 +126,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail("Resource does not exist");
+        return R.fail(ResponseEnum.NO_RESOURCE.getName());
     }
 
     @Override

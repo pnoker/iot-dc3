@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +18,6 @@ import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.driver.DriverMetadata;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +33,7 @@ import java.util.stream.Collectors;
  * BatchService Impl
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @Slf4j
 @Service
@@ -72,7 +70,7 @@ public class BatchServiceImpl implements BatchService {
             driverMetadata.setPointAttributeMap(pointAttributeMap);
 
             List<Device> devices = deviceService.selectByDriverId(driver.getId());
-            Set<String> deviceIds = devices.stream().map(Description::getId).collect(Collectors.toSet());
+            Set<String> deviceIds = devices.stream().map(BaseModel::getId).collect(Collectors.toSet());
 
             Map<String, Map<String, AttributeInfo>> driverInfoMap = getDriverInfoMap(deviceIds, driverAttributeMap);
             driverMetadata.setDriverInfoMap(driverInfoMap);
@@ -96,7 +94,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get driver attribute map
      *
-     * @param driverId Driver Id
+     * @param driverId Driver ID
      * @return map(driverAttributeId, driverAttribute)
      */
     public Map<String, DriverAttribute> getDriverAttributeMap(String driverId) {
@@ -112,7 +110,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get point attribute map
      *
-     * @param driverId Driver Id
+     * @param driverId Driver ID
      * @return map(pointAttributeId, pointAttribute)
      */
     public Map<String, PointAttribute> getPointAttributeMap(String driverId) {
@@ -146,7 +144,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get driver info map
      *
-     * @param deviceId           Device Id
+     * @param deviceId           Device ID
      * @param driverAttributeMap Driver Attribute Map
      * @return map(attributeName, attributeInfo ( value, type))
      */
@@ -226,7 +224,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get profile  map
      *
-     * @param deviceIds Device Id Set
+     * @param deviceIds Device ID Set
      * @return map(profileId ( pointId, point))
      */
     public Map<String, Map<String, Point>> getProfilePointMap(Set<String> deviceIds) {
@@ -241,7 +239,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get point map
      *
-     * @param profileId Profile Id
+     * @param profileId Profile ID
      * @return map(pointId, point)
      */
     public Map<String, Point> getPointMap(String profileId) {

@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,17 +30,19 @@ import javax.validation.constraints.Pattern;
  * 设备变量表
  *
  * @author pnoker
+ * @since 2022.1.0
  */
+// 2022-11-02 检查：通过
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Point extends Description {
+public class Point extends BaseModel {
 
-    @NotBlank(message = "name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/\\.\\|]{1,31}$", message = "Invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
+    @NotBlank(message = "Name can't be empty", groups = {Insert.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
     private String name;
 
     private String type;
@@ -63,7 +63,7 @@ public class Point extends Description {
 
     private Boolean enable;
 
-    @NotNull(message = "profile id can't be empty", groups = {Insert.class, Update.class})
+    @NotNull(message = "Profile id can't be empty", groups = {Insert.class, Update.class})
     private String profileId;
 
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})
@@ -71,22 +71,9 @@ public class Point extends Description {
 
     private String tenantId;
 
-    public Point(String name, String type, Short rw, Float base, Float minimum, Float maximum, Float multiple,
-                 Boolean accrue, String format, String unit, String profileId, String tenantId) {
-        this.name = name;
-        this.type = type;
-        this.rw = rw;
-        this.base = base;
-        this.minimum = minimum;
-        this.maximum = maximum;
-        this.multiple = multiple;
-        this.accrue = accrue;
-        this.format = format;
-        this.unit = unit;
-        this.profileId = profileId;
-        this.tenantId = tenantId;
-    }
-
+    /**
+     * 设置默认值
+     */
     public void setDefault() {
         this.type = PointValueTypeEnum.STRING.getCode();
         this.rw = 0;

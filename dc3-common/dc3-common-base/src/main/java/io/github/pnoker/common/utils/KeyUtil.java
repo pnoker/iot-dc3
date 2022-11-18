@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +14,7 @@
 
 package io.github.pnoker.common.utils;
 
-import io.github.pnoker.common.bean.Keys;
+import io.github.pnoker.common.bean.driver.auth.Keys;
 import io.github.pnoker.common.constant.CacheConstant;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.jsonwebtoken.Claims;
@@ -25,14 +23,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -40,12 +37,18 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Dc3 平台密钥工具类
+ * AES、RSA、JWT相关工具类
  *
  * @author pnoker
+ * @since 2022.1.0
  */
+// 2022-11-01 检查：通过
 @Slf4j
 public class KeyUtil {
+
+    private KeyUtil() {
+        // nothing to do
+    }
 
     /**
      * 生成AES密钥
@@ -61,14 +64,19 @@ public class KeyUtil {
     }
 
     /**
-     * AES 私钥加密
+     * 使用AES密钥加密
      *
      * @param str        String
      * @param privateKey Private Key
      * @return Encrypt Aes
-     * @throws Exception Exception
+     * @throws NoSuchPaddingException    NoSuchPaddingException
+     * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
+     * @throws InvalidKeyException       InvalidKeyException
+     * @throws IllegalBlockSizeException IllegalBlockSizeException
+     * @throws BadPaddingException       BadPaddingException
      */
-    public static String encryptAes(String str, String privateKey) throws Exception {
+    public static String encryptAes(String str, String privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
+            InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, CommonConstant.Algorithm.ALGORITHM_AES);
@@ -79,14 +87,19 @@ public class KeyUtil {
     }
 
     /**
-     * AES 私钥解密
+     * 使用AES密钥解密
      *
      * @param str        String
      * @param privateKey Private Key
      * @return Decrypt Aes
-     * @throws Exception Exception
+     * @throws NoSuchPaddingException    NoSuchPaddingException
+     * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
+     * @throws InvalidKeyException       InvalidKeyException
+     * @throws IllegalBlockSizeException IllegalBlockSizeException
+     * @throws BadPaddingException       BadPaddingException
      */
-    public static String decryptAes(String str, String privateKey) throws Exception {
+    public static String decryptAes(String str, String privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
+            InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, CommonConstant.Algorithm.ALGORITHM_AES);
@@ -106,7 +119,7 @@ public class KeyUtil {
      */
     public static Keys.Rsa genRsaKey() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(CommonConstant.Algorithm.ALGORITHM_RSA);
-        keyPairGen.initialize(1024, new SecureRandom());
+        keyPairGen.initialize(2048, new SecureRandom());
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
@@ -116,14 +129,20 @@ public class KeyUtil {
     }
 
     /**
-     * RSA 公钥加密
+     * 使用RSA公钥加密
      *
      * @param str       String
      * @param publicKey Public Key
      * @return Encrypt Rsa
-     * @throws Exception Exception
+     * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
+     * @throws NoSuchPaddingException    NoSuchPaddingException
+     * @throws InvalidKeyException       InvalidKeyException
+     * @throws IllegalBlockSizeException IllegalBlockSizeException
+     * @throws BadPaddingException       BadPaddingException
+     * @throws InvalidKeySpecException   InvalidKeySpecException
      */
-    public static String encryptRsa(String str, String publicKey) throws Exception {
+    public static String encryptRsa(String str, String publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
         //base64编码的公钥
         byte[] keyBytes = Dc3Util.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
@@ -135,14 +154,20 @@ public class KeyUtil {
     }
 
     /**
-     * RSA 私钥解密
+     * 使用RSA密钥解密
      *
      * @param str        String
      * @param privateKey Private Key
      * @return Decrypt Rsa
-     * @throws Exception Exception
+     * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
+     * @throws NoSuchPaddingException    NoSuchPaddingException
+     * @throws InvalidKeyException       InvalidKeyException
+     * @throws IllegalBlockSizeException IllegalBlockSizeException
+     * @throws BadPaddingException       BadPaddingException
+     * @throws InvalidKeySpecException   InvalidKeySpecException
      */
-    public static String decryptRsa(String str, String privateKey) throws Exception {
+    public static String decryptRsa(String str, String privateKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
         //base64编码的私钥
         byte[] keyBytes = Dc3Util.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
@@ -181,7 +206,7 @@ public class KeyUtil {
      */
     public static Claims parserToken(String username, String salt, String token, String tenantId) {
         return Jwts.parser()
-                .requireIssuer(CommonConstant.Algorithm.DEFAULT_KEY+ CommonConstant.Symbol.SLASH + tenantId)
+                .requireIssuer(CommonConstant.Algorithm.DEFAULT_KEY + CommonConstant.Symbol.SLASH + tenantId)
                 .requireSubject(username)
                 .setSigningKey(salt.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(token)
