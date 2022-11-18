@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,15 +16,18 @@ package io.github.pnoker.common.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import io.github.pnoker.common.exception.JsonException;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +37,14 @@ import java.util.List;
  * 基于 Jackson 实现
  *
  * @author pnoker
+ * @since 2022.1.0
  */
+// 2022-11-01 检查：通过
 public final class JsonUtil {
+
+    private JsonUtil() {
+        // nothing to do
+    }
 
     private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, Boolean.FALSE)
@@ -55,8 +62,8 @@ public final class JsonUtil {
     public static <T> T parseObject(String text, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(text, valueType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -70,8 +77,8 @@ public final class JsonUtil {
     public static <T> T parseObject(byte[] bytes, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(bytes, valueType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -85,8 +92,8 @@ public final class JsonUtil {
     public static <T> T parseObject(JsonParser jsonParser, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(jsonParser, valueType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -100,8 +107,8 @@ public final class JsonUtil {
     public static <T> T parseObject(DataInput dataInput, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(dataInput, valueType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -115,8 +122,8 @@ public final class JsonUtil {
     public static <T> T parseObject(InputStream inputStream, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(inputStream, valueType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -130,8 +137,8 @@ public final class JsonUtil {
     public static <T> T parseObject(Reader reader, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(reader, valueType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -145,8 +152,8 @@ public final class JsonUtil {
     public static <T> T parseObject(File file, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(file, valueType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -160,8 +167,8 @@ public final class JsonUtil {
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
         try {
             return OBJECT_MAPPER.readValue(text, typeReference);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -176,8 +183,8 @@ public final class JsonUtil {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
             return OBJECT_MAPPER.readValue(text, javaType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -192,8 +199,8 @@ public final class JsonUtil {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
             return OBJECT_MAPPER.readValue(bytes, javaType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -208,8 +215,8 @@ public final class JsonUtil {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
             return OBJECT_MAPPER.readValue(jsonParser, javaType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -224,8 +231,8 @@ public final class JsonUtil {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
             return OBJECT_MAPPER.readValue(dataInput, javaType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -240,8 +247,8 @@ public final class JsonUtil {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
             return OBJECT_MAPPER.readValue(inputStream, javaType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -256,8 +263,8 @@ public final class JsonUtil {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
             return OBJECT_MAPPER.readValue(reader, javaType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -272,8 +279,8 @@ public final class JsonUtil {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
             return OBJECT_MAPPER.readValue(file, javaType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -286,8 +293,8 @@ public final class JsonUtil {
     public static <T> String toJsonString(T type) {
         try {
             return OBJECT_MAPPER.writeValueAsString(type);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -301,8 +308,8 @@ public final class JsonUtil {
     public static <T> String toJsonString(T type, Class<?> serializationView) {
         try {
             return OBJECT_MAPPER.writerWithView(serializationView).writeValueAsString(type);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -315,8 +322,8 @@ public final class JsonUtil {
     public static <T> String toPrettyJsonString(T type) {
         try {
             return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(type);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -330,8 +337,8 @@ public final class JsonUtil {
     public static <T> String toPrettyJsonString(T type, Class<?> serializationView) {
         try {
             return OBJECT_MAPPER.writerWithView(serializationView).withDefaultPrettyPrinter().writeValueAsString(type);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 
@@ -344,8 +351,8 @@ public final class JsonUtil {
     public static <T> byte[] toJsonBytes(T type) {
         try {
             return OBJECT_MAPPER.writeValueAsString(type).getBytes(StandardCharsets.UTF_8);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new JsonException(e);
         }
     }
 

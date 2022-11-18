@@ -1,5 +1,6 @@
 #
-# Copyright (c) 2022. Pnoker. All Rights Reserved.
+# Copyright 2016-present Pnoker All Rights Reserved
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,28 +29,28 @@ Cache-Control: no-cache
 }
 
 
-### 根据 Device Id 查询 最新值
+### 根据 Device ID 查询 最新值
 #/latest/device_id/:deviceId
 GET http://localhost:8500/data/point_value/latest/device_id/1
 Accept: */*
 Cache-Control: no-cache
 
 
-### 根据 Device Id 和 Point Id 查询 最新值
+### 根据 Device ID 和 Point ID 查询 最新值
 #/latest/device_id/:deviceId/point_id/:pointId
 GET http://localhost:8500/data/point_value/latest/device_id/1/point_id/1
 Accept: */*
 Cache-Control: no-cache
 
 
-### 根据 Device Id 查询 实时值
+### 根据 Device ID 查询 实时值
 #/realtime/device_id/:deviceId
 GET http://localhost:8500/data/point_value/realtime/device_id/1379432247010025473
 Accept: */*
 Cache-Control: no-cache
 
 
-### 根据 Device Id 和 Point Id 查询 实时值
+### 根据 Device ID 和 Point ID 查询 实时值
 #/realtime/device_id/:deviceId/point_id/:pointId
 GET http://localhost:8500/data/point_value/realtime/device_id/1/point_id/1
 Accept: */*

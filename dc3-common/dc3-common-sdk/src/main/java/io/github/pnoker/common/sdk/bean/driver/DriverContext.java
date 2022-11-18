@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +31,9 @@ import java.util.Optional;
 
 /**
  * @author pnoker
+ * @since 2022.1.0
  */
+// 2022-11-02 检查：通过
 @Data
 @Slf4j
 @Component
@@ -56,7 +56,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取连接设备的驱动配置信息
      *
-     * @param deviceId Device Id
+     * @param deviceId Device ID
      * @return Map<String, AttributeInfo>
      */
     public Map<String, AttributeInfo> getDriverInfoByDeviceId(String deviceId) {
@@ -66,7 +66,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取连接设备的全部位号配置信息
      *
-     * @param deviceId Device Id
+     * @param deviceId Device ID
      * @return Map<String, Map < String, AttributeInfo>>
      */
     public Map<String, Map<String, AttributeInfo>> getPointInfoByDeviceId(String deviceId) {
@@ -81,8 +81,8 @@ public class DriverContext {
     /**
      * 根据 设备Id 和 位号Id 获取连接设备的位号配置信息
      *
-     * @param deviceId Device Id
-     * @param pointId  Point Id
+     * @param deviceId Device ID
+     * @param pointId  Point ID
      * @return Map<String, AttributeInfo>
      */
     public Map<String, AttributeInfo> getPointInfoByDeviceIdAndPointId(String deviceId, String pointId) {
@@ -96,7 +96,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取设备
      *
-     * @param deviceId Device Id
+     * @param deviceId Device ID
      * @return Device
      */
     public Device getDeviceByDeviceId(String deviceId) {
@@ -110,7 +110,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取位号
      *
-     * @param deviceId Device Id
+     * @param deviceId Device ID
      * @return Point Array
      */
     public List<Point> getPointByDeviceId(String deviceId) {
@@ -127,8 +127,8 @@ public class DriverContext {
     /**
      * 根据 设备Id和位号Id 获取位号
      *
-     * @param deviceId Device Id
-     * @param pointId  Point Id
+     * @param deviceId Device ID
+     * @param pointId  Point ID
      * @return Point
      */
     public Point getPointByDeviceIdAndPointId(String deviceId, String pointId) {

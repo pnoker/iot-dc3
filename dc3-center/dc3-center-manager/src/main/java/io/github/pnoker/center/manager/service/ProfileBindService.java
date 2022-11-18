@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,13 +24,14 @@ import java.util.Set;
  * ProfileBind Interface
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto> {
 
     /**
      * 根据 设备ID 删除关联的模版映射
      *
-     * @param deviceId Device Id
+     * @param deviceId Device ID
      * @return boolean
      */
     boolean deleteByDeviceId(String deviceId);
@@ -40,8 +39,8 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
     /**
      * 根据 设备ID 和 模版ID 删除关联的模版映射
      *
-     * @param deviceId  Device Id
-     * @param profileId Profile Id
+     * @param deviceId  Device ID
+     * @param profileId Profile ID
      * @return boolean
      */
     boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId);
@@ -49,8 +48,8 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
     /**
      * 根据 设备ID 和 模版ID 查询关联的模版映射
      *
-     * @param deviceId  Device Id
-     * @param profileId Profile Id
+     * @param deviceId  Device ID
+     * @param profileId Profile ID
      * @return ProfileBind
      */
     ProfileBind selectByDeviceIdAndProfileId(String deviceId, String profileId);
@@ -58,16 +57,16 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
     /**
      * 根据 模版ID 查询关联的 设备ID 集合
      *
-     * @param profileId Profile Id
-     * @return Device Id Set
+     * @param profileId Profile ID
+     * @return Device ID Set
      */
     Set<String> selectDeviceIdsByProfileId(String profileId);
 
     /**
      * 根据 设备ID 查询关联的 模版ID 集合
      *
-     * @param deviceId Device Id
-     * @return Profile Id Set
+     * @param deviceId Device ID
+     * @return Profile ID Set
      */
     Set<String> selectProfileIdsByDeviceId(String deviceId);
 

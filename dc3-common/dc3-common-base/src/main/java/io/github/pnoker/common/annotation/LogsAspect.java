@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +26,9 @@ import org.springframework.stereotype.Component;
  * 日志切片
  *
  * @author pnoker
+ * @since 2022.1.0
  */
+// 2022-11-01 检查：通过
 @Slf4j
 @Aspect
 @Component
@@ -40,7 +40,7 @@ public class LogsAspect {
         // nothing to do
     }
 
-    // 2022-03-13 检查：通过
+    // TODO 这个日志逻辑有点鸡肋，这个里需要写点别的逻辑
     @Around("logsCut() && @annotation(logs)")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint, Logs logs) throws Throwable {
         String uuid = IdUtil.fastSimpleUUID();

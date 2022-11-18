@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +17,7 @@ package io.github.pnoker.transfer.rtmp.init;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.bean.Pages;
+import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.dto.RtmpDto;
 import io.github.pnoker.common.model.Rtmp;
 import io.github.pnoker.transfer.rtmp.service.RtmpService;
@@ -42,13 +40,14 @@ import static java.lang.System.getProperty;
  * 启动服务，自动加载自启任务
  *
  * @author pnoker
+ * @since 2022.1.0
  */
 @Slf4j
 @Setter
 @Order(10)
 @Component
 public class TranscodeRunner implements ApplicationRunner {
-    public String ffmpeg;
+    public static String ffmpeg;
 
     @Value("${rtmp.ffmpeg.window}")
     private String window;

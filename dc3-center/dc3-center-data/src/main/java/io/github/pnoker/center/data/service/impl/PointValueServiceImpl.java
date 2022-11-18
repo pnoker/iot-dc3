@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,14 +21,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointClient;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
-import io.github.pnoker.common.bean.Pages;
+import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.CacheConstant;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.dto.PointValueDto;
-import io.github.pnoker.common.model.Description;
+import io.github.pnoker.common.model.BaseModel;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.SneakyThrows;
@@ -52,6 +50,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author pnoker
+ * @since 2022.1.0
  */
 @Slf4j
 @Service
@@ -102,7 +101,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (!pageR.isOk()) return pointValuePage;
 
         List<Point> points = pageR.getData().getRecords();
-        List<String> pointIds = points.stream().map(Description::getId).collect(Collectors.toList());
+        List<String> pointIds = points.stream().map(BaseModel::getId).collect(Collectors.toList());
         List<PointValue> pointValues = realtime(pointValueDto.getDeviceId(), pointIds);
         if (CollectionUtil.isEmpty(pointValues)) pointValues = latest(pointValueDto.getDeviceId(), pointIds);
         pointValuePage.setCurrent(pageR.getData().getCurrent()).setSize(pageR.getData().getSize()).setTotal(pageR.getData().getTotal()).setRecords(pointValues);

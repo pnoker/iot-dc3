@@ -1,12 +1,10 @@
 /*
- * Copyright 2022 Pnoker All Rights Reserved
+ * Copyright 2016-present Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
  *      https://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +32,9 @@ import java.util.List;
  * 全局异常处理
  *
  * @author pnoker
+ * @since 2022.1.0
  */
+// 2022-11-02 检查：通过
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
@@ -47,7 +47,7 @@ public class GlobalExceptionAdvice {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public R globalException(Exception exception) {
+    public R<String> globalException(Exception exception) {
         log.error("Global Exception Handler: {}", exception.getMessage(), exception);
         return R.fail(exception.getMessage());
     }
@@ -60,7 +60,7 @@ public class GlobalExceptionAdvice {
      */
     @ExceptionHandler(UnAuthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public R unAuthorizedException(UnAuthorizedException unAuthorizedException) {
+    public R<String> unAuthorizedException(UnAuthorizedException unAuthorizedException) {
         log.warn("UnAuthorized Exception Handler: {}", unAuthorizedException.getMessage(), unAuthorizedException);
         return R.fail(unAuthorizedException.getMessage());
     }
@@ -76,7 +76,7 @@ public class GlobalExceptionAdvice {
             MethodArgumentNotValidException.class
     })
     @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
-    public R methodArgumentNotValidException(MethodArgumentNotValidException exception) {
+    public R<String> methodArgumentNotValidException(MethodArgumentNotValidException exception) {
         HashMap<String, String> map = new HashMap<>(16);
         List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
         errorList.forEach(error -> {
