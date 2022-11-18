@@ -1,0 +1,156 @@
+#
+# Copyright (c) 2022. Pnoker. All Rights Reserved.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: '3'
+
+services:
+  gateway:
+    build:
+      context: ../../dc3-gateway/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-gateway:fix
+    restart: always
+    ports:
+      - '8000:8000'
+    container_name: fix-dc3-gateway
+    hostname: dc3-gateway
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-gateway
+
+  register:
+    build:
+      context: ../../dc3-center/dc3-center-register/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-center-register:fix
+    restart: always
+    ports:
+      - '8100:8100'
+    container_name: fix-dc3-center-register
+    hostname: dc3-center-register
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-center-register
+
+  auth:
+    build:
+      context: ../../dc3-center/dc3-center-auth/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-center-auth:fix
+    restart: always
+    ports:
+      - '8300:8300'
+    container_name: fix-dc3-center-auth
+    hostname: dc3-center-auth
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-center-auth
+
+  manager:
+    build:
+      context: ../../dc3-center/dc3-center-manager/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-center-manager:fix
+    restart: always
+    ports:
+      - '8400:8400'
+    container_name: fix-dc3-center-manager
+    hostname: dc3-center-manager
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-center-manager
+
+  data:
+    build:
+      context: ../../dc3-center/dc3-center-data/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-center-data:fix
+    restart: always
+    ports:
+      - '8500:8500'
+    container_name: fix-dc3-center-data
+    hostname: dc3-center-data
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-center-data
+
+  mysql:
+    build:
+      context: ../dependencies/mysql/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-mysql:fix
+    restart: always
+    ports:
+      - '3306:3306'
+    container_name: fix-dc3-mysql
+    hostname: dc3-mysql
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-mysql
+
+  mongo:
+    build:
+      context: ../dependencies/mongo/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-mongo:fix
+    restart: always
+    ports:
+      - '27017:27017'
+    container_name: fix-dc3-mongo
+    hostname: dc3-mongo
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-mongo
+
+  redis:
+    build:
+      context: ../dependencies/redis/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-redis:fix
+    restart: always
+    ports:
+      - '6379:6379'
+    container_name: fix-dc3-redis
+    hostname: dc3-redis
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-redis
+
+  rabbitmq:
+    build:
+      context: ../dependencies/rabbitmq/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-rabbitmq:fix
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    container_name: fix-dc3-rabbitmq
+    hostname: dc3-rabbitmq
+    networks:
+      fix_dc3net:
+        aliases:
+          - dc3-rabbitmq
+
+networks:
+  fix_dc3net:
+    driver: 'bridge'
+...

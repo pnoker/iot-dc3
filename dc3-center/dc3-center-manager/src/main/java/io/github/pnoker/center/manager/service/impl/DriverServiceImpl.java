@@ -101,9 +101,6 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver selectByDeviceId(String deviceId) {
         Device device = deviceService.selectById(deviceId);
-        if (null == device) {
-            throw new NotFoundException("The device does not exist");
-        }
         return selectById(device.getDriverId());
     }
 
