@@ -25,6 +25,10 @@ import io.github.pnoker.driver.api.impl.serializer.S7SerializerImpl;
  */
 public class S7SerializerFactory {
 
+	private S7SerializerFactory() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	/**
 	 * Builds a new serializer with given connector
 	 * 

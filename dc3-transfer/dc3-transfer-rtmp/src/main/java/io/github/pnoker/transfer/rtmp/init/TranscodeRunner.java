@@ -47,7 +47,6 @@ import static java.lang.System.getProperty;
 @Order(10)
 @Component
 public class TranscodeRunner implements ApplicationRunner {
-    public static String ffmpeg;
 
     @Value("${rtmp.ffmpeg.window}")
     private String window;
@@ -57,15 +56,20 @@ public class TranscodeRunner implements ApplicationRunner {
     @Resource
     private RtmpService rtmpService;
 
+    /**
+     * ffmpeg 可执行程序在当前平台的位置
+     */
+    private static String ffmpeg;
+
     @Override
     public void run(ApplicationArguments args) {
-        ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        if (CharSequenceUtil.isBlank(ffmpeg)) {
+        setFfmpeg(getProperty("os.name").toLowerCase().startsWith("win") ? window : unix);
+        if (CharSequenceUtil.isBlank(getFfmpeg())) {
             log.error("FFmpeg path is null,Please fill absolute path!");
             System.exit(1);
         }
-        if (!FileUtil.isFile(ffmpeg)) {
-            log.error("{} does not exist,Please fill absolute path!", ffmpeg);
+        if (!FileUtil.isFile(getFfmpeg())) {
+            log.error("{} does not exist,Please fill absolute path!", getFfmpeg());
             System.exit(1);
         }
         authStartList().forEach(rtmp -> rtmpService.start(rtmp.getId()));
@@ -74,6 +78,24 @@ public class TranscodeRunner implements ApplicationRunner {
     public List<Rtmp> authStartList() {
         Page<Rtmp> page = rtmpService.list(new RtmpDto(true).setPage(new Pages().setSize(-1)));
         return Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>(16));
+    }
+
+    /**
+     * 获取 ffmpeg 可执行程序在当前平台的位置
+     *
+     * @return ffmpeg
+     */
+    public static String getFfmpeg() {
+        return TranscodeRunner.ffmpeg;
+    }
+
+    /**
+     * 获取 ffmpeg 可执行程序在当前平台的位置
+     *
+     * @param ffmpeg ffmpeg 当前平台的位置
+     */
+    public static void setFfmpeg(String ffmpeg) {
+        TranscodeRunner.ffmpeg = ffmpeg;
     }
 
 }

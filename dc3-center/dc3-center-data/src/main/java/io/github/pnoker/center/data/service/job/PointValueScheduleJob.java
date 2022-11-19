@@ -49,9 +49,34 @@ public class PointValueScheduleJob extends QuartzJobBean {
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
-    public static List<PointValue> pointValues = new ArrayList<>();
-    public static ReentrantReadWriteLock valueLock = new ReentrantReadWriteLock();
-    public static AtomicLong valueCount = new AtomicLong(0), valueSpeed = new AtomicLong(0);
+    public static final ReentrantReadWriteLock valueLock = new ReentrantReadWriteLock();
+    public static final AtomicLong valueCount = new AtomicLong(0);
+    public static final AtomicLong valueSpeed = new AtomicLong(0);
+
+    private static final List<PointValue> pointValues = new ArrayList<>();
+
+    /**
+     * 获取 PointValue 长度
+     */
+    public static int getPointValuesSize() {
+        return pointValues.size();
+    }
+
+    /**
+     * 清空 PointValue
+     */
+    public static void clearPointValues() {
+        pointValues.clear();
+    }
+
+    /**
+     * 添加 PointValue
+     *
+     * @param pointValue PointValue
+     */
+    public static void addPointValues(PointValue pointValue) {
+        pointValues.add(pointValue);
+    }
 
     @Override
     protected void executeInternal(@NotNull JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -60,15 +85,15 @@ public class PointValueScheduleJob extends QuartzJobBean {
         valueSpeed.set(speed);
         speed /= interval;
         if (speed >= batchSpeed) {
-            log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, pointValues.size(), interval);
+            log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(), interval);
         }
 
         // Save point value array to Redis & MongoDB
         threadPoolExecutor.execute(() -> {
             valueLock.writeLock().lock();
-            if (pointValues.size() > 0) {
+            if (!pointValues.isEmpty()) {
                 pointValueService.savePointValues(pointValues);
-                pointValues.clear();
+                clearPointValues();
             }
             valueLock.writeLock().unlock();
         });

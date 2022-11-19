@@ -12,40 +12,36 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.bean.driver.auth;
+package io.github.pnoker.common.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.reflection.property.PropertyNamer;
 
 /**
- * Aes/Rsa 加密密钥
+ * 字段名称相关工具类
  *
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
-public class Keys {
+@Slf4j
+public class FieldUtil {
 
-    private Keys() {
+    private FieldUtil() {
         throw new IllegalStateException("Utility class");
     }
 
     /**
-     * Aes 密钥
+     * 获取字段映射
+     *
+     * @param column 需要解析的 lambda 对象
+     * @param <T>    对象的类型
+     * @return Field Name
      */
-    @Data
-    @AllArgsConstructor
-    public static class Aes {
-        private String privateKey;
-    }
-
-    /**
-     * RSA 密钥对
-     */
-    @Data
-    @AllArgsConstructor
-    public static class Rsa {
-        private String publicKey;
-        private String privateKey;
+    public static <T> String getField(SFunction<T, ?> column) {
+        LambdaMeta meta = LambdaUtils.extract(column);
+        return PropertyNamer.methodToProperty(meta.getImplMethodName());
     }
 }

@@ -16,6 +16,7 @@ package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.common.bean.point.PointValue;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -27,11 +28,18 @@ import java.util.List;
 public interface RepositoryService {
 
     /**
+     * 获取存储策略服务名称
+     *
+     * @return Repository Name
+     */
+    String getRepositoryName();
+
+    /**
      * 保存 PointValue
      *
      * @param pointValue PointValue
      */
-    void savePointValue(PointValue pointValue);
+    void savePointValue(PointValue pointValue) throws IOException;
 
     /**
      * 保存 PointValue 集合
@@ -39,5 +47,5 @@ public interface RepositoryService {
      * @param deviceId    Device ID
      * @param pointValues PointValue Array
      */
-    void savePointValues(String deviceId, List<PointValue> pointValues);
+    void savePointValues(String deviceId, List<PointValue> pointValues) throws IOException;
 }

@@ -57,12 +57,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
 
-    private static final Map<String, OpcUaClient> clientMap = new ConcurrentHashMap<>(16);
-
+    private Map<String, OpcUaClient> clientMap;
 
     @Override
     public void initial() {
-        // nothing to do
+        clientMap = new ConcurrentHashMap<>(16);
     }
 
     @Override

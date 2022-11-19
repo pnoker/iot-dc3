@@ -14,11 +14,13 @@
 
 package io.github.pnoker.gateway.utils;
 
+import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.exception.NotFoundException;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
+import java.net.InetSocketAddress;
 import java.util.Objects;
 
 /**
@@ -27,6 +29,10 @@ import java.util.Objects;
  */
 public class GatewayUtil {
 
+    private GatewayUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * 获取远程客户端 IP
      *
@@ -34,20 +40,19 @@ public class GatewayUtil {
      * @return Remote Ip
      */
     public static String getRemoteIp(ServerHttpRequest request) {
-        String ip = request.getHeaders().getFirst("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeaders().getFirst("Proxy-Client-IP");
+        String ip = "";
+        String[] headers = {"X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
+        for (String header : headers) {
+            ip = request.getHeaders().getFirst(header);
+            if (!NetUtil.isUnknown(ip)) {
+                return NetUtil.getMultistageReverseProxyIp(ip);
+            }
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeaders().getFirst("WL-Proxy-Client-IP");
+        InetSocketAddress remoteAddress = request.getRemoteAddress();
+        if (!Objects.isNull(remoteAddress)) {
+            ip = remoteAddress.getHostString();
         }
-        if (ip == null || ip.length() == 0 || "X-Real-IP".equalsIgnoreCase(ip)) {
-            ip = request.getHeaders().getFirst("X-Real-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = Objects.requireNonNull(request.getRemoteAddress()).getHostString();
-        }
-        return ip;
+        return NetUtil.getMultistageReverseProxyIp(ip);
     }
 
     /**

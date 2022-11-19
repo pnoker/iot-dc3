@@ -27,7 +27,7 @@ import java.math.RoundingMode;
 public class ArithmeticUtil {
 
     private ArithmeticUtil() {
-        // nothing to do
+        throw new IllegalStateException("Utility class");
     }
 
     /**

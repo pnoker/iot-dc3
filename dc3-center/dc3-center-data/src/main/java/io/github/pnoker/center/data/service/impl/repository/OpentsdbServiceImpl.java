@@ -15,13 +15,13 @@
 package io.github.pnoker.center.data.service.impl.repository;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import com.google.common.collect.Lists;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.bean.point.TsPointValue;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.utils.JsonUtil;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.http.entity.ContentType;
@@ -55,6 +55,11 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
     @Resource
     private OkHttpClient okHttpClient;
+
+    @Override
+    public String getRepositoryName() {
+        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB;
+    }
 
     @Override
     public void savePointValue(PointValue pointValue) {
@@ -119,13 +124,13 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                log.error("Send pointValue to opentsdb error: {}", e.getMessage(), e);
+                log.error("Send pointValues to opentsdb error: {}", e.getMessage(), e);
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) {
                 if (null != response.body()) {
-                    log.debug("Send pointValue to opentsdb, Response: {}", response.message());
+                    log.debug("Send pointValues to opentsdb, Response: {}", response.message());
                 }
             }
         });

@@ -38,8 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
 import static io.github.pnoker.common.sdk.utils.DriverUtil.value;
@@ -63,10 +63,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         modbusFactory = new ModbusFactory();
     }
 
-    private volatile Map<String, ModbusMaster> masterMap = new HashMap<>(64);
+    private Map<String, ModbusMaster> masterMap;
 
     @Override
     public void initial() {
+        masterMap = new ConcurrentHashMap<>(16);
     }
 
     @Override

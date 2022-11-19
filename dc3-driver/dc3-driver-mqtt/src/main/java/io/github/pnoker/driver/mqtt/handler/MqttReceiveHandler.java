@@ -14,8 +14,8 @@
 
 package io.github.pnoker.driver.mqtt.handler;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.sdk.bean.mqtt.MessageHeader;
 import io.github.pnoker.common.sdk.bean.mqtt.MessagePayload;
 import io.github.pnoker.common.sdk.bean.mqtt.MessageType;
@@ -68,8 +68,10 @@ public class MqttReceiveHandler {
             if (ObjectUtil.isNull(messagePayload)) {
                 messagePayload = new MessagePayload(message.getPayload(), MessageType.DEFAULT);
             } else {
-                if (CharSequenceUtil.isEmpty(messagePayload.getPayload())) messagePayload.setPayload(message.getPayload().toString());
-                if (ObjectUtil.isNull(messagePayload.getMessageType())) messagePayload.setMessageType(MessageType.DEFAULT);
+                if (CharSequenceUtil.isEmpty(messagePayload.getPayload()))
+                    messagePayload.setPayload(message.getPayload().toString());
+                if (ObjectUtil.isNull(messagePayload.getMessageType()))
+                    messagePayload.setMessageType(MessageType.DEFAULT);
             }
 
             MessageHeader messageHeader = new MessageHeader(message.getHeaders());
@@ -77,14 +79,14 @@ public class MqttReceiveHandler {
 
             // Judge whether to process data in batch according to the data transmission speed
             if (MqttScheduleJob.messageSpeed.get() < batchSpeed) {
-                threadPoolExecutor.execute(() -> {
-                    // Receive single mqtt message
-                    mqttReceiveService.receiveValue(mqttMessage);
-                });
+                threadPoolExecutor.execute(() ->
+                        // Receive single mqtt message
+                        mqttReceiveService.receiveValue(mqttMessage)
+                );
             } else {
                 // Save point value to schedule
                 MqttScheduleJob.messageLock.writeLock().lock();
-                MqttScheduleJob.mqttMessages.add(mqttMessage);
+                MqttScheduleJob.addMqttMessages(mqttMessage);
                 MqttScheduleJob.messageLock.writeLock().unlock();
             }
 

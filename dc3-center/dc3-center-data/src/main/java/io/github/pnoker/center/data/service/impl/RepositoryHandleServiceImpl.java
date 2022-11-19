@@ -54,46 +54,25 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
     @Override
     public void save(PointValue pointValue) {
-        // 保存单个数据到 Redis
-        threadPoolExecutor.execute(() -> {
-            try {
-                redisRepositoryService.savePointValue(pointValue);
-            } catch (Exception e) {
-                log.error("Save point value to redis error {}", e.getMessage());
-            }
-        });
+        // 保存单个数据到 Redis & Mongo
+        savePointValueToRepository(pointValue, redisRepositoryService, mongoRepositoryService);
 
-        // 保存单个数据到 Mongo
-        threadPoolExecutor.execute(() -> {
-            try {
-                mongoRepositoryService.savePointValue(pointValue);
-            } catch (Exception e) {
-                log.error("Save point value to mongo error {}", e.getMessage());
-            }
-        });
+        // 保存单个数据到 Influxdb
+        if (Boolean.TRUE.equals(enableInfluxdb)) {
+            // nothing to do
+        }
 
-        // 保存单个数据到其他 Repository
-        threadPoolExecutor.execute(() -> {
-            try {
-                if (enableInfluxdb) {
-                    // 保存单个数据到 Influxdb
-                }
+        // 保存单个数据到 Opentsdb
+        if (Boolean.TRUE.equals(enableOpentsdb)) {
+            RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB);
+            savePointValueToRepository(pointValue, repositoryService);
+        }
 
-                if (enableOpentsdb) {
-                    // 保存单个数据到 Opentsdb
-                    RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB);
-                    repositoryService.savePointValue(pointValue);
-                }
-
-                if (enableElasticsearch) {
-                    // 保存单个数据到 Elasticsearch
-                    RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH);
-                    repositoryService.savePointValue(pointValue);
-                }
-            } catch (Exception e) {
-                log.error("Save point value to repository error {}", e.getMessage());
-            }
-        });
+        // 保存单个数据到 Elasticsearch
+        if (Boolean.TRUE.equals(enableElasticsearch)) {
+            RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH);
+            savePointValueToRepository(pointValue, repositoryService);
+        }
     }
 
     @Override
@@ -101,48 +80,63 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
         final Map<String, List<PointValue>> group = pointValues.stream().collect(Collectors.groupingBy(PointValue::getDeviceId));
 
         group.forEach((deviceId, values) -> {
-            // 保存批量数据到 Redis
-            threadPoolExecutor.execute(() -> {
-                try {
-                    redisRepositoryService.savePointValues(deviceId, values);
-                } catch (Exception e) {
-                    log.error("Save point values to redis error {}", e.getMessage());
-                }
-            });
+            // 保存批量数据到 Redis & Mongo
+            savePointValuesToRepository(deviceId, pointValues, redisRepositoryService, mongoRepositoryService);
 
-            // 保存批量数据到 Mongo
-            threadPoolExecutor.execute(() -> {
-                try {
-                    mongoRepositoryService.savePointValues(deviceId, values);
-                } catch (Exception e) {
-                    log.error("Save point values to mongo error {}", e.getMessage());
-                }
-            });
+            // 保存批量数据到 Influxdb
+            if (Boolean.TRUE.equals(enableInfluxdb)) {
+                // nothing to do
+            }
 
-            // 保存批量数据到其他 Repository
-            threadPoolExecutor.execute(() -> {
-                try {
-                    if (enableInfluxdb) {
-                        // 保存批量数据到 Influxdb
-                    }
+            // 保存批量数据到 Opentsdb
+            if (Boolean.TRUE.equals(enableOpentsdb)) {
+                RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB);
+                savePointValuesToRepository(deviceId, pointValues, repositoryService);
+            }
 
-                    if (enableOpentsdb) {
-                        // 保存批量数据到 Opentsdb
-                        RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB);
-                        repositoryService.savePointValues(deviceId, values);
-                    }
-
-                    if (enableElasticsearch) {
-                        // 保存批量数据到 Elasticsearch
-                        RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH);
-                        repositoryService.savePointValues(deviceId, values);
-                    }
-                } catch (Exception e) {
-                    log.error("Save point values to repository error {}", e.getMessage());
-                }
-            });
+            // 保存批量数据到 Elasticsearch
+            if (Boolean.TRUE.equals(enableElasticsearch)) {
+                RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH);
+                savePointValuesToRepository(deviceId, pointValues, repositoryService);
+            }
         });
+    }
+
+    /**
+     * 保存 PointValue 到指定存储服务
+     *
+     * @param pointValue         PointValue
+     * @param repositoryServices RepositoryService Array
+     */
+    private void savePointValueToRepository(PointValue pointValue, RepositoryService... repositoryServices) {
+        for (RepositoryService repositoryService : repositoryServices) {
+            threadPoolExecutor.execute(() -> {
+                try {
+                    repositoryService.savePointValue(pointValue);
+                } catch (Exception e) {
+                    log.error("Save point value to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
+                }
+            });
+        }
 
     }
 
+    /**
+     * 保存 PointValues 到指定存储服务
+     *
+     * @param deviceId           Device ID
+     * @param pointValues        PointValue Array
+     * @param repositoryServices RepositoryService Array
+     */
+    private void savePointValuesToRepository(String deviceId, List<PointValue> pointValues, RepositoryService... repositoryServices) {
+        for (RepositoryService repositoryService : repositoryServices) {
+            threadPoolExecutor.execute(() -> {
+                try {
+                    repositoryService.savePointValues(deviceId, pointValues);
+                } catch (Exception e) {
+                    log.error("Save point values to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
+                }
+            });
+        }
+    }
 }
