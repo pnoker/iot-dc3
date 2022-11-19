@@ -99,8 +99,8 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public Driver selectByDeviceId(String deviceId) {
-        deviceService.selectById(deviceId);
-        return selectById(deviceId);
+        Device device = deviceService.selectById(deviceId);
+        return selectById(device.getDriverId());
     }
 
     @Override
