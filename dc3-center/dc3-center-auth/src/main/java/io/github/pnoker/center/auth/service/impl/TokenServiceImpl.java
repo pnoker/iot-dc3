@@ -14,9 +14,9 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.auth.bean.TokenValid;
 import io.github.pnoker.center.auth.bean.UserLimit;
 import io.github.pnoker.center.auth.service.TenantBindService;
@@ -65,7 +65,7 @@ public class TokenServiceImpl implements TokenService {
     public String generateSalt(String username, String tenantName) {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
         Tenant tenant = tenantService.selectByName(tenantName);
-        String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username;
+        String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username + CommonConstant.Symbol.HASHTAG + tenant.getId();
         String salt = redisUtil.getKey(redisSaltKey, String.class);
         if (CharSequenceUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
@@ -76,24 +76,24 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(String username, String salt, String password, String tenantName) {
-        checkUserLimit(username);
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
         Tenant tenant = tenantService.selectByName(tenantName);
+        checkUserLimit(username, tenant.getId());
         User user = userService.selectByName(username, false);
         if (tenant.getEnable() && user.getEnable()) {
             tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
-            String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username;
+            String redisSaltKey = CacheConstant.Entity.USER + CacheConstant.Suffix.SALT + CommonConstant.Symbol.SEPARATOR + username + CommonConstant.Symbol.HASHTAG + tenant.getId();
             String saltValue = redisUtil.getKey(redisSaltKey, String.class);
-            if (CharSequenceUtil.isNotBlank(saltValue) && saltValue.equals(salt)) {
-                if (Dc3Util.md5(user.getPassword() + saltValue).equals(password)) {
-                    String redisTokenKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username;
-                    String token = KeyUtil.generateToken(username, saltValue, tenant.getId());
-                    redisUtil.setKey(redisTokenKey, token, CacheConstant.Timeout.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
-                    return token;
-                }
+            if (CharSequenceUtil.isNotEmpty(saltValue)
+                    && saltValue.equals(salt)
+                    && Dc3Util.md5(user.getPassword() + saltValue).equals(password)) {
+                String redisTokenKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username + CommonConstant.Symbol.HASHTAG + tenant.getId();
+                String token = KeyUtil.generateToken(username, saltValue, tenant.getId());
+                redisUtil.setKey(redisTokenKey, token, CacheConstant.Timeout.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+                return token;
             }
         }
-        updateUserLimit(username, true);
+        updateUserLimit(username, tenant.getId(), true);
         throw new ServiceException("Invalid username、password、tenant");
     }
 
@@ -101,12 +101,12 @@ public class TokenServiceImpl implements TokenService {
     public TokenValid checkTokenValid(String username, String salt, String token, String tenantName) {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
         Tenant tenant = tenantService.selectByName(tenantName);
-        String redisToken = redisUtil.getKey(CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username, String.class);
+        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username + CommonConstant.Symbol.HASHTAG + tenant.getId();
+        String redisToken = redisUtil.getKey(redisKey, String.class);
         if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
         try {
-            // todo 需要传 tenantId
             Claims claims = KeyUtil.parserToken(username, salt, token, tenant.getId());
             return new TokenValid(true, claims.getExpiration());
         } catch (Exception e) {
@@ -117,7 +117,8 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public boolean cancelToken(String username, String tenantName) {
         Tenant tenant = tenantService.selectByName(tenantName);
-        redisUtil.deleteKey(CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username);
+        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.TOKEN + CommonConstant.Symbol.SEPARATOR + username + CommonConstant.Symbol.HASHTAG + tenant.getId();
+        redisUtil.deleteKey(redisKey);
         return true;
     }
 
@@ -125,15 +126,16 @@ public class TokenServiceImpl implements TokenService {
      * 检测用户登录限制，返回该用户是否受限
      *
      * @param username Username
+     * @param tenantId Tenant Name
      */
-    private void checkUserLimit(String username) {
-        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.LIMIT + CommonConstant.Symbol.SEPARATOR + username;
+    private void checkUserLimit(String username, String tenantId) {
+        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.LIMIT + CommonConstant.Symbol.SEPARATOR + username + CommonConstant.Symbol.HASHTAG + tenantId;
         UserLimit limit = redisUtil.getKey(redisKey, UserLimit.class);
         if (ObjectUtil.isNotNull(limit) && limit.getTimes() >= 5) {
             Date now = new Date();
             long interval = limit.getExpireTime().getTime() - now.getTime();
             if (interval > 0) {
-                limit = updateUserLimit(username, false);
+                limit = updateUserLimit(username, tenantId, false);
                 throw new ServiceException("Access restricted，Please try again after {}", Dc3Util.formatCompleteData(limit.getExpireTime()));
             }
         }
@@ -142,12 +144,14 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 更新用户登录限制
      *
-     * @param username Username
+     * @param username   Username
+     * @param tenantId   Tenant Name
+     * @param expireTime Expire Time
      * @return UserLimit
      */
-    private UserLimit updateUserLimit(String username, boolean expireTime) {
+    private UserLimit updateUserLimit(String username, String tenantId, boolean expireTime) {
         int amount = CacheConstant.Timeout.USER_LIMIT_TIMEOUT;
-        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.LIMIT + CommonConstant.Symbol.SEPARATOR + username;
+        String redisKey = CacheConstant.Entity.USER + CacheConstant.Suffix.LIMIT + CommonConstant.Symbol.SEPARATOR + username + CommonConstant.Symbol.HASHTAG + tenantId;
         UserLimit limit = Optional.ofNullable(redisUtil.getKey(redisKey, UserLimit.class)).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
         if (limit.getTimes() > 20) {

@@ -29,9 +29,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2022.1.0
  */
 public class RepositoryStrategyFactory {
+
+    private RepositoryStrategyFactory() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final Map<String, RepositoryService> savingStrategyServiceMap = new ConcurrentHashMap<>();
 
-    public static List<RepositoryService> getAll() {
+    public static List<RepositoryService> get() {
         return new ArrayList<>(savingStrategyServiceMap.values());
     }
 

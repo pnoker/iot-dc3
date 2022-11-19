@@ -57,8 +57,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     /**
      * Plc Connector Map
+     * 仅供参考
      */
-    private volatile Map<String, MyS7Connector> s7ConnectorMap;
+    private Map<String, MyS7Connector> s7ConnectorMap;
 
     @Data
     private static class MyS7Connector {

@@ -14,11 +14,11 @@
 
 package io.github.pnoker.center.data.service.rabbit;
 
-import io.github.pnoker.center.data.service.RepositoryHandleService;
+import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.service.PointValueService;
+import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.center.data.service.job.PointValueScheduleJob;
 import io.github.pnoker.common.bean.point.PointValue;
-import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -66,14 +66,14 @@ public class PointValueReceiver {
 
             // Judge whether to process data in batch according to the data transmission speed
             if (PointValueScheduleJob.valueSpeed.get() < batchSpeed) {
-                threadPoolExecutor.execute(() -> {
-                    // Save point value to Redis & MongoDB
-                    pointValueService.savePointValue(pointValue);
-                });
+                threadPoolExecutor.execute(() ->
+                        // Save point value to Redis & MongoDB
+                        pointValueService.savePointValue(pointValue)
+                );
             } else {
                 // Save point value to schedule
                 PointValueScheduleJob.valueLock.writeLock().lock();
-                PointValueScheduleJob.pointValues.add(pointValue);
+                PointValueScheduleJob.addPointValues(pointValue);
                 PointValueScheduleJob.valueLock.writeLock().unlock();
             }
         } catch (IOException e) {

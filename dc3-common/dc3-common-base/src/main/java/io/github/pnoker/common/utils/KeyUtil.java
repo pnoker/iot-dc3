@@ -47,7 +47,7 @@ import java.util.Date;
 public class KeyUtil {
 
     private KeyUtil() {
-        // nothing to do
+        throw new IllegalStateException("Utility class");
     }
 
     /**

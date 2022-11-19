@@ -45,6 +45,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void initial() {
+        // do something to initialize the driver
     }
 
     @Override

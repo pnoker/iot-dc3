@@ -14,15 +14,15 @@
 
 package io.github.pnoker.center.data.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointClient;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
-import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.CacheConstant;
 import io.github.pnoker.common.constant.CommonConstant;
@@ -30,6 +30,7 @@ import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.dto.PointValueDto;
 import io.github.pnoker.common.model.BaseModel;
 import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +82,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public void savePointValues(List<PointValue> pointValues) {
-        if (CollectionUtil.isEmpty(pointValues)) {
+        if (CollUtil.isEmpty(pointValues)) {
             return;
         }
 
@@ -103,11 +104,11 @@ public class PointValueServiceImpl implements PointValueService {
         List<Point> points = pageR.getData().getRecords();
         List<String> pointIds = points.stream().map(BaseModel::getId).collect(Collectors.toList());
         List<PointValue> pointValues = realtime(pointValueDto.getDeviceId(), pointIds);
-        if (CollectionUtil.isEmpty(pointValues)) pointValues = latest(pointValueDto.getDeviceId(), pointIds);
+        if (CollUtil.isEmpty(pointValues)) pointValues = latest(pointValueDto.getDeviceId(), pointIds);
         pointValuePage.setCurrent(pageR.getData().getCurrent()).setSize(pageR.getData().getSize()).setTotal(pageR.getData().getTotal()).setRecords(pointValues);
 
         // 返回最近100个非字符类型的历史值
-        if (pointValueDto.getHistory()) {
+        if (Boolean.TRUE.equals(pointValueDto.getHistory())) {
             pointValues.parallelStream().forEach(pointValue -> pointValue.setChildren(historyPointValue(pointValueDto.getDeviceId(), pointValue.getPointId(), 50)));
         }
 
@@ -123,12 +124,14 @@ public class PointValueServiceImpl implements PointValueService {
 
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
-        if (CharSequenceUtil.isNotEmpty(pointValueDto.getDeviceId())) criteria.and("deviceId").is(pointValueDto.getDeviceId());
-        if (CharSequenceUtil.isNotEmpty(pointValueDto.getPointId())) criteria.and("pointId").is(pointValueDto.getPointId());
+        if (CharSequenceUtil.isNotEmpty(pointValueDto.getDeviceId()))
+            criteria.and(FieldUtil.getField(PointValue::getDeviceId)).is(pointValueDto.getDeviceId());
+        if (CharSequenceUtil.isNotEmpty(pointValueDto.getPointId()))
+            criteria.and(FieldUtil.getField(PointValue::getPointId)).is(pointValueDto.getPointId());
 
         Pages pages = pointValueDto.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
-            criteria.and("createTime").gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
+            criteria.and(FieldUtil.getField(PointValue::getCreateTime)).gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
         final String collection = CharSequenceUtil.isNotEmpty(pointValueDto.getDeviceId()) ? CommonConstant.Storage.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : CacheConstant.Entity.POINT + CacheConstant.Suffix.VALUE;
@@ -136,7 +139,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
             query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
-            query.with(Sort.by(Sort.Direction.DESC, "createTime"));
+            query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
             return mongoTemplate.find(query, PointValue.class, collection);
         });
 
@@ -147,7 +150,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     public List<PointValue> realtime(String deviceId, List<String> pointIds) {
-        if (CollectionUtil.isEmpty(pointIds)) {
+        if (CollUtil.isEmpty(pointIds)) {
             return Collections.emptyList();
         }
 
@@ -158,7 +161,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     public List<PointValue> latest(String deviceId, List<String> pointIds) {
-        if (CollectionUtil.isEmpty(pointIds)) {
+        if (CollUtil.isEmpty(pointIds)) {
             return Collections.emptyList();
         }
 
@@ -177,8 +180,8 @@ public class PointValueServiceImpl implements PointValueService {
     private PointValue latestPointValue(String deviceId, String pointId) {
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
-        criteria.and("pointId").is(pointId);
-        query.with(Sort.by(Sort.Direction.DESC, "createTime"));
+        criteria.and(FieldUtil.getField(PointValue::getPointId)).is(pointId);
+        query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
 
         return mongoTemplate.findOne(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
     }
@@ -186,9 +189,9 @@ public class PointValueServiceImpl implements PointValueService {
     private List<String> historyPointValue(String deviceId, String pointId, int count) {
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
-        criteria.and("deviceId").is(deviceId).and("pointId").is(pointId);
-        query.fields().include("value").exclude("id");
-        query.limit(count).with(Sort.by(Sort.Direction.DESC, "createTime"));
+        criteria.and(FieldUtil.getField(PointValue::getDeviceId)).is(deviceId).and(FieldUtil.getField(PointValue::getPointId)).is(pointId);
+        query.fields().include(FieldUtil.getField(PointValue::getValue)).exclude(FieldUtil.getField(PointValue::getId));
+        query.limit(count).with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
 
         List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
         return pointValues.stream().map(PointValue::getValue).collect(Collectors.toList());

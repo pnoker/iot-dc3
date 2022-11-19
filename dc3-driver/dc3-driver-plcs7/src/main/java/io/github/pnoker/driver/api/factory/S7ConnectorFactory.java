@@ -24,6 +24,10 @@ import io.github.pnoker.driver.api.impl.S7TCPConnection;
  */
 public class S7ConnectorFactory {
 
+    private S7ConnectorFactory() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * TCP Connection builder
      */
@@ -33,7 +37,10 @@ public class S7ConnectorFactory {
 
         private SiemensPLCS plcsType;
 
-        private int rack = 0, slot = 2, port = 102, timeout = 2000;
+        private int rack = 0;
+        private int slot = 2;
+        private int port = 102;
+        private int timeout = 2000;
 
         TCPConnectionBuilder(SiemensPLCS type) {
             this.plcsType = type;

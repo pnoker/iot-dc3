@@ -62,7 +62,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) throws Exception {
-        String commandTopic = attribute(pointInfo, "commandTopic"), value = values.getValue();
+        String commandTopic = attribute(pointInfo, "commandTopic");
+        String value = values.getValue();
         try {
             int commandQos = attribute(pointInfo, "commandQos");
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);

@@ -58,10 +58,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * Opc Da Server Map
      */
-    private final Map<String, Server> serverMap = new ConcurrentHashMap<>(64);
+    private Map<String, Server> serverMap;
 
     @Override
     public void initial() {
+        serverMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
@@ -125,6 +126,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         try {
             server.connect();
         } catch (AlreadyConnectedException ignored) {
+            // nothing to do
         }
         serverMap.put(deviceId, server);
         return server;

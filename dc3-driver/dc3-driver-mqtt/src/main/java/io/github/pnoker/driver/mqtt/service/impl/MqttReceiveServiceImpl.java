@@ -31,10 +31,11 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
 
     @Override
     public void receiveValue(MqttMessage mqttMessage) {
+        // do something to process your mqtt messages
     }
 
     @Override
     public void receiveValues(List<MqttMessage> mqttMessageList) {
-
+        // do something to process your mqtt messages
     }
 }

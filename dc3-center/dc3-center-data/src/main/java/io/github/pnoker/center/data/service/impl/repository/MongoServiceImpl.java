@@ -43,6 +43,11 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
     private MongoTemplate mongoTemplate;
 
     @Override
+    public String getRepositoryName() {
+        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_MONGO;
+    }
+
+    @Override
     public void savePointValue(PointValue pointValue) {
         if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;

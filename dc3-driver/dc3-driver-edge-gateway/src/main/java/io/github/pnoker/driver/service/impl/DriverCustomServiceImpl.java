@@ -21,6 +21,7 @@ import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.driver.mqtt.service.MqttScheduleService;
 import io.github.pnoker.driver.mqtt.service.MqttSendService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,20 +44,26 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
     @Resource
+    private MqttScheduleService mqttScheduleService;
+    @Resource
     private MqttSendService mqttSendService;
 
     @Override
     public void initial() {
+        mqttScheduleService.initial();
     }
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
+        // 因为 MQTT 的数据来源是被动接收的，所以无需实现该 Read 方法
+        // 接收数据处理函数在 io.github.pnoker.driver.mqtt.handler.MqttReceiveHandler.handlerValue
         return "nil";
     }
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) throws Exception {
-        String commandTopic = attribute(pointInfo, "commandTopic"), value = values.getValue();
+        String commandTopic = attribute(pointInfo, "commandTopic");
+        String value = values.getValue();
         try {
             int commandQos = attribute(pointInfo, "commandQos");
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);

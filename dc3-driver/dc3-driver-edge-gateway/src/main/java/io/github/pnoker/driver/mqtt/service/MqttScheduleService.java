@@ -12,22 +12,15 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.driver.service.impl;
-
-import io.github.pnoker.common.sdk.bean.mqtt.MessageHeader;
-import io.github.pnoker.driver.mqtt.service.MqttReceiveService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+package io.github.pnoker.driver.mqtt.service;
 
 /**
  * @author pnoker
  * @since 2022.1.0
  */
-@Slf4j
-@Service
-public class MqttReceiveServiceImpl implements MqttReceiveService {
-
-    @Override
-    public void receiveValue(String client, MessageHeader messageHeader, String data) {
-    }
+public interface MqttScheduleService {
+    /**
+     * 初始化调度任务
+     */
+    void initial();
 }

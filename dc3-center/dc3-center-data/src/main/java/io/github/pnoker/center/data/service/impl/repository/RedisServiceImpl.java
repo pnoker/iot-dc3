@@ -42,6 +42,11 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
     private RedisUtil redisUtil;
 
     @Override
+    public String getRepositoryName() {
+        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_REDIS;
+    }
+
+    @Override
     public void savePointValue(PointValue pointValue) {
         if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;

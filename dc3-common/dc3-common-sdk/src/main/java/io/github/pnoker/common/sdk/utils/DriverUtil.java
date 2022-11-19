@@ -20,7 +20,6 @@ import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointValueTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -31,6 +30,10 @@ import java.util.Map;
  */
 @Slf4j
 public class DriverUtil {
+
+    private DriverUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 获取 属性值
@@ -112,7 +115,8 @@ public class DriverUtil {
         }
         byte[] bcdBytes = new byte[length];
         byte[] decimalBytes = decimalString.getBytes();
-        int j, k;
+        int j;
+        int k;
         for (int i = 0; i < decimalString.length() / 2; i++) {
             if ((decimalBytes[2 * i] >= '0') && (decimalBytes[2 * i] <= '9')) {
                 j = decimalBytes[2 * i] - '0';
@@ -140,7 +144,7 @@ public class DriverUtil {
      * @return String
      */
     public static String bytesToHex(byte[] bytes) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
             String hex = Integer.toHexString(bytes[i] & 0xFF);
             if (hex.length() < 2) {
@@ -199,12 +203,7 @@ public class DriverUtil {
      * @return String
      */
     public static String bytesToAscii(byte[] bytes) {
-        String asciiStr = null;
-        try {
-            asciiStr = new String(bytes, "ISO8859-1");
-        } catch (UnsupportedEncodingException ignored) {
-        }
-        return asciiStr;
+        return new String(bytes, StandardCharsets.ISO_8859_1);
     }
 
     /**

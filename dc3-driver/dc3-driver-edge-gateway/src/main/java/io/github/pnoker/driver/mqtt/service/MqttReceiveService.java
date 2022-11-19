@@ -14,8 +14,9 @@
 
 package io.github.pnoker.driver.mqtt.service;
 
+import io.github.pnoker.common.sdk.bean.mqtt.MqttMessage;
 
-import io.github.pnoker.common.sdk.bean.mqtt.MessageHeader;
+import java.util.List;
 
 /**
  * @author pnoker
@@ -24,11 +25,24 @@ import io.github.pnoker.common.sdk.bean.mqtt.MessageHeader;
 public interface MqttReceiveService {
 
     /**
-     * receive opcua value
+     * 务必实现，单点逻辑
+     * <p>
+     * 将解析之后的数据封装 io.github.pnoker.common.bean.point.PointValue
+     * 然后调用 driverService.pointValueSender(pointValue) 进行数据推送
+     * Tip： 可参考 dc3-driver-listening-virtual 驱动
      *
-     * @param client        String
-     * @param messageHeader MessageHeader
-     * @param data          String
+     * @param mqttMessage MqttMessage
      */
-    void receiveValue(String client, MessageHeader messageHeader, String data);
+    void receiveValue(MqttMessage mqttMessage);
+
+    /**
+     * 务必实现，批量逻辑
+     * <p>
+     * 将解析之后的数据封装 io.github.pnoker.common.bean.point.PointValue
+     * 然后调用 driverService.pointValueSender(pointValue) 进行数据推送
+     * Tip： 可参考 dc3-driver-listening-virtual 驱动
+     *
+     * @param mqttMessageList String Array List
+     */
+    void receiveValues(List<MqttMessage> mqttMessageList);
 }

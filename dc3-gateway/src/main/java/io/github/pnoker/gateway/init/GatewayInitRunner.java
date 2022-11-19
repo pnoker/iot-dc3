@@ -37,5 +37,6 @@ public class GatewayInitRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        // nothing to do
     }
 }

@@ -91,7 +91,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
                 R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(tenant);
-                if (!tenantR.isOk() || !tenantR.getData().getEnable()) {
+                if (!tenantR.isOk() || Boolean.TRUE.equals(!tenantR.getData().getEnable())) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
 
@@ -101,7 +101,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request user header");
                 }
                 R<User> userR = gatewayFilter.userClient.selectByName(user);
-                if (!userR.isOk() || !userR.getData().getEnable()) {
+                if (!userR.isOk() || Boolean.TRUE.equals(!userR.getData().getEnable())) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 

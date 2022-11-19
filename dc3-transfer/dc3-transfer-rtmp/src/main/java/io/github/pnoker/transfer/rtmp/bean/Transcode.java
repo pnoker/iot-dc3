@@ -42,7 +42,7 @@ public class Transcode {
         this.id = rtmp.getId();
         this.run = false;
         this.command = rtmp.getCommand()
-                .replace("{exe}", TranscodeRunner.ffmpeg)
+                .replace("{exe}", TranscodeRunner.getFfmpeg())
                 .replace("{rtsp_url}", rtmp.getRtspUrl())
                 .replace("{rtmp_url}", rtmp.getRtmpUrl());
     }

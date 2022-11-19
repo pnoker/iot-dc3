@@ -19,7 +19,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
@@ -48,7 +47,12 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
     private ElasticsearchClient elasticsearchClient;
 
     @Override
-    public void savePointValue(PointValue pointValue) {
+    public String getRepositoryName() {
+        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH;
+    }
+
+    @Override
+    public void savePointValue(PointValue pointValue) throws IOException {
         if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;
         }
@@ -58,16 +62,11 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
                 .index(index)
                 .document(new EsPointValue(pointValue))
                 .build();
-        try {
-            IndexResponse response = elasticsearchClient.index(indexRequest);
-            log.info("Send pointValue to elasticsearch, Response: {}, Version: {}", response.result(), response.version());
-        } catch (IOException e) {
-            log.error("Send pointValue to elasticsearch error: {}", e.getMessage(), e);
-        }
+        elasticsearchClient.index(indexRequest);
     }
 
     @Override
-    public void savePointValues(String deviceId, List<PointValue> pointValues) {
+    public void savePointValues(String deviceId, List<PointValue> pointValues) throws IOException {
         if (CharSequenceUtil.isEmpty(deviceId)) {
             return;
         }
@@ -83,19 +82,15 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
                         )
                 ));
 
-        try {
-            BulkResponse response = elasticsearchClient.bulk(bulkRequestBuilder.build());
-            if (response.errors()) {
-                for (BulkResponseItem item : response.items()) {
-                    if (null != item.error()) {
-                        log.error("Send pointValue to elasticsearch error: {}", item.error().reason());
-                    }
+        BulkResponse response = elasticsearchClient.bulk(bulkRequestBuilder.build());
+        if (response.errors()) {
+            for (BulkResponseItem item : response.items()) {
+                if (null != item.error()) {
+                    // todo 存在没有保存成功的数据怎么办
+                    log.error("Send pointValues to elasticsearch error: {}", item.error().reason());
                 }
             }
-        } catch (IOException e) {
-            log.error("Send pointValue to elasticsearch error: {}", e.getMessage(), e);
         }
-
     }
 
     @Override

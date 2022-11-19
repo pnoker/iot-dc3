@@ -14,7 +14,10 @@
 
 package io.github.pnoker.gateway.config;
 
+import io.github.pnoker.common.constant.ServiceConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.factory.SpringCloudCircuitBreakerFilterFactory;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -63,48 +66,69 @@ public class RouteConfig {
      */
     @Bean
     public RouteLocator gatewayRouteLocator(RouteLocatorBuilder builder) {
+        String v3ApiPrefix = "/api/v3";
+        String lbPrefix = "lb://";
+        String authUri = lbPrefix + ServiceConstant.Auth.SERVICE_NAME;
         return builder.routes()
                 .route("token_salt",
-                        r -> r.path("/api/v3/token/salt")
+                        r -> r.path(v3ApiPrefix + "/token/salt")
                                 .filters(
                                         f -> f.setPath("/auth/token/salt")
-                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
-                                ).uri("lb://dc3-center-auth")
+                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
+                                                .circuitBreaker(this::setDefaultCircuitBreaker)
+                                ).uri(authUri)
                 )
                 .route("generate_token",
-                        r -> r.path("/api/v3/token/generate")
+                        r -> r.path(v3ApiPrefix + "/token/generate")
                                 .filters(
                                         f -> f.setPath("/auth/token/generate")
-                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
-                                ).uri("lb://dc3-center-auth")
+                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
+                                                .circuitBreaker(this::setDefaultCircuitBreaker)
+                                ).uri(authUri)
                 )
                 .route("check_token",
-                        r -> r.path("/api/v3/token/check")
+                        r -> r.path(v3ApiPrefix + "/token/check")
                                 .filters(
                                         f -> f.setPath("/auth/token/check")
-                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
-                                ).uri("lb://dc3-center-auth")
+                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
+                                                .circuitBreaker(this::setDefaultCircuitBreaker)
+                                ).uri(authUri)
                 )
                 .route("cancel_token",
-                        r -> r.path("/api/v3/token/cancel")
+                        r -> r.path(v3ApiPrefix + "/token/cancel")
                                 .filters(
                                         f -> f.setPath("/auth/token/cancel")
-                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
-                                ).uri("lb://dc3-center-auth")
+                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
+                                                .circuitBreaker(this::setDefaultCircuitBreaker)
+                                ).uri(authUri)
                 )
                 .route("register_user",
-                        r -> r.path("/api/v3/register")
+                        r -> r.path(v3ApiPrefix + "/register")
                                 .filters(
                                         f -> f.setPath("/auth/user/add")
-                                                .requestRateLimiter(l -> l.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter()))
-                                                .circuitBreaker(h -> h.setName("default").setFallbackUri("forward:/fallback"))
-                                ).uri("lb://dc3-center-auth")
+                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
+                                                .circuitBreaker(this::setDefaultCircuitBreaker)
+                                ).uri(authUri)
                 )
                 .build();
+    }
+
+    /**
+     * 设置默认的接口速率限制
+     *
+     * @param config Request Rate Limiter Config
+     */
+    private void setDefaultRequestRateLimiter(RequestRateLimiterGatewayFilterFactory.Config config) {
+        config.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter());
+    }
+
+    /**
+     * 设置默认的熔断地址
+     *
+     * @param config CircuitBreaker Config
+     */
+    private void setDefaultCircuitBreaker(SpringCloudCircuitBreakerFilterFactory.Config config) {
+        config.setName("default").setFallbackUri("forward:/fallback");
     }
 
 }

@@ -43,7 +43,7 @@ import java.util.List;
 public final class JsonUtil {
 
     private JsonUtil() {
-        // nothing to do
+        throw new IllegalStateException("Utility class");
     }
 
     private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()

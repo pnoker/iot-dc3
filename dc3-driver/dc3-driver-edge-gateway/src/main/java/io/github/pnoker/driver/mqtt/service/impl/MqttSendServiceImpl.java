@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.driver.service.impl;
+package io.github.pnoker.driver.mqtt.service.impl;
 
 import io.github.pnoker.driver.mqtt.handler.MqttSendHandler;
 import io.github.pnoker.driver.mqtt.service.MqttSendService;

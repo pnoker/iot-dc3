@@ -12,33 +12,30 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.driver.mqtt.bean;
+package io.github.pnoker.driver.mqtt.service.impl;
 
-import io.github.pnoker.common.utils.JsonUtil;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
+import io.github.pnoker.common.sdk.bean.mqtt.MqttMessage;
+import io.github.pnoker.driver.mqtt.service.MqttReceiveService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Accessors(chain = true)
-public class MqttPayload {
-    private DataType dataType = DataType.DEFAULT;
-    private String data;
+@Slf4j
+@Service
+public class MqttReceiveServiceImpl implements MqttReceiveService {
 
-    public MqttPayload(DataType dataType, Object target) {
-        this.dataType = dataType;
-        this.data = JsonUtil.toJsonString(target);
+    @Override
+    public void receiveValue(MqttMessage mqttMessage) {
+        // do something to process your mqtt messages
     }
 
-    @NoArgsConstructor
-    public enum DataType {
-        OPC_UA, OPC_DA, MODBUS, PLC, SERIAL, SOCKET, HEARTBEAT, DEFAULT
+    @Override
+    public void receiveValues(List<MqttMessage> mqttMessageList) {
+        // do something to process your mqtt messages
     }
 }

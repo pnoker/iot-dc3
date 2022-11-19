@@ -14,9 +14,9 @@
 
 package io.github.pnoker.transfer.rtmp.service.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RuntimeUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -50,7 +51,8 @@ public class RtmpServiceImpl implements RtmpService {
     /**
      * 转码任务Map
      */
-    public volatile Map<String, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
+    private final Map<String, Transcode> transcodeMap = new ConcurrentHashMap<>(16);
+    private static final String NOT_FOUNT_MESSAGE = "The rtmp task does not exist";
 
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
@@ -82,7 +84,7 @@ public class RtmpServiceImpl implements RtmpService {
             }
             return rtmpMapper.deleteById(id) > 0;
         }
-        throw new NotFoundException("The rtmp task does not exist");
+        throw new NotFoundException(NOT_FOUNT_MESSAGE);
     }
 
     @Override
@@ -90,7 +92,7 @@ public class RtmpServiceImpl implements RtmpService {
         rtmp.setUpdateTime(null);
         Rtmp select = selectById(rtmp.getId());
         if (null == select) {
-            throw new NotFoundException("The rtmp task does not exist");
+            throw new NotFoundException(NOT_FOUNT_MESSAGE);
         }
         Transcode transcode = transcodeMap.get(rtmp.getId());
         if (ObjectUtil.isNotNull(transcode)) {
@@ -118,12 +120,12 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public boolean start(String id) {
         Rtmp select = rtmpMapper.selectById(id);
-        if (null == select) {
-            throw new NotFoundException("The rtmp task does not exist");
+        if (Objects.isNull(select)) {
+            throw new NotFoundException(NOT_FOUNT_MESSAGE);
         }
 
         Transcode transcode = transcodeMap.get(id);
-        if (null == transcode) {
+        if (Objects.isNull(transcode)) {
             transcode = new Transcode(select);
             transcodeMap.put(transcode.getId(), transcode);
         }
@@ -136,34 +138,45 @@ public class RtmpServiceImpl implements RtmpService {
         transcode.setRun(true);
         transcode.setProcess(RuntimeUtil.exec(transcode.getCommand()));
 
-        // 打印常规输出
+        printInfoStream(id);
+        printErrorStream(id);
+
+        if (rtmpMapper.updateById(select.setRun(true)) > 0) {
+            return true;
+        }
+        throw new ServiceException("The rtmp task started successfully，database update failed");
+    }
+
+    /**
+     * 打印常规输出
+     *
+     * @param id 转码任务 ID
+     */
+    private void printInfoStream(String id) {
         threadPoolExecutor.execute(() -> {
             Transcode temp = transcodeMap.get(id);
-            InputStream inputStream = temp.getProcess().getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line;
-            try {
+            try (InputStream inputStream = temp.getProcess().getInputStream();
+                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 while (CharSequenceUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
                     log.debug(line);
                 }
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
             }
         });
+    }
 
-        // 打印错误输出
+    /**
+     * 打印错误输出
+     *
+     * @param id 转码任务 ID
+     */
+    private void printErrorStream(String id) {
         threadPoolExecutor.execute(() -> {
             Transcode temp = transcodeMap.get(id);
-            InputStream inputStream = temp.getProcess().getErrorStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line;
-            try {
+            try (InputStream inputStream = temp.getProcess().getErrorStream(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 while (CharSequenceUtil.isNotEmpty((line = bufferedReader.readLine())) && temp.isRun()) {
                     log.error(line);
                     line = line.toLowerCase();
@@ -173,20 +186,8 @@ public class RtmpServiceImpl implements RtmpService {
                 }
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
             }
         });
-
-
-        if (rtmpMapper.updateById(select.setRun(true)) > 0) {
-            return true;
-        }
-        throw new ServiceException("The rtmp task started successfully，database update failed");
     }
 
     @Override
@@ -194,18 +195,16 @@ public class RtmpServiceImpl implements RtmpService {
         Rtmp select = rtmpMapper.selectById(id);
         if (ObjectUtil.isNotNull(select)) {
             Transcode transcode = transcodeMap.get(id);
-            if (ObjectUtil.isNotNull(transcode)) {
-                if (transcode.isRun()) {
-                    transcode.quit();
-                    if (rtmpMapper.updateById(select.setRun(false)) > 0) {
-                        return true;
-                    }
-                    throw new ServiceException("The rtmp task stop failed，database update failed");
+            if (ObjectUtil.isNotNull(transcode) && transcode.isRun()) {
+                transcode.quit();
+                if (rtmpMapper.updateById(select.setRun(false)) > 0) {
+                    return true;
                 }
+                throw new ServiceException("The rtmp task stop failed，database update failed");
             }
             throw new ServiceException("The rtmp task is stopped");
         }
-        throw new NotFoundException("The rtmp task does not exist");
+        throw new NotFoundException(NOT_FOUNT_MESSAGE);
     }
 
     @Override
