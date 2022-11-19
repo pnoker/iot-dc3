@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -94,13 +94,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public User update(User user) {
         User byId = selectById(user.getId());
+        // todo 需要调整，用户名、手机号、邮箱保持租户内唯一即可，没有必要全局唯一
         // 判断 phone 是否修改
         if (CharSequenceUtil.isNotBlank(user.getPhone())) {
-            if (null == byId.getPhone() || !byId.getPhone().equals(user.getPhone())) {
-                if (null != selectByPhone(user.getPhone(), false)) {
+            if (!user.getPhone().equals(byId.getPhone())) {
+                User byPhone = selectByPhone(user.getPhone(), false);
+                if (ObjectUtil.isNotNull(byPhone)) {
                     throw new DuplicateException("The user already exists with phone {}", user.getPhone());
                 }
             }
@@ -110,8 +111,9 @@ public class UserServiceImpl implements UserService {
 
         // 判断 email 是否修改
         if (CharSequenceUtil.isNotBlank(user.getEmail())) {
-            if (null == byId.getEmail() || !byId.getEmail().equals(user.getEmail())) {
-                if (null != selectByEmail(user.getEmail(), false)) {
+            if (!user.getEmail().equals(byId.getEmail())) {
+                User byEmail = selectByEmail(user.getEmail(), false);
+                if (ObjectUtil.isNotNull(byEmail)) {
                     throw new DuplicateException("The user already exists with email {}", user.getEmail());
                 }
             }
