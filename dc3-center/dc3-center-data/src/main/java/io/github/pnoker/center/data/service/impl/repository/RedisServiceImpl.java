@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.service.impl.repository;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.PointValue;
@@ -44,7 +44,7 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public void savePointValue(PointValue pointValue) {
-        if (!StrUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+        if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;
         }
 
@@ -54,13 +54,13 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public void savePointValues(String deviceId, List<PointValue> pointValues) {
-        if (StrUtil.isEmpty(deviceId)) {
+        if (CharSequenceUtil.isEmpty(deviceId)) {
             return;
         }
 
         final String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.DOT;
         Map<String, Object> collect = pointValues.stream()
-                .filter(pointValue -> StrUtil.isNotEmpty(pointValue.getPointId()))
+                .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
                 .collect(Collectors.toMap(pointValue -> prefix + pointValue.getPointId(), pointValue -> pointValue));
         redisUtil.setKey(collect);
     }

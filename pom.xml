@@ -45,7 +45,8 @@
     <inceptionYear>2017-2020</inceptionYear>
     <description>
         IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建，实现设备互联、管理、数据采集、代码生成、快速开发和可视化等，
-        兼容多种流行的物联网数据接入协议（Mqtt\Socket\Modbus-Tcp\Rtsp\Rtmp\Siemens PLC S7\OpcUa\OpcDa...），是一整套完整的物联系统解决方案。
+        兼容多种流行的物联网数据接入协议（Mqtt\Socket\Modbus-Tcp\Rtsp\Rtmp\Siemens PLC
+        S7\OpcUa\OpcDa...），是一整套完整的物联系统解决方案。
     </description>
 
     <modules>
@@ -64,13 +65,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Spring 相关-->
-        <spring-boot.version>2.7.0</spring-boot.version>
-        <spring-cloud.version>2021.0.3</spring-cloud.version>
-        <spring-platform.version>Cairo-SR8</spring-platform.version>
+        <spring-boot.version>2.7.4</spring-boot.version>
+        <spring-cloud.version>2021.0.4</spring-cloud.version>
 
         <!-- 其他依赖-->
-        <spring-boot-admin.version>2.7.0</spring-boot-admin.version>
+        <spring-boot-admin.version>2.7.4</spring-boot-admin.version>
+        <spring-oauth2.version>2.5.2.RELEASE</spring-oauth2.version>
+        <spring-data-mongodb.version>3.4.2</spring-data-mongodb.version>
+        <commons-fileupload.version>1.4</commons-fileupload.version>
         <mybatis.plus.version>3.5.2</mybatis.plus.version>
+        <jackson.version>2.13.4</jackson.version>
         <jwt.version>0.9.1</jwt.version>
         <jna.version>5.11.0</jna.version>
         <oshi.version>6.1.6</oshi.version>
@@ -86,7 +90,7 @@
         <elasticsearch.version>7.17.4</elasticsearch.version>
         <jakarta.version>2.0.1</jakarta.version>
         <guava.version>31.1-jre</guava.version>
-        <hutool.version>5.8.3</hutool.version>
+        <hutool.version>5.8.5</hutool.version>
 
         <!-- Plugin 相关 -->
         <maven.source.plugin>3.2.1</maven.source.plugin>
@@ -146,13 +150,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>io.spring.platform</groupId>
-                <artifactId>platform-bom</artifactId>
-                <version>${spring-platform.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
 
             <!-- Spring Admin -->
             <dependency>
@@ -166,6 +163,13 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!--Spring Security OAuth2-->
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${spring-oauth2.version}</version>
+            </dependency>
+
             <!-- Mybatis Plus -->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -176,6 +180,20 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-extension</artifactId>
                 <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- Spring Data MongoDB -->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-mongodb</artifactId>
+                <version>${spring-data-mongodb.version}</version>
+            </dependency>
+
+            <!-- Jackson -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
 
             <!-- Jwt -->
@@ -276,6 +294,13 @@
                 <groupId>org.eclipse.paho</groupId>
                 <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
                 <version>${paho.mqttv3.version}</version>
+            </dependency>
+
+            <!-- File Upload -->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
             </dependency>
 
             <!-- Guava -->
@@ -394,17 +419,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>spring</id>
-            <name>Aliyun Spring Repository</name>
-            <url>https://maven.aliyun.com/repository/spring</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
     <profiles>
@@ -412,6 +426,7 @@
             <id>dev</id>
             <properties>
                 <NODE_ENV>dev</NODE_ENV>
+                <SERVICE_HOST>192.168.0.104</SERVICE_HOST>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>

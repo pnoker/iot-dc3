@@ -32,8 +32,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -58,8 +58,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -85,8 +85,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -118,8 +118,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -162,8 +162,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -206,8 +206,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -236,8 +236,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -266,8 +266,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -288,8 +288,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -309,8 +309,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -329,8 +329,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -349,8 +349,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: 20m
+        max-file: 20
     networks:
       dc3demonet:
         aliases:
@@ -366,5 +366,5 @@ volumes:
 
 networks:
   dc3demonet:
-    driver: 'bridge'
+    driver: bridge
 ...

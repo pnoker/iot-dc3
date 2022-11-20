@@ -17,7 +17,7 @@
 package io.github.pnoker.transfer.rtmp.init;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.bean.Pages;
 import io.github.pnoker.common.dto.RtmpDto;
@@ -48,7 +48,7 @@ import static java.lang.System.getProperty;
 @Order(10)
 @Component
 public class TranscodeRunner implements ApplicationRunner {
-    public static String ffmpeg;
+    public String ffmpeg;
 
     @Value("${rtmp.ffmpeg.window}")
     private String window;
@@ -61,7 +61,7 @@ public class TranscodeRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         ffmpeg = getProperty("os.name").toLowerCase().startsWith("win") ? window : unix;
-        if (StrUtil.isBlank(ffmpeg)) {
+        if (CharSequenceUtil.isBlank(ffmpeg)) {
             log.error("FFmpeg path is null,Please fill absolute path!");
             System.exit(1);
         }

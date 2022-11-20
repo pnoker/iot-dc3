@@ -17,7 +17,7 @@
 package io.github.pnoker.driver.config;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.sdk.bean.mqtt.MqttProperties;
 import io.github.pnoker.common.sdk.utils.X509Util;
@@ -124,9 +124,9 @@ public class MqttConfig {
                     mqttProperties.getCaCrt(),
                     mqttProperties.getClientCrt(),
                     mqttProperties.getClientKey(),
-                    StrUtil.isBlank(mqttProperties.getClientKeyPass()) ? "" : mqttProperties.getClientKeyPass()
+                    CharSequenceUtil.isBlank(mqttProperties.getClientKeyPass()) ? "" : mqttProperties.getClientKeyPass()
             ));
-            if (!StrUtil.isBlank(mqttProperties.getUsername()) && !StrUtil.isBlank(mqttProperties.getPassword())) {
+            if (!CharSequenceUtil.isBlank(mqttProperties.getUsername()) && !CharSequenceUtil.isBlank(mqttProperties.getPassword())) {
                 mqttConnectOptions.setUserName(mqttProperties.getUsername());
                 mqttConnectOptions.setPassword(mqttProperties.getPassword().toCharArray());
             }

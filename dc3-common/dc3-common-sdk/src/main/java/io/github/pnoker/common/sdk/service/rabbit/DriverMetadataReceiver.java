@@ -17,7 +17,7 @@
 package io.github.pnoker.common.sdk.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.bean.driver.DriverConfiguration;
 import io.github.pnoker.common.bean.driver.DriverMetadata;
 import io.github.pnoker.common.constant.CommonConstant;
@@ -57,7 +57,7 @@ public class DriverMetadataReceiver {
     public void driverConfigurationReceive(Channel channel, Message message, DriverConfiguration driverConfiguration) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (null == driverConfiguration || StrUtil.isEmpty(driverConfiguration.getType()) || StrUtil.isEmpty(driverConfiguration.getCommand())) {
+            if (null == driverConfiguration || CharSequenceUtil.isEmpty(driverConfiguration.getType()) || CharSequenceUtil.isEmpty(driverConfiguration.getCommand())) {
                 log.error("Invalid driver configuration {}", driverConfiguration);
                 return;
             }

@@ -17,8 +17,9 @@
 package io.github.pnoker.common.sdk.utils;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.constant.ValueConstant;
+import io.github.pnoker.common.enums.PointValueTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
@@ -282,26 +283,32 @@ public class DriverUtil {
      */
     public static String getTypeClassName(String type) {
         String className = String.class.getName();
-        switch (type.toLowerCase()) {
-            case ValueConstant.Type.BYTE:
+
+        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(type);
+        if (ObjectUtil.isNull(valueType)) {
+            throw new IllegalArgumentException("Unsupported type of " + type);
+        }
+
+        switch (valueType) {
+            case BYTE:
                 className = Byte.class.getName();
                 break;
-            case ValueConstant.Type.SHORT:
+            case SHORT:
                 className = Short.class.getName();
                 break;
-            case ValueConstant.Type.INT:
+            case INT:
                 className = Integer.class.getName();
                 break;
-            case ValueConstant.Type.LONG:
+            case LONG:
                 className = Long.class.getName();
                 break;
-            case ValueConstant.Type.FLOAT:
+            case FLOAT:
                 className = Float.class.getName();
                 break;
-            case ValueConstant.Type.DOUBLE:
+            case DOUBLE:
                 className = Double.class.getName();
                 break;
-            case ValueConstant.Type.BOOLEAN:
+            case BOOLEAN:
                 className = Boolean.class.getName();
                 break;
             default:

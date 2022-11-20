@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -155,10 +155,10 @@ public class ProfileServiceImpl implements ProfileService {
     public LambdaQueryWrapper<Profile> fuzzyQuery(ProfileDto profileDto) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         if (ObjectUtil.isNotEmpty(profileDto)) {
-            queryWrapper.like(StrUtil.isNotBlank(profileDto.getName()), Profile::getName, profileDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getName()), Profile::getName, profileDto.getName());
             queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getShare()), Profile::getShare, profileDto.getShare());
             queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getEnable()), Profile::getEnable, profileDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotBlank(profileDto.getTenantId()), Profile::getTenantId, profileDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(profileDto.getTenantId()), Profile::getTenantId, profileDto.getTenantId());
         }
         return queryWrapper;
     }
@@ -167,10 +167,10 @@ public class ProfileServiceImpl implements ProfileService {
         QueryWrapper<Profile> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(profileDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(profileDto.getName()), "dp.name", profileDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getName()), "dp.name", profileDto.getName());
             queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getShare()), "dp.share", profileDto.getShare());
             queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getEnable()), "dp.enable", profileDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotEmpty(profileDto.getTenantId()), "dp.tenant_id", profileDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileDto.getTenantId()), "dp.tenant_id", profileDto.getTenantId());
         }
         return queryWrapper.lambda();
     }

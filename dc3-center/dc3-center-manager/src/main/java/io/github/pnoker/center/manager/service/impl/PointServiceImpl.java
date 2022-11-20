@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -174,13 +174,13 @@ public class PointServiceImpl implements PointService {
     public LambdaQueryWrapper<Point> fuzzyQuery(PointDto pointDto) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (null != pointDto) {
-            queryWrapper.like(StrUtil.isNotBlank(pointDto.getName()), Point::getName, pointDto.getName());
-            queryWrapper.eq(StrUtil.isNotBlank(pointDto.getType()), Point::getType, pointDto.getType());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getName()), Point::getName, pointDto.getName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getType()), Point::getType, pointDto.getType());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getRw()), Point::getRw, pointDto.getRw());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getAccrue()), Point::getAccrue, pointDto.getAccrue());
-            queryWrapper.eq(StrUtil.isNotBlank(pointDto.getProfileId()), Point::getProfileId, pointDto.getProfileId());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getProfileId()), Point::getProfileId, pointDto.getProfileId());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getEnable()), Point::getEnable, pointDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotBlank(pointDto.getTenantId()), Point::getTenantId, pointDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getTenantId()), Point::getTenantId, pointDto.getTenantId());
         }
         return queryWrapper;
     }
@@ -189,13 +189,13 @@ public class PointServiceImpl implements PointService {
         QueryWrapper<Point> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(pointDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(pointDto.getName()), "dp.name", pointDto.getName());
-            queryWrapper.eq(StrUtil.isNotEmpty(pointDto.getType()), "dp.type", pointDto.getType());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getName()), "dp.name", pointDto.getName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getType()), "dp.type", pointDto.getType());
             queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getRw()), "dp.rw", pointDto.getRw());
             queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getAccrue()), "dp.accrue", pointDto.getAccrue());
-            queryWrapper.eq(StrUtil.isNotEmpty(pointDto.getProfileId()), "dp.profile_id", pointDto.getProfileId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointDto.getProfileId()), "dp.profile_id", pointDto.getProfileId());
             queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getEnable()), "dp.enable", pointDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotEmpty(pointDto.getTenantId()), "dp.tenant_id", pointDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointDto.getTenantId()), "dp.tenant_id", pointDto.getTenantId());
         }
         return queryWrapper.lambda();
     }

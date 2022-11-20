@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -67,8 +67,8 @@ public class DictionaryServiceImpl implements DictionaryService {
             dictionaryDto.setPage(new Pages());
         }
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.like(StrUtil.isNotEmpty(dictionaryDto.getLabel()), Driver::getName, dictionaryDto.getLabel());
-        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getTenantId()), Driver::getTenantId, dictionaryDto.getTenantId());
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryDto.getLabel()), Driver::getName, dictionaryDto.getLabel());
+        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getTenantId()), Driver::getTenantId, dictionaryDto.getTenantId());
         Page<Driver> driverPage = driverMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
         List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> new Dictionary().setLabel(driver.getName()).setValue(driver.getId())).collect(Collectors.toList());
         Page<Dictionary> page = new Page<>();
@@ -83,9 +83,9 @@ public class DictionaryServiceImpl implements DictionaryService {
             dictionaryDto.setPage(new Pages());
         }
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.like(StrUtil.isNotEmpty(dictionaryDto.getLabel()), Device::getName, dictionaryDto.getLabel());
-        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getParentValue1()), Device::getDriverId, dictionaryDto.getParentValue1());
-        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getTenantId()), Device::getTenantId, dictionaryDto.getTenantId());
+        queryWrapper.like(CharSequenceUtil.isNotBlank(dictionaryDto.getLabel()), Device::getName, dictionaryDto.getLabel());
+        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getParentValue1()), Device::getDriverId, dictionaryDto.getParentValue1());
+        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getTenantId()), Device::getTenantId, dictionaryDto.getTenantId());
         Page<Device> devicePage = deviceMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
         List<Dictionary> dictionaryList = devicePage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getName()).setValue(profile.getId())).collect(Collectors.toList());
         Page<Dictionary> page = new Page<>();
@@ -100,8 +100,8 @@ public class DictionaryServiceImpl implements DictionaryService {
             dictionaryDto.setPage(new Pages());
         }
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.like(StrUtil.isNotEmpty(dictionaryDto.getLabel()), Profile::getName, dictionaryDto.getLabel());
-        queryWrapper.eq(StrUtil.isNotEmpty(dictionaryDto.getTenantId()), Profile::getTenantId, dictionaryDto.getTenantId());
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryDto.getLabel()), Profile::getName, dictionaryDto.getLabel());
+        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getTenantId()), Profile::getTenantId, dictionaryDto.getTenantId());
         Page<Profile> profilePage = profileMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
         List<Dictionary> dictionaryList = profilePage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getName()).setValue(profile.getId())).collect(Collectors.toList());
         Page<Dictionary> page = new Page<>();

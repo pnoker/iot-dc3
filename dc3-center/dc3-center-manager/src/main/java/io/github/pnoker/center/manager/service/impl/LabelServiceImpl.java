@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -121,9 +121,9 @@ public class LabelServiceImpl implements LabelService {
     public LambdaQueryWrapper<Label> fuzzyQuery(LabelDto labelDto) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         if (ObjectUtil.isNotNull(labelDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(labelDto.getName()), Label::getName, labelDto.getName());
-            queryWrapper.eq(StrUtil.isNotEmpty(labelDto.getColor()), Label::getColor, labelDto.getColor());
-            queryWrapper.eq(StrUtil.isNotEmpty(labelDto.getTenantId()), Label::getTenantId, labelDto.getTenantId());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(labelDto.getName()), Label::getName, labelDto.getName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(labelDto.getColor()), Label::getColor, labelDto.getColor());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelDto.getTenantId()), Label::getTenantId, labelDto.getTenantId());
         }
         return queryWrapper;
     }

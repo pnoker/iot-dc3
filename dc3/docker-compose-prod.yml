@@ -29,7 +29,7 @@ services:
     ports:
       - 8000:8000
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - EUREKA_HOST=dc3-center-register
       - EUREKA_PORT=8100
       - SECURITY_USER_NAME=dc3
@@ -57,7 +57,7 @@ services:
     ports:
       - 8100:8100
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - EUREKA_DASHBOARD_PATH=/
       - EUREKA_HOST=dc3-center-register
       - EUREKA_PORT=8100
@@ -86,7 +86,7 @@ services:
     ports:
       - 8200:8200
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - MONITOR_CONTEXT_PATH=/
       - MONITOR_PUBLIC_URL=/
       - EUREKA_HOST=dc3-center-register
@@ -116,7 +116,7 @@ services:
     ports:
       - 8300:8300
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - MYSQL_HOST=dc3-mysql
       - MYSQL_PORT=3306
       - MYSQL_USERNAME=root
@@ -152,7 +152,7 @@ services:
     ports:
       - 8400:8400
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - MYSQL_HOST=dc3-mysql
       - MYSQL_PORT=3306
       - MYSQL_USERNAME=root
@@ -199,7 +199,7 @@ services:
     ports:
       - 8500:8500
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - MYSQL_HOST=dc3-mysql
       - MYSQL_PORT=3306
       - MYSQL_USERNAME=root
@@ -246,7 +246,7 @@ services:
     ports:
       - 8600:8600
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -279,7 +279,7 @@ services:
     ports:
       - 8601:8601
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -312,7 +312,7 @@ services:
     ports:
       - 8602:8602
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -345,7 +345,7 @@ services:
     ports:
       - 8603:8603
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -378,7 +378,7 @@ services:
     ports:
       - 8700:8700
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -411,7 +411,7 @@ services:
     ports:
       - 8701:8701
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -444,7 +444,7 @@ services:
     ports:
       - 8604:8604
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -477,7 +477,7 @@ services:
     ports:
       - 8702:8702
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - RABBITMQ_VIRTUAL_HOST=dc3
       - RABBITMQ_HOST=dc3-rabbitmq
       - RABBITMQ_PORT=5672
@@ -510,7 +510,7 @@ services:
     ports:
       - 8803:8803
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=prod
       - MYSQL_HOST=dc3-mysql
       - MYSQL_PORT=3306
       - MYSQL_USERNAME=root

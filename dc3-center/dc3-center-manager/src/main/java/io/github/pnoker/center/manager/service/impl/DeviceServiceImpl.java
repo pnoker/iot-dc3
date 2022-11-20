@@ -17,8 +17,8 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -40,7 +40,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -179,10 +178,10 @@ public class DeviceServiceImpl implements DeviceService {
     public LambdaQueryWrapper<Device> fuzzyQuery(DeviceDto deviceDto) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         if (ObjectUtil.isNotEmpty(deviceDto)) {
-            queryWrapper.like(StrUtil.isNotBlank(deviceDto.getName()), Device::getName, deviceDto.getName());
-            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getDriverId()), Device::getDriverId, deviceDto.getDriverId());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getName()), Device::getName, deviceDto.getName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getDriverId()), Device::getDriverId, deviceDto.getDriverId());
             queryWrapper.eq(ObjectUtil.isNotEmpty(deviceDto.getEnable()), Device::getEnable, deviceDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getTenantId()), Device::getTenantId, deviceDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getTenantId()), Device::getTenantId, deviceDto.getTenantId());
         }
         return queryWrapper;
     }
@@ -191,10 +190,10 @@ public class DeviceServiceImpl implements DeviceService {
         QueryWrapper<Device> queryWrapper = Wrappers.query();
         queryWrapper.eq("dd.deleted", 0);
         if (ObjectUtil.isNotNull(deviceDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(deviceDto.getName()), "dd.name", deviceDto.getName());
-            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getDriverId()), "dd.driver_id", deviceDto.getDriverId());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getName()), "dd.name", deviceDto.getName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getDriverId()), "dd.driver_id", deviceDto.getDriverId());
             queryWrapper.eq(ObjectUtil.isNotNull(deviceDto.getEnable()), "dd.enable", deviceDto.getEnable());
-            queryWrapper.eq(StrUtil.isNotEmpty(deviceDto.getTenantId()), "dd.tenant_id", deviceDto.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getTenantId()), "dd.tenant_id", deviceDto.getTenantId());
         }
         return queryWrapper.lambda();
     }

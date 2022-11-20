@@ -37,6 +37,7 @@ public class LogsAspect {
     // 2022-03-13 检查：通过
     @Pointcut("@annotation(io.github.pnoker.common.annotation.Logs)")
     public void logsCut() {
+        // nothing to do
     }
 
     // 2022-03-13 检查：通过

@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -142,8 +142,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     public LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindDto profileBindDto) {
         LambdaQueryWrapper<ProfileBind> queryWrapper = Wrappers.<ProfileBind>query().lambda();
         if (ObjectUtil.isNotNull(profileBindDto)) {
-            queryWrapper.eq(StrUtil.isNotEmpty(profileBindDto.getProfileId()), ProfileBind::getProfileId, profileBindDto.getProfileId());
-            queryWrapper.eq(StrUtil.isNotEmpty(profileBindDto.getDeviceId()), ProfileBind::getDeviceId, profileBindDto.getDeviceId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileBindDto.getProfileId()), ProfileBind::getProfileId, profileBindDto.getProfileId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileBindDto.getDeviceId()), ProfileBind::getDeviceId, profileBindDto.getDeviceId());
         }
         return queryWrapper;
     }
