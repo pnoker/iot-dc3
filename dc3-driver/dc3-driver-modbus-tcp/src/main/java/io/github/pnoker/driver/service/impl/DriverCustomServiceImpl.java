@@ -16,15 +16,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ValueConstant;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.bean.driver.DriverContext;
-import io.github.pnoker.common.sdk.service.DriverCustomService;
-import io.github.pnoker.common.sdk.service.DriverService;
-import io.github.pnoker.common.utils.JsonUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.code.DataType;
@@ -35,6 +27,15 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
+import io.github.pnoker.common.bean.driver.AttributeInfo;
+import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.enums.PointValueTypeEnum;
+import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.sdk.bean.driver.DriverContext;
+import io.github.pnoker.common.sdk.service.DriverCustomService;
+import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -196,12 +197,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return Modbus Data Type
      */
     public int getValueType(String type) {
-        switch (type.toLowerCase()) {
-            case ValueConstant.Type.LONG:
+        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(type);
+        if (ObjectUtil.isNull(valueType)) {
+            throw new IllegalArgumentException("Unsupported type of " + type);
+        }
+
+        switch (valueType) {
+            case LONG:
                 return DataType.FOUR_BYTE_INT_SIGNED;
-            case ValueConstant.Type.FLOAT:
+            case FLOAT:
                 return DataType.FOUR_BYTE_FLOAT;
-            case ValueConstant.Type.DOUBLE:
+            case DOUBLE:
                 return DataType.EIGHT_BYTE_FLOAT;
             default:
                 return DataType.TWO_BYTE_INT_SIGNED;

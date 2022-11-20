@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointClient;
 import io.github.pnoker.center.data.service.PointValueService;
@@ -124,15 +124,15 @@ public class PointValueServiceImpl implements PointValueService {
 
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
-        if (StrUtil.isNotEmpty(pointValueDto.getDeviceId())) criteria.and("deviceId").is(pointValueDto.getDeviceId());
-        if (StrUtil.isNotEmpty(pointValueDto.getPointId())) criteria.and("pointId").is(pointValueDto.getPointId());
+        if (CharSequenceUtil.isNotEmpty(pointValueDto.getDeviceId())) criteria.and("deviceId").is(pointValueDto.getDeviceId());
+        if (CharSequenceUtil.isNotEmpty(pointValueDto.getPointId())) criteria.and("pointId").is(pointValueDto.getPointId());
 
         Pages pages = pointValueDto.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and("createTime").gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
-        final String collection = StrUtil.isNotEmpty(pointValueDto.getDeviceId()) ? CommonConstant.Storage.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : CacheConstant.Entity.POINT + CacheConstant.Suffix.VALUE;
+        final String collection = CharSequenceUtil.isNotEmpty(pointValueDto.getDeviceId()) ? CommonConstant.Storage.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : CacheConstant.Entity.POINT + CacheConstant.Suffix.VALUE;
         Future<Long> count = threadPoolExecutor.submit(() -> mongoTemplate.count(query, collection));
 
         Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {

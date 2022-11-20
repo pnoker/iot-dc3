@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.service.impl.repository;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.PointValue;
@@ -59,7 +59,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
     @Override
     public void savePointValue(PointValue pointValue) {
-        if (!StrUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+        if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;
         }
 
@@ -68,12 +68,12 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
     @Override
     public void savePointValues(String deviceId, List<PointValue> pointValues) {
-        if (StrUtil.isEmpty(deviceId)) {
+        if (CharSequenceUtil.isEmpty(deviceId)) {
             return;
         }
 
         List<TsPointValue> tsPointValues = pointValues.stream()
-                .filter(pointValue -> StrUtil.isNotEmpty(pointValue.getPointId()))
+                .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
                 .map(pointValue -> convertPointValues(CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId, pointValue))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());

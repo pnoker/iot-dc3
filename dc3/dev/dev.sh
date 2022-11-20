@@ -22,5 +22,5 @@ cd ../../
 mvn clean -U -U package
 # shellcheck disable=SC2164
 cd dc3/
-docker-compose build mysql redis mongo rabbitmq register auth data manager virtual
-docker-compose up -d mysql redis mongo rabbitmq register auth data manager virtual
+docker-compose build mysql redis mongo rabbitmq register gateway auth data manager virtual
+docker-compose up -d mysql redis mongo rabbitmq register gateway auth data manager virtual

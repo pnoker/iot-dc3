@@ -17,7 +17,7 @@
 package io.github.pnoker.gateway.filter.factory;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.api.center.auth.feign.TokenClient;
 import io.github.pnoker.api.center.auth.feign.UserClient;
@@ -108,7 +108,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
                 String tokenHeader = GatewayUtil.getRequestHeader(request, ServiceConstant.Header.X_AUTH_TOKEN);
                 TokenRequestHeader token = JsonUtil.parseObject(Dc3Util.decode(tokenHeader), TokenRequestHeader.class);
-                if (ObjectUtil.isEmpty(token) || !StrUtil.isAllNotEmpty(token.getSalt(), token.getToken())) {
+                if (ObjectUtil.isEmpty(token) || !CharSequenceUtil.isAllNotEmpty(token.getSalt(), token.getToken())) {
                     throw new UnAuthorizedException("Invalid request token header");
                 }
                 Login login = new Login();

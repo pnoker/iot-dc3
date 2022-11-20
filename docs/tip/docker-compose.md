@@ -73,7 +73,7 @@ volumes:
 
 networks:
   dc3net:
-    driver: 'bridge'
+    driver: bridge
 ```
 
 - **version**：docker-compose的版本号

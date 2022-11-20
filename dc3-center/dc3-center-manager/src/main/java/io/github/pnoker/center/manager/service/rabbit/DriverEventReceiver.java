@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.manager.service.BatchService;
 import io.github.pnoker.center.manager.service.DriverSdkService;
 import io.github.pnoker.center.manager.service.EventService;
@@ -70,7 +70,7 @@ public class DriverEventReceiver {
         try {
             MessageProperties properties = message.getMessageProperties();
             channel.basicAck(properties.getDeliveryTag(), true);
-            if (null == driverEvent || StrUtil.isEmpty(driverEvent.getServiceName())) {
+            if (null == driverEvent || CharSequenceUtil.isEmpty(driverEvent.getServiceName())) {
                 log.error("Invalid driver event {}", driverEvent);
                 return;
             }

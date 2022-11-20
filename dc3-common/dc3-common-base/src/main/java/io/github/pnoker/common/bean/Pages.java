@@ -16,7 +16,7 @@
 
 package io.github.pnoker.common.bean;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
@@ -53,7 +53,7 @@ public class Pages implements Serializable {
 
         boolean createTimeOrder = false;
         for (OrderItem order : page.orders()) {
-            if (StrUtil.isNotEmpty(order.getColumn()) && order.getColumn().equals("create_time")) {
+            if (CharSequenceUtil.isNotBlank(order.getColumn()) && order.getColumn().equals("create_time")) {
                 createTimeOrder = true;
             }
         }

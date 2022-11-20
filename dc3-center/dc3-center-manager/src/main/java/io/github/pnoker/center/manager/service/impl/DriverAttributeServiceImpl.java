@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -122,10 +122,10 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         if (ObjectUtil.isNotNull(driverAttributeDto)) {
-            queryWrapper.like(StrUtil.isNotEmpty(driverAttributeDto.getName()), DriverAttribute::getName, driverAttributeDto.getName());
-            queryWrapper.like(StrUtil.isNotEmpty(driverAttributeDto.getDisplayName()), DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
-            queryWrapper.eq(StrUtil.isNotEmpty(driverAttributeDto.getType()), DriverAttribute::getType, driverAttributeDto.getType());
-            queryWrapper.eq(StrUtil.isNotEmpty(driverAttributeDto.getDriverId()), DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getName()), DriverAttribute::getName, driverAttributeDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getDisplayName()), DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(driverAttributeDto.getType()), DriverAttribute::getType, driverAttributeDto.getType());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributeDto.getDriverId()), DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
         }
         return queryWrapper;
     }

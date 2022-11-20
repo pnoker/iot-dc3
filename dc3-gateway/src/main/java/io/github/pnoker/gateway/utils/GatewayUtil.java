@@ -16,7 +16,7 @@
 
 package io.github.pnoker.gateway.utils;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.exception.NotFoundException;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -60,7 +60,7 @@ public class GatewayUtil {
      */
     public static String getRequestHeader(ServerHttpRequest request, String key) {
         String header = request.getHeaders().getFirst(key);
-        if (!StrUtil.isNotEmpty(header)) {
+        if (!CharSequenceUtil.isNotBlank(header)) {
             throw new NotFoundException("Invalid request header of " + key);
         }
         return header;
@@ -75,7 +75,7 @@ public class GatewayUtil {
      */
     public static String getRequestCookie(ServerHttpRequest request, String key) {
         HttpCookie cookie = request.getCookies().getFirst(key);
-        if (null == cookie || !StrUtil.isNotEmpty(cookie.getValue())) {
+        if (null == cookie || !CharSequenceUtil.isNotEmpty(cookie.getValue())) {
             throw new NotFoundException("Invalid request cookie of " + key);
         }
         return cookie.getValue();

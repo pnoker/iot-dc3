@@ -20,7 +20,7 @@
 .PHONY: build clean
 
 dev:
-	&& cd dc3/bin \
+	cd dc3/bin \
 	&& chmod +x mvn-clean.sh \
 	&& chmod +x mvn-package.sh \
 	&& ./mvn-clean.sh \
