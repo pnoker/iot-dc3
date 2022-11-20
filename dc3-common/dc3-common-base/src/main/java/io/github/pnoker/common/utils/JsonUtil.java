@@ -50,6 +50,7 @@ public final class JsonUtil {
      *
      * @param text      Json String
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(String text, Class<T> valueType) {
@@ -65,6 +66,7 @@ public final class JsonUtil {
      *
      * @param bytes     Json Byte Array
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(byte[] bytes, Class<T> valueType) {
@@ -80,6 +82,7 @@ public final class JsonUtil {
      *
      * @param jsonParser Json Parser
      * @param valueType  Java 对象
+     * @param <T>        Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(JsonParser jsonParser, Class<T> valueType) {
@@ -95,6 +98,7 @@ public final class JsonUtil {
      *
      * @param dataInput Json DataInput
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(DataInput dataInput, Class<T> valueType) {
@@ -110,6 +114,7 @@ public final class JsonUtil {
      *
      * @param inputStream Json InputStream
      * @param valueType   Java 对象
+     * @param <T>         Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(InputStream inputStream, Class<T> valueType) {
@@ -125,6 +130,7 @@ public final class JsonUtil {
      *
      * @param reader    Json Reader
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(Reader reader, Class<T> valueType) {
@@ -140,6 +146,7 @@ public final class JsonUtil {
      *
      * @param file      Json File
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(File file, Class<T> valueType) {
@@ -155,6 +162,7 @@ public final class JsonUtil {
      *
      * @param text          Json String
      * @param typeReference TypeReference，T 为指定要转化为的数据类型
+     * @param <T>           Java 对象类型
      * @return Java 对象
      */
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
@@ -170,6 +178,7 @@ public final class JsonUtil {
      *
      * @param text      Json String
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象集合
      */
     public static <T> List<T> parseArray(String text, Class<T> valueType) {
@@ -186,6 +195,7 @@ public final class JsonUtil {
      *
      * @param bytes     Json Byte Array
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象集合
      */
     public static <T> List<T> parseArray(byte[] bytes, Class<T> valueType) {
@@ -202,6 +212,7 @@ public final class JsonUtil {
      *
      * @param jsonParser Json JsonParser
      * @param valueType  Java 对象
+     * @param <T>        Java 对象类型
      * @return Java 对象集合
      */
     public static <T> List<T> parseArray(JsonParser jsonParser, Class<T> valueType) {
@@ -218,6 +229,7 @@ public final class JsonUtil {
      *
      * @param dataInput Json DataInput
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象集合
      */
     public static <T> List<T> parseArray(DataInput dataInput, Class<T> valueType) {
@@ -234,6 +246,7 @@ public final class JsonUtil {
      *
      * @param inputStream Json InputStream
      * @param valueType   Java 对象
+     * @param <T>         Java 对象类型
      * @return Java 对象集合
      */
     public static <T> List<T> parseArray(InputStream inputStream, Class<T> valueType) {
@@ -250,6 +263,7 @@ public final class JsonUtil {
      *
      * @param reader    Json Reader
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象集合
      */
     public static <T> List<T> parseArray(Reader reader, Class<T> valueType) {
@@ -266,6 +280,7 @@ public final class JsonUtil {
      *
      * @param file      Json File
      * @param valueType Java 对象
+     * @param <T>       Java 对象类型
      * @return Java 对象集合
      */
     public static <T> List<T> parseArray(File file, Class<T> valueType) {
@@ -281,6 +296,7 @@ public final class JsonUtil {
      * 序列化，将一个 Java 对象或 Java 对象集合转化为 Json 字符串
      *
      * @param type Java 对象引用
+     * @param <T>  Java 对象类型
      * @return Json 字符串
      */
     public static <T> String toJsonString(T type) {
@@ -296,6 +312,7 @@ public final class JsonUtil {
      *
      * @param type              Java 对象引用
      * @param serializationView 定制现实内容的 Java 对象
+     * @param <T>               Java 对象类型
      * @return Json 字符串
      */
     public static <T> String toJsonString(T type, Class<?> serializationView) {
@@ -310,6 +327,7 @@ public final class JsonUtil {
      * 美化序列化，将一个 Java 对象或 Java 对象集合转化为 Json 字符串
      *
      * @param type Java 对象引用
+     * @param <T>  Java 对象类型
      * @return Json 字符串
      */
     public static <T> String toPrettyJsonString(T type) {
@@ -325,6 +343,7 @@ public final class JsonUtil {
      *
      * @param type              Java 对象引用
      * @param serializationView 定制现实内容的Java 对象
+     * @param <T>               Java 对象类型
      * @return Json 字符串
      */
     public static <T> String toPrettyJsonString(T type, Class<?> serializationView) {
@@ -339,6 +358,7 @@ public final class JsonUtil {
      * 序列化，将一个 Java 对象或 Java 对象集合转化为 Json Byte Array
      *
      * @param type Java 对象引用
+     * @param <T>  Java 对象类型
      * @return Json 字符串
      */
     public static <T> byte[] toJsonBytes(T type) {

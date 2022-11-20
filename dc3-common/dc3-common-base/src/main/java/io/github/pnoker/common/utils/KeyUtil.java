@@ -159,6 +159,8 @@ public class KeyUtil {
      * 生成Token令牌
      *
      * @param username String
+     * @param salt     String
+     * @param tenantId String
      * @return String
      */
     public static String generateToken(String username, String salt, String tenantId) {
@@ -177,11 +179,12 @@ public class KeyUtil {
      * @param username String
      * @param salt     String
      * @param token    String
+     * @param tenantId String
      * @return Claims
      */
     public static Claims parserToken(String username, String salt, String token, String tenantId) {
         return Jwts.parser()
-                .requireIssuer(CommonConstant.Algorithm.DEFAULT_KEY+ CommonConstant.Symbol.SLASH + tenantId)
+                .requireIssuer(CommonConstant.Algorithm.DEFAULT_KEY + CommonConstant.Symbol.SLASH + tenantId)
                 .requireSubject(username)
                 .setSigningKey(salt.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(token)
