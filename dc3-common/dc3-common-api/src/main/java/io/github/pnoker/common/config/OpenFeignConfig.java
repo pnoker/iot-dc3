@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Configuration
 public class OpenFeignConfig {
 

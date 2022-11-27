@@ -14,18 +14,18 @@
 
 package io.github.pnoker.common.sdk.service.impl;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.EventConstant;
+import io.github.pnoker.common.constant.RabbitConstant;
 import io.github.pnoker.common.enums.PointValueTypeEnum;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.DeviceEvent;
 import io.github.pnoker.common.model.DriverEvent;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.common.utils.ConvertUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -49,119 +49,57 @@ public class DriverServiceImpl implements DriverService {
     private String serviceName;
 
     @Resource
-    private DriverContext driverContext;
-    @Resource
     private RabbitTemplate rabbitTemplate;
     @Resource
     private ApplicationContext applicationContext;
 
-    public String convertValue(String deviceId, String pointId, String rawValue) {
-        String value;
-        Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
-
-        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(point.getType());
-        if (ObjectUtil.isNull(valueType)) {
-            throw new IllegalArgumentException("Unsupported type of " + point.getType());
-        }
-
-        switch (valueType) {
-            case STRING:
-                value = rawValue;
-                break;
-            case BYTE:
-            case SHORT:
-            case INT:
-            case LONG:
-            case DOUBLE:
-            case FLOAT:
-                try {
-                    float base = null != point.getBase() ? point.getBase() : 0;
-                    float multiple = null != point.getMultiple() ? point.getMultiple() : 1;
-                    double temp = (Convert.convert(Double.class, rawValue.trim()) + base) * multiple;
-                    if (null != point.getMinimum() && temp < point.getMinimum()) {
-                        log.info("Device({}) point({}) value({}) is lower than lower limit({})", deviceId, pointId, temp, point.getMinimum());
-                        deviceEventSender(deviceId, pointId, CommonConstant.Device.Event.OVER_LOWER_LIMIT,
-                                String.format("Value(%s) is lower than lower limit %s", temp, point.getMinimum()));
-                    }
-                    if (null != point.getMaximum() && temp > point.getMaximum()) {
-                        log.info("Device({}) point({}) value({}) is greater than upper limit({})", deviceId, pointId, temp, point.getMaximum());
-                        deviceEventSender(deviceId, pointId, CommonConstant.Device.Event.OVER_UPPER_LIMIT,
-                                String.format("Value(%s) is greater than upper limit %s", temp, point.getMaximum()));
-                    }
-                    if (CharSequenceUtil.isNotBlank(point.getFormat())) {
-                        value = String.format(point.getFormat(), temp);
-                    } else {
-                        value = String.valueOf(temp);
-                    }
-                } catch (Exception e) {
-                    throw new ServiceException("Invalid device({}) point({}) value({}), error: {}", deviceId, pointId, rawValue, e.getMessage());
-                }
-                break;
-            case BOOLEAN:
-                try {
-                    try {
-                        Double booleanValue = Convert.convert(Double.class, rawValue.trim());
-                        if (booleanValue > 0) {
-                            value = Boolean.TRUE.toString();
-                        } else {
-                            value = Boolean.FALSE.toString();
-                        }
-                    } catch (Exception e) {
-                        value = String.valueOf(Boolean.parseBoolean(rawValue.trim()));
-                    }
-                } catch (Exception e) {
-                    throw new ServiceException("Invalid device({}) point({}) value({}), error: {}", deviceId, pointId, rawValue, e.getMessage());
-                }
-                break;
-            default:
-                throw new ServiceException("Invalid device({}) point({}) value({}) type: {} ", deviceId, pointId, rawValue, point.getType());
-        }
-
-        return value;
-    }
-
     @Override
     public void driverEventSender(DriverEvent driverEvent) {
-        if (null != driverEvent) {
+        if (ObjectUtil.isNotNull(driverEvent)) {
             log.debug("Send driver event: {}", JsonUtil.toJsonString(driverEvent));
             rabbitTemplate.convertAndSend(
-                    CommonConstant.Rabbit.TOPIC_EXCHANGE_EVENT,
-                    CommonConstant.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + serviceName,
+                    RabbitConstant.TOPIC_EXCHANGE_EVENT,
+                    RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + serviceName,
                     driverEvent
             );
         }
     }
 
+    @Override
     public void deviceEventSender(DeviceEvent deviceEvent) {
-        if (null != deviceEvent) {
+        if (ObjectUtil.isNotNull(deviceEvent)) {
             log.debug("Send device event: {}", JsonUtil.toJsonString(deviceEvent));
             rabbitTemplate.convertAndSend(
-                    CommonConstant.Rabbit.TOPIC_EXCHANGE_EVENT,
-                    CommonConstant.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + serviceName,
+                    RabbitConstant.TOPIC_EXCHANGE_EVENT,
+                    RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + serviceName,
                     deviceEvent
             );
         }
     }
 
-    public void deviceEventSender(String deviceId, String type, String content) {
-        deviceEventSender(new DeviceEvent(deviceId, type, content));
-    }
-
+    @Override
     public void deviceEventSender(String deviceId, String pointId, String type, String content) {
         deviceEventSender(new DeviceEvent(deviceId, pointId, type, content));
     }
 
+    @Override
+    public void deviceStatusSender(String deviceId, StatusEnum status) {
+        deviceEventSender(new DeviceEvent(deviceId, EventConstant.Device.STATUS, status));
+    }
+
+    @Override
     public void pointValueSender(PointValue pointValue) {
         if (null != pointValue) {
             log.debug("Send point value: {}", JsonUtil.toJsonString(pointValue));
             rabbitTemplate.convertAndSend(
-                    CommonConstant.Rabbit.TOPIC_EXCHANGE_VALUE,
-                    CommonConstant.Rabbit.ROUTING_POINT_VALUE_PREFIX + serviceName,
+                    RabbitConstant.TOPIC_EXCHANGE_VALUE,
+                    RabbitConstant.ROUTING_POINT_VALUE_PREFIX + serviceName,
                     pointValue
             );
         }
     }
 
+    @Override
     public void pointValueSender(List<PointValue> pointValues) {
         // TODO 需要添加新的队列支持list数据发送
         if (null != pointValues) {
@@ -169,6 +107,7 @@ public class DriverServiceImpl implements DriverService {
         }
     }
 
+    @Override
     public void close(CharSequence template, Object... params) {
         log.error(CharSequenceUtil.format(template, params));
         ((ConfigurableApplicationContext) applicationContext).close();

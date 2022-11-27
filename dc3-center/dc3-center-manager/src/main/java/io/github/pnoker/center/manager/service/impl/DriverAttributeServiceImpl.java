@@ -81,7 +81,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public DriverAttribute selectById(String id) {
         DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
         if (null == driverAttribute) {
-            throw new NotFoundException("The driver attribute does not exist");
+            throw new NotFoundException();
         }
         return driverAttribute;
     }
@@ -93,7 +93,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         queryWrapper.eq(DriverAttribute::getDriverId, driverId);
         DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
         if (null == driverAttribute) {
-            throw new NotFoundException("The driver attribute does not exist");
+            throw new NotFoundException();
         }
         return driverAttribute;
     }
@@ -103,8 +103,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
         driverAttributeDto.setDriverId(driverId);
         List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributeDto));
-        if (null == driverAttributes || driverAttributes.size() < 1) {
-            throw new NotFoundException("The driver attributes does not exist");
+        if (null == driverAttributes || driverAttributes.isEmpty()) {
+            throw new NotFoundException();
         }
         return driverAttributes;
     }

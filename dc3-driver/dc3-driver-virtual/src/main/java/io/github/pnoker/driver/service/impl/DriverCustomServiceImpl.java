@@ -16,7 +16,8 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.EventConstant;
+import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.DeviceEvent;
 import io.github.pnoker.common.model.Point;
@@ -78,7 +79,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(new DeviceEvent(id, CommonConstant.Device.Event.HEARTBEAT, CommonConstant.Status.ONLINE, 25, TimeUnit.SECONDS)));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(new DeviceEvent(id, EventConstant.Device.STATUS, StatusEnum.ONLINE, 25, TimeUnit.SECONDS)));
     }
 
 }

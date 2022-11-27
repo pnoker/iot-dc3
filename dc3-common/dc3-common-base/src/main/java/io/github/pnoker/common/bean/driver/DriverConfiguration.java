@@ -14,6 +14,7 @@
 
 package io.github.pnoker.common.bean.driver;
 
+import io.github.pnoker.common.enums.ResponseEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,6 @@ import java.io.Serializable;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,5 +36,5 @@ public class DriverConfiguration implements Serializable {
     private String type;
     private String command;
     private Object content;
-    private String response;
+    private ResponseEnum response;
 }

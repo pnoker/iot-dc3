@@ -16,7 +16,8 @@ package io.github.pnoker.api.center.manager.feign;
 
 import io.github.pnoker.api.center.manager.fallback.StatusClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DeviceDto;
 import io.github.pnoker.common.dto.DriverDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -31,7 +32,7 @@ import java.util.Map;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.STATUS_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = StatusClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.STATUS_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = StatusClientFallback.class)
 public interface StatusClient {
 
     /**
@@ -42,7 +43,7 @@ public interface StatusClient {
      * @return Map<String, String>
      */
     @PostMapping("/driver")
-    R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询 Device 服务状态
@@ -52,7 +53,7 @@ public interface StatusClient {
      * @return Map<String, String>
      */
     @PostMapping("/device")
-    R<Map<String, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Map<String, String>> deviceStatus(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 驱动ID 查询 Device 服务状态

@@ -18,7 +18,7 @@ import io.github.pnoker.api.transfer.rtmp.fallback.DriverCommandFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.driver.command.CmdParameter;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.DriverServiceConstant;
 import io.github.pnoker.common.valid.Read;
 import io.github.pnoker.common.valid.ValidatableList;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -33,7 +33,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Driver.COMMAND_URL_PREFIX, fallbackFactory = DriverCommandFallback.class)
+@FeignClient(path = DriverServiceConstant.COMMAND_URL_PREFIX, fallbackFactory = DriverCommandFallback.class)
 public interface DriverCommandClient {
 
     /**

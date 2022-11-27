@@ -17,7 +17,8 @@ package io.github.pnoker.api.center.manager.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.LabelClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.LabelDto;
 import io.github.pnoker.common.model.Label;
 import io.github.pnoker.common.valid.Insert;
@@ -34,7 +35,7 @@ import javax.validation.constraints.NotNull;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.LABEL_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = LabelClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.LABEL_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = LabelClientFallback.class)
 public interface LabelClient {
 
     /**
@@ -44,7 +45,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/add")
-    R<Label> add(@Validated(Insert.class) @RequestBody Label label, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Label> add(@Validated(Insert.class) @RequestBody Label label, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Label
@@ -62,7 +63,7 @@ public interface LabelClient {
      * @return Label
      */
     @PostMapping("/update")
-    R<Label> update(@Validated(Update.class) @RequestBody Label label, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Label> update(@Validated(Update.class) @RequestBody Label label, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Label
@@ -80,6 +81,6 @@ public interface LabelClient {
      * @return Page<Label>
      */
     @PostMapping("/list")
-    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

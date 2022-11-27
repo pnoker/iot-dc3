@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.EventClient;
 import io.github.pnoker.center.manager.service.EventService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DeviceEventDto;
 import io.github.pnoker.common.dto.DriverEventDto;
 import io.github.pnoker.common.model.DeviceEvent;
@@ -36,7 +36,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.EVENT_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.EVENT_URL_PREFIX)
 public class EventApi implements EventClient {
 
     @Resource

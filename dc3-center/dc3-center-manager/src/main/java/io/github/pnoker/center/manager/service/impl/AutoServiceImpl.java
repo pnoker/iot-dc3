@@ -17,7 +17,7 @@ package io.github.pnoker.center.manager.service.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.point.PointDetail;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.MetadataConstant;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
@@ -50,7 +50,6 @@ public class AutoServiceImpl implements AutoService {
     @Resource
     private NotifyService notifyService;
 
-    // 2022-06-24 检查：通过
     @Override
     public PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, String driverId, String tenantId) {
         // 新增设备
@@ -60,10 +59,11 @@ public class AutoServiceImpl implements AutoService {
             device = deviceService.add(device);
 
             // 通知驱动新增设备
-            notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, device);
+            notifyService.notifyDriverDevice(MetadataConstant.Device.ADD, device);
         } catch (DuplicateException duplicateException) {
             device = deviceService.selectByName(deviceName, tenantId);
         } catch (Exception ignored) {
+            // nothing to do
         }
 
         // 新增私有模板
@@ -74,6 +74,7 @@ public class AutoServiceImpl implements AutoService {
         } catch (DuplicateException duplicateException) {
             profile = profileService.selectByNameAndType(deviceName, (short) 2, tenantId);
         } catch (Exception ignored) {
+            // nothing to do
         }
 
         // 绑定模板
@@ -83,6 +84,7 @@ public class AutoServiceImpl implements AutoService {
                 profileBind.setDeviceId(device.getId()).setProfileId(profile.getId());
                 profileBindService.add(profileBind);
             } catch (Exception ignored) {
+                // nothing to do
             }
 
             // 新增位号
@@ -92,10 +94,11 @@ public class AutoServiceImpl implements AutoService {
                 point = pointService.add(point);
 
                 // 同时驱动新增位号
-                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, point);
+                notifyService.notifyDriverPoint(MetadataConstant.Point.ADD, point);
             } catch (DuplicateException duplicateException) {
                 point = pointService.selectByNameAndProfileId(pointName, profile.getId());
             } catch (Exception ignored) {
+                // nothing to do
             }
 
             return new PointDetail(device.getId(), point.getId());

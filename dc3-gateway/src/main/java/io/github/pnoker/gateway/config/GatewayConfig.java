@@ -14,10 +14,10 @@
 
 package io.github.pnoker.gateway.config;
 
+import feign.codec.Decoder;
+import io.github.pnoker.gateway.fallback.GatewayFallback;
 import io.github.pnoker.gateway.filter.BlackIpGlobalFilter;
 import io.github.pnoker.gateway.filter.factory.AuthenticGatewayFilterFactory;
-import io.github.pnoker.gateway.fallback.GatewayFallback;
-import feign.codec.Decoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 网关配置
+ *
  * @author pnoker
  * @since 2022.1.0
  */

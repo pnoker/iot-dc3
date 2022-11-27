@@ -81,6 +81,7 @@ public class PointInfoServiceImpl implements PointInfoService {
                 selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
                 throw new DuplicateException("The point info already exists");
             } catch (NotFoundException ignored) {
+                // nothing to do
             }
         }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
@@ -95,7 +96,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     public PointInfo selectById(String id) {
         PointInfo pointInfo = pointInfoMapper.selectById(id);
         if (null == pointInfo) {
-            throw new NotFoundException("The point info does not exist");
+            throw new NotFoundException();
         }
         return pointInfo;
     }
@@ -108,7 +109,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getPointId, pointId);
         PointInfo pointInfo = pointInfoMapper.selectOne(queryWrapper);
         if (null == pointInfo) {
-            throw new NotFoundException("The point info does not exist");
+            throw new NotFoundException();
         }
         return pointInfo;
     }
@@ -118,8 +119,8 @@ public class PointInfoServiceImpl implements PointInfoService {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
-        if (null == pointInfos || pointInfos.size() < 1) {
-            throw new NotFoundException("The point infos does not exist");
+        if (null == pointInfos || pointInfos.isEmpty()) {
+            throw new NotFoundException();
         }
         return pointInfos;
     }
@@ -133,7 +134,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.in(PointInfo::getPointId, pointIds);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
         if (null == pointInfos) {
-            throw new NotFoundException("The point infos does not exist");
+            throw new NotFoundException();
         }
         return pointInfos;
     }
@@ -145,7 +146,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getPointId, pointId);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
         if (null == pointInfos) {
-            throw new NotFoundException("The point infos does not exist");
+            throw new NotFoundException();
         }
         return pointInfos;
     }

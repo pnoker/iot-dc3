@@ -81,7 +81,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public PointAttribute selectById(String id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
         if (null == pointAttribute) {
-            throw new NotFoundException("The point attribute does not exist");
+            throw new NotFoundException();
         }
         return pointAttribute;
     }
@@ -93,7 +93,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
         PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
         if (null == pointAttribute) {
-            throw new NotFoundException("The point attribute does not exist");
+            throw new NotFoundException();
         }
         return pointAttribute;
     }
@@ -103,8 +103,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
         pointAttributeDto.setDriverId(driverId);
         List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributeDto));
-        if (null == pointAttributes || pointAttributes.size() < 1) {
-            throw new NotFoundException("The point attributes does not exist");
+        if (null == pointAttributes || pointAttributes.isEmpty()) {
+            throw new NotFoundException();
         }
         return pointAttributes;
     }

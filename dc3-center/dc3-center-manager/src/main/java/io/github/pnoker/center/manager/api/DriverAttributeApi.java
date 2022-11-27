@@ -14,15 +14,14 @@
 
 package io.github.pnoker.center.manager.api;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DriverAttributeClient;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DriverAttributeDto;
-import io.github.pnoker.common.dto.DriverDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.DRIVER_ATTRIBUTE_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.DRIVER_ATTRIBUTE_URL_PREFIX)
 public class DriverAttributeApi implements DriverAttributeClient {
 
     @Resource
@@ -99,7 +98,7 @@ public class DriverAttributeApi implements DriverAttributeClient {
     public R<List<DriverAttribute>> selectByDriverId(String id) {
         try {
             List<DriverAttribute> select = driverAttributeService.selectByDriverId(id);
-            if (CollectionUtil.isNotEmpty(select)) {
+            if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
         } catch (NotFoundException ne) {

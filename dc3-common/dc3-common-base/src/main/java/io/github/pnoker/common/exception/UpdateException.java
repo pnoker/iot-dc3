@@ -22,7 +22,6 @@ import cn.hutool.core.text.CharSequenceUtil;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 public class UpdateException extends RuntimeException {
     public UpdateException(CharSequence template, Object... params) {
         super(CharSequenceUtil.format(template, params));

@@ -17,7 +17,8 @@ package io.github.pnoker.api.center.manager.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.PointClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.valid.Insert;
@@ -37,7 +38,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.POINT_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = PointClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.POINT_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = PointClientFallback.class)
 public interface PointClient {
 
     /**
@@ -47,7 +48,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/add")
-    R<Point> add(@Validated(Insert.class) @RequestBody Point point, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Point> add(@Validated(Insert.class) @RequestBody Point point, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Point
@@ -65,7 +66,7 @@ public interface PointClient {
      * @return Point
      */
     @PostMapping("/update")
-    R<Point> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Point> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Point
@@ -110,7 +111,7 @@ public interface PointClient {
      * @return Page<Point>
      */
     @PostMapping("/list")
-    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询 位号单位

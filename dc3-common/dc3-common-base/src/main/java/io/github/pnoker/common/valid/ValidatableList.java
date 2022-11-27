@@ -26,7 +26,6 @@ import java.util.*;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-01 检查：通过
 public class ValidatableList<E> implements List<E> {
 
     @Valid

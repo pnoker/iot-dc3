@@ -20,9 +20,8 @@ import io.github.pnoker.api.center.manager.feign.DriverInfoClient;
 import io.github.pnoker.center.manager.service.DriverInfoService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ServiceConstant;
-import io.github.pnoker.common.dto.DriverAttributeDto;
+import io.github.pnoker.common.constant.MetadataConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DriverInfoDto;
 import io.github.pnoker.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +39,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.DRIVER_INFO_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.DRIVER_INFO_URL_PREFIX)
 public class DriverInfoApi implements DriverInfoClient {
 
     @Resource
@@ -54,7 +53,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo add = driverInfoService.add(driverInfo);
             if (null != add) {
-                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.ADD, add);
+                notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -68,7 +67,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo driverInfo = driverInfoService.selectById(id);
             if (null != driverInfo && driverInfoService.delete(id)) {
-                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.DELETE, driverInfo);
+                notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.DELETE, driverInfo);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -82,7 +81,7 @@ public class DriverInfoApi implements DriverInfoClient {
         try {
             DriverInfo update = driverInfoService.update(driverInfo);
             if (null != update) {
-                notifyService.notifyDriverDriverInfo(CommonConstant.Driver.DriverInfo.UPDATE, update);
+                notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

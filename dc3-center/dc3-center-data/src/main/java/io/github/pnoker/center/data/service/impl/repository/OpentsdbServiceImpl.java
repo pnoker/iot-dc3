@@ -20,7 +20,8 @@ import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.bean.point.TsPointValue;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.StorageConstant;
+import io.github.pnoker.common.constant.StrategyConstant;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -58,7 +59,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
     @Override
     public String getRepositoryName() {
-        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB;
+        return StrategyConstant.Storage.STRATEGY_OPENTSDB;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
         List<TsPointValue> tsPointValues = pointValues.stream()
                 .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
-                .map(pointValue -> convertPointValues(CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId, pointValue))
+                .map(pointValue -> convertPointValues(StorageConstant.POINT_VALUE_PREFIX + deviceId, pointValue))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
@@ -88,7 +89,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
     @Override
     public void afterPropertiesSet() {
-        RepositoryStrategyFactory.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB, this);
+        RepositoryStrategyFactory.put(StrategyConstant.Storage.STRATEGY_OPENTSDB, this);
     }
 
     private List<TsPointValue> convertPointValues(String metric, PointValue pointValue) {

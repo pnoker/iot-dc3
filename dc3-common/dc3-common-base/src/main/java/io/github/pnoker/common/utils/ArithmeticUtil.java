@@ -14,6 +14,8 @@
 
 package io.github.pnoker.common.utils;
 
+import io.github.pnoker.common.constant.common.ExceptionConstant;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -23,11 +25,10 @@ import java.math.RoundingMode;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 public class ArithmeticUtil {
 
     private ArithmeticUtil() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     /**

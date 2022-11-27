@@ -82,7 +82,7 @@ public class GroupServiceImpl implements GroupService {
     public Group selectById(String id) {
         Group group = groupMapper.selectById(id);
         if (null == group) {
-            throw new NotFoundException("The group does not exist");
+            throw new NotFoundException();
         }
         return group;
     }
@@ -93,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
         queryWrapper.eq(Group::getName, name);
         Group group = groupMapper.selectOne(queryWrapper);
         if (null == group) {
-            throw new NotFoundException("The group does not exist");
+            throw new NotFoundException();
         }
         return group;
     }

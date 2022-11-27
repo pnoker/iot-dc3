@@ -32,7 +32,6 @@ import javax.validation.constraints.Pattern;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -58,7 +57,7 @@ public class Point extends BaseModel {
     private Float multiple;
 
     private Boolean accrue;
-    private String format;
+    private Integer decimal;
     private String unit;
 
     private Boolean enable;
@@ -82,7 +81,7 @@ public class Point extends BaseModel {
         this.maximum = 999999F;
         this.multiple = 1F;
         this.accrue = false;
-        this.format = "%3.f";
-        this.unit = "\"";
+        this.decimal = 3;
+        this.unit = "";
     }
 }

@@ -72,7 +72,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     public TenantBind selectById(String id) {
         TenantBind tenantBind = tenantBindMapper.selectById(id);
         if (null == tenantBind) {
-            throw new NotFoundException("The tenant bind does not exist");
+            throw new NotFoundException();
         }
         return tenantBind;
     }
@@ -84,7 +84,7 @@ public class TenantBindServiceImpl implements TenantBindService {
         queryWrapper.eq(TenantBind::getUserId, userId);
         TenantBind tenantBind = tenantBindMapper.selectOne(queryWrapper);
         if (null == tenantBind) {
-            throw new NotFoundException("The tenant bind does not exist");
+            throw new NotFoundException();
         }
         return tenantBind;
     }

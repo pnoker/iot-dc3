@@ -17,7 +17,8 @@ package io.github.pnoker.api.center.manager.feign;
 import io.github.pnoker.api.center.manager.fallback.AutoClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointDetail;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.valid.Insert;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
@@ -31,10 +32,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.AUTO_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = AutoClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.AUTO_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = AutoClientFallback.class)
 public interface AutoClient {
 
     @PostMapping("/create_device_point")
-    R<PointDetail> autoCreateDeviceAndPoint(@Validated(Insert.class) @RequestBody PointDetail pointDetail, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<PointDetail> autoCreateDeviceAndPoint(@Validated(Insert.class) @RequestBody PointDetail pointDetail, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

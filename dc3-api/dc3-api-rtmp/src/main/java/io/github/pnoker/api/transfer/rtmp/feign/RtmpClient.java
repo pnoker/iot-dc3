@@ -17,7 +17,8 @@ package io.github.pnoker.api.transfer.rtmp.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.transfer.rtmp.fallback.RtmpClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.RtmpServiceConstant;
 import io.github.pnoker.common.dto.RtmpDto;
 import io.github.pnoker.common.model.Rtmp;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -32,7 +33,7 @@ import javax.validation.constraints.NotNull;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Rtmp.URL_PREFIX, name = ServiceConstant.Rtmp.SERVICE_NAME, fallbackFactory = RtmpClientFallback.class)
+@FeignClient(path = RtmpServiceConstant.URL_PREFIX, name = RtmpServiceConstant.SERVICE_NAME, fallbackFactory = RtmpClientFallback.class)
 public interface RtmpClient {
 
     /**
@@ -42,7 +43,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/add")
-    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Rtmp
@@ -60,7 +61,7 @@ public interface RtmpClient {
      * @return R<Rtmp>
      */
     @PostMapping("/update")
-    R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Rtmp
@@ -78,7 +79,7 @@ public interface RtmpClient {
      * @return R<Page < Rtmp>>
      */
     @PostMapping("/list")
-    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 启动 Rtmp 转码任务

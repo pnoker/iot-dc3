@@ -18,10 +18,12 @@ import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCommandService;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.common.utils.ConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,6 @@ import javax.annotation.Resource;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Slf4j
 @Service
 public class DriverCommandServiceImpl implements DriverCommandService {
@@ -46,6 +47,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @Override
     public PointValue read(String deviceId, String pointId) {
         Device device = driverContext.getDeviceByDeviceId(deviceId);
+        Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
 
         try {
             String rawValue = driverCustomService.read(
@@ -55,7 +57,7 @@ public class DriverCommandServiceImpl implements DriverCommandService {
                     driverContext.getPointByDeviceIdAndPointId(deviceId, pointId)
             );
 
-            PointValue pointValue = new PointValue(deviceId, pointId, rawValue, driverService.convertValue(deviceId, pointId, rawValue));
+            PointValue pointValue = new PointValue(deviceId, pointId, rawValue, ConvertUtil.convertValue(point, rawValue));
             driverService.pointValueSender(pointValue);
             return pointValue;
         } catch (Exception e) {

@@ -18,7 +18,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.transfer.rtmp.feign.RtmpClient;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.RtmpServiceConstant;
 import io.github.pnoker.common.dto.RtmpDto;
 import io.github.pnoker.common.model.Rtmp;
 import io.github.pnoker.transfer.rtmp.service.RtmpService;
@@ -36,7 +36,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Rtmp.URL_PREFIX)
+@RequestMapping(RtmpServiceConstant.URL_PREFIX)
 public class RtmpApi implements RtmpClient {
 
     @Resource

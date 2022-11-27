@@ -16,7 +16,7 @@ package io.github.pnoker.driver.config;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.RandomUtil;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.sdk.bean.mqtt.MqttProperties;
 import io.github.pnoker.common.sdk.utils.X509Util;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ import java.util.ArrayList;
 @EnableConfigurationProperties({MqttProperties.class})
 public class MqttConfig {
 
-    private static final String RANDOM_ID = CommonConstant.Symbol.UNDERSCORE + RandomUtil.randomString(8);
+    private static final String RANDOM_ID = SymbolConstant.UNDERSCORE + RandomUtil.randomString(8);
 
     @Resource
     private MqttProperties mqttProperties;

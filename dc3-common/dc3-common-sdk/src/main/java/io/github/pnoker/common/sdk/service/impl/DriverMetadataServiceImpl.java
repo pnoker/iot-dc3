@@ -18,7 +18,8 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.driver.DriverRegister;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.EventConstant;
+import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.*;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
@@ -26,13 +27,14 @@ import io.github.pnoker.common.sdk.bean.driver.DriverProperty;
 import io.github.pnoker.common.sdk.service.DriverMetadataService;
 import io.github.pnoker.common.sdk.service.DriverService;
 import io.github.pnoker.common.utils.Dc3Util;
-import io.github.pnoker.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Driver Metadata Service Implements
@@ -75,7 +77,7 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
         registerHandshake();
         driverService.driverEventSender(new DriverEvent(
                 serviceName,
-                CommonConstant.Driver.Event.DRIVER_REGISTER,
+                EventConstant.Driver.REGISTER,
                 new DriverRegister(
                         driverProperty.getTenant(),
                         driver,
@@ -193,16 +195,18 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             threadPoolExecutor.submit(() -> {
                 driverService.driverEventSender(new DriverEvent(
                         serviceName,
-                        CommonConstant.Driver.Event.DRIVER_HANDSHAKE,
+                        EventConstant.Driver.HANDSHAKE,
                         null
                 ));
 
-                while (!CommonConstant.Status.REGISTERING.equals(driverContext.getDriverStatus())) {
+                while (!StatusEnum.REGISTERING.equals(driverContext.getDriverStatus())) {
                     ThreadUtil.sleep(500);
                 }
             }).get(5, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
+        } catch (Exception ignored) {
+            // TODO 待推敲
             driverService.close("The driver initialization failed, Check whether dc3-center-manager are started normally");
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -211,16 +215,18 @@ public class DriverMetadataServiceImpl implements DriverMetadataService {
             threadPoolExecutor.submit(() -> {
                 driverService.driverEventSender(new DriverEvent(
                         serviceName,
-                        CommonConstant.Driver.Event.DRIVER_METADATA_SYNC,
+                        EventConstant.Driver.METADATA_SYNC,
                         driver.getServiceName()
                 ));
 
-                while (!CommonConstant.Status.ONLINE.equals(driverContext.getDriverStatus())) {
+                while (!StatusEnum.ONLINE.equals(driverContext.getDriverStatus())) {
                     ThreadUtil.sleep(500);
                 }
             }).get(5, TimeUnit.MINUTES);
-        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
+        } catch (Exception ignored) {
+            // TODO 待推敲
             driverService.close("The driver initialization failed, Sync driver metadata from dc3-center-manager timeout");
+            Thread.currentThread().interrupt();
         }
     }
 }

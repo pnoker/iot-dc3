@@ -18,8 +18,8 @@ import io.github.pnoker.api.transfer.rtmp.feign.DriverCommandClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.driver.command.CmdParameter;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.DriverServiceConstant;
 import io.github.pnoker.common.sdk.service.DriverCommandService;
 import io.github.pnoker.common.valid.ValidatableList;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +37,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Driver.COMMAND_URL_PREFIX)
+@RequestMapping(DriverServiceConstant.COMMAND_URL_PREFIX)
 public class DriverCommandApi implements DriverCommandClient {
 
     @Resource
@@ -50,8 +49,8 @@ public class DriverCommandApi implements DriverCommandClient {
     public R<List<PointValue>> readPoint(ValidatableList<CmdParameter> cmdParameters) {
         List<PointValue> pointValues = new ArrayList<>(16);
         try {
-            if (cmdParameters.size() > CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE) {
-                return R.fail("point request size are limited to " + CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE);
+            if (cmdParameters.size() > RequestConstant.DEFAULT_MAX_REQUEST_SIZE) {
+                return R.fail("Point request size are limited to " + RequestConstant.DEFAULT_MAX_REQUEST_SIZE);
             }
             cmdParameters.forEach(cmdParameter -> {
                 PointValue pointValue = driverCommandService.read(cmdParameter.getDeviceId(), cmdParameter.getPointId());
@@ -66,8 +65,8 @@ public class DriverCommandApi implements DriverCommandClient {
     @Override
     public R<Boolean> writePoint(ValidatableList<CmdParameter> cmdParameters) {
         try {
-            if (cmdParameters.size() > CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE) {
-                return R.fail("point request size are limited to " + CommonConstant.Driver.DEFAULT_MAX_REQUEST_SIZE);
+            if (cmdParameters.size() > RequestConstant.DEFAULT_MAX_REQUEST_SIZE) {
+                return R.fail("Point request size are limited to " + RequestConstant.DEFAULT_MAX_REQUEST_SIZE);
             }
             cmdParameters.forEach(cmdParameter -> driverCommandService.write(cmdParameter.getDeviceId(), cmdParameter.getPointId(), cmdParameter.getValue()));
         } catch (Exception e) {

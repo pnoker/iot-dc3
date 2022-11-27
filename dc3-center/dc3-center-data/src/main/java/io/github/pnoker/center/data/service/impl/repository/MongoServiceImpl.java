@@ -19,7 +19,8 @@ import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.MgPointValue;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.StorageConstant;
+import io.github.pnoker.common.constant.StrategyConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.domain.Sort;
@@ -44,7 +45,7 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public String getRepositoryName() {
-        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_MONGO;
+        return StrategyConstant.Storage.MONGO;
     }
 
     @Override
@@ -53,7 +54,7 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
             return;
         }
 
-        final String collection = CommonConstant.Storage.POINT_VALUE_PREFIX + pointValue.getDeviceId();
+        final String collection = StorageConstant.POINT_VALUE_PREFIX + pointValue.getDeviceId();
         ensurePointValueIndex(collection);
         mongoTemplate.insert(new MgPointValue(pointValue), collection);
     }
@@ -64,7 +65,7 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
             return;
         }
 
-        final String collection = CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId;
+        final String collection = StorageConstant.POINT_VALUE_PREFIX + deviceId;
         ensurePointValueIndex(collection);
         final List<MgPointValue> batch = pointValues.stream()
                 .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
@@ -75,7 +76,7 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        RepositoryStrategyFactory.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_MONGO, this);
+        RepositoryStrategyFactory.put(StrategyConstant.Storage.MONGO, this);
     }
 
     /**

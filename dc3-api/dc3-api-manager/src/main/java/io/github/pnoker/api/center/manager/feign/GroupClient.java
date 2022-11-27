@@ -17,7 +17,8 @@ package io.github.pnoker.api.center.manager.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.GroupClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.GroupDto;
 import io.github.pnoker.common.model.Group;
 import io.github.pnoker.common.valid.Insert;
@@ -34,7 +35,7 @@ import javax.validation.constraints.NotNull;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.GROUP_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = GroupClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.GROUP_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = GroupClientFallback.class)
 public interface GroupClient {
 
     /**
@@ -44,7 +45,7 @@ public interface GroupClient {
      * @return Group
      */
     @PostMapping("/add")
-    R<Group> add(@Validated(Insert.class) @RequestBody Group group, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Group> add(@Validated(Insert.class) @RequestBody Group group, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Group
@@ -62,7 +63,7 @@ public interface GroupClient {
      * @return Group
      */
     @PostMapping("/update")
-    R<Group> update(@Validated(Update.class) @RequestBody Group group, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Group> update(@Validated(Update.class) @RequestBody Group group, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Group
@@ -80,6 +81,6 @@ public interface GroupClient {
      * @return Page<Group>
      */
     @PostMapping("/list")
-    R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

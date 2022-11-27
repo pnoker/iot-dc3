@@ -19,9 +19,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DriverClient;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DriverDto;
-import io.github.pnoker.common.dto.PointValueDto;
 import io.github.pnoker.common.model.Driver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.DRIVER_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.DRIVER_URL_PREFIX)
 public class DriverApi implements DriverClient {
 
     @Resource

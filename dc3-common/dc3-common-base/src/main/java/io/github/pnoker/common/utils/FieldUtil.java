@@ -17,6 +17,7 @@ package io.github.pnoker.common.utils;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.LambdaMeta;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
@@ -30,7 +31,7 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 public class FieldUtil {
 
     private FieldUtil() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     /**

@@ -20,9 +20,8 @@ import io.github.pnoker.api.center.manager.feign.ProfileClient;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ServiceConstant;
-import io.github.pnoker.common.dto.PointInfoDto;
+import io.github.pnoker.common.constant.MetadataConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.ProfileDto;
 import io.github.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.PROFILE_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.PROFILE_URL_PREFIX)
 public class ProfileApi implements ProfileClient {
 
     @Resource
@@ -71,7 +70,7 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile profile = profileService.selectById(id);
             if (ObjectUtil.isNotNull(profile) && profileService.delete(id)) {
-                notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.DELETE, profile);
+                notifyService.notifyDriverProfile(MetadataConstant.Profile.DELETE, profile);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -85,7 +84,7 @@ public class ProfileApi implements ProfileClient {
         try {
             Profile update = profileService.update(profile.setTenantId(tenantId));
             if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverProfile(CommonConstant.Driver.Profile.UPDATE, update);
+                notifyService.notifyDriverProfile(MetadataConstant.Profile.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

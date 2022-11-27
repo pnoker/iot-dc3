@@ -14,7 +14,7 @@
 
 package io.github.pnoker.common.sdk.service.job;
 
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.EventConstant;
 import io.github.pnoker.common.model.DriverEvent;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
@@ -47,7 +47,7 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        DriverEvent driverEvent = new DriverEvent(serviceName, CommonConstant.Driver.Event.DRIVER_HEARTBEAT, driverContext.getDriverStatus(), 10, TimeUnit.SECONDS);
+        DriverEvent driverEvent = new DriverEvent(serviceName, EventConstant.Driver.STATUS, driverContext.getDriverStatus(), 10, TimeUnit.SECONDS);
         driverService.driverEventSender(driverEvent);
     }
 }

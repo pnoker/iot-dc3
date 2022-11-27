@@ -27,7 +27,6 @@ import java.util.List;
  * @since 2022.1.0
  */
 
-// 2022-11-02 检查：通过
 @Data
 public class TreeNode implements Serializable {
     private static final long serialVersionUID = 1L;

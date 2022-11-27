@@ -48,14 +48,15 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             if (null == property.getStatus()) {
                 property.setStatus(new ScheduleConfig(true, "0/5 * * * * ?"));
             }
-            if (property.getRead().getEnable()) {
-                createScheduleJobWithCorn("DriverScheduleGroup", "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
+            final String scheduleGroup = "DriverScheduleGroup";
+            if (Boolean.TRUE.equals(property.getRead().getEnable())) {
+                createScheduleJobWithCorn(scheduleGroup, "ReadScheduleJob", property.getRead().getCorn(), DriverReadScheduleJob.class);
             }
-            if (property.getCustom().getEnable()) {
-                createScheduleJobWithCorn("DriverScheduleGroup", "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
+            if (Boolean.TRUE.equals(property.getCustom().getEnable())) {
+                createScheduleJobWithCorn(scheduleGroup, "CustomScheduleJob", property.getCustom().getCorn(), DriverCustomScheduleJob.class);
             }
-            if (property.getStatus().getEnable()) {
-                createScheduleJobWithCorn("DriverScheduleGroup", "StatusScheduleJob", property.getStatus().getCorn(), DriverStatusScheduleJob.class);
+            if (Boolean.TRUE.equals(property.getStatus().getEnable())) {
+                createScheduleJobWithCorn(scheduleGroup, "StatusScheduleJob", property.getStatus().getCorn(), DriverStatusScheduleJob.class);
             }
 
             try {

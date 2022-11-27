@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.manager.feign.AutoClient;
 import io.github.pnoker.center.manager.service.AutoService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointDetail;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +34,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.AUTO_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.AUTO_URL_PREFIX)
 public class AutoApi implements AutoClient {
 
     @Resource

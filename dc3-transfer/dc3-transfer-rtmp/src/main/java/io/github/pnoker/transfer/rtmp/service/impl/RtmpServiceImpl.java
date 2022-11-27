@@ -120,12 +120,12 @@ public class RtmpServiceImpl implements RtmpService {
     @Override
     public boolean start(String id) {
         Rtmp select = rtmpMapper.selectById(id);
-        if (Objects.isNull(select)) {
+        if (ObjectUtil.isNull(select)) {
             throw new NotFoundException(NOT_FOUNT_MESSAGE);
         }
 
         Transcode transcode = transcodeMap.get(id);
-        if (Objects.isNull(transcode)) {
+        if (ObjectUtil.isNull(transcode)) {
             transcode = new Transcode(select);
             transcodeMap.put(transcode.getId(), transcode);
         }

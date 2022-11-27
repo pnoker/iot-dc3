@@ -16,8 +16,8 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.constant.CommonConstant;
 import io.github.pnoker.common.enums.PointValueTypeEnum;
+import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
@@ -104,7 +104,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceEventSender(id, CommonConstant.Device.Event.HEARTBEAT, CommonConstant.Status.ONLINE));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, StatusEnum.ONLINE));
     }
 
     /**
@@ -201,7 +201,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private void writeItem(Item item, String type, String value) throws JIException {
         int writeResult = 0;
 
-        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(type);
+        PointValueTypeEnum valueType = PointValueTypeEnum.of(type);
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + type);
         }

@@ -16,7 +16,7 @@ package io.github.pnoker.common.sdk.bean.driver;
 
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.driver.DriverMetadata;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
@@ -33,7 +33,6 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Data
 @Slf4j
 @Component
@@ -47,9 +46,9 @@ public class DriverContext {
     /**
      * 驱动 状态，默认为 未注册 状态
      */
-    private String driverStatus = CommonConstant.Status.UNREGISTERED;
+    private StatusEnum driverStatus = StatusEnum.UNREGISTERED;
 
-    public synchronized void setDriverStatus(String driverStatus) {
+    public synchronized void setDriverStatus(StatusEnum driverStatus) {
         this.driverStatus = driverStatus;
     }
 
@@ -73,7 +72,7 @@ public class DriverContext {
         Map<String, Map<String, AttributeInfo>> tmpMap = this.driverMetadata.getPointInfoMap().get(deviceId);
         if (null == tmpMap || tmpMap.size() < 1) {
             //todo 提示信息需要统一替换
-            throw new NotFoundException("Device(" + deviceId + ") does not exist");
+            throw new NotFoundException("Device({}) does not exist", deviceId);
         }
         return tmpMap;
     }
@@ -88,7 +87,7 @@ public class DriverContext {
     public Map<String, AttributeInfo> getPointInfoByDeviceIdAndPointId(String deviceId, String pointId) {
         Map<String, AttributeInfo> tmpMap = getPointInfoByDeviceId(deviceId).get(pointId);
         if (null == tmpMap || tmpMap.size() < 1) {
-            throw new NotFoundException("Point(" + pointId + ") info does not exist");
+            throw new NotFoundException("Point({}) info does not exist", pointId);
         }
         return tmpMap;
     }
@@ -102,7 +101,7 @@ public class DriverContext {
     public Device getDeviceByDeviceId(String deviceId) {
         Device device = this.driverMetadata.getDeviceMap().get(deviceId);
         if (null == device) {
-            throw new NotFoundException("Device(" + deviceId + ") does not exist");
+            throw new NotFoundException("Device({}) does not exist", deviceId);
         }
         return device;
     }
@@ -132,6 +131,7 @@ public class DriverContext {
      * @return Point
      */
     public Point getPointByDeviceIdAndPointId(String deviceId, String pointId) {
+        // TODO 当设备量很大的时候，建议用本地数据库来存储设备数据，弄个热数据缓存，仅仅把经常使用的数据放到内存中来
         Device device = getDeviceByDeviceId(deviceId);
         Optional<Map<String, Point>> optional = this.driverMetadata.getProfilePointMap().entrySet().stream()
                 .filter(entry -> device.getProfileIds().contains(entry.getKey()))
@@ -143,7 +143,7 @@ public class DriverContext {
             return optional.get().get(pointId);
         }
 
-        throw new NotFoundException("Point(" + pointId + ") point does not exist");
+        throw new NotFoundException("Point({}) info does not exist", pointId);
     }
 
 }

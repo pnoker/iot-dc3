@@ -17,7 +17,8 @@ package io.github.pnoker.api.center.auth.feign;
 import io.github.pnoker.api.center.auth.fallback.DictionaryClientFallback;
 import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,7 +31,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Auth.DICTIONARY_URL_PREFIX, name = ServiceConstant.Auth.SERVICE_NAME, fallbackFactory = DictionaryClientFallback.class)
+@FeignClient(path = AuthServiceConstant.DICTIONARY_URL_PREFIX, name = AuthServiceConstant.SERVICE_NAME, fallbackFactory = DictionaryClientFallback.class)
 public interface DictionaryClient {
 
     /**
@@ -47,7 +48,7 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/user")
-    R<List<Dictionary>> userDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询 Ip 黑名单 Dictionary
@@ -55,6 +56,6 @@ public interface DictionaryClient {
      * @return List<Dictionary>
      */
     @GetMapping("/black_ip")
-    R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

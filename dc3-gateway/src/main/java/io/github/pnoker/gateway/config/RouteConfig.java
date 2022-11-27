@@ -14,7 +14,7 @@
 
 package io.github.pnoker.gateway.config;
 
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.SpringCloudCircuitBreakerFilterFactory;
@@ -68,7 +68,7 @@ public class RouteConfig {
     public RouteLocator gatewayRouteLocator(RouteLocatorBuilder builder) {
         String v3ApiPrefix = "/api/v3";
         String lbPrefix = "lb://";
-        String authUri = lbPrefix + ServiceConstant.Auth.SERVICE_NAME;
+        String authUri = lbPrefix + AuthServiceConstant.SERVICE_NAME;
         return builder.routes()
                 .route("token_salt",
                         r -> r.path(v3ApiPrefix + "/token/salt")

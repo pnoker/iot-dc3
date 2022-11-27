@@ -19,9 +19,9 @@ import io.github.pnoker.center.auth.bean.TokenValid;
 import io.github.pnoker.center.auth.service.TokenService;
 import io.github.pnoker.common.bean.driver.auth.Login;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.utils.Dc3Util;
+import io.github.pnoker.common.utils.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +36,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Auth.TOKEN_URL_PREFIX)
+@RequestMapping(AuthServiceConstant.TOKEN_URL_PREFIX)
 public class TokenApi implements TokenClient {
 
     @Resource
@@ -58,7 +58,7 @@ public class TokenApi implements TokenClient {
     public R<String> checkTokenValid(Login login) {
         TokenValid tokenValid = tokenService.checkTokenValid(login.getName(), login.getSalt(), login.getToken(), login.getTenant());
         if (tokenValid.isValid()) {
-            String expireTime = Dc3Util.formatCompleteData(tokenValid.getExpireTime());
+            String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
             return R.ok(expireTime, "The token will expire in " + expireTime);
         }
         throw new UnAuthorizedException("Token invalid");

@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.UserClient;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.dto.UserDto;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.model.User;
@@ -37,7 +37,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Auth.USER_URL_PREFIX)
+@RequestMapping(AuthServiceConstant.USER_URL_PREFIX)
 public class UserApi implements UserClient {
 
     @Resource
@@ -97,7 +97,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getName());
+        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     @Override
@@ -110,7 +110,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getName());
+        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     @Override
@@ -126,7 +126,7 @@ public class UserApi implements UserClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getName());
+        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     @Override

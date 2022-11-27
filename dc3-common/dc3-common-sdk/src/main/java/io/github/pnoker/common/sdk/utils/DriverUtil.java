@@ -17,7 +17,9 @@ package io.github.pnoker.common.sdk.utils;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.enums.PointValueTypeEnum;
+import io.github.pnoker.common.utils.DecodeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -32,7 +34,7 @@ import java.util.Map;
 public class DriverUtil {
 
     private DriverUtil() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     /**
@@ -66,7 +68,7 @@ public class DriverUtil {
      * @return string
      */
     public static String base64Encode(String content) {
-        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = DecodeUtil.stringToByte(content);
         return Base64.getEncoder().encodeToString(bytes);
     }
 
@@ -77,7 +79,7 @@ public class DriverUtil {
      * @return string
      */
     public static String base64Decode(String content) {
-        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = DecodeUtil.stringToByte(content);
         return new String(Base64.getDecoder().decode(bytes));
     }
 
@@ -114,7 +116,7 @@ public class DriverUtil {
             length = length / 2;
         }
         byte[] bcdBytes = new byte[length];
-        byte[] decimalBytes = decimalString.getBytes();
+        byte[] decimalBytes = DecodeUtil.stringToByte(decimalString);
         int j;
         int k;
         for (int i = 0; i < decimalString.length() / 2; i++) {
@@ -282,7 +284,7 @@ public class DriverUtil {
     public static String getTypeClassName(String type) {
         String className = String.class.getName();
 
-        PointValueTypeEnum valueType = PointValueTypeEnum.getByCode(type);
+        PointValueTypeEnum valueType = PointValueTypeEnum.of(type);
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + type);
         }

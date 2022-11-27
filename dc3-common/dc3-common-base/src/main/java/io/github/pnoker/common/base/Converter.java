@@ -21,7 +21,6 @@ package io.github.pnoker.common.base;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-01 检查：通过
 public interface Converter<D> {
     /**
      * DTO 转 DO

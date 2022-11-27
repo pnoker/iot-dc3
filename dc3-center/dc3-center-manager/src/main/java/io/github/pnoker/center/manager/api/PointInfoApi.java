@@ -20,9 +20,8 @@ import io.github.pnoker.api.center.manager.feign.PointInfoClient;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointInfoService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ServiceConstant;
-import io.github.pnoker.common.dto.PointAttributeDto;
+import io.github.pnoker.common.constant.MetadataConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.PointInfoDto;
 import io.github.pnoker.common.model.PointInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +39,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.POINT_INFO_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.POINT_INFO_URL_PREFIX)
 public class PointInfoApi implements PointInfoClient {
 
     @Resource
@@ -54,7 +53,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo add = pointInfoService.add(pointInfo);
             if (ObjectUtil.isNotNull(add)) {
-                notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.ADD, add);
+                notifyService.notifyDriverPointInfo(MetadataConstant.PointInfo.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -68,7 +67,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo pointInfo = pointInfoService.selectById(id);
             if (ObjectUtil.isNotNull(pointInfo) && pointInfoService.delete(id)) {
-                notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.DELETE, pointInfo);
+                notifyService.notifyDriverPointInfo(MetadataConstant.PointInfo.DELETE, pointInfo);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -82,7 +81,7 @@ public class PointInfoApi implements PointInfoClient {
         try {
             PointInfo update = pointInfoService.update(pointInfo);
             if (null != update) {
-                notifyService.notifyDriverPointInfo(CommonConstant.Driver.PointInfo.UPDATE, update);
+                notifyService.notifyDriverPointInfo(MetadataConstant.PointInfo.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

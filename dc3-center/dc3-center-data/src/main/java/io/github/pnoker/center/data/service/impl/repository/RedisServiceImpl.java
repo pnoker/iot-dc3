@@ -18,8 +18,9 @@ import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.CacheConstant;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.constant.StrategyConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -43,7 +44,7 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public String getRepositoryName() {
-        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_REDIS;
+        return StrategyConstant.Storage.REDIS;
     }
 
     @Override
@@ -52,7 +53,7 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
             return;
         }
 
-        final String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + CommonConstant.Symbol.DOT;
+        final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + SymbolConstant.DOT;
         redisUtil.setKey(prefix + pointValue.getPointId(), pointValue);
     }
 
@@ -62,7 +63,7 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
             return;
         }
 
-        final String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.DOT;
+        final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT;
         Map<String, Object> collect = pointValues.stream()
                 .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
                 .collect(Collectors.toMap(pointValue -> prefix + pointValue.getPointId(), pointValue -> pointValue));
@@ -71,6 +72,6 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        RepositoryStrategyFactory.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_REDIS, this);
+        RepositoryStrategyFactory.put(StrategyConstant.Storage.REDIS, this);
     }
 }

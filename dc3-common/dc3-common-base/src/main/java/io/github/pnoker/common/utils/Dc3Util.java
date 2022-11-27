@@ -15,9 +15,7 @@
 package io.github.pnoker.common.utils;
 
 import cn.hutool.core.util.ReUtil;
-import cn.hutool.crypto.digest.MD5;
 import io.github.pnoker.common.bean.common.TreeNode;
-import io.github.pnoker.common.constant.CommonConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -27,10 +25,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,166 +36,22 @@ import java.util.stream.Collectors;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Slf4j
 public class Dc3Util {
-    /**
-     * SimpleDateFormat ThreadLocal 保证线程安全
-     */
-    private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL =
-            ThreadLocal.withInitial(() -> new SimpleDateFormat(CommonConstant.Time.DEFAULT_DATE_FORMAT));
-    private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL =
-            ThreadLocal.withInitial(() -> new SimpleDateFormat(CommonConstant.Time.COMPLETE_DATE_FORMAT));
 
     /**
-     * 获取 md5 加密编码
+     * 判断字符串是否为 数字格式
      *
-     * @param str String
-     * @return String
+     * @param content 字符串
+     * @return boolean
      */
-    public static String md5(String str) {
-        MD5 md5 = MD5.create();
-        return md5.digestHex(str, StandardCharsets.UTF_8);
-    }
-
-    /**
-     * 获取 md5 & salt 加密编码
-     *
-     * @param str  String
-     * @param salt String
-     * @return String
-     */
-    public static String md5(String str, String salt) {
-        return md5(md5(str) + salt);
-    }
-
-    /**
-     * 将字符串进行Base64编码
-     *
-     * @param str String
-     * @return Byte Array
-     */
-    public static String encodeString(String str) {
-        return new String(
-                Base64.getEncoder().encode(str.getBytes(StandardCharsets.UTF_8)),
-                StandardCharsets.UTF_8
-        );
-    }
-
-    /**
-     * 必须配合encodeString使用，用于encodeString编码之后解码
-     *
-     * @param str String
-     * @return Byte Array
-     */
-    public static String decodeString(String str) {
-        return new String(
-                Base64.getDecoder().decode(str),
-                StandardCharsets.UTF_8
-        );
-    }
-
-
-    /**
-     * 将字符串进行Base64编码
-     *
-     * @param str String
-     * @return Byte Array
-     */
-    public static byte[] encode(String str) {
-        return Base64.getEncoder().encode(str.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
-     * 将字节流进行Base64编码
-     *
-     * @param bytes Byte Array
-     * @return Byte Array
-     */
-    public static String encode(byte[] bytes) {
-        return Base64.getEncoder().encodeToString(bytes);
-    }
-
-    /**
-     * 必须配合encode使用，用于encode编码之后解码
-     *
-     * @param str String
-     * @return Byte Array
-     */
-    public static byte[] decode(String str) {
-        return Base64.getDecoder().decode(str);
-    }
-
-    /**
-     * 必须配合encode使用，用于encode编码之后解码
-     *
-     * @param input Byte Array
-     * @return Byte Array
-     */
-    public static byte[] decode(byte[] input) {
-        return Base64.getDecoder().decode(input);
-    }
-
-    /**
-     * 使用 yyyy-MM-dd HH:mm:ss 格式化时间
-     *
-     * @param date Date
-     * @return String
-     */
-    public static String formatDefaultData(Date date) {
-        return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().format(date);
-    }
-
-    /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss 转为时间类型
-     *
-     * @param dateString Date String
-     * @return Date
-     */
-    public static Date stringToDefaultDate(String dateString) {
+    public static boolean isNumeric(String content) {
+        String regex = "-?[0-9]+(\\.[0-9]+)?";
         try {
-            return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
-        } catch (ParseException e) {
-            return null;
+            return ReUtil.isMatch(regex, new BigDecimal(content).toString());
+        } catch (Exception e) {
+            return false;
         }
-    }
-
-    /**
-     * 使用 yyyy-MM-dd HH:mm:ss.SSS 格式化时间
-     *
-     * @param date Date
-     * @return String
-     */
-    public static String formatCompleteData(Date date) {
-        return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().format(date);
-    }
-
-    /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss.SSS 转为时间类型
-     *
-     * @param dateString Date String
-     * @return Date
-     */
-    public static Date stringToCompleteDate(String dateString) {
-        try {
-            return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().parse(dateString);
-        } catch (ParseException e) {
-            return null;
-        }
-    }
-
-    /**
-     * 按小时推迟时间
-     *
-     * @param amount Integer
-     * @param field  Calendar field : Calendar.HOUR/MINUTE/...
-     * @return Date
-     */
-    public static Date expireTime(int amount, int field) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(field, amount);
-        return calendar.getTime();
     }
 
     /**
@@ -268,7 +120,6 @@ public class Dc3Util {
         return ReUtil.isMatch(regex, String.valueOf(port));
     }
 
-
     /**
      * InputStream 转 String
      * 此方法可以防止中文乱码
@@ -288,7 +139,7 @@ public class Dc3Util {
             if (temp.contains("gb2312")) {
                 return new String(result, "gb2312");
             } else {
-                return new String(result, StandardCharsets.UTF_8);
+                return DecodeUtil.byteToString(result);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

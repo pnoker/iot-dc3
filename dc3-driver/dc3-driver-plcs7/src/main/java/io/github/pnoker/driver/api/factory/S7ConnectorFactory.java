@@ -13,6 +13,7 @@
  */
 package io.github.pnoker.driver.api.factory;
 
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.SiemensPLCS;
 import io.github.pnoker.driver.api.impl.S7TCPConnection;
@@ -25,7 +26,7 @@ import io.github.pnoker.driver.api.impl.S7TCPConnection;
 public class S7ConnectorFactory {
 
     private S7ConnectorFactory() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     /**

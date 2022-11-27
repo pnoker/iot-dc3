@@ -20,7 +20,7 @@ import io.github.pnoker.api.center.manager.feign.DictionaryClient;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DictionaryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.DICTIONARY_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.DICTIONARY_URL_PREFIX)
 public class DictionaryApi implements DictionaryClient {
 
     @Resource

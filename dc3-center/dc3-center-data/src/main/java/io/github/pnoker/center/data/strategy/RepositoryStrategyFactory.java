@@ -15,7 +15,8 @@
 package io.github.pnoker.center.data.strategy;
 
 import io.github.pnoker.center.data.service.RepositoryService;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.StrategyConstant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RepositoryStrategyFactory {
 
     private RepositoryStrategyFactory() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     private static final Map<String, RepositoryService> savingStrategyServiceMap = new ConcurrentHashMap<>();
@@ -41,10 +42,10 @@ public class RepositoryStrategyFactory {
     }
 
     public static RepositoryService get(String name) {
-        return savingStrategyServiceMap.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY + name);
+        return savingStrategyServiceMap.get(StrategyConstant.Storage.REPOSITORY_PREFIX + name);
     }
 
     public static void put(String name, RepositoryService service) {
-        savingStrategyServiceMap.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY + name, service);
+        savingStrategyServiceMap.put(StrategyConstant.Storage.REPOSITORY_PREFIX + name, service);
     }
 }

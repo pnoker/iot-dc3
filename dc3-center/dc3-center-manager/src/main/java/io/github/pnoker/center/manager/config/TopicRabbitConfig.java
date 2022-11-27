@@ -14,13 +14,15 @@
 
 package io.github.pnoker.center.manager.config;
 
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.RabbitConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,9 +47,7 @@ public class TopicRabbitConfig {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         rabbitTemplate.setMandatory(true);
-        rabbitTemplate.setReturnsCallback((message) -> {
-            log.error("Send message({}) to exchange({}), routingKey({}) failed: {}", message.getMessage(), message.getExchange(), message.getRoutingKey(), message.getReplyText());
-        });
+        rabbitTemplate.setReturnsCallback(message -> log.error("Send message({}) to exchange({}), routingKey({}) failed: {}", message.getMessage(), message.getExchange(), message.getRoutingKey(), message.getReplyText()));
         rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
             if (!ack) {
                 log.error("CorrelationData({}) ack failed: {}", correlationData, cause);
@@ -57,7 +57,7 @@ public class TopicRabbitConfig {
     }
 
     @Bean
-    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory() {
+    public RabbitListenerContainerFactory<SimpleMessageListenerContainer> rabbitListenerContainerFactory() {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(new Jackson2JsonMessageConverter());
@@ -67,15 +67,15 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange eventExchange() {
-        return new TopicExchange(CommonConstant.Rabbit.TOPIC_EXCHANGE_EVENT, true, false);
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_EVENT, true, false);
     }
 
     @Bean
     Queue driverEventQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 15秒：15 * 1000 = 15000L
-        arguments.put(CommonConstant.Rabbit.MESSAGE_TTL, 15000L);
-        return new Queue(CommonConstant.Rabbit.QUEUE_DRIVER_EVENT, true, false, false, arguments);
+        arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_EVENT, true, false, false, arguments);
     }
 
     @Bean
@@ -83,15 +83,15 @@ public class TopicRabbitConfig {
         return BindingBuilder
                 .bind(driverEventQueue)
                 .to(eventExchange)
-                .with(CommonConstant.Rabbit.ROUTING_DRIVER_EVENT_PREFIX + CommonConstant.Symbol.ASTERISK);
+                .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
     }
 
     @Bean
     Queue deviceEventQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 15秒：15 * 1000 = 15000L
-        arguments.put(CommonConstant.Rabbit.MESSAGE_TTL, 15000L);
-        return new Queue(CommonConstant.Rabbit.QUEUE_DEVICE_EVENT, true, false, false, arguments);
+        arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
+        return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, false, arguments);
     }
 
     @Bean
@@ -99,7 +99,7 @@ public class TopicRabbitConfig {
         return BindingBuilder
                 .bind(deviceEventQueue)
                 .to(eventExchange)
-                .with(CommonConstant.Rabbit.ROUTING_DEVICE_EVENT_PREFIX + CommonConstant.Symbol.ASTERISK);
+                .with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
     }
 
 }

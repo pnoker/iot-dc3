@@ -14,7 +14,7 @@
 
 package io.github.pnoker.common.sdk.bean.driver;
 
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.sdk.bean.schedule.ScheduleProperty;
@@ -35,7 +35,6 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Setter
 @Getter
 @Validated({Insert.class, Update.class})
@@ -48,7 +47,7 @@ public class DriverProperty {
             groups = {Insert.class, Update.class})
     private String tenant;
     private String name;
-    private String type = CommonConstant.Driver.Type.DRIVER;
+    private String type = PrefixConstant.DRIVER;
     private String description;
     private ScheduleProperty schedule;
     private List<DriverAttribute> driverAttribute;

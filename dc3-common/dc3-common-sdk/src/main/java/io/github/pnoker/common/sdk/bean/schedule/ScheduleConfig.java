@@ -23,7 +23,6 @@ import lombok.Setter;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Setter
 @Getter
 @NoArgsConstructor

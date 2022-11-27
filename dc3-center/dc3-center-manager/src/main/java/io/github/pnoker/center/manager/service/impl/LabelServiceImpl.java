@@ -69,7 +69,7 @@ public class LabelServiceImpl implements LabelService {
         }
         Label label = selectById(id);
         if (null == label) {
-            throw new NotFoundException("The label does not exist");
+            throw new NotFoundException();
         }
         return labelMapper.deleteById(id) > 0;
     }
@@ -90,7 +90,7 @@ public class LabelServiceImpl implements LabelService {
     public Label selectById(String id) {
         Label label = labelMapper.selectById(id);
         if (null == label) {
-            throw new NotFoundException("The label does not exist");
+            throw new NotFoundException();
         }
         return label;
     }
@@ -102,7 +102,7 @@ public class LabelServiceImpl implements LabelService {
         queryWrapper.eq(Label::getTenantId, tenantId);
         Label label = labelMapper.selectOne(queryWrapper);
         if (null == label) {
-            throw new NotFoundException("The label does not exist");
+            throw new NotFoundException();
         }
         return label;
     }

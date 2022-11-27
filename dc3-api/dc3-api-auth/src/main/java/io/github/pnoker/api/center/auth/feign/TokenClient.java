@@ -17,7 +17,7 @@ package io.github.pnoker.api.center.auth.feign;
 import io.github.pnoker.api.center.auth.fallback.TokenClientFallback;
 import io.github.pnoker.common.bean.driver.auth.Login;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Check;
 import io.github.pnoker.common.valid.Update;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Auth.TOKEN_URL_PREFIX, name = ServiceConstant.Auth.SERVICE_NAME, fallbackFactory = TokenClientFallback.class)
+@FeignClient(path = AuthServiceConstant.TOKEN_URL_PREFIX, name = AuthServiceConstant.SERVICE_NAME, fallbackFactory = TokenClientFallback.class)
 public interface TokenClient {
 
     /**

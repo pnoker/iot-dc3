@@ -20,7 +20,6 @@ package io.github.pnoker.common.annotation;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-01 检查：通过
 public enum LogsType {
     INFO, WARN, DEBUG, ERROR;
 }

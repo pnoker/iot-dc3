@@ -15,6 +15,7 @@
 package io.github.pnoker.common.sdk.service;
 
 import io.github.pnoker.common.bean.point.PointValue;
+import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.DeviceEvent;
 import io.github.pnoker.common.model.DriverEvent;
 
@@ -25,16 +26,6 @@ import java.util.List;
  * @since 2022.1.0
  */
 public interface DriverService {
-
-    /**
-     * 将位号原始值进行处理和转换
-     *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @param rawValue Raw Value
-     * @return PointValue
-     */
-    String convertValue(String deviceId, String pointId, String rawValue);
 
     /**
      * 发送驱动事件
@@ -54,20 +45,19 @@ public interface DriverService {
      * 发送设备事件
      *
      * @param deviceId Device ID
-     * @param type     Event Type, STATUS、LIMIT
-     * @param content  Event Content
-     */
-    void deviceEventSender(String deviceId, String type, String content);
-
-    /**
-     * 发送设备事件
-     *
-     * @param deviceId Device ID
      * @param pointId  Point ID
      * @param type     Event Type, STATUS、LIMIT
      * @param content  Event Content
      */
     void deviceEventSender(String deviceId, String pointId, String type, String content);
+
+    /**
+     * 发送设备状态事件
+     *
+     * @param deviceId Device ID
+     * @param status   StatusEnum
+     */
+    void deviceStatusSender(String deviceId, StatusEnum status);
 
     /**
      * 发送位号值到消息组件

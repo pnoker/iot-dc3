@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Data
 @Document
 @NoArgsConstructor
@@ -47,6 +46,9 @@ public class DriverEvent implements Serializable {
     @MongoId
     private ObjectId id;
 
+    /**
+     * 驱动服务名称
+     */
     private String serviceName;
 
     /**

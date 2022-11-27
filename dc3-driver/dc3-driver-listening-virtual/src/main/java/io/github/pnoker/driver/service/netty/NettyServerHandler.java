@@ -22,6 +22,7 @@ import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
 import io.github.pnoker.common.sdk.utils.DriverUtil;
+import io.github.pnoker.common.utils.ConvertUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -81,32 +82,32 @@ public class NettyServerHandler {
                     case "海拔":
                         float altitude = byteBuf.getFloat(start);
                         pointValue = new PointValue(deviceId, pointId, String.valueOf(altitude),
-                                driverService.convertValue(deviceId, pointId, String.valueOf(altitude)));
+                                ConvertUtil.convertValue(point, String.valueOf(altitude)));
                         break;
                     case "速度":
                         double speed = byteBuf.getDouble(start);
                         pointValue = new PointValue(deviceId, pointId, String.valueOf(speed),
-                                driverService.convertValue(deviceId, pointId, String.valueOf(speed)));
+                                ConvertUtil.convertValue(point, String.valueOf(speed)));
                         break;
                     case "液位":
                         long level = byteBuf.getLong(start);
                         pointValue = new PointValue(deviceId, pointId, String.valueOf(level),
-                                driverService.convertValue(deviceId, pointId, String.valueOf(level)));
+                                ConvertUtil.convertValue(point, String.valueOf(level)));
                         break;
                     case "方向":
                         int direction = byteBuf.getInt(start);
                         pointValue = new PointValue(deviceId, pointId, String.valueOf(direction),
-                                driverService.convertValue(deviceId, pointId, String.valueOf(direction)));
+                                ConvertUtil.convertValue(point, String.valueOf(direction)));
                         break;
                     case "锁定":
                         boolean lock = byteBuf.getBoolean(start);
                         pointValue = new PointValue(deviceId, pointId, String.valueOf(lock),
-                                driverService.convertValue(deviceId, pointId, String.valueOf(lock)));
+                                ConvertUtil.convertValue(point, String.valueOf(lock)));
                         break;
                     case "经纬":
                         String lalo = byteBuf.toString(start, end, CharsetUtil.CHARSET_ISO_8859_1).trim();
                         pointValue = new PointValue(deviceId, pointId, lalo,
-                                driverService.convertValue(deviceId, pointId, lalo));
+                                ConvertUtil.convertValue(point, lalo));
                         break;
                     default:
                         break;
