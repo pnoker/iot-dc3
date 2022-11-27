@@ -51,6 +51,7 @@ public class MongoDbConfig {
         try {
             mappingConverter.setCustomConversions(beanFactory.getBean(CustomConversions.class));
         } catch (NoSuchBeanDefinitionException ignored) {
+            // nothing to do
         }
         mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return mappingConverter;

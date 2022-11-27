@@ -32,7 +32,6 @@ import javax.annotation.Resource;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Component
 @ComponentScan(basePackages = {
         "io.github.pnoker.common.sdk"

@@ -14,16 +14,15 @@
 
 package io.github.pnoker.center.manager.api;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointClient;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ServiceConstant;
-import io.github.pnoker.common.dto.LabelDto;
+import io.github.pnoker.common.constant.MetadataConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.POINT_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.POINT_URL_PREFIX)
 public class PointApi implements PointClient {
 
     @Resource
@@ -59,7 +58,7 @@ public class PointApi implements PointClient {
         try {
             Point add = pointService.add(point.setTenantId(tenantId));
             if (ObjectUtil.isNotNull(add)) {
-                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, add);
+                notifyService.notifyDriverPoint(MetadataConstant.Point.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -73,7 +72,7 @@ public class PointApi implements PointClient {
         try {
             Point point = pointService.selectById(id);
             if (ObjectUtil.isNotNull(point) && pointService.delete(id)) {
-                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.DELETE, point);
+                notifyService.notifyDriverPoint(MetadataConstant.Point.DELETE, point);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -87,7 +86,7 @@ public class PointApi implements PointClient {
         try {
             Point update = pointService.update(point.setTenantId(tenantId));
             if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverPoint(CommonConstant.Driver.Point.UPDATE, update);
+                notifyService.notifyDriverPoint(MetadataConstant.Point.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {
@@ -124,7 +123,7 @@ public class PointApi implements PointClient {
     public R<List<Point>> selectByProfileId(String profileId) {
         try {
             List<Point> select = pointService.selectByProfileId(profileId);
-            if (CollectionUtil.isNotEmpty(select)) {
+            if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -137,7 +136,7 @@ public class PointApi implements PointClient {
     public R<List<Point>> selectByDeviceId(String deviceId) {
         try {
             List<Point> select = pointService.selectByDeviceId(deviceId);
-            if (CollectionUtil.isNotEmpty(select)) {
+            if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {

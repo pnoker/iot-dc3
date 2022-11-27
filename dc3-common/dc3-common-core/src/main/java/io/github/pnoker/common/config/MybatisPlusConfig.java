@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author : pnoker
  */
-// 2022-11-02 检查：通过
 @Configuration
 public class MybatisPlusConfig {
 

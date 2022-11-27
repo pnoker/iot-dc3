@@ -13,6 +13,7 @@
  */
 package io.github.pnoker.driver.api.impl.serializer.converter;
 
+import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.driver.api.S7Serializable;
 import io.github.pnoker.driver.api.S7Type;
 
@@ -75,7 +76,7 @@ public final class StringConverter implements S7Serializable {
         buffer[byteOffset + OFFSET_OVERALL_LENGTH] = (byte) size;
         buffer[byteOffset + OFFSET_CURRENT_LENGTH] = (byte) len;
 
-        final byte[] strBytes = value.getBytes();
+        final byte[] strBytes = DecodeUtil.stringToByte(value);
         System.arraycopy(strBytes, 0, buffer, byteOffset + OFFSET_START, len);
     }
 

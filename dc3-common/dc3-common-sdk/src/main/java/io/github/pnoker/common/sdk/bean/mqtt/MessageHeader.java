@@ -14,7 +14,6 @@
 
 package io.github.pnoker.common.sdk.bean.mqtt;
 
-import cn.hutool.core.util.ObjectUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,20 +21,21 @@ import lombok.experimental.Accessors;
 import org.springframework.messaging.MessageHeaders;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * @author pnoker
  * @since 2022.1.0
  */
-// TODO 该地方需要重新考虑设计，自己看看MQTT相关文档描述
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 public class MessageHeader implements Serializable {
+// TODO 该地方需要重新考虑设计，自己看看MQTT相关文档描述
 
-    private String id;
+    private UUID id;
     private Integer mqttId;
     private Integer mqttReceivedQos;
     private String mqttReceivedTopic;
@@ -44,38 +44,32 @@ public class MessageHeader implements Serializable {
     private Long timestamp;
 
     public MessageHeader(MessageHeaders messageHeaders) {
-        if (ObjectUtil.isNotNull(messageHeaders)) {
-            try {
-                UUID id = messageHeaders.get("id", UUID.class);
-                if (ObjectUtil.isNotNull(id)) {
-                    this.id = id.toString();
-                }
-            } catch (Exception ignored) {
-            }
-            try {
-                this.mqttId = messageHeaders.get("mqtt_id", Integer.class);
-            } catch (Exception ignored) {
-            }
-            try {
-                this.mqttReceivedQos = messageHeaders.get("mqtt_receivedQos", Integer.class);
-            } catch (Exception ignored) {
-            }
-            try {
-                this.mqttReceivedTopic = messageHeaders.get("mqtt_receivedTopic", String.class);
-            } catch (Exception ignored) {
-            }
-            try {
-                this.mqttDuplicate = messageHeaders.get("mqtt_duplicate", Boolean.class);
-            } catch (Exception ignored) {
-            }
-            try {
-                this.mqttReceivedRetained = messageHeaders.get("mqtt_receivedRetained", Boolean.class);
-            } catch (Exception ignored) {
-            }
-            try {
-                this.timestamp = messageHeaders.get("timestamp", Long.class);
-            } catch (Exception ignored) {
-            }
+        if (!Objects.isNull(messageHeaders)) {
+            this.id = messageHeaders.getId();
+            this.mqttId = getMessageHeader(messageHeaders, "mqtt_id", Integer.class);
+            this.mqttReceivedQos = getMessageHeader(messageHeaders, "mqtt_receivedQos", Integer.class);
+            this.mqttReceivedTopic = getMessageHeader(messageHeaders, "mqtt_receivedTopic", String.class);
+            this.mqttDuplicate = getMessageHeader(messageHeaders, "mqtt_duplicate", Boolean.class);
+            this.mqttReceivedRetained = getMessageHeader(messageHeaders, "mqtt_receivedRetained", Boolean.class);
+            this.timestamp = getMessageHeader(messageHeaders, "timestamp", Long.class);
         }
+    }
+
+    /**
+     * 获取消息头
+     *
+     * @param messageHeaders MessageHeaders
+     * @param key            Header Key
+     * @param type           Header Key Type
+     * @param <T>            Header Key Type
+     * @return Header Value
+     */
+    private <T> T getMessageHeader(MessageHeaders messageHeaders, String key, Class<T> type) {
+        try {
+            return messageHeaders.get(key, type);
+        } catch (Exception ignored) {
+            // nothing to do
+        }
+        return null;
     }
 }

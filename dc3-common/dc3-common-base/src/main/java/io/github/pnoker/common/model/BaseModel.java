@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.valid.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +36,6 @@ import java.util.Date;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -58,11 +57,11 @@ public class BaseModel implements Serializable {
     private String description;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonFormat(pattern = CommonConstant.Time.COMPLETE_DATE_FORMAT, timezone = CommonConstant.Time.TIMEZONE)
+    @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.TIMEZONE)
     private Date createTime;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonFormat(pattern = CommonConstant.Time.COMPLETE_DATE_FORMAT, timezone = CommonConstant.Time.TIMEZONE)
+    @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.TIMEZONE)
     private Date updateTime;
 
     /**

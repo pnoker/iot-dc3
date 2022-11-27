@@ -186,7 +186,7 @@ CREATE TABLE `dc3_point`
     `maximum`     float(255, 6)                                           NULL DEFAULT NULL COMMENT '最大值',
     `multiple`    float(255, 6)                                           NULL DEFAULT 1 COMMENT '倍数',
     `accrue`      tinyint(4)                                              NULL DEFAULT 0 COMMENT '累计标识',
-    `format`      varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT '' COMMENT '格式数据，Jave格式 %.3f',
+    `format`      tinyint(4)                                              NULL DEFAULT 6 COMMENT '精度',
     `unit`        varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT '' COMMENT '单位',
     `enable`      tinyint(4)                                              NULL DEFAULT 1 COMMENT '是否可用',
     `profile_id`  varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '模板ID',
@@ -502,7 +502,8 @@ VALUES ('-1', 'default', 1, '平台开发默认租户', '2016-10-01 00:00:00', '
 -- Records of dc3_user
 -- ----------------------------
 INSERT INTO `dc3_user`
-VALUES ('-1', 'pnoker', '18304071393', 'pnokers@icloud.com', '10e339be1130a90dc1b9ff0332abced6', 1, '平台开发者账号', '2016-10-01 00:00:00', '2016-10-01 00:00:00', 0);
+VALUES ('-1', 'pnoker', '18304071393', 'pnokers@icloud.com', '10e339be1130a90dc1b9ff0332abced6', 1, '平台开发者账号',
+        '2016-10-01 00:00:00', '2016-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_tenant_bind
@@ -514,12 +515,16 @@ VALUES ('-1', '-1', '-1', '平台开发默认租户和默认用户关联', '2016
 -- Records of dc3_rtmp
 -- ----------------------------
 INSERT INTO `dc3_rtmp`
-VALUES ('-1', '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_local',
-        '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '-1', '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2016-10-01 00:00:00',
+VALUES ('-1', '本地测试视频', 'D:/FFmpeg/bin/190314223540373995.mp4',
+        'rtmp://dc3-nginx:1935/rtmp/190314223540373995_local',
+        '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '-1',
+        '本地MP4视频文件（复仇者联盟预告），用于测试使用', '2016-10-01 00:00:00',
         '2016-10-01 00:00:00', 0);
 INSERT INTO `dc3_rtmp`
-VALUES ('-2', '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4', 'rtmp://dc3-nginx:1935/rtmp/190314223540373995_online',
-        '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '-1', '在线视频流（无限动力预告），用于测试使用', '2016-10-01 00:00:00',
+VALUES ('-2', '在线测试视频', 'http://vfx.mtime.cn/Video/2019/03/19/mp4/190319104618910544.mp4',
+        'rtmp://dc3-nginx:1935/rtmp/190314223540373995_online',
+        '{exe} -re -stream_loop -1 -i {rtsp_url} -vcodec copy -acodec copy -f flv -y {rtmp_url}', 0, 0, 0, '-1',
+        '在线视频流（无限动力预告），用于测试使用', '2016-10-01 00:00:00',
         '2016-10-01 00:00:00', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

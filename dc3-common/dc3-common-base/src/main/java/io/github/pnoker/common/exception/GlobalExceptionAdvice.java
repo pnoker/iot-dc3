@@ -34,7 +34,6 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionAdvice {

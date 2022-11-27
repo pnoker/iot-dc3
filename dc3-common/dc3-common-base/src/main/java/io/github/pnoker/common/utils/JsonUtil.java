@@ -22,13 +22,13 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.JsonException;
 
 import java.io.DataInput;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,11 +39,10 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-01 检查：通过
 public final class JsonUtil {
 
     private JsonUtil() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
@@ -350,7 +349,7 @@ public final class JsonUtil {
      */
     public static <T> byte[] toJsonBytes(T type) {
         try {
-            return OBJECT_MAPPER.writeValueAsString(type).getBytes(StandardCharsets.UTF_8);
+            return DecodeUtil.stringToByte(OBJECT_MAPPER.writeValueAsString(type));
         } catch (Exception e) {
             throw new JsonException(e);
         }

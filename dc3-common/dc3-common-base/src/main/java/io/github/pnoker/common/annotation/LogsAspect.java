@@ -28,13 +28,11 @@ import org.springframework.stereotype.Component;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-01 检查：通过
 @Slf4j
 @Aspect
 @Component
 public class LogsAspect {
 
-    // 2022-03-13 检查：通过
     @Pointcut("@annotation(io.github.pnoker.common.annotation.Logs)")
     public void logsCut() {
         // nothing to do

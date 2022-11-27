@@ -17,7 +17,8 @@ package io.github.pnoker.center.manager.service.impl;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.driver.DriverConfiguration;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.RabbitConstant;
+import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,13 +43,12 @@ public class NotifyServiceImpl implements NotifyService {
     @Resource
     private RabbitTemplate rabbitTemplate;
 
-    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverProfile(String command, Profile profile) {
         try {
             List<Driver> drivers = driverService.selectByProfileId(profile.getId());
             drivers.forEach(driver -> {
-                DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.PROFILE).setCommand(command).setContent(profile);
+                DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.PROFILE).setCommand(command).setContent(profile);
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
@@ -56,13 +56,12 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
-    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverPoint(String command, Point point) {
         try {
             List<Driver> drivers = driverService.selectByProfileId(point.getProfileId());
             drivers.forEach(driver -> {
-                DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.POINT).setCommand(command).setContent(point);
+                DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.POINT).setCommand(command).setContent(point);
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
@@ -70,36 +69,33 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
-    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverDevice(String command, Device device) {
         try {
             Driver driver = driverService.selectById(device.getDriverId());
-            DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.DEVICE).setCommand(command).setContent(device);
+            DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.DEVICE).setCommand(command).setContent(device);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.error("Notify driver {} device: {}", command, e.getMessage());
         }
     }
 
-    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverDriverInfo(String command, DriverInfo driverInfo) {
         try {
             Driver driver = driverService.selectByDeviceId(driverInfo.getDeviceId());
-            DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.DRIVER_INFO).setCommand(command).setContent(driverInfo);
+            DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.DRIVER_INFO).setCommand(command).setContent(driverInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.error("Notify driver {} driverInfo: {}", command, e.getMessage());
         }
     }
 
-    // 2022-06-24 检查：通过
     @Override
     public void notifyDriverPointInfo(String command, PointInfo pointInfo) {
         try {
             Driver driver = driverService.selectByDeviceId(pointInfo.getDeviceId());
-            DriverConfiguration operation = new DriverConfiguration().setType(CommonConstant.Driver.Type.POINT_INFO).setCommand(command).setContent(pointInfo);
+            DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.POINT_INFO).setCommand(command).setContent(pointInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.error("Notify driver {} pointInfo: {}", command, e.getMessage());
@@ -112,10 +108,9 @@ public class NotifyServiceImpl implements NotifyService {
      * @param driver              Driver
      * @param driverConfiguration DriverConfiguration
      */
-    // 2022-06-24 检查：通过
     private void notifyDriver(Driver driver, DriverConfiguration driverConfiguration) {
         log.info("Notify driver[{}] : {}", driver.getServiceName(), driverConfiguration);
-        rabbitTemplate.convertAndSend(CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA, CommonConstant.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driver.getServiceName(), driverConfiguration);
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA, RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driver.getServiceName(), driverConfiguration);
     }
 
 }

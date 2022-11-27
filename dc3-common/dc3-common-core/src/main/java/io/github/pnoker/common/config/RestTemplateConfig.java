@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Configuration
 public class RestTemplateConfig {
     @Bean

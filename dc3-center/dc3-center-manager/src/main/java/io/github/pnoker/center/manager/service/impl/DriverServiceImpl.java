@@ -14,9 +14,10 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -24,7 +25,7 @@ import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.dto.DriverDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -92,7 +93,7 @@ public class DriverServiceImpl implements DriverService {
     public Driver selectById(String id) {
         Driver driver = driverMapper.selectById(id);
         if (null == driver) {
-            throw new NotFoundException("The driver does not exist");
+            throw new NotFoundException();
         }
         return driver;
     }
@@ -109,7 +110,7 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(Driver::getServiceName, serviceName);
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
-            throw new NotFoundException("The driver does not exist");
+            throw new NotFoundException();
         }
         return driver;
     }
@@ -123,7 +124,7 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(Driver::getTenantId, tenantId);
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
-            throw new NotFoundException("The driver does not exist");
+            throw new NotFoundException();
         }
         return driver;
     }
@@ -131,8 +132,8 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public List<Driver> selectByIds(Set<String> ids) {
         List<Driver> drivers = driverMapper.selectBatchIds(ids);
-        if (CollectionUtil.isEmpty(drivers)) {
-            throw new NotFoundException("The driver does not exist");
+        if (CollUtil.isEmpty(drivers)) {
+            throw new NotFoundException();
         }
         return drivers;
     }
@@ -161,7 +162,7 @@ public class DriverServiceImpl implements DriverService {
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getHost()), Driver::getHost, driverDto.getHost());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getPort()), Driver::getPort, driverDto.getPort());
             if (CharSequenceUtil.isEmpty(driverDto.getType())) {
-                driverDto.setType(CommonConstant.Driver.Type.DRIVER);
+                driverDto.setType(PrefixConstant.DRIVER);
             }
             queryWrapper.like(Driver::getType, driverDto.getType());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getEnable()), Driver::getEnable, driverDto.getEnable());

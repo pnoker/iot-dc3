@@ -14,6 +14,7 @@
 
 package io.github.pnoker.common.bean.driver.auth;
 
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -23,11 +24,10 @@ import lombok.Data;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 public class Keys {
 
     private Keys() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     /**

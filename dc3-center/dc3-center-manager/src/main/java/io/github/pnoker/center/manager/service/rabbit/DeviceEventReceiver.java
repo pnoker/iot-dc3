@@ -15,8 +15,8 @@
 package io.github.pnoker.center.manager.service.rabbit;
 
 import io.github.pnoker.center.manager.service.EventService;
-import io.github.pnoker.common.constant.CacheConstant;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.EventConstant;
+import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.model.DeviceEvent;
 import io.github.pnoker.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
@@ -60,17 +60,15 @@ public class DeviceEventReceiver {
 
             switch (deviceEvent.getType()) {
                 // Save device heartbeat to Redis
-                case CommonConstant.Device.Event.HEARTBEAT:
+                case EventConstant.Device.STATUS:
                     redisUtil.setKey(
-                            CacheConstant.Prefix.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
+                            PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
                             deviceEvent.getContent(),
                             deviceEvent.getTimeOut(),
                             deviceEvent.getTimeUnit()
                     );
                     break;
-                case CommonConstant.Device.Event.ERROR:
-                case CommonConstant.Device.Event.OVER_UPPER_LIMIT:
-                case CommonConstant.Device.Event.OVER_LOWER_LIMIT:
+                case EventConstant.Device.ERROR:
                     //TODO 去重
                     threadPoolExecutor.execute(() -> eventService.addDeviceEvent(deviceEvent));
                     break;

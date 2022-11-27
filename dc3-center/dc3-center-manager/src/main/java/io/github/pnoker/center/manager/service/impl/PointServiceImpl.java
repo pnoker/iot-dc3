@@ -14,9 +14,9 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -34,7 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -81,6 +84,7 @@ public class PointServiceImpl implements PointService {
                 selectByNameAndProfileId(point.getName(), point.getProfileId());
                 throw new DuplicateException("The point already exists");
             } catch (NotFoundException ignored) {
+                // nothing to do
             }
         }
         if (pointMapper.updateById(point) > 0) {
@@ -95,7 +99,7 @@ public class PointServiceImpl implements PointService {
     public Point selectById(String id) {
         Point point = pointMapper.selectById(id);
         if (null == point) {
-            throw new NotFoundException("The point does not exist");
+            throw new NotFoundException();
         }
         return point;
     }
@@ -103,8 +107,8 @@ public class PointServiceImpl implements PointService {
     @Override
     public List<Point> selectByIds(Set<String> ids) {
         List<Point> devices = pointMapper.selectBatchIds(ids);
-        if (CollectionUtil.isEmpty(devices)) {
-            throw new NotFoundException("The points does not exist");
+        if (CollUtil.isEmpty(devices)) {
+            throw new NotFoundException();
         }
         return devices;
     }
@@ -116,7 +120,7 @@ public class PointServiceImpl implements PointService {
         queryWrapper.eq(Point::getProfileId, profileId);
         Point point = pointMapper.selectOne(queryWrapper);
         if (null == point) {
-            throw new NotFoundException("The point does not exist");
+            throw new NotFoundException();
         }
         return point;
     }
@@ -132,8 +136,8 @@ public class PointServiceImpl implements PointService {
         PointDto pointDto = new PointDto();
         pointDto.setProfileId(profileId);
         List<Point> points = pointMapper.selectList(fuzzyQuery(pointDto));
-        if (null == points || points.size() < 1) {
-            throw new NotFoundException("The points does not exist");
+        if (null == points || points.isEmpty()) {
+            throw new NotFoundException();
         }
         return points;
     }
@@ -149,8 +153,8 @@ public class PointServiceImpl implements PointService {
                 points.addAll(pointList);
             }
         });
-        if (points.size() < 1) {
-            throw new NotFoundException("The points does not exist");
+        if (points.isEmpty()) {
+            throw new NotFoundException();
         }
         return points;
     }

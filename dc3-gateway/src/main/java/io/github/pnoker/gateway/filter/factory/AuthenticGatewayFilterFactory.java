@@ -14,19 +14,19 @@
 
 package io.github.pnoker.gateway.filter.factory;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.api.center.auth.feign.TokenClient;
 import io.github.pnoker.api.center.auth.feign.UserClient;
 import io.github.pnoker.common.annotation.Logs;
-import io.github.pnoker.common.bean.driver.auth.Login;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.bean.driver.auth.Login;
+import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.model.User;
-import io.github.pnoker.common.utils.Dc3Util;
+import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.gateway.bean.TokenRequestHeader;
 import io.github.pnoker.gateway.utils.GatewayUtil;
@@ -85,8 +85,8 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
             ServerHttpRequest request = exchange.getRequest();
 
             try {
-                String tenantHeader = GatewayUtil.getRequestHeader(request, ServiceConstant.Header.X_AUTH_TENANT);
-                String tenant = Dc3Util.decodeString(tenantHeader);
+                String tenantHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
+                String tenant = DecodeUtil.byteToString(DecodeUtil.decode(tenantHeader));
                 if (ObjectUtil.isEmpty(tenant)) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
@@ -95,8 +95,8 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
 
-                String userHeader = GatewayUtil.getRequestHeader(request, ServiceConstant.Header.X_AUTH_USER);
-                String user = Dc3Util.decodeString(userHeader);
+                String userHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
+                String user = DecodeUtil.byteToString(DecodeUtil.decode(userHeader));
                 if (ObjectUtil.isEmpty(user)) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
@@ -105,8 +105,8 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 
-                String tokenHeader = GatewayUtil.getRequestHeader(request, ServiceConstant.Header.X_AUTH_TOKEN);
-                TokenRequestHeader token = JsonUtil.parseObject(Dc3Util.decode(tokenHeader), TokenRequestHeader.class);
+                String tokenHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
+                TokenRequestHeader token = JsonUtil.parseObject(DecodeUtil.decode(tokenHeader), TokenRequestHeader.class);
                 if (ObjectUtil.isEmpty(token) || !CharSequenceUtil.isAllNotEmpty(token.getSalt(), token.getToken())) {
                     throw new UnAuthorizedException("Invalid request token header");
                 }
@@ -119,10 +119,10 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
                 ServerHttpRequest build = request.mutate().headers(
                         httpHeader -> {
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT_ID, tenantR.getData().getId());
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_TENANT, tenantR.getData().getName());
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_USER_ID, userR.getData().getId());
-                            httpHeader.set(ServiceConstant.Header.X_AUTH_USER, userR.getData().getName());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT_ID, tenantR.getData().getId());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT, tenantR.getData().getName());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_USER_ID, userR.getData().getId());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_USER, userR.getData().getName());
                         }
                 ).build();
 

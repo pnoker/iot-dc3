@@ -19,8 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.LabelClient;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
-import io.github.pnoker.common.dto.GroupDto;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.LabelDto;
 import io.github.pnoker.common.model.Label;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.LABEL_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.LABEL_URL_PREFIX)
 public class LabelApi implements LabelClient {
 
     @Resource

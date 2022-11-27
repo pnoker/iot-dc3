@@ -17,7 +17,7 @@ package io.github.pnoker.api.center.manager.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.DriverAttributeClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DriverAttributeDto;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.valid.Insert;
@@ -38,7 +38,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.DRIVER_ATTRIBUTE_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = DriverAttributeClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.DRIVER_ATTRIBUTE_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = DriverAttributeClientFallback.class)
 public interface DriverAttributeClient {
 
     /**

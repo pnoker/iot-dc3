@@ -96,7 +96,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     public ProfileBind selectById(String id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
         if (null == profileBind) {
-            throw new NotFoundException("The profile bind does not exist");
+            throw new NotFoundException();
         }
         return profileBind;
     }
@@ -108,7 +108,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         profileBindDto.setProfileId(profileId);
         ProfileBind profileBind = profileBindMapper.selectOne(fuzzyQuery(profileBindDto));
         if (null == profileBind) {
-            throw new NotFoundException("The profile bind does not exist");
+            throw new NotFoundException();
         }
         return profileBind;
     }

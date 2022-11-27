@@ -72,7 +72,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     public LabelBind selectById(String id) {
         LabelBind labelBind = labelBindMapper.selectById(id);
         if (null == labelBind) {
-            throw new NotFoundException("The label bind does not exist");
+            throw new NotFoundException();
         }
         return labelBind;
     }

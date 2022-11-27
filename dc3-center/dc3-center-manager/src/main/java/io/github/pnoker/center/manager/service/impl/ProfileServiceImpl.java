@@ -14,9 +14,9 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -58,7 +58,6 @@ public class ProfileServiceImpl implements ProfileService {
     private ProfileBindService profileBindService;
 
     @Override
-    // 2022-07-30 检查：不通过，新增模板是没有添加位号的，为啥还需要返回位号集合，已移除
     public Profile add(Profile profile) {
         try {
             selectByNameAndType(profile.getName(), profile.getType(), profile.getTenantId());
@@ -73,7 +72,6 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    // 2022-07-30 检查：通过
     public boolean delete(String id) {
         try {
             pointService.selectByProfileId(id);
@@ -85,7 +83,6 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    // 2022-07-30 检查：不通过，修改模板是没有添加位号的，为啥还需要返回位号集合，已移除
     public Profile update(Profile profile) {
         selectById(profile.getId());
         profile.setUpdateTime(null);
@@ -96,17 +93,15 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public Profile selectById(String id) {
         Profile profile = profileMapper.selectById(id);
         if (null == profile) {
-            throw new NotFoundException("The profile does not exist");
+            throw new NotFoundException();
         }
         return profile;
     }
 
     @Override
-    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public Profile selectByNameAndType(String name, Short type, String tenantId) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.eq(Profile::getName, name);
@@ -114,33 +109,30 @@ public class ProfileServiceImpl implements ProfileService {
         queryWrapper.eq(Profile::getTenantId, tenantId);
         Profile profile = profileMapper.selectOne(queryWrapper);
         if (null == profile) {
-            throw new NotFoundException("The profile does not exist");
+            throw new NotFoundException();
         }
         return profile;
     }
 
     @Override
-    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public List<Profile> selectByIds(Set<String> ids) {
         List<Profile> profiles = new ArrayList<>();
-        if (CollectionUtil.isNotEmpty(ids)) {
+        if (CollUtil.isNotEmpty(ids)) {
             profiles = profileMapper.selectBatchIds(ids);
         }
         return profiles;
     }
 
     @Override
-    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public List<Profile> selectByDeviceId(String deviceId) {
         Set<String> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
-        if (CollectionUtil.isNotEmpty(profileIds)) {
+        if (CollUtil.isNotEmpty(profileIds)) {
             return selectByIds(profileIds);
         }
         return new ArrayList<>();
     }
 
     @Override
-    // 2022-07-30 检查：不通过，在查询模板的时候请勿全量返回改模板下的位号，因为位号可能会很多，已移除
     public Page<Profile> list(ProfileDto profileDto) {
         if (ObjectUtil.isNull(profileDto.getPage())) {
             profileDto.setPage(new Pages());
@@ -149,7 +141,6 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    // 2022-07-30 检查：通过
     public LambdaQueryWrapper<Profile> fuzzyQuery(ProfileDto profileDto) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         if (ObjectUtil.isNotEmpty(profileDto)) {

@@ -13,6 +13,7 @@
  */
 package io.github.pnoker.driver.api.factory;
 
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.S7Serializer;
 import io.github.pnoker.driver.api.impl.serializer.S7SerializerImpl;
@@ -26,7 +27,7 @@ import io.github.pnoker.driver.api.impl.serializer.S7SerializerImpl;
 public class S7SerializerFactory {
 
 	private S7SerializerFactory() {
-		throw new IllegalStateException("Utility class");
+		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
 	}
 
 	/**

@@ -19,8 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.GroupClient;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
-import io.github.pnoker.common.dto.DriverInfoDto;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.GroupDto;
 import io.github.pnoker.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.GROUP_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.GROUP_URL_PREFIX)
 public class GroupApi implements GroupClient {
 
     @Resource

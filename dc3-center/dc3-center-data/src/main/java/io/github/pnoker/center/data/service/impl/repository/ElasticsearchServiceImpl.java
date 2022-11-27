@@ -24,7 +24,8 @@ import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.EsPointValue;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.StorageConstant;
+import io.github.pnoker.common.constant.StrategyConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -48,7 +49,7 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
 
     @Override
     public String getRepositoryName() {
-        return CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH;
+        return StrategyConstant.Storage.STRATEGY_ELASTICSEARCH;
     }
 
     @Override
@@ -57,7 +58,7 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
             return;
         }
 
-        final String index = CommonConstant.Storage.POINT_VALUE_PREFIX + pointValue.getDeviceId();
+        final String index = StorageConstant.POINT_VALUE_PREFIX + pointValue.getDeviceId();
         IndexRequest<EsPointValue> indexRequest = new IndexRequest.Builder<EsPointValue>()
                 .index(index)
                 .document(new EsPointValue(pointValue))
@@ -71,7 +72,7 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
             return;
         }
 
-        final String index = CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId;
+        final String index = StorageConstant.POINT_VALUE_PREFIX + deviceId;
         BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
         pointValues.stream()
                 .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
@@ -95,7 +96,7 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
 
     @Override
     public void afterPropertiesSet() {
-        RepositoryStrategyFactory.put(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH, this);
+        RepositoryStrategyFactory.put(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH, this);
     }
 
 }

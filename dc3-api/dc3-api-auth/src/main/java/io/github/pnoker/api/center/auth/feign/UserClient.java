@@ -17,7 +17,7 @@ package io.github.pnoker.api.center.auth.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.fallback.UserClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.dto.UserDto;
 import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.valid.Insert;
@@ -37,7 +37,7 @@ import javax.validation.constraints.NotNull;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Auth.USER_URL_PREFIX, name = ServiceConstant.Auth.SERVICE_NAME, fallbackFactory = UserClientFallback.class)
+@FeignClient(path = AuthServiceConstant.USER_URL_PREFIX, name = AuthServiceConstant.SERVICE_NAME, fallbackFactory = UserClientFallback.class)
 public interface UserClient {
 
     /**

@@ -18,7 +18,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.DictionaryClientFallback;
 import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DictionaryDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.DICTIONARY_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = DictionaryClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.DICTIONARY_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = DictionaryClientFallback.class)
 public interface DictionaryClient {
 
     /**
@@ -41,7 +42,7 @@ public interface DictionaryClient {
      * @return Page<Dictionary>
      */
     @PostMapping("/driver")
-    R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询模板 Dictionary
@@ -49,7 +50,7 @@ public interface DictionaryClient {
      * @return Page<Dictionary>
      */
     @PostMapping("/profile")
-    R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询设备 Dictionary
@@ -58,7 +59,7 @@ public interface DictionaryClient {
      * @return Page<Dictionary>
      */
     @PostMapping("/device")
-    R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 查询位号 Dictionary
@@ -67,6 +68,6 @@ public interface DictionaryClient {
      * @return Page<Dictionary>
      */
     @PostMapping("/point")
-    R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.BlackIpClient;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.dto.BlackIpDto;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.model.BlackIp;
@@ -37,7 +37,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = ServiceConstant.Auth.BLACK_IP_URL_PREFIX)
+@RequestMapping(value = AuthServiceConstant.BLACK_IP_URL_PREFIX)
 public class BlackIpApi implements BlackIpClient {
 
     @Resource
@@ -88,7 +88,7 @@ public class BlackIpApi implements BlackIpClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getName());
+        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     @Override
@@ -101,7 +101,7 @@ public class BlackIpApi implements BlackIpClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getName());
+        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     @Override
@@ -117,7 +117,7 @@ public class BlackIpApi implements BlackIpClient {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getName());
+        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     @Override

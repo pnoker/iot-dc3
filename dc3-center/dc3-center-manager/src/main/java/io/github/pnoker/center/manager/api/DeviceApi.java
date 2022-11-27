@@ -20,8 +20,8 @@ import io.github.pnoker.api.center.manager.feign.DeviceClient;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.CommonConstant;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.MetadataConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DeviceDto;
 import io.github.pnoker.common.model.Device;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.DEVICE_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.DEVICE_URL_PREFIX)
 public class DeviceApi implements DeviceClient {
 
     @Resource
@@ -58,7 +58,7 @@ public class DeviceApi implements DeviceClient {
             Device add = deviceService.add(device.setTenantId(tenantId));
             if (ObjectUtil.isNotNull(add)) {
                 // 通知驱动新增设备
-                notifyService.notifyDriverDevice(CommonConstant.Driver.Device.ADD, add);
+                notifyService.notifyDriverDevice(MetadataConstant.Device.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class DeviceApi implements DeviceClient {
             Device device = deviceService.selectById(id);
             if (null != device && deviceService.delete(id)) {
                 // 通知驱动删除设备
-                notifyService.notifyDriverDevice(CommonConstant.Driver.Device.DELETE, device);
+                notifyService.notifyDriverDevice(MetadataConstant.Device.DELETE, device);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -88,7 +88,7 @@ public class DeviceApi implements DeviceClient {
             Device update = deviceService.update(device.setTenantId(tenantId));
             if (ObjectUtil.isNotNull(update)) {
                 // 通知驱动更新设备
-                notifyService.notifyDriverDevice(CommonConstant.Driver.Device.UPDATE, update);
+                notifyService.notifyDriverDevice(MetadataConstant.Device.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

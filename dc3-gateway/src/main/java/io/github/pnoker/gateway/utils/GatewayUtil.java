@@ -16,6 +16,7 @@ package io.github.pnoker.gateway.utils;
 
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.NotFoundException;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -30,7 +31,7 @@ import java.util.Objects;
 public class GatewayUtil {
 
     private GatewayUtil() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     /**

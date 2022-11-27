@@ -17,7 +17,7 @@ package io.github.pnoker.center.manager.api;
 import io.github.pnoker.api.center.manager.feign.StatusClient;
 import io.github.pnoker.center.manager.service.StatusService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DeviceDto;
 import io.github.pnoker.common.dto.DriverDto;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.STATUS_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.STATUS_URL_PREFIX)
 public class StatusApi implements StatusClient {
 
     @Resource

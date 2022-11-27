@@ -24,8 +24,10 @@ import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.CacheConstant;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.*;
+import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.constant.common.SuffixConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.dto.PointValueDto;
 import io.github.pnoker.common.model.BaseModel;
@@ -134,7 +136,7 @@ public class PointValueServiceImpl implements PointValueService {
             criteria.and(FieldUtil.getField(PointValue::getCreateTime)).gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
-        final String collection = CharSequenceUtil.isNotEmpty(pointValueDto.getDeviceId()) ? CommonConstant.Storage.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : CacheConstant.Entity.POINT + CacheConstant.Suffix.VALUE;
+        final String collection = CharSequenceUtil.isNotEmpty(pointValueDto.getDeviceId()) ? StorageConstant.POINT_VALUE_PREFIX + pointValueDto.getDeviceId() : PrefixConstant.POINT + SuffixConstant.VALUE;
         Future<Long> count = threadPoolExecutor.submit(() -> mongoTemplate.count(query, collection));
 
         Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
@@ -154,7 +156,7 @@ public class PointValueServiceImpl implements PointValueService {
             return Collections.emptyList();
         }
 
-        String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.DOT;
+        String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT;
         List<String> keys = pointIds.stream().map(pointId -> prefix + pointId).collect(Collectors.toList());
         List<PointValue> pointValues = redisUtil.getKey(keys, PointValue.class);
         return pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
@@ -169,7 +171,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     public PointValue realtime(String deviceId, String pointId) {
-        String key = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE + pointId;
+        String key = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.UNDERSCORE + pointId;
         return redisUtil.getKey(key, PointValue.class);
     }
 
@@ -183,7 +185,7 @@ public class PointValueServiceImpl implements PointValueService {
         criteria.and(FieldUtil.getField(PointValue::getPointId)).is(pointId);
         query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
 
-        return mongoTemplate.findOne(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
+        return mongoTemplate.findOne(query, PointValue.class, StorageConstant.POINT_VALUE_PREFIX + deviceId);
     }
 
     private List<String> historyPointValue(String deviceId, String pointId, int count) {
@@ -193,7 +195,7 @@ public class PointValueServiceImpl implements PointValueService {
         query.fields().include(FieldUtil.getField(PointValue::getValue)).exclude(FieldUtil.getField(PointValue::getId));
         query.limit(count).with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
 
-        List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class, CommonConstant.Storage.POINT_VALUE_PREFIX + deviceId);
+        List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class, StorageConstant.POINT_VALUE_PREFIX + deviceId);
         return pointValues.stream().map(PointValue::getValue).collect(Collectors.toList());
     }
 }

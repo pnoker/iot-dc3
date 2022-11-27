@@ -17,7 +17,8 @@ package io.github.pnoker.api.center.manager.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.DriverClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DriverDto;
 import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.valid.Insert;
@@ -36,7 +37,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.DRIVER_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = DriverClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.DRIVER_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = DriverClientFallback.class)
 public interface DriverClient {
 
     /**
@@ -46,7 +47,7 @@ public interface DriverClient {
      * @return Driver
      */
     @PostMapping("/add")
-    R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Driver
@@ -64,7 +65,7 @@ public interface DriverClient {
      * @return Driver
      */
     @PostMapping("/update")
-    R<Driver> update(@Validated(Update.class) @RequestBody Driver driver, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Driver> update(@Validated(Update.class) @RequestBody Driver driver, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Driver
@@ -102,7 +103,7 @@ public interface DriverClient {
      * @return Driver
      */
     @GetMapping("/type/{type}/host/{host}/port/{port}")
-    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "type") String type, @NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Driver> selectByHostPort(@NotNull @PathVariable(value = "type") String type, @NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 分页查询 Driver
@@ -111,6 +112,6 @@ public interface DriverClient {
      * @return Page<Driver>
      */
     @PostMapping("/list")
-    R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }

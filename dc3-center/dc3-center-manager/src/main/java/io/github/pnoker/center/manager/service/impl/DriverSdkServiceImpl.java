@@ -24,7 +24,6 @@ import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.center.manager.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +58,22 @@ public class DriverSdkServiceImpl implements DriverSdkService {
 
     @Override
     public void driverRegister(DriverRegister driverRegister) {
+        // register driver
+        Driver driver = registerDriver(driverRegister);
+
+        //register driver attribute
+        registerDriverAttribute(driverRegister, driver);
+
+        // register point attribute
+        registerPointAttribute(driverRegister, driver);
+    }
+
+    /**
+     * 注册驱动
+     *
+     * @param driverRegister DriverRegister
+     */
+    private Driver registerDriver(DriverRegister driverRegister) {
         // check tenant
         R<Tenant> tenantR = tenantClient.selectByName(driverRegister.getTenant());
         if (!tenantR.isOk()) {
@@ -82,10 +97,18 @@ public class DriverSdkServiceImpl implements DriverSdkService {
                 driver = driverService.add(driver);
             }
         }
+        return driver;
+    }
 
-        //register driver attribute
+    /**
+     * 注册驱动属性
+     *
+     * @param driverRegister DriverRegister
+     * @param driver         Driver
+     */
+    private void registerDriverAttribute(DriverRegister driverRegister, Driver driver) {
         Map<String, DriverAttribute> newDriverAttributeMap = new HashMap<>(8);
-        if (null != driverRegister.getDriverAttributes() && driverRegister.getDriverAttributes().size() > 0) {
+        if (null != driverRegister.getDriverAttributes() && !driverRegister.getDriverAttributes().isEmpty()) {
             driverRegister.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
         }
 
@@ -94,9 +117,11 @@ public class DriverSdkServiceImpl implements DriverSdkService {
             List<DriverAttribute> byDriverId = driverAttributeService.selectByDriverId(driver.getId());
             byDriverId.forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
         } catch (NotFoundException ignored) {
+            // nothing to do
         }
 
-        for (String name : newDriverAttributeMap.keySet()) {
+        for (Map.Entry<String, DriverAttribute> entry : newDriverAttributeMap.entrySet()) {
+            String name = entry.getKey();
             DriverAttribute info = newDriverAttributeMap.get(name).setDriverId(driver.getId());
             if (oldDriverAttributeMap.containsKey(name)) {
                 info.setId(oldDriverAttributeMap.get(name).getId());
@@ -108,7 +133,8 @@ public class DriverSdkServiceImpl implements DriverSdkService {
             }
         }
 
-        for (String name : oldDriverAttributeMap.keySet()) {
+        for (Map.Entry<String, DriverAttribute> entry : oldDriverAttributeMap.entrySet()) {
+            String name = entry.getKey();
             if (!newDriverAttributeMap.containsKey(name)) {
                 try {
                     driverInfoService.selectByAttributeId(oldDriverAttributeMap.get(name).getId());
@@ -119,10 +145,17 @@ public class DriverSdkServiceImpl implements DriverSdkService {
                 }
             }
         }
+    }
 
-        // register point attribute
+    /**
+     * 注册位号属性
+     *
+     * @param driverRegister DriverRegister
+     * @param driver         Driver
+     */
+    private void registerPointAttribute(DriverRegister driverRegister, Driver driver) {
         Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);
-        if (null != driverRegister.getPointAttributes() && driverRegister.getPointAttributes().size() > 0) {
+        if (null != driverRegister.getPointAttributes() && !driverRegister.getPointAttributes().isEmpty()) {
             driverRegister.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
         }
 
@@ -131,9 +164,11 @@ public class DriverSdkServiceImpl implements DriverSdkService {
             List<PointAttribute> byDriverId = pointAttributeService.selectByDriverId(driver.getId());
             byDriverId.forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
         } catch (NotFoundException ignored) {
+            // nothing to do
         }
 
-        for (String name : newPointAttributeMap.keySet()) {
+        for (Map.Entry<String, PointAttribute> entry : newPointAttributeMap.entrySet()) {
+            String name = entry.getKey();
             PointAttribute attribute = newPointAttributeMap.get(name).setDriverId(driver.getId());
             if (oldPointAttributeMap.containsKey(name)) {
                 attribute.setId(oldPointAttributeMap.get(name).getId());
@@ -145,7 +180,8 @@ public class DriverSdkServiceImpl implements DriverSdkService {
             }
         }
 
-        for (String name : oldPointAttributeMap.keySet()) {
+        for (Map.Entry<String, PointAttribute> entry : oldPointAttributeMap.entrySet()) {
+            String name = entry.getKey();
             if (!newPointAttributeMap.containsKey(name)) {
                 try {
                     pointInfoService.selectByAttributeId(oldPointAttributeMap.get(name).getId());

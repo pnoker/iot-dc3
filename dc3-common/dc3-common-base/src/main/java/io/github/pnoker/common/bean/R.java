@@ -15,10 +15,9 @@
 package io.github.pnoker.common.bean;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.enums.ResponseEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -30,7 +29,6 @@ import java.io.Serializable;
  * @since 2022.1.0
  */
 
-// 2022-11-02 检查：通过
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,10 +36,10 @@ public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private boolean ok = false;
-    private int code = Code.OK.getValue();
+    private String code = ResponseEnum.OK.getCode();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String message = CommonConstant.Response.ERROR;
+    private String message = ResponseEnum.FAILURE.getMessage();
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
@@ -69,8 +67,8 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    public static <T> R<T> ok(Code code, String message) {
-        return new R<T>().success(code.getValue(), message);
+    public static <T> R<T> ok(ResponseEnum code, String message) {
+        return new R<T>().success(code.getCode(), message);
     }
 
     /**
@@ -116,8 +114,8 @@ public class R<T> implements Serializable {
      *
      * @return Response
      */
-    public static <T> R<T> fail(Code code, String message) {
-        return new R<T>().failure(code.getValue(), message);
+    public static <T> R<T> fail(ResponseEnum code, String message) {
+        return new R<T>().failure(code.getCode(), message);
     }
 
     /**
@@ -156,8 +154,8 @@ public class R<T> implements Serializable {
      */
     private R<T> success() {
         this.ok = true;
-        this.code = Code.OK.getValue();
-        this.message = CommonConstant.Response.OK;
+        this.code = ResponseEnum.OK.getCode();
+        this.message = ResponseEnum.OK.getMessage();
         return this;
     }
 
@@ -169,7 +167,7 @@ public class R<T> implements Serializable {
      */
     private R<T> success(String message) {
         this.ok = true;
-        this.code = Code.OK.getValue();
+        this.code = ResponseEnum.OK.getCode();
         this.message = message;
         return this;
     }
@@ -181,7 +179,7 @@ public class R<T> implements Serializable {
      * @param message 成功提示信息
      * @return Response
      */
-    private R<T> success(int code, String message) {
+    private R<T> success(String code, String message) {
         this.ok = true;
         this.code = code;
         this.message = message;
@@ -195,8 +193,8 @@ public class R<T> implements Serializable {
      */
     private R<T> failure() {
         this.ok = false;
-        this.code = Code.FAILURE.getValue();
-        this.message = CommonConstant.Response.ERROR;
+        this.code = ResponseEnum.FAILURE.getCode();
+        this.message = ResponseEnum.FAILURE.getMessage();
         return this;
     }
 
@@ -208,7 +206,7 @@ public class R<T> implements Serializable {
      */
     private R<T> failure(String message) {
         this.ok = false;
-        this.code = Code.FAILURE.getValue();
+        this.code = ResponseEnum.FAILURE.getCode();
         this.message = message;
         return this;
     }
@@ -220,20 +218,11 @@ public class R<T> implements Serializable {
      * @param message 错误提示信息
      * @return Response
      */
-    private R<T> failure(int code, String message) {
+    private R<T> failure(String code, String message) {
         this.ok = false;
         this.code = code;
         this.message = message;
         return this;
     }
 
-    @Getter
-    @AllArgsConstructor
-    public enum Code {
-        OK(200),
-        FAILURE(500),
-        NOT_FOUND(3404);
-
-        private final int value;
-    }
 }

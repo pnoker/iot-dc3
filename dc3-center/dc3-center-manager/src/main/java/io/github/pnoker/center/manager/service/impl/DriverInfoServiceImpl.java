@@ -74,6 +74,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
                 selectByAttributeIdAndDeviceId(driverInfo.getDriverAttributeId(), driverInfo.getDeviceId());
                 throw new DuplicateException("The driver info already exists");
             } catch (NotFoundException ignored) {
+                // nothing to do
             }
         }
         if (driverInfoMapper.updateById(driverInfo) > 0) {
@@ -88,7 +89,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     public DriverInfo selectById(String id) {
         DriverInfo driverInfo = driverInfoMapper.selectById(id);
         if (null == driverInfo) {
-            throw new NotFoundException("The driver info does not exist");
+            throw new NotFoundException();
         }
         return driverInfo;
     }
@@ -100,7 +101,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         driverInfoDto.setDeviceId(deviceId);
         DriverInfo driverInfo = driverInfoMapper.selectOne(fuzzyQuery(driverInfoDto));
         if (null == driverInfo) {
-            throw new NotFoundException("The driver info does not exist");
+            throw new NotFoundException();
         }
         return driverInfo;
     }
@@ -110,8 +111,8 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDriverAttributeId(driverAttributeId);
         List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));
-        if (null == driverInfos || driverInfos.size() < 1) {
-            throw new NotFoundException("The driver infos does not exist");
+        if (null == driverInfos || driverInfos.isEmpty()) {
+            throw new NotFoundException();
         }
         return driverInfos;
     }
@@ -121,8 +122,8 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDeviceId(deviceId);
         List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));
-        if (null == driverInfos || driverInfos.size() < 1) {
-            throw new NotFoundException("The driver infos does not exist");
+        if (null == driverInfos || driverInfos.isEmpty()) {
+            throw new NotFoundException();
         }
         return driverInfos;
     }

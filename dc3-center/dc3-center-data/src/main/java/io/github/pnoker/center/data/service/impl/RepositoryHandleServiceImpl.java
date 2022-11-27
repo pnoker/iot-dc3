@@ -18,7 +18,7 @@ import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.StrategyConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -64,13 +64,13 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
         // 保存单个数据到 Opentsdb
         if (Boolean.TRUE.equals(enableOpentsdb)) {
-            RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB);
+            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_OPENTSDB);
             savePointValueToRepository(pointValue, repositoryService);
         }
 
         // 保存单个数据到 Elasticsearch
         if (Boolean.TRUE.equals(enableElasticsearch)) {
-            RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH);
+            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH);
             savePointValueToRepository(pointValue, repositoryService);
         }
     }
@@ -90,13 +90,13 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
             // 保存批量数据到 Opentsdb
             if (Boolean.TRUE.equals(enableOpentsdb)) {
-                RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_OPENTSDB);
+                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_OPENTSDB);
                 savePointValuesToRepository(deviceId, pointValues, repositoryService);
             }
 
             // 保存批量数据到 Elasticsearch
             if (Boolean.TRUE.equals(enableElasticsearch)) {
-                RepositoryService repositoryService = RepositoryStrategyFactory.get(CommonConstant.RepositoryStrategy.REPOSITORY_STRATEGY_ELASTICSEARCH);
+                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH);
                 savePointValuesToRepository(deviceId, pointValues, repositoryService);
             }
         });

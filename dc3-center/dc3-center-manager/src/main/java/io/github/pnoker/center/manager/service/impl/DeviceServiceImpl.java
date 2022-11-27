@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -24,7 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.MetadataConstant;
 import io.github.pnoker.common.dto.DeviceDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -63,7 +63,6 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private NotifyService notifyService;
 
-    // 2022-06-23 检查：通过
     @Override
     public Device add(Device device) {
         try {
@@ -80,7 +79,6 @@ public class DeviceServiceImpl implements DeviceService {
         }
     }
 
-    // 2022-06-23 检查：通过
     @Override
     public boolean delete(String id) {
         selectById(id);
@@ -88,7 +86,6 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceMapper.deleteById(id) > 0;
     }
 
-    // 2022-06-23 检查：通过
     @Override
     public Device update(Device device) {
         selectById(device.getId());
@@ -121,7 +118,7 @@ public class DeviceServiceImpl implements DeviceService {
     public Device selectById(String id) {
         Device device = deviceMapper.selectById(id);
         if (null == device) {
-            throw new NotFoundException("The device does not exist");
+            throw new NotFoundException();
         }
         return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
     }
@@ -133,7 +130,7 @@ public class DeviceServiceImpl implements DeviceService {
         queryWrapper.eq(Device::getTenantId, tenantId);
         Device device = deviceMapper.selectOne(queryWrapper);
         if (null == device) {
-            throw new NotFoundException("The device does not exist");
+            throw new NotFoundException();
         }
         return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId()));
     }
@@ -143,8 +140,8 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceDto deviceDto = new DeviceDto();
         deviceDto.setDriverId(driverId);
         List<Device> devices = deviceMapper.selectList(fuzzyQuery(deviceDto));
-        if (null == devices || devices.size() < 1) {
-            throw new NotFoundException("The devices does not exist");
+        if (null == devices || devices.isEmpty()) {
+            throw new NotFoundException();
         }
         devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return devices;
@@ -158,8 +155,8 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public List<Device> selectByIds(Set<String> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);
-        if (CollectionUtil.isEmpty(devices)) {
-            throw new NotFoundException("The devices does not exist");
+        if (CollUtil.isEmpty(devices)) {
+            throw new NotFoundException();
         }
         devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return devices;
@@ -206,8 +203,9 @@ public class DeviceServiceImpl implements DeviceService {
 
                     List<Point> points = pointService.selectByProfileId(profileId);
                     // 通知驱动新增位号
-                    points.forEach(point -> notifyService.notifyDriverPoint(CommonConstant.Driver.Point.ADD, point));
+                    points.forEach(point -> notifyService.notifyDriverPoint(MetadataConstant.Point.ADD, point));
                 } catch (Exception ignored) {
+                    // nothing to do
                 }
             });
         }

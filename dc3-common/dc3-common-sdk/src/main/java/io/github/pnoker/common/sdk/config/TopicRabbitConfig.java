@@ -14,7 +14,7 @@
 
 package io.github.pnoker.common.sdk.config;
 
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.RabbitConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -32,7 +32,6 @@ import java.util.Map;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Slf4j
 @Configuration
 public class TopicRabbitConfig {
@@ -65,15 +64,15 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange metadataExchange() {
-        return new TopicExchange(CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA, true, false);
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_METADATA, true, false);
     }
 
     @Bean
     Queue driverMetadataQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 15秒：15 * 1000 = 15000L
-        arguments.put(CommonConstant.Rabbit.MESSAGE_TTL, 15000L);
-        return new Queue(CommonConstant.Rabbit.QUEUE_DRIVER_METADATA_PREFIX + this.serviceName, false, false, false, arguments);
+        arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + this.serviceName, false, false, false, arguments);
     }
 
     @Bean
@@ -81,7 +80,7 @@ public class TopicRabbitConfig {
         return BindingBuilder
                 .bind(driverMetadataQueue)
                 .to(metadataExchange)
-                .with(CommonConstant.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + this.serviceName);
+                .with(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + this.serviceName);
     }
 
 }

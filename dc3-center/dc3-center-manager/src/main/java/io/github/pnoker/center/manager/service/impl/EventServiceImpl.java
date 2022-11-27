@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.service.EventService;
 import io.github.pnoker.common.bean.common.Pages;
@@ -53,10 +53,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addDriverEvents(List<DriverEvent> driverEvents) {
-        if (null != driverEvents) {
-            if (driverEvents.size() > 0) {
-                mongoTemplate.insert(driverEvents, DriverEvent.class);
-            }
+        if (null != driverEvents && !driverEvents.isEmpty()) {
+            mongoTemplate.insert(driverEvents, DriverEvent.class);
         }
     }
 
@@ -69,10 +67,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addDeviceEvents(List<DeviceEvent> deviceEvents) {
-        if (null != deviceEvents) {
-            if (deviceEvents.size() > 0) {
-                mongoTemplate.insert(deviceEvents, DeviceEvent.class);
-            }
+        if (null != deviceEvents && !deviceEvents.isEmpty()) {
+            mongoTemplate.insert(deviceEvents, DeviceEvent.class);
         }
     }
 

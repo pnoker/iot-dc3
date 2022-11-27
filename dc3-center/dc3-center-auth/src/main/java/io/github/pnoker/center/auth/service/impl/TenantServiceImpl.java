@@ -61,7 +61,7 @@ public class TenantServiceImpl implements TenantService {
     public boolean delete(String id) {
         Tenant tenant = selectById(id);
         if (null == tenant) {
-            throw new NotFoundException("The tenant does not exist");
+            throw new NotFoundException();
         }
         return tenantMapper.deleteById(id) > 0;
     }
@@ -88,7 +88,7 @@ public class TenantServiceImpl implements TenantService {
         queryWrapper.eq(Tenant::getName, name);
         Tenant tenant = tenantMapper.selectOne(queryWrapper);
         if (null == tenant) {
-            throw new NotFoundException("The tenant does not exist");
+            throw new NotFoundException();
         }
         return tenant;
     }

@@ -14,15 +14,14 @@
 
 package io.github.pnoker.center.manager.api;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointAttributeClient;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.PointAttributeDto;
-import io.github.pnoker.common.dto.PointDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Manager.POINT_ATTRIBUTE_URL_PREFIX)
+@RequestMapping(ManagerServiceConstant.POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeApi implements PointAttributeClient {
 
     @Resource
@@ -99,7 +98,7 @@ public class PointAttributeApi implements PointAttributeClient {
     public R<List<PointAttribute>> selectByDriverId(String id) {
         try {
             List<PointAttribute> select = pointAttributeService.selectByDriverId(id);
-            if (CollectionUtil.isNotEmpty(select)) {
+            if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
         } catch (NotFoundException ne) {

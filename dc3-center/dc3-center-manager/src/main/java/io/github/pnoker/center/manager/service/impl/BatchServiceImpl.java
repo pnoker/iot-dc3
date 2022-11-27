@@ -86,6 +86,7 @@ public class BatchServiceImpl implements BatchService {
 
             return driverMetadata;
         } catch (NotFoundException ignored) {
+            // nothing to do
         }
 
         return driverMetadata;
@@ -103,6 +104,7 @@ public class BatchServiceImpl implements BatchService {
             List<DriverAttribute> driverAttributes = driverAttributeService.selectByDriverId(driverId);
             driverAttributes.forEach(driverAttribute -> driverAttributeMap.put(driverAttribute.getId(), driverAttribute));
         } catch (NotFoundException ignored) {
+            // nothing to do
         }
         return driverAttributeMap;
     }
@@ -119,6 +121,7 @@ public class BatchServiceImpl implements BatchService {
             List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(driverId);
             pointAttributes.forEach(pointAttribute -> pointAttributeMap.put(pointAttribute.getId(), pointAttribute));
         } catch (NotFoundException ignored) {
+            // nothing to do
         }
         return pointAttributeMap;
     }
@@ -157,6 +160,7 @@ public class BatchServiceImpl implements BatchService {
                 attributeInfoMap.put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
             });
         } catch (NotFoundException ignored) {
+            // nothing to do
         }
         return attributeInfoMap;
     }
@@ -204,6 +208,7 @@ public class BatchServiceImpl implements BatchService {
                             attributeInfoMap.put(pointId, infoMap);
                         }
                     } catch (NotFoundException ignored) {
+                        // nothing to do
                     }
                 }));
         return attributeInfoMap;
@@ -247,6 +252,7 @@ public class BatchServiceImpl implements BatchService {
         try {
             pointService.selectByProfileId(profileId).forEach(point -> pointMap.put(point.getId(), point));
         } catch (NotFoundException ignored) {
+            // nothing to do
         }
         return pointMap;
     }

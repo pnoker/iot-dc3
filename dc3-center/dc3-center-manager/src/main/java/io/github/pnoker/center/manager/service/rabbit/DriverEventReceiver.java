@@ -16,16 +16,18 @@ package io.github.pnoker.center.manager.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.CharSequenceUtil;
+import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.manager.service.BatchService;
 import io.github.pnoker.center.manager.service.DriverSdkService;
 import io.github.pnoker.center.manager.service.EventService;
 import io.github.pnoker.common.bean.driver.DriverConfiguration;
 import io.github.pnoker.common.bean.driver.DriverRegister;
-import io.github.pnoker.common.constant.CacheConstant;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.EventConstant;
+import io.github.pnoker.common.constant.RabbitConstant;
+import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.model.DriverEvent;
 import io.github.pnoker.common.utils.RedisUtil;
-import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -75,69 +77,25 @@ public class DriverEventReceiver {
             }
 
             log.debug("Driver {} event, From: {}, Received: {}", driverEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
-            String routingKey = CommonConstant.Rabbit.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName();
+            String routingKey = RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName();
 
             switch (driverEvent.getType()) {
-                case CommonConstant.Driver.Event.DRIVER_HANDSHAKE:
-                    DriverConfiguration driverConfiguration = new DriverConfiguration(
-                            CommonConstant.Driver.Type.DRIVER,
-                            CommonConstant.Driver.Event.DRIVER_HANDSHAKE_BACK,
-                            null,
-                            CommonConstant.Response.OK
-                    );
-                    rabbitTemplate.convertAndSend(
-                            CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA,
-                            routingKey,
-                            driverConfiguration
-                    );
+                case EventConstant.Driver.HANDSHAKE:
+                    handshakeEvent(routingKey);
                     break;
-                case CommonConstant.Driver.Event.DRIVER_REGISTER:
-                    driverConfiguration = new DriverConfiguration(
-                            CommonConstant.Driver.Type.DRIVER,
-                            CommonConstant.Driver.Event.DRIVER_REGISTER_BACK,
-                            null,
-                            CommonConstant.Response.OK
-                    );
-                    try {
-                        driverSdkService.driverRegister(Convert.convert(DriverRegister.class, driverEvent.getContent()));
-                    } catch (Exception e) {
-                        driverConfiguration.setResponse(e.getMessage());
-                    }
-                    rabbitTemplate.convertAndSend(
-                            CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA,
-                            routingKey,
-                            driverConfiguration
-                    );
+                case EventConstant.Driver.REGISTER:
+                    registerEvent(driverEvent, routingKey);
                     break;
-                case CommonConstant.Driver.Event.DRIVER_METADATA_SYNC:
-                    driverConfiguration = new DriverConfiguration(
-                            CommonConstant.Driver.Type.DRIVER,
-                            CommonConstant.Driver.Event.DRIVER_METADATA_SYNC_BACK,
-                            null,
-                            CommonConstant.Response.OK
-                    );
-                    try {
-                        driverConfiguration.setContent(batchService.batchDriverMetadata(driverEvent.getServiceName()));
-                    } catch (Exception e) {
-                        driverConfiguration.setResponse(e.getMessage());
-                    }
-                    rabbitTemplate.convertAndSend(
-                            CommonConstant.Rabbit.TOPIC_EXCHANGE_METADATA,
-                            routingKey,
-                            driverConfiguration
-                    );
+                case EventConstant.Driver.METADATA_SYNC:
+                    metadataEvent(driverEvent, routingKey);
                     break;
-                case CommonConstant.Driver.Event.DRIVER_HEARTBEAT:
-                    redisUtil.setKey(
-                            CacheConstant.Prefix.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
-                            driverEvent.getContent(),
-                            driverEvent.getTimeOut(),
-                            driverEvent.getTimeUnit()
-                    );
+                case EventConstant.Driver.STATUS:
+                    statusEvent(driverEvent);
                     break;
-                case CommonConstant.Driver.Event.ERROR:
+                case EventConstant.Driver.ERROR:
                     //TODO 去重
                     threadPoolExecutor.execute(() -> eventService.addDriverEvent(driverEvent));
+                    break;
                 default:
                     log.error("Invalid event type, {}", driverEvent.getType());
                     break;
@@ -145,5 +103,88 @@ public class DriverEventReceiver {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 处理握手事件
+     *
+     * @param routingKey Routing Key
+     */
+    private void handshakeEvent(String routingKey) {
+        DriverConfiguration driverConfiguration = new DriverConfiguration(
+                PrefixConstant.DRIVER,
+                EventConstant.Driver.HANDSHAKE_BACK,
+                null,
+                ResponseEnum.OK
+        );
+        rabbitTemplate.convertAndSend(
+                RabbitConstant.TOPIC_EXCHANGE_METADATA,
+                routingKey,
+                driverConfiguration
+        );
+    }
+
+    /**
+     * 处理注册事件
+     *
+     * @param driverEvent DriverEvent
+     * @param routingKey  Routing Key
+     */
+    private void registerEvent(DriverEvent driverEvent, String routingKey) {
+        DriverConfiguration driverConfiguration = new DriverConfiguration(
+                PrefixConstant.DRIVER,
+                EventConstant.Driver.REGISTER_BACK,
+                null,
+                ResponseEnum.OK
+        );
+        try {
+            driverSdkService.driverRegister(Convert.convert(DriverRegister.class, driverEvent.getContent()));
+        } catch (Exception e) {
+            driverConfiguration.setResponse(ResponseEnum.FAILURE);
+        }
+        rabbitTemplate.convertAndSend(
+                RabbitConstant.TOPIC_EXCHANGE_METADATA,
+                routingKey,
+                driverConfiguration
+        );
+    }
+
+    /**
+     * 处理元数据同步事件
+     *
+     * @param driverEvent DriverEvent
+     * @param routingKey  Routing Key
+     */
+    private void metadataEvent(DriverEvent driverEvent, String routingKey) {
+        DriverConfiguration driverConfiguration = new DriverConfiguration(
+                PrefixConstant.DRIVER,
+                EventConstant.Driver.METADATA_SYNC_BACK,
+                null,
+                ResponseEnum.OK
+        );
+        try {
+            driverConfiguration.setContent(batchService.batchDriverMetadata(driverEvent.getServiceName()));
+        } catch (Exception e) {
+            driverConfiguration.setResponse(ResponseEnum.FAILURE);
+        }
+        rabbitTemplate.convertAndSend(
+                RabbitConstant.TOPIC_EXCHANGE_METADATA,
+                routingKey,
+                driverConfiguration
+        );
+    }
+
+    /**
+     * 处理状态事件
+     *
+     * @param driverEvent DriverEvent
+     */
+    private void statusEvent(DriverEvent driverEvent) {
+        redisUtil.setKey(
+                PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
+                driverEvent.getContent(),
+                driverEvent.getTimeOut(),
+                driverEvent.getTimeUnit()
+        );
     }
 }

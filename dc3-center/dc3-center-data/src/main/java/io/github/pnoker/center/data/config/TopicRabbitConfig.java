@@ -14,7 +14,8 @@
 
 package io.github.pnoker.center.data.config;
 
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.RabbitConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -67,15 +68,15 @@ public class TopicRabbitConfig {
 
     @Bean
     TopicExchange valueExchange() {
-        return new TopicExchange(CommonConstant.Rabbit.TOPIC_EXCHANGE_VALUE, true, false);
+        return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_VALUE, true, false);
     }
 
     @Bean
     Queue pointValueQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 30天： 30 * 24 * 60 * 60 * 1000 = 2592000000L
-        arguments.put(CommonConstant.Rabbit.MESSAGE_TTL, 2592000000L);
-        return new Queue(CommonConstant.Rabbit.QUEUE_POINT_VALUE, true, false, false, arguments);
+        arguments.put(RabbitConstant.MESSAGE_TTL, 2592000000L);
+        return new Queue(RabbitConstant.QUEUE_POINT_VALUE, true, false, false, arguments);
     }
 
     @Bean
@@ -83,7 +84,7 @@ public class TopicRabbitConfig {
         return BindingBuilder
                 .bind(pointValueQueue)
                 .to(valueExchange)
-                .with(CommonConstant.Rabbit.ROUTING_POINT_VALUE_PREFIX + CommonConstant.Symbol.ASTERISK);
+                .with(RabbitConstant.ROUTING_POINT_VALUE_PREFIX + SymbolConstant.ASTERISK);
     }
 
 }

@@ -17,7 +17,7 @@ package io.github.pnoker.api.center.manager.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.EventClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DeviceEventDto;
 import io.github.pnoker.common.dto.DriverEventDto;
 import io.github.pnoker.common.model.DeviceEvent;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.EVENT_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = EventClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.EVENT_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = EventClientFallback.class)
 public interface EventClient {
 
     /**

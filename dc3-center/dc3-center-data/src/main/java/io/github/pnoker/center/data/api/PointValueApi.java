@@ -20,7 +20,7 @@ import io.github.pnoker.api.center.data.feign.PointValueClient;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.dto.PointValueDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(ServiceConstant.Data.VALUE_URL_PREFIX)
+@RequestMapping(DataServiceConstant.VALUE_URL_PREFIX)
 public class PointValueApi implements PointValueClient {
 
     @Resource

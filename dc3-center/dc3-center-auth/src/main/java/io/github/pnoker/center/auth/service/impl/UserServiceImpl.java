@@ -24,11 +24,11 @@ import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.dto.UserDto;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.User;
-import io.github.pnoker.common.utils.Dc3Util;
+import io.github.pnoker.common.utils.DecodeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +51,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Logs("Add user")
     @Transactional
-    // 2022-03-13 检查：不通过，会返回密码数据
     public User add(User user) {
+        // todo 不通过，会返回密码数据
         // 判断用户是否存在
         User selectByName = selectByName(user.getName(), false);
         if (ObjectUtil.isNotNull(selectByName)) {
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(user.setPassword(Dc3Util.md5(user.getPassword()))) > 0) {
+        if (userMapper.insert(user.setPassword(DecodeUtil.md5(user.getPassword()))) > 0) {
             return userMapper.selectById(user.getId());
         }
 
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
     public boolean delete(String id) {
         User user = selectById(id);
         if (null == user) {
-            throw new NotFoundException("The user does not exist");
+            throw new NotFoundException();
         }
         return userMapper.deleteById(id) > 0;
     }
@@ -136,7 +136,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    // 2022-03-13 检查：通过
     public User selectByName(String name, boolean isEx) {
         if (CharSequenceUtil.isEmpty(name)) {
             if (isEx) {
@@ -149,7 +148,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    // 2022-03-13 检查：通过
     public User selectByPhone(String phone, boolean isEx) {
         if (CharSequenceUtil.isEmpty(phone)) {
             if (isEx) {
@@ -162,7 +160,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    // 2022-03-13 检查：通过
     public User selectByEmail(String email, boolean isEx) {
         if (CharSequenceUtil.isEmpty(email)) {
             if (isEx) {
@@ -206,7 +203,7 @@ public class UserServiceImpl implements UserService {
     public boolean restPassword(String id) {
         User user = selectById(id);
         if (ObjectUtil.isNotNull(user)) {
-            user.setPassword(Dc3Util.md5(CommonConstant.Algorithm.DEFAULT_PASSWORD));
+            user.setPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
             return null != update(user);
         }
         return false;
@@ -227,7 +224,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectOne(queryWrapper);
         if (ObjectUtil.isNull(user)) {
             if (isEx) {
-                throw new NotFoundException("The user does not exist");
+                throw new NotFoundException();
             }
             return null;
         }

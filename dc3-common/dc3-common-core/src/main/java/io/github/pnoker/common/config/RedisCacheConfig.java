@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
-import io.github.pnoker.common.constant.CommonConstant;
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
@@ -42,7 +42,6 @@ import java.time.Duration;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-02 检查：通过
 @Configuration
 @ConfigurationProperties(prefix = "spring.cache.redis")
 public class RedisCacheConfig extends CachingConfigurerSupport {
@@ -73,9 +72,9 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
         return (target, method, params) -> {
             StringBuilder sb = new StringBuilder();
             sb.append(target.getClass().getName());
-            sb.append(CommonConstant.Symbol.DOT);
+            sb.append(SymbolConstant.DOT);
             sb.append(method.getName());
-            sb.append(CommonConstant.Symbol.HASHTAG);
+            sb.append(SymbolConstant.HASHTAG);
             for (Object obj : params) {
                 sb.append(obj.toString());
             }

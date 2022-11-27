@@ -26,7 +26,6 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-// 2022-11-01 检查：通过，添加注释
 @Getter
 @AllArgsConstructor
 public enum PointValueTypeEnum {
@@ -51,13 +50,13 @@ public enum PointValueTypeEnum {
     private final String name;
 
     /**
-     * 通过位号数据类型编码获取名称
+     * 根据 Code 获取枚举
      *
-     * @param code 位号数据类型编码
+     * @param code Code
      * @return PointValueTypeEnum
      */
-    public static PointValueTypeEnum getByCode(String code) {
-        Optional<PointValueTypeEnum> any = Arrays.stream(PointValueTypeEnum.values()).filter(type -> type.getCode().equals(code)).findAny();
+    public static PointValueTypeEnum of(String code) {
+        Optional<PointValueTypeEnum> any = Arrays.stream(PointValueTypeEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
         return any.orElse(null);
     }
 }

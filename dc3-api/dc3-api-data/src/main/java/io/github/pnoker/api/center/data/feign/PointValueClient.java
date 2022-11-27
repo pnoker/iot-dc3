@@ -18,7 +18,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.data.fallback.PointValueClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.dto.PointValueDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
  * @since 2022.1.0
  */
 @Validated
-@FeignClient(path = ServiceConstant.Data.VALUE_URL_PREFIX, name = ServiceConstant.Data.SERVICE_NAME, fallbackFactory = PointValueClientFallback.class)
+@FeignClient(path = DataServiceConstant.VALUE_URL_PREFIX, name = DataServiceConstant.SERVICE_NAME, fallbackFactory = PointValueClientFallback.class)
 public interface PointValueClient {
 
     /**
@@ -43,7 +44,7 @@ public interface PointValueClient {
      * @return Page<PointValue>
      */
     @PostMapping("/latest")
-    R<Page<PointValue>> latest(@RequestBody PointValueDto pointValueDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<PointValue>> latest(@RequestBody PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 分页查询 PointValue
@@ -52,5 +53,5 @@ public interface PointValueClient {
      * @return Page<PointValue>
      */
     @PostMapping("/list")
-    R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 }

@@ -29,7 +29,12 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum ResponseEnum {
-    NO_RESOURCE("R_404", "Resource does not exist");
+
+    OK("R_200", "Success"),
+    FAILURE("R_500", "Service exception"),
+    NO_RESOURCE("R_404", "Resource does not exist"),
+    OUT_RANGE("R_900", "Number out range"),
+    ;
 
     /**
      * 返回结果编码
@@ -37,18 +42,18 @@ public enum ResponseEnum {
     private final String code;
 
     /**
-     * 返回结果名称
+     * 返回结果信息
      */
-    private final String name;
+    private final String message;
 
     /**
-     * 通过返回结果编码获取名称
+     * 根据 Code 获取枚举
      *
-     * @param code 返回结果编码
-     * @return PointValueTypeEnum
+     * @param code Code
+     * @return ResponseEnum
      */
-    public static ResponseEnum getByCode(String code) {
-        Optional<ResponseEnum> any = Arrays.stream(ResponseEnum.values()).filter(type -> type.getCode().equals(code)).findAny();
+    public static ResponseEnum of(String code) {
+        Optional<ResponseEnum> any = Arrays.stream(ResponseEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
         return any.orElse(null);
     }
 }

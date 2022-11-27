@@ -17,7 +17,8 @@ package io.github.pnoker.api.center.manager.feign;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.ProfileClientFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.ServiceConstant;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.ProfileDto;
 import io.github.pnoker.common.model.Profile;
 import io.github.pnoker.common.valid.Insert;
@@ -37,7 +38,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-@FeignClient(path = ServiceConstant.Manager.PROFILE_URL_PREFIX, name = ServiceConstant.Manager.SERVICE_NAME, fallbackFactory = ProfileClientFallback.class)
+@FeignClient(path = ManagerServiceConstant.PROFILE_URL_PREFIX, name = ManagerServiceConstant.SERVICE_NAME, fallbackFactory = ProfileClientFallback.class)
 public interface ProfileClient {
 
     /**
@@ -47,7 +48,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/add")
-    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 删除 Profile
@@ -65,7 +66,7 @@ public interface ProfileClient {
      * @return Profile
      */
     @PostMapping("/update")
-    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Profile> update(@Validated(Update.class) @RequestBody Profile profile, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
      * 根据 ID 查询 Profile
@@ -101,6 +102,6 @@ public interface ProfileClient {
      * @return Page<Profile>
      */
     @PostMapping("/list")
-    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = ServiceConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
+    R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
 }
