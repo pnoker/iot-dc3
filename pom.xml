@@ -43,8 +43,7 @@
     <inceptionYear>2017-2020</inceptionYear>
     <description>
         IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建，实现设备互联、管理、数据采集、代码生成、快速开发和可视化等，
-        兼容多种流行的物联网数据接入协议（Mqtt\Socket\Modbus-Tcp\Rtsp\Rtmp\Siemens PLC
-        S7\OpcUa\OpcDa...），是一整套完整的物联系统解决方案。
+        兼容多种流行的物联网数据接入协议（Mqtt\Socket\Modbus-Tcp\Rtsp\Rtmp\Siemens PLC S7\OpcUa\OpcDa...），是一整套完整的物联系统解决方案。
     </description>
 
     <modules>
@@ -91,7 +90,9 @@
         <hutool.version>5.8.5</hutool.version>
 
         <!-- Plugin 相关 -->
+        <maven.gpg.plugin>3.0.1</maven.gpg.plugin>
         <maven.source.plugin>3.2.1</maven.source.plugin>
+        <maven.javadoc.plugin>3.4.1</maven.javadoc.plugin>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.plugin>3.8.0</maven.compiler.plugin>
@@ -384,10 +385,13 @@
     </dependencyManagement>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>pnoker</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
-            <id>github</id>
-            <name>GitHub DC3 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/pnoker/iot-dc3</url>
+            <id>pnoker</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -464,7 +468,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -489,7 +501,7 @@
                         </execution>
                     </executions>
                 </plugin>
-                <!-- 编译相关 -->
+                <!-- 编译插件 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -500,14 +512,47 @@
                         <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>
                 </plugin>
-                <!-- 源码相关 -->
+                <!-- GPG 插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${maven.gpg.plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- 源码插件 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${maven.source.plugin}</version>
                     <executions>
                         <execution>
-                            <id>sources</id>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- 文档插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven.javadoc.plugin}</version>
+                    <configuration>
+                        <failOnError>false</failOnError>
+                        <doclint>none</doclint>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
