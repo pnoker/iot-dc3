@@ -195,8 +195,10 @@ public class Dc3Util {
     /**
      * 两层循环实现建树
      *
+     * @param <T>       Object
      * @param treeNodes 传入的树节点列表
-     * @return T Array
+     * @param root      根节点
+     * @return T Tree
      */
     public <T extends TreeNode> List<T> buildByLoop(List<T> treeNodes, Object root) {
         List<T> trees = new ArrayList<>(16);
@@ -219,8 +221,10 @@ public class Dc3Util {
     /**
      * 使用递归方法建树
      *
+     * @param <T>       Object
      * @param treeNodes 传入的树节点列表
-     * @return T Array
+     * @param root      根节点
+     * @return T Tree
      */
     public <T extends TreeNode> List<T> buildByRecursive(List<T> treeNodes, Object root) {
         List<T> trees = new ArrayList<>(16);
@@ -235,8 +239,10 @@ public class Dc3Util {
     /**
      * 递归查找子节点
      *
+     * @param <T>       Object
+     * @param treeNode  子节点
      * @param treeNodes 传入的树节点列表
-     * @return T
+     * @return T Tree
      */
     public <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
         for (T it : treeNodes) {

@@ -33,7 +33,7 @@ public interface DeviceService extends Service<Device, DeviceDto> {
      * 根据 设备Name 和 租户Id 查询设备
      *
      * @param name     Device Name
-     * @param tenantId Tenant ID
+     * @param tenantId 租户ID
      * @return Device
      */
     Device selectByName(String name, String tenantId);

@@ -43,7 +43,8 @@ public interface DeviceClient {
     /**
      * 新增 Device
      *
-     * @param device Device
+     * @param device   Device
+     * @param tenantId 租户ID
      * @return Device
      */
     @PostMapping("/add")
@@ -61,7 +62,8 @@ public interface DeviceClient {
     /**
      * 修改 Device
      *
-     * @param device Device
+     * @param device   Device
+     * @param tenantId 租户ID
      * @return Device
      */
     @PostMapping("/update")
@@ -80,7 +82,7 @@ public interface DeviceClient {
      * 根据 ID 集合查询 Device
      *
      * @param deviceIds Device ID Set
-     * @return Map<String, Device>
+     * @return Map String:Device
      */
     @PostMapping("/ids")
     R<Map<String, Device>> selectByIds(@RequestBody Set<String> deviceIds);
@@ -88,8 +90,9 @@ public interface DeviceClient {
     /**
      * 分页查询 Device
      *
+     * @param tenantId  租户ID
      * @param deviceDto Device Dto
-     * @return Page < Device>
+     * @return Page Of Device
      */
     @PostMapping("/list")
     R<Page<Device>> list(@RequestBody(required = false) DeviceDto deviceDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

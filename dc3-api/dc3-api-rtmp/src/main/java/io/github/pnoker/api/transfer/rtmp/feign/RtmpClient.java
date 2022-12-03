@@ -39,8 +39,9 @@ public interface RtmpClient {
     /**
      * 新增 Rtmp
      *
-     * @param rtmp Rtmp
-     * @return R<Rtmp>
+     * @param rtmp     Rtmp
+     * @param tenantId 租户ID
+     * @return R Of Rtmp
      */
     @PostMapping("/add")
     R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -49,7 +50,7 @@ public interface RtmpClient {
      * 根据 ID 删除 Rtmp
      *
      * @param id rtmpId
-     * @return R<Boolean>
+     * @return R Of Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -57,8 +58,9 @@ public interface RtmpClient {
     /**
      * 修改 Rtmp
      *
-     * @param rtmp Rtmp
-     * @return R<Rtmp>
+     * @param rtmp     Rtmp
+     * @param tenantId 租户ID
+     * @return Rtmp
      */
     @PostMapping("/update")
     R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -67,7 +69,7 @@ public interface RtmpClient {
      * 根据 ID 查询 Rtmp
      *
      * @param id Rtmp ID
-     * @return R<Rtmp>
+     * @return Rtmp
      */
     @GetMapping("/id/{id}")
     R<Rtmp> selectById(@NotNull @PathVariable(value = "id") String id);
@@ -75,8 +77,9 @@ public interface RtmpClient {
     /**
      * 分页查询 Rtmp
      *
-     * @param rtmpDto Rtmp Dto
-     * @return R<Page < Rtmp>>
+     * @param rtmpDto  Rtmp Dto
+     * @param tenantId 租户ID
+     * @return Page Of Rtmp
      */
     @PostMapping("/list")
     R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -85,7 +88,7 @@ public interface RtmpClient {
      * 启动 Rtmp 转码任务
      *
      * @param id Rtmp ID
-     * @return R<Boolean>
+     * @return Boolean
      */
     @PostMapping("/start/{id}")
     R<Boolean> start(@NotNull @PathVariable(value = "id") String id);
@@ -94,7 +97,7 @@ public interface RtmpClient {
      * 停止 Rtmp 转码任务
      *
      * @param id Rtmp ID
-     * @return R<Boolean>
+     * @return Boolean
      */
     @PostMapping("/stop/{id}")
     R<Boolean> stop(@NotNull @PathVariable(value = "id") String id);

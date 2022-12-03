@@ -72,7 +72,7 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         try {
             pointService.selectByProfileId(id);
             throw new ServiceException("The profile already bound by the point");

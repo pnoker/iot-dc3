@@ -60,7 +60,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         LabelBindDto labelBindDto = new LabelBindDto();
         labelBindDto.setLabelId(id);
         Page<LabelBind> labelBindPage = labelBindService.list(labelBindDto);

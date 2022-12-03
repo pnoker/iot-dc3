@@ -90,7 +90,7 @@ public interface DriverAttributeClient {
      * 分页查询 DriverAttribute
      *
      * @param driverAttributeDto DriverAttribute Dto
-     * @return Page<DriverAttribute>
+     * @return Page Of DriverAttribute
      */
     @PostMapping("/list")
     R<Page<DriverAttribute>> list(@RequestBody(required = false) DriverAttributeDto driverAttributeDto);

@@ -43,6 +43,9 @@ public class BlackIpApi implements BlackIpClient {
     @Resource
     private BlackIpService blackIpService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public R<BlackIp> add(BlackIp blackIp) {
         try {
@@ -56,6 +59,9 @@ public class BlackIpApi implements BlackIpClient {
         return R.fail();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public R<Boolean> delete(String id) {
         try {
@@ -65,6 +71,9 @@ public class BlackIpApi implements BlackIpClient {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public R<BlackIp> update(BlackIp blackIp) {
         try {
@@ -78,6 +87,9 @@ public class BlackIpApi implements BlackIpClient {
         return R.fail();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public R<BlackIp> selectById(String id) {
         try {
@@ -91,6 +103,9 @@ public class BlackIpApi implements BlackIpClient {
         return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public R<BlackIp> selectByIp(String ip) {
         try {
@@ -104,6 +119,9 @@ public class BlackIpApi implements BlackIpClient {
         return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
         try {
@@ -120,6 +138,9 @@ public class BlackIpApi implements BlackIpClient {
         return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public R<Boolean> checkBlackIpValid(String ip) {
         try {

@@ -31,7 +31,7 @@ import java.util.Set;
 public interface PointService extends Service<Point, PointDto> {
 
     /**
-     * 根据 位号Name & 模板Id 查询位号
+     * 根据 位号Name 、 模板Id 查询位号
      *
      * @param name      Point Name
      * @param profileId Profile ID
@@ -75,7 +75,7 @@ public interface PointService extends Service<Point, PointDto> {
      * 查询 位号单位
      *
      * @param pointIds Point ID Set
-     * @return Map<Long, String>
+     * @return Map Long:tring
      */
     Map<String, String> unit(Set<String> pointIds);
 }

@@ -56,7 +56,7 @@ public class DriverContext {
      * 根据 设备Id 获取连接设备的驱动配置信息
      *
      * @param deviceId Device ID
-     * @return Map<String, AttributeInfo>
+     * @return Map String:AttributeInfo
      */
     public Map<String, AttributeInfo> getDriverInfoByDeviceId(String deviceId) {
         return this.driverMetadata.getDriverInfoMap().get(deviceId);
@@ -66,7 +66,7 @@ public class DriverContext {
      * 根据 设备Id 获取连接设备的全部位号配置信息
      *
      * @param deviceId Device ID
-     * @return Map<String, Map < String, AttributeInfo>>
+     * @return Map String:(Map String:AttributeInfo)
      */
     public Map<String, Map<String, AttributeInfo>> getPointInfoByDeviceId(String deviceId) {
         Map<String, Map<String, AttributeInfo>> tmpMap = this.driverMetadata.getPointInfoMap().get(deviceId);
@@ -82,7 +82,7 @@ public class DriverContext {
      *
      * @param deviceId Device ID
      * @param pointId  Point ID
-     * @return Map<String, AttributeInfo>
+     * @return Map String:AttributeInfo
      */
     public Map<String, AttributeInfo> getPointInfoByDeviceIdAndPointId(String deviceId, String pointId) {
         Map<String, AttributeInfo> tmpMap = getPointInfoByDeviceId(deviceId).get(pointId);

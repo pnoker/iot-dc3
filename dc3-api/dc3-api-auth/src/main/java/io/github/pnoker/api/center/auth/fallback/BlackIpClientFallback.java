@@ -40,36 +40,57 @@ public class BlackIpClientFallback implements FallbackFactory<BlackIpClient> {
 
         return new BlackIpClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<BlackIp> add(BlackIp blackIp) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<BlackIp> update(BlackIp blackIp) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<BlackIp> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<BlackIp> selectByIp(String ip) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<BlackIp>> list(BlackIpDto blackIpDto) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> checkBlackIpValid(String ip) {
                 return R.fail(message);

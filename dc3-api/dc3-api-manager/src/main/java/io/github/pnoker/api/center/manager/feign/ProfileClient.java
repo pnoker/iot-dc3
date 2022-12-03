@@ -44,7 +44,8 @@ public interface ProfileClient {
     /**
      * 新增 Profile
      *
-     * @param profile Profile
+     * @param profile  Profile
+     * @param tenantId 租户ID
      * @return Profile
      */
     @PostMapping("/add")
@@ -62,7 +63,8 @@ public interface ProfileClient {
     /**
      * 修改 Profile
      *
-     * @param profile Profile
+     * @param profile  Profile
+     * @param tenantId 租户ID
      * @return Profile
      */
     @PostMapping("/update")
@@ -81,7 +83,7 @@ public interface ProfileClient {
      * 根据 ID 集合查询 Profile
      *
      * @param profileIds Profile ID set
-     * @return Map<String, Profile>
+     * @return Map String:Profile
      */
     @PostMapping("/ids")
     R<Map<String, Profile>> selectByIds(@RequestBody Set<String> profileIds);
@@ -99,7 +101,8 @@ public interface ProfileClient {
      * 分页查询 Profile
      *
      * @param profileDto Profile Dto
-     * @return Page<Profile>
+     * @param tenantId   租户ID
+     * @return Page Of Profile
      */
     @PostMapping("/list")
     R<Page<Profile>> list(@RequestBody(required = false) ProfileDto profileDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

@@ -29,21 +29,23 @@ public interface DictionaryService {
     /**
      * 获取租户字典
      *
-     * @return
+     * @return Dictionary Array
      */
     List<Dictionary> tenantDictionary();
 
     /**
      * 获取用户字典
      *
-     * @return
+     * @param tenantId 租户ID
+     * @return Dictionary Array
      */
     List<Dictionary> userDictionary(String tenantId);
 
     /**
      * 获取 Ip 黑名单字典
      *
-     * @return
+     * @param tenantId 租户ID
+     * @return Dictionary Array
      */
     List<Dictionary> blackIpDictionary(String tenantId);
 

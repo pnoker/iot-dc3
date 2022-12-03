@@ -53,7 +53,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return labelBindMapper.deleteById(id) > 0;
     }

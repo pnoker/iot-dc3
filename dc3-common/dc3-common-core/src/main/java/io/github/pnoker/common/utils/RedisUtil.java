@@ -74,7 +74,7 @@ public class RedisUtil {
     /**
      * 批量添加 Key 缓存
      *
-     * @param valuesMap Map<String, Object>
+     * @param valuesMap Map String:Object
      */
     public void setKey(Map<String, Object> valuesMap) {
         try {
@@ -87,8 +87,8 @@ public class RedisUtil {
     /**
      * 批量添加 Key 缓存,并设置失效时间
      *
-     * @param valueMap     Map<String, Object>
-     * @param expireMillis Map<String, Long>
+     * @param valueMap     Map String:Object
+     * @param expireMillis Map String:Long
      */
     public void setKey(Map<String, Object> valueMap, Map<String, Long> expireMillis) {
         try {
@@ -102,8 +102,9 @@ public class RedisUtil {
     /**
      * 获取 Key 缓存
      *
-     * @param key String key
-     * @param <T> T
+     * @param key  String key
+     * @param type Class
+     * @param <T>  T
      * @return T
      */
     public <T> T getKey(String key, Class<T> type) {
@@ -120,6 +121,7 @@ public class RedisUtil {
      * 批量获取 Key 缓存
      *
      * @param keys String key array
+     * @param type Class
      * @param <T>  T
      * @return T Array
      */
@@ -197,7 +199,7 @@ public class RedisUtil {
     /**
      * 批量指定键值失效时间
      *
-     * @param expireMillis Map<String, Long>
+     * @param expireMillis Map String:Long
      */
     public void setExpire(Map<String, Long> expireMillis) {
         try {

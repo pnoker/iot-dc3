@@ -29,8 +29,8 @@ public interface TenantBindService extends Service<TenantBind, TenantBindDto> {
     /**
      * 根据 租户ID 和 关联的用户ID 查询
      *
-     * @param tenantId TenantID
-     * @param userId   userId
+     * @param tenantId 租户ID
+     * @param userId   User Id
      * @return TenantBind
      */
     TenantBind selectByTenantIdAndUserId(String tenantId, String userId);

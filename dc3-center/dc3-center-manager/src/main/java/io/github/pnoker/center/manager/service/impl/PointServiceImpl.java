@@ -70,7 +70,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return pointMapper.deleteById(id) > 0;
     }

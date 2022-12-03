@@ -32,8 +32,9 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
     /**
      * 根据 模板Name 查询模版
      *
-     * @param name Profile Name
-     * @param type Profile Type
+     * @param name     Profile Name
+     * @param type     Profile Type
+     * @param tenantId 租户ID
      * @return Profile
      */
     Profile selectByNameAndType(String name, Short type, String tenantId);

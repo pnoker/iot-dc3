@@ -63,7 +63,7 @@ public class Group {
     /**
      * remove the group from the server
      *
-     * @throws JIException
+     * @throws JIException JIException
      */
     public void remove() throws JIException {
         this._server.removeGroup(this, true);
@@ -77,7 +77,7 @@ public class Group {
      * Get the group name from the server
      *
      * @return The group name fetched from the server
-     * @throws JIException
+     * @throws JIException JIException
      */
     public String getName() throws JIException {
         return this._group.getState().getName();
@@ -87,7 +87,7 @@ public class Group {
      * Change the group name
      *
      * @param name the new name of the group
-     * @throws JIException
+     * @throws JIException JIException
      */
     public void setName(final String name) throws JIException {
         this._group.setName(name);
@@ -116,7 +116,7 @@ public class Group {
      *
      * @param items The items to validate
      * @return A result map of item id to result information (including error code).
-     * @throws JIException
+     * @throws JIException JIException
      */
     public synchronized Map<String, Result<OPCITEMRESULT>> validateItems(final String... items) throws JIException {
         OPCITEMDEF[] defs = new OPCITEMDEF[items.length];

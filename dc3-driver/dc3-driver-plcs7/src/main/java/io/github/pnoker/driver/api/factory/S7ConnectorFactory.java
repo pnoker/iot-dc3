@@ -36,7 +36,7 @@ public class S7ConnectorFactory {
 
         private String host;
 
-        private SiemensPLCS plcsType;
+        private final SiemensPLCS plcsType;
 
         private int rack = 0;
         private int slot = 2;
@@ -49,6 +49,8 @@ public class S7ConnectorFactory {
 
         /**
          * Builds a connection with given params
+         *
+         * @return S7Connector
          */
         public S7Connector build() {
             return new S7TCPConnection(this.host, this.rack, this.slot, this.port, this.timeout, this.plcsType);
@@ -56,6 +58,9 @@ public class S7ConnectorFactory {
 
         /**
          * use hostname/ip
+         *
+         * @param host Host
+         * @return TCPConnectionBuilder
          */
         public TCPConnectionBuilder withHost(final String host) {
             this.host = host;
@@ -64,6 +69,9 @@ public class S7ConnectorFactory {
 
         /**
          * use port, default is 102
+         *
+         * @param port Port
+         * @return TCPConnectionBuilder
          */
         public TCPConnectionBuilder withPort(final int port) {
             this.port = port;
@@ -72,6 +80,9 @@ public class S7ConnectorFactory {
 
         /**
          * use rack, default is 0
+         *
+         * @param rack Rack
+         * @return TCPConnectionBuilder
          */
         public TCPConnectionBuilder withRack(final int rack) {
             this.rack = rack;
@@ -80,6 +91,9 @@ public class S7ConnectorFactory {
 
         /**
          * use slot, default is 2
+         *
+         * @param slot Slot
+         * @return TCPConnectionBuilder
          */
         public TCPConnectionBuilder withSlot(final int slot) {
             this.slot = slot;
@@ -88,6 +102,9 @@ public class S7ConnectorFactory {
 
         /**
          * use timeout, default is 2000
+         *
+         * @param timeout Timeout
+         * @return TCPConnectionBuilder
          */
         public TCPConnectionBuilder withTimeout(final int timeout) {
             this.timeout = timeout;
@@ -105,7 +122,7 @@ public class S7ConnectorFactory {
     }
 
     public static TCPConnectionBuilder buildTCPConnector() {
-        return new TCPConnectionBuilder(SiemensPLCS.SNon200);
+        return new TCPConnectionBuilder(SiemensPLCS.S_NON_200);
     }
 
 }

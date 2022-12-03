@@ -29,7 +29,7 @@ import java.net.UnknownHostException;
 /**
  * Implementation for <code>IOPCBrowseServerAddressSpace</code>
  *
- * @author Jens Reimann <jens.reimann@th4-systems.com>
+ * @author Jens Reimann jens.reimann@th4-systems.com
  */
 public class OPCBrowseServerAddressSpace extends BaseCOMObject {
     public OPCBrowseServerAddressSpace(final IJIComObject opcServer) throws IllegalArgumentException, UnknownHostException, JIException {
@@ -40,7 +40,7 @@ public class OPCBrowseServerAddressSpace extends BaseCOMObject {
      * Get the information how the namespace is organized
      *
      * @return the organization of the namespace
-     * @throws JIException
+     * @throws JIException JIException
      */
     public OPCNAMESPACETYPE queryOrganization() throws JIException {
         JICallBuilder callObject = new JICallBuilder(true);
@@ -68,7 +68,7 @@ public class OPCBrowseServerAddressSpace extends BaseCOMObject {
      *
      * @param position  The item position reference for the direction
      * @param direction The direction to go based on the position
-     * @throws JIException
+     * @throws JIException JIException
      */
     public void changePosition(final String position, final OPCBROWSEDIRECTION direction) throws JIException {
         JICallBuilder callObject = new JICallBuilder(true);
@@ -101,9 +101,9 @@ public class OPCBrowseServerAddressSpace extends BaseCOMObject {
      *
      * @param itemID the item to query
      * @return A string enumerator for the possible access paths
-     * @throws JIException
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
+     * @throws JIException              JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
      */
     public EnumString browseAccessPaths(final String itemID) throws JIException, IllegalArgumentException, UnknownHostException {
         JICallBuilder callObject = new JICallBuilder(true);
@@ -127,7 +127,7 @@ public class OPCBrowseServerAddressSpace extends BaseCOMObject {
      *
      * @param item the local item
      * @return the complete item ID
-     * @throws JIException
+     * @throws JIException JIException
      */
     public String getItemID(final String item) throws JIException {
         JICallBuilder callObject = new JICallBuilder(true);

@@ -48,7 +48,7 @@ public class Branch {
 
     /**
      * Get all branches.
-     * <br/>
+     * <p>
      * They must be filled first with a fill method from the {@link TreeBrowser}
      *
      * @return The list of branches
@@ -63,7 +63,7 @@ public class Branch {
 
     /**
      * Get all leaves.
-     * <br/>
+     * <p>
      * They must be filled first with a fill method from the {@link TreeBrowser}
      *
      * @return The list of leaves

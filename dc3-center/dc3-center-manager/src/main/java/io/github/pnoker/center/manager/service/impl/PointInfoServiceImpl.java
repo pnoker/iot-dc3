@@ -67,7 +67,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return pointInfoMapper.deleteById(id) > 0;
     }

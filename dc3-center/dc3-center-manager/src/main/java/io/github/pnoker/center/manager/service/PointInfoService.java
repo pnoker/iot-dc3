@@ -29,7 +29,7 @@ import java.util.List;
 public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
 
     /**
-     * 根据位号配置信息 ID & 设备 ID & 位号 ID 查询
+     * 根据位号配置信息 ID 、 设备 ID 、 位号 ID 查询
      *
      * @param pointAttributeId Point Attribute ID
      * @param deviceId         Device ID
@@ -55,7 +55,7 @@ public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
     List<PointInfo> selectByDeviceId(String deviceId);
 
     /**
-     * 根据 设备 ID & 位号 ID 查询
+     * 根据 设备 ID 、 位号 ID 查询
      *
      * @param deviceId Device ID
      * @param pointId  Point ID

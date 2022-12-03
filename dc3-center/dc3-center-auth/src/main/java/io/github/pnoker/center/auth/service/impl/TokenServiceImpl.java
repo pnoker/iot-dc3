@@ -30,7 +30,10 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.model.User;
-import io.github.pnoker.common.utils.*;
+import io.github.pnoker.common.utils.DecodeUtil;
+import io.github.pnoker.common.utils.KeyUtil;
+import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.utils.TimeUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -115,7 +118,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public boolean cancelToken(String username, String tenantName) {
+    public Boolean cancelToken(String username, String tenantName) {
         Tenant tenant = tenantService.selectByName(tenantName);
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();
         redisUtil.deleteKey(redisKey);
@@ -126,7 +129,7 @@ public class TokenServiceImpl implements TokenService {
      * 检测用户登录限制，返回该用户是否受限
      *
      * @param username User Name
-     * @param tenantId Tenant Name
+     * @param tenantId 租户ID
      */
     private void checkUserLimit(String username, String tenantId) {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenantId;
@@ -145,7 +148,7 @@ public class TokenServiceImpl implements TokenService {
      * 更新用户登录限制
      *
      * @param username   User Name
-     * @param tenantId   Tenant Name
+     * @param tenantId   租户ID
      * @param expireTime Expire Time
      * @return UserLimit
      */

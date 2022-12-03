@@ -29,7 +29,7 @@ public interface AutoService {
      * @param deviceName Device Name
      * @param pointName  Point Name
      * @param driverId   Driver ID
-     * @param tenantId   Tenant ID
+     * @param tenantId   租户ID
      * @return booleaDevicePointn
      */
     PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, String driverId, String tenantId);

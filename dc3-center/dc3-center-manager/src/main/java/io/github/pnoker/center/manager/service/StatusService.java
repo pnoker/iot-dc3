@@ -39,7 +39,7 @@ public interface StatusService {
      * 分页查询 Driver 服务状态，同驱动分页查询配套使用
      *
      * @param driverDto Driver Dto
-     * @return Map<String, String>
+     * @return Map String:String
      */
     Map<String, String> driver(DriverDto driverDto);
 
@@ -55,7 +55,7 @@ public interface StatusService {
      * 分页查询 Device 服务状态，同设备分页查询配套使用
      *
      * @param deviceDto Device Dto
-     * @return Map<String, String>
+     * @return Map String:String
      */
     Map<String, String> device(DeviceDto deviceDto);
 
@@ -63,7 +63,7 @@ public interface StatusService {
      * 根据 模板ID 查询 Device 服务状态
      *
      * @param profileId Profile ID
-     * @return Map<String, String>
+     * @return Map String:String
      */
     Map<String, String> deviceByProfileId(String profileId);
 }

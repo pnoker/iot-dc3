@@ -60,7 +60,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return driverAttributeMapper.deleteById(id) > 0;
     }

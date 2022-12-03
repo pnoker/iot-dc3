@@ -47,6 +47,7 @@ public class R<T> implements Serializable {
     /**
      * 成功
      *
+     * @param <T> Object
      * @return Response
      */
     public static <T> R<T> ok() {
@@ -56,6 +57,8 @@ public class R<T> implements Serializable {
     /**
      * 成功 自定义提示信息
      *
+     * @param <T>     Object
+     * @param message 成功信息
      * @return Response
      */
     public static <T> R<T> ok(String message) {
@@ -63,8 +66,11 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 成功 自定义 Code & 提示信息
+     * 成功 自定义 Code 和 提示信息
      *
+     * @param <T>     Object
+     * @param code    ResponseEnum
+     * @param message 成功信息
      * @return Response
      */
     public static <T> R<T> ok(ResponseEnum code, String message) {
@@ -74,6 +80,7 @@ public class R<T> implements Serializable {
     /**
      * 成功 返回结果
      *
+     * @param <T>  Object
      * @param data 返回结果
      * @return Response
      */
@@ -82,9 +89,11 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 成功 返回结果 & 自定义提示信息
+     * 成功 返回结果 和 自定义提示信息
      *
-     * @param data 返回结果
+     * @param <T>     Object
+     * @param data    返回结果
+     * @param message 成功信息
      * @return Response
      */
     public static <T> R<T> ok(T data, String message) {
@@ -94,6 +103,7 @@ public class R<T> implements Serializable {
     /**
      * 失败
      *
+     * @param <T> Object
      * @return Response
      */
     public static <T> R<T> fail() {
@@ -103,6 +113,8 @@ public class R<T> implements Serializable {
     /**
      * 失败 自定义提示信息
      *
+     * @param <T>     Object
+     * @param message 失败信息
      * @return Response
      */
     public static <T> R<T> fail(String message) {
@@ -110,8 +122,11 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 自定义 Code & 提示信息
+     * 失败 自定义 Code 和 提示信息
      *
+     * @param <T>     Object
+     * @param code    ResponseEnum
+     * @param message 失败信息
      * @return Response
      */
     public static <T> R<T> fail(ResponseEnum code, String message) {
@@ -121,6 +136,7 @@ public class R<T> implements Serializable {
     /**
      * 失败 返回结果
      *
+     * @param <T>  Object
      * @param data 返回结果
      * @return Response
      */
@@ -129,9 +145,11 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 返回结果 & 自定义提示信息
+     * 失败 返回结果 和 自定义提示信息
      *
-     * @param data 返回结果
+     * @param <T>     Object
+     * @param data    返回结果
+     * @param message 失败信息
      * @return Response
      */
     public static <T> R<T> fail(T data, String message) {

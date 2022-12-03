@@ -28,8 +28,9 @@ public interface GroupService extends Service<Group, GroupDto> {
     /**
      * 根据分组 NAME 查询
      *
-     * @param name
-     * @return
+     * @param name     分组名称
+     * @param tenantId 租户ID
+     * @return Group
      */
     Group selectByName(String name, String tenantId);
 

@@ -28,7 +28,7 @@ import java.net.UnknownHostException;
 /**
  * Implementation of <code>IOPCGroupStateMgt</code>
  *
- * @author Jens Reimann <jens.reimann@th4-systems.com>
+ * @author Jens Reimann jens.reimann@th4-systems.com
  */
 public class OPCGroupStateMgt extends BaseCOMObject {
     public OPCGroupStateMgt(final IJIComObject opcGroup) throws IllegalArgumentException, UnknownHostException, JIException {
@@ -73,7 +73,7 @@ public class OPCGroupStateMgt extends BaseCOMObject {
      * @param localeID            the locale ID
      * @param clientHandle        the client handle
      * @return the granted update rate
-     * @throws JIException
+     * @throws JIException JIException
      */
     public int setState(final Integer requestedUpdateRate, final Boolean active, final Integer timeBias, final Float percentDeadband, final Integer localeID, final Integer clientHandle) throws JIException {
         final JICallBuilder callObject = new JICallBuilder(true);
@@ -105,7 +105,7 @@ public class OPCGroupStateMgt extends BaseCOMObject {
      * Rename to group
      *
      * @param name the new name
-     * @throws JIException
+     * @throws JIException JIException
      */
     public void setName(final String name) throws JIException {
         final JICallBuilder callObject = new JICallBuilder(true);
@@ -121,9 +121,9 @@ public class OPCGroupStateMgt extends BaseCOMObject {
      *
      * @param name the name of the cloned group
      * @return The cloned group
-     * @throws JIException
-     * @throws UnknownHostException
-     * @throws IllegalArgumentException
+     * @throws JIException              JIException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws IllegalArgumentException IllegalArgumentException
      */
     public OPCGroupStateMgt clone(final String name) throws JIException, IllegalArgumentException, UnknownHostException {
         final JICallBuilder callObject = new JICallBuilder(true);
@@ -142,7 +142,7 @@ public class OPCGroupStateMgt extends BaseCOMObject {
      *
      * @param callback The callback to attach
      * @return The event handler information
-     * @throws JIException
+     * @throws JIException JIException
      */
     public EventHandler attach(final IOPCDataCallback callback) throws JIException {
         final OPCDataCallback callbackObject = new OPCDataCallback();

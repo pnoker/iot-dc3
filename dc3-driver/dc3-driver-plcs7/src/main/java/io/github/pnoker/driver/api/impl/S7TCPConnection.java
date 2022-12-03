@@ -15,31 +15,32 @@ package io.github.pnoker.driver.api.impl;
 
 import io.github.pnoker.driver.api.DaveArea;
 import io.github.pnoker.driver.api.SiemensPLCS;
-import io.github.pnoker.driver.exception.S7Exception;
 import io.github.pnoker.driver.api.impl.nodave.Nodave;
 import io.github.pnoker.driver.api.impl.nodave.PLCinterface;
 import io.github.pnoker.driver.api.impl.nodave.TCPConnection;
+import io.github.pnoker.driver.exception.S7Exception;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
  * TCP_Connection to a S7 PLC
+ * <p>
+ * 参考：<a href="http://libnodave.sourceforge.net/">http://libnodave.sourceforge.net</a>
  *
  * @author Thomas Rudin
- * @href http://libnodave.sourceforge.net/
  */
 public final class S7TCPConnection extends S7BaseConnection {
 
     /**
      * The Connection
      */
-    private TCPConnection dc;
+    private TCPConnection tcpConnection;
 
     /**
      * The Interface
      */
-    private PLCinterface di;
+    private PLCinterface plCinterface;
 
     /**
      * The Host to connect to
@@ -52,9 +53,14 @@ public final class S7TCPConnection extends S7BaseConnection {
     private final int port;
 
     /**
-     * Rack and slot number
+     * Rack  number
      */
-    private final int rack, slot;
+    private final int rack;
+
+    /**
+     * Slot number
+     */
+    private final int slot;
 
     /**
      * Timeout number
@@ -67,23 +73,28 @@ public final class S7TCPConnection extends S7BaseConnection {
     private Socket socket;
 
     /**
-     * The connect device type,such as S200
+     * To connect device type,such as S200
      */
-    private SiemensPLCS plcType;
+    private final SiemensPLCS siemensPLCS;
 
     /**
      * Creates a new Instance to the given host, rack, slot and port
      *
-     * @param host
-     * @throws S7Exception
+     * @param host        Host
+     * @param rack        Rack
+     * @param slot        Slot
+     * @param port        Port
+     * @param timeout     Timeout
+     * @param siemensPLCS SiemensPLCS
+     * @throws S7Exception S7Exception
      */
-    public S7TCPConnection(final String host, final int rack, final int slot, final int port, final int timeout, final SiemensPLCS plcType) throws S7Exception {
+    public S7TCPConnection(final String host, final int rack, final int slot, final int port, final int timeout, final SiemensPLCS siemensPLCS) throws S7Exception {
         this.host = host;
         this.rack = rack;
         this.slot = slot;
         this.port = port;
         this.timeout = timeout;
-        this.plcType = plcType;
+        this.siemensPLCS = siemensPLCS;
         this.setupSocket();
     }
 
@@ -115,29 +126,29 @@ public final class S7TCPConnection extends S7BaseConnection {
 
             //select the plc interface protocol by the plcsType
             int protocol;
-            switch (this.plcType) {
-                case S200:
+            switch (this.siemensPLCS) {
+                case S_200:
                     protocol = Nodave.PROTOCOL_ISOTCP243;
                     break;
-                case SNon200:
-                case S300:
-                case S400:
-                case S1200:
-                case S1500:
-                case S200Smart:
+                case S_NON_200:
+                case S_300:
+                case S_400:
+                case S_1200:
+                case S_1500:
+                case S_200_SMART:
                 default:
                     protocol = Nodave.PROTOCOL_ISOTCP;
                     break;
             }
-            this.di = new PLCinterface(this.socket.getOutputStream(), this.socket.getInputStream(), "IF1",
+            this.plCinterface = new PLCinterface(this.socket.getOutputStream(), this.socket.getInputStream(), "IF1",
                     DaveArea.LOCAL.getCode(), // TODO Local MPI-Address?
                     protocol);
 
-            this.dc = new TCPConnection(this.di, this.rack, this.slot);
-            final int res = this.dc.connectPLC();
+            this.tcpConnection = new TCPConnection(this.plCinterface, this.rack, this.slot);
+            final int res = this.tcpConnection.connectPLC();
             checkResult(res);
 
-            super.init(this.dc);
+            super.init(this.tcpConnection);
         } catch (final Exception e) {
             throw new S7Exception("constructor", e);
         }

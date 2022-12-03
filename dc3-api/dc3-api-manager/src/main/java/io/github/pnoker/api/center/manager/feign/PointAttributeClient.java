@@ -90,7 +90,7 @@ public interface PointAttributeClient {
      * 分页查询 PointAttribute
      *
      * @param pointAttributeDto PointAttribute Dto
-     * @return Page<PointAttribute>
+     * @return Page Of PointAttribute
      */
     @PostMapping("/list")
     R<Page<PointAttribute>> list(@RequestBody(required = false) PointAttributeDto pointAttributeDto);

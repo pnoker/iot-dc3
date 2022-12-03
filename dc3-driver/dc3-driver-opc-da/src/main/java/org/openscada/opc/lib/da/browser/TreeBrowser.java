@@ -27,12 +27,12 @@ import java.util.LinkedList;
 
 /**
  * Browse through the hierarchical server namespace.
- * <br/>
+ * <p>
  * The operations on the address space browser browser are not synchronized
  * as is the TreeBrowser itself. The user must take care of preventing
  * simultanious access to this instance and the server address space browser.
  *
- * @author Jens Reimann <jens.reimann@th4-systems.com>
+ * @author Jens Reimann jens.reimann@th4-systems.com
  */
 public class TreeBrowser extends BaseBrowser {
 
@@ -44,9 +44,8 @@ public class TreeBrowser extends BaseBrowser {
 
     /**
      * Browse for all items without search parameters.
-     * <br/>
+     * <p>
      * This will actually call:
-     * <br/>
      * <code>
      * TreeBrowser ( browser, "", EnumSet.noneOf ( Access.class ), JIVariant.VT_EMPTY );
      * </code>
@@ -75,7 +74,7 @@ public class TreeBrowser extends BaseBrowser {
     /**
      * Move the tree browser to the root folder
      *
-     * @throws JIException
+     * @throws JIException JIException
      */
     protected void moveToRoot() throws JIException {
         this._browser.changePosition(null, OPCBROWSEDIRECTION.OPC_BROWSE_TO);
@@ -85,7 +84,7 @@ public class TreeBrowser extends BaseBrowser {
      * Move the tree browser to a branch
      *
      * @param branch The branch to move to
-     * @throws JIException
+     * @throws JIException JIException
      */
     protected void moveToBranch(final Branch branch) throws JIException {
         Collection<String> branchStack = branch.getBranchStack();
@@ -99,10 +98,10 @@ public class TreeBrowser extends BaseBrowser {
     /**
      * Browse the root branch for its sub-branches.
      *
-     * @return The list of sub branches
-     * @throws JIException
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
+     * @return The list of sub-branches
+     * @throws JIException              JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
      */
     public Branch browseBranches() throws JIException, IllegalArgumentException, UnknownHostException {
         Branch branch = new Branch();
@@ -114,9 +113,9 @@ public class TreeBrowser extends BaseBrowser {
      * Browse the root branch for this leaves.
      *
      * @return The list of leaves
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public Branch browseLeaves() throws IllegalArgumentException, UnknownHostException, JIException {
         Branch branch = new Branch();
@@ -128,9 +127,9 @@ public class TreeBrowser extends BaseBrowser {
      * Fill the branch list of the provided branch.
      *
      * @param branch The branch to fill.
-     * @throws JIException
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
+     * @throws JIException              JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
      */
     public void fillBranches(final Branch branch) throws JIException, IllegalArgumentException, UnknownHostException {
         moveToBranch(branch);
@@ -141,9 +140,9 @@ public class TreeBrowser extends BaseBrowser {
      * Fill the leaf list of the provided branch.
      *
      * @param branch The branch to fill.
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public void fillLeaves(final Branch branch) throws IllegalArgumentException, UnknownHostException, JIException {
         moveToBranch(branch);
@@ -154,9 +153,9 @@ public class TreeBrowser extends BaseBrowser {
      * Browse through all levels of the tree browser.
      *
      * @return The whole expanded server address space
-     * @throws JIException
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
+     * @throws JIException              JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
      */
     public Branch browse() throws JIException, IllegalArgumentException, UnknownHostException {
         Branch branch = new Branch();
@@ -169,9 +168,9 @@ public class TreeBrowser extends BaseBrowser {
      * alls sub-branches.
      *
      * @param branch The branch to fill.
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public void fill(final Branch branch) throws IllegalArgumentException, UnknownHostException, JIException {
         moveToBranch(branch);
@@ -180,13 +179,13 @@ public class TreeBrowser extends BaseBrowser {
 
     /**
      * Fill the branch object with the leaves of this currently selected branch.
-     * <br/>
+     * <p>
      * The server object is not located to the branch before browsing!
      *
      * @param branch The branch to fill
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     protected void browseLeaves(final Branch branch) throws IllegalArgumentException, UnknownHostException, JIException {
         branch.setLeaves(new LinkedList<Leaf>());

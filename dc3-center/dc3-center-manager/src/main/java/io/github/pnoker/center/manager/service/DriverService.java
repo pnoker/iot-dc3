@@ -38,11 +38,12 @@ public interface DriverService extends Service<Driver, DriverDto> {
     Driver selectByServiceName(String serviceName);
 
     /**
-     * 根据 驱动 Host & Port 查询 驱动
+     * 根据 驱动 Host 、 Port 查询 驱动
      *
-     * @param type Driver Type
-     * @param host Driver Service Host
-     * @param port Driver Service Port
+     * @param type     Driver Type
+     * @param host     Driver Service Host
+     * @param port     Driver Service Port
+     * @param tenantId 租户ID
      * @return Driver
      */
     Driver selectByHostPort(String type, String host, Integer port, String tenantId);

@@ -39,5 +39,5 @@ public interface BlackIpService extends Service<BlackIp, BlackIpDto> {
      * @param ip IP
      * @return boolean
      */
-    boolean checkBlackIpValid(String ip);
+    Boolean checkBlackIpValid(String ip);
 }

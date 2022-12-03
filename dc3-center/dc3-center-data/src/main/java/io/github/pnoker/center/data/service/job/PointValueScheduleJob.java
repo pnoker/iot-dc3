@@ -57,6 +57,8 @@ public class PointValueScheduleJob extends QuartzJobBean {
 
     /**
      * 获取 PointValue 长度
+     *
+     * @return Point Value Size
      */
     public static int getPointValuesSize() {
         return pointValues.size();

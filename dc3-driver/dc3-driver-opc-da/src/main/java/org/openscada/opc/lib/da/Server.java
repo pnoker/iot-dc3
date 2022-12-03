@@ -215,9 +215,9 @@ public class Server {
      *             <code>null</code> so that the server creates a unique name.
      * @return The new group
      * @throws NotConnectedException    If the server is not connected using {@link Server#connect()}
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      * @throws DuplicateGroupException  If a group with this name already exists
      */
     public synchronized Group addGroup(final String name) throws NotConnectedException, IllegalArgumentException, UnknownHostException, JIException, DuplicateGroupException {
@@ -246,11 +246,11 @@ public class Server {
      * <code>null</code> as parameter.
      *
      * @return the new group
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws NotConnectedException
-     * @throws JIException
-     * @throws DuplicateGroupException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws NotConnectedException    NotConnectedException
+     * @throws JIException              JIException
+     * @throws DuplicateGroupException  DuplicateGroupException
      */
     public Group addGroup() throws IllegalArgumentException,
             UnknownHostException, NotConnectedException, JIException,
@@ -263,9 +263,9 @@ public class Server {
      *
      * @param name The name to look for
      * @return The group
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      * @throws UnknownGroupException    If the group was not found
      * @throws NotConnectedException    If the server is not connected
      */
@@ -347,7 +347,7 @@ public class Server {
      *
      * @return The tree browser or <code>null</code> if the functionality is not
      * supported
-     * @throws JIException
+     * @throws JIException JIException
      */
     public TreeBrowser getTreeBrowser() throws JIException {
         final OPCBrowseServerAddressSpace browser = this.server.getBrowser();

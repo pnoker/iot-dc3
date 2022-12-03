@@ -98,7 +98,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，也可以在read中实现设备状态的设置；
         你可以通过某种判断机制确定设备的状态，然后通过driverService.deviceEventSender接口将设备状态交给SDK管理。
 
-        设备状态（DeviceStatus）如下：
+        设备状态（StatusEnum）如下：
         ONLINE:在线
         OFFLINE:离线
         MAINTAIN:维护
@@ -112,9 +112,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      *
      * @param deviceId   Device ID
      * @param driverInfo Driver Info
-     * @return
-     * @throws JIException
-     * @throws UnknownHostException
+     * @return Server
+     * @throws JIException          JIException
+     * @throws UnknownHostException UnknownHostException
      */
     private Server getServer(String deviceId, Map<String, AttributeInfo> driverInfo) throws JIException, UnknownHostException {
         Server server = serverMap.get(deviceId);
@@ -135,14 +135,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 获取 Opc Da Item
      *
-     * @param server
-     * @param pointInfo
-     * @return
-     * @throws UnknownGroupException
-     * @throws NotConnectedException
-     * @throws JIException
-     * @throws UnknownHostException
-     * @throws DuplicateGroupException
+     * @param server    Server
+     * @param pointInfo Point Info Map
+     * @return Item
+     * @throws NotConnectedException   NotConnectedException
+     * @throws JIException             JIException
+     * @throws UnknownHostException    UnknownHostException
+     * @throws DuplicateGroupException DuplicateGroupException
+     * @throws AddFailedException      AddFailedException
      */
     public Item getItem(Server server, Map<String, AttributeInfo> pointInfo) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
         Group group;
@@ -158,9 +158,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 读取 Opc Da 位号值
      *
-     * @param item
-     * @return
-     * @throws JIException
+     * @param item Opc Item
+     * @return String Value
+     * @throws JIException JIException
      */
     public String readItem(Item item) throws JIException {
         JIVariant jiVariant = item.read(false).getValue();

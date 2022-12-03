@@ -61,6 +61,9 @@ public final class PDU {
 
     /**
      * set up the PDU information
+     *
+     * @param mem Mem
+     * @param pos Pos
      */
     public PDU(final byte[] mem, final int pos) {
         this.mem = mem;
@@ -149,6 +152,9 @@ public final class PDU {
     /**
      * Add len bytes of len after parameters from a maybe longer block of bytes.
      * Set dlen as needed. Needs valid header and parameters
+     *
+     * @param newData New Data
+     * @param len     Length
      */
     public void addData(final byte[] newData, final int len) {
         final int appPos = this.data + this.dlen; // append to this position
@@ -319,6 +325,8 @@ public final class PDU {
 
     /**
      * return the function code of the PDU
+     *
+     * @return Function Code Of PDU
      */
     public int getFunc() {
         return Nodave.USByte(this.mem, this.param + 0);
@@ -335,6 +343,8 @@ public final class PDU {
 
     /**
      * return the number of the PDU
+     *
+     * @return number
      */
     public int getNumber() {
         return Nodave.USBEWord(this.mem, this.header + 4);
@@ -342,6 +352,8 @@ public final class PDU {
 
     /**
      * reserve space for the header of a new PDU
+     *
+     * @param type Type
      */
     public void initHeader(final int type) {
         if ((type == 2) || (type == 3)) {
@@ -394,16 +406,19 @@ public final class PDU {
 
     /**
      * set the number of the PDU
+     *
+     * @param n number
      */
     public void setNumber(final int n) {
         Nodave.setUSBEWord(this.mem, this.header + 4, n);
     }
 
     /**
-     * Setup a PDU instance to reflect the structure of data present in the
+     * Set up a PDU instance to reflect the structure of data present in the
      * memory area given to initHeader. Needs valid header.
+     *
+     * @return Result
      */
-
     public int setupReceivedPDU() {
         int res = Nodave.RESULT_CANNOT_EVALUATE_PDU; // just assume the worst
         if ((this.mem[this.header + 1] == 2) || (this.mem[this.header + 1] == 3)) {

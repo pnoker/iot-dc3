@@ -83,11 +83,11 @@ public final class DateAndTimeConverter extends ByteConverter {
     }
 
     /**
-     * Dec -> Hex 10 = 0a 16 = 0f 17 = 10
+     * Dec to Hex 10 = 0a 16 = 0f 17 = 10
      *
-     * @param buffer
-     * @param offset
-     * @return
+     * @param buffer Byte Array
+     * @param offset Offset
+     * @return Byte
      */
     public byte getFromPLC(final byte[] buffer, final int offset) {
         try {
@@ -176,11 +176,11 @@ public final class DateAndTimeConverter extends ByteConverter {
     }
 
     /**
-     * Hex -> dec 0a = 10 0f = 16 10 = 17
+     * Hex to dec 0a = 10 0f = 16 10 = 17
      *
-     * @param buffer
-     * @param offset
-     * @param i
+     * @param buffer Byte Array
+     * @param offset Offset
+     * @param i      int
      */
     public void putToPLC(final byte[] buffer, final int offset, final int i) {
         try {
