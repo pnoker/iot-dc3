@@ -80,7 +80,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         profileBindService.deleteByDeviceId(id);
         return deviceMapper.deleteById(id) > 0;

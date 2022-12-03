@@ -72,7 +72,7 @@ public class RtmpServiceImpl implements RtmpService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         Rtmp select = selectById(id);
         if (ObjectUtil.isNotNull(select)) {
             Transcode transcode = transcodeMap.get(id);

@@ -35,7 +35,7 @@ public class OPCServer extends BaseCOMObject {
      * Retrieve the current server status
      *
      * @return the current server status
-     * @throws JIException
+     * @throws JIException JIException
      */
     public OPCSERVERSTATUS getStatus() throws JIException {
         JICallBuilder callObject = new JICallBuilder(true);
@@ -101,9 +101,9 @@ public class OPCServer extends BaseCOMObject {
      *
      * @param scope The scope to get
      * @return A string enumerator with the groups
-     * @throws JIException
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
+     * @throws JIException              JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
      */
     public EnumString getGroups(final OPCENUMSCOPE scope) throws JIException, IllegalArgumentException, UnknownHostException {
         JICallBuilder callObject = new JICallBuilder(true);

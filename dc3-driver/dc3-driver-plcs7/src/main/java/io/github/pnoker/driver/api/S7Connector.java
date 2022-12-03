@@ -22,21 +22,21 @@ public interface S7Connector extends Closeable {
     /**
      * Reads an area
      *
-     * @param area
-     * @param areaNumber
-     * @param bytes
-     * @param offset
-     * @return
+     * @param area       DaveArea
+     * @param areaNumber Area Number
+     * @param bytes      Byte Number
+     * @param offset     Byte Offset
+     * @return Byte Array
      */
     public byte[] read(DaveArea area, int areaNumber, int bytes, int offset);
 
     /**
      * Writes an area
      *
-     * @param area
-     * @param areaNumber
-     * @param offset
-     * @param buffer
+     * @param area       DaveArea
+     * @param areaNumber Area Number
+     * @param offset     Byte Offset
+     * @param buffer     Write Byte Array
      */
     public void write(DaveArea area, int areaNumber, int offset, byte[] buffer);
 

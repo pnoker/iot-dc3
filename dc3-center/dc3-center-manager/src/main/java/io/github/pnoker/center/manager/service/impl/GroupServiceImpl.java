@@ -61,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return groupMapper.deleteById(id) > 0;
     }

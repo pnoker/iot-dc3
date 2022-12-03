@@ -58,7 +58,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         Tenant tenant = selectById(id);
         if (null == tenant) {
             throw new NotFoundException();

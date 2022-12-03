@@ -17,7 +17,7 @@ package org.openscada.opc.lib.common;
 /**
  * Holds the connection information
  *
- * @author Jens Reimann <jens.reimann@th4-systems.com>
+ * @author Jens Reimann jens.reimann@th4-systems.com
  * <p>
  * If both <code>clsId</code> and <code>progId</code> are set then <code>clsId</code>
  * has priority!
@@ -69,7 +69,7 @@ public class ConnectionInformation {
     /**
      * Set the domain of the user used for logging on
      *
-     * @param domain
+     * @param domain Domain
      */
     public void setDomain(final String domain) {
         this._domain = domain;

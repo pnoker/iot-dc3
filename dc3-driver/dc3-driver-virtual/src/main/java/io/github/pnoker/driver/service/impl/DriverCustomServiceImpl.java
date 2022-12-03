@@ -73,7 +73,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，也可以在read中实现设备状态的设置；
         你可以通过某种判断机制确定设备的状态，然后通过driverService.deviceEventSender接口将设备状态交给SDK管理。
 
-        设备状态（DeviceStatus）如下：
+        设备状态（StatusEnum）如下：
         ONLINE:在线
         OFFLINE:离线
         MAINTAIN:维护

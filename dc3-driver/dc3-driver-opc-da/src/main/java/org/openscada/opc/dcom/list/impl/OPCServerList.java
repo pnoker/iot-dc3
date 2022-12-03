@@ -57,7 +57,8 @@ public class OPCServerList extends BaseCOMObject {
      * Return details about a serve class
      *
      * @param clsId A server class
-     * @throws JIException
+     * @return ClassDetails
+     * @throws JIException JIException
      */
     public ClassDetails getClassDetails(final JIClsid clsId) throws JIException {
         if (clsId == null) {

@@ -28,26 +28,36 @@ import java.lang.annotation.*;
 public @interface S7Variable {
     /**
      * The size of the array
+     *
+     * @return Size
      */
     int arraySize() default 1;
 
     /**
      * The bit offset, if any
+     *
+     * @return Offset
      */
     int bitOffset() default 0;
 
     /**
      * The Byte Offset
+     *
+     * @return Offset
      */
     int byteOffset();
 
     /**
      * The specified size (for String)
+     *
+     * @return Size
      */
     int size() default 0;
 
     /**
      * The corresponding S7 Type
+     *
+     * @return S7Type
      */
     S7Type type();
 

@@ -38,6 +38,7 @@ public interface RepositoryService {
      * 保存 PointValue
      *
      * @param pointValue PointValue
+     * @throws IOException IOException
      */
     void savePointValue(PointValue pointValue) throws IOException;
 
@@ -46,6 +47,7 @@ public interface RepositoryService {
      *
      * @param deviceId    Device ID
      * @param pointValues PointValue Array
+     * @throws IOException IOException
      */
     void savePointValues(String deviceId, List<PointValue> pointValues) throws IOException;
 }

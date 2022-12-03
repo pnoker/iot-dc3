@@ -51,7 +51,7 @@ public interface S7Serializer {
      * Dispense.
      *
      * @param plcs7PointVariable the point
-     * @return
+     * @return Object
      * @throws S7Exception the s7 exception
      */
     Object dispense(PlcS7PointVariable plcs7PointVariable) throws S7Exception;

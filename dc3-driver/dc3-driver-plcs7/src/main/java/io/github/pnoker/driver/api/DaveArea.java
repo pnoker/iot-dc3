@@ -28,8 +28,8 @@ public enum DaveArea {
     LOCAL(0x86), // data blocks
     OUTPUTS(0x82), // instance data blocks
     P(0x80), // not tested
-    SYSINFO(3), // local of caller
-    SYSTEMFLAGS(5), // S7 counters
+    SYSTEM_INFO(3), // local of caller
+    SYSTEM_FLAGS(5), // S7 counters
     TIMER(29), // S7 timers
     TIMER200(31), // IEC counters (200 family)
     V(0x87); // IEC timers (200 family)
@@ -37,17 +37,16 @@ public enum DaveArea {
     /**
      * Function Code
      */
-    int code;
+    final int code;
 
-    /**
-     * Constructor
-     */
     DaveArea(final int code) {
         this.code = code;
     }
 
     /**
      * Returns the function code as associated
+     *
+     * @return code
      */
     public int getCode() {
         return this.code;

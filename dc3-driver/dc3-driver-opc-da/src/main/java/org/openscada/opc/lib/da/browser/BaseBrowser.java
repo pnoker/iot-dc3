@@ -38,7 +38,7 @@ public class BaseBrowser {
      * The batch size is the number of entries that will be requested with one call
      * from the server. Sometimes too big batch sizes will cause an exception. And
      * smaller batch sizes degrade perfomance. The default is set by {@link EnumString#DEFAULT_BATCH_SIZE}
-     * and can be overridden by the java property <q>openscada.dcom.enum-batch-size</q>.
+     * and can be overridden by the java property openscada.dcom.enum-batch-size.
      */
     protected int _batchSize;
 
@@ -73,14 +73,14 @@ public class BaseBrowser {
     /**
      * Perform the browse operation.
      *
-     * @param type
-     * @param filterCriteria
-     * @param accessMask
-     * @param variantType
+     * @param type           OPCBROWSETYPE
+     * @param filterCriteria Filter Criteria
+     * @param accessMask     Access Mask
+     * @param variantType    Variant Type
      * @return The browse result
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     protected Collection<String> browse(final OPCBROWSETYPE type, final String filterCriteria, final EnumSet<Access> accessMask, final int variantType) throws IllegalArgumentException, UnknownHostException, JIException {
         int accessMaskValue = 0;
@@ -102,9 +102,9 @@ public class BaseBrowser {
      *
      * @param itemId The item ID to look up the access paths
      * @return The collection of the access paths
-     * @throws JIException
-     * @throws UnknownHostException
-     * @throws IllegalArgumentException
+     * @throws JIException              JIException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws IllegalArgumentException IllegalArgumentException
      */
     public Collection<String> getAccessPaths(final String itemId) throws IllegalArgumentException, UnknownHostException, JIException {
         return this._browser.browseAccessPaths(itemId).asCollection(this._batchSize);

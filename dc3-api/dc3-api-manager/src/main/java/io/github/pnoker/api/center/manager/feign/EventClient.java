@@ -39,7 +39,7 @@ public interface EventClient {
      * 分页查询 DriverEvent
      *
      * @param driverEventDto DriverEventDto
-     * @return Page<DriverEvent>
+     * @return Page Of DriverEvent
      */
     @PostMapping("/driver")
     R<Page<DriverEvent>> driverEvent(@RequestBody(required = false) DriverEventDto driverEventDto);
@@ -48,7 +48,7 @@ public interface EventClient {
      * 分页查询 DeviceEvent
      *
      * @param deviceEventDto DeviceEventDto
-     * @return Page<DeviceEvent>
+     * @return Page Of DeviceEvent
      */
     @PostMapping("/device")
     R<Page<DeviceEvent>> deviceEvent(@RequestBody(required = false) DeviceEventDto deviceEventDto);

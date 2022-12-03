@@ -25,14 +25,14 @@ import org.springframework.messaging.handler.annotation.Header;
 public interface MqttSendService {
 
     /**
-     * Use Default Topic & Default Qos Send Data
+     * Use Default Topic and Default Qos Send Data
      *
      * @param data string
      */
     void sendToMqtt(String data);
 
     /**
-     * Use Default Topic & Custom Qos Send Data
+     * Use Default Topic and Custom Qos Send Data
      *
      * @param qos  Custom Qos
      * @param data string
@@ -40,7 +40,7 @@ public interface MqttSendService {
     void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
 
     /**
-     * Use Custom Topic & Default Qos Send Data
+     * Use Custom Topic and Default Qos Send Data
      *
      * @param topic Custom Topic
      * @param data  string
@@ -48,7 +48,7 @@ public interface MqttSendService {
     void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
 
     /**
-     * Use Custom Topic & Custom Qos Send Data
+     * Use Custom Topic and Custom Qos Send Data
      *
      * @param topic Custom Topic
      * @param qos   Custom Qos

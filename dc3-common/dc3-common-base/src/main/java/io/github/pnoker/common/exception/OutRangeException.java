@@ -36,7 +36,6 @@ public class OutRangeException extends RuntimeException {
      *
      * @param template 文本模板，被替换的部分用 {} 表示，如果模板为null，返回"null"
      * @param params   参数值
-     * @return 格式化后的文本，如果模板为null，返回"null"
      */
     public OutRangeException(CharSequence template, Object... params) {
         super(ExceptionUtil.getOutRangeMessage(template, params));

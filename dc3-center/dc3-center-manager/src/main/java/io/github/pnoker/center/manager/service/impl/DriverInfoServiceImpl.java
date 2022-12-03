@@ -60,7 +60,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return driverInfoMapper.deleteById(id) > 0;
     }

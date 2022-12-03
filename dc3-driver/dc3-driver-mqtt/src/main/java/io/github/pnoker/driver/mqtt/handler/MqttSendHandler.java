@@ -25,14 +25,14 @@ import org.springframework.messaging.handler.annotation.Header;
 @MessagingGateway(defaultRequestChannel = "mqttOutputChannel")
 public interface MqttSendHandler {
     /**
-     * 使用 Default Topic & Default Qos 发送数据
+     * 使用 Default Topic 和 Default Qos 发送数据
      *
      * @param data string
      */
     void sendToMqtt(String data);
 
     /**
-     * 使用 Default Topic & 自定义 Qos 发送数据
+     * 使用 Default Topic 和 自定义 Qos 发送数据
      *
      * @param qos  自定义 Qos
      * @param data string
@@ -40,7 +40,7 @@ public interface MqttSendHandler {
     void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
 
     /**
-     * 使用 自定义 Topic & Default Qos 发送数据
+     * 使用 自定义 Topic 和 Default Qos 发送数据
      *
      * @param topic 自定义 Topic
      * @param data  string
@@ -48,7 +48,7 @@ public interface MqttSendHandler {
     void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
 
     /**
-     * 使用 自定义 Topic & 自定义 Qos 发送数据
+     * 使用 自定义 Topic 和 自定义 Qos 发送数据
      *
      * @param topic 自定义 Topic
      * @param qos   自定义 Qos

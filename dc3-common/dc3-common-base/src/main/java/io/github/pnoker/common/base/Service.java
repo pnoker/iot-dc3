@@ -38,7 +38,7 @@ public interface Service<T, D> {
      * @param id Object ID
      * @return Boolean
      */
-    boolean delete(String id);
+    Boolean delete(String id);
 
     /**
      * 更新
@@ -60,7 +60,7 @@ public interface Service<T, D> {
      * 获取带分页、排序
      *
      * @param dto Dto Object
-     * @return Page<Object>
+     * @return Page Of Object
      */
     Page<T> list(D dto);
 

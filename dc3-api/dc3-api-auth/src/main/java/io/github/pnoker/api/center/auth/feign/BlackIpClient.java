@@ -92,7 +92,7 @@ public interface BlackIpClient {
      * 分页查询 BlackIp
      *
      * @param blackIpDto Dto
-     * @return Page<BlackIp>
+     * @return Page Of BlackIp
      */
     @PostMapping("/list")
     R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpDto blackIpDto);

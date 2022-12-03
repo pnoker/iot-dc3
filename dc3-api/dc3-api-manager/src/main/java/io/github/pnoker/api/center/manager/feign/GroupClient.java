@@ -41,7 +41,8 @@ public interface GroupClient {
     /**
      * 新增 Group
      *
-     * @param group Group
+     * @param group    Group
+     * @param tenantId 租户ID
      * @return Group
      */
     @PostMapping("/add")
@@ -59,7 +60,8 @@ public interface GroupClient {
     /**
      * 修改 Group
      *
-     * @param group Group
+     * @param group    Group
+     * @param tenantId 租户ID
      * @return Group
      */
     @PostMapping("/update")
@@ -78,7 +80,8 @@ public interface GroupClient {
      * 分页查询 Group
      *
      * @param groupDto Group Dto
-     * @return Page<Group>
+     * @param tenantId 租户ID
+     * @return Page Of Group
      */
     @PostMapping("/list")
     R<Page<Group>> list(@RequestBody(required = false) GroupDto groupDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

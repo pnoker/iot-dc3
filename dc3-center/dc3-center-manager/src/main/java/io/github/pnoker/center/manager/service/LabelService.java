@@ -28,8 +28,9 @@ public interface LabelService extends Service<Label, LabelDto> {
     /**
      * 根据标签 NAME 查询
      *
-     * @param name
-     * @return
+     * @param name     Label Name
+     * @param tenantId 租户ID
+     * @return Label
      */
     Label selectByName(String name, String tenantId);
 }

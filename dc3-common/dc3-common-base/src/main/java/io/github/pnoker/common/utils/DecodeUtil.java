@@ -59,7 +59,7 @@ public class DecodeUtil {
     }
 
     /**
-     * 获取 md5 编码
+     * 获取 MD5 编码
      *
      * @param content 字符串
      * @return MD5 字符串
@@ -70,7 +70,7 @@ public class DecodeUtil {
     }
 
     /**
-     * 获取 md5 & salt 编码
+     * 获取 MD5 编码
      *
      * @param content 字符串
      * @param salt    盐值

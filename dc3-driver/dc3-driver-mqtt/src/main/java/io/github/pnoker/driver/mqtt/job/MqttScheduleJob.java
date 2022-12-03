@@ -55,6 +55,8 @@ public class MqttScheduleJob extends QuartzJobBean {
 
     /**
      * 获取 MqttMessage 长度
+     *
+     * @return 消息长度
      */
     public static int getMqttMessagesSize() {
         return mqttMessages.size();

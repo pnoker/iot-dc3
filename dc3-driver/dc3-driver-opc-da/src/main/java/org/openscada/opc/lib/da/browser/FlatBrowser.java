@@ -26,7 +26,7 @@ import java.util.EnumSet;
 /**
  * Browse through the flat server namespace
  *
- * @author Jens Reimann <jens.reimann@th4-systems.com>
+ * @author Jens Reimann jens.reimann@th4-systems.com
  */
 public class FlatBrowser extends BaseBrowser {
     public FlatBrowser(final OPCBrowseServerAddressSpace browser) {
@@ -44,9 +44,9 @@ public class FlatBrowser extends BaseBrowser {
      * @param accessMask     The access mask. An empty set will search for all.
      * @param variantType    The variant type. Must be one of the <code>VT_</code> constants of {@link JIVariant}. Use {@link JIVariant#VT_EMPTY} if you want to browse for all.
      * @return The list of entries
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public Collection<String> browse(final String filterCriteria, final EnumSet<Access> accessMask, final int variantType) throws IllegalArgumentException, UnknownHostException, JIException {
         return browse(OPCBROWSETYPE.OPC_FLAT, filterCriteria, accessMask, variantType);

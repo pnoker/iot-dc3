@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         User user = selectById(id);
         if (null == user) {
             throw new NotFoundException();

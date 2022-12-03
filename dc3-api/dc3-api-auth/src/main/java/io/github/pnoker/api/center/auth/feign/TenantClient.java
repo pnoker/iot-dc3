@@ -52,7 +52,7 @@ public interface TenantClient {
     /**
      * 根据 ID 删除 Tenant
      *
-     * @param id Tenant ID
+     * @param id 租户ID
      * @return Boolean
      */
     @PostMapping("/delete/{id}")
@@ -73,7 +73,7 @@ public interface TenantClient {
     /**
      * 根据 ID 查询 Tenant
      *
-     * @param id Tenant ID
+     * @param id 租户ID
      * @return Tenant
      */
     @GetMapping("/id/{id}")
@@ -82,7 +82,7 @@ public interface TenantClient {
     /**
      * 根据 Name 查询 Tenant
      *
-     * @param name Tenant Name
+     * @param name 租户名称
      * @return Tenant
      */
     @GetMapping("/name/{name}")
@@ -92,7 +92,7 @@ public interface TenantClient {
      * 分页查询 Tenant
      *
      * @param tenantDto Dto
-     * @return Page<Tenant>
+     * @return Page Of Tenant
      */
     @PostMapping("/list")
     R<Page<Tenant>> list(@RequestBody(required = false) TenantDto tenantDto);

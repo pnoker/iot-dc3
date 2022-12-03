@@ -80,7 +80,7 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
     }
 
     /**
-     * Ensure device point & time index
+     * Ensure device point and time index
      *
      * @param collection Collection Name
      */

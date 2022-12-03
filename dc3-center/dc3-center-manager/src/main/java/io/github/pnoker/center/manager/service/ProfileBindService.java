@@ -32,18 +32,18 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindDto>
      * 根据 设备ID 删除关联的模版映射
      *
      * @param deviceId Device ID
-     * @return boolean
+     * @return Boolean
      */
-    boolean deleteByDeviceId(String deviceId);
+    Boolean deleteByDeviceId(String deviceId);
 
     /**
      * 根据 设备ID 和 模版ID 删除关联的模版映射
      *
      * @param deviceId  Device ID
      * @param profileId Profile ID
-     * @return boolean
+     * @return Boolean
      */
-    boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId);
+    Boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId);
 
     /**
      * 根据 设备ID 和 模版ID 查询关联的模版映射

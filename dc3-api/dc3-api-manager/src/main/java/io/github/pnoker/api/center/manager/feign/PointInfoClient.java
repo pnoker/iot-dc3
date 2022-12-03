@@ -111,7 +111,7 @@ public interface PointInfoClient {
      * 分页查询 PointInfo
      *
      * @param pointInfoDto PointInfo Dto
-     * @return Page<PointInfo>
+     * @return Page Of PointInfo
      */
     @PostMapping("/list")
     R<Page<PointInfo>> list(@RequestBody(required = false) PointInfoDto pointInfoDto);

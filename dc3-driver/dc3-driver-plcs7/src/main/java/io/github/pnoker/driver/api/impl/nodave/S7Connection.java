@@ -169,7 +169,9 @@ public abstract class S7Connection {
     }
 
     /**
-     * get an signed 32bit value from the current position in result bytes
+     * get a signed 32bit value from the current position in result bytes
+     *
+     * @return value
      */
     public long getDINT() {
         this.dataPointer += 4;
@@ -177,7 +179,10 @@ public abstract class S7Connection {
     }
 
     /**
-     * get an signed 32bit value from the specified position in result bytes
+     * get a signed 32bit value from the specified position in result bytes
+     *
+     * @param pos Pos
+     * @return Value
      */
     public long getDINT(final int pos) {
         return Nodave.SBELong(this.msgIn, this.udata + pos);
@@ -185,6 +190,9 @@ public abstract class S7Connection {
 
     /**
      * get an unsigned 32bit value from the specified position in result bytes
+     *
+     * @param pos Pos
+     * @return value
      */
     public long getDWORD(final int pos) {
         // System.out.println("getDWORD pos " + pos);
@@ -193,6 +201,8 @@ public abstract class S7Connection {
 
     /**
      * get a float value from the current position in result bytes
+     *
+     * @return value
      */
     public float getFloat() {
         this.dataPointer += 4;
@@ -206,6 +216,9 @@ public abstract class S7Connection {
 
     /**
      * get a float value from the specified position in result bytes
+     *
+     * @param pos Pos
+     * @return value
      */
     public float getFloat(final int pos) {
         // System.out.println("getFloat pos " + pos);
@@ -246,6 +259,8 @@ public abstract class S7Connection {
 
     /**
      * get an unsigned 32bit value from the current position in result bytes
+     *
+     * @return value
      */
     public long getU32() {
         this.dataPointer += 4;
@@ -266,6 +281,8 @@ public abstract class S7Connection {
 
     /**
      * get an unsigned 16bit value from the current position in result bytes
+     *
+     * @return word
      */
     public int getWORD() {
         this.dataPointer += 2;
@@ -274,13 +291,18 @@ public abstract class S7Connection {
 
     /**
      * get an unsigned 16bit value from the specified position in result bytes
+     *
+     * @param pos Pos
+     * @return word
      */
     public int getWORD(final int pos) {
         return Nodave.USBEWord(this.msgIn, this.udata + pos);
     }
 
-    /*
+    /**
      * build the PDU for a PDU length negotiation
+     *
+     * @return word
      */
     public int negPDUlengthRequest() {
         int res;

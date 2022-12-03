@@ -100,7 +100,7 @@ public interface DriverInfoClient {
      * 分页查询 DriverInfo
      *
      * @param driverInfoDto DriverInfo Dto
-     * @return Page<DriverInfo>
+     * @return Page Of DriverInfo
      */
     @PostMapping("/list")
     R<Page<DriverInfo>> list(@RequestBody(required = false) DriverInfoDto driverInfoDto);

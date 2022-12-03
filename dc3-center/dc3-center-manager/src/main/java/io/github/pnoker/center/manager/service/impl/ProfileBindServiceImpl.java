@@ -62,20 +62,20 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return profileBindMapper.deleteById(id) > 0;
     }
 
     @Override
-    public boolean deleteByDeviceId(String deviceId) {
+    public Boolean deleteByDeviceId(String deviceId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setDeviceId(deviceId);
         return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
     }
 
     @Override
-    public boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId) {
+    public Boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
         profileBindDto.setProfileId(profileId);
         profileBindDto.setDeviceId(deviceId);

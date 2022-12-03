@@ -56,7 +56,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         BlackIp blackIp = selectById(id);
         if (null == blackIp) {
             throw new ServiceException("The ip does not exist in the blacklist");
@@ -96,7 +96,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public boolean checkBlackIpValid(String ip) {
+    public Boolean checkBlackIpValid(String ip) {
         BlackIp blackIp = selectByIp(ip);
         if (ObjectUtil.isNotNull(blackIp)) {
             return blackIp.getEnable();

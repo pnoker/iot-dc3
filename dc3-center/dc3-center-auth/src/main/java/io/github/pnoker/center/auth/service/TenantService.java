@@ -29,8 +29,8 @@ public interface TenantService extends Service<Tenant, TenantDto> {
     /**
      * 根据租户名查询租户
      *
-     * @param nama
+     * @param name 租户名称
      * @return Tenant
      */
-    Tenant selectByName(String nama);
+    Tenant selectByName(String name);
 }

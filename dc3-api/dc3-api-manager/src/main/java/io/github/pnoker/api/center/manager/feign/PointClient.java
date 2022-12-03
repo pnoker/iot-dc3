@@ -44,7 +44,8 @@ public interface PointClient {
     /**
      * 新增 Point
      *
-     * @param point Point
+     * @param point    Point
+     * @param tenantId 租户ID
      * @return Point
      */
     @PostMapping("/add")
@@ -62,7 +63,8 @@ public interface PointClient {
     /**
      * 修改 Point
      *
-     * @param point Point
+     * @param point    Point
+     * @param tenantId 租户ID
      * @return Point
      */
     @PostMapping("/update")
@@ -81,7 +83,7 @@ public interface PointClient {
      * 根据 ID 集合查询 Point
      *
      * @param pointIds Point ID Set
-     * @return Map<String, Point>
+     * @return Map String:Point
      */
     @PostMapping("/ids")
     R<Map<String, Point>> selectByIds(@RequestBody Set<String> pointIds);
@@ -108,7 +110,8 @@ public interface PointClient {
      * 分页查询 Point
      *
      * @param pointDto Point Dto
-     * @return Page<Point>
+     * @param tenantId 租户ID
+     * @return Page Of Point
      */
     @PostMapping("/list")
     R<Page<Point>> list(@RequestBody(required = false) PointDto pointDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -117,7 +120,7 @@ public interface PointClient {
      * 查询 位号单位
      *
      * @param pointIds Point ID Set
-     * @return Map<String, String>
+     * @return Map String:String
      */
     @PostMapping("/unit")
     R<Map<String, String>> unit(@RequestBody Set<String> pointIds);

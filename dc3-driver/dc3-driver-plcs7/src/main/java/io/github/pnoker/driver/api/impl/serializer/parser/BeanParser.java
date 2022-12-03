@@ -13,10 +13,11 @@
  */
 package io.github.pnoker.driver.api.impl.serializer.parser;
 
-import io.github.pnoker.driver.bean.PlcS7PointVariable;
+import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.driver.api.S7Serializable;
 import io.github.pnoker.driver.api.S7Type;
 import io.github.pnoker.driver.api.annotation.S7Variable;
+import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -24,11 +25,15 @@ import java.lang.reflect.Field;
 @Slf4j
 public final class BeanParser {
 
+    private BeanParser() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
+
     /**
      * Returns the wrapper for the primitive type
      *
-     * @param primitiveType
-     * @return
+     * @param primitiveType Class
+     * @return Class
      */
     private static Class<?> getWrapperForPrimitiveType(final Class<?> primitiveType) {
         if (primitiveType == boolean.class) {
@@ -65,9 +70,9 @@ public final class BeanParser {
     /**
      * Parses a Class
      *
-     * @param jclass
-     * @return
-     * @throws Exception
+     * @param jclass Class
+     * @return BeanParseResult
+     * @throws Exception Exception
      */
     public static BeanParseResult parse(final Class<?> jclass) throws Exception {
         final BeanParseResult res = new BeanParseResult();
@@ -150,9 +155,9 @@ public final class BeanParser {
     /**
      * Parses an Object
      *
-     * @param obj
-     * @return
-     * @throws Exception
+     * @param obj Object
+     * @return BeanParseResult
+     * @throws Exception Exception
      */
     public static BeanParseResult parse(final Object obj) throws Exception {
         return parse(obj.getClass());

@@ -16,8 +16,8 @@ package io.github.pnoker.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.DictionaryClientFallback;
-import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DictionaryDto;
@@ -39,7 +39,8 @@ public interface DictionaryClient {
      * 查询驱动 Dictionary
      *
      * @param dictionaryDto DictionaryDto
-     * @return Page<Dictionary>
+     * @param tenantId      租户ID
+     * @return Page Of Dictionary
      */
     @PostMapping("/driver")
     R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -47,7 +48,9 @@ public interface DictionaryClient {
     /**
      * 查询模板 Dictionary
      *
-     * @return Page<Dictionary>
+     * @param dictionaryDto DictionaryDto
+     * @param tenantId      租户ID
+     * @return Page Of Dictionary
      */
     @PostMapping("/profile")
     R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -56,7 +59,8 @@ public interface DictionaryClient {
      * 查询设备 Dictionary
      *
      * @param dictionaryDto DictionaryDto
-     * @return Page<Dictionary>
+     * @param tenantId      租户ID
+     * @return Page Of Dictionary
      */
     @PostMapping("/device")
     R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -65,7 +69,8 @@ public interface DictionaryClient {
      * 查询位号 Dictionary
      *
      * @param dictionaryDto DictionaryDto
-     * @return Page<Dictionary>
+     * @param tenantId      租户ID
+     * @return Page Of Dictionary
      */
     @PostMapping("/point")
     R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryDto dictionaryDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

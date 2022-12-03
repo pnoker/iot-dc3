@@ -15,8 +15,8 @@
 package io.github.pnoker.api.center.auth.feign;
 
 import io.github.pnoker.api.center.auth.fallback.DictionaryClientFallback;
-import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -37,7 +37,7 @@ public interface DictionaryClient {
     /**
      * 查询租户 Dictionary
      *
-     * @return List<Dictionary>
+     * @return List Of Dictionary
      */
     @GetMapping("/tenant")
     R<List<Dictionary>> tenantDictionary();
@@ -45,7 +45,8 @@ public interface DictionaryClient {
     /**
      * 查询用户 Dictionary
      *
-     * @return List<Dictionary>
+     * @param tenantId 租户ID
+     * @return List Of Dictionary
      */
     @GetMapping("/user")
     R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -53,7 +54,8 @@ public interface DictionaryClient {
     /**
      * 查询 Ip 黑名单 Dictionary
      *
-     * @return List<Dictionary>
+     * @param tenantId 租户ID
+     * @return List Of Dictionary
      */
     @GetMapping("/black_ip")
     R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

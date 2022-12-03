@@ -43,7 +43,8 @@ public interface DriverClient {
     /**
      * 新增 Driver
      *
-     * @param driver Driver
+     * @param driver   Driver
+     * @param tenantId 租户ID
      * @return Driver
      */
     @PostMapping("/add")
@@ -61,7 +62,8 @@ public interface DriverClient {
     /**
      * 修改 Driver
      *
-     * @param driver Driver
+     * @param driver   Driver
+     * @param tenantId 租户ID
      * @return Driver
      */
     @PostMapping("/update")
@@ -80,7 +82,7 @@ public interface DriverClient {
      * 根据 ID 集合查询 Driver
      *
      * @param driverIds Driver ID Set
-     * @return Map<String, Driver>
+     * @return Map String:Driver
      */
     @PostMapping("/ids")
     R<Map<String, Driver>> selectByIds(@RequestBody Set<String> driverIds);
@@ -95,11 +97,12 @@ public interface DriverClient {
     R<Driver> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName);
 
     /**
-     * 根据 TYPE & HOST & PORT 查询 Driver
+     * 根据 TYPE 、 HOST 、 PORT 查询 Driver
      *
-     * @param type Driver type
-     * @param host Driver Host
-     * @param port Driver Port
+     * @param type     Driver type
+     * @param host     Driver Host
+     * @param port     Driver Port
+     * @param tenantId 租户ID
      * @return Driver
      */
     @GetMapping("/type/{type}/host/{host}/port/{port}")
@@ -109,7 +112,8 @@ public interface DriverClient {
      * 分页查询 Driver
      *
      * @param driverDto Driver Dto
-     * @return Page<Driver>
+     * @param tenantId  租户ID
+     * @return Page Of Driver
      */
     @PostMapping("/list")
     R<Page<Driver>> list(@RequestBody(required = false) DriverDto driverDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

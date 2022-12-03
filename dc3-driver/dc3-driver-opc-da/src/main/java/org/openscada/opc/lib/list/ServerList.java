@@ -44,9 +44,9 @@ public class ServerList {
      *
      * @param session the DCOM session
      * @param host    the host to query
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public ServerList(final JISession session, final String host) throws IllegalArgumentException, UnknownHostException, JIException {
         this._session = session;
@@ -60,9 +60,9 @@ public class ServerList {
      * @param host     the host to contact
      * @param user     the user to use for authentication
      * @param password the password to use for authentication
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public ServerList(final String host, final String user, final String password) throws IllegalArgumentException, UnknownHostException, JIException {
         this(host, user, password, null);
@@ -75,9 +75,9 @@ public class ServerList {
      * @param user     the user to use for authentication
      * @param password the password to use for authentication
      * @param domain   The domain to use for authentication
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public ServerList(final String host, final String user, final String password, final String domain) throws IllegalArgumentException, UnknownHostException, JIException {
         this(JISession.createSession(domain, user, password), host);
@@ -88,7 +88,7 @@ public class ServerList {
      *
      * @param clsId the class to request details for
      * @return The class details
-     * @throws JIException
+     * @throws JIException JIException
      */
     public ClassDetails getDetails(final String clsId) throws JIException {
         return this._serverList.getClassDetails(JIClsid.valueOf(clsId));
@@ -99,7 +99,7 @@ public class ServerList {
      *
      * @param progId The prog id to look up
      * @return the class id or <code>null</code> if none could be found.
-     * @throws JIException
+     * @throws JIException JIException
      */
     public String getClsIdFromProgId(final String progId) throws JIException {
         JIClsid cls = this._serverList.getCLSIDFromProgID(progId);
@@ -114,10 +114,10 @@ public class ServerList {
      *
      * @param implemented All implemented categories
      * @param required    All required categories
-     * @return A collection of <q>class ids</q>
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @return A collection of class ids
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public Collection<String> listServers(final Category[] implemented, final Category[] required) throws IllegalArgumentException, UnknownHostException, JIException {
         // convert the type safe categories to plain UUIDs
@@ -149,9 +149,9 @@ public class ServerList {
      * @param implemented All implemented categories
      * @param required    All required categories
      * @return a collection of matching server and their class information
-     * @throws IllegalArgumentException
-     * @throws UnknownHostException
-     * @throws JIException
+     * @throws IllegalArgumentException IllegalArgumentException
+     * @throws UnknownHostException     UnknownHostException
+     * @throws JIException              JIException
      */
     public Collection<ClassDetails> listServersWithDetails(final Category[] implemented, final Category[] required) throws IllegalArgumentException, UnknownHostException, JIException {
         Collection<String> resultString = listServers(implemented, required);

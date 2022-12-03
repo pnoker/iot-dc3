@@ -23,7 +23,8 @@ import io.github.pnoker.common.valid.Read;
 import io.github.pnoker.common.valid.ValidatableList;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -39,8 +40,8 @@ public interface DriverCommandClient {
     /**
      * 读
      *
-     * @param cmdParameters list<{deviceId,pointId}>
-     * @return R<List < PointValue>>
+     * @param cmdParameters CmdParameter Array
+     * @return List Of PointValue
      */
     @PostMapping("/read")
     public R<List<PointValue>> readPoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters);
@@ -48,8 +49,8 @@ public interface DriverCommandClient {
     /**
      * 写
      *
-     * @param cmdParameters list<{deviceId,pointId,stringValue}>
-     * @return R<Boolean>
+     * @param cmdParameters CmdParameter Array
+     * @return Boolean
      */
     @PostMapping("/write")
     public R<Boolean> writePoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters);

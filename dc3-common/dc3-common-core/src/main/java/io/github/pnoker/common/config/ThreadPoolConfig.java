@@ -43,6 +43,8 @@ public class ThreadPoolConfig {
 
     /**
      * LinkedBlockingQueue ThreadPoolExecutor
+     *
+     * @return ThreadPoolExecutor
      */
     @Bean
     public ThreadPoolExecutor threadPoolExecutor() {
@@ -58,6 +60,8 @@ public class ThreadPoolConfig {
 
     /**
      * ScheduledThreadPoolExecutor ThreadPoolExecutor
+     *
+     * @return ScheduledThreadPoolExecutor
      */
     @Bean
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
@@ -67,6 +71,12 @@ public class ThreadPoolConfig {
                 (r, e) -> new BlockingRejectedExecutionHandler());
     }
 
+    /**
+     * 自定义 RejectedExecutionHandler
+     *
+     * @author pnoker
+     * @since 2022.1.0
+     */
     private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {

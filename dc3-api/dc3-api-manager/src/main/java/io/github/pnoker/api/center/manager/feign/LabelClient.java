@@ -41,7 +41,8 @@ public interface LabelClient {
     /**
      * 新增 Label
      *
-     * @param label Label
+     * @param label    Label
+     * @param tenantId 租户ID
      * @return Label
      */
     @PostMapping("/add")
@@ -59,7 +60,8 @@ public interface LabelClient {
     /**
      * 修改 Label
      *
-     * @param label Label
+     * @param label    Label
+     * @param tenantId 租户ID
      * @return Label
      */
     @PostMapping("/update")
@@ -78,7 +80,8 @@ public interface LabelClient {
      * 分页查询 Label
      *
      * @param labelDto Label Dto
-     * @return Page<Label>
+     * @param tenantId 租户ID
+     * @return Page Of Label
      */
     @PostMapping("/list")
     R<Page<Label>> list(@RequestBody(required = false) LabelDto labelDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

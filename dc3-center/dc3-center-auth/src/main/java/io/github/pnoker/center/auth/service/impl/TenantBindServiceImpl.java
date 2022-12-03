@@ -53,7 +53,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public boolean delete(String id) {
+    public Boolean delete(String id) {
         selectById(id);
         return tenantBindMapper.deleteById(id) > 0;
     }

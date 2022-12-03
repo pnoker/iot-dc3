@@ -101,7 +101,7 @@ public interface UserClient {
      * 分页查询 User
      *
      * @param userDto Dto
-     * @return Page<User>
+     * @return Page Of User
      */
     @PostMapping("/list")
     R<Page<User>> list(@RequestBody(required = false) UserDto userDto);

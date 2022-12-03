@@ -41,7 +41,8 @@ public interface PointValueClient {
      * 查询最新 PointValue 集合
      *
      * @param pointValueDto PointValueDto
-     * @return Page<PointValue>
+     * @param tenantId      租户ID
+     * @return Page Of PointValue
      */
     @PostMapping("/latest")
     R<Page<PointValue>> latest(@RequestBody PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -50,7 +51,8 @@ public interface PointValueClient {
      * 分页查询 PointValue
      *
      * @param pointValueDto PointValueDto
-     * @return Page<PointValue>
+     * @param tenantId      租户ID
+     * @return Page Of PointValue
      */
     @PostMapping("/list")
     R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

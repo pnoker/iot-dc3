@@ -17,7 +17,7 @@ package io.github.pnoker.common.valid;
 /**
  * Update 校验分组
  * <p>
- * 在{@link org.springframework.validation.annotation.Validated}
+ * 在org.springframework.validation.annotation.Validated
  * 注解后添加具体校验的分组名，可实现不同场景的校验需求
  *
  * @author pnoker

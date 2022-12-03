@@ -185,7 +185,7 @@ public class KeyUtil {
      *
      * @param username User Name
      * @param salt     Salt
-     * @param tenantId Tenant Id
+     * @param tenantId 租户ID
      * @return Token String
      */
     public static String generateToken(String username, String salt, String tenantId) {
@@ -204,6 +204,7 @@ public class KeyUtil {
      * @param username User Name
      * @param salt     Salt
      * @param token    Token
+     * @param tenantId 租户ID
      * @return Claims
      */
     public static Claims parserToken(String username, String salt, String token, String tenantId) {

@@ -44,16 +44,18 @@ public interface PointValueService {
      * 获取带分页、排序
      *
      * @param pointValueDto PointValueDto
-     * @return Page<PointValue>
+     * @param tenantId      租户ID
+     * @return Page Of PointValue
      */
-    Page<PointValue> latest(PointValueDto pointValueDto,String tenantId);
+    Page<PointValue> latest(PointValueDto pointValueDto, String tenantId);
 
     /**
      * 获取带分页、排序
      *
      * @param pointValueDto PointValueDto
-     * @return Page<PointValue>
+     * @param tenantId      租户ID
+     * @return Page Of PointValue
      */
-    Page<PointValue> list(PointValueDto pointValueDto,String tenantId);
+    Page<PointValue> list(PointValueDto pointValueDto, String tenantId);
 
 }

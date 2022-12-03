@@ -18,7 +18,8 @@ import io.github.pnoker.driver.api.impl.serializer.converter.*;
 /**
  * Type of the Address
  *
- * @author Thomas Rudin Libnodave: http://libnodave.sourceforge.net/
+ * @author Thomas Rudin Libnodave:
+ * <a href="http://libnodave.sourceforge.net/">libnodave.sourceforge.net</a>
  */
 public enum S7Type {
     /**
@@ -80,16 +81,17 @@ public enum S7Type {
      */
     STRUCT(StructConverter.class, 0, 0);
 
-    private int byteSize, bitSize;
+    private final int byteSize;
+    private final int bitSize;
 
-    private Class<? extends S7Serializable> serializer;
+    private final Class<? extends S7Serializable> serializer;
 
     /**
      * Enum Constructor
      *
-     * @param serializer
-     * @param byteSize
-     * @param bitSize
+     * @param serializer S7Serializable
+     * @param byteSize   A Byte Size
+     * @param bitSize    A bit Size
      */
     S7Type(final Class<? extends S7Serializable> serializer, final int byteSize, final int bitSize) {
         this.serializer = serializer;

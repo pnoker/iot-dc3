@@ -82,7 +82,7 @@ public class OPCITEMDEF {
      * Convert to structure to a J-Interop structure
      *
      * @return the j-interop structe
-     * @throws JIException
+     * @throws JIException JIException
      */
     public JIStruct toStruct() throws JIException {
         final JIStruct struct = new JIStruct();

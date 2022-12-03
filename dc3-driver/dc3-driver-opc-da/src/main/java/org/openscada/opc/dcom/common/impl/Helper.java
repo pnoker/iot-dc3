@@ -27,7 +27,7 @@ public class Helper {
      * @param object     the object to make to call on
      * @param callObject the call object
      * @return the result of the call
-     * @throws JIException
+     * @throws JIException JIException
      */
     public static Object[] callRespectSFALSE(final IJIComObject object, final JICallBuilder callObject) throws JIException {
         try {
@@ -46,7 +46,7 @@ public class Helper {
      *
      * @param value the value to fix
      * @return the fixed value
-     * @throws JIException In case something goes wrong
+     * @throws JIException JIException
      */
     public static JIVariant fixVariant(final JIVariant value) throws JIException {
         if (value.isArray()) {
