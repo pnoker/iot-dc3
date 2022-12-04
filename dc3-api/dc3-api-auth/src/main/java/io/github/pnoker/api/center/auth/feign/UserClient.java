@@ -41,49 +41,50 @@ import javax.validation.constraints.NotNull;
 public interface UserClient {
 
     /**
-     * 新增 User
+     * 新增用户
      *
-     * @param user User
-     * @return User
+     * @param user 用户
+     * @return {@link io.github.pnoker.common.model.User}
      */
     @PostMapping("/add")
     R<User> add(@Validated(Insert.class) @RequestBody User user);
 
     /**
-     * 根据 ID 删除 User
+     * 根据 ID 删除用户
      *
-     * @param id User ID
-     * @return Boolean
+     * @param id 用户ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 修改 User
-     * <p>
-     * 支  持: Enable,Password
-     * 不支持: Name
+     * 修改用户
+     * <ol>
+     * <li>支持修改: Enable,Password</li>
+     * <li>不支持修改: Name</li>
+     * </ol>
      *
-     * @param user User
-     * @return User
+     * @param user 用户
+     * @return {@link io.github.pnoker.common.model.User}
      */
     @PostMapping("/update")
     R<User> update(@Validated(Update.class) @RequestBody User user);
 
     /**
-     * 根据 ID 重置 User 密码
+     * 根据 ID 重置用户密码
      *
-     * @param id User ID
-     * @return Boolean
+     * @param id 用户ID
+     * @return 是否重置
      */
     @PostMapping("/reset/{id}")
     R<Boolean> restPassword(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 根据 ID 查询 User
+     * 根据 ID 查询用户
      *
-     * @param id User ID
-     * @return User
+     * @param id 用户ID
+     * @return {@link io.github.pnoker.common.model.User}
      */
     @GetMapping("/id/{id}")
     R<User> selectById(@NotNull @PathVariable(value = "id") String id);
@@ -91,17 +92,17 @@ public interface UserClient {
     /**
      * 根据 Name 查询 User
      *
-     * @param name User Name
-     * @return User
+     * @param name 用户名称
+     * @return {@link io.github.pnoker.common.model.User}
      */
     @GetMapping("/name/{name}")
     R<User> selectByName(@NotNull @PathVariable(value = "name") String name);
 
     /**
-     * 分页查询 User
+     * 模糊分页查询 User
      *
-     * @param userDto Dto
-     * @return Page Of User
+     * @param userDto 用户和分页参数
+     * @return 带分页的 {@link io.github.pnoker.common.model.User}
      */
     @PostMapping("/list")
     R<Page<User>> list(@RequestBody(required = false) UserDto userDto);
@@ -109,8 +110,8 @@ public interface UserClient {
     /**
      * 检测用户是否存在
      *
-     * @param name User Name
-     * @return Boolean
+     * @param name 用户名称
+     * @return 是否有效
      */
     @GetMapping("/check/{name}")
     R<Boolean> checkUserValid(@NotNull @PathVariable(value = "name") String name);

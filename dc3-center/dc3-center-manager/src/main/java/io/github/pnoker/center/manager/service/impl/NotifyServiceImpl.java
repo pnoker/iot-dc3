@@ -43,6 +43,9 @@ public class NotifyServiceImpl implements NotifyService {
     @Resource
     private RabbitTemplate rabbitTemplate;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyDriverProfile(String command, Profile profile) {
         try {
@@ -56,6 +59,9 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyDriverPoint(String command, Point point) {
         try {
@@ -69,6 +75,9 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyDriverDevice(String command, Device device) {
         try {
@@ -80,6 +89,9 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyDriverDriverInfo(String command, DriverInfo driverInfo) {
         try {
@@ -91,6 +103,9 @@ public class NotifyServiceImpl implements NotifyService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyDriverPointInfo(String command, PointInfo pointInfo) {
         try {

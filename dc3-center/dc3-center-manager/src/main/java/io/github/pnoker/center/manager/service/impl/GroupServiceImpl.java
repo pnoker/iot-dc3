@@ -46,6 +46,9 @@ public class GroupServiceImpl implements GroupService {
     private GroupMapper groupMapper;
 
 
+    /**
+     * {@inheritDoc}
+     */
     //todo 分组逻辑需要调整，同时支持驱动、模版、位号、设备，分组只是一种UI上的显示逻辑，不影响实际数据采集
     @Override
     public Group add(Group group) {
@@ -60,12 +63,18 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return groupMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Group update(Group group) {
         selectById(group.getId());
@@ -78,6 +87,9 @@ public class GroupServiceImpl implements GroupService {
         throw new ServiceException("The group update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Group selectById(String id) {
         Group group = groupMapper.selectById(id);
@@ -87,6 +99,9 @@ public class GroupServiceImpl implements GroupService {
         return group;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Group selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
@@ -98,6 +113,9 @@ public class GroupServiceImpl implements GroupService {
         return group;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<Group> list(GroupDto groupDto) {
         if (ObjectUtil.isNull(groupDto.getPage())) {
@@ -106,6 +124,9 @@ public class GroupServiceImpl implements GroupService {
         return groupMapper.selectPage(groupDto.getPage().convert(), fuzzyQuery(groupDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<Group> fuzzyQuery(GroupDto groupDto) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();

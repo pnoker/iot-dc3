@@ -41,58 +41,59 @@ import javax.validation.constraints.NotNull;
 public interface TenantClient {
 
     /**
-     * 新增 Tenant
+     * 新增租户
      *
-     * @param tenant Tenant
-     * @return Tenant
+     * @param tenant 租户
+     * @return {@link io.github.pnoker.common.model.Tenant}
      */
     @PostMapping("/add")
     R<Tenant> add(@Validated(Insert.class) @RequestBody Tenant tenant);
 
     /**
-     * 根据 ID 删除 Tenant
+     * 根据 ID 删除租户
      *
      * @param id 租户ID
-     * @return Boolean
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 修改 Tenant
-     * <p>
-     * 支  持: Enable
-     * 不支持: Name
+     * 根据 ID 修改租户
+     * <ol>
+     * <li>支持修改: Enable</li>
+     * <li>不支持修改: Name</li>
+     * </ol>
      *
      * @param tenant Tenant
-     * @return Tenant
+     * @return {@link io.github.pnoker.common.model.Tenant}
      */
     @PostMapping("/update")
     R<Tenant> update(@Validated(Update.class) @RequestBody Tenant tenant);
 
     /**
-     * 根据 ID 查询 Tenant
+     * 根据 ID 查询租户
      *
      * @param id 租户ID
-     * @return Tenant
+     * @return {@link io.github.pnoker.common.model.Tenant}
      */
     @GetMapping("/id/{id}")
     R<Tenant> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 根据 Name 查询 Tenant
+     * 根据 Name 查询租户
      *
      * @param name 租户名称
-     * @return Tenant
+     * @return {@link io.github.pnoker.common.model.Tenant}
      */
     @GetMapping("/name/{name}")
     R<Tenant> selectByName(@NotNull @PathVariable(value = "name") String name);
 
     /**
-     * 分页查询 Tenant
+     * 模糊分页查询租户
      *
-     * @param tenantDto Dto
-     * @return Page Of Tenant
+     * @param tenantDto 租户和分页参数
+     * @return 带分页的 {@link io.github.pnoker.common.model.Tenant}
      */
     @PostMapping("/list")
     R<Page<Tenant>> list(@RequestBody(required = false) TenantDto tenantDto);

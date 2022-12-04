@@ -18,7 +18,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.data.feign.PointValueClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
+import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.dto.PointValueDto;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -35,16 +37,22 @@ public class PointValueClientFallback implements FallbackFactory<PointValueClien
 
     @Override
     public PointValueClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-DATA" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(DataServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new PointValueClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<PointValue>> latest(PointValueDto pointValueDto, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<PointValue>> list(PointValueDto pointValueDto, String tenantId) {
                 return R.fail(message);

@@ -26,7 +26,7 @@ public interface TokenService {
     /**
      * 生成用户的随机 salt
      *
-     * @param username   User Name
+     * @param username   用户名称
      * @param tenantName 租户名称
      * @return String
      */
@@ -35,7 +35,7 @@ public interface TokenService {
     /**
      * 生成用户的Token令牌
      *
-     * @param username   User Name
+     * @param username   用户名称
      * @param salt       User Salt
      * @param password   User Password
      * @param tenantName 租户名称
@@ -46,7 +46,7 @@ public interface TokenService {
     /**
      * 校验用户的Token令牌是否有效
      *
-     * @param username   User Name
+     * @param username   用户名称
      * @param salt       盐值
      * @param token      Token
      * @param tenantName 租户名称
@@ -57,9 +57,9 @@ public interface TokenService {
     /**
      * 注销用户的Token令牌
      *
-     * @param username   User Name
+     * @param username   用户名称
      * @param tenantName 租户名称
-     * @return Boolean
+     * @return 是否注销
      */
     Boolean cancelToken(String username, String tenantName);
 }

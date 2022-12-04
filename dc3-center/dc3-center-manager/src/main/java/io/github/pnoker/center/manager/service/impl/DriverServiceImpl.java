@@ -57,6 +57,9 @@ public class DriverServiceImpl implements DriverService {
     @Resource
     private DeviceService deviceService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Driver add(Driver driver) {
         try {
@@ -70,12 +73,18 @@ public class DriverServiceImpl implements DriverService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return driverMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Driver update(Driver driver) {
         selectById(driver.getId());
@@ -88,6 +97,9 @@ public class DriverServiceImpl implements DriverService {
         throw new ServiceException("The driver update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Driver selectById(String id) {
         Driver driver = driverMapper.selectById(id);
@@ -97,12 +109,18 @@ public class DriverServiceImpl implements DriverService {
         return driver;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Driver selectByDeviceId(String deviceId) {
         Device device = deviceService.selectById(deviceId);
         return selectById(device.getDriverId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Driver selectByServiceName(String serviceName) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
@@ -114,6 +132,9 @@ public class DriverServiceImpl implements DriverService {
         return driver;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Driver selectByHostPort(String type, String host, Integer port, String tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
@@ -128,6 +149,9 @@ public class DriverServiceImpl implements DriverService {
         return driver;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Driver> selectByIds(Set<String> ids) {
         List<Driver> drivers = driverMapper.selectBatchIds(ids);
@@ -137,6 +161,9 @@ public class DriverServiceImpl implements DriverService {
         return drivers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Driver> selectByProfileId(String profileId) {
         List<Device> devices = deviceService.selectByProfileId(profileId);
@@ -144,6 +171,9 @@ public class DriverServiceImpl implements DriverService {
         return selectByIds(driverIds);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<Driver> list(DriverDto driverDto) {
         if (null == driverDto.getPage()) {
@@ -152,6 +182,9 @@ public class DriverServiceImpl implements DriverService {
         return driverMapper.selectPage(driverDto.getPage().convert(), fuzzyQuery(driverDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();

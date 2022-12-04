@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.auth.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.dto.TenantDto;
 import io.github.pnoker.common.model.Tenant;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -35,36 +37,54 @@ public class TenantClientFallback implements FallbackFactory<TenantClient> {
 
     @Override
     public TenantClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-AUTH" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(AuthServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new TenantClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Tenant> add(Tenant user) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Tenant> update(Tenant user) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Tenant> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Tenant> selectByName(String name) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<Tenant>> list(TenantDto userDto) {
                 return R.fail(message);

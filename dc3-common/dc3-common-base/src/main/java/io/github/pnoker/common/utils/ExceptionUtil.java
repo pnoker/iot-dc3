@@ -63,4 +63,18 @@ public class ExceptionUtil {
         }
         return CharSequenceUtil.format(template, params);
     }
+
+    /**
+     * 获取不可用服务的错误信息
+     *
+     * @param service 服务名称
+     * @param message 默认的错误信息
+     * @return 错误信息
+     */
+    public static String getNotAvailableServiceMessage(String service, String message) {
+        if (CharSequenceUtil.isEmpty(message)) {
+            message = CharSequenceUtil.format("{}: {}", ExceptionConstant.NO_AVAILABLE_SERVER, service);
+        }
+        return message;
+    }
 }

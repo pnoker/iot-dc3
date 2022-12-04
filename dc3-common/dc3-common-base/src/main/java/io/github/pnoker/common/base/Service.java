@@ -35,8 +35,8 @@ public interface Service<T, D> {
     /**
      * 删除
      *
-     * @param id Object ID
-     * @return Boolean
+     * @param id ID
+     * @return 是否删除
      */
     Boolean delete(String id);
 
@@ -51,7 +51,7 @@ public interface Service<T, D> {
     /**
      * 通过 ID 查询
      *
-     * @param id Object ID
+     * @param id ID
      * @return Object
      */
     T selectById(String id);

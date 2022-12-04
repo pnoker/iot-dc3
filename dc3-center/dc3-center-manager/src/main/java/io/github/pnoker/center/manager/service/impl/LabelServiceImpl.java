@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,6 +50,9 @@ public class LabelServiceImpl implements LabelService {
     @Resource
     private LabelBindService labelBindService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Label add(Label label) {
         selectByName(label.getName(), label.getTenantId());
@@ -59,6 +62,9 @@ public class LabelServiceImpl implements LabelService {
         throw new ServiceException("The label add failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         LabelBindDto labelBindDto = new LabelBindDto();
@@ -74,6 +80,9 @@ public class LabelServiceImpl implements LabelService {
         return labelMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Label update(Label label) {
         selectById(label.getId());
@@ -86,6 +95,9 @@ public class LabelServiceImpl implements LabelService {
         throw new ServiceException("The label update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Label selectById(String id) {
         Label label = labelMapper.selectById(id);
@@ -95,6 +107,9 @@ public class LabelServiceImpl implements LabelService {
         return label;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Label selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
@@ -107,6 +122,9 @@ public class LabelServiceImpl implements LabelService {
         return label;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<Label> list(LabelDto labelDto) {
         if (ObjectUtil.isNull(labelDto.getPage())) {
@@ -115,6 +133,9 @@ public class LabelServiceImpl implements LabelService {
         return labelMapper.selectPage(labelDto.getPage().convert(), fuzzyQuery(labelDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<Label> fuzzyQuery(LabelDto labelDto) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();

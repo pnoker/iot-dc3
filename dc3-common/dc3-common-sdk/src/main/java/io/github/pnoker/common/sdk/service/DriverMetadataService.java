@@ -15,7 +15,6 @@
 package io.github.pnoker.common.sdk.service;
 
 import io.github.pnoker.common.model.*;
-import io.github.pnoker.common.model.*;
 
 /**
  * @author pnoker
@@ -66,7 +65,7 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中位号
      *
-     * @param profileId Profile ID
+     * @param profileId 模板ID
      * @param id        ID
      */
     void deletePoint(String profileId, String id);

@@ -44,8 +44,8 @@ public interface DriverService {
     /**
      * 发送设备事件
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
      * @param type     Event Type, STATUS、LIMIT
      * @param content  Event Content
      */
@@ -54,7 +54,7 @@ public interface DriverService {
     /**
      * 发送设备状态事件
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @param status   StatusEnum
      */
     void deviceStatusSender(String deviceId, StatusEnum status);

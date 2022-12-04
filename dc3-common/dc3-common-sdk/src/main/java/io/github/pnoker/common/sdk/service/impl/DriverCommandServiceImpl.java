@@ -44,6 +44,9 @@ public class DriverCommandServiceImpl implements DriverCommandService {
     @Resource
     private DriverCustomService driverCustomService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointValue read(String deviceId, String pointId) {
         Device device = driverContext.getDeviceByDeviceId(deviceId);
@@ -65,6 +68,9 @@ public class DriverCommandServiceImpl implements DriverCommandService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean write(String deviceId, String pointId, String value) {
         Device device = driverContext.getDeviceByDeviceId(deviceId);

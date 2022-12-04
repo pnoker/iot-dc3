@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -44,6 +44,9 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Resource
     private LabelBindMapper labelBindMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LabelBind add(LabelBind labelBind) {
         if (labelBindMapper.insert(labelBind) > 0) {
@@ -52,12 +55,18 @@ public class LabelBindServiceImpl implements LabelBindService {
         throw new ServiceException("The label bind add failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return labelBindMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LabelBind update(LabelBind labelBind) {
         selectById(labelBind.getId());
@@ -68,6 +77,9 @@ public class LabelBindServiceImpl implements LabelBindService {
         throw new ServiceException("The label bind update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LabelBind selectById(String id) {
         LabelBind labelBind = labelBindMapper.selectById(id);
@@ -77,6 +89,9 @@ public class LabelBindServiceImpl implements LabelBindService {
         return labelBind;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<LabelBind> list(LabelBindDto labelBindDto) {
         if (ObjectUtil.isNull(labelBindDto.getPage())) {
@@ -85,6 +100,9 @@ public class LabelBindServiceImpl implements LabelBindService {
         return labelBindMapper.selectPage(labelBindDto.getPage().convert(), fuzzyQuery(labelBindDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindDto labelBindDto) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();

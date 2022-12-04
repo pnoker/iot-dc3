@@ -56,6 +56,9 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     @Resource
     private PointInfoService pointInfoService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void driverRegister(DriverRegister driverRegister) {
         // register driver

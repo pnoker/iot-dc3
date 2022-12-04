@@ -56,6 +56,9 @@ public class BatchServiceImpl implements BatchService {
     @Resource
     private PointInfoService pointInfoService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverMetadata batchDriverMetadata(String serviceName) {
         DriverMetadata driverMetadata = new DriverMetadata();

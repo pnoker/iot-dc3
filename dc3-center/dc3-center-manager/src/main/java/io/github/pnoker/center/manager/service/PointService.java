@@ -42,7 +42,7 @@ public interface PointService extends Service<Point, PointDto> {
     /**
      * 根据 设备Id 查询位号
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Point Array
      */
     List<Point> selectByDeviceId(String deviceId);

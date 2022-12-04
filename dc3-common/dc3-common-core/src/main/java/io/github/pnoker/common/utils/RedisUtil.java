@@ -242,7 +242,7 @@ public class RedisUtil {
      *
      * @param key  String key
      * @param unit TimeUnit
-     * @return long
+     * @return 剩余失效时长
      */
     public long getExpire(String key, TimeUnit unit) {
         try {

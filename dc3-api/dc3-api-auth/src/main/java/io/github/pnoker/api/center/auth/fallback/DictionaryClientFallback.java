@@ -15,8 +15,10 @@
 package io.github.pnoker.api.center.auth.fallback;
 
 import io.github.pnoker.api.center.auth.feign.DictionaryClient;
-import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.bean.common.Dictionary;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -35,21 +37,29 @@ public class DictionaryClientFallback implements FallbackFactory<DictionaryClien
 
     @Override
     public DictionaryClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-AUTH" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(AuthServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new DictionaryClient() {
-
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<Dictionary>> tenantDictionary() {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<Dictionary>> userDictionary(String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<Dictionary>> blackIpDictionary(String tenantId) {
                 return R.fail(message);

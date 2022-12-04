@@ -51,8 +51,8 @@ public interface GroupClient {
     /**
      * 根据 ID 删除 Group
      *
-     * @param id Group ID
-     * @return Boolean
+     * @param id 分组ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -70,14 +70,14 @@ public interface GroupClient {
     /**
      * 根据 ID 查询 Group
      *
-     * @param id Group ID
+     * @param id 分组ID
      * @return Group
      */
     @GetMapping("/id/{id}")
     R<Group> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 分页查询 Group
+     * 模糊分页查询 Group
      *
      * @param groupDto Group Dto
      * @param tenantId 租户ID

@@ -44,7 +44,7 @@ public interface BlackIpClient {
      * 新增 BlackIp
      *
      * @param blackIp BlackIp
-     * @return BlackIp
+     * @return {@link io.github.pnoker.common.model.BlackIp}
      */
     @PostMapping("/add")
     R<BlackIp> add(@Validated(Insert.class) @RequestBody BlackIp blackIp);
@@ -52,20 +52,21 @@ public interface BlackIpClient {
     /**
      * 根据 ID 删除 BlackIp
      *
-     * @param id BlackIp ID
-     * @return Boolean
+     * @param id ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
      * 修改 BlackIp
-     * <p>
-     * 支  持: Enable
-     * 不支持: Ip
+     * <ol>
+     * <li>支持修改: Enable</li>
+     * <li>不支持修改: Ip</li>
+     * </ol>
      *
      * @param blackIp BlackIp
-     * @return BlackIp
+     * @return {@link io.github.pnoker.common.model.BlackIp}
      */
     @PostMapping("/update")
     R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp);
@@ -73,8 +74,8 @@ public interface BlackIpClient {
     /**
      * 根据 ID 查询 BlackIp
      *
-     * @param id BlackIp ID
-     * @return BlackIp
+     * @param id ID
+     * @return {@link io.github.pnoker.common.model.BlackIp}
      */
     @GetMapping("/id/{id}")
     R<BlackIp> selectById(@NotNull @PathVariable(value = "id") String id);
@@ -83,16 +84,16 @@ public interface BlackIpClient {
      * 根据 Ip 查询 BlackIp
      *
      * @param ip Black Ip
-     * @return BlackIp
+     * @return {@link io.github.pnoker.common.model.BlackIp}
      */
     @GetMapping("/ip/{ip}")
     R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip);
 
     /**
-     * 分页查询 BlackIp
+     * 模糊分页查询 BlackIp
      *
-     * @param blackIpDto Dto
-     * @return Page Of BlackIp
+     * @param blackIpDto BlackIp和分页参数
+     * @return 带分页的 {@link io.github.pnoker.common.model.BlackIp}
      */
     @PostMapping("/list")
     R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpDto blackIpDto);
@@ -101,7 +102,7 @@ public interface BlackIpClient {
      * 检测 Ip 是否在 Ip 黑名单列表
      *
      * @param ip Black Ip
-     * @return Boolean
+     * @return 当前IP是否在黑名单中
      */
     @GetMapping("/check/{ip}")
     R<Boolean> checkBlackIpValid(@NotNull @PathVariable(value = "ip") String ip);

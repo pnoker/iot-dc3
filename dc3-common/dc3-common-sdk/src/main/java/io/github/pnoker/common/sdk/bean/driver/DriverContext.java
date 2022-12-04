@@ -55,7 +55,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取连接设备的驱动配置信息
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Map String:AttributeInfo
      */
     public Map<String, AttributeInfo> getDriverInfoByDeviceId(String deviceId) {
@@ -65,7 +65,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取连接设备的全部位号配置信息
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Map String:(Map String:AttributeInfo)
      */
     public Map<String, Map<String, AttributeInfo>> getPointInfoByDeviceId(String deviceId) {
@@ -80,8 +80,8 @@ public class DriverContext {
     /**
      * 根据 设备Id 和 位号Id 获取连接设备的位号配置信息
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
      * @return Map String:AttributeInfo
      */
     public Map<String, AttributeInfo> getPointInfoByDeviceIdAndPointId(String deviceId, String pointId) {
@@ -95,7 +95,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取设备
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Device
      */
     public Device getDeviceByDeviceId(String deviceId) {
@@ -109,7 +109,7 @@ public class DriverContext {
     /**
      * 根据 设备Id 获取位号
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Point Array
      */
     public List<Point> getPointByDeviceId(String deviceId) {
@@ -126,8 +126,8 @@ public class DriverContext {
     /**
      * 根据 设备Id和位号Id 获取位号
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
      * @return Point
      */
     public Point getPointByDeviceIdAndPointId(String deviceId, String pointId) {

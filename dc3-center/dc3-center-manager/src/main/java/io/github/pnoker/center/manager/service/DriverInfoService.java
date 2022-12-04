@@ -48,7 +48,7 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
     /**
      * 根据设备 ID 查询
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return DriverInfo Array
      */
     List<DriverInfo> selectByDeviceId(String deviceId);

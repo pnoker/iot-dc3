@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.auth.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.BlackIpClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.dto.BlackIpDto;
 import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -35,7 +37,7 @@ public class BlackIpClientFallback implements FallbackFactory<BlackIpClient> {
 
     @Override
     public BlackIpClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-AUTH" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(AuthServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new BlackIpClient() {

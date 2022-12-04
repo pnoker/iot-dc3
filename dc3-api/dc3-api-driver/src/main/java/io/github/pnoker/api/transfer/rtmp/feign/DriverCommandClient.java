@@ -38,21 +38,23 @@ import java.util.List;
 public interface DriverCommandClient {
 
     /**
-     * 读
+     * 读取位号值
+     * 最多读取 {@link io.github.pnoker.common.constant.common.RequestConstant#DEFAULT_MAX_REQUEST_SIZE RequestConstant.DEFAULT_MAX_REQUEST_SIZE} 个
      *
-     * @param cmdParameters CmdParameter Array
-     * @return List Of PointValue
+     * @param cmdParameters 读取指令列表
+     * @return 位号值列表
      */
     @PostMapping("/read")
-    public R<List<PointValue>> readPoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters);
+    R<List<PointValue>> read(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters);
 
     /**
-     * 写
+     * 写取位号值
+     * 最多写入 {@link io.github.pnoker.common.constant.common.RequestConstant#DEFAULT_MAX_REQUEST_SIZE RequestConstant.DEFAULT_MAX_REQUEST_SIZE} 个
      *
-     * @param cmdParameters CmdParameter Array
-     * @return Boolean
+     * @param cmdParameters 写入指令列表
+     * @return 是否写入
      */
     @PostMapping("/write")
-    public R<Boolean> writePoint(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters);
+    R<Boolean> write(@Validated(Read.class) @RequestBody ValidatableList<CmdParameter> cmdParameters);
 
 }

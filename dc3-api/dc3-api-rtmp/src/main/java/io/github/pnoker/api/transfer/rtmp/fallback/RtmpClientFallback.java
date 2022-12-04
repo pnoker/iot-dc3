@@ -17,8 +17,10 @@ package io.github.pnoker.api.transfer.rtmp.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.transfer.rtmp.feign.RtmpClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.RtmpServiceConstant;
 import io.github.pnoker.common.dto.RtmpDto;
 import io.github.pnoker.common.model.Rtmp;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -35,40 +37,62 @@ public class RtmpClientFallback implements FallbackFactory<RtmpClient> {
 
     @Override
     public RtmpClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-TRANSFER-RTMP" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(RtmpServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new RtmpClient() {
+
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Rtmp> add(Rtmp rtmp, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Rtmp> update(Rtmp rtmp, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Rtmp> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<Rtmp>> list(RtmpDto rtmpDto, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> start(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> stop(String id) {
                 return R.fail(message);

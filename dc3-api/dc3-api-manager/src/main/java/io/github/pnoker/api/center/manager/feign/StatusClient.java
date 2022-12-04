@@ -39,7 +39,7 @@ public interface StatusClient {
      * 查询 Driver 服务状态
      * ONLINE, OFFLINE
      *
-     * @param driverDto Driver Dto
+     * @param driverDto 驱动和分页参数
      * @param tenantId  租户ID
      * @return Map String:String
      */

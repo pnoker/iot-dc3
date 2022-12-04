@@ -25,6 +25,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
+ * 指令参数
+ *
  * @author pnoker
  * @since 2022.1.0
  */
@@ -33,12 +35,22 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class CmdParameter {
+
+    /**
+     * 设备ID
+     */
     @NotNull(message = "Device id can't be empty", groups = {Read.class, Write.class})
     private String deviceId;
 
+    /**
+     * 位号ID
+     */
     @NotNull(message = "Point id can't be empty", groups = {Read.class, Write.class})
     private String pointId;
 
+    /**
+     * 写入值
+     */
     @NotBlank(message = "Value can't be empty", groups = {Write.class})
     private String value;
 }

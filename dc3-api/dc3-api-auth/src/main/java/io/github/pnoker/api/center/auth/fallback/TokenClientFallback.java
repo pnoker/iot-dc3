@@ -17,6 +17,8 @@ package io.github.pnoker.api.center.auth.fallback;
 import io.github.pnoker.api.center.auth.feign.TokenClient;
 import io.github.pnoker.common.bean.driver.auth.Login;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -33,26 +35,38 @@ public class TokenClientFallback implements FallbackFactory<TokenClient> {
 
     @Override
     public TokenClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-AUTH" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(AuthServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new TokenClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<String> generateSalt(Login login) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<String> generateToken(Login login) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<String> checkTokenValid(Login login) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> cancelToken(Login login) {
                 return R.fail(message);

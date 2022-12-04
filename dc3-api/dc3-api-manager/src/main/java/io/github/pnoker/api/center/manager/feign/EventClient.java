@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface EventClient {
 
     /**
-     * 分页查询 DriverEvent
+     * 模糊分页查询 DriverEvent
      *
      * @param driverEventDto DriverEventDto
      * @return Page Of DriverEvent
@@ -45,7 +45,7 @@ public interface EventClient {
     R<Page<DriverEvent>> driverEvent(@RequestBody(required = false) DriverEventDto driverEventDto);
 
     /**
-     * 分页查询 DeviceEvent
+     * 模糊分页查询 DeviceEvent
      *
      * @param deviceEventDto DeviceEventDto
      * @return Page Of DeviceEvent

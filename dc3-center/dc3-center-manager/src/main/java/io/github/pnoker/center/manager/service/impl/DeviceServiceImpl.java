@@ -63,6 +63,9 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private NotifyService notifyService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Device add(Device device) {
         try {
@@ -79,6 +82,9 @@ public class DeviceServiceImpl implements DeviceService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
@@ -86,6 +92,9 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Device update(Device device) {
         selectById(device.getId());
@@ -114,6 +123,9 @@ public class DeviceServiceImpl implements DeviceService {
         throw new ServiceException("The device update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Device selectById(String id) {
         Device device = deviceMapper.selectById(id);
@@ -123,6 +135,9 @@ public class DeviceServiceImpl implements DeviceService {
         return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Device selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
@@ -135,6 +150,9 @@ public class DeviceServiceImpl implements DeviceService {
         return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Device> selectByDriverId(String driverId) {
         DeviceDto deviceDto = new DeviceDto();
@@ -147,11 +165,17 @@ public class DeviceServiceImpl implements DeviceService {
         return devices;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Device> selectByProfileId(String profileId) {
         return selectByIds(profileBindService.selectDeviceIdsByProfileId(profileId));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Device> selectByIds(Set<String> ids) {
         List<Device> devices = deviceMapper.selectBatchIds(ids);
@@ -162,6 +186,9 @@ public class DeviceServiceImpl implements DeviceService {
         return devices;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<Device> list(DeviceDto deviceDto) {
         if (ObjectUtil.isNull(deviceDto.getPage())) {
@@ -170,6 +197,9 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceMapper.selectPageWithProfile(deviceDto.getPage().convert(), customFuzzyQuery(deviceDto), deviceDto.getProfileId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<Device> fuzzyQuery(DeviceDto deviceDto) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();

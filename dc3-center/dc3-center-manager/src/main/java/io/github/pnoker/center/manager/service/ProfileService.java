@@ -50,7 +50,7 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
     /**
      * 根据 设备Id 查询模版
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Profile Array
      */
     List<Profile> selectByDeviceId(String deviceId);

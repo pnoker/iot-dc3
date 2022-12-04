@@ -27,35 +27,35 @@ import io.github.pnoker.common.dto.DictionaryDto;
 public interface DictionaryService {
 
     /**
-     * 获取驱动字典
+     * 获取驱动字典带分页的列表
      *
-     * @param dictionaryDto DictionaryDto
-     * @return Dictionary Page
+     * @param dictionaryDto 字典和分页参数
+     * @return 带分页的 {@link io.github.pnoker.common.dto.DictionaryDto}
      */
     Page<Dictionary> driverDictionary(DictionaryDto dictionaryDto);
 
     /**
-     * 获取设备字典
+     * 获取设备字典带分页的列表
      *
-     * @param dictionaryDto DictionaryDto
-     * @return Dictionary Page
+     * @param dictionaryDto 字典和分页参数
+     * @return 带分页的 {@link io.github.pnoker.common.dto.DictionaryDto}
      */
     Page<Dictionary> deviceDictionary(DictionaryDto dictionaryDto);
 
     /**
-     * 获取模板字典
+     * 获取模板字典带分页的列表
      *
-     * @param dictionaryDto DictionaryDto
-     * @return Dictionary Page
+     * @param dictionaryDto 字典和分页参数
+     * @return 带分页的 {@link io.github.pnoker.common.dto.DictionaryDto}
      */
     Page<Dictionary> profileDictionary(DictionaryDto dictionaryDto);
 
     /**
-     * 获取位号字典
+     * 带分页的列表
      * profile/device
      *
-     * @param dictionaryDto DictionaryDto
-     * @return Dictionary Page
+     * @param dictionaryDto 字典和分页参数
+     * @return 带分页的 {@link io.github.pnoker.common.dto.DictionaryDto}
      */
     Page<Dictionary> pointDictionary(DictionaryDto dictionaryDto);
 

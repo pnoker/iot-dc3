@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.manager.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DriverInfoClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DriverInfoDto;
 import io.github.pnoker.common.model.DriverInfo;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -37,41 +39,62 @@ public class DriverInfoClientFallback implements FallbackFactory<DriverInfoClien
 
     @Override
     public DriverInfoClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(ManagerServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new DriverInfoClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<DriverInfo> add(DriverInfo driverInfo) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<DriverInfo> update(DriverInfo driverInfo) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<DriverInfo> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<DriverInfo> selectByAttributeIdAndDeviceId(String attributeId, String deviceId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<DriverInfo>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<DriverInfo>> list(DriverInfoDto driverInfoDto) {
                 return R.fail(message);

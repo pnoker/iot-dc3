@@ -30,7 +30,7 @@ public interface TenantService extends Service<Tenant, TenantDto> {
      * 根据租户名查询租户
      *
      * @param name 租户名称
-     * @return Tenant
+     * @return {@link io.github.pnoker.common.model.Tenant}
      */
     Tenant selectByName(String name);
 }

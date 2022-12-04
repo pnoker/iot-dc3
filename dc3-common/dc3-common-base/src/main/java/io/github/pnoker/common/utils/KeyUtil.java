@@ -183,7 +183,7 @@ public class KeyUtil {
     /**
      * 生成Token令牌
      *
-     * @param username User Name
+     * @param username 用户名称
      * @param salt     Salt
      * @param tenantId 租户ID
      * @return Token String
@@ -201,7 +201,7 @@ public class KeyUtil {
     /**
      * 解析Token令牌
      *
-     * @param username User Name
+     * @param username 用户名称
      * @param salt     Salt
      * @param token    Token
      * @param tenantId 租户ID

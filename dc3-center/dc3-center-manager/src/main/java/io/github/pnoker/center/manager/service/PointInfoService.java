@@ -49,7 +49,7 @@ public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
     /**
      * 根据 设备 ID 查询
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return PointInfo Array
      */
     List<PointInfo> selectByDeviceId(String deviceId);
@@ -57,8 +57,8 @@ public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
     /**
      * 根据 设备 ID 、 位号 ID 查询
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
      * @return PointInfo Array
      */
     List<PointInfo> selectByDeviceIdAndPointId(String deviceId, String pointId);
