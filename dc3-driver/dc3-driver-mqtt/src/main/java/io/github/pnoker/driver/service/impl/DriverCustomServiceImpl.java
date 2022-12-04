@@ -54,14 +54,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         // 因为 MQTT 的数据来源是被动接收的，所以无需实现该 Read 方法
         // 接收数据处理函数在 io.github.pnoker.driver.mqtt.handler.MqttReceiveHandler.handlerValue
         return "nil";
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) throws Exception {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) {
         String commandTopic = attribute(pointInfo, "commandTopic");
         String value = values.getValue();
         try {

@@ -150,7 +150,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get driver info map
      *
-     * @param deviceId           Device ID
+     * @param deviceId           设备ID
      * @param driverAttributeMap Driver Attribute Map
      * @return map(attributeName, attributeInfo ( value, type))
      */
@@ -232,7 +232,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get profile  map
      *
-     * @param deviceIds Device ID Set
+     * @param deviceIds 设备ID Set
      * @return map(profileId ( pointId, point))
      */
     public Map<String, Map<String, Point>> getProfilePointMap(Set<String> deviceIds) {

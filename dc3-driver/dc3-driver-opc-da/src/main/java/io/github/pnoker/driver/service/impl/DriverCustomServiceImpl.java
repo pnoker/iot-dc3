@@ -18,11 +18,15 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.enums.StatusEnum;
+import io.github.pnoker.common.exception.ConnectorException;
+import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.common.sdk.utils.DriverUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
@@ -40,7 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
-import static io.github.pnoker.common.sdk.utils.DriverUtil.value;
 
 /**
  * @author pnoker
@@ -58,36 +61,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * Opc Da Server Map
      */
-    private Map<String, Server> serverMap;
+    private Map<String, Server> connectMap;
 
     @Override
     public void initial() {
-        serverMap = new ConcurrentHashMap<>(16);
-    }
-
-    @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        log.debug("Opc Da Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
-        Server server = getServer(device.getId(), driverInfo);
-        try {
-            Item item = getItem(server, pointInfo);
-            return readItem(item);
-        } finally {
-            server.dispose();
-        }
-    }
-
-    @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        log.debug("Opc Da Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(value));
-        Server server = getServer(device.getId(), driverInfo);
-        try {
-            Item item = getItem(server, pointInfo);
-            writeItem(item, value.getType(), value.getValue());
-            return true;
-        } finally {
-            server.dispose();
-        }
+        /*
+        TODO: 仅供参考
+        可自定义实现
+        */
+        connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
@@ -107,28 +89,44 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, StatusEnum.ONLINE));
     }
 
+    @Override
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+        Server server = getConnector(device.getId(), driverInfo);
+        return readValue(server, pointInfo);
+    }
+
+    @Override
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+        Server server = getConnector(device.getId(), driverInfo);
+        return writeValue(server, pointInfo, value);
+    }
+
     /**
      * 获取 Opc Da Server
      *
-     * @param deviceId   Device ID
-     * @param driverInfo Driver Info
+     * @param deviceId   设备ID
+     * @param driverInfo 驱动信息
      * @return Server
-     * @throws JIException          JIException
-     * @throws UnknownHostException UnknownHostException
      */
-    private Server getServer(String deviceId, Map<String, AttributeInfo> driverInfo) throws JIException, UnknownHostException {
-        Server server = serverMap.get(deviceId);
+    private Server getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
+        log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
+        Server server = connectMap.get(deviceId);
         if (null == server) {
-            ConnectionInformation connectionInformation = new ConnectionInformation(attribute(driverInfo, "host"), attribute(driverInfo, "clsId"), attribute(driverInfo, "username"), attribute(driverInfo, "password"));
-            log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(connectionInformation));
+            String host = attribute(driverInfo, "host");
+            String clsId = attribute(driverInfo, "clsId");
+            String user = attribute(driverInfo, "username");
+            String password = attribute(driverInfo, "password");
+            ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
             server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
+            try {
+                server.connect();
+                connectMap.put(deviceId, server);
+            } catch (AlreadyConnectedException | UnknownHostException | JIException e) {
+                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
+                log.error("Connect opc da server error: {}", e.getMessage(), e);
+                throw new ConnectorException(e.getMessage());
+            }
         }
-        try {
-            server.connect();
-        } catch (AlreadyConnectedException ignored) {
-            // nothing to do
-        }
-        serverMap.put(deviceId, server);
         return server;
     }
 
@@ -153,6 +151,25 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             group = server.addGroup(groupName);
         }
         return group.addItem(attribute(pointInfo, "tag"));
+    }
+
+    /**
+     * 获取 OpcDa 值
+     *
+     * @param server    OpcDa Server
+     * @param pointInfo 位号信息
+     * @return Item Value
+     */
+    private String readValue(Server server, Map<String, AttributeInfo> pointInfo) {
+        try {
+            Item item = getItem(server, pointInfo);
+            return readItem(item);
+        } catch (NotConnectedException | JIException | AddFailedException | DuplicateGroupException |
+                 UnknownHostException e) {
+            server.dispose();
+            log.error("Read opc da value error: {}", e.getMessage(), e);
+            throw new ReadPointException(e.getMessage());
+        }
     }
 
     /**
@@ -191,45 +208,62 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
+     * 写入 OpcDa 值
+     *
+     * @param server    OpcDa Server
+     * @param pointInfo 位号信息
+     * @param value     写入值
+     * @return 是否写入
+     */
+    private boolean writeValue(Server server, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+        try {
+            Item item = getItem(server, pointInfo);
+            return writeItem(item, value);
+        } catch (NotConnectedException | AddFailedException | DuplicateGroupException | UnknownHostException |
+                 JIException e) {
+            server.dispose();
+            log.error("Write opc da value error: {}", e.getMessage(), e);
+            throw new WritePointException(e.getMessage());
+        }
+    }
+
+    /**
      * Write Opc Da Item
      *
      * @param item  OpcDa Item
-     * @param type  Value Type
-     * @param value String Value
+     * @param value 写入值
      * @throws JIException OpcDa JIException
      */
-    private void writeItem(Item item, String type, String value) throws JIException {
-        int writeResult = 0;
-
-        PointValueTypeEnum valueType = PointValueTypeEnum.of(type);
+    private boolean writeItem(Item item, AttributeInfo value) throws JIException {
+        PointValueTypeEnum valueType = PointValueTypeEnum.of(value.getType());
         if (ObjectUtil.isNull(valueType)) {
-            throw new IllegalArgumentException("Unsupported type of " + type);
+            throw new IllegalArgumentException("Unsupported type of " + value.getType());
         }
 
-        // TODO 需要为每个驱动定制自己的数据类型列表，而不是公用一个数据列表，这样很不合理
+        int writeResult = 0;
         switch (valueType) {
             case SHORT:
-                short shortValue = value(type, value);
+                short shortValue = DriverUtil.value(value.getType(), value.getValue());
                 writeResult = item.write(new JIVariant(shortValue, false));
                 break;
             case INT:
-                int intValue = value(type, value);
+                int intValue = DriverUtil.value(value.getType(), value.getValue());
                 writeResult = item.write(new JIVariant(intValue, false));
                 break;
             case LONG:
-                long longValue = value(type, value);
+                long longValue = DriverUtil.value(value.getType(), value.getValue());
                 writeResult = item.write(new JIVariant(longValue, false));
                 break;
             case FLOAT:
-                float floatValue = value(type, value);
+                float floatValue = DriverUtil.value(value.getType(), value.getValue());
                 writeResult = item.write(new JIVariant(floatValue, false));
                 break;
             case DOUBLE:
-                double doubleValue = value(type, value);
+                double doubleValue = DriverUtil.value(value.getType(), value.getValue());
                 writeResult = item.write(new JIVariant(doubleValue, false));
                 break;
             case BOOLEAN:
-                boolean booleanValue = value(type, value);
+                boolean booleanValue = DriverUtil.value(value.getType(), value.getValue());
                 writeResult = item.write(new JIVariant(booleanValue, false));
                 break;
             case STRING:
@@ -238,7 +272,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             default:
                 break;
         }
-        log.debug("OpcDa write item result code: {}", writeResult);
+        return writeResult > 0;
     }
 
 }

@@ -18,27 +18,29 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.enums.StatusEnum;
+import io.github.pnoker.common.exception.ConnectorException;
+import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
+import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
 import static io.github.pnoker.common.sdk.utils.DriverUtil.value;
@@ -57,137 +59,180 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
 
-    private Map<String, OpcUaClient> clientMap;
+    private Map<String, OpcUaClient> connectMap;
 
     @Override
     public void initial() {
-        clientMap = new ConcurrentHashMap<>(16);
-    }
-
-    @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        int namespace = attribute(pointInfo, "namespace");
-        String tag = attribute(pointInfo, "tag");
-
-        NodeId nodeId = new NodeId(namespace, tag);
-        CompletableFuture<String> value = new CompletableFuture<>();
-        OpcUaClient client = getOpcUaClient(device.getId(), driverInfo);
-
-        client.connect().get();
-        client.readValue(0.0, TimestampsToReturn.Both, nodeId).thenAccept(dataValue -> {
-            try {
-                value.complete(dataValue.getValue().getValue().toString());
-            } catch (Exception e) {
-                log.error("accept point(ns={};s={}) value error: {}", namespace, tag, e.getMessage());
-            }
-        });
-        String rawValue = value.get(1, TimeUnit.SECONDS);
-        log.debug("read point(ns={};s={}) value: {}", namespace, tag, rawValue);
-        return rawValue;
-
-    }
-
-    @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        writeItem(device.getId(), driverInfo, pointInfo, value);
-        return true;
+        /*
+        TODO: 仅供参考
+        可自定义实现
+        */
+        connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
     public void schedule() {
+        /*
+        TODO:设备状态
+        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，也可以在read中实现设备状态的设置；
+        你可以通过某种判断机制确定设备的状态，然后通过driverService.deviceEventSender接口将设备状态交给SDK管理。
+
+        设备状态（StatusEnum）如下：
+        ONLINE:在线
+        OFFLINE:离线
+        MAINTAIN:维护
+        FAULT:故障
+         */
         driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, StatusEnum.ONLINE));
     }
 
-    /**
-     * Get Opc Ua Client
-     *
-     * @param deviceId   Device ID
-     * @param driverInfo Driver Info
-     * @return OpcUaClient
-     */
-    private OpcUaClient getOpcUaClient(String deviceId, Map<String, AttributeInfo> driverInfo) {
-        OpcUaClient opcUaClient = clientMap.get(deviceId);
-        if (null == opcUaClient) {
-            try {
-                opcUaClient = OpcUaClient.create(
-                        String.format("opc.tcp://%s:%s%s",
-                                attribute(driverInfo, "host"),
-                                attribute(driverInfo, "port"),
-                                attribute(driverInfo, "path")
-                        ),
-                        endpoints -> endpoints.stream().findFirst(),
-                        configBuilder -> configBuilder
-                                .setIdentityProvider(new AnonymousProvider())
-                                .setRequestTimeout(uint(5000))
-                                .build()
-                );
-                clientMap.put(deviceId, opcUaClient);
-            } catch (UaException e) {
-                log.error("get opc ua client error: {}", e.getMessage());
-                clientMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-            }
-        }
-        return clientMap.get(deviceId);
+    @Override
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+        OpcUaClient client = getConnector(device.getId(), driverInfo);
+        return readValue(client, pointInfo);
+
+    }
+
+    @Override
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+        OpcUaClient client = getConnector(device.getId(), driverInfo);
+        return writeValue(client, pointInfo, value);
     }
 
     /**
-     * Write Opc Ua Point Value
+     * 获取 Opc Ua Client
      *
-     * @param deviceId   Device ID
-     * @param driverInfo Driver Info
-     * @param pointInfo  Point Info
-     * @param values     Value Array
+     * @param deviceId   设备ID
+     * @param driverInfo 驱动信息
+     * @return OpcUaClient
      */
-    private void writeItem(String deviceId, Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, AttributeInfo values) {
-        OpcUaClient client;
-        try {
-            int namespace = attribute(pointInfo, "namespace");
-            String tag = attribute(pointInfo, "tag");
-            String type = values.getType();
-            String value = values.getValue();
-
-            PointValueTypeEnum valueType = PointValueTypeEnum.of(type);
-            if (ObjectUtil.isNull(valueType)) {
-                throw new IllegalArgumentException("Unsupported type of " + type);
+    private OpcUaClient getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
+        log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
+        OpcUaClient opcUaClient = connectMap.get(deviceId);
+        if (null == opcUaClient) {
+            String host = attribute(driverInfo, "host");
+            String port = attribute(driverInfo, "port");
+            String path = attribute(driverInfo, "path");
+            String url = String.format("opc.tcp://%s:%s%s", host, port, path);
+            try {
+                opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(), configBuilder -> configBuilder.setIdentityProvider(new AnonymousProvider()).setRequestTimeout(uint(5000)).build());
+                connectMap.put(deviceId, opcUaClient);
+            } catch (UaException e) {
+                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
+                log.error("Connect opc ua client error: {}", e.getMessage(), e);
+                throw new ConnectorException(e.getMessage());
             }
-
-            NodeId nodeId = new NodeId(namespace, tag);
-            client = getOpcUaClient(deviceId, driverInfo);
-            client.connect().get();
-
-            switch (valueType) {
-                case INT:
-                    int intValue = value(type, value);
-                    client.writeValue(nodeId, new DataValue(new Variant(intValue)));
-                    break;
-                case LONG:
-                    long longValue = value(type, value);
-                    client.writeValue(nodeId, new DataValue(new Variant(longValue)));
-                    break;
-                case FLOAT:
-                    float floatValue = value(type, value);
-                    client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
-                    break;
-                case DOUBLE:
-                    double doubleValue = value(type, value);
-                    client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
-                    break;
-                case BOOLEAN:
-                    boolean booleanValue = value(type, value);
-                    client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
-                    break;
-                case STRING:
-                    client.writeValue(nodeId, new DataValue(new Variant(value)));
-                    break;
-                default:
-                    break;
-            }
-        } catch (InterruptedException e) {
-            log.error("Opc Ua Point Write Error: {}", e.getMessage());
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            log.error("Opc Ua Point Write Error: {}", e.getMessage());
         }
+        return opcUaClient;
+    }
+
+    /**
+     * 获取 Opc Ua Item
+     *
+     * @param pointInfo 位号信息
+     * @return OpcUa Node
+     */
+    private NodeId getNode(Map<String, AttributeInfo> pointInfo) {
+        int namespace = attribute(pointInfo, "namespace");
+        String tag = attribute(pointInfo, "tag");
+        return new NodeId(namespace, tag);
+    }
+
+    /**
+     * 获取 OpcUa 值
+     *
+     * @param client    OpcUaClient
+     * @param pointInfo 位号信息
+     * @return Node Value
+     */
+    private String readValue(OpcUaClient client, Map<String, AttributeInfo> pointInfo) {
+        try {
+            NodeId nodeId = getNode(pointInfo);
+            client.connect().get();
+            CompletableFuture<String> value = new CompletableFuture<>();
+            client.readValue(0.0, TimestampsToReturn.Both, nodeId).thenAccept(dataValue -> value.complete(dataValue.getValue().getValue().toString()));
+            return value.get(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            log.error("Read opc ua value error: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw new ReadPointException(e.getMessage());
+        } catch (ExecutionException | TimeoutException e) {
+            log.error("Read opc ua value error: {}", e.getMessage(), e);
+            throw new ReadPointException(e.getMessage());
+        }
+    }
+
+    /**
+     * 写入 OpcUa 值
+     *
+     * @param pointInfo 位号信息
+     * @param value     写入值
+     */
+    private boolean writeValue(OpcUaClient client, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+        try {
+            NodeId nodeId = getNode(pointInfo);
+
+            client.connect().get();
+            return writeNode(client, nodeId, value);
+        } catch (InterruptedException e) {
+            log.error("Write opc ua value error: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            throw new WritePointException(e.getMessage());
+        } catch (ExecutionException e) {
+            log.error("Write opc ua value error: {}", e.getMessage(), e);
+            throw new WritePointException(e.getMessage());
+        }
+    }
+
+    /**
+     * Write Opc Ua Node
+     *
+     * @param client OpcUaClient
+     * @param nodeId OpcUa Node
+     * @param value  写入值
+     * @return 是否写入
+     * @throws ExecutionException   ExecutionException
+     * @throws InterruptedException InterruptedException
+     */
+    private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeInfo value) throws ExecutionException, InterruptedException {
+        PointValueTypeEnum valueType = PointValueTypeEnum.of(value.getType());
+        if (ObjectUtil.isNull(valueType)) {
+            throw new IllegalArgumentException("Unsupported type of " + value.getType());
+        }
+
+        CompletableFuture<StatusCode> status = new CompletableFuture<>();
+        switch (valueType) {
+            case INT:
+                int intValue = value(value.getType(), value.getValue());
+                status = client.writeValue(nodeId, new DataValue(new Variant(intValue)));
+                break;
+            case LONG:
+                long longValue = value(value.getType(), value.getValue());
+                status = client.writeValue(nodeId, new DataValue(new Variant(longValue)));
+                break;
+            case FLOAT:
+                float floatValue = value(value.getType(), value.getValue());
+                status = client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
+                break;
+            case DOUBLE:
+                double doubleValue = value(value.getType(), value.getValue());
+                status = client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
+                break;
+            case BOOLEAN:
+                boolean booleanValue = value(value.getType(), value.getValue());
+                status = client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
+                break;
+            case STRING:
+                status = client.writeValue(nodeId, new DataValue(new Variant(value.getValue())));
+                break;
+            default:
+                break;
+        }
+
+        if (null != status && null != status.get()) {
+            return status.get().getValue() > 0;
+        }
+        return false;
     }
 
 }

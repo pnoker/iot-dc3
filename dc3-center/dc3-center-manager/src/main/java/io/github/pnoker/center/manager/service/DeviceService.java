@@ -57,7 +57,7 @@ public interface DeviceService extends Service<Device, DeviceDto> {
     /**
      * 根据 设备Id集 查询设备
      *
-     * @param ids Device ID Set
+     * @param ids 设备ID Set
      * @return Device Array
      */
     List<Device> selectByIds(Set<String> ids);

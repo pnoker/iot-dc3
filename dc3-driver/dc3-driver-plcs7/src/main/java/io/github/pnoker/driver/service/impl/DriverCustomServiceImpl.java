@@ -73,7 +73,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         log.debug("Plc S7 Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
         myS7Connector.lock.writeLock().lock();
@@ -91,7 +91,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
         log.debug("Plc S7 Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(value));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
         myS7Connector.lock.writeLock().lock();
@@ -130,7 +130,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 获取 plcs7 serializer
      * 先从缓存中取，没有就新建
      *
-     * @param deviceId   Device ID
+     * @param deviceId   设备ID
      * @param driverInfo DeviceInfo Map
      * @return S7Serializer
      */

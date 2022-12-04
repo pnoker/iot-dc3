@@ -118,10 +118,10 @@ services:
       - 8300:8300
     environment:
       - NODE_ENV=prod
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
+      - DB_HOST=dc3-mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=dc3
@@ -154,10 +154,10 @@ services:
       - 8400:8400
     environment:
       - NODE_ENV=prod
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
+      - DB_HOST=dc3-mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=dc3
@@ -201,10 +201,10 @@ services:
       - 8500:8500
     environment:
       - NODE_ENV=prod
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
+      - DB_HOST=dc3-mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=dc3
@@ -512,10 +512,10 @@ services:
       - 8803:8803
     environment:
       - NODE_ENV=prod
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
+      - DB_HOST=dc3-mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=dc3

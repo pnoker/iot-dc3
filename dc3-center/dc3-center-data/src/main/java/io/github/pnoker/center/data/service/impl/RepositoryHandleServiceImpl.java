@@ -124,7 +124,7 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
     /**
      * 保存 PointValues 到指定存储服务
      *
-     * @param deviceId           Device ID
+     * @param deviceId           设备ID
      * @param pointValues        PointValue Array
      * @param repositoryServices RepositoryService Array
      */

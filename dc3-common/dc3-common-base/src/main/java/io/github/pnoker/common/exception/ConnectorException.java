@@ -12,24 +12,18 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.monitor;
+package io.github.pnoker.common.exception;
 
-import de.codecentric.boot.admin.server.config.EnableAdminServer;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import cn.hutool.core.text.CharSequenceUtil;
 
 /**
- * 服务监控中心
+ * 自定义 连接器 异常
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@SpringBootApplication
-@EnableAdminServer
-public class MonitorApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(MonitorApplication.class, args);
+public class ConnectorException extends RuntimeException {
+    public ConnectorException(CharSequence template, Object... params) {
+        super(CharSequenceUtil.format(template, params));
     }
-
 }
