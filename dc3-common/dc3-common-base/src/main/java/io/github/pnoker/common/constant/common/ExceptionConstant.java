@@ -30,4 +30,9 @@ public class ExceptionConstant {
      * 公共类实例化错误提示
      */
     public static final String UTILITY_CLASS = "Utility class";
+
+    /**
+     * 没有可用的服务
+     */
+    public static final String NO_AVAILABLE_SERVER = "No available server for client";
 }

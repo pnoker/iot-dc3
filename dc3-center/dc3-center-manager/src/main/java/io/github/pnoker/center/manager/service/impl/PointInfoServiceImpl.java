@@ -53,6 +53,9 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Resource
     private PointService pointService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointInfo add(PointInfo pointInfo) {
         try {
@@ -66,12 +69,18 @@ public class PointInfoServiceImpl implements PointInfoService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return pointInfoMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointInfo update(PointInfo pointInfo) {
         PointInfo old = selectById(pointInfo.getId());
@@ -92,6 +101,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         throw new ServiceException("The point info update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointInfo selectById(String id) {
         PointInfo pointInfo = pointInfoMapper.selectById(id);
@@ -101,6 +113,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         return pointInfo;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointInfo selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
@@ -114,6 +129,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         return pointInfo;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<PointInfo> selectByAttributeId(String pointAttributeId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
@@ -125,6 +143,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         return pointInfos;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<PointInfo> selectByDeviceId(String deviceId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
@@ -139,6 +160,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         return pointInfos;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<PointInfo> selectByDeviceIdAndPointId(String deviceId, String pointId) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
@@ -151,6 +175,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         return pointInfos;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<PointInfo> list(PointInfoDto pointInfoDto) {
         if (ObjectUtil.isNull(pointInfoDto.getPage())) {
@@ -159,6 +186,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         return pointInfoMapper.selectPage(pointInfoDto.getPage().convert(), fuzzyQuery(pointInfoDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<PointInfo> fuzzyQuery(PointInfoDto pointInfoDto) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();

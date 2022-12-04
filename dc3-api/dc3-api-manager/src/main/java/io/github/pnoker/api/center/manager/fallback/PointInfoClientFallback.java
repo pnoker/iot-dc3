@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.manager.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointInfoClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.PointInfoDto;
 import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -37,46 +39,70 @@ public class PointInfoClientFallback implements FallbackFactory<PointInfoClient>
 
     @Override
     public PointInfoClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(ManagerServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new PointInfoClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointInfo> add(PointInfo pointInfo) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointInfo> update(PointInfo pointInfo) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointInfo> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(String attributeId, String deviceId, String pointId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<PointInfo>> selectByDeviceIdAndPointId(String deviceId, String pointId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<PointInfo>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<PointInfo>> list(PointInfoDto pointInfoDto) {
                 return R.fail(message);

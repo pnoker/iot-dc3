@@ -15,9 +15,9 @@
 package io.github.pnoker.common.model;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -42,7 +42,9 @@ import java.util.Set;
 public class Device extends BaseModel {
 
     @NotBlank(message = "name can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid name,contains invalid characters or length is not in the range of 2~32", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid name,contains invalid characters or length is not in the range of 2~32",
+            groups = {Insert.class, Update.class})
     private String name;
 
     /**
@@ -56,7 +58,8 @@ public class Device extends BaseModel {
     @TableField(exist = false)
     private Set<String> profileIds = new HashSet<>(8);
 
-    @NotNull(message = "driver id can't be empty", groups = {Insert.class, Update.class})
+    @NotNull(message = "driver id can't be empty",
+            groups = {Insert.class, Update.class})
     private String driverId;
 
     // TODO 后期再实现分组，先放着占个坑 @NotNull(message = "group id can't be empty", groups = {Insert.class, Update.class})

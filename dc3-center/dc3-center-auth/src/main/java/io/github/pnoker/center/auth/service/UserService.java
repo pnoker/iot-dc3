@@ -29,7 +29,7 @@ public interface UserService extends Service<User, UserDto> {
     /**
      * 根据用户名查询用户
      *
-     * @param name User Name
+     * @param name 用户名称
      * @param isEx Throw Exception
      * @return User
      */
@@ -56,7 +56,7 @@ public interface UserService extends Service<User, UserDto> {
     /**
      * 根据用户名判断用户是否存在
      *
-     * @param name User Name
+     * @param name 用户名称
      * @return boolean
      */
     boolean checkUserValid(String name);

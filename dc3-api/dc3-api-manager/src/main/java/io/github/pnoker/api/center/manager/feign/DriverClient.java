@@ -53,8 +53,8 @@ public interface DriverClient {
     /**
      * 根据 ID 删除 Driver
      *
-     * @param id Driver ID
-     * @return Boolean
+     * @param id 驱动ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -72,7 +72,7 @@ public interface DriverClient {
     /**
      * 根据 ID 查询 Driver
      *
-     * @param id Driver ID
+     * @param id 驱动ID
      * @return Driver
      */
     @GetMapping("/id/{id}")
@@ -109,7 +109,7 @@ public interface DriverClient {
     R<Driver> selectByHostPort(@NotNull @PathVariable(value = "type") String type, @NotNull @PathVariable(value = "host") String host, @NotNull @PathVariable(value = "port") Integer port, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
-     * 分页查询 Driver
+     * 模糊分页查询 Driver
      *
      * @param driverDto Driver Dto
      * @param tenantId  租户ID

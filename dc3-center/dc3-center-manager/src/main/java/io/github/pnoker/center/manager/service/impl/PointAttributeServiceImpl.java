@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -46,6 +46,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Resource
     private PointAttributeMapper pointAttributeMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointAttribute add(PointAttribute pointAttribute) {
         try {
@@ -59,12 +62,18 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return pointAttributeMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointAttribute update(PointAttribute pointAttribute) {
         selectById(pointAttribute.getId());
@@ -77,6 +86,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         throw new ServiceException("The point attribute update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointAttribute selectById(String id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
@@ -86,6 +98,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         return pointAttribute;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointAttribute selectByNameAndDriverId(String name, String driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
@@ -98,6 +113,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         return pointAttribute;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<PointAttribute> selectByDriverId(String driverId) {
         PointAttributeDto pointAttributeDto = new PointAttributeDto();
@@ -109,6 +127,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         return pointAttributes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<PointAttribute> list(PointAttributeDto pointAttributeDto) {
         if (ObjectUtil.isNull(pointAttributeDto.getPage())) {
@@ -117,6 +138,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         return pointAttributeMapper.selectPage(pointAttributeDto.getPage().convert(), fuzzyQuery(pointAttributeDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();

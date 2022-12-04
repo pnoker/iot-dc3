@@ -37,67 +37,67 @@ import javax.validation.constraints.NotNull;
 public interface RtmpClient {
 
     /**
-     * 新增 Rtmp
+     * 新增转码任务
      *
-     * @param rtmp     Rtmp
+     * @param rtmp     转码任务
      * @param tenantId 租户ID
-     * @return R Of Rtmp
+     * @return {@link io.github.pnoker.common.dto.RtmpDto}
      */
     @PostMapping("/add")
     R<Rtmp> add(@Validated @RequestBody Rtmp rtmp, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
-     * 根据 ID 删除 Rtmp
+     * 根据 ID 删除转码任务
      *
-     * @param id rtmpId
+     * @param id 任务ID
      * @return R Of Boolean
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 修改 Rtmp
+     * 修改转码任务
      *
-     * @param rtmp     Rtmp
+     * @param rtmp     转码任务
      * @param tenantId 租户ID
-     * @return Rtmp
+     * @return {@link io.github.pnoker.common.dto.RtmpDto}
      */
     @PostMapping("/update")
     R<Rtmp> update(@RequestBody Rtmp rtmp, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
-     * 根据 ID 查询 Rtmp
+     * 根据 ID 查询转码任务
      *
-     * @param id Rtmp ID
-     * @return Rtmp
+     * @param id 任务ID
+     * @return {@link io.github.pnoker.common.dto.RtmpDto}
      */
     @GetMapping("/id/{id}")
     R<Rtmp> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 分页查询 Rtmp
+     * 模糊分页查询转码任务
      *
-     * @param rtmpDto  Rtmp Dto
+     * @param rtmpDto  转码任务和分页参数
      * @param tenantId 租户ID
-     * @return Page Of Rtmp
+     * @return 带分页的 {@link io.github.pnoker.common.dto.RtmpDto}
      */
     @PostMapping("/list")
     R<Page<Rtmp>> list(@RequestBody(required = false) RtmpDto rtmpDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
-     * 启动 Rtmp 转码任务
+     * 启动转码任务
      *
-     * @param id Rtmp ID
-     * @return Boolean
+     * @param id 任务ID
+     * @return 是否启动
      */
     @PostMapping("/start/{id}")
     R<Boolean> start(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 停止 Rtmp 转码任务
+     * 停止转码任务
      *
-     * @param id Rtmp ID
-     * @return Boolean
+     * @param id 任务ID
+     * @return 是否停止
      */
     @PostMapping("/stop/{id}")
     R<Boolean> stop(@NotNull @PathVariable(value = "id") String id);

@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.manager.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.ProfileClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.ProfileDto;
 import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -39,41 +41,62 @@ public class ProfileClientFallback implements FallbackFactory<ProfileClient> {
 
     @Override
     public ProfileClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(ManagerServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new ProfileClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Profile> add(Profile profile, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Profile> update(Profile profile, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Profile> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Map<String, Profile>> selectByIds(Set<String> profileIds) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<Profile>> selectByDeviceId(String deviceId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<Profile>> list(ProfileDto profileDto, String tenantId) {
                 return R.fail(message);

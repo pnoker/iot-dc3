@@ -18,6 +18,8 @@ import io.github.pnoker.api.transfer.rtmp.feign.DriverCommandClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.driver.command.CmdParameter;
 import io.github.pnoker.common.bean.point.PointValue;
+import io.github.pnoker.common.constant.service.DriverServiceConstant;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import io.github.pnoker.common.valid.ValidatableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -37,19 +39,25 @@ public class DriverCommandFallback implements FallbackFactory<DriverCommandClien
 
     @Override
     public DriverCommandClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-DRIVER" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(DriverServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
 
         return new DriverCommandClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public R<List<PointValue>> readPoint(ValidatableList<CmdParameter> cmdParameters) {
+            public R<List<PointValue>> read(ValidatableList<CmdParameter> cmdParameters) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public R<Boolean> writePoint(ValidatableList<CmdParameter> cmdParameters) {
+            public R<Boolean> write(ValidatableList<CmdParameter> cmdParameters) {
                 return R.fail(message);
             }
         };

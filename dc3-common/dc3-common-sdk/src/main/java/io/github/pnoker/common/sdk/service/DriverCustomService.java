@@ -58,7 +58,7 @@ public interface DriverCustomService {
      * @param pointInfo  Point Attribute Info
      * @param device     Device
      * @param value      Value Attribute Info
-     * @return Boolean Boolean
+     * @return Boolean 是否写入
      * @throws Exception Exception
      */
     Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception;

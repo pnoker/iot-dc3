@@ -53,8 +53,8 @@ public interface DeviceClient {
     /**
      * 根据 ID 删除 Device
      *
-     * @param id Device ID
-     * @return Boolean
+     * @param id 设备ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -72,7 +72,7 @@ public interface DeviceClient {
     /**
      * 根据 ID 查询 Device
      *
-     * @param id Device ID
+     * @param id 设备ID
      * @return Device
      */
     @GetMapping("/id/{id}")
@@ -88,10 +88,10 @@ public interface DeviceClient {
     R<Map<String, Device>> selectByIds(@RequestBody Set<String> deviceIds);
 
     /**
-     * 分页查询 Device
+     * 模糊分页查询 Device
      *
      * @param tenantId  租户ID
-     * @param deviceDto Device Dto
+     * @param deviceDto 设备和分页参数
      * @return Page Of Device
      */
     @PostMapping("/list")

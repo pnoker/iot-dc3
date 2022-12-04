@@ -38,21 +38,31 @@ import javax.validation.constraints.Pattern;
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseModel {
 
-    @NotBlank(message = "Name can't be empty", groups = {Insert.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$", message = "Invalid name , /^[a-zA-Z]\\w{2,15}$/", groups = {Insert.class})
+    @NotBlank(message = "Name can't be empty",
+            groups = {Insert.class, Auth.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{2,15}$",
+            message = "Invalid name , /^[a-zA-Z]\\w{2,15}$/",
+            groups = {Insert.class})
     private String name;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Pattern(regexp = "^1([3-9])\\d{9}$", message = "Invalid phone , /^1([3-9])\\d{9}$/", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^1([3-9])\\d{9}$",
+            message = "Invalid phone , /^1([3-9])\\d{9}$/",
+            groups = {Insert.class, Update.class})
     private String phone;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Pattern(regexp = "^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", message = "Invalid email , /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$/", groups = {Insert.class, Update.class})
+    @Pattern(regexp = "^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$",
+            message = "Invalid email , /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$/",
+            groups = {Insert.class, Update.class})
     private String email;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    @NotBlank(message = "Password can't be empty", groups = {Insert.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "Invalid password , /^[a-zA-Z]\\w{7,15}$/", groups = {Insert.class, Update.class})
+    @NotBlank(message = "Password can't be empty",
+            groups = {Insert.class, Auth.class})
+    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$",
+            message = "Invalid password , /^[a-zA-Z]\\w{7,15}$/",
+            groups = {Insert.class, Update.class})
     private String password;
 
     private Boolean enable;

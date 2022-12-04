@@ -51,7 +51,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
     /**
      * 根据 驱动Id 查询 驱动
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Driver
      */
     Driver selectByDeviceId(String deviceId);

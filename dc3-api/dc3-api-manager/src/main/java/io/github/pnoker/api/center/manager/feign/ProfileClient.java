@@ -54,8 +54,8 @@ public interface ProfileClient {
     /**
      * 根据 ID 删除 Profile
      *
-     * @param id profile ID
-     * @return Boolean
+     * @param id 模板ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -73,7 +73,7 @@ public interface ProfileClient {
     /**
      * 根据 ID 查询 Profile
      *
-     * @param id Profile ID
+     * @param id 模板ID
      * @return Profile
      */
     @GetMapping("/id/{id}")
@@ -91,14 +91,14 @@ public interface ProfileClient {
     /**
      * 根据 设备 ID 查询 Profile 集合
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Profile Array
      */
     @GetMapping("/device_id/{deviceId}")
     R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
-     * 分页查询 Profile
+     * 模糊分页查询 Profile
      *
      * @param profileDto Profile Dto
      * @param tenantId   租户ID

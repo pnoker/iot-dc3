@@ -50,6 +50,9 @@ public class AutoServiceImpl implements AutoService {
     @Resource
     private NotifyService notifyService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, String driverId, String tenantId) {
         // 新增设备

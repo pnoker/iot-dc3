@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -59,12 +59,18 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return driverInfoMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverInfo update(DriverInfo driverInfo) {
         DriverInfo oldDriverInfo = selectById(driverInfo.getId());
@@ -85,6 +91,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         throw new ServiceException("The driver info update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverInfo selectById(String id) {
         DriverInfo driverInfo = driverInfoMapper.selectById(id);
@@ -94,6 +103,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         return driverInfo;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverInfo selectByAttributeIdAndDeviceId(String driverAttributeId, String deviceId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
@@ -106,6 +118,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         return driverInfo;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DriverInfo> selectByAttributeId(String driverAttributeId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
@@ -117,6 +132,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         return driverInfos;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DriverInfo> selectByDeviceId(String deviceId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
@@ -128,6 +146,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         return driverInfos;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<DriverInfo> list(DriverInfoDto driverInfoDto) {
         if (ObjectUtil.isNull(driverInfoDto.getPage())) {
@@ -136,6 +157,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         return driverInfoMapper.selectPage(driverInfoDto.getPage().convert(), fuzzyQuery(driverInfoDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();

@@ -35,27 +35,27 @@ import java.util.List;
 public interface DictionaryClient {
 
     /**
-     * 查询租户 Dictionary
+     * 查询租户字典列表
      *
-     * @return List Of Dictionary
+     * @return 字典列表
      */
     @GetMapping("/tenant")
     R<List<Dictionary>> tenantDictionary();
 
     /**
-     * 查询用户 Dictionary
+     * 查询用户字典列表
      *
      * @param tenantId 租户ID
-     * @return List Of Dictionary
+     * @return 字典列表
      */
     @GetMapping("/user")
     R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
-     * 查询 Ip 黑名单 Dictionary
+     * 查询 Ip 黑名单字典列表
      *
      * @param tenantId 租户ID
-     * @return List Of Dictionary
+     * @return 字典列表
      */
     @GetMapping("/black_ip")
     R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

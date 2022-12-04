@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.manager.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointAttributeClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.PointAttributeDto;
 import io.github.pnoker.common.model.PointAttribute;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -38,36 +40,54 @@ public class PointAttributeClientFallback implements FallbackFactory<PointAttrib
 
     @Override
     public PointAttributeClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(ManagerServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new PointAttributeClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointAttribute> add(PointAttribute pointAttribute) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointAttribute> update(PointAttribute pointAttribute) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointAttribute> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<List<PointAttribute>> selectByDriverId(@NotNull String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<PointAttribute>> list(PointAttributeDto pointAttributeDto) {
                 return R.fail(message);

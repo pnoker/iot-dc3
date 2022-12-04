@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -46,6 +46,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Resource
     private DriverAttributeMapper driverAttributeMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverAttribute add(DriverAttribute driverAttribute) {
         try {
@@ -59,12 +62,18 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return driverAttributeMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverAttribute update(DriverAttribute driverAttribute) {
         selectById(driverAttribute.getId());
@@ -77,6 +86,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         throw new ServiceException("The driver attribute update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverAttribute selectById(String id) {
         DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
@@ -86,6 +98,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttribute;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DriverAttribute selectByNameAndDriverId(String name, String driverId) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
@@ -98,6 +113,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttribute;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DriverAttribute> selectByDriverId(String driverId) {
         DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
@@ -109,6 +127,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttributes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<DriverAttribute> list(DriverAttributeDto driverAttributeDto) {
         if (null == driverAttributeDto.getPage()) {
@@ -117,6 +138,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttributeMapper.selectPage(driverAttributeDto.getPage().convert(), fuzzyQuery(driverAttributeDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();

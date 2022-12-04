@@ -53,8 +53,8 @@ public interface DriverInfoClient {
     /**
      * 根据 ID 删除 DriverInfo
      *
-     * @param id DriverInfo ID
-     * @return Boolean
+     * @param id 驱动信息ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -71,7 +71,7 @@ public interface DriverInfoClient {
     /**
      * 根据 ID 查询 DriverInfo
      *
-     * @param id DriverInfo ID
+     * @param id 驱动信息ID
      * @return DriverInfo
      */
     @GetMapping("/id/{id}")
@@ -90,14 +90,14 @@ public interface DriverInfoClient {
     /**
      * 根据 设备ID 查询 DriverInfo
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return DriverInfo Array
      */
     @GetMapping("/device_id/{deviceId}")
     R<List<DriverInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
-     * 分页查询 DriverInfo
+     * 模糊分页查询 DriverInfo
      *
      * @param driverInfoDto DriverInfo Dto
      * @return Page Of DriverInfo

@@ -128,7 +128,7 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 检测用户登录限制，返回该用户是否受限
      *
-     * @param username User Name
+     * @param username 用户名称
      * @param tenantId 租户ID
      */
     private void checkUserLimit(String username, String tenantId) {
@@ -147,7 +147,7 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 更新用户登录限制
      *
-     * @param username   User Name
+     * @param username   用户名称
      * @param tenantId   租户ID
      * @param expireTime Expire Time
      * @return UserLimit

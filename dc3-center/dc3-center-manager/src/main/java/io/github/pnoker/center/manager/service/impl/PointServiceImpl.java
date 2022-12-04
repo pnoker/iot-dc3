@@ -56,6 +56,9 @@ public class PointServiceImpl implements PointService {
     @Resource
     private ProfileBindService profileBindService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Point add(Point point) {
         try {
@@ -69,12 +72,18 @@ public class PointServiceImpl implements PointService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return pointMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Point update(Point point) {
         Point old = selectById(point.getId());
@@ -95,6 +104,9 @@ public class PointServiceImpl implements PointService {
         throw new ServiceException("The point update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Point selectById(String id) {
         Point point = pointMapper.selectById(id);
@@ -104,6 +116,9 @@ public class PointServiceImpl implements PointService {
         return point;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Point> selectByIds(Set<String> ids) {
         List<Point> devices = pointMapper.selectBatchIds(ids);
@@ -113,6 +128,9 @@ public class PointServiceImpl implements PointService {
         return devices;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Point selectByNameAndProfileId(String name, String profileId) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
@@ -125,12 +143,18 @@ public class PointServiceImpl implements PointService {
         return point;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Point> selectByDeviceId(String deviceId) {
         Set<String> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
         return selectByProfileIds(profileIds);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Point> selectByProfileId(String profileId) {
         PointDto pointDto = new PointDto();
@@ -142,6 +166,9 @@ public class PointServiceImpl implements PointService {
         return points;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Point> selectByProfileIds(Set<String> profileIds) {
         List<Point> points = new ArrayList<>(16);
@@ -159,6 +186,9 @@ public class PointServiceImpl implements PointService {
         return points;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<Point> list(PointDto pointDto) {
         if (ObjectUtil.isNull(pointDto.getPage())) {
@@ -167,12 +197,18 @@ public class PointServiceImpl implements PointService {
         return pointMapper.selectPageWithDevice(pointDto.getPage().convert(), customFuzzyQuery(pointDto), pointDto.getDeviceId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> unit(Set<String> pointIds) {
         List<Point> points = pointMapper.selectBatchIds(pointIds);
         return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<Point> fuzzyQuery(PointDto pointDto) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();

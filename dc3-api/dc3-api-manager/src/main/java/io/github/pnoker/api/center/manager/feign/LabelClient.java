@@ -51,8 +51,8 @@ public interface LabelClient {
     /**
      * 根据 ID 删除 Label
      *
-     * @param id Label ID
-     * @return Boolean
+     * @param id 标签ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -70,14 +70,14 @@ public interface LabelClient {
     /**
      * 根据 ID 查询 Label
      *
-     * @param id Label ID
+     * @param id 标签ID
      * @return Label
      */
     @GetMapping("/id/{id}")
     R<Label> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 分页查询 Label
+     * 模糊分页查询 Label
      *
      * @param labelDto Label Dto
      * @param tenantId 租户ID

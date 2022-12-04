@@ -40,19 +40,19 @@ public interface PointValueClient {
     /**
      * 查询最新 PointValue 集合
      *
-     * @param pointValueDto PointValueDto
+     * @param pointValueDto 位号值和分页参数
      * @param tenantId      租户ID
-     * @return Page Of PointValue
+     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
      */
     @PostMapping("/latest")
     R<Page<PointValue>> latest(@RequestBody PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
 
     /**
-     * 分页查询 PointValue
+     * 模糊分页查询 PointValue
      *
-     * @param pointValueDto PointValueDto
+     * @param pointValueDto 位号值和分页参数
      * @param tenantId      租户ID
-     * @return Page Of PointValue
+     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
      */
     @PostMapping("/list")
     R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

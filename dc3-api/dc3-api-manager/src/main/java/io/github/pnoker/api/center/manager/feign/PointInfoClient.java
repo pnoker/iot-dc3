@@ -53,8 +53,8 @@ public interface PointInfoClient {
     /**
      * 根据 ID 删除 PointInfo
      *
-     * @param id PointInfo ID
-     * @return Boolean
+     * @param id 位号信息ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -71,7 +71,7 @@ public interface PointInfoClient {
     /**
      * 根据 ID 查询 PointInfo
      *
-     * @param id PointInfo ID
+     * @param id 位号信息ID
      * @return PointInfo
      */
     @GetMapping("/id/{id}")
@@ -91,8 +91,8 @@ public interface PointInfoClient {
     /**
      * 根据 设备ID 和 位号ID 查询 PointInfo
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
@@ -101,14 +101,14 @@ public interface PointInfoClient {
     /**
      * 根据 设备ID 查询 PointInfo
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}")
     R<List<PointInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId);
 
     /**
-     * 分页查询 PointInfo
+     * 模糊分页查询 PointInfo
      *
      * @param pointInfoDto PointInfo Dto
      * @return Page Of PointInfo

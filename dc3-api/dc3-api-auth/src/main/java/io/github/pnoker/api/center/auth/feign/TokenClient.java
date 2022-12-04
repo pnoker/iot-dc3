@@ -15,8 +15,8 @@
 package io.github.pnoker.api.center.auth.feign;
 
 import io.github.pnoker.api.center.auth.fallback.TokenClientFallback;
-import io.github.pnoker.common.bean.driver.auth.Login;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.bean.driver.auth.Login;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Check;
@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface TokenClient {
 
     /**
-     * 生成用户随机 Salt
+     * 生成用户随机盐值
      *
-     * @param login Login
-     * @return String
+     * @param login 登录信息
+     * @return 盐值
      */
     @PostMapping("/salt")
     R<String> generateSalt(@Validated(Update.class) @RequestBody Login login);
@@ -47,8 +47,8 @@ public interface TokenClient {
     /**
      * 生成用户 Token 令牌
      *
-     * @param login Login
-     * @return String
+     * @param login 登录信息
+     * @return Token 令牌
      */
     @PostMapping("/generate")
     R<String> generateToken(@Validated(Auth.class) @RequestBody Login login);
@@ -56,8 +56,8 @@ public interface TokenClient {
     /**
      * 检测用户 Token 令牌是否有效
      *
-     * @param login Login
-     * @return Boolean
+     * @param login 登录信息
+     * @return 如果有效，返回过期时间
      */
     @PostMapping("/check")
     R<String> checkTokenValid(@Validated(Check.class) @RequestBody Login login);
@@ -65,8 +65,8 @@ public interface TokenClient {
     /**
      * 注销用户的Token令牌
      *
-     * @param login Login
-     * @return Boolean
+     * @param login 登录信息
+     * @return 是否注销
      */
     @PostMapping("/cancel")
     R<Boolean> cancelToken(@Validated(Update.class) @RequestBody Login login);

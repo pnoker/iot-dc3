@@ -54,8 +54,8 @@ public interface PointClient {
     /**
      * 根据 ID 删除 Point
      *
-     * @param id Point ID
-     * @return Boolean
+     * @param id 位号ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -73,7 +73,7 @@ public interface PointClient {
     /**
      * 根据 ID 查询 Point
      *
-     * @param id Point ID
+     * @param id 位号ID
      * @return Point
      */
     @GetMapping("/id/{id}")
@@ -91,7 +91,7 @@ public interface PointClient {
     /**
      * 根据 设备 ID 查询 Point
      *
-     * @param deviceId Device ID
+     * @param deviceId 设备ID
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
@@ -107,7 +107,7 @@ public interface PointClient {
     R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") String profileId);
 
     /**
-     * 分页查询 Point
+     * 模糊分页查询 Point
      *
      * @param pointDto Point Dto
      * @param tenantId 租户ID

@@ -48,6 +48,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Resource
     private ProfileBindMapper profileBindMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ProfileBind add(ProfileBind profileBind) {
         try {
@@ -61,12 +64,18 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean delete(String id) {
         selectById(id);
         return profileBindMapper.deleteById(id) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean deleteByDeviceId(String deviceId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
@@ -74,6 +83,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
@@ -82,6 +94,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ProfileBind update(ProfileBind profileBind) {
         selectById(profileBind.getId());
@@ -92,6 +107,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         throw new ServiceException("The profile bind update failed");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ProfileBind selectById(String id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
@@ -101,6 +119,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBind;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ProfileBind selectByDeviceIdAndProfileId(String deviceId, String profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
@@ -113,6 +134,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBind;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> selectDeviceIdsByProfileId(String profileId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
@@ -121,6 +145,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBinds.stream().map(ProfileBind::getDeviceId).collect(Collectors.toSet());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> selectProfileIdsByDeviceId(String deviceId) {
         ProfileBindDto profileBindDto = new ProfileBindDto();
@@ -129,6 +156,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBinds.stream().map(ProfileBind::getProfileId).collect(Collectors.toSet());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Page<ProfileBind> list(ProfileBindDto profileBindDto) {
         if (ObjectUtil.isNull(profileBindDto.getPage())) {
@@ -137,6 +167,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindMapper.selectPage(profileBindDto.getPage().convert(), fuzzyQuery(profileBindDto));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindDto profileBindDto) {
         LambdaQueryWrapper<ProfileBind> queryWrapper = Wrappers.<ProfileBind>query().lambda();

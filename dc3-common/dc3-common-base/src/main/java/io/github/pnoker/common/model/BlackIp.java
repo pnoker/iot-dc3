@@ -36,7 +36,9 @@ import javax.validation.constraints.Pattern;
 public class BlackIp extends BaseModel {
 
     @NotBlank(message = "Ip can't be empty", groups = {Insert.class})
-    @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$", message = "Invalid ip , /^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$/", groups = {Insert.class})
+    @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
+            message = "Invalid ip , /^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$/",
+            groups = {Insert.class})
     private String ip;
     private Boolean enable;
 }

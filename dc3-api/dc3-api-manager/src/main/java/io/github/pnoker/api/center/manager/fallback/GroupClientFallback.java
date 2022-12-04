@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.manager.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.GroupClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.GroupDto;
 import io.github.pnoker.common.model.Group;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -35,31 +37,46 @@ public class GroupClientFallback implements FallbackFactory<GroupClient> {
 
     @Override
     public GroupClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(ManagerServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new GroupClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Group> add(Group group, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Group> update(Group group, String tenantId) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Group> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<Group>> list(GroupDto groupDto, String tenantId) {
                 return R.fail(message);

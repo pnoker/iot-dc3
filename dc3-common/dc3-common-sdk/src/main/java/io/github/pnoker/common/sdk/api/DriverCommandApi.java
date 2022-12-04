@@ -45,8 +45,11 @@ public class DriverCommandApi implements DriverCommandClient {
     @Resource
     private DriverCommandService driverCommandService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public R<List<PointValue>> readPoint(ValidatableList<CmdParameter> cmdParameters) {
+    public R<List<PointValue>> read(ValidatableList<CmdParameter> cmdParameters) {
         List<PointValue> pointValues = new ArrayList<>(16);
         try {
             if (cmdParameters.size() > RequestConstant.DEFAULT_MAX_REQUEST_SIZE) {
@@ -62,8 +65,11 @@ public class DriverCommandApi implements DriverCommandClient {
         return R.ok(pointValues);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public R<Boolean> writePoint(ValidatableList<CmdParameter> cmdParameters) {
+    public R<Boolean> write(ValidatableList<CmdParameter> cmdParameters) {
         try {
             if (cmdParameters.size() > RequestConstant.DEFAULT_MAX_REQUEST_SIZE) {
                 return R.fail("Point request size are limited to " + RequestConstant.DEFAULT_MAX_REQUEST_SIZE);

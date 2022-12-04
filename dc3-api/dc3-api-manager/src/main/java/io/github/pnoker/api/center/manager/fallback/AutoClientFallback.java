@@ -17,6 +17,8 @@ package io.github.pnoker.api.center.manager.fallback;
 import io.github.pnoker.api.center.manager.feign.AutoClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointDetail;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -33,11 +35,14 @@ public class AutoClientFallback implements FallbackFactory<AutoClient> {
 
     @Override
     public AutoClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-MANAGER" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(ManagerServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new AutoClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<PointDetail> autoCreateDeviceAndPoint(PointDetail pointDetail, String tenantId) {
                 return R.fail(message);

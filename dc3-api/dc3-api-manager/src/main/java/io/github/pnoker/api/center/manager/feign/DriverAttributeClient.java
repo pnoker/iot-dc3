@@ -53,8 +53,8 @@ public interface DriverAttributeClient {
     /**
      * 根据 ID 删除 DriverAttribute
      *
-     * @param id DriverAttributeId
-     * @return Boolean
+     * @param id 驱动属性ID
+     * @return 是否删除
      */
     @PostMapping("/delete/{id}")
     R<Boolean> delete(@NotNull @PathVariable(value = "id") String id);
@@ -71,7 +71,7 @@ public interface DriverAttributeClient {
     /**
      * 根据 ID 查询 DriverAttribute
      *
-     * @param id DriverAttribute ID
+     * @param id 驱动属性ID
      * @return DriverAttribute
      */
     @GetMapping("/id/{id}")
@@ -80,14 +80,14 @@ public interface DriverAttributeClient {
     /**
      * 根据 驱动ID 查询 DriverAttribute
      *
-     * @param id DriverAttribute ID
+     * @param id 驱动属性ID
      * @return DriverAttribute
      */
     @GetMapping("/driver_id/{id}")
     R<List<DriverAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 分页查询 DriverAttribute
+     * 模糊分页查询 DriverAttribute
      *
      * @param driverAttributeDto DriverAttribute Dto
      * @return Page Of DriverAttribute

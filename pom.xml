@@ -50,10 +50,7 @@
     <modules>
         <module>dc3-gateway</module>
         <module>dc3-center</module>
-
-        <module>dc3-transfer</module>
         <module>dc3-driver</module>
-
         <module>dc3-api</module>
         <module>dc3-common</module>
     </modules>

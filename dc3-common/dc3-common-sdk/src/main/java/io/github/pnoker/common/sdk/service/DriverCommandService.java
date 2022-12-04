@@ -17,27 +17,29 @@ package io.github.pnoker.common.sdk.service;
 import io.github.pnoker.common.bean.point.PointValue;
 
 /**
+ * 驱动指令服务
+ *
  * @author pnoker
  * @since 2022.1.0
  */
 public interface DriverCommandService {
 
     /**
-     * 读操作
+     * 读取位号值
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @return PointValue
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
+     * @return 位号值
      */
     PointValue read(String deviceId, String pointId);
 
     /**
-     * 写操作
+     * 写取位号值
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @param value    String Value
-     * @return Boolean
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
+     * @param value    写入值，写入时会根据位号的类型进行解析
+     * @return 是否写入
      */
     Boolean write(String deviceId, String pointId, String value);
 

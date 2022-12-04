@@ -17,8 +17,10 @@ package io.github.pnoker.api.center.auth.fallback;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.feign.UserClient;
 import io.github.pnoker.common.bean.R;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.dto.UserDto;
 import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
@@ -35,46 +37,70 @@ public class UserClientFallback implements FallbackFactory<UserClient> {
 
     @Override
     public UserClient create(Throwable throwable) {
-        String message = throwable.getMessage() == null ? "No available server for client: DC3-CENTER-AUTH" : throwable.getMessage();
+        String message = ExceptionUtil.getNotAvailableServiceMessage(AuthServiceConstant.SERVICE_NAME, throwable.getMessage());
         log.error("Fallback:{}", message);
 
         return new UserClient() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<User> add(User user) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> delete(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<User> update(User user) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> restPassword(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<User> selectById(String id) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<User> selectByName(String name) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Page<User>> list(UserDto userDto) {
                 return R.fail(message);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public R<Boolean> checkUserValid(String username) {
                 return R.fail(message);

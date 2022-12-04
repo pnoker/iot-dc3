@@ -59,7 +59,7 @@ public interface EventService {
     /**
      * 获取 DriverEvent 带分页、排序
      *
-     * @param driverEventDto DriverEventDto
+     * @param driverEventDto 驱动事件和分页参数
      * @return Page Of DriverEvent
      */
     Page<DriverEvent> driverEvent(DriverEventDto driverEventDto);
@@ -67,7 +67,7 @@ public interface EventService {
     /**
      * 获取 DeviceEvent 带分页、排序
      *
-     * @param deviceEventDto DeviceEventDto
+     * @param deviceEventDto 设备事件和分页参数
      * @return Page Of DeviceEvent
      */
     Page<DeviceEvent> deviceEvent(DeviceEventDto deviceEventDto);
