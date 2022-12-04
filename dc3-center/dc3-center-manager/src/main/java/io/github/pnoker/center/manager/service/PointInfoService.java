@@ -32,7 +32,7 @@ public interface PointInfoService extends Service<PointInfo, PointInfoDto> {
      * 根据位号配置信息 ID 、 设备 ID 、 位号 ID 查询
      *
      * @param pointAttributeId Point Attribute ID
-     * @param deviceId         Device ID
+     * @param deviceId         设备ID
      * @param pointId          Point ID
      * @return PointInfo
      */

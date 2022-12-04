@@ -28,11 +28,15 @@ import com.serotonin.modbus4j.msg.WriteCoilResponse;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointValueTypeEnum;
 import io.github.pnoker.common.enums.StatusEnum;
+import io.github.pnoker.common.exception.ConnectorException;
+import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.common.sdk.utils.DriverUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +46,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
-import static io.github.pnoker.common.sdk.utils.DriverUtil.value;
 
 /**
  * @author pnoker
@@ -63,23 +66,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         modbusFactory = new ModbusFactory();
     }
 
-    private Map<String, ModbusMaster> masterMap;
+    private Map<String, ModbusMaster> connectMap;
 
     @Override
     public void initial() {
-        masterMap = new ConcurrentHashMap<>(16);
-    }
-
-    @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        ModbusMaster modbusMaster = getMaster(device.getId(), driverInfo);
-        return readValue(modbusMaster, pointInfo, point.getType());
-    }
-
-    @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        ModbusMaster modbusMaster = getMaster(device.getId(), driverInfo);
-        return writeValue(modbusMaster, pointInfo, value.getType(), value.getValue());
+        /*
+        TODO: 仅供参考
+        可自定义实现
+        */
+        connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
@@ -99,24 +94,41 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, StatusEnum.ONLINE));
     }
 
+    @Override
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+        ModbusMaster modbusMaster = getConnector(device.getId(), driverInfo);
+        return readValue(modbusMaster, pointInfo, point.getType());
+    }
+
+    @Override
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+        ModbusMaster modbusMaster = getConnector(device.getId(), driverInfo);
+        return writeValue(modbusMaster, pointInfo, value);
+    }
+
     /**
      * 获取 Modbus Master
      *
-     * @param deviceId   Device ID
-     * @param driverInfo Driver Info
+     * @param deviceId   设备ID
+     * @param driverInfo 驱动信息
      * @return ModbusMaster
-     * @throws ModbusInitException ModbusInitException
      */
-    public ModbusMaster getMaster(String deviceId, Map<String, AttributeInfo> driverInfo) throws ModbusInitException {
-        log.debug("Modbus Tcp Connection Info {}", JsonUtil.toJsonString(driverInfo));
-        ModbusMaster modbusMaster = masterMap.get(deviceId);
+    private ModbusMaster getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
+        log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverInfo));
+        ModbusMaster modbusMaster = connectMap.get(deviceId);
         if (null == modbusMaster) {
             IpParameters params = new IpParameters();
             params.setHost(attribute(driverInfo, "host"));
             params.setPort(attribute(driverInfo, "port"));
             modbusMaster = modbusFactory.createTcpMaster(params, true);
-            modbusMaster.init();
-            masterMap.put(deviceId, modbusMaster);
+            try {
+                modbusMaster.init();
+                connectMap.put(deviceId, modbusMaster);
+            } catch (ModbusInitException e) {
+                connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
+                log.error("Connect modbus master error: {}", e.getMessage(), e);
+                throw new ConnectorException(e.getMessage());
+            }
         }
         return modbusMaster;
     }
@@ -128,29 +140,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo    Point Info
      * @param type         Value Type
      * @return String Value
-     * @throws ModbusTransportException ModbusTransportException
-     * @throws ErrorResponseException   ErrorResponseException
      */
-    public String readValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, String type) throws ModbusTransportException, ErrorResponseException {
+    private String readValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, String type) {
         int slaveId = attribute(pointInfo, "slaveId");
         int functionCode = attribute(pointInfo, "functionCode");
         int offset = attribute(pointInfo, "offset");
         switch (functionCode) {
             case 1:
                 BaseLocator<Boolean> coilLocator = BaseLocator.coilStatus(slaveId, offset);
-                Boolean coilValue = modbusMaster.getValue(coilLocator);
+                Boolean coilValue = getMasterValue(modbusMaster, coilLocator);
                 return String.valueOf(coilValue);
             case 2:
                 BaseLocator<Boolean> inputLocator = BaseLocator.inputStatus(slaveId, offset);
-                Boolean inputStatusValue = modbusMaster.getValue(inputLocator);
+                Boolean inputStatusValue = getMasterValue(modbusMaster, inputLocator);
                 return String.valueOf(inputStatusValue);
             case 3:
                 BaseLocator<Number> holdingLocator = BaseLocator.holdingRegister(slaveId, offset, getValueType(type));
-                Number holdingValue = modbusMaster.getValue(holdingLocator);
+                Number holdingValue = getMasterValue(modbusMaster, holdingLocator);
                 return String.valueOf(holdingValue);
             case 4:
                 BaseLocator<Number> inputRegister = BaseLocator.inputRegister(slaveId, offset, getValueType(type));
-                Number inputRegisterValue = modbusMaster.getValue(inputRegister);
+                Number inputRegisterValue = getMasterValue(modbusMaster, inputRegister);
                 return String.valueOf(inputRegisterValue);
             default:
                 return "0";
@@ -158,29 +168,41 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 写 Value
+     * 获取 ModbusMaster 值
+     *
+     * @param modbusMaster ModbusMaster
+     * @param locator      BaseLocator
+     * @param <T>          类型
+     * @return 类型
+     */
+    private <T> T getMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator) {
+        try {
+            return modbusMaster.getValue(locator);
+        } catch (ModbusTransportException | ErrorResponseException e) {
+            log.error("Read modbus master value error: {}", e.getMessage(), e);
+            throw new ReadPointException(e.getMessage());
+        }
+    }
+
+    /**
+     * 写入 ModbusMaster 值
      *
      * @param modbusMaster ModbusMaster
      * @param pointInfo    Point Info
-     * @param type         Value Type
-     * @param value        String Value
+     * @param value        Value
      * @return Write Result
-     * @throws ModbusTransportException ModbusTransportException
-     * @throws ErrorResponseException   ErrorResponseException
      */
-    public boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, String type, String value) throws ModbusTransportException, ErrorResponseException {
+    private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
         int slaveId = attribute(pointInfo, "slaveId");
         int functionCode = attribute(pointInfo, "functionCode");
         int offset = attribute(pointInfo, "offset");
         switch (functionCode) {
             case 1:
-                boolean coilValue = value(type, value);
-                WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, coilValue);
-                WriteCoilResponse coilResponse = (WriteCoilResponse) modbusMaster.send(coilRequest);
+                WriteCoilResponse coilResponse = setMasterValue(modbusMaster, slaveId, offset, value);
                 return !coilResponse.isException();
             case 3:
-                BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset, getValueType(type));
-                modbusMaster.setValue(locator, value(type, value));
+                BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset, getValueType(value.getType()));
+                setMasterValue(modbusMaster, locator, value);
                 return true;
             default:
                 return false;
@@ -197,7 +219,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param type Value Type
      * @return Modbus Data Type
      */
-    public int getValueType(String type) {
+    private int getValueType(String type) {
         PointValueTypeEnum valueType = PointValueTypeEnum.of(type);
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + type);
@@ -212,6 +234,42 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                 return DataType.EIGHT_BYTE_FLOAT;
             default:
                 return DataType.TWO_BYTE_INT_SIGNED;
+        }
+    }
+
+    /**
+     * 写入 ModbusMaster 值
+     *
+     * @param modbusMaster ModbusMaster
+     * @param slaveId      从站ID
+     * @param offset       偏移量
+     * @param value        写入值
+     * @return WriteCoilResponse
+     */
+    private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, AttributeInfo value) {
+        try {
+            WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, DriverUtil.value(value.getType(), value.getValue()));
+            return (WriteCoilResponse) modbusMaster.send(coilRequest);
+        } catch (ModbusTransportException e) {
+            log.error("Write modbus master value error: {}", e.getMessage(), e);
+            throw new WritePointException(e.getMessage());
+        }
+    }
+
+    /**
+     * 写入 ModbusMaster 值
+     *
+     * @param modbusMaster ModbusMaster
+     * @param locator      BaseLocator
+     * @param value        写入值
+     * @param <T>          类型
+     */
+    private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, AttributeInfo value) {
+        try {
+            modbusMaster.setValue(locator, DriverUtil.value(value.getType(), value.getValue()));
+        } catch (ModbusTransportException | ErrorResponseException e) {
+            log.error("Write modbus master value error: {}", e.getMessage(), e);
+            throw new WritePointException(e.getMessage());
         }
     }
 

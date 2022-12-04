@@ -100,10 +100,10 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:demo
     restart: always
     environment:
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
+      - DB_HOST=dc3-mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=dc3
@@ -133,10 +133,10 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:demo
     restart: always
     environment:
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
+      - DB_HOST=dc3-mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=dc3
@@ -177,10 +177,10 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:demo
     restart: always
     environment:
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
+      - DB_HOST=dc3-mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=dc3

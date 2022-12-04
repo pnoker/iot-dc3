@@ -12,20 +12,18 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.monitor.config;
+package io.github.pnoker.common.exception;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import cn.hutool.core.text.CharSequenceUtil;
 
 /**
+ * 自定义 读取位号值 异常
+ *
  * @author pnoker
  * @since 2022.1.0
  */
-@Configuration
-public class WebMvcConfig implements WebMvcConfigurer {
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/monitor/images/**").addResourceLocations("classpath:/static/images/");
+public class ReadPointException extends RuntimeException {
+    public ReadPointException(CharSequence template, Object... params) {
+        super(CharSequenceUtil.format(template, params));
     }
 }

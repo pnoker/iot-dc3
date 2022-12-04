@@ -81,7 +81,7 @@ public interface DriverInfoClient {
      * 根据 属性ID 和 设备ID 查询 DriverInfo
      *
      * @param attributeId Attribute ID
-     * @param deviceId    Device ID
+     * @param deviceId    设备ID
      * @return DriverInfo
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}")

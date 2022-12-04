@@ -81,7 +81,7 @@ public interface PointInfoClient {
      * 根据 属性ID、设备ID 和 位号ID 查询 PointInfo
      *
      * @param attributeId Attribute ID
-     * @param deviceId    Device ID
+     * @param deviceId    设备ID
      * @param pointId     Point ID
      * @return PointInfo
      */

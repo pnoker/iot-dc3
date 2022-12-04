@@ -80,7 +80,7 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中添加驱动配置信息
      *
-     * @param deviceId    Device ID
+     * @param deviceId    设备ID
      * @param attributeId Attribute ID
      */
     void deleteDriverInfo(String deviceId, String attributeId);
@@ -95,7 +95,7 @@ public interface DriverMetadataService {
     /**
      * 删除 DeviceDriver 中添加位号配置信息
      *
-     * @param deviceId    Device ID
+     * @param deviceId    设备ID
      * @param pointId     Point ID
      * @param attributeId Attribute ID
      */

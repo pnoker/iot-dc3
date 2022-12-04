@@ -70,27 +70,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception {
-        // 因为 Listening Virtual 的数据来源是被动接收的，所以无需实现该 Read 方法
-        // 接收数据处理函数在
-        // - io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler.channelRead
-        // - io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler.channelRead0
-        return "nil";
-    }
-
-    @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception {
-        String deviceId = device.getId();
-
-        // TODO 获取设备的Channel，并向下发送数据
-        Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
-        if (null != channel) {
-            channel.writeAndFlush(DecodeUtil.stringToByte(value.getValue()));
-        }
-        return true;
-    }
-
-    @Override
     public void schedule() {
 
         /*
@@ -105,6 +84,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         FAULT:故障
          */
         driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, StatusEnum.ONLINE));
+    }
+
+    @Override
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+        // 因为 Listening Virtual 的数据来源是被动接收的，所以无需实现该 Read 方法
+        // 接收数据处理函数在
+        // - io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler.channelRead
+        // - io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler.channelRead0
+        return "nil";
+    }
+
+    @Override
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+        String deviceId = device.getId();
+
+        // TODO 获取设备的Channel，并向下发送数据
+        Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
+        if (null != channel) {
+            channel.writeAndFlush(DecodeUtil.stringToByte(value.getValue()));
+        }
+        return true;
     }
 
 }

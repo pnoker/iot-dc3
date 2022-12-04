@@ -32,7 +32,7 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
      * 根据驱动属性配置 ID 和 设备 ID 查询
      *
      * @param driverAttributeId Driver Attribute ID
-     * @param deviceId          Device ID
+     * @param deviceId          设备ID
      * @return DriverInfo
      */
     DriverInfo selectByAttributeIdAndDeviceId(String driverAttributeId, String deviceId);

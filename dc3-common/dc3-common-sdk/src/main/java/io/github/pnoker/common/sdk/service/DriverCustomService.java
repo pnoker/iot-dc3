@@ -25,9 +25,9 @@ import java.util.Map;
  *
  * <ol>
  * <li>{@link DriverCustomService#initial} 初始化操作，需要根据不同的驱动实现该功能</li>
+ * <li>{@link DriverCustomService#schedule} 调度操作，需要根据不同的驱动实现该功能</li>
  * <li>{@link DriverCustomService#read} 读操作，需要根据不同的驱动实现该功能</li>
  * <li>{@link DriverCustomService#write} 写操作，需要根据不同的驱动实现该功能</li>
- * <li>{@link DriverCustomService#schedule} 调度操作，需要根据不同的驱动实现该功能</li>
  * </ol>
  *
  * @author pnoker
@@ -40,6 +40,11 @@ public interface DriverCustomService {
     void initial();
 
     /**
+     * Schedule Operation
+     */
+    void schedule();
+
+    /**
      * Read Operation
      *
      * @param driverInfo Driver Attribute Info
@@ -47,9 +52,8 @@ public interface DriverCustomService {
      * @param device     Device
      * @param point      Point
      * @return String Value
-     * @throws Exception Exception
      */
-    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) throws Exception;
+    String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point);
 
     /**
      * Write Operation
@@ -59,12 +63,7 @@ public interface DriverCustomService {
      * @param device     Device
      * @param value      Value Attribute Info
      * @return Boolean 是否写入
-     * @throws Exception Exception
      */
-    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) throws Exception;
+    Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value);
 
-    /**
-     * Schedule Operation
-     */
-    void schedule();
 }

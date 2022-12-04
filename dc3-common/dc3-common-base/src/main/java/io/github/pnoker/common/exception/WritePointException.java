@@ -12,24 +12,18 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.register;
+package io.github.pnoker.common.exception;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import cn.hutool.core.text.CharSequenceUtil;
 
 /**
- * 服务注册中心
+ * 自定义 写入位号值 异常
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@SpringBootApplication
-@EnableEurekaServer
-public class RegisterApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(RegisterApplication.class, args);
+public class WritePointException extends RuntimeException {
+    public WritePointException(CharSequence template, Object... params) {
+        super(CharSequenceUtil.format(template, params));
     }
-
 }

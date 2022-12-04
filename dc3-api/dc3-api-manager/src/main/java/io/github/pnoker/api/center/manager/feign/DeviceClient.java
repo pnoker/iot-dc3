@@ -81,7 +81,7 @@ public interface DeviceClient {
     /**
      * 根据 ID 集合查询 Device
      *
-     * @param deviceIds Device ID Set
+     * @param deviceIds 设备ID Set
      * @return Map String:Device
      */
     @PostMapping("/ids")
