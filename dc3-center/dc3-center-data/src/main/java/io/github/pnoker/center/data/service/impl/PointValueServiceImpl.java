@@ -24,7 +24,7 @@ import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.*;
+import io.github.pnoker.common.constant.StorageConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
@@ -158,7 +158,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT;
         List<String> keys = pointIds.stream().map(pointId -> prefix + pointId).collect(Collectors.toList());
-        List<PointValue> pointValues = redisUtil.getKey(keys, PointValue.class);
+        List<PointValue> pointValues = redisUtil.getKey(keys);
         return pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
@@ -172,7 +172,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     public PointValue realtime(String deviceId, String pointId) {
         String key = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.UNDERSCORE + pointId;
-        return redisUtil.getKey(key, PointValue.class);
+        return redisUtil.getKey(key);
     }
 
     public PointValue latest(String deviceId, String pointId) {
