@@ -18,8 +18,8 @@ import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.StrategyConstant;
+import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +64,7 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
         }
 
         final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT;
-        Map<String, Object> collect = pointValues.stream()
+        Map<String, PointValue> collect = pointValues.stream()
                 .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
                 .collect(Collectors.toMap(pointValue -> prefix + pointValue.getPointId(), pointValue -> pointValue));
         redisUtil.setKey(collect);

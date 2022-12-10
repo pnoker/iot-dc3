@@ -69,7 +69,7 @@ public class TokenServiceImpl implements TokenService {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
         Tenant tenant = tenantService.selectByName(tenantName);
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();
-        String salt = redisUtil.getKey(redisSaltKey, String.class);
+        String salt = redisUtil.getKey(redisSaltKey);
         if (CharSequenceUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
             redisUtil.setKey(redisSaltKey, salt, TimeoutConstant.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
@@ -86,7 +86,7 @@ public class TokenServiceImpl implements TokenService {
         if (tenant.getEnable() && user.getEnable()) {
             tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
             String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();
-            String saltValue = redisUtil.getKey(redisSaltKey, String.class);
+            String saltValue = redisUtil.getKey(redisSaltKey);
             if (CharSequenceUtil.isNotEmpty(saltValue)
                     && saltValue.equals(salt)
                     && DecodeUtil.md5(user.getPassword() + saltValue).equals(password)) {
@@ -105,7 +105,7 @@ public class TokenServiceImpl implements TokenService {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
         Tenant tenant = tenantService.selectByName(tenantName);
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();
-        String redisToken = redisUtil.getKey(redisKey, String.class);
+        String redisToken = redisUtil.getKey(redisKey);
         if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
@@ -133,7 +133,7 @@ public class TokenServiceImpl implements TokenService {
      */
     private void checkUserLimit(String username, String tenantId) {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenantId;
-        UserLimit limit = redisUtil.getKey(redisKey, UserLimit.class);
+        UserLimit limit = redisUtil.getKey(redisKey);
         if (ObjectUtil.isNotNull(limit) && limit.getTimes() >= 5) {
             Date now = new Date();
             long interval = limit.getExpireTime().getTime() - now.getTime();
@@ -155,7 +155,8 @@ public class TokenServiceImpl implements TokenService {
     private UserLimit updateUserLimit(String username, String tenantId, boolean expireTime) {
         int amount = TimeoutConstant.USER_LIMIT_TIMEOUT;
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenantId;
-        UserLimit limit = Optional.ofNullable(redisUtil.getKey(redisKey, UserLimit.class)).orElse(new UserLimit(0, new Date()));
+        UserLimit userLimit = redisUtil.getKey(redisKey);
+        UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);
         if (limit.getTimes() > 20) {
             //TODO 拉黑IP和锁定用户操作，然后通过Gateway进行拦截

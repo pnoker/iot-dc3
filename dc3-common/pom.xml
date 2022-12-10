@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2022.1.0</version>
+        <version>2022.1.7</version>
     </parent>
 
     <artifactId>dc3-common</artifactId>
@@ -30,11 +30,8 @@
     <description>IOT DC3 平台 Common 公共模块。</description>
 
     <modules>
-        <module>dc3-common-api</module>
-        <module>dc3-common-core</module>
         <module>dc3-common-base</module>
-        <module>dc3-common-profiles</module>
-        <module>dc3-common-sdk</module>
+        <module>dc3-driver-sdk</module>
     </modules>
 
 </project>

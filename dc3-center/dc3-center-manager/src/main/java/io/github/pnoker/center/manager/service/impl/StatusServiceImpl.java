@@ -56,7 +56,7 @@ public class StatusServiceImpl implements StatusService {
     @Override
     public String driver(String serviceName) {
         String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + serviceName;
-        String status = redisUtil.getKey(key, String.class);
+        String status = redisUtil.getKey(key);
         status = null != status ? status : StatusEnum.OFFLINE.getCode();
         return status;
     }
@@ -68,7 +68,7 @@ public class StatusServiceImpl implements StatusService {
         Page<Driver> page = driverService.list(driverDto);
         page.getRecords().forEach(driver -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
-            String status = redisUtil.getKey(key, String.class);
+            String status = redisUtil.getKey(key);
             status = null != status ? status : StatusEnum.OFFLINE.getCode();
             statusMap.put(driver.getId(), status);
         });
@@ -78,7 +78,7 @@ public class StatusServiceImpl implements StatusService {
     @Override
     public String device(String id) {
         String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
-        String status = redisUtil.getKey(key, String.class);
+        String status = redisUtil.getKey(key);
         status = null != status ? status : StatusEnum.OFFLINE.getCode();
         return status;
     }
@@ -90,7 +90,7 @@ public class StatusServiceImpl implements StatusService {
         Page<Device> page = deviceService.list(deviceDto);
         page.getRecords().forEach(device -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + device.getId();
-            String status = redisUtil.getKey(key, String.class);
+            String status = redisUtil.getKey(key);
             status = null != status ? status : StatusEnum.OFFLINE.getCode();
             statusMap.put(device.getId(), status);
         });
@@ -103,7 +103,7 @@ public class StatusServiceImpl implements StatusService {
 
         profileBindService.selectDeviceIdsByProfileId(profileId).forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
-            String status = redisUtil.getKey(key, String.class);
+            String status = redisUtil.getKey(key);
             status = null != status ? status : StatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });

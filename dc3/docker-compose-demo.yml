@@ -40,59 +40,6 @@ services:
         aliases:
           - dc3-gateway
 
-  register:
-    build:
-      context: ../dc3-center/dc3-center-register/
-      dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:demo
-    restart: always
-    environment:
-      - EUREKA_DASHBOARD_PATH=/
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
-    container_name: dc3-center-register
-    hostname: dc3-center-register
-    volumes:
-      - demo_logs:/dc3-center/dc3-center-register/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: 20m
-        max-file: 20
-    networks:
-      dc3demonet:
-        aliases:
-          - dc3-center-register
-
-  monitor:
-    build:
-      context: ../dc3-center/dc3-center-monitor/
-      dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-monitor:demo
-    restart: always
-    environment:
-      - MONITOR_CONTEXT_PATH=/
-      - MONITOR_PUBLIC_URL=/
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
-    container_name: dc3-center-monitor
-    hostname: dc3-center-monitor
-    volumes:
-      - demo_logs:/dc3-center/dc3-center-monitor/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: 20m
-        max-file: 20
-    networks:
-      dc3demonet:
-        aliases:
-          - dc3-center-monitor
-
   auth:
     build:
       context: ../dc3-center/dc3-center-auth/
