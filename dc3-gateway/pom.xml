@@ -74,22 +74,28 @@
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
 
-        <!-- Dc3 Api -->
+        <!-- Apache Pool2 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+
+        <!-- DC3 Api -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
-        <!-- Dc3 Common Profiles -->
+        <!-- DC3 Common Profiles -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-profiles</artifactId>
         </dependency>
 
-        <!-- Apache Pool2 -->
+        <!-- DC3 Common Log -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-log</artifactId>
         </dependency>
 
     </dependencies>

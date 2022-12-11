@@ -15,10 +15,10 @@
 package io.github.pnoker.center.manager.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.dto.DeviceEventDto;
-import io.github.pnoker.common.dto.DriverEventDto;
-import io.github.pnoker.common.model.DeviceEvent;
-import io.github.pnoker.common.model.DriverEvent;
+import io.github.pnoker.api.center.manager.dto.DeviceEventDto;
+import io.github.pnoker.api.center.manager.dto.DriverEventDto;
+import io.github.pnoker.common.bean.model.DeviceEvent;
+import io.github.pnoker.common.bean.model.DriverEvent;
 
 import java.util.List;
 

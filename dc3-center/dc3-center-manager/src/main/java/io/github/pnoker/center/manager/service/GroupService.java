@@ -15,7 +15,7 @@
 package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.dto.GroupDto;
+import io.github.pnoker.api.center.manager.dto.GroupDto;
 import io.github.pnoker.common.model.Group;
 
 /**

@@ -18,7 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.fallback.BlackIpClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.dto.BlackIpDto;
+import io.github.pnoker.api.center.auth.dto.BlackIpDto;
 import io.github.pnoker.common.model.BlackIp;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;

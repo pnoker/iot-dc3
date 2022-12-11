@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.manager.feign.DriverAttributeClient;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.DriverAttributeDto;
+import io.github.pnoker.api.center.manager.dto.DriverAttributeDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;

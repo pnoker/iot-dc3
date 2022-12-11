@@ -39,16 +39,28 @@
 
     <dependencies>
 
-        <!-- Dc3 Common Api -->
+        <!-- DC3 Common Public -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-public</artifactId>
+        </dependency>
+
+        <!-- DC3 Common Feign -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-feign</artifactId>
         </dependency>
 
-        <!-- Dc3 Common Base -->
+        <!-- DC3 Common Model -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-base</artifactId>
+            <artifactId>dc3-common-model</artifactId>
+        </dependency>
+
+        <!-- DC3 Common Exception -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-exception</artifactId>
         </dependency>
 
     </dependencies>

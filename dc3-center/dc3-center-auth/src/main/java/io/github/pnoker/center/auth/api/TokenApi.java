@@ -17,7 +17,7 @@ package io.github.pnoker.center.auth.api;
 import io.github.pnoker.api.center.auth.feign.TokenClient;
 import io.github.pnoker.center.auth.bean.TokenValid;
 import io.github.pnoker.center.auth.service.TokenService;
-import io.github.pnoker.common.bean.driver.auth.Login;
+import io.github.pnoker.common.bean.auth.Login;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;

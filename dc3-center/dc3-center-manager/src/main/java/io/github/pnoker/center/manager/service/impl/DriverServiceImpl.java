@@ -25,7 +25,7 @@ import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.dto.DriverDto;
+import io.github.pnoker.api.center.manager.dto.DriverDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;

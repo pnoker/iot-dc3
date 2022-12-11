@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.auth.feign.TokenClient;
 import io.github.pnoker.api.center.auth.feign.UserClient;
 import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.driver.auth.Login;
+import io.github.pnoker.common.bean.auth.Login;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.model.Tenant;

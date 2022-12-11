@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.config;
 
-import io.github.pnoker.common.constant.RabbitConstant;
+import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;

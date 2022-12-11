@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.manager.fallback.LabelClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.LabelDto;
+import io.github.pnoker.api.center.manager.dto.LabelDto;
 import io.github.pnoker.common.model.Label;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;

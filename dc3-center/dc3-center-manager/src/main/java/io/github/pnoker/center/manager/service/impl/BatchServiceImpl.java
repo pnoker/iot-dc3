@@ -17,6 +17,7 @@ package io.github.pnoker.center.manager.service.impl;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.driver.DriverMetadata;
+import io.github.pnoker.common.bean.model.BaseModel;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.*;
 import lombok.extern.slf4j.Slf4j;

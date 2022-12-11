@@ -16,11 +16,11 @@ package io.github.pnoker.api.transfer.rtmp.fallback;
 
 import io.github.pnoker.api.transfer.rtmp.feign.DriverCommandClient;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.driver.command.CmdParameter;
+import io.github.pnoker.common.bean.driver.CmdParameter;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.service.DriverServiceConstant;
 import io.github.pnoker.common.utils.ExceptionUtil;
-import io.github.pnoker.common.valid.ValidatableList;
+import io.github.pnoker.common.bean.ValidatableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;

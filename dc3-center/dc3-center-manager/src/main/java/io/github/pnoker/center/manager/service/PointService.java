@@ -15,7 +15,7 @@
 package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.dto.PointDto;
+import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.common.model.Point;
 
 import java.util.List;

@@ -15,7 +15,7 @@
 package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.dto.TenantDto;
+import io.github.pnoker.api.center.auth.dto.TenantDto;
 import io.github.pnoker.common.model.Tenant;
 
 /**

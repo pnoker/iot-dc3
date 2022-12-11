@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.dto.BlackIpDto;
+import io.github.pnoker.api.center.auth.dto.BlackIpDto;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.BlackIp;
 import lombok.extern.slf4j.Slf4j;

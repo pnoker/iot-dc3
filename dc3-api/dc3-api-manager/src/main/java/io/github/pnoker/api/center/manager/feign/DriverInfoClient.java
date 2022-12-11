@@ -18,7 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.fallback.DriverInfoClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.DriverInfoDto;
+import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
 import io.github.pnoker.common.model.DriverInfo;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;

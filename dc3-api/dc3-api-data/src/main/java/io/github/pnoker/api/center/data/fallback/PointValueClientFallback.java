@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.data.feign.PointValueClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
-import io.github.pnoker.common.dto.PointValueDto;
+import io.github.pnoker.api.center.data.dto.PointValueDto;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

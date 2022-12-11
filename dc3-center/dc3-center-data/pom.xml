@@ -57,36 +57,28 @@
             <artifactId>jakarta.json-api</artifactId>
         </dependency>
 
-        <!-- Dc3 Api -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-data</artifactId>
-        </dependency>
+        <!-- DC3 Api Manager -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
-        <!-- Dc3 Common -->
+        <!-- DC3 Api Data -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-web</artifactId>
+            <artifactId>dc3-api-data</artifactId>
         </dependency>
+
+        <!-- DC3 Common MySQL -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
         </dependency>
+
+        <!-- DC3 Common Redis -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-thread</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-profiles</artifactId>
         </dependency>
 
     </dependencies>
