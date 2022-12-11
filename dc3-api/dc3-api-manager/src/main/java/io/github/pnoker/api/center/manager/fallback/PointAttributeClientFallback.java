@@ -18,7 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.PointAttributeClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.PointAttributeDto;
+import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;

@@ -12,14 +12,17 @@
 # limitations under the License.
 #
 
-FROM maven:3.6-jdk-8 AS build
+# builder
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-jdk-8.13.14 AS builder
 MAINTAINER pnoker <pnokers.icloud.com>
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3
+ARG PROFILE=dev
 
-WORKDIR /dc3
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+WORKDIR /build
+COPY . /build
 
 COPY ./ ./
 
-RUN mvn -s ./dc3/dependencies/maven/settings.xml clean -U package
+RUN mvn -U -e -B clean package -DskipTests -P $PROFILE

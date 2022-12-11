@@ -26,7 +26,7 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.dto.ProfileDto;
+import io.github.pnoker.api.center.manager.dto.ProfileDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;

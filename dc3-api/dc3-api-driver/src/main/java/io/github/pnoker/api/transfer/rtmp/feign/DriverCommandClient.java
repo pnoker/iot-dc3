@@ -16,11 +16,11 @@ package io.github.pnoker.api.transfer.rtmp.feign;
 
 import io.github.pnoker.api.transfer.rtmp.fallback.DriverCommandFallback;
 import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.driver.command.CmdParameter;
+import io.github.pnoker.common.bean.driver.CmdParameter;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.service.DriverServiceConstant;
 import io.github.pnoker.common.valid.Read;
-import io.github.pnoker.common.valid.ValidatableList;
+import io.github.pnoker.common.bean.ValidatableList;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;

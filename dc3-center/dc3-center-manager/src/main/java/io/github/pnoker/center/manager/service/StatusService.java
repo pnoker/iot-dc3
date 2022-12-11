@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.dto.DeviceDto;
-import io.github.pnoker.common.dto.DriverDto;
+import io.github.pnoker.api.center.manager.dto.DeviceDto;
+import io.github.pnoker.api.center.manager.dto.DriverDto;
 
 import java.util.Map;
 

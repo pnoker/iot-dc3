@@ -18,7 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.feign.DriverClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.DriverDto;
+import io.github.pnoker.api.center.manager.dto.DriverDto;
 import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;

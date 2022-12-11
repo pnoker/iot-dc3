@@ -16,10 +16,10 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.constant.EventConstant;
+import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.DeviceEvent;
+import io.github.pnoker.common.bean.model.DeviceEvent;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;

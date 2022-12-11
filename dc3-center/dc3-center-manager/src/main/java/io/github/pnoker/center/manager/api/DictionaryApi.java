@@ -21,7 +21,7 @@ import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.DictionaryDto;
+import io.github.pnoker.api.center.manager.dto.DictionaryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

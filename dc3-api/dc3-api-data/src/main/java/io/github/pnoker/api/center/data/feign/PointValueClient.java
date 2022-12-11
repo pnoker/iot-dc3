@@ -20,7 +20,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
-import io.github.pnoker.common.dto.PointValueDto;
+import io.github.pnoker.api.center.data.dto.PointValueDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;

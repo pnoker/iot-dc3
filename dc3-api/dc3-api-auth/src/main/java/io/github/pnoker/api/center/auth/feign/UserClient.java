@@ -18,7 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.fallback.UserClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.dto.UserDto;
+import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;

@@ -42,11 +42,13 @@
     </properties>
 
     <dependencies>
-        <!-- Dc3 Driver Sdk -->
+
+        <!-- DC3 Driver Sdk -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-driver-sdk</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>

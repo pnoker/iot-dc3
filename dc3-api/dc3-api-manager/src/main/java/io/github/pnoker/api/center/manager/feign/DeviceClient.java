@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.manager.fallback.DeviceClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.DeviceDto;
+import io.github.pnoker.api.center.manager.dto.DeviceDto;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;

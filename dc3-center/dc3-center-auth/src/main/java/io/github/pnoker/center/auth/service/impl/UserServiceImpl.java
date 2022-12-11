@@ -25,7 +25,7 @@ import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
-import io.github.pnoker.common.dto.UserDto;
+import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.utils.DecodeUtil;

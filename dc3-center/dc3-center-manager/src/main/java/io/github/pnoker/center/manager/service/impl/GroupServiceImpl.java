@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.mapper.GroupMapper;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.dto.GroupDto;
+import io.github.pnoker.api.center.manager.dto.GroupDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;

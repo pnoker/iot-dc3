@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.manager.fallback.DriverClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.DriverDto;
+import io.github.pnoker.api.center.manager.dto.DriverDto;
 import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;

@@ -28,7 +28,7 @@ Cache-Control: no-cache
 ### 生成用户 Token 令牌
 #/auth/token/generate
 # pnoker/10e339be1130a90dc1b9ff0332abced6
-# Dc3Util.md5("10e339be1130a90dc1b9ff0332abced6"+"verfdkkq")
+# DC3Util.md5("10e339be1130a90dc1b9ff0332abced6"+"verfdkkq")
 POST http://localhost:8300/auth/token/generate
 Accept: */*
 Content-Type: application/json

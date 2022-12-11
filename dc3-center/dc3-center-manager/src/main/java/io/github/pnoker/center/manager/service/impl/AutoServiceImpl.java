@@ -17,7 +17,7 @@ package io.github.pnoker.center.manager.service.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.point.PointDetail;
-import io.github.pnoker.common.constant.MetadataConstant;
+import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;

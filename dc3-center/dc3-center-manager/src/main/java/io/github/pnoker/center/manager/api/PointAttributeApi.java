@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.manager.feign.PointAttributeClient;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.PointAttributeDto;
+import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;

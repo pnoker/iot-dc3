@@ -17,7 +17,7 @@ package io.github.pnoker.center.manager.service.impl;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.driver.DriverConfiguration;
-import io.github.pnoker.common.constant.RabbitConstant;
+import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.model.*;
 import lombok.extern.slf4j.Slf4j;

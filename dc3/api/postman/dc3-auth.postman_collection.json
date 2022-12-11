@@ -63,7 +63,7 @@
 								"generate"
 							]
 						},
-						"description": "**说明：**\n\n - 1.用户名/密码：pnoker/10e339be1130a90dc1b9ff0332abced6\n\n - 2.生成MD5加密之后的密码：Dc3Util.md5(\"10e339be1130a90dc1b9ff0332abced6\"+\"salt\")，其中salt是第一步[1.获取SALT]中获取的\n\n---\n\n**例如：**\n\n - 1.salt是：fwl6rojy63jawkfu\n\n - 2.MD5加密之后的密码是：\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwbm9rZXIiLCJpc3MiOiJwbm9rZXIvZGMzLy0xIiwiaWF0IjoxNjIxODQ4MzE3LCJleHAiOjE2MjE4OTE1MTd9.ZfntzrNUtSjTiN81tODM61-2yJWhmiB8scTdD_1nT3U\""
+						"description": "**说明：**\n\n - 1.用户名/密码：pnoker/10e339be1130a90dc1b9ff0332abced6\n\n - 2.生成MD5加密之后的密码：DC3Util.md5(\"10e339be1130a90dc1b9ff0332abced6\"+\"salt\")，其中salt是第一步[1.获取SALT]中获取的\n\n---\n\n**例如：**\n\n - 1.salt是：fwl6rojy63jawkfu\n\n - 2.MD5加密之后的密码是：\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwbm9rZXIiLCJpc3MiOiJwbm9rZXIvZGMzLy0xIiwiaWF0IjoxNjIxODQ4MzE3LCJleHAiOjE2MjE4OTE1MTd9.ZfntzrNUtSjTiN81tODM61-2yJWhmiB8scTdD_1nT3U\""
 					},
 					"response": []
 				},

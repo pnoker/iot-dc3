@@ -20,7 +20,7 @@ import io.github.pnoker.api.center.auth.feign.UserClient;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.dto.UserDto;
+import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;

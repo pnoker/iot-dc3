@@ -20,7 +20,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.dto.DictionaryDto;
+import io.github.pnoker.api.center.manager.dto.DictionaryDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
