@@ -18,12 +18,12 @@ import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.driver.DriverRegister;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.entity.Driver;
 import io.github.pnoker.common.entity.DriverAttribute;
 import io.github.pnoker.common.entity.PointAttribute;
 import io.github.pnoker.common.entity.Tenant;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -126,7 +126,8 @@ public class DriverSdkServiceImpl implements DriverSdkService {
 
         for (Map.Entry<String, DriverAttribute> entry : newDriverAttributeMap.entrySet()) {
             String name = entry.getKey();
-            DriverAttribute info = newDriverAttributeMap.get(name).setDriverId(driver.getId());
+            DriverAttribute info = newDriverAttributeMap.get(name);
+            info.setDriverId(driver.getId());
             if (oldDriverAttributeMap.containsKey(name)) {
                 info.setId(oldDriverAttributeMap.get(name).getId());
                 log.debug("Driver attribute registered, updating: {}", info);
@@ -173,7 +174,8 @@ public class DriverSdkServiceImpl implements DriverSdkService {
 
         for (Map.Entry<String, PointAttribute> entry : newPointAttributeMap.entrySet()) {
             String name = entry.getKey();
-            PointAttribute attribute = newPointAttributeMap.get(name).setDriverId(driver.getId());
+            PointAttribute attribute = newPointAttributeMap.get(name);
+            attribute.setDriverId(driver.getId());
             if (oldPointAttributeMap.containsKey(name)) {
                 attribute.setId(oldPointAttributeMap.get(name).getId());
                 log.debug("Point attribute registered, updating: {}", attribute);

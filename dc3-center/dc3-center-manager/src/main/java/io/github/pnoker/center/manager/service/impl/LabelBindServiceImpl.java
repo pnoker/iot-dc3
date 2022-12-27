@@ -19,13 +19,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.LabelBindDto;
 import io.github.pnoker.center.manager.mapper.LabelBindMapper;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.LabelBindDto;
+import io.github.pnoker.common.entity.LabelBind;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -109,7 +109,6 @@ public class LabelBindServiceImpl implements LabelBindService {
         if (ObjectUtil.isNotNull(labelBindDto)) {
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindDto.getLabelId()), LabelBind::getLabelId, labelBindDto.getLabelId());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindDto.getEntityId()), LabelBind::getEntityId, labelBindDto.getEntityId());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(labelBindDto.getType()), LabelBind::getType, labelBindDto.getType());
         }
         return queryWrapper;
     }

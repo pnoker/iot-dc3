@@ -12,16 +12,16 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.bean;
+package io.github.pnoker.api.center.auth.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import io.github.pnoker.common.base.Converter;
+import io.github.pnoker.common.bean.common.Pages;
+import io.github.pnoker.common.entity.UserExt;
+import lombok.*;
+import org.springframework.beans.BeanUtils;
 
 /**
- * 用户登录限制
+ * UserExt DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -29,14 +29,19 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLimit {
-    /**
-     * 登录验证错误次数
-     */
-    private Integer times;
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class UserExtDto extends UserExt implements Converter<UserExt> {
 
-    /**
-     * 限制失效时间
-     */
-    private Date expireTime;
+    private Pages page;
+
+    @Override
+    public void convertDtoToDo(UserExt userExt) {
+        BeanUtils.copyProperties(this, userExt);
+    }
+
+    @Override
+    public void convertDoToDto(UserExt userExt) {
+        BeanUtils.copyProperties(userExt, this);
+    }
 }

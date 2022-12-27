@@ -52,7 +52,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
         List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
         for (Tenant tenant : tenantList) {
-            Dictionary driverDictionary = new Dictionary().setLabel(tenant.getTenantName()).setValue(tenant.getId());
+            Dictionary driverDictionary = new Dictionary();
+            driverDictionary.setLabel(tenant.getTenantName());
+            driverDictionary.setValue(tenant.getId());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;
@@ -64,7 +66,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         List<User> userList = userMapper.selectList(queryWrapper);
         for (User user : userList) {
-            Dictionary driverDictionary = new Dictionary().setLabel(user.getLoginName()).setValue(user.getId());
+            Dictionary driverDictionary = new Dictionary();
+            driverDictionary.setLabel(user.getLoginName());
+            driverDictionary.setValue(user.getId());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;
@@ -76,7 +80,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         List<BlackIp> blackIpList = blackIpMapper.selectList(queryWrapper);
         for (BlackIp blackIp : blackIpList) {
-            Dictionary driverDictionary = new Dictionary().setLabel(blackIp.getIp()).setValue(blackIp.getId());
+            Dictionary driverDictionary = new Dictionary();
+            driverDictionary.setLabel(blackIp.getIp());
+            driverDictionary.setValue(blackIp.getId());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;

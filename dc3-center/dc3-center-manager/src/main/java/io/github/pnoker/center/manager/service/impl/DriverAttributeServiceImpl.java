@@ -19,14 +19,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DriverAttributeDto;
 import io.github.pnoker.center.manager.mapper.DriverAttributeMapper;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.DriverAttributeDto;
+import io.github.pnoker.common.entity.DriverAttribute;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -80,7 +80,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         driverAttribute.setUpdateTime(null);
         if (driverAttributeMapper.updateById(driverAttribute) > 0) {
             DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
-            driverAttribute.setAttributeName(select.getAttributeName()).setDriverId(select.getDriverId());
+            driverAttribute.setAttributeName(select.getAttributeName());
+            driverAttribute.setDriverId(select.getDriverId());
             return select;
         }
         throw new ServiceException("The driver attribute update failed");
@@ -147,7 +148,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (ObjectUtil.isNotNull(driverAttributeDto)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getAttributeName()), DriverAttribute::getAttributeName, driverAttributeDto.getAttributeName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getDisplayName()), DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(driverAttributeDto.getTypeFlag()), DriverAttribute::getTypeFlag, driverAttributeDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverAttributeDto.getTypeFlag()), DriverAttribute::getTypeFlag, driverAttributeDto.getTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributeDto.getDriverId()), DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
         }
         return queryWrapper;

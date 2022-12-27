@@ -20,17 +20,17 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DriverDto;
 import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.entity.Driver;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.Device;
-import io.github.pnoker.common.entity.Driver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -91,7 +91,9 @@ public class DriverServiceImpl implements DriverService {
         driver.setUpdateTime(null);
         if (driverMapper.updateById(driver) > 0) {
             Driver select = driverMapper.selectById(driver.getId());
-            driver.setServiceName(select.getServiceName()).setHost(select.getServerHost()).setPort(select.getServerPort());
+            driver.setServiceName(select.getServiceName());
+            driver.setServerHost(select.getServerHost());
+            driver.setServerPort(select.getServerPort());
             return select;
         }
         throw new ServiceException("The driver update failed");
@@ -136,7 +138,7 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public Driver selectByHostPort(String type, String host, Integer port, String tenantId) {
+    public Driver selectByHostPort(DriverTypeEnum type, String host, Integer port, String tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getTypeFlag, type);
         queryWrapper.eq(Driver::getServerHost, host);
@@ -193,8 +195,8 @@ public class DriverServiceImpl implements DriverService {
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceName()), Driver::getServiceName, driverDto.getServiceName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServerHost()), Driver::getServerHost, driverDto.getServerHost());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getServerPort()), Driver::getServerPort, driverDto.getServerPort());
-            if (CharSequenceUtil.isEmpty(driverDto.getTypeFlag())) {
-                driverDto.setTypeFlag(PrefixConstant.DRIVER);
+            if (ObjectUtil.isNull(driverDto.getTypeFlag())) {
+                driverDto.setTypeFlag(DriverTypeEnum.DRIVER);
             }
             queryWrapper.like(Driver::getTypeFlag, driverDto.getTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getEnableFlag()), Driver::getEnableFlag, driverDto.getEnableFlag());

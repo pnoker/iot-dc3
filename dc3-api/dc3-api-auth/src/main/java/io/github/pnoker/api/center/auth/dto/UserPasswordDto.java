@@ -12,40 +12,36 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.api.center.manager.dto;
+package io.github.pnoker.api.center.auth.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.bean.entity.DeviceEvent;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.github.pnoker.common.entity.UserPassword;
+import lombok.*;
 import org.springframework.beans.BeanUtils;
 
-import java.io.Serializable;
-
 /**
+ * UserPassword DTO
+ *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeviceEventDto implements Serializable, Converter<DeviceEvent> {
-    private static final long serialVersionUID = 1L;
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class UserPasswordDto extends UserPassword implements Converter<UserPassword> {
 
-    private String deviceId;
-    private String pointId;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    public void convertDtoToDo(DeviceEvent deviceEvent) {
-        BeanUtils.copyProperties(this, deviceEvent);
+    @Override
+    public void convertDtoToDo(UserPassword userPassword) {
+        BeanUtils.copyProperties(this, userPassword);
     }
 
-    public void convertDoToDto(DeviceEvent deviceEvent) {
-        BeanUtils.copyProperties(deviceEvent, this);
+    @Override
+    public void convertDoToDto(UserPassword userPassword) {
+        BeanUtils.copyProperties(userPassword, this);
     }
 }

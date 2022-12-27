@@ -19,7 +19,6 @@ import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.entity.DriverAttribute;
 import lombok.*;
-import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -31,7 +30,6 @@ import org.springframework.beans.BeanUtils;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class DriverAttributeDto extends DriverAttribute implements Converter<DriverAttribute> {

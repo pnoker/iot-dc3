@@ -14,32 +14,42 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.api.center.auth.dto.UserDto;
+import io.github.pnoker.api.center.auth.dto.UserExtDto;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.entity.User;
+import io.github.pnoker.common.entity.UserExt;
 
 /**
- * User Interface
+ * UserExt Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserService extends Service<User, UserDto> {
+public interface UserExtService extends Service<UserExt, UserExtDto> {
 
     /**
-     * 根据登录名称查询用户
+     * 根据用户名查询用户
      *
-     * @param loginName 登录名称
-     * @param isEx      Throw Exception
-     * @return User
+     * @param userName 用户名称
+     * @param isEx     Throw Exception
+     * @return UserExt
      */
-    User selectByLoginName(String loginName, boolean isEx);
+    UserExt selectByUserName(String userName, boolean isEx);
 
     /**
-     * 判断登录名称是否有效
+     * 根据手机号查询用户
      *
-     * @param loginName 登录名称
-     * @return Boolean
+     * @param phone Phone
+     * @param isEx  Throw Exception
+     * @return UserExt
      */
-    Boolean checkLoginNameValid(String loginName);
+    UserExt selectByPhone(String phone, boolean isEx);
+
+    /**
+     * 根据邮箱查询用户
+     *
+     * @param email Email
+     * @param isEx  Throw Exception
+     * @return UserExt
+     */
+    UserExt selectByEmail(String email, boolean isEx);
 }

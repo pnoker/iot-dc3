@@ -14,17 +14,18 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.auth.dto.BlackIpDto;
 import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.auth.dto.BlackIpDto;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.entity.BlackIp;
+import io.github.pnoker.common.enums.EnableTypeEnum;
+import io.github.pnoker.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +67,8 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public BlackIp update(BlackIp blackIp) {
-        blackIp.setIp(null).setUpdateTime(null);
+        blackIp.setIp(null);
+        blackIp.setUpdateTime(null);
         if (blackIpMapper.updateById(blackIp) > 0) {
             BlackIp select = blackIpMapper.selectById(blackIp.getId());
             blackIp.setIp(select.getIp());
@@ -99,7 +101,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     public Boolean checkBlackIpValid(String ip) {
         BlackIp blackIp = selectByIp(ip);
         if (ObjectUtil.isNotNull(blackIp)) {
-            return blackIp.getEnableFlag();
+            return EnableTypeEnum.ENABLE.equals(blackIp.getEnableFlag());
         }
         return false;
     }

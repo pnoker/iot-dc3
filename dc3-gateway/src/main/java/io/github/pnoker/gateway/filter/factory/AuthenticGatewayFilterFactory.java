@@ -19,7 +19,6 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.api.center.auth.feign.TokenClient;
 import io.github.pnoker.api.center.auth.feign.UserClient;
-import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.auth.Login;
 import io.github.pnoker.common.constant.common.RequestConstant;
@@ -81,7 +80,6 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
         }
 
         @Override
-        @Logs("Authentic Gateway Filter")
         public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
             ServerHttpRequest request = exchange.getRequest();
 
@@ -114,7 +112,10 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request token header");
                 }
                 Login login = new Login();
-                login.setTenant(tenantR.getData().getTenantName()).setName(userR.getData().getLoginName()).setSalt(token.getSalt()).setToken(token.getToken());
+                login.setTenant(tenantR.getData().getTenantName());
+                login.setName(userR.getData().getLoginName());
+                login.setSalt(token.getSalt());
+                login.setToken(token.getToken());
                 // todo 后期全部替换为grpc
                 R<String> tokenR = gatewayFilter.tokenClient.checkTokenValid(login);
                 if (!tokenR.isOk()) {

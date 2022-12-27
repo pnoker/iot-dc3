@@ -16,13 +16,14 @@ package io.github.pnoker.center.auth.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.api.center.auth.feign.UserClient;
+import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.api.center.auth.dto.UserDto;
-import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.entity.User;
+import io.github.pnoker.common.enums.ResponseEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +43,8 @@ public class UserApi implements UserClient {
 
     @Resource
     private UserService userService;
+    @Resource
+    private UserPasswordService userPasswordService;
 
     @Override
     public R<User> add(User user) {
@@ -68,7 +71,8 @@ public class UserApi implements UserClient {
     @Override
     public R<User> update(User user) {
         try {
-            User update = userService.update(user.setLoginName(null));
+            user.setLoginName(null);
+            User update = userService.update(user);
             if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
@@ -81,7 +85,7 @@ public class UserApi implements UserClient {
     @Override
     public R<Boolean> restPassword(String id) {
         try {
-            return userService.restPassword(id) ? R.ok() : R.fail();
+            return userPasswordService.restPassword(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -103,7 +107,7 @@ public class UserApi implements UserClient {
     @Override
     public R<User> selectByName(String name) {
         try {
-            User select = userService.selectByName(name, false);
+            User select = userService.selectByLoginName(name, false);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -130,9 +134,9 @@ public class UserApi implements UserClient {
     }
 
     @Override
-    public R<Boolean> checkUserValid(String name) {
+    public R<Boolean> checkLoginNameValid(String name) {
         try {
-            return userService.checkUserValid(name) ? R.ok() : R.fail();
+            return userService.checkLoginNameValid(name) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

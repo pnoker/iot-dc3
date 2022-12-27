@@ -97,7 +97,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         ModbusMaster modbusMaster = getConnector(device.getId(), driverInfo);
-        return readValue(modbusMaster, pointInfo, point.getTypeFlag());
+        return readValue(modbusMaster, pointInfo, point.getTypeFlag().getCode());
     }
 
     @Override
@@ -201,7 +201,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                 WriteCoilResponse coilResponse = setMasterValue(modbusMaster, slaveId, offset, value);
                 return !coilResponse.isException();
             case 3:
-                BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset, getValueType(value.getType()));
+                BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset, getValueType(value.getType().getCode()));
                 setMasterValue(modbusMaster, locator, value);
                 return true;
             default:
@@ -248,7 +248,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, AttributeInfo value) {
         try {
-            WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, DriverUtil.value(value.getType(), value.getValue()));
+            WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, DriverUtil.value(value.getType().getCode(), value.getValue()));
             return (WriteCoilResponse) modbusMaster.send(coilRequest);
         } catch (ModbusTransportException e) {
             log.error("Write modbus master value error: {}", e.getMessage(), e);
@@ -266,7 +266,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, AttributeInfo value) {
         try {
-            modbusMaster.setValue(locator, DriverUtil.value(value.getType(), value.getValue()));
+            modbusMaster.setValue(locator, DriverUtil.value(value.getType().getCode(), value.getValue()));
         } catch (ModbusTransportException | ErrorResponseException e) {
             log.error("Write modbus master value error: {}", e.getMessage(), e);
             throw new WritePointException(e.getMessage());

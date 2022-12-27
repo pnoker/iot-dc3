@@ -18,19 +18,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.data.dto.PointValueDto;
+import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.api.center.manager.feign.PointClient;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.common.Pages;
+import io.github.pnoker.common.bean.entity.BaseModel;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-import io.github.pnoker.api.center.manager.dto.PointDto;
-import io.github.pnoker.api.center.data.dto.PointValueDto;
-import io.github.pnoker.common.bean.entity.BaseModel;
+import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.RedisUtil;
@@ -78,8 +78,8 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        final PointValue repositoryValue = pointValue.setCreateTime(new Date());
-        repositoryHandleService.save(repositoryValue);
+        pointValue.setCreateTime(new Date());
+        repositoryHandleService.save(pointValue);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        final List<PointValue> repositoryValues = pointValues.stream().map(pointValue -> pointValue.setCreateTime(new Date())).collect(Collectors.toList());
+        final List<PointValue> repositoryValues = pointValues.stream().peek(pointValue -> pointValue.setCreateTime(new Date())).collect(Collectors.toList());
         repositoryHandleService.save(repositoryValues);
     }
 
@@ -98,8 +98,11 @@ public class PointValueServiceImpl implements PointValueService {
         if (ObjectUtil.isEmpty(pointValueDto.getPage())) pointValueDto.setPage(new Pages());
         pointValuePage.setCurrent(pointValueDto.getPage().getCurrent()).setSize(pointValueDto.getPage().getSize());
 
-        PointDto pointDto = (new PointDto()).setDeviceId(pointValueDto.getDeviceId()).setPage(pointValueDto.getPage());
-        pointDto.setPointName(pointValueDto.getName()).setEnableStatus(pointValueDto.getEnable());
+        PointDto pointDto = new PointDto();
+        pointDto.setDeviceId(pointValueDto.getDeviceId());
+        pointDto.setPage(pointValueDto.getPage());
+        pointDto.setPointName(pointValueDto.getPointName());
+        pointDto.setEnableFlag(pointValueDto.getEnableFlag());
         R<Page<Point>> pageR = pointClient.list(pointDto, tenantId);
         if (!pageR.isOk()) return pointValuePage;
 

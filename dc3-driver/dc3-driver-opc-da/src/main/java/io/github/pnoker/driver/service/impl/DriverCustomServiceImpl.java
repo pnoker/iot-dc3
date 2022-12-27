@@ -16,13 +16,13 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
+import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import io.github.pnoker.common.entity.Device;
-import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
@@ -235,7 +235,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws JIException OpcDa JIException
      */
     private boolean writeItem(Item item, AttributeInfo value) throws JIException {
-        PointTypeEnum valueType = PointTypeEnum.of(value.getType());
+        PointTypeEnum valueType = PointTypeEnum.of(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());
         }
@@ -243,27 +243,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         int writeResult = 0;
         switch (valueType) {
             case SHORT:
-                short shortValue = DriverUtil.value(value.getType(), value.getValue());
+                short shortValue = DriverUtil.value(value.getType().getCode(), value.getValue());
                 writeResult = item.write(new JIVariant(shortValue, false));
                 break;
             case INT:
-                int intValue = DriverUtil.value(value.getType(), value.getValue());
+                int intValue = DriverUtil.value(value.getType().getCode(), value.getValue());
                 writeResult = item.write(new JIVariant(intValue, false));
                 break;
             case LONG:
-                long longValue = DriverUtil.value(value.getType(), value.getValue());
+                long longValue = DriverUtil.value(value.getType().getCode(), value.getValue());
                 writeResult = item.write(new JIVariant(longValue, false));
                 break;
             case FLOAT:
-                float floatValue = DriverUtil.value(value.getType(), value.getValue());
+                float floatValue = DriverUtil.value(value.getType().getCode(), value.getValue());
                 writeResult = item.write(new JIVariant(floatValue, false));
                 break;
             case DOUBLE:
-                double doubleValue = DriverUtil.value(value.getType(), value.getValue());
+                double doubleValue = DriverUtil.value(value.getType().getCode(), value.getValue());
                 writeResult = item.write(new JIVariant(doubleValue, false));
                 break;
             case BOOLEAN:
-                boolean booleanValue = DriverUtil.value(value.getType(), value.getValue());
+                boolean booleanValue = DriverUtil.value(value.getType().getCode(), value.getValue());
                 writeResult = item.write(new JIVariant(booleanValue, false));
                 break;
             case STRING:

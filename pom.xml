@@ -19,7 +19,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2022.1.8</version>
+        <version>2022.1.9</version>
     </parent>
 
     <name>${project.artifactId}</name>
@@ -88,6 +88,8 @@
         <module>dc3-center</module>
         <module>dc3-driver</module>
         <module>dc3-api</module>
+        <module>dc3-common</module>
+        <module>dc3-driver-sdk</module>
     </modules>
 
     <dependencyManagement>

@@ -18,11 +18,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.bean.point.PointValue;
+import io.github.pnoker.common.enums.EnableTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -34,15 +33,25 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
-@ToString(callSuper = true)
 public class PointValueDto implements Serializable, Converter<PointValue> {
     private static final long serialVersionUID = 1L;
 
     private String deviceId;
     private String pointId;
-    private String name;
-    private Boolean enable;
+
+    /**
+     * 位号名称
+     */
+    private String pointName;
+
+    /**
+     * 使能标识
+     */
+    private EnableTypeEnum enableFlag;
+
+    /**
+     * 是否返回最近历史数据
+     */
     private Boolean history = false;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

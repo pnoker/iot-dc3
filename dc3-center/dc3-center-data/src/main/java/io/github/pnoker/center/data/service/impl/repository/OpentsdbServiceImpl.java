@@ -100,15 +100,13 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
         List<TsPointValue> tsPointValues = new ArrayList<>(2);
 
         TsPointValue tsValue = new TsPointValue(metric, value);
-        tsValue.setTimestamp(timestamp)
-                .addTag("point", point)
-                .addTag("valueType", "value");
+        tsValue.setTimestamp(timestamp);
+        tsValue.addTag("point", point).addTag("valueType", "value");
         tsPointValues.add(tsValue);
 
         TsPointValue tsRawValue = new TsPointValue(metric, value);
-        tsRawValue.setTimestamp(timestamp)
-                .addTag("point", point)
-                .addTag("valueType", "rawValue");
+        tsRawValue.setTimestamp(timestamp);
+        tsValue.addTag("point", point).addTag("valueType", "rawValue");
         tsPointValues.add(tsRawValue);
 
         return tsPointValues;

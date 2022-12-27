@@ -78,7 +78,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
         myS7Connector.lock.writeLock().lock();
         S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
-        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getTypeFlag());
+        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getTypeFlag().getCode());
 
         try {
             return String.valueOf(serializer.dispense(plcs7PointVariable));
@@ -96,10 +96,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
         myS7Connector.lock.writeLock().lock();
         S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
-        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType());
+        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, value.getType().getCode());
 
         try {
-            store(serializer, plcs7PointVariable, value.getType(), value.getValue());
+            store(serializer, plcs7PointVariable, value.getType().getCode(), value.getValue());
             return true;
         } catch (Exception e) {
             log.error("Plc S7 Write Error: {}", e.getMessage());

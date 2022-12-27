@@ -19,14 +19,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
 import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
+import io.github.pnoker.common.entity.PointAttribute;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -80,7 +80,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         pointAttribute.setUpdateTime(null);
         if (pointAttributeMapper.updateById(pointAttribute) > 0) {
             PointAttribute select = pointAttributeMapper.selectById(pointAttribute.getId());
-            pointAttribute.setAttributeName(select.getAttributeName()).setDriverId(select.getDriverId());
+            pointAttribute.setAttributeName(select.getAttributeName());
+            pointAttribute.setDriverId(select.getDriverId());
             return select;
         }
         throw new ServiceException("The point attribute update failed");
@@ -147,7 +148,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (ObjectUtil.isNotNull(pointAttributeDto)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getAttributeName()), PointAttribute::getAttributeName, pointAttributeDto.getAttributeName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getDisplayName()), PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointAttributeDto.getTypeFlag()), PointAttribute::getTypeFlag, pointAttributeDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointAttributeDto.getTypeFlag()), PointAttribute::getTypeFlag, pointAttributeDto.getTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributeDto.getDriverId()), PointAttribute::getDriverId, pointAttributeDto.getDriverId());
         }
         return queryWrapper;

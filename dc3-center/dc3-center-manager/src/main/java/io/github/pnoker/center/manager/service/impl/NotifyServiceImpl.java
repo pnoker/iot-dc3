@@ -17,8 +17,8 @@ package io.github.pnoker.center.manager.service.impl;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.driver.DriverConfiguration;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -51,7 +51,10 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             List<Driver> drivers = driverService.selectByProfileId(profile.getId());
             drivers.forEach(driver -> {
-                DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.PROFILE).setCommand(command).setContent(profile);
+                DriverConfiguration operation = new DriverConfiguration();
+                operation.setType(PrefixConstant.PROFILE);
+                operation.setCommand(command);
+                operation.setContent(profile);
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
@@ -67,7 +70,10 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             List<Driver> drivers = driverService.selectByProfileId(point.getProfileId());
             drivers.forEach(driver -> {
-                DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.POINT).setCommand(command).setContent(point);
+                DriverConfiguration operation = new DriverConfiguration();
+                operation.setType(PrefixConstant.POINT);
+                operation.setCommand(command);
+                operation.setContent(point);
                 notifyDriver(driver, operation);
             });
         } catch (Exception e) {
@@ -82,7 +88,10 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverDevice(String command, Device device) {
         try {
             Driver driver = driverService.selectById(device.getDriverId());
-            DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.DEVICE).setCommand(command).setContent(device);
+            DriverConfiguration operation = new DriverConfiguration();
+            operation.setType(PrefixConstant.DEVICE);
+            operation.setCommand(command);
+            operation.setContent(device);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.error("Notify driver {} device: {}", command, e.getMessage());
@@ -96,7 +105,10 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverDriverInfo(String command, DriverInfo driverInfo) {
         try {
             Driver driver = driverService.selectByDeviceId(driverInfo.getDeviceId());
-            DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.DRIVER_INFO).setCommand(command).setContent(driverInfo);
+            DriverConfiguration operation = new DriverConfiguration();
+            operation.setType(PrefixConstant.DRIVER_INFO);
+            operation.setCommand(command);
+            operation.setContent(driverInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.error("Notify driver {} driverInfo: {}", command, e.getMessage());
@@ -110,7 +122,10 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverPointInfo(String command, PointInfo pointInfo) {
         try {
             Driver driver = driverService.selectByDeviceId(pointInfo.getDeviceId());
-            DriverConfiguration operation = new DriverConfiguration().setType(PrefixConstant.POINT_INFO).setCommand(command).setContent(pointInfo);
+            DriverConfiguration operation = new DriverConfiguration();
+            operation.setType(PrefixConstant.POINT_INFO);
+            operation.setCommand(command);
+            operation.setContent(pointInfo);
             notifyDriver(driver, operation);
         } catch (Exception e) {
             log.error("Notify driver {} pointInfo: {}", command, e.getMessage());

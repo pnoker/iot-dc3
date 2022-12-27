@@ -14,9 +14,10 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.manager.dto.PointDto;
+import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.enums.UnitTypeEnum;
 
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,7 @@ public interface PointService extends Service<Point, PointDto> {
      * 查询 位号单位
      *
      * @param pointIds Point ID Set
-     * @return Map Long:tring
+     * @return Map Long:UnitTypeEnum
      */
-    Map<String, String> unit(Set<String> pointIds);
+    Map<String, UnitTypeEnum> unit(Set<String> pointIds);
 }
