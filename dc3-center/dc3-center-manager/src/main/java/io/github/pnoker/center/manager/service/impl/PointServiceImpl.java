@@ -21,15 +21,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.PointDto;
+import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.enums.UnitTypeEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.Point;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -98,7 +99,8 @@ public class PointServiceImpl implements PointService {
         }
         if (pointMapper.updateById(point) > 0) {
             Point select = pointMapper.selectById(point.getId());
-            point.setPointName(select.getPointName()).setProfileId(select.getProfileId());
+            point.setPointName(select.getPointName());
+            point.setProfileId(select.getProfileId());
             return select;
         }
         throw new ServiceException("The point update failed");
@@ -201,7 +203,7 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> unit(Set<String> pointIds) {
+    public Map<String, UnitTypeEnum> unit(Set<String> pointIds) {
         List<Point> points = pointMapper.selectBatchIds(pointIds);
         return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
     }
@@ -214,7 +216,7 @@ public class PointServiceImpl implements PointService {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (null != pointDto) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getPointName()), Point::getPointName, pointDto.getPointName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getTypeFlag()), Point::getTypeFlag, pointDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getTypeFlag()), Point::getTypeFlag, pointDto.getTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getRwFlag()), Point::getRwFlag, pointDto.getRwFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getAccrueFlag()), Point::getAccrueFlag, pointDto.getAccrueFlag());
             queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getProfileId()), Point::getProfileId, pointDto.getProfileId());
@@ -229,7 +231,7 @@ public class PointServiceImpl implements PointService {
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(pointDto)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getPointName()), "dp.name", pointDto.getPointName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getTypeFlag()), "dp.type", pointDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getTypeFlag()), "dp.type", pointDto.getTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getRwFlag()), "dp.rw", pointDto.getRwFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getAccrueFlag()), "dp.accrue", pointDto.getAccrueFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointDto.getProfileId()), "dp.profile_id", pointDto.getProfileId());

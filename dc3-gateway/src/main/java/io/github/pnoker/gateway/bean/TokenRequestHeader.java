@@ -17,7 +17,6 @@ package io.github.pnoker.gateway.bean;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 /**
  * Request Token Header
@@ -28,7 +27,6 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 public class TokenRequestHeader {
     private String salt;
     private String token;

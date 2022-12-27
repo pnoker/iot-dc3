@@ -14,18 +14,18 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DictionaryDto;
+import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.center.manager.mapper.*;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.DictionaryDto;
-import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.common.entity.Device;
 import io.github.pnoker.common.entity.Driver;
 import io.github.pnoker.common.entity.Point;
@@ -69,7 +69,12 @@ public class DictionaryServiceImpl implements DictionaryService {
         queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryDto.getLabel()), Driver::getDriverName, dictionaryDto.getLabel());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getTenantId()), Driver::getTenantId, dictionaryDto.getTenantId());
         Page<Driver> driverPage = driverMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
-        List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> new Dictionary().setLabel(driver.getDriverName()).setValue(driver.getId())).collect(Collectors.toList());
+        List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> {
+            Dictionary dictionary = new Dictionary();
+            dictionary.setLabel(driver.getDriverName());
+            dictionary.setValue(driver.getId());
+            return dictionary;
+        }).collect(Collectors.toList());
         Page<Dictionary> page = new Page<>();
         BeanUtils.copyProperties(driverPage, page);
         page.setRecords(dictionaryList);
@@ -86,7 +91,12 @@ public class DictionaryServiceImpl implements DictionaryService {
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getParentValue1()), Device::getDriverId, dictionaryDto.getParentValue1());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getTenantId()), Device::getTenantId, dictionaryDto.getTenantId());
         Page<Device> devicePage = deviceMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
-        List<Dictionary> dictionaryList = devicePage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getDeviceName()).setValue(profile.getId())).collect(Collectors.toList());
+        List<Dictionary> dictionaryList = devicePage.getRecords().parallelStream().map(profile -> {
+            Dictionary dictionary = new Dictionary();
+            dictionary.setLabel(profile.getDeviceName());
+            dictionary.setValue(profile.getId());
+            return dictionary;
+        }).collect(Collectors.toList());
         Page<Dictionary> page = new Page<>();
         BeanUtils.copyProperties(devicePage, page);
         page.setRecords(dictionaryList);
@@ -102,7 +112,12 @@ public class DictionaryServiceImpl implements DictionaryService {
         queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryDto.getLabel()), Profile::getProfileName, dictionaryDto.getLabel());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryDto.getTenantId()), Profile::getTenantId, dictionaryDto.getTenantId());
         Page<Profile> profilePage = profileMapper.selectPage(dictionaryDto.getPage().convert(), queryWrapper);
-        List<Dictionary> dictionaryList = profilePage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getProfileName()).setValue(profile.getId())).collect(Collectors.toList());
+        List<Dictionary> dictionaryList = profilePage.getRecords().parallelStream().map(profile -> {
+            Dictionary dictionary = new Dictionary();
+            dictionary.setLabel(profile.getProfileName());
+            dictionary.setValue(profile.getId());
+            return dictionary;
+        }).collect(Collectors.toList());
         Page<Dictionary> page = new Page<>();
         BeanUtils.copyProperties(profilePage, page);
         page.setRecords(dictionaryList);
@@ -114,11 +129,19 @@ public class DictionaryServiceImpl implements DictionaryService {
         if (ObjectUtil.isNull(dictionaryDto.getPage())) {
             dictionaryDto.setPage(new Pages());
         }
-        PointDto pointDto = (new PointDto()).setPage(dictionaryDto.getPage());
+        PointDto pointDto = new PointDto();
+        pointDto.setPage(dictionaryDto.getPage());
         pointDto.setDeviceId(dictionaryDto.getParentValue2());
-        pointDto.setPointName(dictionaryDto.getLabel()).setProfileId(dictionaryDto.getParentValue1()).setTenantId(dictionaryDto.getTenantId());
+        pointDto.setPointName(dictionaryDto.getLabel());
+        pointDto.setProfileId(dictionaryDto.getParentValue1());
+        pointDto.setTenantId(dictionaryDto.getTenantId());
         Page<Point> pointPage = pointService.list(pointDto);
-        List<Dictionary> dictionaryList = pointPage.getRecords().parallelStream().map(profile -> new Dictionary().setLabel(profile.getPointName()).setValue(profile.getId())).collect(Collectors.toList());
+        List<Dictionary> dictionaryList = pointPage.getRecords().parallelStream().map(profile -> {
+            Dictionary dictionary = new Dictionary();
+            dictionary.setLabel(profile.getPointName());
+            dictionary.setValue(profile.getId());
+            return dictionary;
+        }).collect(Collectors.toList());
         Page<Dictionary> page = new Page<>();
         BeanUtils.copyProperties(pointPage, page);
         page.setRecords(dictionaryList);

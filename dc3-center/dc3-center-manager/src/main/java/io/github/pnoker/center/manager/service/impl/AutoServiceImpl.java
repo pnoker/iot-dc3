@@ -18,11 +18,11 @@ import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.point.PointDetail;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
-import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.entity.Device;
 import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.entity.Profile;
 import io.github.pnoker.common.entity.ProfileBind;
+import io.github.pnoker.common.exception.DuplicateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +57,8 @@ public class AutoServiceImpl implements AutoService {
     public PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, String driverId, String tenantId) {
         // 新增设备
         Device device = new Device();
-        device.setDeviceName(deviceName).setDriverId(driverId);
+        device.setDeviceName(deviceName);
+        device.setDriverId(driverId);
         device.setTenantId(tenantId);
         device.setRemark("auto create by driver");
         try {
@@ -73,7 +74,10 @@ public class AutoServiceImpl implements AutoService {
 
         // 新增私有模板
         Profile profile = new Profile();
-        profile.setProfileName(deviceName).setShare(false).setType((short) 2).setTenantId(tenantId);
+        profile.setProfileName(deviceName);
+        profile.setShareFlag(false);
+        profile.setTypeFlag((short) 2);
+        profile.setTenantId(tenantId);
         try {
             profile = profileService.add(profile);
         } catch (DuplicateException duplicateException) {
@@ -86,7 +90,8 @@ public class AutoServiceImpl implements AutoService {
         if (CharSequenceUtil.isAllNotEmpty(device.getId(), profile.getId())) {
             try {
                 ProfileBind profileBind = new ProfileBind();
-                profileBind.setDeviceId(device.getId()).setProfileId(profile.getId());
+                profileBind.setDeviceId(device.getId());
+                profileBind.setProfileId(profile.getId());
                 profileBindService.add(profileBind);
             } catch (Exception ignored) {
                 // nothing to do
@@ -94,7 +99,8 @@ public class AutoServiceImpl implements AutoService {
 
             // 新增位号
             Point point = new Point();
-            point.setPointName(pointName).setProfileId(profile.getId());
+            point.setPointName(pointName);
+            point.setProfileId(profile.getId());
             point.setTenantId(tenantId);
             point.setDefault();
             try {

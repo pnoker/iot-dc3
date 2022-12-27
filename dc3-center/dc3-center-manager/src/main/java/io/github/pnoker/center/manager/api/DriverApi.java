@@ -22,6 +22,7 @@ import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.Driver;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -118,7 +119,8 @@ public class DriverApi implements DriverClient {
     @Override
     public R<Driver> selectByHostPort(String type, String host, Integer port, String tenantId) {
         try {
-            Driver select = driverService.selectByHostPort(type, host, port, tenantId);
+            DriverTypeEnum typeEnum = DriverTypeEnum.of(type);
+            Driver select = driverService.selectByHostPort(typeEnum, host, port, tenantId);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());

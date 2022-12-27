@@ -14,21 +14,21 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.PointInfoDto;
 import io.github.pnoker.center.manager.mapper.PointInfoMapper;
 import io.github.pnoker.center.manager.service.PointInfoService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.PointInfoDto;
+import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.entity.PointInfo;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.Point;
-import io.github.pnoker.common.entity.PointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -95,7 +95,9 @@ public class PointInfoServiceImpl implements PointInfoService {
         }
         if (pointInfoMapper.updateById(pointInfo) > 0) {
             PointInfo select = pointInfoMapper.selectById(pointInfo.getId());
-            pointInfo.setPointAttributeId(select.getPointAttributeId()).setDeviceId(select.getDeviceId()).setPointId(select.getPointId());
+            pointInfo.setPointAttributeId(select.getPointAttributeId());
+            pointInfo.setDeviceId(select.getDeviceId());
+            pointInfo.setPointId(select.getPointId());
             return select;
         }
         throw new ServiceException("The point info update failed");

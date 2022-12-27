@@ -195,7 +195,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws InterruptedException InterruptedException
      */
     private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeInfo value) throws ExecutionException, InterruptedException {
-        PointTypeEnum valueType = PointTypeEnum.of(value.getType());
+        PointTypeEnum valueType = PointTypeEnum.of(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());
         }
@@ -203,23 +203,23 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         CompletableFuture<StatusCode> status = new CompletableFuture<>();
         switch (valueType) {
             case INT:
-                int intValue = value(value.getType(), value.getValue());
+                int intValue = value(value.getType().getCode(), value.getValue());
                 status = client.writeValue(nodeId, new DataValue(new Variant(intValue)));
                 break;
             case LONG:
-                long longValue = value(value.getType(), value.getValue());
+                long longValue = value(value.getType().getCode(), value.getValue());
                 status = client.writeValue(nodeId, new DataValue(new Variant(longValue)));
                 break;
             case FLOAT:
-                float floatValue = value(value.getType(), value.getValue());
+                float floatValue = value(value.getType().getCode(), value.getValue());
                 status = client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
                 break;
             case DOUBLE:
-                double doubleValue = value(value.getType(), value.getValue());
+                double doubleValue = value(value.getType().getCode(), value.getValue());
                 status = client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
                 break;
             case BOOLEAN:
-                boolean booleanValue = value(value.getType(), value.getValue());
+                boolean booleanValue = value(value.getType().getCode(), value.getValue());
                 status = client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
                 break;
             case STRING:

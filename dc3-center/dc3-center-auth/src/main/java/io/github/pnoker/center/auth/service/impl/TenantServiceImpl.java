@@ -14,19 +14,19 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.auth.dto.TenantDto;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.auth.dto.TenantDto;
+import io.github.pnoker.common.entity.Tenant;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.Tenant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +47,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Tenant add(Tenant tenant) {
-        Tenant select = selectByName(tenant.getName());
+        Tenant select = selectByName(tenant.getTenantName());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
@@ -68,10 +68,11 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Tenant update(Tenant tenant) {
-        tenant.setName(null).setUpdateTime(null);
+        tenant.setTenantName(null);
+        tenant.setUpdateTime(null);
         if (tenantMapper.updateById(tenant) > 0) {
             Tenant select = tenantMapper.selectById(tenant.getId());
-            tenant.setName(select.getName());
+            tenant.setTenantName(select.getTenantName());
             return select;
         }
         throw new ServiceException("The tenant update failed");
@@ -85,7 +86,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public Tenant selectByName(String name) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        queryWrapper.eq(Tenant::getName, name);
+        queryWrapper.eq(Tenant::getTenantName, name);
         Tenant tenant = tenantMapper.selectOne(queryWrapper);
         if (null == tenant) {
             throw new NotFoundException();
@@ -105,7 +106,7 @@ public class TenantServiceImpl implements TenantService {
     public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantDto tenantDto) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
         if (ObjectUtil.isNotNull(tenantDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(tenantDto.getName()), Tenant::getName, tenantDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(tenantDto.getTenantName()), Tenant::getTenantName, tenantDto.getTenantName());
         }
         return queryWrapper;
     }

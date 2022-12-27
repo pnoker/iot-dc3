@@ -12,31 +12,18 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.bean;
+package io.github.pnoker.center.auth.mapper;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.github.pnoker.common.entity.UserPassword;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 用户登录限制
+ * Mapper
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserLimit {
-    /**
-     * 登录验证错误次数
-     */
-    private Integer times;
-
-    /**
-     * 限制失效时间
-     */
-    private Date expireTime;
+@Mapper
+public interface UserPasswordMapper extends BaseMapper<UserPassword> {
 }

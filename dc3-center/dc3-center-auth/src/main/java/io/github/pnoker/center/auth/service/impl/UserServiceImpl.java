@@ -18,17 +18,14 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
-import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.constant.common.AlgorithmConstant;
-import io.github.pnoker.api.center.auth.dto.UserDto;
-import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.entity.User;
-import io.github.pnoker.common.utils.DecodeUtil;
+import io.github.pnoker.common.enums.EnableTypeEnum;
+import io.github.pnoker.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,34 +46,16 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    @Logs("Add user")
     @Transactional
     public User add(User user) {
-        // todo 不通过，会返回密码数据
-        // 判断用户是否存在
-        User selectByName = selectByName(user.getLoginName(), false);
-        if (ObjectUtil.isNotNull(selectByName)) {
-            throw new DuplicateException("The user already exists with username: {}", user.getLoginName());
-        }
-
-        // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
-        if (CharSequenceUtil.isNotBlank(user.getPhone())) {
-            User selectByPhone = selectByPhone(user.getPhone(), false);
-            if (ObjectUtil.isNotNull(selectByPhone)) {
-                throw new DuplicateException("The user already exists with phone: {}", user.getPhone());
-            }
-        }
-
-        // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
-        if (CharSequenceUtil.isNotBlank(user.getEmail())) {
-            User selectByEmail = selectByEmail(user.getEmail(), false);
-            if (ObjectUtil.isNotNull(selectByEmail)) {
-                throw new DuplicateException("The user already exists with email: {}", user.getEmail());
-            }
+        // 判断登录名称是否存在
+        User selectByLoginName = selectByLoginName(user.getLoginName(), false);
+        if (ObjectUtil.isNotNull(selectByLoginName)) {
+            throw new DuplicateException("The user already exists with login name: {}", user.getLoginName());
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(user.setPassword(DecodeUtil.md5(user.getPassword()))) > 0) {
+        if (userMapper.insert(user) > 0) {
             return userMapper.selectById(user.getId());
         }
 
@@ -95,33 +74,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        User byId = selectById(user.getId());
-        // todo 需要调整，用户名、手机号、邮箱保持租户内唯一即可，没有必要全局唯一
-        // 判断 phone 是否修改
-        if (CharSequenceUtil.isNotBlank(user.getPhone())) {
-            if (!user.getPhone().equals(byId.getPhone())) {
-                User byPhone = selectByPhone(user.getPhone(), false);
-                if (ObjectUtil.isNotNull(byPhone)) {
-                    throw new DuplicateException("The user already exists with phone {}", user.getPhone());
-                }
-            }
-        } else {
-            user.setPhone(null);
+        User selectById = selectById(user.getId());
+        if (null == selectById) {
+            throw new NotFoundException();
         }
-
-        // 判断 email 是否修改
-        if (CharSequenceUtil.isNotBlank(user.getEmail())) {
-            if (!user.getEmail().equals(byId.getEmail())) {
-                User byEmail = selectByEmail(user.getEmail(), false);
-                if (ObjectUtil.isNotNull(byEmail)) {
-                    throw new DuplicateException("The user already exists with email {}", user.getEmail());
-                }
-            }
-        } else {
-            user.setEmail(null);
-        }
-
-        user.setLoginName(null).setUpdateTime(null);
+        user.setLoginName(null);
+        user.setUpdateTime(null);
         if (userMapper.updateById(user) > 0) {
             User select = userMapper.selectById(user.getId());
             user.setLoginName(select.getLoginName());
@@ -136,42 +94,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User selectByName(String name, boolean isEx) {
-        if (CharSequenceUtil.isEmpty(name)) {
-            if (isEx) {
-                throw new EmptyException("The name is empty");
-            }
-            return null;
-        }
-
-        return selectByKey(User::getLoginName, name, isEx);
-    }
-
-    @Override
-    public User selectByPhone(String phone, boolean isEx) {
-        if (CharSequenceUtil.isEmpty(phone)) {
-            if (isEx) {
-                throw new EmptyException("The phone is empty");
-            }
-            return null;
-        }
-
-        return selectByKey(User::getPhone, phone, isEx);
-    }
-
-    @Override
-    public User selectByEmail(String email, boolean isEx) {
-        if (CharSequenceUtil.isEmpty(email)) {
-            if (isEx) {
-                throw new EmptyException("The phone is empty");
-            }
-            return null;
-        }
-
-        return selectByKey(User::getEmail, email, isEx);
-    }
-
-    @Override
     public Page<User> list(UserDto userDto) {
         if (ObjectUtil.isNull(userDto.getPage())) {
             userDto.setPage(new Pages());
@@ -180,32 +102,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkUserValid(String name) {
-        User user = selectByName(name, false);
-        if (ObjectUtil.isNotNull(user)) {
-            return user.getEnableFlag();
+    public User selectByLoginName(String loginName, boolean isEx) {
+        if (CharSequenceUtil.isEmpty(loginName)) {
+            if (isEx) {
+                throw new EmptyException("The login name is empty");
+            }
+            return null;
         }
 
-        user = selectByPhone(name, false);
-        if (ObjectUtil.isNotNull(user)) {
-            return user.getEnableFlag();
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
+        queryWrapper.eq(User::getLoginName, loginName);
+        User user = userMapper.selectOne(queryWrapper);
+        if (null == user) {
+            throw new NotFoundException();
         }
-
-        user = selectByEmail(name, false);
-        if (ObjectUtil.isNotNull(user)) {
-            return user.getEnableFlag();
-        }
-
-        return false;
+        return user;
     }
 
     @Override
-    public boolean restPassword(String id) {
-        User user = selectById(id);
+    public Boolean checkLoginNameValid(String loginName) {
+        User user = selectByLoginName(loginName, false);
         if (ObjectUtil.isNotNull(user)) {
-            user.setPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
-            return null != update(user);
+            return EnableTypeEnum.ENABLE.equals(user.getEnableFlag());
         }
+
         return false;
     }
 
@@ -216,19 +136,6 @@ public class UserServiceImpl implements UserService {
             queryWrapper.like(CharSequenceUtil.isNotBlank(userDto.getLoginName()), User::getLoginName, userDto.getLoginName());
         }
         return queryWrapper;
-    }
-
-    private User selectByKey(SFunction<User, ?> key, String value, boolean isEx) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(key, value);
-        User user = userMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(user)) {
-            if (isEx) {
-                throw new NotFoundException();
-            }
-            return null;
-        }
-        return user;
     }
 
 }

@@ -102,7 +102,7 @@ public class UserClientFallback implements FallbackFactory<UserClient> {
              * {@inheritDoc}
              */
             @Override
-            public R<Boolean> checkUserValid(String username) {
+            public R<Boolean> checkLoginNameValid(String username) {
                 return R.fail(message);
             }
         };

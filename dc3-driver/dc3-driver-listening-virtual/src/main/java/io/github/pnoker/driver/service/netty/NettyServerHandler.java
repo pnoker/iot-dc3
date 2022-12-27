@@ -21,8 +21,8 @@ import io.github.pnoker.common.entity.Device;
 import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
-import io.github.pnoker.common.sdk.utils.DriverUtil;
 import io.github.pnoker.common.sdk.utils.ConvertUtil;
+import io.github.pnoker.common.sdk.utils.DriverUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -73,8 +73,8 @@ public class NettyServerHandler {
         for (String pointId : pointInfoMap.keySet()) {
             Point point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeInfo> infoMap = pointInfoMap.get(pointId);
-            int start = DriverUtil.value(infoMap.get("start").getType(), infoMap.get("start").getValue());
-            int end = DriverUtil.value(infoMap.get("end").getType(), infoMap.get("end").getValue());
+            int start = DriverUtil.value(infoMap.get("start").getType().getCode(), infoMap.get("start").getValue());
+            int end = DriverUtil.value(infoMap.get("end").getType().getCode(), infoMap.get("end").getValue());
 
             if (infoMap.get("key").getValue().equals(hexKey)) {
                 PointValue pointValue = null;

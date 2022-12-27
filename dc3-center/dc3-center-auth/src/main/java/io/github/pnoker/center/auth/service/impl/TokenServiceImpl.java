@@ -19,17 +19,16 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.center.auth.bean.TokenValid;
 import io.github.pnoker.center.auth.bean.UserLimit;
-import io.github.pnoker.center.auth.service.TenantBindService;
-import io.github.pnoker.center.auth.service.TenantService;
-import io.github.pnoker.center.auth.service.TokenService;
-import io.github.pnoker.center.auth.service.UserService;
+import io.github.pnoker.center.auth.service.*;
 import io.github.pnoker.common.constant.cache.TimeoutConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.entity.Tenant;
 import io.github.pnoker.common.entity.User;
+import io.github.pnoker.common.entity.UserPassword;
+import io.github.pnoker.common.enums.EnableTypeEnum;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.RedisUtil;
@@ -59,6 +58,8 @@ public class TokenServiceImpl implements TokenService {
     @Resource
     private UserService userService;
     @Resource
+    private UserPasswordService userPasswordService;
+    @Resource
     private TenantBindService tenantBindService;
 
     @Resource
@@ -82,16 +83,17 @@ public class TokenServiceImpl implements TokenService {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
         Tenant tenant = tenantService.selectByName(tenantName);
         checkUserLimit(username, tenant.getId());
-        User user = userService.selectByName(username, false);
-        if (tenant.getEnableFlag() && user.getEnableFlag()) {
+        User user = userService.selectByLoginName(username, false);
+        if (EnableTypeEnum.ENABLE.equals(tenant.getEnableFlag()) && EnableTypeEnum.ENABLE.equals(user.getEnableFlag())) {
             tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
+            UserPassword userPassword = userPasswordService.selectById(user.getUserPasswordId());
             String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();
-            String saltValue = redisUtil.getKey(redisSaltKey);
-            if (CharSequenceUtil.isNotEmpty(saltValue)
-                    && saltValue.equals(salt)
-                    && DecodeUtil.md5(user.getPassword() + saltValue).equals(password)) {
+            String redisSaltValue = redisUtil.getKey(redisSaltKey);
+            if (CharSequenceUtil.isNotEmpty(redisSaltValue)
+                    && redisSaltValue.equals(salt)
+                    && DecodeUtil.md5(userPassword.getPassword() + redisSaltValue).equals(password)) {
                 String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();
-                String token = KeyUtil.generateToken(username, saltValue, tenant.getId());
+                String token = KeyUtil.generateToken(username, redisSaltValue, tenant.getId());
                 redisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
                 return token;
             }

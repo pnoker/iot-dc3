@@ -12,31 +12,25 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.bean;
+package io.github.pnoker.center.auth.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import io.github.pnoker.api.center.auth.dto.UserPasswordDto;
+import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.entity.UserPassword;
 
 /**
- * 用户登录限制
+ * UserPassword Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserLimit {
-    /**
-     * 登录验证错误次数
-     */
-    private Integer times;
+public interface UserPasswordService extends Service<UserPassword, UserPasswordDto> {
 
     /**
-     * 限制失效时间
+     * 重置密码
+     *
+     * @param id ID
+     * @return Boolean
      */
-    private Date expireTime;
+    Boolean restPassword(String id);
 }

@@ -14,9 +14,10 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.entity.Driver;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 
 import java.util.List;
 import java.util.Set;
@@ -46,7 +47,7 @@ public interface DriverService extends Service<Driver, DriverDto> {
      * @param tenantId 租户ID
      * @return Driver
      */
-    Driver selectByHostPort(String type, String host, Integer port, String tenantId);
+    Driver selectByHostPort(DriverTypeEnum type, String host, Integer port, String tenantId);
 
     /**
      * 根据 驱动Id 查询 驱动

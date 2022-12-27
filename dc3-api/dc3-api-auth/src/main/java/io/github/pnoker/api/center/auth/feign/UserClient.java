@@ -15,10 +15,10 @@
 package io.github.pnoker.api.center.auth.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.api.center.auth.fallback.UserClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.common.entity.User;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -108,12 +108,12 @@ public interface UserClient {
     R<Page<User>> list(@RequestBody(required = false) UserDto userDto);
 
     /**
-     * 检测用户是否存在
+     * 检测登录名称是否有效
      *
      * @param name 用户名称
      * @return 是否有效
      */
     @GetMapping("/check/{name}")
-    R<Boolean> checkUserValid(@NotNull @PathVariable(value = "name") String name);
+    R<Boolean> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name);
 
 }

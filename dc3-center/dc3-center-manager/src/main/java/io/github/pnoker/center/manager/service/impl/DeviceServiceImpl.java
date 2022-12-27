@@ -21,17 +21,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DeviceDto;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
-import io.github.pnoker.api.center.manager.dto.DeviceDto;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.entity.Device;
 import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.entity.ProfileBind;
+import io.github.pnoker.common.exception.DuplicateException;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -132,7 +132,8 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == device) {
             throw new NotFoundException();
         }
-        return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
+        device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
+        return device;
     }
 
     /**
@@ -147,7 +148,8 @@ public class DeviceServiceImpl implements DeviceService {
         if (null == device) {
             throw new NotFoundException();
         }
-        return device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId()));
+        device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId()));
+        return device;
     }
 
     /**

@@ -21,8 +21,6 @@ import io.github.pnoker.common.bean.entity.DriverEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -34,8 +32,6 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
-@ToString(callSuper = true)
 public class DriverEventDto implements Serializable, Converter<DriverEvent> {
     private static final long serialVersionUID = 1L;
 
