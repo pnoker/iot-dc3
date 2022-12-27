@@ -17,8 +17,8 @@ package io.github.pnoker.driver.service.netty;
 import cn.hutool.core.util.CharsetUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.point.PointValue;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
 import io.github.pnoker.common.sdk.utils.DriverUtil;
@@ -52,7 +52,7 @@ public class NettyServerHandler {
         List<Device> values = new ArrayList<>(driverContext.getDriverMetadata().getDeviceMap().values());
         for (int i = 0; i < values.size(); i++) {
             Device device = values.get(i);
-            if (device.getName().equals(name)) {
+            if (device.getDeviceName().equals(name)) {
                 return device.getId();
             }
         }
@@ -78,7 +78,7 @@ public class NettyServerHandler {
 
             if (infoMap.get("key").getValue().equals(hexKey)) {
                 PointValue pointValue = null;
-                switch (point.getName()) {
+                switch (point.getPointName()) {
                     case "海拔":
                         float altitude = byteBuf.getFloat(start);
                         pointValue = new PointValue(deviceId, pointId, String.valueOf(altitude),

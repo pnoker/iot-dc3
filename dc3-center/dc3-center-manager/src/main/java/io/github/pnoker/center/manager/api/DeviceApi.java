@@ -16,14 +16,14 @@ package io.github.pnoker.center.manager.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DeviceDto;
 import io.github.pnoker.api.center.manager.feign.DeviceClient;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.DeviceDto;
-import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.entity.Device;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,7 +55,8 @@ public class DeviceApi implements DeviceClient {
     @Override
     public R<Device> add(Device device, String tenantId) {
         try {
-            Device add = deviceService.add(device.setTenantId(tenantId));
+            device.setTenantId(tenantId);
+            Device add = deviceService.add(device);
             if (ObjectUtil.isNotNull(add)) {
                 // 通知驱动新增设备
                 notifyService.notifyDriverDevice(MetadataConstant.Device.ADD, add);
@@ -85,7 +86,8 @@ public class DeviceApi implements DeviceClient {
     @Override
     public R<Device> update(Device device, String tenantId) {
         try {
-            Device update = deviceService.update(device.setTenantId(tenantId));
+            device.setTenantId(tenantId);
+            Device update = deviceService.update(device);
             if (ObjectUtil.isNotNull(update)) {
                 // 通知驱动更新设备
                 notifyService.notifyDriverDevice(MetadataConstant.Device.UPDATE, update);

@@ -29,8 +29,8 @@ import io.github.pnoker.api.center.manager.dto.DriverDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.entity.Driver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -91,7 +91,7 @@ public class DriverServiceImpl implements DriverService {
         driver.setUpdateTime(null);
         if (driverMapper.updateById(driver) > 0) {
             Driver select = driverMapper.selectById(driver.getId());
-            driver.setServiceName(select.getServiceName()).setHost(select.getHost()).setPort(select.getPort());
+            driver.setServiceName(select.getServiceName()).setHost(select.getServerHost()).setPort(select.getServerPort());
             return select;
         }
         throw new ServiceException("The driver update failed");
@@ -138,9 +138,9 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver selectByHostPort(String type, String host, Integer port, String tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.eq(Driver::getType, type);
-        queryWrapper.eq(Driver::getHost, host);
-        queryWrapper.eq(Driver::getPort, port);
+        queryWrapper.eq(Driver::getTypeFlag, type);
+        queryWrapper.eq(Driver::getServerHost, host);
+        queryWrapper.eq(Driver::getServerPort, port);
         queryWrapper.eq(Driver::getTenantId, tenantId);
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
@@ -189,15 +189,15 @@ public class DriverServiceImpl implements DriverService {
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         if (ObjectUtil.isNotNull(driverDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getName()), Driver::getName, driverDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getDriverName()), Driver::getDriverName, driverDto.getDriverName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceName()), Driver::getServiceName, driverDto.getServiceName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getHost()), Driver::getHost, driverDto.getHost());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getPort()), Driver::getPort, driverDto.getPort());
-            if (CharSequenceUtil.isEmpty(driverDto.getType())) {
-                driverDto.setType(PrefixConstant.DRIVER);
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServerHost()), Driver::getServerHost, driverDto.getServerHost());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getServerPort()), Driver::getServerPort, driverDto.getServerPort());
+            if (CharSequenceUtil.isEmpty(driverDto.getTypeFlag())) {
+                driverDto.setTypeFlag(PrefixConstant.DRIVER);
             }
-            queryWrapper.like(Driver::getType, driverDto.getType());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getEnable()), Driver::getEnable, driverDto.getEnable());
+            queryWrapper.like(Driver::getTypeFlag, driverDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getEnableFlag()), Driver::getEnableFlag, driverDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverDto.getTenantId()), Driver::getTenantId, driverDto.getTenantId());
         }
         return queryWrapper;

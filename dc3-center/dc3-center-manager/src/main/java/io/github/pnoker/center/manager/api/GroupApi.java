@@ -16,12 +16,12 @@ package io.github.pnoker.center.manager.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.GroupDto;
 import io.github.pnoker.api.center.manager.feign.GroupClient;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.GroupDto;
-import io.github.pnoker.common.model.Group;
+import io.github.pnoker.common.entity.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +45,8 @@ public class GroupApi implements GroupClient {
     @Override
     public R<Group> add(Group group, String tenantId) {
         try {
-            Group add = groupService.add(group.setTenantId(tenantId));
+            group.setTenantId(tenantId);
+            Group add = groupService.add(group);
             if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
@@ -67,7 +68,8 @@ public class GroupApi implements GroupClient {
     @Override
     public R<Group> update(Group group, String tenantId) {
         try {
-            Group update = groupService.update(group.setTenantId(tenantId));
+            group.setTenantId(tenantId);
+            Group update = groupService.update(group);
             if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }

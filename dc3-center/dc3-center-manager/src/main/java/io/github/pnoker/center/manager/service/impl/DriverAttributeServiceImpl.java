@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.dto.DriverAttributeDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.DriverAttribute;
+import io.github.pnoker.common.entity.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +52,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     public DriverAttribute add(DriverAttribute driverAttribute) {
         try {
-            selectByNameAndDriverId(driverAttribute.getName(), driverAttribute.getDriverId());
+            selectByNameAndDriverId(driverAttribute.getAttributeName(), driverAttribute.getDriverId());
             throw new DuplicateException("The driver attribute already exists");
         } catch (NotFoundException notFoundException) {
             if (driverAttributeMapper.insert(driverAttribute) > 0) {
@@ -80,7 +80,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         driverAttribute.setUpdateTime(null);
         if (driverAttributeMapper.updateById(driverAttribute) > 0) {
             DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
-            driverAttribute.setName(select.getName()).setDriverId(select.getDriverId());
+            driverAttribute.setAttributeName(select.getAttributeName()).setDriverId(select.getDriverId());
             return select;
         }
         throw new ServiceException("The driver attribute update failed");
@@ -104,7 +104,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     public DriverAttribute selectByNameAndDriverId(String name, String driverId) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        queryWrapper.eq(DriverAttribute::getName, name);
+        queryWrapper.eq(DriverAttribute::getAttributeName, name);
         queryWrapper.eq(DriverAttribute::getDriverId, driverId);
         DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
         if (null == driverAttribute) {
@@ -145,9 +145,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         if (ObjectUtil.isNotNull(driverAttributeDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getName()), DriverAttribute::getName, driverAttributeDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getAttributeName()), DriverAttribute::getAttributeName, driverAttributeDto.getAttributeName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getDisplayName()), DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(driverAttributeDto.getType()), DriverAttribute::getType, driverAttributeDto.getType());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(driverAttributeDto.getTypeFlag()), DriverAttribute::getTypeFlag, driverAttributeDto.getTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributeDto.getDriverId()), DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
         }
         return queryWrapper;

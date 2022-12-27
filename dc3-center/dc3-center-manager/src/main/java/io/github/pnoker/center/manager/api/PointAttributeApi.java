@@ -23,7 +23,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.model.PointAttribute;
+import io.github.pnoker.common.entity.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

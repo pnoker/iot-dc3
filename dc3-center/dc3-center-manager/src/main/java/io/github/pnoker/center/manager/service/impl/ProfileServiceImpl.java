@@ -30,7 +30,7 @@ import io.github.pnoker.api.center.manager.dto.ProfileDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.common.entity.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +60,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public Profile add(Profile profile) {
         try {
-            selectByNameAndType(profile.getName(), profile.getType(), profile.getTenantId());
+            selectByNameAndType(profile.getProfileName(), profile.getTypeFlag(), profile.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException1) {
             if (profileMapper.insert(profile) > 0) {
@@ -104,8 +104,8 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public Profile selectByNameAndType(String name, Short type, String tenantId) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.eq(Profile::getName, name);
-        queryWrapper.eq(Profile::getType, type);
+        queryWrapper.eq(Profile::getProfileName, name);
+        queryWrapper.eq(Profile::getTypeFlag, type);
         queryWrapper.eq(Profile::getTenantId, tenantId);
         Profile profile = profileMapper.selectOne(queryWrapper);
         if (null == profile) {
@@ -144,9 +144,9 @@ public class ProfileServiceImpl implements ProfileService {
     public LambdaQueryWrapper<Profile> fuzzyQuery(ProfileDto profileDto) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         if (ObjectUtil.isNotEmpty(profileDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getName()), Profile::getName, profileDto.getName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getShare()), Profile::getShare, profileDto.getShare());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getEnable()), Profile::getEnable, profileDto.getEnable());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getProfileName()), Profile::getProfileName, profileDto.getProfileName());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getShareFlag()), Profile::getShareFlag, profileDto.getShareFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getEnableFlag()), Profile::getEnableFlag, profileDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotBlank(profileDto.getTenantId()), Profile::getTenantId, profileDto.getTenantId());
         }
         return queryWrapper;
@@ -156,9 +156,9 @@ public class ProfileServiceImpl implements ProfileService {
         QueryWrapper<Profile> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(profileDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getName()), "dp.name", profileDto.getName());
-            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getShare()), "dp.share", profileDto.getShare());
-            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getEnable()), "dp.enable", profileDto.getEnable());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getProfileName()), "dp.name", profileDto.getProfileName());
+            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getShareFlag()), "dp.share", profileDto.getShareFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getEnableFlag()), "dp.enable", profileDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileDto.getTenantId()), "dp.tenant_id", profileDto.getTenantId());
         }
         return queryWrapper.lambda();

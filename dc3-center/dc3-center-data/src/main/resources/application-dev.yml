@@ -27,11 +27,6 @@ data:
         host: dc3-elasticsearch
         port: 9200
 
-eureka:
-  instance:
-    # Custom node registration ip, dedicated to the development environment
-    ip-address: ${SERVICE_HOST}
-
 spring:
   datasource:
     # Customize MySQL configuration

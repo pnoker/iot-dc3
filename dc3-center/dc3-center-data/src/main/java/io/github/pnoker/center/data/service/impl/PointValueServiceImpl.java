@@ -30,8 +30,8 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.api.center.data.dto.PointValueDto;
-import io.github.pnoker.common.bean.model.BaseModel;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.bean.entity.BaseModel;
+import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.SneakyThrows;
@@ -99,7 +99,7 @@ public class PointValueServiceImpl implements PointValueService {
         pointValuePage.setCurrent(pointValueDto.getPage().getCurrent()).setSize(pointValueDto.getPage().getSize());
 
         PointDto pointDto = (new PointDto()).setDeviceId(pointValueDto.getDeviceId()).setPage(pointValueDto.getPage());
-        pointDto.setName(pointValueDto.getName()).setEnable(pointValueDto.getEnable());
+        pointDto.setPointName(pointValueDto.getName()).setEnableStatus(pointValueDto.getEnable());
         R<Page<Point>> pageR = pointClient.list(pointDto, tenantId);
         if (!pageR.isOk()) return pointValuePage;
 

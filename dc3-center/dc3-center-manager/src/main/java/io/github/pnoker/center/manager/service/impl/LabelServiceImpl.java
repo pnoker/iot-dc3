@@ -27,8 +27,8 @@ import io.github.pnoker.api.center.manager.dto.LabelBindDto;
 import io.github.pnoker.api.center.manager.dto.LabelDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Label;
-import io.github.pnoker.common.model.LabelBind;
+import io.github.pnoker.common.entity.Label;
+import io.github.pnoker.common.entity.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +55,7 @@ public class LabelServiceImpl implements LabelService {
      */
     @Override
     public Label add(Label label) {
-        selectByName(label.getName(), label.getTenantId());
+        selectByName(label.getLabelName(), label.getTenantId());
         if (labelMapper.insert(label) > 0) {
             return labelMapper.selectById(label.getId());
         }
@@ -89,7 +89,7 @@ public class LabelServiceImpl implements LabelService {
         label.setUpdateTime(null);
         if (labelMapper.updateById(label) > 0) {
             Label select = labelMapper.selectById(label.getId());
-            label.setName(select.getName());
+            label.setLabelName(select.getLabelName());
             return select;
         }
         throw new ServiceException("The label update failed");
@@ -113,7 +113,7 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public Label selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        queryWrapper.eq(Label::getName, name);
+        queryWrapper.eq(Label::getLabelName, name);
         queryWrapper.eq(Label::getTenantId, tenantId);
         Label label = labelMapper.selectOne(queryWrapper);
         if (null == label) {
@@ -140,7 +140,7 @@ public class LabelServiceImpl implements LabelService {
     public LambdaQueryWrapper<Label> fuzzyQuery(LabelDto labelDto) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         if (ObjectUtil.isNotNull(labelDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(labelDto.getName()), Label::getName, labelDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(labelDto.getLabelName()), Label::getLabelName, labelDto.getLabelName());
             queryWrapper.eq(CharSequenceUtil.isNotBlank(labelDto.getColor()), Label::getColor, labelDto.getColor());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelDto.getTenantId()), Label::getTenantId, labelDto.getTenantId());
         }

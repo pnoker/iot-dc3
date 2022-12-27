@@ -29,7 +29,7 @@ import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.entity.Point;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +62,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public Point add(Point point) {
         try {
-            selectByNameAndProfileId(point.getName(), point.getProfileId());
+            selectByNameAndProfileId(point.getPointName(), point.getProfileId());
             throw new DuplicateException("The point already exists in the profile");
         } catch (NotFoundException notFoundException) {
             if (pointMapper.insert(point) > 0) {
@@ -88,9 +88,9 @@ public class PointServiceImpl implements PointService {
     public Point update(Point point) {
         Point old = selectById(point.getId());
         point.setUpdateTime(null);
-        if (!old.getProfileId().equals(point.getProfileId()) || !old.getName().equals(point.getName())) {
+        if (!old.getProfileId().equals(point.getProfileId()) || !old.getPointName().equals(point.getPointName())) {
             try {
-                selectByNameAndProfileId(point.getName(), point.getProfileId());
+                selectByNameAndProfileId(point.getPointName(), point.getProfileId());
                 throw new DuplicateException("The point already exists");
             } catch (NotFoundException ignored) {
                 // nothing to do
@@ -98,7 +98,7 @@ public class PointServiceImpl implements PointService {
         }
         if (pointMapper.updateById(point) > 0) {
             Point select = pointMapper.selectById(point.getId());
-            point.setName(select.getName()).setProfileId(select.getProfileId());
+            point.setPointName(select.getPointName()).setProfileId(select.getProfileId());
             return select;
         }
         throw new ServiceException("The point update failed");
@@ -134,7 +134,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public Point selectByNameAndProfileId(String name, String profileId) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        queryWrapper.eq(Point::getName, name);
+        queryWrapper.eq(Point::getPointName, name);
         queryWrapper.eq(Point::getProfileId, profileId);
         Point point = pointMapper.selectOne(queryWrapper);
         if (null == point) {
@@ -213,12 +213,12 @@ public class PointServiceImpl implements PointService {
     public LambdaQueryWrapper<Point> fuzzyQuery(PointDto pointDto) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (null != pointDto) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getName()), Point::getName, pointDto.getName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getType()), Point::getType, pointDto.getType());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getRw()), Point::getRw, pointDto.getRw());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getAccrue()), Point::getAccrue, pointDto.getAccrue());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getPointName()), Point::getPointName, pointDto.getPointName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getTypeFlag()), Point::getTypeFlag, pointDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getRwFlag()), Point::getRwFlag, pointDto.getRwFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getAccrueFlag()), Point::getAccrueFlag, pointDto.getAccrueFlag());
             queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getProfileId()), Point::getProfileId, pointDto.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getEnable()), Point::getEnable, pointDto.getEnable());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getEnableFlag()), Point::getEnableFlag, pointDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getTenantId()), Point::getTenantId, pointDto.getTenantId());
         }
         return queryWrapper;
@@ -228,12 +228,12 @@ public class PointServiceImpl implements PointService {
         QueryWrapper<Point> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(pointDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getName()), "dp.name", pointDto.getName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getType()), "dp.type", pointDto.getType());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getRw()), "dp.rw", pointDto.getRw());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getAccrue()), "dp.accrue", pointDto.getAccrue());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getPointName()), "dp.name", pointDto.getPointName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getTypeFlag()), "dp.type", pointDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getRwFlag()), "dp.rw", pointDto.getRwFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getAccrueFlag()), "dp.accrue", pointDto.getAccrueFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointDto.getProfileId()), "dp.profile_id", pointDto.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getEnable()), "dp.enable", pointDto.getEnable());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getEnableFlag()), "dp.enable", pointDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointDto.getTenantId()), "dp.tenant_id", pointDto.getTenantId());
         }
         return queryWrapper.lambda();

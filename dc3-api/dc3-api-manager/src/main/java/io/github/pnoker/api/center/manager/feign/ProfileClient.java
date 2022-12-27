@@ -20,7 +20,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.ProfileDto;
-import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.common.entity.Profile;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;

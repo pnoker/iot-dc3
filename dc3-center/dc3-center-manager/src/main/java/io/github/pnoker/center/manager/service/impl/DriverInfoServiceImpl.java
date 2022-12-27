@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.DriverInfo;
+import io.github.pnoker.common.entity.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

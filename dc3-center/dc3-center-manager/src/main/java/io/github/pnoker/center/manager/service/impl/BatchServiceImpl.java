@@ -17,9 +17,9 @@ package io.github.pnoker.center.manager.service.impl;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.driver.DriverMetadata;
-import io.github.pnoker.common.bean.model.BaseModel;
+import io.github.pnoker.common.bean.entity.BaseModel;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -161,7 +161,7 @@ public class BatchServiceImpl implements BatchService {
             List<DriverInfo> driverInfos = driverInfoService.selectByDeviceId(deviceId);
             driverInfos.forEach(driverInfo -> {
                 DriverAttribute attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
-                attributeInfoMap.put(attribute.getName(), new AttributeInfo(driverInfo.getValue(), attribute.getType()));
+                attributeInfoMap.put(attribute.getAttributeName(), new AttributeInfo(driverInfo.getConfigValue(), attribute.getTypeFlag()));
             });
         } catch (NotFoundException ignored) {
             // nothing to do
@@ -205,7 +205,7 @@ public class BatchServiceImpl implements BatchService {
                         Map<String, AttributeInfo> infoMap = new ConcurrentHashMap<>(16);
                         pointInfos.forEach(pointInfo -> {
                             PointAttribute attribute = pointAttributeMap.get(pointInfo.getPointAttributeId());
-                            infoMap.put(attribute.getName(), new AttributeInfo(pointInfo.getValue(), attribute.getType()));
+                            infoMap.put(attribute.getAttributeName(), new AttributeInfo(pointInfo.getConfigValue(), attribute.getTypeFlag()));
                         });
 
                         if (infoMap.size() > 0) {

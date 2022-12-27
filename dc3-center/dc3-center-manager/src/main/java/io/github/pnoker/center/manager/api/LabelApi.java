@@ -16,12 +16,12 @@ package io.github.pnoker.center.manager.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.LabelDto;
 import io.github.pnoker.api.center.manager.feign.LabelClient;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.LabelDto;
-import io.github.pnoker.common.model.Label;
+import io.github.pnoker.common.entity.Label;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +45,8 @@ public class LabelApi implements LabelClient {
     @Override
     public R<Label> add(Label label, String tenantId) {
         try {
-            Label add = labelService.add(label.setTenantId(tenantId));
+            label.setTenantId(tenantId);
+            Label add = labelService.add(label);
             if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
@@ -67,7 +68,8 @@ public class LabelApi implements LabelClient {
     @Override
     public R<Label> update(Label label, String tenantId) {
         try {
-            Label update = labelService.update(label.setTenantId(tenantId));
+            label.setTenantId(tenantId);
+            Label update = labelService.update(label);
             if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }

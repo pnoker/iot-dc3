@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.entity.*;
 
 /**
  * Notify Interface

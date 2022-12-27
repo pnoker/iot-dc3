@@ -16,7 +16,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.manager.dto.DriverDto;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.entity.Driver;
 
 import java.util.List;
 import java.util.Set;

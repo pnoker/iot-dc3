@@ -18,9 +18,9 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.enums.StatusEnum;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.bean.model.DeviceEvent;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.bean.entity.DeviceEvent;
+import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
@@ -51,10 +51,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        if (point.getType().equals("string")) {
+        if (point.getTypeFlag().equals("string")) {
             return RandomUtil.randomString(8);
         }
-        if (point.getType().equals("boolean")) {
+        if (point.getTypeFlag().equals("boolean")) {
             return String.valueOf(RandomUtil.randomBoolean());
         }
         return String.valueOf(RandomUtil.randomDouble(100));

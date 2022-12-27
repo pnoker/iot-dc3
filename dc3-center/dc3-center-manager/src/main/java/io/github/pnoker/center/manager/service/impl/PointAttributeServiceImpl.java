@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.PointAttribute;
+import io.github.pnoker.common.entity.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +52,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     public PointAttribute add(PointAttribute pointAttribute) {
         try {
-            selectByNameAndDriverId(pointAttribute.getName(), pointAttribute.getDriverId());
+            selectByNameAndDriverId(pointAttribute.getAttributeName(), pointAttribute.getDriverId());
             throw new DuplicateException("The point attribute already exists");
         } catch (NotFoundException notFoundException) {
             if (pointAttributeMapper.insert(pointAttribute) > 0) {
@@ -80,7 +80,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         pointAttribute.setUpdateTime(null);
         if (pointAttributeMapper.updateById(pointAttribute) > 0) {
             PointAttribute select = pointAttributeMapper.selectById(pointAttribute.getId());
-            pointAttribute.setName(select.getName()).setDriverId(select.getDriverId());
+            pointAttribute.setAttributeName(select.getAttributeName()).setDriverId(select.getDriverId());
             return select;
         }
         throw new ServiceException("The point attribute update failed");
@@ -104,7 +104,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     public PointAttribute selectByNameAndDriverId(String name, String driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        queryWrapper.eq(PointAttribute::getName, name);
+        queryWrapper.eq(PointAttribute::getAttributeName, name);
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
         PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
         if (null == pointAttribute) {
@@ -145,9 +145,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         if (ObjectUtil.isNotNull(pointAttributeDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getName()), PointAttribute::getName, pointAttributeDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getAttributeName()), PointAttribute::getAttributeName, pointAttributeDto.getAttributeName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getDisplayName()), PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointAttributeDto.getType()), PointAttribute::getType, pointAttributeDto.getType());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointAttributeDto.getTypeFlag()), PointAttribute::getTypeFlag, pointAttributeDto.getTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributeDto.getDriverId()), PointAttribute::getDriverId, pointAttributeDto.getDriverId());
         }
         return queryWrapper;

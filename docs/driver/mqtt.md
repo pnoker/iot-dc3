@@ -65,12 +65,12 @@
       name: commandTopic
       type: string
       value: commandTopic
-      description: 测点/设备接收下行指令的Mqtt主题
+      remark: 测点/设备接收下行指令的Mqtt主题
     - displayName: 指令Qos
       name: commandQos
       type: int
       value: 2
-      description: 测点/设备接收下行指令的Mqtt主题的Qos
+      remark: 测点/设备接收下行指令的Mqtt主题的Qos
 ```
 
 

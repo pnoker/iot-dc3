@@ -17,7 +17,7 @@ package io.github.pnoker.api.center.manager.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.bean.model.DriverEvent;
+import io.github.pnoker.common.bean.entity.DriverEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

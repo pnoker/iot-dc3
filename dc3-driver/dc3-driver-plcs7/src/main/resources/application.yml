@@ -16,7 +16,7 @@ driver:
   name: PlcS7Driver
   type: driver
   project: @project.artifactId@
-  description: @project.description@
+  remark: @project.description@
   schedule:
     status:
       enable: true
@@ -32,7 +32,7 @@ driver:
       name: host
       type: string
       value: 192.168.0.20
-      description: Ip
+      remark: Ip
       option:
         type: input\select\checkox\switch\time...
         required: true
@@ -42,7 +42,7 @@ driver:
       name: port
       type: int
       value: 102
-      description: Port
+      remark: Port
       option:
         type: input\select\checkox\switch\time...
         required: true
@@ -53,7 +53,7 @@ driver:
       name: dbNum
       type: int
       value: 0
-      description: 数据块号，从 0 开始计数
+      remark: 数据块号，从 0 开始计数
       option:
         type: input\select\checkox\switch\time...
         required: true
@@ -63,7 +63,7 @@ driver:
       name: byteOffset
       type: int
       value: 0
-      description: 字偏移
+      remark: 字偏移
       option:
         type: input\select\checkox\switch\time...
         required: true
@@ -73,7 +73,7 @@ driver:
       name: bitOffset
       type: int
       value: 0
-      description: 位偏移
+      remark: 位偏移
       option:
         type: input\select\checkox\switch\time...
         required: true
@@ -83,7 +83,7 @@ driver:
       name: blockSize
       type: int
       value: 8
-      description: 数据块长度
+      remark: 数据块长度
       option:
         type: input\select\checkox\switch\time...
         required: true

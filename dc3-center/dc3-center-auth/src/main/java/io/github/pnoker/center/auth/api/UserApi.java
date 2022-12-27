@@ -22,7 +22,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,7 +68,7 @@ public class UserApi implements UserClient {
     @Override
     public R<User> update(User user) {
         try {
-            User update = userService.update(user.setName(null));
+            User update = userService.update(user.setLoginName(null));
             if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }

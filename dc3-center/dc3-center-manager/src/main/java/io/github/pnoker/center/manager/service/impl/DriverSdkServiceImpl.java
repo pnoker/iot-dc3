@@ -20,10 +20,10 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.driver.DriverRegister;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Driver;
-import io.github.pnoker.common.model.DriverAttribute;
-import io.github.pnoker.common.model.PointAttribute;
-import io.github.pnoker.common.model.Tenant;
+import io.github.pnoker.common.entity.Driver;
+import io.github.pnoker.common.entity.DriverAttribute;
+import io.github.pnoker.common.entity.PointAttribute;
+import io.github.pnoker.common.entity.Tenant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +84,8 @@ public class DriverSdkServiceImpl implements DriverSdkService {
         }
 
         // register driver
-        Driver driver = driverRegister.getDriver().setTenantId(tenantR.getData().getId());
+        Driver driver = driverRegister.getDriver();
+        driver.setTenantId(tenantR.getData().getId());
         log.info("Register driver {}", driver);
         try {
             Driver byServiceName = driverService.selectByServiceName(driver.getServiceName());
@@ -94,8 +95,8 @@ public class DriverSdkServiceImpl implements DriverSdkService {
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", driver);
             try {
-                Driver byHostPort = driverService.selectByHostPort(driver.getType(), driver.getHost(), driver.getPort(), driver.getTenantId());
-                throw new ServiceException("The port(" + driver.getPort() + ") is already occupied by driver(" + byHostPort.getServiceName() + "/" + byHostPort.getName() + ")");
+                Driver byHostPort = driverService.selectByHostPort(driver.getTypeFlag(), driver.getServerHost(), driver.getServerPort(), driver.getTenantId());
+                throw new ServiceException("The port(" + driver.getServerPort() + ") is already occupied by driver(" + byHostPort.getServiceName() + "/" + byHostPort.getDriverName() + ")");
             } catch (NotFoundException notFoundException2) {
                 driver = driverService.add(driver);
             }
@@ -112,13 +113,13 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     private void registerDriverAttribute(DriverRegister driverRegister, Driver driver) {
         Map<String, DriverAttribute> newDriverAttributeMap = new HashMap<>(8);
         if (null != driverRegister.getDriverAttributes() && !driverRegister.getDriverAttributes().isEmpty()) {
-            driverRegister.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
+            driverRegister.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         }
 
         Map<String, DriverAttribute> oldDriverAttributeMap = new HashMap<>(8);
         try {
             List<DriverAttribute> byDriverId = driverAttributeService.selectByDriverId(driver.getId());
-            byDriverId.forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getName(), driverAttribute));
+            byDriverId.forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
         }
@@ -159,13 +160,13 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     private void registerPointAttribute(DriverRegister driverRegister, Driver driver) {
         Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);
         if (null != driverRegister.getPointAttributes() && !driverRegister.getPointAttributes().isEmpty()) {
-            driverRegister.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
+            driverRegister.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         }
 
         Map<String, PointAttribute> oldPointAttributeMap = new HashMap<>(8);
         try {
             List<PointAttribute> byDriverId = pointAttributeService.selectByDriverId(driver.getId());
-            byDriverId.forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getName(), pointAttribute));
+            byDriverId.forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
         }

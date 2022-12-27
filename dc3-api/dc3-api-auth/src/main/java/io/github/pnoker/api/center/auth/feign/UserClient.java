@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.auth.fallback.UserClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.UserDto;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.entity.User;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -44,7 +44,7 @@ public interface UserClient {
      * 新增用户
      *
      * @param user 用户
-     * @return {@link io.github.pnoker.common.model.User}
+     * @return {@link io.github.pnoker.common.entity.User}
      */
     @PostMapping("/add")
     R<User> add(@Validated(Insert.class) @RequestBody User user);
@@ -66,7 +66,7 @@ public interface UserClient {
      * </ol>
      *
      * @param user 用户
-     * @return {@link io.github.pnoker.common.model.User}
+     * @return {@link io.github.pnoker.common.entity.User}
      */
     @PostMapping("/update")
     R<User> update(@Validated(Update.class) @RequestBody User user);
@@ -84,7 +84,7 @@ public interface UserClient {
      * 根据 ID 查询用户
      *
      * @param id 用户ID
-     * @return {@link io.github.pnoker.common.model.User}
+     * @return {@link io.github.pnoker.common.entity.User}
      */
     @GetMapping("/id/{id}")
     R<User> selectById(@NotNull @PathVariable(value = "id") String id);
@@ -93,7 +93,7 @@ public interface UserClient {
      * 根据 Name 查询 User
      *
      * @param name 用户名称
-     * @return {@link io.github.pnoker.common.model.User}
+     * @return {@link io.github.pnoker.common.entity.User}
      */
     @GetMapping("/name/{name}")
     R<User> selectByName(@NotNull @PathVariable(value = "name") String name);
@@ -102,7 +102,7 @@ public interface UserClient {
      * 模糊分页查询 User
      *
      * @param userDto 用户和分页参数
-     * @return 带分页的 {@link io.github.pnoker.common.model.User}
+     * @return 带分页的 {@link io.github.pnoker.common.entity.User}
      */
     @PostMapping("/list")
     R<Page<User>> list(@RequestBody(required = false) UserDto userDto);

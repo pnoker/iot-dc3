@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.manager.feign.GroupClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.GroupDto;
-import io.github.pnoker.common.model.Group;
+import io.github.pnoker.common.entity.Group;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

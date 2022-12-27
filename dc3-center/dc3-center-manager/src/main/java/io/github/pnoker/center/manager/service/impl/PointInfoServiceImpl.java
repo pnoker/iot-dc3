@@ -27,8 +27,8 @@ import io.github.pnoker.api.center.manager.dto.PointInfoDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.entity.PointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
