@@ -30,17 +30,17 @@
       name: host
       type: string
       value: localhost
-      description: Opc Ua IP
+      remark: Opc Ua IP
     - displayName: 端口
       name: port
       type: int
       value: 18600
-      description: Opc Ua Port
+      remark: Opc Ua Port
     - displayName: 路径
       name: path
       type: string
       value: /
-      description: Opc Ua Path
+      remark: Opc Ua Path
 ```
 
 
@@ -59,12 +59,12 @@
       name: namespace
       type: int
       value: 5
-      description: 命名空间索引
+      remark: 命名空间索引
     - displayName: 位号
       name: tag
       type: string
       value: TAG
-      description: 位号名称
+      remark: 位号名称
 ```
 
 

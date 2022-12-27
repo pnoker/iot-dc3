@@ -19,7 +19,7 @@ import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.driver.DriverConfiguration;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;

@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.auth.fallback.TenantClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.TenantDto;
-import io.github.pnoker.common.model.Tenant;
+import io.github.pnoker.common.entity.Tenant;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -44,7 +44,7 @@ public interface TenantClient {
      * 新增租户
      *
      * @param tenant 租户
-     * @return {@link io.github.pnoker.common.model.Tenant}
+     * @return {@link io.github.pnoker.common.entity.Tenant}
      */
     @PostMapping("/add")
     R<Tenant> add(@Validated(Insert.class) @RequestBody Tenant tenant);
@@ -66,7 +66,7 @@ public interface TenantClient {
      * </ol>
      *
      * @param tenant Tenant
-     * @return {@link io.github.pnoker.common.model.Tenant}
+     * @return {@link io.github.pnoker.common.entity.Tenant}
      */
     @PostMapping("/update")
     R<Tenant> update(@Validated(Update.class) @RequestBody Tenant tenant);
@@ -75,7 +75,7 @@ public interface TenantClient {
      * 根据 ID 查询租户
      *
      * @param id 租户ID
-     * @return {@link io.github.pnoker.common.model.Tenant}
+     * @return {@link io.github.pnoker.common.entity.Tenant}
      */
     @GetMapping("/id/{id}")
     R<Tenant> selectById(@NotNull @PathVariable(value = "id") String id);
@@ -84,7 +84,7 @@ public interface TenantClient {
      * 根据 Name 查询租户
      *
      * @param name 租户名称
-     * @return {@link io.github.pnoker.common.model.Tenant}
+     * @return {@link io.github.pnoker.common.entity.Tenant}
      */
     @GetMapping("/name/{name}")
     R<Tenant> selectByName(@NotNull @PathVariable(value = "name") String name);
@@ -93,7 +93,7 @@ public interface TenantClient {
      * 模糊分页查询租户
      *
      * @param tenantDto 租户和分页参数
-     * @return 带分页的 {@link io.github.pnoker.common.model.Tenant}
+     * @return 带分页的 {@link io.github.pnoker.common.entity.Tenant}
      */
     @PostMapping("/list")
     R<Page<Tenant>> list(@RequestBody(required = false) TenantDto tenantDto);

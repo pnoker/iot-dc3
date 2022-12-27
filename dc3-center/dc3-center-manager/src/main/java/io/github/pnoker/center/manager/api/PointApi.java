@@ -17,14 +17,14 @@ package io.github.pnoker.center.manager.api;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.api.center.manager.feign.PointClient;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.PointDto;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.entity.Point;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +56,8 @@ public class PointApi implements PointClient {
     @Override
     public R<Point> add(Point point, String tenantId) {
         try {
-            Point add = pointService.add(point.setTenantId(tenantId));
+            point.setTenantId(tenantId);
+            Point add = pointService.add(point);
             if (ObjectUtil.isNotNull(add)) {
                 notifyService.notifyDriverPoint(MetadataConstant.Point.ADD, add);
                 return R.ok(add);
@@ -84,7 +85,8 @@ public class PointApi implements PointClient {
     @Override
     public R<Point> update(Point point, String tenantId) {
         try {
-            Point update = pointService.update(point.setTenantId(tenantId));
+            point.setTenantId(tenantId);
+            Point update = pointService.update(point);
             if (ObjectUtil.isNotNull(update)) {
                 notifyService.notifyDriverPoint(MetadataConstant.Point.UPDATE, update);
                 return R.ok(update);

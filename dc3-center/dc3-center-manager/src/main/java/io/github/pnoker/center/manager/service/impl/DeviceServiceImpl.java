@@ -29,9 +29,9 @@ import io.github.pnoker.api.center.manager.dto.DeviceDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.model.ProfileBind;
+import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.entity.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +69,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public Device add(Device device) {
         try {
-            selectByName(device.getName(), device.getTenantId());
+            selectByName(device.getDeviceName(), device.getTenantId());
             throw new DuplicateException("The device already exists");
         } catch (NotFoundException notFoundException) {
             if (deviceMapper.insert(device) > 0) {
@@ -117,7 +117,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (deviceMapper.updateById(device) > 0) {
             Device select = deviceMapper.selectById(device.getId());
             select.setProfileIds(newProfileIds);
-            device.setName(select.getName());
+            device.setDeviceName(select.getDeviceName());
             return select;
         }
         throw new ServiceException("The device update failed");
@@ -141,7 +141,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public Device selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.eq(Device::getName, name);
+        queryWrapper.eq(Device::getDeviceName, name);
         queryWrapper.eq(Device::getTenantId, tenantId);
         Device device = deviceMapper.selectOne(queryWrapper);
         if (null == device) {
@@ -204,9 +204,9 @@ public class DeviceServiceImpl implements DeviceService {
     public LambdaQueryWrapper<Device> fuzzyQuery(DeviceDto deviceDto) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         if (ObjectUtil.isNotEmpty(deviceDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getName()), Device::getName, deviceDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getDeviceName()), Device::getDeviceName, deviceDto.getDeviceName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getDriverId()), Device::getDriverId, deviceDto.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(deviceDto.getEnable()), Device::getEnable, deviceDto.getEnable());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(deviceDto.getEnableFlag()), Device::getEnableFlag, deviceDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getTenantId()), Device::getTenantId, deviceDto.getTenantId());
         }
         return queryWrapper;
@@ -216,9 +216,9 @@ public class DeviceServiceImpl implements DeviceService {
         QueryWrapper<Device> queryWrapper = Wrappers.query();
         queryWrapper.eq("dd.deleted", 0);
         if (ObjectUtil.isNotNull(deviceDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getName()), "dd.name", deviceDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getDeviceName()), "dd.name", deviceDto.getDeviceName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getDriverId()), "dd.driver_id", deviceDto.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotNull(deviceDto.getEnable()), "dd.enable", deviceDto.getEnable());
+            queryWrapper.eq(ObjectUtil.isNotNull(deviceDto.getEnableFlag()), "dd.enable", deviceDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getTenantId()), "dd.tenant_id", deviceDto.getTenantId());
         }
         return queryWrapper.lambda();

@@ -16,13 +16,13 @@ package io.github.pnoker.center.auth.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.auth.dto.TenantDto;
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.api.center.auth.dto.TenantDto;
+import io.github.pnoker.common.entity.Tenant;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.Tenant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,7 +68,8 @@ public class TenantApi implements TenantClient {
     @Override
     public R<Tenant> update(Tenant tenant) {
         try {
-            Tenant update = tenantService.update(tenant.setName(null));
+            tenant.setTenantName(null);
+            Tenant update = tenantService.update(tenant);
             if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }

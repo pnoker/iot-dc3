@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.dto.GroupDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Group;
+import io.github.pnoker.common.entity.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +53,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group add(Group group) {
         try {
-            selectByName(group.getName(), group.getTenantId());
+            selectByName(group.getGroupName(), group.getTenantId());
             throw new DuplicateException("The device group already exists");
         } catch (NotFoundException notFoundException) {
             if (groupMapper.insert(group) > 0) {
@@ -81,7 +81,7 @@ public class GroupServiceImpl implements GroupService {
         group.setUpdateTime(null);
         if (groupMapper.updateById(group) > 0) {
             Group select = groupMapper.selectById(group.getId());
-            group.setName(select.getName());
+            group.setGroupName(select.getGroupName());
             return select;
         }
         throw new ServiceException("The group update failed");
@@ -105,7 +105,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        queryWrapper.eq(Group::getName, name);
+        queryWrapper.eq(Group::getGroupName, name);
         Group group = groupMapper.selectOne(queryWrapper);
         if (null == group) {
             throw new NotFoundException();
@@ -131,7 +131,7 @@ public class GroupServiceImpl implements GroupService {
     public LambdaQueryWrapper<Group> fuzzyQuery(GroupDto groupDto) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         if (ObjectUtil.isNotNull(groupDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(groupDto.getName()), Group::getName, groupDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(groupDto.getGroupName()), Group::getGroupName, groupDto.getGroupName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(groupDto.getTenantId()), Group::getTenantId, groupDto.getTenantId());
         }
         return queryWrapper;

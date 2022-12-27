@@ -19,10 +19,10 @@ import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.point.PointDetail;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.model.Profile;
-import io.github.pnoker.common.model.ProfileBind;
+import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.entity.Profile;
+import io.github.pnoker.common.entity.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +57,9 @@ public class AutoServiceImpl implements AutoService {
     public PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, String driverId, String tenantId) {
         // 新增设备
         Device device = new Device();
-        device.setName(deviceName).setDriverId(driverId).setTenantId(tenantId).setDescription("auto create by driver");
+        device.setDeviceName(deviceName).setDriverId(driverId);
+        device.setTenantId(tenantId);
+        device.setRemark("auto create by driver");
         try {
             device = deviceService.add(device);
 
@@ -71,7 +73,7 @@ public class AutoServiceImpl implements AutoService {
 
         // 新增私有模板
         Profile profile = new Profile();
-        profile.setName(deviceName).setShare(false).setType((short) 2).setTenantId(tenantId);
+        profile.setProfileName(deviceName).setShare(false).setType((short) 2).setTenantId(tenantId);
         try {
             profile = profileService.add(profile);
         } catch (DuplicateException duplicateException) {
@@ -92,7 +94,9 @@ public class AutoServiceImpl implements AutoService {
 
             // 新增位号
             Point point = new Point();
-            point.setName(pointName).setProfileId(profile.getId()).setTenantId(tenantId).setDefault();
+            point.setPointName(pointName).setProfileId(profile.getId());
+            point.setTenantId(tenantId);
+            point.setDefault();
             try {
                 point = pointService.add(point);
 

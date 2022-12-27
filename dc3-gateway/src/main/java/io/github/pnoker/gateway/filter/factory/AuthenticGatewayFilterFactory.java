@@ -23,9 +23,10 @@ import io.github.pnoker.common.annotation.Logs;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.auth.Login;
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.entity.Tenant;
+import io.github.pnoker.common.entity.User;
+import io.github.pnoker.common.enums.EnableTypeEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.gateway.bean.TokenRequestHeader;
@@ -90,8 +91,9 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 if (ObjectUtil.isEmpty(tenant)) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
+                // todo 后期全部替换为grpc
                 R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(tenant);
-                if (!tenantR.isOk() || Boolean.TRUE.equals(!tenantR.getData().getEnable())) {
+                if (!tenantR.isOk() || !EnableTypeEnum.ENABLE.equals(tenantR.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
 
@@ -100,8 +102,9 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 if (ObjectUtil.isEmpty(user)) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
+                // todo 后期全部替换为grpc
                 R<User> userR = gatewayFilter.userClient.selectByName(user);
-                if (!userR.isOk() || Boolean.TRUE.equals(!userR.getData().getEnable())) {
+                if (!userR.isOk() || !EnableTypeEnum.ENABLE.equals(userR.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 
@@ -111,7 +114,8 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request token header");
                 }
                 Login login = new Login();
-                login.setTenant(tenantR.getData().getName()).setName(userR.getData().getName()).setSalt(token.getSalt()).setToken(token.getToken());
+                login.setTenant(tenantR.getData().getTenantName()).setName(userR.getData().getLoginName()).setSalt(token.getSalt()).setToken(token.getToken());
+                // todo 后期全部替换为grpc
                 R<String> tokenR = gatewayFilter.tokenClient.checkTokenValid(login);
                 if (!tokenR.isOk()) {
                     throw new UnAuthorizedException("Invalid request token header");
@@ -120,9 +124,9 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 ServerHttpRequest build = request.mutate().headers(
                         httpHeader -> {
                             httpHeader.set(RequestConstant.Header.X_AUTH_TENANT_ID, tenantR.getData().getId());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT, tenantR.getData().getName());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT, tenantR.getData().getTenantName());
                             httpHeader.set(RequestConstant.Header.X_AUTH_USER_ID, userR.getData().getId());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_USER, userR.getData().getName());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_USER, userR.getData().getLoginName());
                         }
                 ).build();
 

@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2022.1.7</version>
+        <version>2022.1.8</version>
     </parent>
 
     <artifactId>dc3-gateway</artifactId>
@@ -34,6 +34,7 @@
     </properties>
 
     <dependencies>
+
         <!-- Undertow Web 容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,6 +55,18 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!-- Spring Cloud Eureka -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Spring Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- Thymeleaf -->
@@ -80,7 +93,7 @@
             <artifactId>commons-pool2</artifactId>
         </dependency>
 
-        <!-- DC3 Api -->
+        <!-- DC3 Api Auth -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>

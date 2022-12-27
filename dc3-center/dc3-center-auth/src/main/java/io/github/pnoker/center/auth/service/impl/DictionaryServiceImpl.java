@@ -21,9 +21,9 @@ import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.DictionaryService;
 import io.github.pnoker.common.bean.common.Dictionary;
-import io.github.pnoker.common.model.BlackIp;
-import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.entity.BlackIp;
+import io.github.pnoker.common.entity.Tenant;
+import io.github.pnoker.common.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +52,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
         List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
         for (Tenant tenant : tenantList) {
-            Dictionary driverDictionary = new Dictionary().setLabel(tenant.getName()).setValue(tenant.getId());
+            Dictionary driverDictionary = new Dictionary().setLabel(tenant.getTenantName()).setValue(tenant.getId());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;
@@ -64,7 +64,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         List<User> userList = userMapper.selectList(queryWrapper);
         for (User user : userList) {
-            Dictionary driverDictionary = new Dictionary().setLabel(user.getName()).setValue(user.getId());
+            Dictionary driverDictionary = new Dictionary().setLabel(user.getLoginName()).setValue(user.getId());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;

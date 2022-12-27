@@ -17,7 +17,7 @@ package io.github.pnoker.api.center.manager.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.model.LabelBind;
+import io.github.pnoker.common.entity.LabelBind;
 import lombok.*;
 import org.springframework.beans.BeanUtils;
 

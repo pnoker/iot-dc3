@@ -25,7 +25,7 @@ import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.api.center.manager.dto.LabelBindDto;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.LabelBind;
+import io.github.pnoker.common.entity.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

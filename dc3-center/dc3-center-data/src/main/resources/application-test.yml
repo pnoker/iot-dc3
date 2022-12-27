@@ -13,3 +13,7 @@
 #
 
 # Test environment, customizable configuration
+eureka:
+  instance:
+    # Custom node registration ip, dedicated to the development environment
+    ip-address: ${SERVICE_HOST}

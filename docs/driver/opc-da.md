@@ -32,22 +32,22 @@
       name: host
       type: string
       value: localhost
-      description: Opc Da Host
+      remark: Opc Da Host
     - displayName: CLSID
       name: clsId
       type: string
       value: F8582CF2-88FB-11D0-B850-00C0F0104305
-      description: Opc Da Server CLAID
+      remark: Opc Da Server CLAID
     - displayName: 用户名
       name: username
       type: string
       value: dc3
-      description: Opc Da UserName
+      remark: Opc Da UserName
     - displayName: 密码
       name: password
       type: string
       value: dc3dc3
-      description: Opc Da Passward
+      remark: Opc Da Passward
 ```
 
 
@@ -66,12 +66,12 @@
       name: group
       type: string
       value: GROUP
-      description: 分组名称
+      remark: 分组名称
     - displayName: 位号
       name: tag
       type: string
       value: TAG
-      description: 位号名称
+      remark: 位号名称
 ```
 
 

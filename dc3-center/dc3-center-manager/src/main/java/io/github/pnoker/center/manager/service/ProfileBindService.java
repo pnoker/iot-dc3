@@ -16,7 +16,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.manager.dto.ProfileBindDto;
-import io.github.pnoker.common.model.ProfileBind;
+import io.github.pnoker.common.entity.ProfileBind;
 
 import java.util.Set;
 

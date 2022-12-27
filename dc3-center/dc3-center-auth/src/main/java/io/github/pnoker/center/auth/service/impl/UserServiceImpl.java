@@ -27,7 +27,7 @@ import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.entity.User;
 import io.github.pnoker.common.utils.DecodeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,9 +54,9 @@ public class UserServiceImpl implements UserService {
     public User add(User user) {
         // todo 不通过，会返回密码数据
         // 判断用户是否存在
-        User selectByName = selectByName(user.getName(), false);
+        User selectByName = selectByName(user.getLoginName(), false);
         if (ObjectUtil.isNotNull(selectByName)) {
-            throw new DuplicateException("The user already exists with username: {}", user.getName());
+            throw new DuplicateException("The user already exists with username: {}", user.getLoginName());
         }
 
         // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
@@ -121,10 +121,10 @@ public class UserServiceImpl implements UserService {
             user.setEmail(null);
         }
 
-        user.setName(null).setUpdateTime(null);
+        user.setLoginName(null).setUpdateTime(null);
         if (userMapper.updateById(user) > 0) {
             User select = userMapper.selectById(user.getId());
-            user.setName(select.getName());
+            user.setLoginName(select.getLoginName());
             return select;
         }
         throw new ServiceException("The user update failed");
@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return selectByKey(User::getName, name, isEx);
+        return selectByKey(User::getLoginName, name, isEx);
     }
 
     @Override
@@ -183,17 +183,17 @@ public class UserServiceImpl implements UserService {
     public boolean checkUserValid(String name) {
         User user = selectByName(name, false);
         if (ObjectUtil.isNotNull(user)) {
-            return user.getEnable();
+            return user.getEnableFlag();
         }
 
         user = selectByPhone(name, false);
         if (ObjectUtil.isNotNull(user)) {
-            return user.getEnable();
+            return user.getEnableFlag();
         }
 
         user = selectByEmail(name, false);
         if (ObjectUtil.isNotNull(user)) {
-            return user.getEnable();
+            return user.getEnableFlag();
         }
 
         return false;
@@ -213,7 +213,7 @@ public class UserServiceImpl implements UserService {
     public LambdaQueryWrapper<User> fuzzyQuery(UserDto userDto) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         if (ObjectUtil.isNotNull(userDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userDto.getName()), User::getName, userDto.getName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(userDto.getLoginName()), User::getLoginName, userDto.getLoginName());
         }
         return queryWrapper;
     }

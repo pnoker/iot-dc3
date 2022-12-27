@@ -16,14 +16,14 @@ package io.github.pnoker.center.manager.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.ProfileDto;
 import io.github.pnoker.api.center.manager.feign.ProfileClient;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.ProfileDto;
-import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.common.entity.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,7 +55,8 @@ public class ProfileApi implements ProfileClient {
     @Override
     public R<Profile> add(Profile profile, String tenantId) {
         try {
-            Profile add = profileService.add(profile.setTenantId(tenantId));
+            profile.setTenantId(tenantId);
+            Profile add = profileService.add(profile);
             if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
@@ -82,7 +83,8 @@ public class ProfileApi implements ProfileClient {
     @Override
     public R<Profile> update(Profile profile, String tenantId) {
         try {
-            Profile update = profileService.update(profile.setTenantId(tenantId));
+            profile.setTenantId(tenantId);
+            Profile update = profileService.update(profile);
             if (ObjectUtil.isNotNull(update)) {
                 notifyService.notifyDriverProfile(MetadataConstant.Profile.UPDATE, update);
                 return R.ok(update);

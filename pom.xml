@@ -19,7 +19,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2022.1.7</version>
+        <version>2022.1.8</version>
     </parent>
 
     <name>${project.artifactId}</name>
@@ -63,7 +63,6 @@
             <properties>
                 <!-- You can configure environment variables commonly used in development -->
                 <NODE_ENV>dev</NODE_ENV>
-                <SERVICE_HOST>192.168.0.104</SERVICE_HOST>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -73,6 +72,7 @@
             <id>test</id>
             <properties>
                 <NODE_ENV>test</NODE_ENV>
+                <SERVICE_HOST>192.168.0.100</SERVICE_HOST>
             </properties>
         </profile>
         <profile>

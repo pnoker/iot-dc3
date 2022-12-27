@@ -26,7 +26,7 @@ import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.bean.model.DriverEvent;
+import io.github.pnoker.common.bean.entity.DriverEvent;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -140,6 +140,7 @@ public class DriverEventReceiver {
         try {
             driverSdkService.driverRegister(Convert.convert(DriverRegister.class, driverEvent.getContent()));
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             driverConfiguration.setResponse(ResponseEnum.FAILURE);
         }
         rabbitTemplate.convertAndSend(
@@ -165,6 +166,7 @@ public class DriverEventReceiver {
         try {
             driverConfiguration.setContent(batchService.batchDriverMetadata(driverEvent.getServiceName()));
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             driverConfiguration.setResponse(ResponseEnum.FAILURE);
         }
         rabbitTemplate.convertAndSend(

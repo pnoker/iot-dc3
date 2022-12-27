@@ -30,12 +30,12 @@
       name: host
       type: string
       value: localhost
-      description: Modbus IP
+      remark: Modbus IP
     - displayName: 端口
       name: port
       type: int
       value: 502
-      description: Modbus Port
+      remark: Modbus Port
 ```
 
 
@@ -54,17 +54,17 @@
       name: slaveId
       type: int
       value: 1
-      description: 从站编号
+      remark: 从站编号
     - displayName: 功能码
       name: functionCode
       type: int
       value: 1
-      description: 功能码 [1、2、3、4]
+      remark: 功能码 [1、2、3、4]
     - displayName: 偏移量
       name: offset
       type: int
       value: 0
-      description: 偏移量
+      remark: 偏移量
 ```
 
 

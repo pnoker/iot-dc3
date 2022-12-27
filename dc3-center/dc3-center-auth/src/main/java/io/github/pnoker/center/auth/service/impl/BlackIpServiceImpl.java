@@ -24,7 +24,7 @@ import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.api.center.auth.dto.BlackIpDto;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.common.entity.BlackIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -99,7 +99,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     public Boolean checkBlackIpValid(String ip) {
         BlackIp blackIp = selectByIp(ip);
         if (ObjectUtil.isNotNull(blackIp)) {
-            return blackIp.getEnable();
+            return blackIp.getEnableFlag();
         }
         return false;
     }

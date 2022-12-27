@@ -22,7 +22,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.BlackIpDto;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.common.entity.BlackIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

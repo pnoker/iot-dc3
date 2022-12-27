@@ -16,12 +16,12 @@ package io.github.pnoker.center.manager.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DriverDto;
 import io.github.pnoker.api.center.manager.feign.DriverClient;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.DriverDto;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.entity.Driver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,7 +50,8 @@ public class DriverApi implements DriverClient {
     @Override
     public R<Driver> add(Driver driver, String tenantId) {
         try {
-            Driver add = driverService.add(driver.setTenantId(tenantId));
+            driver.setTenantId(tenantId);
+            Driver add = driverService.add(driver);
             if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
@@ -72,7 +73,8 @@ public class DriverApi implements DriverClient {
     @Override
     public R<Driver> update(Driver driver, String tenantId) {
         try {
-            Driver update = driverService.update(driver.setTenantId(tenantId));
+            driver.setTenantId(tenantId);
+            Driver update = driverService.update(driver);
             if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }

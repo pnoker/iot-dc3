@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.manager.feign.PointInfoClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.PointInfoDto;
-import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.entity.PointInfo;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

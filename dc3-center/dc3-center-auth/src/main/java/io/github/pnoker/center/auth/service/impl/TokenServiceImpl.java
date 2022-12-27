@@ -28,8 +28,8 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.entity.Tenant;
+import io.github.pnoker.common.entity.User;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.RedisUtil;
@@ -83,7 +83,7 @@ public class TokenServiceImpl implements TokenService {
         Tenant tenant = tenantService.selectByName(tenantName);
         checkUserLimit(username, tenant.getId());
         User user = userService.selectByName(username, false);
-        if (tenant.getEnable() && user.getEnable()) {
+        if (tenant.getEnableFlag() && user.getEnableFlag()) {
             tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
             String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();
             String saltValue = redisUtil.getKey(redisSaltKey);

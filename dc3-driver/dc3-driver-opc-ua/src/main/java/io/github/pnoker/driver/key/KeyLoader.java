@@ -14,7 +14,7 @@
 
 package io.github.pnoker.driver.key;
 
-import io.github.pnoker.common.utils.RequestUtil;
+import io.github.pnoker.common.utils.HostUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.stack.core.util.SelfSignedCertificateBuilder;
@@ -63,7 +63,7 @@ public class KeyLoader {
                     .addIpAddress("127.0.0.1");
 
             // Get as many hostnames and IP addresses as we can listed in the certificate.
-            for (String hostname : RequestUtil.getHostNames("0.0.0.0")) {
+            for (String hostname : HostUtil.getHostNames("0.0.0.0")) {
                 if (IP_ADDR_PATTERN.matcher(hostname).matches()) {
                     builder.addIpAddress(hostname);
                 } else {
