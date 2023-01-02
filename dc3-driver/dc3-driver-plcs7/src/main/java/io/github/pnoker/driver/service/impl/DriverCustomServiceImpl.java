@@ -16,7 +16,7 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.entity.Device;
@@ -78,7 +78,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
         myS7Connector.lock.writeLock().lock();
         S7Serializer serializer = S7SerializerFactory.buildSerializer(myS7Connector.getConnector());
-        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getTypeFlag().getCode());
+        PlcS7PointVariable plcs7PointVariable = getPointVariable(pointInfo, point.getPointTypeFlag().getCode());
 
         try {
             return String.valueOf(serializer.dispense(plcs7PointVariable));
@@ -175,7 +175,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value              String Value
      */
     private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
-        PointTypeEnum valueType = PointTypeEnum.of(type);
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.of(type);
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + type);
         }

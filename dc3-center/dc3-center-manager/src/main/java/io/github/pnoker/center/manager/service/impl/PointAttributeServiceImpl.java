@@ -148,7 +148,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         if (ObjectUtil.isNotNull(pointAttributeDto)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getAttributeName()), PointAttribute::getAttributeName, pointAttributeDto.getAttributeName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getDisplayName()), PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointAttributeDto.getTypeFlag()), PointAttribute::getTypeFlag, pointAttributeDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointAttributeDto.getAttributeTypeFlag()), PointAttribute::getAttributeTypeFlag, pointAttributeDto.getAttributeTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributeDto.getDriverId()), PointAttribute::getDriverId, pointAttributeDto.getDriverId());
         }
         return queryWrapper;

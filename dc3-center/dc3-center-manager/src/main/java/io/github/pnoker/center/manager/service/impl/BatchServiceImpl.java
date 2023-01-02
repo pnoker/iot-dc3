@@ -162,7 +162,7 @@ public class BatchServiceImpl implements BatchService {
             List<DriverInfo> driverInfos = driverInfoService.selectByDeviceId(deviceId);
             driverInfos.forEach(driverInfo -> {
                 DriverAttribute attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
-                attributeInfoMap.put(attribute.getAttributeName(), new AttributeInfo(driverInfo.getConfigValue(), attribute.getTypeFlag()));
+                attributeInfoMap.put(attribute.getAttributeName(), new AttributeInfo(driverInfo.getConfigValue(), attribute.getAttributeTypeFlag()));
             });
         } catch (NotFoundException ignored) {
             // nothing to do
@@ -206,7 +206,7 @@ public class BatchServiceImpl implements BatchService {
                         Map<String, AttributeInfo> infoMap = new ConcurrentHashMap<>(16);
                         pointInfos.forEach(pointInfo -> {
                             PointAttribute attribute = pointAttributeMap.get(pointInfo.getPointAttributeId());
-                            infoMap.put(attribute.getAttributeName(), new AttributeInfo(pointInfo.getConfigValue(), attribute.getTypeFlag()));
+                            infoMap.put(attribute.getAttributeName(), new AttributeInfo(pointInfo.getConfigValue(), attribute.getAttributeTypeFlag()));
                         });
 
                         if (infoMap.size() > 0) {

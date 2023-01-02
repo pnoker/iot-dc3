@@ -148,7 +148,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (ObjectUtil.isNotNull(driverAttributeDto)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getAttributeName()), DriverAttribute::getAttributeName, driverAttributeDto.getAttributeName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getDisplayName()), DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverAttributeDto.getTypeFlag()), DriverAttribute::getTypeFlag, driverAttributeDto.getTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverAttributeDto.getAttributeTypeFlag()), DriverAttribute::getAttributeTypeFlag, driverAttributeDto.getAttributeTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributeDto.getDriverId()), DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
         }
         return queryWrapper;

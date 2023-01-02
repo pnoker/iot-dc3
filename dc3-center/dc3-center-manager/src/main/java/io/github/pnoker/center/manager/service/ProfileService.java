@@ -14,9 +14,10 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.manager.dto.ProfileDto;
+import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.entity.Profile;
+import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,7 @@ public interface ProfileService extends Service<Profile, ProfileDto> {
      * @param tenantId 租户ID
      * @return Profile
      */
-    Profile selectByNameAndType(String name, Short type, String tenantId);
+    Profile selectByNameAndType(String name, ProfileTypeFlagEnum type, String tenantId);
 
     /**
      * 根据 模版Id集 查询模版

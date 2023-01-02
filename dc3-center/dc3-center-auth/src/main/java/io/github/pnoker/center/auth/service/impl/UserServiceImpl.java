@@ -24,7 +24,7 @@ import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.entity.User;
-import io.github.pnoker.common.enums.EnableTypeEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
     public Boolean checkLoginNameValid(String loginName) {
         User user = selectByLoginName(loginName, false);
         if (ObjectUtil.isNotNull(user)) {
-            return EnableTypeEnum.ENABLE.equals(user.getEnableFlag());
+            return EnableFlagEnum.ENABLE.equals(user.getEnableFlag());
         }
 
         return false;

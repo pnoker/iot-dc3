@@ -27,7 +27,7 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.Tenant;
 import io.github.pnoker.common.entity.User;
 import io.github.pnoker.common.entity.UserPassword;
-import io.github.pnoker.common.enums.EnableTypeEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
@@ -84,7 +84,7 @@ public class TokenServiceImpl implements TokenService {
         Tenant tenant = tenantService.selectByName(tenantName);
         checkUserLimit(username, tenant.getId());
         User user = userService.selectByLoginName(username, false);
-        if (EnableTypeEnum.ENABLE.equals(tenant.getEnableFlag()) && EnableTypeEnum.ENABLE.equals(user.getEnableFlag())) {
+        if (EnableFlagEnum.ENABLE.equals(tenant.getEnableFlag()) && EnableFlagEnum.ENABLE.equals(user.getEnableFlag())) {
             tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
             UserPassword userPassword = userPasswordService.selectById(user.getUserPasswordId());
             String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.SEPARATOR + username + SymbolConstant.HASHTAG + tenant.getId();

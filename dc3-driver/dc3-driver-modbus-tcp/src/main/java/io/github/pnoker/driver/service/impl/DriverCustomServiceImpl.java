@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
@@ -97,7 +97,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
         ModbusMaster modbusMaster = getConnector(device.getId(), driverInfo);
-        return readValue(modbusMaster, pointInfo, point.getTypeFlag().getCode());
+        return readValue(modbusMaster, pointInfo, point.getPointTypeFlag().getCode());
     }
 
     @Override
@@ -220,7 +220,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return Modbus Data Type
      */
     private int getValueType(String type) {
-        PointTypeEnum valueType = PointTypeEnum.of(type);
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.of(type);
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + type);
         }
