@@ -24,7 +24,7 @@ import io.github.pnoker.common.bean.auth.Login;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.Tenant;
 import io.github.pnoker.common.entity.User;
-import io.github.pnoker.common.enums.EnableTypeEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -91,7 +91,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 }
                 // todo 后期全部替换为grpc
                 R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(tenant);
-                if (!tenantR.isOk() || !EnableTypeEnum.ENABLE.equals(tenantR.getData().getEnableFlag())) {
+                if (!tenantR.isOk() || !EnableFlagEnum.ENABLE.equals(tenantR.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
 
@@ -102,7 +102,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 }
                 // todo 后期全部替换为grpc
                 R<User> userR = gatewayFilter.userClient.selectByName(user);
-                if (!userR.isOk() || !EnableTypeEnum.ENABLE.equals(userR.getData().getEnableFlag())) {
+                if (!userR.isOk() || !EnableFlagEnum.ENABLE.equals(userR.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 

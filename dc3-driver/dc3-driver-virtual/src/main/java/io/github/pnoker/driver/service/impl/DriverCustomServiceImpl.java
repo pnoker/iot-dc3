@@ -51,10 +51,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        if (point.getTypeFlag().equals("string")) {
+        if (point.getPointTypeFlag().equals("string")) {
             return RandomUtil.randomString(8);
         }
-        if (point.getTypeFlag().equals("boolean")) {
+        if (point.getPointTypeFlag().equals("boolean")) {
             return String.valueOf(RandomUtil.randomBoolean());
         }
         return String.valueOf(RandomUtil.randomDouble(100));

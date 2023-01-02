@@ -25,7 +25,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.Point;
-import io.github.pnoker.common.enums.UnitTypeEnum;
+import io.github.pnoker.common.enums.UnitEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -168,7 +168,7 @@ public class PointApi implements PointClient {
     @Override
     public R<Map<String, String>> unit(Set<String> pointIds) {
         try {
-            Map<String, UnitTypeEnum> units = pointService.unit(pointIds);
+            Map<String, UnitEnum> units = pointService.unit(pointIds);
             if (null != units) {
                 Map<String, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getCode()));
                 return R.ok(unitCodeMap);

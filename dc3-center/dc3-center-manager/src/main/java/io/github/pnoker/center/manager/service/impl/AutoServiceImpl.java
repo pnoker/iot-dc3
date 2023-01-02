@@ -22,6 +22,8 @@ import io.github.pnoker.common.entity.Device;
 import io.github.pnoker.common.entity.Point;
 import io.github.pnoker.common.entity.Profile;
 import io.github.pnoker.common.entity.ProfileBind;
+import io.github.pnoker.common.enums.ProfileShareFlagEnum;
+import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,13 +77,13 @@ public class AutoServiceImpl implements AutoService {
         // 新增私有模板
         Profile profile = new Profile();
         profile.setProfileName(deviceName);
-        profile.setShareFlag(false);
-        profile.setTypeFlag((short) 2);
+        profile.setProfileShareFlag(ProfileShareFlagEnum.DRIVER);
+        profile.setProfileTypeFlag(ProfileTypeFlagEnum.DRIVER);
         profile.setTenantId(tenantId);
         try {
             profile = profileService.add(profile);
         } catch (DuplicateException duplicateException) {
-            profile = profileService.selectByNameAndType(deviceName, (short) 2, tenantId);
+            profile = profileService.selectByNameAndType(deviceName, ProfileTypeFlagEnum.DRIVER, tenantId);
         } catch (Exception ignored) {
             // nothing to do
         }

@@ -27,7 +27,7 @@ import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.entity.Device;
 import io.github.pnoker.common.entity.Driver;
-import io.github.pnoker.common.enums.DriverTypeEnum;
+import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -138,9 +138,9 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public Driver selectByHostPort(DriverTypeEnum type, String host, Integer port, String tenantId) {
+    public Driver selectByHostPort(DriverTypeFlagEnum type, String host, Integer port, String tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.eq(Driver::getTypeFlag, type);
+        queryWrapper.eq(Driver::getDriverTypeFlag, type);
         queryWrapper.eq(Driver::getServerHost, host);
         queryWrapper.eq(Driver::getServerPort, port);
         queryWrapper.eq(Driver::getTenantId, tenantId);
@@ -195,10 +195,10 @@ public class DriverServiceImpl implements DriverService {
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceName()), Driver::getServiceName, driverDto.getServiceName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServerHost()), Driver::getServerHost, driverDto.getServerHost());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getServerPort()), Driver::getServerPort, driverDto.getServerPort());
-            if (ObjectUtil.isNull(driverDto.getTypeFlag())) {
-                driverDto.setTypeFlag(DriverTypeEnum.DRIVER);
+            if (ObjectUtil.isNull(driverDto.getDriverTypeFlag())) {
+                driverDto.setDriverTypeFlag(DriverTypeFlagEnum.DRIVER);
             }
-            queryWrapper.like(Driver::getTypeFlag, driverDto.getTypeFlag());
+            queryWrapper.like(Driver::getDriverTypeFlag, driverDto.getDriverTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getEnableFlag()), Driver::getEnableFlag, driverDto.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverDto.getTenantId()), Driver::getTenantId, driverDto.getTenantId());
         }

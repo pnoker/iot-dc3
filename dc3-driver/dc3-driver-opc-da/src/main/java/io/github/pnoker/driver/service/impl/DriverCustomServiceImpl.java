@@ -18,7 +18,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.entity.Device;
 import io.github.pnoker.common.entity.Point;
-import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
@@ -235,7 +235,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws JIException OpcDa JIException
      */
     private boolean writeItem(Item item, AttributeInfo value) throws JIException {
-        PointTypeEnum valueType = PointTypeEnum.of(value.getType().getCode());
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.of(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());
         }
