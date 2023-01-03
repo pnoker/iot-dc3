@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2022.2.2</version>
+        <version>2022.2.3</version>
     </parent>
 
     <artifactId>dc3-gateway</artifactId>
@@ -57,16 +57,10 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
-        <!-- Spring Cloud Eureka -->
+        <!-- DC3 Center Register Client Starter -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
-        <!-- Spring Actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-starter-center-register-client</artifactId>
         </dependency>
 
         <!-- Thymeleaf -->
