@@ -25,9 +25,6 @@ spring:
     name: @project.artifactId@
   profiles:
     active:
-      - register
-      - redis
-      - feign
       - ${NODE_ENV:dev}
   transaction:
     rollback-on-commit-failure: true

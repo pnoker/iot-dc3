@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-public class TopicConfig {
+public class DataTopicConfig {
 
     @Bean
     TopicExchange valueExchange() {
