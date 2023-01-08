@@ -20,15 +20,6 @@ spring:
     name: @project.artifactId@
   profiles:
     active:
-      - web
-      - register
-      - feign
-      - mysql
-      - redis
-      - mongo
-      - rabbitmq
-      - thread
-      - quartz
       - ${NODE_ENV:dev}
   redis:
     database: 3

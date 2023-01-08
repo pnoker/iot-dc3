@@ -86,13 +86,6 @@ server:
 spring:
   profiles:
     active:
-      - web
-      - register
-      - rabbitmq
-      - quartz
-      - thread
-      - driver
-      - feign
       - ${NODE_ENV:dev}
 
 logging:

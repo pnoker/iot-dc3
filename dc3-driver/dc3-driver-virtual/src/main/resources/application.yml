@@ -66,10 +66,6 @@ server:
 spring:
   profiles:
     active:
-      - driver
-      - rabbitmq
-      - quartz
-      - thread
       - ${NODE_ENV:dev}
 
 logging:
