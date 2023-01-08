@@ -119,7 +119,6 @@ services:
       - MONGO_HOST=dc3-mongo
       - MONGO_PORT=27017
       - MONGO_DATABASE=dc3
-      - MONGO_AUTH_TYPE=password
       - MONGO_USERNAME=dc3
       - MONGO_PASSWORD=dc3
       - RABBITMQ_VIRTUAL_HOST=dc3
@@ -160,7 +159,6 @@ services:
       - MONGO_HOST=dc3-mongo
       - MONGO_PORT=27017
       - MONGO_DATABASE=dc3
-      - MONGO_AUTH_TYPE=password
       - MONGO_USERNAME=dc3
       - MONGO_PASSWORD=dc3
       - RABBITMQ_VIRTUAL_HOST=dc3

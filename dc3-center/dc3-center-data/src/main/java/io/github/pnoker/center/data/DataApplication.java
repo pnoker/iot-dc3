@@ -16,6 +16,7 @@ package io.github.pnoker.center.data;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * 消息中心中心服务启动入口
@@ -24,6 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2022.1.0
  */
 @SpringBootApplication
+@EnableTransactionManagement
 public class DataApplication {
     public static void main(String[] args) {
         SpringApplication.run(DataApplication.class, args);

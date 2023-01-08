@@ -25,6 +25,8 @@ import java.net.InetSocketAddress;
 import java.util.Objects;
 
 /**
+ * 网关通用工具类
+ *
  * @author pnoker
  * @since 2022.1.0
  */

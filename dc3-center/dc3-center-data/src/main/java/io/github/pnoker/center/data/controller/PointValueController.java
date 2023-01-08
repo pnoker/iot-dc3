@@ -12,35 +12,44 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.api;
+package io.github.pnoker.center.data.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.data.feign.PointValueClient;
+import io.github.pnoker.api.center.data.dto.PointValueDto;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
-import io.github.pnoker.api.center.data.dto.PointValueDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
 /**
+ * PointValue Controller
+ *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @RestController
 @RequestMapping(DataServiceConstant.VALUE_URL_PREFIX)
-public class PointValueApi implements PointValueClient {
+public class PointValueController {
 
     @Resource
     private PointValueService pointValueService;
 
-    @Override
+    /**
+     * 查询最新 PointValue 集合
+     *
+     * @param pointValueDto 位号值和分页参数
+     * @param tenantId      租户ID
+     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
+     */
+    @PostMapping("/latest")
     public R<Page<PointValue>> latest(PointValueDto pointValueDto, String tenantId) {
         try {
             if (ObjectUtil.isEmpty(pointValueDto)) {
@@ -56,7 +65,14 @@ public class PointValueApi implements PointValueClient {
         return R.fail();
     }
 
-    @Override
+    /**
+     * 模糊分页查询 PointValue
+     *
+     * @param pointValueDto 位号值和分页参数
+     * @param tenantId      租户ID
+     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
+     */
+    @PostMapping("/list")
     public R<Page<PointValue>> list(PointValueDto pointValueDto, String tenantId) {
         try {
             if (ObjectUtil.isEmpty(pointValueDto)) {

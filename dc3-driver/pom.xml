@@ -19,7 +19,6 @@
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
         <version>2022.2.3</version>
-        <relativePath/>
     </parent>
 
     <artifactId>dc3-driver</artifactId>

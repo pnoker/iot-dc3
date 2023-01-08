@@ -28,18 +28,6 @@
 
     <dependencies>
 
-        <!-- Spring MongoDB-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-
-        <!-- Spring RabbitMq -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-
         <!-- DC3 Api Manager -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -52,10 +40,22 @@
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
+        <!-- DC3 Common RabbitMQ -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-rabbitmq</artifactId>
+        </dependency>
+
         <!-- DC3 Common MySQL -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
+        </dependency>
+
+        <!-- DC3 Common Mongo -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mongo</artifactId>
         </dependency>
 
         <!-- DC3 Common Redis -->
