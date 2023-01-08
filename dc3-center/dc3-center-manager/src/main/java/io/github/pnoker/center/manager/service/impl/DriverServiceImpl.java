@@ -92,8 +92,8 @@ public class DriverServiceImpl implements DriverService {
         if (driverMapper.updateById(driver) > 0) {
             Driver select = driverMapper.selectById(driver.getId());
             driver.setServiceName(select.getServiceName());
-            driver.setServerHost(select.getServerHost());
-            driver.setServerPort(select.getServerPort());
+            driver.setServiceHost(select.getServiceHost());
+            driver.setServicePort(select.getServicePort());
             return select;
         }
         throw new ServiceException("The driver update failed");
@@ -141,8 +141,8 @@ public class DriverServiceImpl implements DriverService {
     public Driver selectByHostPort(DriverTypeFlagEnum type, String host, Integer port, String tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getDriverTypeFlag, type);
-        queryWrapper.eq(Driver::getServerHost, host);
-        queryWrapper.eq(Driver::getServerPort, port);
+        queryWrapper.eq(Driver::getServiceHost, host);
+        queryWrapper.eq(Driver::getServicePort, port);
         queryWrapper.eq(Driver::getTenantId, tenantId);
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
@@ -193,8 +193,8 @@ public class DriverServiceImpl implements DriverService {
         if (ObjectUtil.isNotNull(driverDto)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getDriverName()), Driver::getDriverName, driverDto.getDriverName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceName()), Driver::getServiceName, driverDto.getServiceName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServerHost()), Driver::getServerHost, driverDto.getServerHost());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getServerPort()), Driver::getServerPort, driverDto.getServerPort());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceHost()), Driver::getServiceHost, driverDto.getServiceHost());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getServicePort()), Driver::getServicePort, driverDto.getServicePort());
             if (ObjectUtil.isNull(driverDto.getDriverTypeFlag())) {
                 driverDto.setDriverTypeFlag(DriverTypeFlagEnum.DRIVER);
             }

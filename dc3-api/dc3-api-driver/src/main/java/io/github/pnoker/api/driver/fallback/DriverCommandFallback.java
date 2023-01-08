@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.api.transfer.rtmp.fallback;
+package io.github.pnoker.api.driver.fallback;
 
-import io.github.pnoker.api.transfer.rtmp.feign.DriverCommandClient;
+import io.github.pnoker.api.driver.feign.DriverCommandClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.driver.CmdParameter;
 import io.github.pnoker.common.bean.point.PointValue;

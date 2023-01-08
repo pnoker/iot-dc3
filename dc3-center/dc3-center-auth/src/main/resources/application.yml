@@ -20,20 +20,13 @@ spring:
     name: @project.artifactId@
   profiles:
     active:
-      - server
+      - web
+      - feign
       - register
-      - monitor
       - mysql
       - redis
-      - feign
+      - thread
       - ${NODE_ENV:dev}
-  main:
-    allow-bean-definition-overriding: true
-  mvc:
-    throw-exception-if-no-handler-found: true
-  web:
-    resources:
-      add-mappings: false
   redis:
     database: 1
   cache:

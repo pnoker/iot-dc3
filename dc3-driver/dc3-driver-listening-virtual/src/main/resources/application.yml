@@ -80,11 +80,11 @@ server:
 spring:
   profiles:
     active:
-      - server
+      - web
       - register
-      - monitor
       - rabbitmq
       - quartz
+      - thread
       - driver
       - feign
       - ${NODE_ENV:dev}

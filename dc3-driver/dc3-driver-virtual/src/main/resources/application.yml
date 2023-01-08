@@ -66,13 +66,10 @@ server:
 spring:
   profiles:
     active:
-      - server
-      - register
-      - monitor
+      - driver
       - rabbitmq
       - quartz
-      - driver
-      - feign
+      - thread
       - ${NODE_ENV:dev}
 
 logging:

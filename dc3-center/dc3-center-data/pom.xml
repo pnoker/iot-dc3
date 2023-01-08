@@ -29,22 +29,12 @@
 
     <dependencies>
 
-        <!-- Spring MongoDB-->
+        <!-- Spring Configuration-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-
-        <!-- Spring RabbitMq -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-
-        <!-- Spring Quartz -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- Elasticsearch -->
@@ -69,16 +59,34 @@
             <artifactId>dc3-api-data</artifactId>
         </dependency>
 
+        <!-- DC3 Common RabbitMQ -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-rabbitmq</artifactId>
+        </dependency>
+
         <!-- DC3 Common MySQL -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
         </dependency>
 
+        <!-- DC3 Common Mongo -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mongo</artifactId>
+        </dependency>
+
         <!-- DC3 Common Redis -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
+        </dependency>
+
+        <!-- DC3 Common Quartz -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-quartz</artifactId>
         </dependency>
 
     </dependencies>
