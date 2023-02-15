@@ -90,7 +90,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
                 // todo 后期全部替换为grpc
-                R<Tenant> tenantR = gatewayFilter.tenantClient.selectByName(tenant);
+                R<Tenant> tenantR = gatewayFilter.tenantClient.selectByCode(tenant);
                 if (!tenantR.isOk() || !EnableFlagEnum.ENABLE.equals(tenantR.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }

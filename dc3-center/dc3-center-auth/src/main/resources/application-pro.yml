@@ -13,3 +13,12 @@
 #
 
 # Product environment, customizable configuration
+spring:
+  cache:
+    redis:
+      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
+
+eureka:
+  client:
+    tls:
+      enabled: ${EUREKA_TLS_ENABLE:true}

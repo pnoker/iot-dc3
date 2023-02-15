@@ -78,7 +78,7 @@ public class TenantClientFallback implements FallbackFactory<TenantClient> {
              * {@inheritDoc}
              */
             @Override
-            public R<Tenant> selectByName(String name) {
+            public R<Tenant> selectByCode(String code) {
                 return R.fail(message);
             }
 

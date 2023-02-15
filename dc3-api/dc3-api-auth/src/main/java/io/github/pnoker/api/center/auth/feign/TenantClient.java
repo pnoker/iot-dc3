@@ -15,10 +15,10 @@
 package io.github.pnoker.api.center.auth.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.auth.dto.TenantDto;
 import io.github.pnoker.api.center.auth.fallback.TenantClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.api.center.auth.dto.TenantDto;
 import io.github.pnoker.common.entity.Tenant;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -81,13 +81,13 @@ public interface TenantClient {
     R<Tenant> selectById(@NotNull @PathVariable(value = "id") String id);
 
     /**
-     * 根据 Name 查询租户
+     * 根据 Code 查询租户
      *
-     * @param name 租户名称
+     * @param code 租户Code
      * @return {@link io.github.pnoker.common.entity.Tenant}
      */
-    @GetMapping("/name/{name}")
-    R<Tenant> selectByName(@NotNull @PathVariable(value = "name") String name);
+    @GetMapping("/code/{code}")
+    R<Tenant> selectByCode(@NotNull @PathVariable(value = "code") String code);
 
     /**
      * 模糊分页查询租户

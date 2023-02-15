@@ -68,7 +68,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String generateSalt(String username, String tenantName) {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
-        Tenant tenant = tenantService.selectByName(tenantName);
+        Tenant tenant = tenantService.selectByCode(tenantName);
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.DOUBLE_COLON + username + SymbolConstant.HASHTAG + tenant.getId();
         String salt = redisUtil.getKey(redisSaltKey);
         if (CharSequenceUtil.isBlank(salt)) {
@@ -81,7 +81,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String generateToken(String username, String salt, String password, String tenantName) {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
-        Tenant tenant = tenantService.selectByName(tenantName);
+        Tenant tenant = tenantService.selectByCode(tenantName);
         checkUserLimit(username, tenant.getId());
         User user = userService.selectByLoginName(username, false);
         if (EnableFlagEnum.ENABLE.equals(tenant.getEnableFlag()) && EnableFlagEnum.ENABLE.equals(user.getEnableFlag())) {
@@ -105,7 +105,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public TokenValid checkTokenValid(String username, String salt, String token, String tenantName) {
         // todo 此处一个bug，会抛异常，导致无法记录失败登录次数
-        Tenant tenant = tenantService.selectByName(tenantName);
+        Tenant tenant = tenantService.selectByCode(tenantName);
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.DOUBLE_COLON + username + SymbolConstant.HASHTAG + tenant.getId();
         String redisToken = redisUtil.getKey(redisKey);
         if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
@@ -121,7 +121,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Boolean cancelToken(String username, String tenantName) {
-        Tenant tenant = tenantService.selectByName(tenantName);
+        Tenant tenant = tenantService.selectByCode(tenantName);
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.DOUBLE_COLON + username + SymbolConstant.HASHTAG + tenant.getId();
         redisUtil.deleteKey(redisKey);
         return true;

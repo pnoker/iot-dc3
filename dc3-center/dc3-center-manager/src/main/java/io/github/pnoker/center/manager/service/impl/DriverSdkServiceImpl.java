@@ -78,7 +78,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      */
     private Driver registerDriver(DriverRegister driverRegister) {
         // check tenant
-        R<Tenant> tenantR = tenantClient.selectByName(driverRegister.getTenant());
+        R<Tenant> tenantR = tenantClient.selectByCode(driverRegister.getTenant());
         if (!tenantR.isOk()) {
             throw new ServiceException("Invalid {}, {}", driverRegister.getTenant(), tenantR.getMessage());
         }

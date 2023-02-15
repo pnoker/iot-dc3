@@ -16,6 +16,12 @@
 FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runtime
 MAINTAINER pnoker <pnokers.icloud.com>
 
+# default env
+ENV NODE_ENV dev
+ENV EUREKA_TLS_ENABLE false
+ENV SERVER_PORT 8300
+
+# default jvm & gc env
 ENV JAVA_OPS -server \
              -Xms128m \
              -Xmx1024m \
@@ -40,7 +46,7 @@ WORKDIR /dc3-center/dc3-center-auth
 
 ADD ./target/dc3-center-auth.jar ./
 
-EXPOSE 8300
+EXPOSE ${SERVER_PORT}
 VOLUME /dc3-center/dc3-center-auth/dc3/logs
 
 CMD mkdir -p /dc3-center/dc3-center-auth/dc3/logs/center/auth/gc \
