@@ -16,6 +16,7 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/rabbitmq:3.8-alpine
 MAINTAINER pnoker <pnokers.icloud.com>
 
 COPY ./rabbitmq.conf /etc/rabbitmq/rabbitmq.conf
+COPY ./keys /data/rabbitmq/dc3/keys
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && rm -f /etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf \

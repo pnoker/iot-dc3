@@ -601,6 +601,7 @@ services:
     ports:
       - 5672:5672
       - 1883:1883
+      - 8883:8883
       - 61613:61613
       - 15672:15672
     container_name: dc3-rabbitmq

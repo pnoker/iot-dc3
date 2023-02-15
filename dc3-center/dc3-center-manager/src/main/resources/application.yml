@@ -13,7 +13,7 @@
 #
 
 server:
-  port: 8400
+  port: ${SERVER_PORT:8400}
 
 spring:
   application:
@@ -23,9 +23,6 @@ spring:
       - ${NODE_ENV:dev}
   redis:
     database: 2
-  cache:
-    redis:
-      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
 
 logging:
   level:

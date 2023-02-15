@@ -47,7 +47,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Tenant add(Tenant tenant) {
-        Tenant select = selectByName(tenant.getTenantName());
+        Tenant select = selectByCode(tenant.getTenantName());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
@@ -84,9 +84,9 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Tenant selectByName(String name) {
+    public Tenant selectByCode(String code) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        queryWrapper.eq(Tenant::getTenantName, name);
+        queryWrapper.eq(Tenant::getTenantCode, code);
         Tenant tenant = tenantMapper.selectOne(queryWrapper);
         if (null == tenant) {
             throw new NotFoundException();

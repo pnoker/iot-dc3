@@ -18,8 +18,7 @@ SET
 CREATE
     DATABASE dc3;
 
-USE
-    dc3;
+USE dc3;
 
 -- ----------------------------
 -- Drop table structure

@@ -49,7 +49,7 @@ driver:
         data-type: static/url
         data: jsonString
   mqtt:
-    url: ssl://dc3-emqx:8883
+    url: ssl://dc3-rabbitmq:8883
     auth-type: X509
     username: dc3
     password: dc3

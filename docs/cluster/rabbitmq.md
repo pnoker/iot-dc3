@@ -506,7 +506,7 @@ listeners.tcp.default = 5000
 ## config items control what gets created.
 ## Relevant doc guide: https://rabbitmq.com/access-control.html
 ##
-default_vhost = /dc3
+default_vhost = dc3
 default_user = dc3
 default_pass = dc3
 
@@ -1079,7 +1079,7 @@ mqtt.allow_anonymous = false
 ## If you have multiple vhosts, specify the one to which the
 ## adapter connects.
 ##
-mqtt.vhost = /dc3
+mqtt.vhost = dc3
 
 ## Specify the exchange to which messages from MQTT clients are published.
 ##
@@ -1313,7 +1313,7 @@ CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf
 ##### 4.2.4 `enabled_plugins`
 
 ```yaml
-[rabbitmq_management,rabbitmq_mqtt].
+[rabbitmq_management,rabbitmq_mqtt,rabbitmq_stomp].
 ```
 
 

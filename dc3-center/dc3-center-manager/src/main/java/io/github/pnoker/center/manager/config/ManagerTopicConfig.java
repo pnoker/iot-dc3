@@ -49,19 +49,19 @@ public class ManagerTopicConfig {
     }
 
     @Bean
-    Binding driverEventBinding(TopicExchange eventExchange, Queue driverEventQueue) {
-        return BindingBuilder
-                .bind(driverEventQueue)
-                .to(eventExchange)
-                .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
-    }
-
-    @Bean
     Queue deviceEventQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 15秒：15 * 1000 = 15000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
         return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, false, arguments);
+    }
+
+    @Bean
+    Binding driverEventBinding(TopicExchange eventExchange, Queue driverEventQueue) {
+        return BindingBuilder
+                .bind(driverEventQueue)
+                .to(eventExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
     }
 
     @Bean

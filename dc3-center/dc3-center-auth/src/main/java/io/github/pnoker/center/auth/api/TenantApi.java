@@ -93,9 +93,9 @@ public class TenantApi implements TenantClient {
     }
 
     @Override
-    public R<Tenant> selectByName(String name) {
+    public R<Tenant> selectByCode(String code) {
         try {
-            Tenant select = tenantService.selectByName(name);
+            Tenant select = tenantService.selectByCode(code);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
