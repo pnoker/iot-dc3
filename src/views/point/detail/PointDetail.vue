@@ -79,5 +79,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '~@/components/card/styles/things-card.scss';
+@import '@/components/card/styles/things-card.scss';
 </style>

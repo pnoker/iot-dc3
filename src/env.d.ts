@@ -17,25 +17,9 @@
 /// <reference types="vite/client" />
 
 /* eslint-disable */
-declare module '*.vue' {
-    import type { DefineComponent } from 'vue'
-    const component: DefineComponent<{}, {}, any>
-    export default component
-}
-
-/* eslint-disable */
-import { Axios, AxiosResponseHeaders, InternalAxiosRequestConfig } from 'axios'
+import { Axios, AxiosResponse } from 'axios'
 
 declare module 'axios' {
-    interface AxiosResponse<T = any, D = any> {
-        data: T
-        status: number
-        statusText: string
-        headers: RawAxiosResponseHeaders | AxiosResponseHeaders
-        config: InternalAxiosRequestConfig<D>
-        request?: any
-    }
-
     type MyAxiosPromise<T = any> = Promise<AxiosResponse<T>>
 
     interface AxiosInstance extends Axios {

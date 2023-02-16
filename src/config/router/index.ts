@@ -27,7 +27,7 @@ import { isNull } from '@/util/utils'
 import { Login } from '../type/types'
 
 const router = createRouter({
-    history: createWebHashHistory(process.env.BASE_URL),
+    history: createWebHashHistory(import.meta.env.BASE_URL),
     routes: [...commonRouters, viewsRouters, ...operateRouters],
 })
 

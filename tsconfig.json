@@ -9,33 +9,37 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "esModuleInterop": true,
-        "noImplicitAny": false,
-        "experimentalDecorators": true,
         "skipLibCheck": true,
         "noEmit": true,
-        "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true,
-        "sourceMap": true,
-        "baseUrl": ".",
-        "types": [],
+        "baseUrl": "./",
         "paths": {
             "@/*": [
                 "src/*"
             ]
         },
+        "types": [
+            "vite/client"
+        ],
         "lib": [
-            "ESNext",
-            "DOM"
+            "DOM",
+            "DOM.Iterable",
+            "ESNext"
         ]
     },
     "include": [
-        "*.ts",
-        "src/**/*.ts",
-        "src/**/*.tsx",
+        "src/*.vue",
         "src/**/*.vue",
+        "src/*.ts",
+        "src/**/*.ts",
         "src/**/*.d.ts",
+        "src/**/*.tsx"
     ],
     "exclude": [
         "node_modules"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        }
     ]
 }

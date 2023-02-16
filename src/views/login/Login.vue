@@ -80,5 +80,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '~@/views/login/style.scss';
+@import '@/views/login/style.scss';
 </style>

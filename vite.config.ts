@@ -22,10 +22,9 @@ import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
 export default ({ mode }) => {
-    const nodeEnv = (process.env.NODE_ENV = mode || 'dev')
-    const envFiles = [`./src/config/env/.env`, `./src/config/env/.env.${nodeEnv}`]
+    const NODE_ENV = (process.env.NODE_ENV = mode || 'dev')
 
-    for (const file of envFiles) {
+    for (const file of [`./src/config/env/.env`, `./src/config/env/.env.${NODE_ENV}`]) {
         const envConfig = dotenv.parse(fs.readFileSync(file))
         for (const k in envConfig) {
             process.env[k] = envConfig[k]
@@ -36,24 +35,27 @@ export default ({ mode }) => {
         '@': resolve(__dirname, './src'),
         vue$: 'vue/dist/vue.runtime.esm-bundler.js',
     }
+    const proxy = {
+        [process.env.APP_API_PREFIX as string]: {
+            ws: true,
+            changeOrigin: true,
+            target: `${process.env.APP_API_PATH}:${process.env.APP_API_PORT}`,
+            rewrite: (path) =>
+                path.replace(new RegExp('^' + process.env.APP_API_PREFIX), process.env.APP_API_PREFIX as string),
+        },
+    }
 
     return defineConfig({
         base: './',
         root: './',
+        envDir: './src/config/env',
+        envPrefix: 'APP_',
         resolve: {
             alias,
         },
         server: {
-            port: process.env.APP_CLI_PORT,
-            proxy: {
-                [process.env.APP_API_PREFIX]: {
-                    target: `${process.env.APP_API_PATH}:${process.env.APP_API_PORT}`,
-                    changeOrigin: true,
-                    ws: true,
-                    rewrite: (path) =>
-                        path.replace(new RegExp('^' + process.env.APP_API_PREFIX), process.env.APP_API_PREFIX),
-                },
-            },
+            port: Number(process.env.APP_CLI_PORT),
+            proxy,
         },
         plugins: [
             vue(),

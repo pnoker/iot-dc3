@@ -157,5 +157,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '~@/components/card/styles/tool-card.scss';
+@import '@/components/card/styles/tool-card.scss';
 </style>

@@ -135,6 +135,6 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '~@/components/dialog/styles/things-dialog';
-@import '~@/components/card/styles/tool-card';
+@import '@/components/dialog/styles/things-dialog';
+@import '@/components/card/styles/tool-card';
 </style>

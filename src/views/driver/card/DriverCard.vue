@@ -94,6 +94,6 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '~@/components/card/styles/things-card.scss';
-@import '~@/views/driver/card/style.scss';
+@import '@/components/card/styles/things-card.scss';
+@import '@/views/driver/card/style.scss';
 </style>

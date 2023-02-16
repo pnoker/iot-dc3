@@ -130,5 +130,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '~@/components/card/styles/tool-card';
+@import '@/components/card/styles/tool-card';
 </style>
