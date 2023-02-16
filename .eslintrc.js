@@ -16,10 +16,6 @@
 
 module.exports = {
     root: true,
-    parserOptions: {
-        parser: 'babel-eslint',
-        sourceType: 'module',
-    },
     env: {
         node: true,
     },
@@ -31,7 +27,6 @@ module.exports = {
     ],
     plugins: ['vue', '@typescript-eslint'],
     parserOptions: {
-        ecmaVersion: 2020,
         parser: '@typescript-eslint/parser',
         sourceType: 'module',
     },
