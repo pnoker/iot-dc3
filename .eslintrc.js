@@ -18,7 +18,7 @@ module.exports = {
     root: true,
     parserOptions: {
         parser: 'babel-eslint',
-        sourceType: 'module'
+        sourceType: 'module',
     },
     env: {
         node: true,
@@ -45,7 +45,7 @@ module.exports = {
             },
         ],
         'brace-style': [2, '1tbs', { allowSingleLine: true }],
-        'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-        'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+        'no-console': process.env.NODE_ENV === 'pro' ? 'warn' : 'off',
+        'no-debugger': process.env.NODE_ENV === 'pro' ? 'warn' : 'off',
     },
 }
