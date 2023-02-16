@@ -17,7 +17,7 @@
 import { Hide, Histogram, List, Management, Promotion, View } from '@element-plus/icons-vue'
 import element from 'element-plus'
 import 'element-plus/dist/index.css'
-import './element-variables.less'
+import './element-variables.scss'
 import locale from 'element-plus/es/locale/lang/zh-cn'
 
 export default (app) => {

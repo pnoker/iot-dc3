@@ -18,7 +18,7 @@
     <div class="container">
         <div class="header">
             <el-col :span="4" class="header_item">
-                <img class="header_logo" src="images/logo/logo.png" />
+                <img class="header_logo" src="/images/logo/logo.png" />
             </el-col>
             <el-col :span="16" class="header_item">
                 <el-menu
@@ -78,6 +78,6 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less">
-@import '~@/components/layout/style.less';
+<style lang="scss">
+@import '@/components/layout/style.scss';
 </style>

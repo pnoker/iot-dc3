@@ -79,6 +79,6 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less">
-@import '~@/views/login/style.less';
+<style lang="scss">
+@import '~@/views/login/style.scss';
 </style>

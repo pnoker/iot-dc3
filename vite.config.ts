@@ -18,11 +18,12 @@ import legacy from '@vitejs/plugin-legacy'
 import vue from '@vitejs/plugin-vue'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'
+import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
 export default ({ mode }) => {
     const nodeEnv = (process.env.NODE_ENV = mode || 'dev')
-    const envFiles = [`./src/env/.env`, `./src/env/.env.${nodeEnv}`]
+    const envFiles = [`./src/config/env/.env`, `./src/config/env/.env.${nodeEnv}`]
 
     for (const file of envFiles) {
         const envConfig = dotenv.parse(fs.readFileSync(file))
@@ -30,18 +31,19 @@ export default ({ mode }) => {
             process.env[k] = envConfig[k]
         }
     }
-    console.log(process.env.APP_API_PORT)
-    console.log(process.env.APP_API_PREFIX)
-    console.log(process.env.APP_API_PATH)
-    console.log(process.env.APP_API_PORT)
+
+    const alias = {
+        '@': resolve(__dirname, './src'),
+        vue$: 'vue/dist/vue.runtime.esm-bundler.js',
+    }
 
     return defineConfig({
         base: './',
-        root: './public',
+        root: './',
+        resolve: {
+            alias,
+        },
         server: {
-            hmr: {
-                overlay: false,
-            },
             port: process.env.APP_CLI_PORT,
             proxy: {
                 [process.env.APP_API_PREFIX]: {

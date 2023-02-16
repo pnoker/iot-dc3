@@ -51,6 +51,6 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less">
-@import '~@/components/dialog/styles/things-dialog.less';
+<style lang="scss">
+@import '~@/components/dialog/styles/things-dialog.scss';
 </style>

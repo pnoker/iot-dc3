@@ -307,7 +307,7 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less">
+<style lang="scss">
 @import '~@/components/card/styles/edit-card';
 @import '~@/components/card/styles/tool-card';
 </style>

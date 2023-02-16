@@ -24,7 +24,7 @@ declare module '*.vue' {
 }
 
 /* eslint-disable */
-import { InternalAxiosRequestConfig, AxiosResponseHeaders, Axios } from 'axios'
+import { Axios, AxiosResponseHeaders, InternalAxiosRequestConfig } from 'axios'
 
 declare module 'axios' {
     interface AxiosResponse<T = any, D = any> {

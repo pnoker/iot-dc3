@@ -34,6 +34,6 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less">
-@import '~@/views/home/style.less';
+<style lang="scss">
+@import '~@/views/home/style.scss';
 </style>

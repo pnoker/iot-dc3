@@ -53,4 +53,4 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less"></style>
+<style lang="scss"></style>

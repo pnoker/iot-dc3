@@ -66,8 +66,8 @@ export default {
 }
 </script>
 
-<style lang="less">
-@import '~@/components/card/styles/things-card.less';
+<style lang="scss">
+@import '~@/components/card/styles/things-card.scss';
 
 .things-card-application {
     width: 140px;

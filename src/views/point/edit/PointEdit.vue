@@ -180,6 +180,6 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less">
-@import '~@/components/card/styles/edit-card.less';
+<style lang="scss">
+@import '~@/components/card/styles/edit-card.scss';
 </style>

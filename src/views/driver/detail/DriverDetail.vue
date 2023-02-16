@@ -95,7 +95,7 @@
 
 <script src="./index.ts" lang="ts" />
 
-<style lang="less">
+<style lang="scss">
 .detail-content {
     margin-left: 0 !important;
     margin-right: 0 !important;

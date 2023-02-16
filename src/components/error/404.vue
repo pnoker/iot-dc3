@@ -29,6 +29,6 @@
     </div>
 </template>
 
-<style lang="less" scoped>
-@import 'style.less';
+<style lang="scss" scoped>
+@import 'style.scss';
 </style>
