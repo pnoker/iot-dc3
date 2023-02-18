@@ -15,22 +15,12 @@
  */
 
 import { computed, defineComponent } from 'vue'
-import {
-    Bottom,
-    CircleCheck,
-    CircleClose,
-    Edit,
-    List,
-    Location,
-    Sunset,
-    SwitchButton,
-    Top,
-} from '@element-plus/icons-vue'
+import { Bottom, CircleCheck, CircleClose, Edit, List, Location, Sunset, SwitchButton, Top } from '@element-plus/icons-vue'
 
 import router from '@/config/router'
 
-import { successMessage } from '@/util/NotificationUtils'
-import { copyId, timestamp } from '@/util/CommonUtils'
+import { successMessage } from '@/utils/NotificationUtils'
+import { copyId, timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'PointCard',
@@ -132,11 +122,9 @@ export default defineComponent({
         }
 
         const edit = () => {
-            router
-                .push({ name: 'pointEdit', query: { id: props.data.id, profileId: props.data.profileId, active: '0' } })
-                .catch(() => {
-                    // nothing to do
-                })
+            router.push({ name: 'pointEdit', query: { id: props.data.id, profileId: props.data.profileId, active: '0' } }).catch(() => {
+                // nothing to do
+            })
         }
 
         const detail = () => {

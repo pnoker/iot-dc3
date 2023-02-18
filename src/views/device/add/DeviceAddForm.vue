@@ -29,21 +29,10 @@
                 <el-input v-model="reactiveData.formData.name" placeholder="请输入设备名称" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
-                <el-select
-                    v-model="reactiveData.formData.driverId"
-                    class="edit-form-special"
-                    placeholder="请选择所属驱动"
-                    clearable
-                    @visible-change="driverDictionaryVisible"
-                >
+                <el-select v-model="reactiveData.formData.driverId" class="edit-form-special" placeholder="请选择所属驱动" clearable @visible-change="driverDictionaryVisible">
                     <div class="tool-select">
                         <el-form-item class="tool-select-input">
-                            <el-input
-                                v-model="reactiveData.driverQuery"
-                                placeholder="请选择所属驱动"
-                                clearable
-                                @input="driverDictionary"
-                            />
+                            <el-input v-model="reactiveData.driverQuery" placeholder="请选择所属驱动" clearable @input="driverDictionary" />
                         </el-form-item>
                         <el-pagination
                             class="tool-select-pagination"
@@ -58,12 +47,7 @@
                             @current-change="driverCurrentChange"
                         ></el-pagination>
                     </div>
-                    <el-option
-                        v-for="dictionary in reactiveData.driverDictionary"
-                        :key="dictionary.value"
-                        :label="dictionary.label"
-                        :value="dictionary.value"
-                    ></el-option>
+                    <el-option v-for="dictionary in reactiveData.driverDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="关联模板" prop="profileIds">
@@ -77,12 +61,7 @@
                 >
                     <div class="tool-select">
                         <el-form-item class="tool-select-input">
-                            <el-input
-                                v-model="reactiveData.profileQuery"
-                                placeholder="请选择关联模板"
-                                clearable
-                                @input="profileDictionary"
-                            />
+                            <el-input v-model="reactiveData.profileQuery" placeholder="请选择关联模板" clearable @input="profileDictionary" />
                         </el-form-item>
                         <el-pagination
                             class="tool-select-pagination"
@@ -97,12 +76,7 @@
                             @current-change="profileCurrentChange"
                         ></el-pagination>
                     </div>
-                    <el-option
-                        v-for="dictionary in reactiveData.profileDictionary"
-                        :key="dictionary.value"
-                        :label="dictionary.label"
-                        :value="dictionary.value"
-                    ></el-option>
+                    <el-option v-for="dictionary in reactiveData.profileDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="存储类型" prop="multi">
@@ -112,14 +86,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="描述" prop="description">
-                <el-input
-                    v-model="reactiveData.formData.description"
-                    placeholder="请输入设备描述"
-                    type="textarea"
-                    maxlength="300"
-                    show-word-limit
-                    clearable
-                ></el-input>
+                <el-input v-model="reactiveData.formData.description" placeholder="请输入设备描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">

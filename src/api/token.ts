@@ -15,7 +15,7 @@
  */
 
 import request from '@/config/axios'
-import { Login, R } from '@/config/type/types'
+import  Login  from '@/config/type/types/login'
 
 /**
  * 通过用户名获取 Salt

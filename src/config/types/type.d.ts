@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { dateFormat, setCopyContent } from '@/util/utils'
-
-export const copyId = (content: string, message: string) => {
-    setCopyContent(content, true, message)
-}
-
-export const timestamp = (timestamp: string): string => {
-    return dateFormat(new Date(timestamp))
+/**
+ * 统一返回
+ */
+declare type R<T = any> = {
+    ok: boolean
+    code: number
+    message: string
+    data: T
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { successMessage } from '@/util/NotificationUtils'
+import { successMessage } from '@/utils/NotificationUtils'
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 

@@ -17,19 +17,25 @@
 module.exports = {
     root: true,
     env: {
+        browser: true,
+        es2021: true,
         node: true,
     },
-    extends: [
-        'plugin:vue/vue3-recommended',
-        '@vue/typescript/recommended',
-        'eslint:recommended',
-        'plugin:prettier/recommended',
-    ],
-    plugins: ['vue', '@typescript-eslint'],
+    parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',
         sourceType: 'module',
     },
+    extends: ['plugin:vue/vue3-recommended', '@vue/typescript/recommended', 'eslint:recommended', 'plugin:prettier/recommended'],
+    plugins: ['vue', '@typescript-eslint'],
+    overrides: [
+        {
+            files: ['*.ts', '*.tsx', '*.vue'],
+            rules: {
+                'no-undef': 'off',
+            },
+        },
+    ],
     rules: {
         'vue/multi-word-component-names': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
@@ -39,7 +45,7 @@ module.exports = {
                 allow: ['arrowFunctions'],
             },
         ],
-        'brace-style': [2, '1tbs', { allowSingleLine: true }],
+        'brace-style': [2, '1tbs', {allowSingleLine: true}],
         'no-console': process.env.NODE_ENV === 'pro' ? 'warn' : 'off',
         'no-debugger': process.env.NODE_ENV === 'pro' ? 'warn' : 'off',
     },

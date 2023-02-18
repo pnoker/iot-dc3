@@ -17,7 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 
-import { successMessage } from '@/util/NotificationUtils'
+import { successMessage } from '@/utils/NotificationUtils'
 
 export default defineComponent({
     name: 'PointValueEditForm',

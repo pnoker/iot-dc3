@@ -14,23 +14,42 @@
  * limitations under the License.
  */
 
-const interval = {
-    state: {
-        pointValueInterval: null,
-    },
-    actions: {
-        ClearPointValueInterval({ commit }: any, interval: number) {
-            commit('CLEAR_POINT_VALUE_INTERVAL', interval)
-        },
-    },
-    mutations: {
-        CLEAR_POINT_VALUE_INTERVAL: (state: any, interval: number) => {
-            if (state.pointValueInterval) {
-                clearInterval(state.pointValueInterval)
-            }
-            state.pointValueInterval = interval
-        },
-    },
+/**
+ * 登录信息
+ */
+export type Login = {
+    tenant: string
+    name: string
+    salt: string
+    password: string
+    token: string
 }
 
-export default interval
+/**
+ * 属性
+ */
+export type Attribute = {
+    id: string
+    name: string
+    displayName: string
+}
+
+/**
+ * 字典
+ */
+export type Dictionary = {
+    type: string
+    label: string
+    value: string
+    disabled: boolean
+    expand: boolean
+    children: Array<Dictionary>
+}
+
+/**
+ * 排序
+ */
+export type Order = {
+    column: string
+    asc: boolean
+}

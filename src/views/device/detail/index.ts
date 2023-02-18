@@ -20,9 +20,9 @@ import { CollectionTag, Edit, List, Management, Promotion, Sunset } from '@eleme
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { driverByIdApi } from '@/api/driver'
+import { driverByIdApi } from '@/api/DriverApi'
 import { profileByDeviceIdApi } from '@/api/profile'
-import { deviceByIdApi } from '@/api/device'
+import { deviceByIdApi } from '@/api/DeviceApi'
 import { profileByIdsApi } from '@/api/profile'
 
 import baseCard from '@/components/card/base/BaseCard.vue'
@@ -37,7 +37,7 @@ import pointValueCard from '@/views/point/value/card/PointValueCard.vue'
 import pointValue from '@/views/point/value/PointValue.vue'
 import pointValueEditForm from '@/views/point/value/edit/PointValueEditForm.vue'
 
-import { timestamp } from '@/util/CommonUtils'
+import { timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'DeviceDetail',
@@ -130,9 +130,7 @@ export default defineComponent({
                     reactiveData.listProfileData = res.data.data
 
                     // profile
-                    const profileIds = Array.from(
-                        new Set(reactiveData.listProfileData.map((pointValue) => pointValue.id))
-                    )
+                    const profileIds = Array.from(new Set(reactiveData.listProfileData.map((pointValue) => pointValue.id)))
                     profileByIdsApi(profileIds)
                         .then((res) => {
                             reactiveData.profileTable = res.data.data

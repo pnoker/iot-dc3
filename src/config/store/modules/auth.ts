@@ -19,11 +19,11 @@ import { ElLoading } from 'element-plus'
 
 import { cancelTokenApi, generateSaltApi, generateTokenApi } from '@/api/token'
 
-import md5 from 'js-md5'
-import CommonConstant from '@/util/CommonConstant'
-import { getStorage, removeStorage, setStorage } from '@/util/StorageUtils'
 import { Login } from '@/config/type/types'
-import { isNull } from '@/util/utils'
+import CommonConstant from '@/config/constant/CommonConstant'
+import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtils'
+import { isNull } from '@/utils/utils'
+import { Md5 } from 'ts-md5'
 
 const auth = {
     namespaced: true,
@@ -32,7 +32,7 @@ const auth = {
         name: 'pnoker',
     },
     mutations: {
-        setToken: (state, login) => {
+        setToken: (state: any, login: any) => {
             setStorage(CommonConstant.TENANT_HEADER, login.tenant)
             setStorage(CommonConstant.USER_HEADER, login.name)
             setStorage(CommonConstant.TOKEN_HEADER, { salt: login.salt, token: login.token })
@@ -47,7 +47,7 @@ const auth = {
         },
     },
     actions: {
-        login({ commit }, form) {
+        login({ commit }: any, form: any) {
             const loading = ElLoading.service({
                 lock: true,
                 text: '登录中,请稍后...',
@@ -63,7 +63,7 @@ const auth = {
                         tenant: form.tenant,
                         name: form.name,
                         salt: salt,
-                        password: md5(md5(form.password) + salt),
+                        password: Md5.hashStr(Md5.hashStr(form.password) + salt),
                     } as Login
 
                     generateTokenApi(login)
@@ -80,7 +80,7 @@ const auth = {
                 })
                 .catch(() => loading.close())
         },
-        logout({ commit }) {
+        logout({ commit }: any) {
             const tenant = getStorage(CommonConstant.TENANT_HEADER)
             const user = getStorage(CommonConstant.USER_HEADER)
             if (!isNull(tenant) && !isNull(user)) {

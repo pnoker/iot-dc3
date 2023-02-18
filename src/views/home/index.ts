@@ -243,13 +243,7 @@ export default defineComponent({
                 tooltip: {
                     position: 'top',
                     formatter: (params) => {
-                        return (
-                            params.value[2] +
-                            ' commits in ' +
-                            reactiveData.hours[params.value[0]] +
-                            ' of ' +
-                            reactiveData.days[params.value[1]]
-                        )
+                        return params.value[2] + ' commits in ' + reactiveData.hours[params.value[0]] + ' of ' + reactiveData.days[params.value[1]]
                     },
                 },
                 grid: {

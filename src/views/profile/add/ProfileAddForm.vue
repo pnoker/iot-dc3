@@ -29,14 +29,7 @@
                 <el-input v-model="reactiveData.formData.name" placeholder="请输入模板名称" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="描述" prop="description">
-                <el-input
-                    v-model="reactiveData.formData.description"
-                    type="textarea"
-                    maxlength="300"
-                    show-word-limit
-                    placeholder="请输入模板描述"
-                    clearable
-                ></el-input>
+                <el-input v-model="reactiveData.formData.description" type="textarea" maxlength="300" show-word-limit placeholder="请输入模板描述" clearable></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">

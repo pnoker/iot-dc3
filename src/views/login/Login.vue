@@ -26,13 +26,7 @@
             <div class="login-border">
                 <div class="login-main">
                     <h4 class="login-title">DC3 IoT 平台</h4>
-                    <el-form
-                        ref="formDataRef"
-                        class="login-form"
-                        status-icon
-                        :rules="formRule"
-                        :model="reactiveData.formData"
-                    >
+                    <el-form ref="formDataRef" class="login-form" status-icon :rules="formRule" :model="reactiveData.formData">
                         <el-form-item prop="tenant">
                             <el-input
                                 v-model="reactiveData.formData.tenant"
@@ -43,13 +37,7 @@
                             ></el-input>
                         </el-form-item>
                         <el-form-item prop="name">
-                            <el-input
-                                v-model="reactiveData.formData.name"
-                                :prefix-icon="User"
-                                placeholder="请输入用户名"
-                                auto-complete="off"
-                                @keyup.enter="handleLogin"
-                            ></el-input>
+                            <el-input v-model="reactiveData.formData.name" :prefix-icon="User" placeholder="请输入用户名" auto-complete="off" @keyup.enter="handleLogin"></el-input>
                         </el-form-item>
                         <el-form-item prop="password">
                             <el-input
@@ -66,9 +54,7 @@
                             </el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button class="login-submit" type="primary" @click.prevent="handleLogin"
-                                >登录
-                            </el-button>
+                            <el-button class="login-submit" type="primary" @click.prevent="handleLogin">登录 </el-button>
                         </el-form-item>
                     </el-form>
                 </div>

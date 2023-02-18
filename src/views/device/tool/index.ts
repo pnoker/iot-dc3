@@ -19,7 +19,7 @@ import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
 
 import { Dictionary, Order } from '@/config/type/types'
-import { driverDictionaryApi } from '@/api/dictionary'
+import { driverDictionaryApi } from '@/api/DictionaryApi'
 
 export default defineComponent({
     name: 'DeviceTool',

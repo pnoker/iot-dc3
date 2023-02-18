@@ -37,13 +37,7 @@
                     <el-empty description="暂无模板数据！"></el-empty>
                 </el-col>
                 <el-col v-for="data in reactiveData.listData" :key="data.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
-                    <profile-card
-                        :embedded="embedded != ''"
-                        :data="data"
-                        @disable-thing="disableThing"
-                        @enable-thing="enableThing"
-                        @delete-thing="deleteThing"
-                    ></profile-card>
+                    <profile-card :embedded="embedded != ''" :data="data" @disable-thing="disableThing" @enable-thing="enableThing" @delete-thing="deleteThing"></profile-card>
                 </el-col>
             </el-row>
         </blank-card>

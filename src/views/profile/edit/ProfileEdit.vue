@@ -32,20 +32,10 @@
                 <el-form ref="formDataRef" :inline="true" :model="reactiveData.profileFormData" :rules="formRule">
                     <div class="edit-form-item">
                         <el-form-item label="模板名称" prop="name">
-                            <el-input
-                                v-model="reactiveData.profileFormData.name"
-                                clearable
-                                class="edit-form-default"
-                                placeholder="请输入模板名称"
-                            ></el-input>
+                            <el-input v-model="reactiveData.profileFormData.name" clearable class="edit-form-default" placeholder="请输入模板名称"></el-input>
                         </el-form-item>
                         <el-form-item label="使能" prop="enable">
-                            <el-select
-                                v-model="reactiveData.profileFormData.enable"
-                                clearable
-                                class="edit-form-small"
-                                placeholder="请选择使能"
-                            >
+                            <el-select v-model="reactiveData.profileFormData.enable" clearable class="edit-form-small" placeholder="请选择使能">
                                 <el-option label="启用" :value="true"></el-option>
                                 <el-option label="停用" :value="false"></el-option>
                             </el-select>
@@ -74,13 +64,7 @@
             </el-card>
             <el-card v-if="reactiveData.active === 1" shadow="hover">
                 <el-divider content-position="left">模板位号配置</el-divider>
-                <point
-                    :embedded="'edit'"
-                    :pre="true"
-                    :profile-id="reactiveData.id"
-                    @pre-handle="pre"
-                    @next-handle="next"
-                ></point>
+                <point :embedded="'edit'" :pre="true" :profile-id="reactiveData.id" @pre-handle="pre" @next-handle="next"></point>
             </el-card>
             <el-card v-if="reactiveData.active === 2" shadow="hover">
                 <el-divider content-position="left">模板配置完成</el-divider>

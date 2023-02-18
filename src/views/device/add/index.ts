@@ -19,8 +19,8 @@ import { FormInstance, FormRules } from 'element-plus'
 
 import { Dictionary, Order } from '@/config/type/types'
 
-import { successMessage } from '@/util/NotificationUtils'
-import { driverDictionaryApi, profileDictionaryApi } from '@/api/dictionary'
+import { successMessage } from '@/utils/NotificationUtils'
+import { driverDictionaryApi, profileDictionaryApi } from '@/api/DictionaryApi'
 
 export default defineComponent({
     name: 'DeviceAddForm',

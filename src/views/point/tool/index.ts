@@ -19,7 +19,7 @@ import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshLeft, Search, Sort, Back, Check } from '@element-plus/icons-vue'
 
 import { Dictionary, Order } from '@/config/type/types'
-import { profileDictionaryApi } from '@/api/dictionary'
+import { profileDictionaryApi } from '@/api/DictionaryApi'
 
 export default defineComponent({
     name: 'PointTool',
@@ -49,17 +49,7 @@ export default defineComponent({
             },
         },
     },
-    emits: [
-        'search',
-        'reset',
-        'show-add',
-        'refresh',
-        'sort',
-        'size-change',
-        'current-change',
-        'pre-handle',
-        'next-handle',
-    ],
+    emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change', 'pre-handle', 'next-handle'],
     setup(props, { emit }) {
         // 定义表单引用
         const formDataRef = ref<FormInstance>()

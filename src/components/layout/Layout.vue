@@ -21,12 +21,7 @@
                 <img class="header_logo" src="/images/logo/logo.png" />
             </el-col>
             <el-col :span="16" class="header_item">
-                <el-menu
-                    class="header_menu"
-                    :default-active="handleMenuEnter($route.path)"
-                    mode="horizontal"
-                    :router="true"
-                >
+                <el-menu :default-active="handleMenuEnter($route.path)" mode="horizontal" :router="true" class="header_menu">
                     <el-menu-item index="/home">
                         <el-icon>
                             <HomeFilled />
@@ -36,9 +31,7 @@
                     <template v-for="menu in menus">
                         <el-sub-menu v-if="menu.children" :key="menu.name" :index="menu.path">
                             <template #title>{{ menu.meta.title }}</template>
-                            <el-menu-item v-for="m in menu.children" :key="m.path" :index="m.path">{{
-                                m.meta.title
-                            }}</el-menu-item>
+                            <el-menu-item v-for="m in menu.children" :key="m.path" :index="m.path">{{ m.meta.title }}</el-menu-item>
                         </el-sub-menu>
                         <el-menu-item v-else :key="menu.name" :index="menu.path">
                             <el-icon>

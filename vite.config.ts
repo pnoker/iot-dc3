@@ -19,36 +19,39 @@ import vue from '@vitejs/plugin-vue'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'
 import { resolve } from 'path'
-import { defineConfig } from 'vite'
+import { ConfigEnv, defineConfig } from 'vite'
 
-export default ({ mode }) => {
-    const NODE_ENV = (process.env.NODE_ENV = mode || 'dev')
+export default (configEnv: ConfigEnv) => {
+    process.env.NODE_ENV = configEnv.mode || 'dev'
 
-    for (const file of [`./src/config/env/.env`, `./src/config/env/.env.${NODE_ENV}`]) {
-        const envConfig = dotenv.parse(fs.readFileSync(file))
-        for (const k in envConfig) {
-            process.env[k] = envConfig[k]
-        }
-    }
+    const envDir = './src/config/env'
+    const files = [`${envDir}/.env`, `${envDir}/.env.${process.env.NODE_ENV}`]
 
-    const alias = {
+    files.forEach((file) => {
+        const config = dotenv.parse<any>(fs.readFileSync(file))
+        Object.keys(config).forEach((key) => {
+            process.env[key] = config[key]
+        })
+    })
+
+    const alias: Record<string, string> = {
         '@': resolve(__dirname, './src'),
         vue$: 'vue/dist/vue.runtime.esm-bundler.js',
     }
+    const apiPrefix = process.env.APP_API_PREFIX as string
     const proxy = {
-        [process.env.APP_API_PREFIX as string]: {
+        [apiPrefix]: {
             ws: true,
             changeOrigin: true,
             target: `${process.env.APP_API_PATH}:${process.env.APP_API_PORT}`,
-            rewrite: (path) =>
-                path.replace(new RegExp('^' + process.env.APP_API_PREFIX), process.env.APP_API_PREFIX as string),
+            rewrite: (path: string) => path.replace(new RegExp(`^${apiPrefix}`), apiPrefix),
         },
     }
 
     return defineConfig({
         base: './',
         root: './',
-        envDir: './src/config/env',
+        envDir,
         envPrefix: 'APP_',
         resolve: {
             alias,
@@ -60,14 +63,7 @@ export default ({ mode }) => {
         plugins: [
             vue(),
             legacy({
-                targets: [
-                    'Android > 39',
-                    'Chrome >= 60',
-                    'Safari >= 10.1',
-                    'iOS >= 10.3',
-                    'Firefox >= 54',
-                    'Edge >= 15',
-                ],
+                targets: ['Android > 39', 'Chrome >= 60', 'Safari >= 10.1', 'iOS >= 10.3', 'Firefox >= 54', 'Edge >= 15'],
             }),
         ],
     })

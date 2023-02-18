@@ -21,24 +21,17 @@ import { Back, Check, Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { driverDictionaryApi, profileDictionaryApi } from '@/api/dictionary'
-import { deviceByIdApi, deviceUpdateApi } from '@/api/device'
-import { driverAttributeByDriverIdApi, pointAttributeByDriverIdApi } from '@/api/attribute'
-import {
-    driverInfoAddApi,
-    driverInfoByDeviceIdApi,
-    driverInfoUpdateApi,
-    pointInfoAddApi,
-    pointInfoByDeviceIdApi,
-    pointInfoUpdateApi,
-} from '@/api/info'
+import { driverDictionaryApi, profileDictionaryApi } from '@/api/DictionaryApi'
+import { deviceByIdApi, deviceUpdateApi } from '@/api/DeviceApi'
+import { driverAttributeByDriverIdApi, pointAttributeByDriverIdApi } from '@/api/AttributeApi'
+import { driverInfoAddApi, driverInfoByDeviceIdApi, driverInfoUpdateApi, pointInfoAddApi, pointInfoByDeviceIdApi, pointInfoUpdateApi } from '@/api/InfoApi'
 
 import { Dictionary, Order } from '@/config/type/types'
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue'
-import { isNull } from '@/util/utils'
-import { driverByIdApi } from '@/api/driver'
+import { isNull } from '@/utils/utils'
+import { driverByIdApi } from '@/api/DriverApi'
 import { profileByIdsApi } from '@/api/profile'
 import { pointByDeviceIdApi } from '@/api/point'
 

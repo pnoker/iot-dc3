@@ -53,21 +53,8 @@
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
                     <el-row>
-                        <el-col
-                            v-for="data in reactiveData.listDeviceData"
-                            :key="data.id"
-                            :xs="24"
-                            :sm="12"
-                            :md="8"
-                            :lg="6"
-                            :xl="4"
-                        >
-                            <device-card
-                                :data="data"
-                                :driver="reactiveData.driverTable[data.driverId]"
-                                :status="reactiveData.statusTable[data.id]"
-                                :embedded="true"
-                            ></device-card>
+                        <el-col v-for="data in reactiveData.listDeviceData" :key="data.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
+                            <device-card :data="data" :driver="reactiveData.driverTable[data.driverId]" :status="reactiveData.statusTable[data.id]" :embedded="true"></device-card>
                         </el-col>
                     </el-row>
                 </el-tab-pane>

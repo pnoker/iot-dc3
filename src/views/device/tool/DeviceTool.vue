@@ -17,22 +17,10 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form
-                ref="formDataRef"
-                class="tool-card-body"
-                :model="reactiveData.formData"
-                :rules="formRule"
-                :inline="true"
-            >
+            <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="name" label="设备名称">
-                        <el-input
-                            v-model="reactiveData.formData.name"
-                            class="edit-form-default"
-                            placeholder="请输入设备名称"
-                            clearable
-                            @keyup.enter="search"
-                        />
+                        <el-input v-model="reactiveData.formData.name" class="edit-form-default" placeholder="请输入设备名称" clearable @keyup.enter="search" />
                     </el-form-item>
                     <el-form-item v-if="embedded != 'driver'" prop="driverId" label="所属驱动">
                         <el-select
@@ -44,12 +32,7 @@
                         >
                             <div class="tool-select">
                                 <el-form-item class="tool-select-input">
-                                    <el-input
-                                        v-model="reactiveData.driverQuery"
-                                        placeholder="请输入驱动名称"
-                                        clearable
-                                        @input="driverDictionary"
-                                    />
+                                    <el-input v-model="reactiveData.driverQuery" placeholder="请输入驱动名称" clearable @input="driverDictionary" />
                                 </el-form-item>
                                 <el-pagination
                                     class="tool-select-pagination"
@@ -64,32 +47,17 @@
                                     @current-change="driverCurrentChange"
                                 ></el-pagination>
                             </div>
-                            <el-option
-                                v-for="dictionary in reactiveData.driverDictionary"
-                                :key="dictionary.value"
-                                :label="dictionary.label"
-                                :value="dictionary.value"
-                            ></el-option>
+                            <el-option v-for="dictionary in reactiveData.driverDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item prop="multi" label="存储类型">
-                        <el-select
-                            v-model="reactiveData.formData.multi"
-                            class="edit-form-medium"
-                            placeholder="请选择存储类型"
-                            clearable
-                        >
+                        <el-select v-model="reactiveData.formData.multi" class="edit-form-medium" placeholder="请选择存储类型" clearable>
                             <el-option label="单点数据" :value="false"></el-option>
                             <el-option label="结构数据" :value="true"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item prop="enable" label="使能">
-                        <el-select
-                            v-model="reactiveData.formData.enable"
-                            class="edit-form-small"
-                            placeholder="请选择使能"
-                            clearable
-                        >
+                        <el-select v-model="reactiveData.formData.enable" class="edit-form-small" placeholder="请选择使能" clearable>
                             <el-option label="启用" :value="true"></el-option>
                             <el-option label="停用" :value="false"></el-option>
                         </el-select>

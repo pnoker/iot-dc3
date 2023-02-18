@@ -14,9 +14,33 @@
  * limitations under the License.
  */
 
-import VueHighlightJS from 'vue3-highlightjs'
+import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 
-export default (app) => {
-    app.use(VueHighlightJS)
+export default (app: any) => {
+    app.directive('highlight', {
+        // Directive has a set of lifecycle hooks:
+        // called before bound element's parent component is mounted
+        beforeMount(el: any) {
+            // on first bind, highlight all targets
+            const blocks = el.querySelectorAll('pre code')
+            for (let i = 0; i < blocks.length; i++) {
+                const item = blocks[i]
+                console.log(item)
+                hljs.highlightBlock(item)
+            }
+        },
+        // called after the containing component's VNode and the VNodes of its children // have updated
+        updated(el: any, binding: any) {
+            // after an update, re-fill the content and then highlight
+            const targets = el.querySelectorAll('code')
+            for (let i = 0; i < targets.length; i += 1) {
+                const target = targets[i]
+                if (typeof binding.value === 'string') {
+                    target.textContent = binding.value
+                }
+                hljs.highlightBlock(target)
+            }
+        },
+    })
 }

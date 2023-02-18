@@ -16,15 +16,7 @@
 
 <template>
     <div>
-        <driver-tool
-            :page="reactiveData.page"
-            @search="search"
-            @reset="reset"
-            @refresh="refresh"
-            @sort="sort"
-            @size-change="sizeChange"
-            @current-change="currentChange"
-        >
+        <driver-tool :page="reactiveData.page" @search="search" @reset="reset" @refresh="refresh" @sort="sort" @size-change="sizeChange" @current-change="currentChange">
         </driver-tool>
 
         <blank-card>

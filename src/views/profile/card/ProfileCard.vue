@@ -58,24 +58,12 @@
                 </div>
                 <div v-if="!embedded" class="things-card__footer">
                     <div class="things-card-footer-operation">
-                        <el-popconfirm
-                            title="是否确定停用该模板？"
-                            placement="top"
-                            :icon="SwitchButton"
-                            icon-color="#e6a23c"
-                            @confirm="disableThing"
-                        >
+                        <el-popconfirm title="是否确定停用该模板？" placement="top" :icon="SwitchButton" icon-color="#e6a23c" @confirm="disableThing">
                             <template #reference>
                                 <el-button type="primary" :disabled="!data.enable" link>停用</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-popconfirm
-                            title="是否确定启用该模板？"
-                            placement="top"
-                            :icon="CircleCheck"
-                            icon-color="#67c23a"
-                            @confirm="enableThing"
-                        >
+                        <el-popconfirm title="是否确定启用该模板？" placement="top" :icon="CircleCheck" icon-color="#67c23a" @confirm="enableThing">
                             <template #reference>
                                 <el-button type="primary" :disabled="data.enable" link>启用</el-button>
                             </template>

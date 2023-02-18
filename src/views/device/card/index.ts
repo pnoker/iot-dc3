@@ -19,8 +19,8 @@ import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchBu
 
 import router from '@/config/router'
 
-import { successMessage } from '@/util/NotificationUtils'
-import { copyId, timestamp } from '@/util/CommonUtils'
+import { successMessage } from '@/utils/NotificationUtils'
+import { copyId, timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'DeviceCard',

@@ -15,51 +15,9 @@
  */
 
 /**
- * 统一返回
- */
-export interface R<T = any> {
-    ok: boolean
-    code: number
-    message: string
-    data: T
-}
-
-/**
- * 登录信息
- */
-export interface Login {
-    tenant: string
-    name: string
-    salt: string
-    password: string
-    token: string
-}
-
-/**
- * 字典
- */
-export interface Dictionary {
-    type: string
-    label: string
-    value: string
-    disabled: boolean
-    expand: boolean
-    children: Array<Dictionary>
-}
-
-/**
- * 属性
- */
-export interface Attribute {
-    id: string
-    name: string
-    displayName: string
-}
-
-/**
  * 排序
  */
-export interface Order {
+export type Order = {
     column: string
     asc: boolean
 }

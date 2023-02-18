@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-/// <reference types="vite/client" />
-
 /* eslint-disable */
-import { Axios, AxiosResponse } from 'axios'
+import * as axios from 'axios'
 
 declare module 'axios' {
     type MyAxiosPromise<T = any> = Promise<AxiosResponse<T>>

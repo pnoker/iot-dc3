@@ -15,14 +15,7 @@
   -->
 
 <template>
-    <iframe
-        class="things-dashboard-iframe"
-        frameborder="no"
-        border="0"
-        marginwidth="0"
-        marginheight="0"
-        :src="iframeUrl"
-    ></iframe>
+    <iframe class="things-dashboard-iframe" frameborder="no" border="0" marginwidth="0" marginheight="0" :src="iframeUrl"></iframe>
 </template>
 
 <script src="./index.ts" lang="ts" />

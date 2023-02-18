@@ -20,7 +20,7 @@ import 'element-plus/dist/index.css'
 import './element-variables.scss'
 import locale from 'element-plus/es/locale/lang/zh-cn'
 
-export default (app) => {
+export default (app: any) => {
     const Icons = [Hide, Histogram, List, Management, Promotion, View]
     Icons.forEach((icon) => {
         app.component(icon.name, icon)

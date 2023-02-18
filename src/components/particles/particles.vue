@@ -168,24 +168,7 @@ class ShaderProgram {
             const fovRad = camera.fov * (Math.PI / 180)
             const f = Math.tan(Math.PI * 0.5 - 0.5 * fovRad)
             const rangeInv = 1.0 / (camera.near - camera.far)
-            const matrix = [
-                f / camera.aspect,
-                0,
-                0,
-                0,
-                0,
-                f,
-                0,
-                0,
-                0,
-                0,
-                (camera.near + camera.far) * rangeInv,
-                -1,
-                0,
-                0,
-                camera.near * camera.far * rangeInv * 2,
-                0,
-            ]
+            const matrix = [f / camera.aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (camera.near + camera.far) * rangeInv, -1, 0, 0, camera.near * camera.far * rangeInv * 2, 0]
             matrix[14] += camera.z
             matrix[15] += camera.z
             return matrix

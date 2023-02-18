@@ -17,14 +17,14 @@
 import { createRouter, createWebHashHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
 import commonRouters from './common'
-import viewsRouters from './views'
 import operateRouters from './operate'
+import viewsRouters from './views'
 
-import CommonConstant from '@/util/CommonConstant'
-import { getStorage } from '@/util/StorageUtils'
 import { checkTokenValidApi } from '@/api/token'
-import { isNull } from '@/util/utils'
-import { Login } from '../type/types'
+import CommonConstant from '@/config/constant/CommonConstant'
+import { getStorage } from '@/utils/StorageUtils'
+import { isNull } from '@/utils/utils'
+import { Login } from '../types/type'
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),

@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Plus, RefreshRight, Search, Refresh } from '@element-plus/icons-vue'
 import { Dictionary, Order } from '@/config/type/types'
-import { deviceDictionaryApi, pointDictionaryApi } from '@/api/dictionary'
+import { deviceDictionaryApi, pointDictionaryApi } from '@/api/DictionaryApi'
 
 export default defineComponent({
     name: 'PointValueTool',

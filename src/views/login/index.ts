@@ -61,9 +61,7 @@ export default defineComponent({
 
         // 显示、隐藏密码
         const showPassword = () => {
-            reactiveData.passwordType === ''
-                ? (reactiveData.passwordType = 'password')
-                : (reactiveData.passwordType = '')
+            reactiveData.passwordType === '' ? (reactiveData.passwordType = 'password') : (reactiveData.passwordType = '')
             reactiveData.isHide === 'View' ? (reactiveData.isHide = 'Hide') : (reactiveData.isHide = 'View')
         }
 

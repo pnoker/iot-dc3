@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isNull } from '@/util/utils'
+import { isNull } from '@/utils/utils'
 import { decode, encode } from 'js-base64'
 import Cookies from 'js-cookie'
 

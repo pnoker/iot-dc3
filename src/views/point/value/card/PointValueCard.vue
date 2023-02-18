@@ -40,9 +40,7 @@
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <ul class="things-card-body-content-value">
-                            <li title="处理值，点击复制" class="nowrap-item value" @click="copyValue(data)">
-                                {{ data.value }} {{ unit }}
-                            </li>
+                            <li title="处理值，点击复制" class="nowrap-item value" @click="copyValue(data)">{{ data.value }} {{ unit }}</li>
                             <li title="计算值" class="nowrap-item">
                                 {{ data.calculateValue || '-' }}
                             </li>
@@ -69,12 +67,7 @@
                 </div>
                 <div v-if="embedded == ''" class="things-card__footer">
                     <div class="things-card-footer-operation">
-                        <el-popconfirm
-                            title="是否确定删除该数据？该数据下的配置将会被全部删除，且该操作不可恢复！"
-                            placement="top"
-                            :icon="CircleClose"
-                            icon-color="#f56c6c"
-                        >
+                        <el-popconfirm title="是否确定删除该数据？该数据下的配置将会被全部删除，且该操作不可恢复！" placement="top" :icon="CircleClose" icon-color="#f56c6c">
                             <template #reference>
                                 <el-button type="primary" link>删除</el-button>
                             </template>

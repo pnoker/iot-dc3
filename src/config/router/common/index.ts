@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'login',
         path: '/login',
         meta: {
-            title: 'DC3 IoT 平台',
+            title: 'IoT DC3 Web',
         },
         component: () => import('@/views/login/Login.vue'),
     },

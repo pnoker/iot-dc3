@@ -67,11 +67,7 @@
                     <point ref="pointViewRef" :embedded="'device'" :device-id="reactiveData.id"></point>
                 </el-tab-pane>
                 <el-tab-pane label="设备数据" name="pointValue">
-                    <point-value
-                        ref="pointValueViewRef"
-                        :embedded="'device'"
-                        :device-id="reactiveData.id"
-                    ></point-value>
+                    <point-value ref="pointValueViewRef" :embedded="'device'" :device-id="reactiveData.id"></point-value>
                 </el-tab-pane>
                 <!-- <el-tab-pane label="设备模型" name="deviceModel">
                     <el-empty description="暂无设备模型数据！"></el-empty>

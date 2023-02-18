@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-const interval = {
-    state: {
-        pointValueInterval: null,
-    },
-    actions: {
-        ClearPointValueInterval({ commit }: any, interval: number) {
-            commit('CLEAR_POINT_VALUE_INTERVAL', interval)
-        },
-    },
-    mutations: {
-        CLEAR_POINT_VALUE_INTERVAL: (state: any, interval: number) => {
-            if (state.pointValueInterval) {
-                clearInterval(state.pointValueInterval)
-            }
-            state.pointValueInterval = interval
-        },
-    },
+import { dateFormat, setCopyContent } from '@/utils/utils'
+
+export const copyId = (content: string, message: string) => {
+    setCopyContent(content, true, message)
 }
 
-export default interval
+export const timestamp = (timestamp: string): string => {
+    return dateFormat(new Date(timestamp))
+}

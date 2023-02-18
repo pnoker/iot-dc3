@@ -14,23 +14,4 @@
  * limitations under the License.
  */
 
-const interval = {
-    state: {
-        pointValueInterval: null,
-    },
-    actions: {
-        ClearPointValueInterval({ commit }: any, interval: number) {
-            commit('CLEAR_POINT_VALUE_INTERVAL', interval)
-        },
-    },
-    mutations: {
-        CLEAR_POINT_VALUE_INTERVAL: (state: any, interval: number) => {
-            if (state.pointValueInterval) {
-                clearInterval(state.pointValueInterval)
-            }
-            state.pointValueInterval = interval
-        },
-    },
-}
-
-export default interval
+/// <reference types="vite/client" />

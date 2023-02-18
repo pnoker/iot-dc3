@@ -16,8 +16,8 @@
 
 import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { driverByIdsApi } from '@/api/driver'
-import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi, deviceUpdateApi } from '@/api/device'
+import { driverByIdsApi } from '@/api/DriverApi'
+import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi, deviceUpdateApi } from '@/api/DeviceApi'
 
 import { Order } from '@/config/type/types'
 
@@ -26,8 +26,8 @@ import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import deviceTool from './tool/DeviceTool.vue'
 import deviceAddForm from './add/DeviceAddForm.vue'
 import deviceCard from './card/DeviceCard.vue'
-import { isNull } from '@/util/utils'
-import { failMessage } from '@/util/NotificationUtils'
+import { isNull } from '@/utils/utils'
+import { failMessage } from '@/utils/NotificationUtils'
 
 export default defineComponent({
     name: 'Device',

@@ -70,7 +70,7 @@ export const deviceListApi = (device: any) =>
     })
 
 // device status
-export const deviceStatusApi = (device) =>
+export const deviceStatusApi = (device: any) =>
     request<R>({
         url: `api/v3/manager/status/device`,
         method: 'post',

@@ -15,11 +15,11 @@
  */
 
 import ElementPlugins from '@/config/plugins/element/element.js'
-import VueHighlightJSPlugins from '@/config/plugins/highlight/highlight.js'
+import HighlightJSPlugins from '@/config/plugins/highlight/highlight.js'
 
-export default (app) => {
+export default (app: any) => {
     ElementPlugins(app)
-    VueHighlightJSPlugins(app)
+    HighlightJSPlugins(app)
 
     console.log(
         '.___     ___________ ________  _________ ________\n' +
@@ -29,6 +29,6 @@ export default (app) => {
             '|___|\\____/|____|    /_______  /\\______  /______  /\n' +
             '                             \\/        \\/       \\/\n' +
             'https://doc.dc3.site\n' +
-            'DC3 IOT Platform V2022.1.0 Pnoker Authors'
+            'IoT DC3 Web V2022.2.6 Pnoker Authors'
     )
 }

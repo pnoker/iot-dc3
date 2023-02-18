@@ -17,14 +17,14 @@
 import { defineComponent, reactive, computed } from 'vue'
 
 import { pointUnitApi, pointValueListApi, pointByIdsApi, pointValueLatestApi } from '@/api/point'
-import { deviceByIdsApi } from '@/api/device'
+import { deviceByIdsApi } from '@/api/DeviceApi'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointValueTool from './tool/PointValueTool.vue'
 import pointValueCard from './card/PointValueCard.vue'
 
-import { isNull } from '@/util/utils'
+import { isNull } from '@/utils/utils'
 
 export default defineComponent({
     components: {
@@ -155,13 +155,9 @@ export default defineComponent({
                     if (pointValue.type === 'string') {
                         reactiveData.historyData[pointValue.pointId] = []
                     } else if (pointValue.type === 'boolean') {
-                        reactiveData.historyData[pointValue.pointId] = pointValue.children
-                            .reverse()
-                            .map((value) => (value === 'true' ? 1 : 0))
+                        reactiveData.historyData[pointValue.pointId] = pointValue.children.reverse().map((value) => (value === 'true' ? 1 : 0))
                     } else {
-                        reactiveData.historyData[pointValue.pointId] = pointValue.children
-                            .reverse()
-                            .map((value) => +value)
+                        reactiveData.historyData[pointValue.pointId] = pointValue.children.reverse().map((value) => +value)
                     }
                 })
             }

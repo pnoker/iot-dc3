@@ -16,13 +16,13 @@
 
 import { createApp } from 'vue'
 
-import axios from '@/config/axios'
 import vueAxios from 'vue-axios'
+import axios from '@/config/axios'
 
 import router from '@/config/router'
 import store from '@/config/store'
 
-import App from '@/App.vue'
+import App from './App.vue'
 
 import plugins from '@/config/plugins/index'
 

@@ -32,9 +32,7 @@
                     <skeleton-card :loading="reactiveData.loading"></skeleton-card>
                 </el-col>
                 <el-col v-if="hasData">
-                    <el-empty
-                        :description="embedded == 'device' ? '暂无设备数据' : '暂无数据，请选择设备和位号！'"
-                    ></el-empty>
+                    <el-empty :description="embedded == 'device' ? '暂无设备数据' : '暂无数据，请选择设备和位号！'"></el-empty>
                 </el-col>
                 <el-col v-for="data in reactiveData.listData" :key="data.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
                     <point-value-card

@@ -17,23 +17,10 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form
-                ref="formDataRef"
-                class="tool-card-body"
-                :model="reactiveData.formData"
-                :rules="formRule"
-                :inline="true"
-            >
+            <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="name" label="位号名称">
-                        <el-input
-                            v-model="reactiveData.formData.name"
-                            class="edit-form-default"
-                            placeholder="请输入位号名称"
-                            clearable
-                            @keyup.enter="search"
-                        >
-                        </el-input>
+                        <el-input v-model="reactiveData.formData.name" class="edit-form-default" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
                     </el-form-item>
                     <el-form-item v-if="embedded != 'profile' && embedded != 'edit'" prop="profileId" label="所属模板">
                         <el-select
@@ -45,12 +32,7 @@
                         >
                             <div class="tool-select">
                                 <el-form-item class="tool-select-input">
-                                    <el-input
-                                        v-model="reactiveData.profileQuery"
-                                        placeholder="请输入模板名称"
-                                        clearable
-                                        @input="profileDictionary"
-                                    />
+                                    <el-input v-model="reactiveData.profileQuery" placeholder="请输入模板名称" clearable @input="profileDictionary" />
                                 </el-form-item>
                                 <el-pagination
                                     class="tool-select-pagination"
@@ -65,22 +47,12 @@
                                     @current-change="profileCurrentChange"
                                 ></el-pagination>
                             </div>
-                            <el-option
-                                v-for="dictionary in reactiveData.profileDictionary"
-                                :key="dictionary.value"
-                                :label="dictionary.label"
-                                :value="dictionary.value"
-                            >
+                            <el-option v-for="dictionary in reactiveData.profileDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item prop="enable" label="使能">
-                        <el-select
-                            v-model="reactiveData.formData.enable"
-                            class="edit-form-small"
-                            placeholder="请选择使能"
-                            clearable
-                        >
+                        <el-select v-model="reactiveData.formData.enable" class="edit-form-small" placeholder="请选择使能" clearable>
                             <el-option label="启用" :value="true"></el-option>
                             <el-option label="停用" :value="false"></el-option>
                         </el-select>
@@ -95,9 +67,7 @@
             </el-form>
             <div class="tool-card-footer">
                 <div class="tool-card-footer-button">
-                    <el-button v-if="embedded == '' || embedded == 'edit'" type="success" :icon="Plus" @click="showAdd"
-                        >新增</el-button
-                    >
+                    <el-button v-if="embedded == '' || embedded == 'edit'" type="success" :icon="Plus" @click="showAdd">新增</el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination

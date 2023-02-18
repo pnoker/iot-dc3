@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, computed } from 'vue'
 import menu from '@/config/router/views'
 import { HomeFilled } from '@element-plus/icons-vue'
+import { computed, defineComponent } from 'vue'
 
-import { useStore } from 'vuex'
 import router from '@/config/router'
-import { warning } from '@/util/MessageUtils'
+import { warning } from '@/utils/MessageUtils'
+import { useStore } from 'vuex'
 
 export default defineComponent({
     components: {
@@ -34,7 +34,7 @@ export default defineComponent({
             return children.filter((view) => view.name !== 'home')
         })
 
-        const handleMenuEnter = (index) => {
+        const handleMenuEnter = (index: string) => {
             if (index.indexOf('/') === 0) {
                 const split = index.split('/')
                 if (split.length > 2) {
@@ -48,7 +48,7 @@ export default defineComponent({
             warning('待开发')
         }
 
-        const handleCommand = (command) => {
+        const handleCommand = (command: string) => {
             if (command === 'logout') {
                 store.dispatch('auth/logout').then(() => router.push({ path: '/login' }))
             } else if (command === 'help') {

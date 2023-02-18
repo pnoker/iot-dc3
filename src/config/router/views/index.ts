@@ -16,8 +16,7 @@
 
 import { RouteRecordRaw } from 'vue-router'
 
-import Layout from '@/components/layout/Layout.vue'
-
+const Layout = () => import('@/components/layout/Layout.vue')
 const routes: RouteRecordRaw = {
     path: '/',
     redirect: '/home',

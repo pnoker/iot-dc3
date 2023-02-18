@@ -25,8 +25,8 @@ import blankCard from '@/components/card/blank/BlankCard.vue'
 import profileAddForm from '@/views/profile/add/ProfileAddForm.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import profileCard from '@/views/profile/card/ProfileCard.vue'
-import { isNull } from '@/util/utils'
-import { failMessage } from '@/util/NotificationUtils'
+import { isNull } from '@/utils/utils'
+import { failMessage } from '@/utils/NotificationUtils'
 
 export default defineComponent({
     components: {

@@ -71,14 +71,7 @@
                 <el-input v-model="reactiveData.formData.maximum" placeholder="请输入最大值" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="描述" prop="description">
-                <el-input
-                    v-model="reactiveData.formData.description"
-                    placeholder="请输入位号描述"
-                    type="textarea"
-                    maxlength="300"
-                    show-word-limit
-                    clearable
-                ></el-input>
+                <el-input v-model="reactiveData.formData.description" placeholder="请输入位号描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">

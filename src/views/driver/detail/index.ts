@@ -20,7 +20,7 @@ import { Connection, Edit, Management, Monitor, Position, Promotion, Sunset } fr
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { driverByIdApi } from '@/api/driver'
+import { driverByIdApi } from '@/api/DriverApi'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import baseCard from '@/components/card/base/BaseCard.vue'
@@ -33,7 +33,7 @@ import deviceCard from '@/views/device/card/DeviceCard.vue'
 import device from '@/views/device/Device.vue'
 import pointCard from '@/views/point/card/PointCard.vue'
 
-import { timestamp } from '@/util/CommonUtils'
+import { timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'DriverDetail',

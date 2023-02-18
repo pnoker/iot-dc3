@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Pnoker All Rights Reserved
+ * Copyright 2022 Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-/* eslint-disable */
-declare module '*.vue' {
-    import type { DefineComponent } from 'vue'
-    const component: DefineComponent<{}, {}, any>
-    export default component
+/**
+ * 字典
+ */
+export type Dictionary = {
+    type: string
+    label: string
+    value: string
+    disabled: boolean
+    expand: boolean
+    children: Array<Dictionary>
 }

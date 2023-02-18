@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, computed } from 'vue'
 
-import { driverListApi, driverStatusApi } from '@/api/driver'
+import { driverListApi, driverStatusApi } from '@/api/DriverApi'
 
 import { Order } from '@/config/type/types'
 
