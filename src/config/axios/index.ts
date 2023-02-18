@@ -22,10 +22,10 @@ import store from '@/config/store'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-import { getStorage } from '@/utils/StorageUtils'
 import CommonConstant from '@/config/constant/CommonConstant'
-import { isNull } from '@/utils/utils'
 import { warning } from '@/utils/MessageUtils'
+import { getStorage } from '@/utils/StorageUtils'
+import { isNull } from '@/utils/utils'
 
 import { encode } from 'js-base64'
 

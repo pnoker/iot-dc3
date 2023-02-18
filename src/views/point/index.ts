@@ -19,7 +19,7 @@ import { defineComponent, reactive, ref, computed } from 'vue'
 import { pointAddApi, pointDeleteApi, pointListApi, pointUpdateApi } from '@/api/point'
 import { profileByIdsApi } from '@/api/profile'
 
-import { Order } from '@/config/type/types'
+import { Order } from '@/config/types'
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointTool from './tool/PointTool.vue'

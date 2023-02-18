@@ -15,7 +15,7 @@
  */
 
 import request from '@/config/axios'
-import { R } from '@/config/type/types'
+import { R } from '@/config/types'
 
 // point
 export const pointAddApi = (point: any) =>

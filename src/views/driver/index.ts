@@ -18,7 +18,7 @@ import { defineComponent, reactive, computed } from 'vue'
 
 import { driverListApi, driverStatusApi } from '@/api/DriverApi'
 
-import { Order } from '@/config/type/types'
+import { Order } from '@/config/types'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'

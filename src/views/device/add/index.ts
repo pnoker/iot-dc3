@@ -17,7 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 
-import { Dictionary, Order } from '@/config/type/types'
+import { Dictionary, Order } from '@/config/types'
 
 import { successMessage } from '@/utils/NotificationUtils'
 import { driverDictionaryApi, profileDictionaryApi } from '@/api/DictionaryApi'

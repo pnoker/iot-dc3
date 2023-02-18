@@ -18,7 +18,7 @@
     <div class="login-container">
         <div class="login-wrapper-left animated bounceInDown">
             <div class="login-left">
-                <img class="img" src="images/logo/logo-white.png" />
+                <img class="img" src="/images/logo/logo-white.png" />
             </div>
         </div>
         <particles />

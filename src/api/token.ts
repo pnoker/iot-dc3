@@ -15,12 +15,12 @@
  */
 
 import request from '@/config/axios'
-import  Login  from '@/config/type/types/login'
+import { Login } from '@/config/types'
 
 /**
  * 通过用户名获取 Salt
  *
- * @param name 用户名
+ * @param login Login
  * @returns {AxiosPromise}
  */
 export const generateSaltApi = (login: Login) =>
@@ -33,7 +33,7 @@ export const generateSaltApi = (login: Login) =>
 /**
  * 登录
  *
- * @param login {tenant, name, salt, password}
+ * @param login Login
  * @returns {AxiosPromise}
  */
 export const generateTokenApi = (login: Login) =>
@@ -46,7 +46,7 @@ export const generateTokenApi = (login: Login) =>
 /**
  * 注销
  *
- * @param name 用户名
+ * @param login Login
  * @returns {AxiosPromise}
  */
 export const cancelTokenApi = (login: Login) =>
@@ -59,7 +59,7 @@ export const cancelTokenApi = (login: Login) =>
 /**
  * 校验 Token
  *
- * @param login {name, salt, token}
+ * @param login Login
  * @returns {Promise}
  */
 export const checkTokenValidApi = (login: Login) =>

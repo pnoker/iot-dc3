@@ -18,7 +18,7 @@ import { reactive, ref, computed, defineComponent } from 'vue'
 
 import { profileAddApi, profileDeleteApi, profileListApi, profileUpdateApi } from '@/api/profile'
 
-import { Order } from '@/config/type/types'
+import { Order } from '@/config/types'
 
 import profileTool from '@/views/profile/tool/ProfileTool.vue'
 import blankCard from '@/components/card/blank/BlankCard.vue'

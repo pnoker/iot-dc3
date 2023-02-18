@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-import { createApp } from 'vue'
-
-import vueAxios from 'vue-axios'
-import axios from '@/config/axios'
-
+import App from '@/App.vue'
+import plugins from '@/config/plugins/index'
 import router from '@/config/router'
 import store from '@/config/store'
-
-import App from './App.vue'
-
-import plugins from '@/config/plugins/index'
+import { createApp } from 'vue'
 
 // config app
 const app = createApp(App)
-app.use(vueAxios, axios)
 app.use(router)
 app.use(store)
 plugins(app)

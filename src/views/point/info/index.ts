@@ -17,7 +17,7 @@
 import { computed, defineComponent } from 'vue'
 import { Goblet } from '@element-plus/icons-vue'
 
-import { Attribute } from '@/config/type/types'
+import { Attribute } from '@/config/types'
 
 export default defineComponent({
     name: 'PointInfoCard',

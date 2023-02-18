@@ -15,7 +15,6 @@
  */
 
 import request from '@/config/axios'
-import { R } from '@/config/type/types'
 
 export const driverInfoAddApi = (driverInfo: any) =>
     request<R>({

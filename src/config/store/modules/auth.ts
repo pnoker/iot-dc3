@@ -19,7 +19,7 @@ import { ElLoading } from 'element-plus'
 
 import { cancelTokenApi, generateSaltApi, generateTokenApi } from '@/api/token'
 
-import { Login } from '@/config/type/types'
+import { Login } from '@/config/types'
 import CommonConstant from '@/config/constant/CommonConstant'
 import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'

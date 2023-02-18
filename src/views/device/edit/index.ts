@@ -26,7 +26,7 @@ import { deviceByIdApi, deviceUpdateApi } from '@/api/DeviceApi'
 import { driverAttributeByDriverIdApi, pointAttributeByDriverIdApi } from '@/api/AttributeApi'
 import { driverInfoAddApi, driverInfoByDeviceIdApi, driverInfoUpdateApi, pointInfoAddApi, pointInfoByDeviceIdApi, pointInfoUpdateApi } from '@/api/InfoApi'
 
-import { Dictionary, Order } from '@/config/type/types'
+import { Dictionary, Order } from '@/config/types'
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue'

@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
 
-import { Dictionary, Order } from '@/config/type/types'
+import { Dictionary, Order } from '@/config/types'
 import { driverDictionaryApi } from '@/api/DictionaryApi'
 
 export default defineComponent({

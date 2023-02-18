@@ -19,7 +19,7 @@ import { defineComponent, reactive, ref, computed } from 'vue'
 import { driverByIdsApi } from '@/api/DriverApi'
 import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi, deviceUpdateApi } from '@/api/DeviceApi'
 
-import { Order } from '@/config/type/types'
+import { Order } from '@/config/types'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'

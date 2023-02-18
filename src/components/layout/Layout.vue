@@ -46,7 +46,7 @@
                 <el-dropdown class="user_avatar" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
                         <el-avatar>
-                            <img src="images/common/avatar.png" />
+                            <img src="/images/common/avatar.png" />
                         </el-avatar>
                     </span>
                     <template #dropdown>
