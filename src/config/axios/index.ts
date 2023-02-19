@@ -22,7 +22,7 @@ import store from '@/config/store'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-import CommonConstant from '@/config/constant/CommonConstant'
+import CommonConstant from '@/config/constant/common'
 import { warning } from '@/utils/MessageUtils'
 import { getStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'

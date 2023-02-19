@@ -16,46 +16,88 @@
 
 import request from '@/config/axios'
 
-export const profileAddApi = (profile: any) =>
+/**
+ * 新增模板
+ *
+ * @param profile Profile
+ * @returns MyAxiosPromise
+ */
+export const addProfile = (profile: any) =>
     request<R>({
         url: `api/v3/manager/profile/add`,
         method: 'post',
         data: profile,
     })
 
-export const profileDeleteApi = (id: string) =>
+/**
+ * 删除模板
+ *
+ * @param id 模板ID
+ * @returns MyAxiosPromise
+ */
+export const deleteProfile = (id: string) =>
     request<R>({
         url: `api/v3/manager/profile/delete/${id}`,
         method: 'post',
     })
 
-export const profileUpdateApi = (profile: any) =>
+/**
+ * 修改模板
+ *
+ * @param profile Profile
+ * @returns MyAxiosPromise
+ */
+export const updateProfile = (profile: any) =>
     request<R>({
         url: `api/v3/manager/profile/update`,
         method: 'post',
         data: profile,
     })
 
-export const profileByIdApi = (id: string) =>
+/**
+ * 通过模板ID查询模板
+ *
+ * @param id 模板ID
+ * @returns MyAxiosPromise
+ */
+export const getProfileById = (id: string) =>
     request<R>({
         url: `api/v3/manager/profile/id/${id}`,
         method: 'get',
     })
 
-export const profileByIdsApi = (profileIds: any) =>
+/**
+ * 通过模板ID集查询模板
+ *
+ * @param profileIds ProfileId Array
+ * @returns MyAxiosPromise
+ */
+export const getProfileByIds = (profileIds: any) =>
     request<R>({
         url: `api/v3/manager/profile/ids`,
         method: 'post',
         data: profileIds,
     })
 
-export const profileByDeviceIdApi = (deviceId: string) =>
+/**
+ * 通过设备ID查询模板
+ *
+ * @param deviceId DeviceId
+ * @returns MyAxiosPromise
+ */
+export const getProfileByDeviceId = (deviceId: string) =>
     request<R>({
         url: `api/v3/manager/profile/device_id/${deviceId}`,
         method: 'get',
     })
 
-export const profileListApi = (profile: any) =>
+/**
+ * 分页查询
+ *
+ * @param profile Profile
+ * @returns MyAxiosPromise
+ */
+export const getProfileList = (profile: any) =>
     request<R>({
         url: `api/v3/manager/profile/list`,
         method: 'post',

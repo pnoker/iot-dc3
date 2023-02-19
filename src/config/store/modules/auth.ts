@@ -17,10 +17,10 @@
 import router from '@/config/router'
 import { ElLoading } from 'element-plus'
 
-import { cancelTokenApi, generateSaltApi, generateTokenApi } from '@/api/token'
+import { cancelToken, generateSalt, generateToken } from '@/api/token'
 
 import { Login } from '@/config/types'
-import CommonConstant from '@/config/constant/CommonConstant'
+import CommonConstant from '@/config/constant/common'
 import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'
 import { Md5 } from 'ts-md5'
@@ -56,7 +56,7 @@ const auth = {
                 tenant: form.tenant,
                 name: form.name,
             } as Login
-            generateSaltApi(login)
+            generateSalt(login)
                 .then((res) => {
                     const salt = res.data.data
                     const login = {
@@ -66,7 +66,7 @@ const auth = {
                         password: Md5.hashStr(Md5.hashStr(form.password) + salt),
                     } as Login
 
-                    generateTokenApi(login)
+                    generateToken(login)
                         .then((res) => {
                             commit('setToken', {
                                 tenant: login.tenant,
@@ -88,7 +88,7 @@ const auth = {
                     tenant: tenant,
                     name: user,
                 } as Login
-                cancelTokenApi(login)
+                cancelToken(login)
             }
             commit('removeToken')
         },

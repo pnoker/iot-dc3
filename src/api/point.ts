@@ -15,9 +15,13 @@
  */
 
 import request from '@/config/axios'
-import { R } from '@/config/types'
 
-// point
+/**
+ * 新增位号
+ *
+ * @param point Point
+ * @returns MyAxiosPromise
+ */
 export const pointAddApi = (point: any) =>
     request<R>({
         url: `api/v3/manager/point/add`,
@@ -25,67 +29,126 @@ export const pointAddApi = (point: any) =>
         data: point,
     })
 
+/**
+ * 新增位号
+ *
+ * @param point Point
+ * @returns MyAxiosPromise
+ */
 export const pointDeleteApi = (id: string) =>
     request<R>({
         url: `api/v3/manager/point/delete/${id}`,
         method: 'post',
     })
 
-export const pointUpdateApi = (point: any) =>
+/**
+ * 更新位号
+ *
+ * @param point Point
+ * @returns MyAxiosPromise
+ */
+export const getPointUpdate = (point: any) =>
     request<R>({
         url: `api/v3/manager/point/update`,
         method: 'post',
         data: point,
     })
 
-export const pointByIdApi = (id: string) =>
+/**
+ * 通过位号ID查询位号
+ *
+ * @param id 位号ID
+ * @returns MyAxiosPromise
+ */
+export const getPointById = (id: string) =>
     request<R>({
         url: `api/v3/manager/point/id/${id}`,
         method: 'get',
     })
 
-export const pointByIdsApi = (pointIds: any) =>
+/**
+ * 通过位号ID集查询位号
+ *
+ * @param pointIds PointId Array
+ * @returns MyAxiosPromise
+ */
+export const getPointByIds = (pointIds: any) =>
     request<R>({
         url: `api/v3/manager/point/ids`,
         method: 'post',
         data: pointIds,
     })
 
-export const pointListApi = (point: any) =>
+/**
+ * 模糊分页查询位号
+ *
+ * @param point Point
+ * @returns MyAxiosPromise
+ */
+export const getPointList = (point: any) =>
     request<R>({
         url: `api/v3/manager/point/list`,
         method: 'post',
         data: point,
     })
 
-export const pointUnitApi = (pointIds: any) =>
+/**
+ * 通过位号ID集查询位号单位
+ *
+ * @param pointIds PointId Array
+ * @returns MyAxiosPromise
+ */
+export const getPointUnit = (pointIds: any) =>
     request<R>({
         url: `api/v3/manager/point/unit`,
         method: 'post',
         data: pointIds,
     })
 
-export const pointByProfileIdApi = (profileId: string) =>
+/**
+ * 通过模板ID查询位号
+ *
+ * @param profileId 模板ID
+ * @returns MyAxiosPromise
+ */
+export const getPointByProfileId = (profileId: string) =>
     request<R>({
         url: `api/v3/manager/point/profile_id/${profileId}`,
         method: 'get',
     })
 
-export const pointByDeviceIdApi = (deviceId: string) =>
+/**
+ * 通过设备ID查询位号
+ *
+ * @param deviceId 设备ID
+ * @returns MyAxiosPromise
+ */
+export const getPointByDeviceId = (deviceId: string) =>
     request<R>({
         url: `api/v3/manager/point/device_id/${deviceId}`,
         method: 'get',
     })
 
-// point value
-export const pointValueLatestApi = (pointValue: any) =>
+/**
+ * 分页查询最新位号值
+ *
+ * @param pointValue PointValue
+ * @returns MyAxiosPromise
+ */
+export const getPointValueLatest = (pointValue: any) =>
     request<R>({
         url: `api/v3/data/point_value/latest`,
         method: 'post',
         data: pointValue,
     })
 
-export const pointValueListApi = (pointValue: any) =>
+/**
+ * 分页查询位号值
+ *
+ * @param pointValue PointValue
+ * @returns MyAxiosPromise
+ */
+export const getPointValueList = (pointValue: any) =>
     request<R>({
         url: `api/v3/data/point_value/list`,
         method: 'post',

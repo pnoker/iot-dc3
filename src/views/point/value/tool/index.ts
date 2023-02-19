@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Plus, RefreshRight, Search, Refresh } from '@element-plus/icons-vue'
 import { Dictionary, Order } from '@/config/types'
-import { deviceDictionaryApi, pointDictionaryApi } from '@/api/DictionaryApi'
+import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary'
 
 export default defineComponent({
     name: 'PointValueTool',
@@ -74,7 +74,7 @@ export default defineComponent({
         }
 
         const deviceDictionary = () => {
-            deviceDictionaryApi({
+            getDeviceDictionary({
                 page: reactiveData.devicePage,
                 label: reactiveData.deviceQuery,
             })
@@ -94,7 +94,7 @@ export default defineComponent({
         }
 
         const pointDictionary = () => {
-            pointDictionaryApi({
+            getPointDictionary({
                 page: reactiveData.pointPage,
                 label: reactiveData.pointQuery,
                 parentValue2: reactiveData.formData.deviceId,

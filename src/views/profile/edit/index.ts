@@ -21,7 +21,7 @@ import { Edit, RefreshLeft, Right, Back } from '@element-plus/icons-vue'
 import router from '@/config/router'
 import { useRoute } from 'vue-router'
 
-import { profileByIdApi, profileUpdateApi } from '@/api/profile'
+import { getProfileById, updateProfile } from '@/api/profile'
 
 import point from '@/views/point/Point.vue'
 
@@ -86,7 +86,7 @@ export default defineComponent({
 
         const profile = () => {
             const id = route.query.id as string
-            profileByIdApi(id).then((res) => {
+            getProfileById(id).then((res) => {
                 reactiveData.profileFormData = res.data.data
                 reactiveData.oldProfileFormData = { ...res.data.data }
             })
@@ -96,7 +96,7 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    profileUpdateApi(reactiveData.profileFormData).then((res) => {
+                    updateProfile(reactiveData.profileFormData).then((res) => {
                         reactiveData.oldProfileFormData = { ...res.data.data }
                     })
                 }

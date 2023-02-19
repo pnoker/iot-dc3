@@ -20,10 +20,10 @@ import { CollectionTag, Edit, Management, Sunset } from '@element-plus/icons-vue
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { deviceByDriverIdApi, deviceStatusByDriverIdApi } from '@/api/DeviceApi'
-import { profileByIdsApi } from '@/api/profile'
-import { driverByIdsApi } from '@/api/DriverApi'
-import { driverByIdApi } from '@/api/DriverApi'
+import { getDeviceByDriverId, getDeviceStatusByDriverId } from '@/api/device'
+import { getProfileByIds } from '@/api/profile'
+import { getDriverByIds } from '@/api/driver'
+import { getDriverById } from '@/api/driver'
 
 import baseCard from '@/components/card/base/BaseCard.vue'
 import detailCard from '@/components/card/detail/DetailCard.vue'
@@ -58,7 +58,7 @@ export default defineComponent({
         })
 
         const driver = () => {
-            driverByIdApi(reactiveData.id)
+            getDriverById(reactiveData.id)
                 .then((res) => {
                     reactiveData.data = res.data.data
                 })
@@ -68,13 +68,13 @@ export default defineComponent({
         }
 
         const device = () => {
-            deviceByDriverIdApi(reactiveData.id)
+            getDeviceByDriverId(reactiveData.id)
                 .then((res) => {
                     reactiveData.listDeviceData = res.data.data
 
                     // driver
                     const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId)))
-                    driverByIdsApi(driverIds)
+                    getDriverByIds(driverIds)
                         .then((res) => {
                             reactiveData.driverTable = res.data.data
                         })
@@ -91,7 +91,7 @@ export default defineComponent({
                             }, [])
                         )
                     )
-                    profileByIdsApi(profileIds)
+                    getProfileByIds(profileIds)
                         .then((res) => {
                             reactiveData.profileTable = res.data.data
                         })
@@ -103,7 +103,7 @@ export default defineComponent({
                     // nothing to do
                 })
 
-            deviceStatusByDriverIdApi(reactiveData.id)
+            getDeviceStatusByDriverId(reactiveData.id)
                 .then((res) => {
                     reactiveData.statusTable = res.data.data
                 })

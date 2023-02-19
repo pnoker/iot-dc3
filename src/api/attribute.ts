@@ -15,13 +15,25 @@
  */
 
 import request from '@/config/axios'
-export const driverAttributeByDriverIdApi = (id: string) =>
+
+/**
+ * 通过驱动ID查询驱动属性
+ *
+ * @param id 驱动ID
+ * @returns MyAxiosPromise
+ */
+export const getDriverAttributeByDriverId = (id: string) =>
     request<R>({
         url: `api/v3/manager/driver_attribute/driver_id/${id}`,
         method: 'get',
     })
 
-export const pointAttributeByDriverIdApi = (id: string) =>
+/**
+ * 通过驱动ID查询位号属性
+ * @param id 驱动ID
+ * @returns MyAxiosPromise
+ */
+export const getPointAttributeByDriverId = (id: string) =>
     request<R>({
         url: `api/v3/manager/point_attribute/driver_id/${id}`,
         method: 'get',

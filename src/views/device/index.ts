@@ -16,8 +16,8 @@
 
 import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { driverByIdsApi } from '@/api/DriverApi'
-import { deviceAddApi, deviceDeleteApi, deviceListApi, deviceStatusApi, deviceUpdateApi } from '@/api/DeviceApi'
+import { getDriverByIds } from '@/api/driver'
+import { addDevice, deleteDevice, getDeviceList, getDeviceStatus, updateDevice } from '@/api/device'
 
 import { Order } from '@/config/types'
 
@@ -96,7 +96,7 @@ export default defineComponent({
                 }
             }
 
-            deviceListApi({
+            getDeviceList({
                 page: reactiveData.page,
                 ...reactiveData.query,
             })
@@ -107,7 +107,7 @@ export default defineComponent({
 
                     // driver
                     const driverIds = Array.from(new Set(reactiveData.listData.map((device) => device.driverId)))
-                    driverByIdsApi(driverIds)
+                    getDriverByIds(driverIds)
                         .then((res) => {
                             reactiveData.driverTable = res.data.data
                         })
@@ -122,7 +122,7 @@ export default defineComponent({
                     reactiveData.loading = false
                 })
 
-            deviceStatusApi({
+            getDeviceStatus({
                 page: reactiveData.page,
                 ...reactiveData.query,
             })
@@ -170,7 +170,7 @@ export default defineComponent({
         }
 
         const addThing = (form, done) => {
-            deviceAddApi(form)
+            addDevice(form)
                 .then(() => {
                     list()
                     done()
@@ -181,7 +181,7 @@ export default defineComponent({
         }
 
         const disableThing = (id, done) => {
-            deviceUpdateApi({ id: id, enable: false })
+            updateDevice({ id: id, enable: false })
                 .then(() => {
                     list()
                     done()
@@ -192,7 +192,7 @@ export default defineComponent({
         }
 
         const enableThing = (id, done) => {
-            deviceUpdateApi({ id: id, enable: true })
+            updateDevice({ id: id, enable: true })
                 .then(() => {
                     list()
                     done()
@@ -203,7 +203,7 @@ export default defineComponent({
         }
 
         const deleteThing = (id, done) => {
-            deviceDeleteApi(id)
+            deleteDevice(id)
                 .then((res) => {
                     if (res.data.ok) {
                         list()

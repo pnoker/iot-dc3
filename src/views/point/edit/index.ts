@@ -21,7 +21,7 @@ import { Edit, RefreshLeft, Right, Back } from '@element-plus/icons-vue'
 import router from '@/config/router'
 import { useRoute } from 'vue-router'
 
-import { pointByIdApi, pointUpdateApi } from '@/api/point'
+import { getPointById, getPointUpdate } from '@/api/point'
 
 import pointList from '@/views/point/Point.vue'
 
@@ -86,7 +86,7 @@ export default defineComponent({
 
         const point = () => {
             const id = route.query.id as string
-            pointByIdApi(id)
+            getPointById(id)
                 .then((res) => {
                     reactiveData.pointFormData = res.data.data
                     reactiveData.oldPointFormData = { ...res.data.data }
@@ -100,7 +100,7 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    pointUpdateApi(reactiveData.pointFormData)
+                    getPointUpdate(reactiveData.pointFormData)
                         .then((res) => {
                             reactiveData.oldPointFormData = { ...res.data.data }
                         })

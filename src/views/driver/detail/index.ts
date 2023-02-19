@@ -20,7 +20,7 @@ import { Connection, Edit, Management, Monitor, Position, Promotion, Sunset } fr
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { driverByIdApi } from '@/api/DriverApi'
+import { getDriverById } from '@/api/driver'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import baseCard from '@/components/card/base/BaseCard.vue'
@@ -74,7 +74,7 @@ export default defineComponent({
 
         // 加载驱动数据
         const driver = () => {
-            driverByIdApi(reactiveData.id).then((res) => {
+            getDriverById(reactiveData.id).then((res) => {
                 reactiveData.data = res.data.data
             })
         }

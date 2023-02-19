@@ -18,12 +18,12 @@ import request from '@/config/axios'
 import { Login } from '@/config/types'
 
 /**
- * 通过用户名获取 Salt
+ * 获取 Salt
  *
  * @param login Login
- * @returns {AxiosPromise}
+ * @returns MyAxiosPromise
  */
-export const generateSaltApi = (login: Login) =>
+export const generateSalt = (login: Login) =>
     request<R>({
         url: `api/v3/token/salt`,
         method: 'post',
@@ -34,9 +34,9 @@ export const generateSaltApi = (login: Login) =>
  * 登录
  *
  * @param login Login
- * @returns {AxiosPromise}
+ * @returns MyAxiosPromise
  */
-export const generateTokenApi = (login: Login) =>
+export const generateToken = (login: Login) =>
     request<R>({
         url: `api/v3/token/generate`,
         method: 'post',
@@ -47,9 +47,9 @@ export const generateTokenApi = (login: Login) =>
  * 注销
  *
  * @param login Login
- * @returns {AxiosPromise}
+ * @returns MyAxiosPromise
  */
-export const cancelTokenApi = (login: Login) =>
+export const cancelToken = (login: Login) =>
     request<R>({
         url: `api/v3/token/cancel`,
         method: 'post',
@@ -60,9 +60,9 @@ export const cancelTokenApi = (login: Login) =>
  * 校验 Token
  *
  * @param login Login
- * @returns {Promise}
+ * @returns MyAxiosPromise
  */
-export const checkTokenValidApi = (login: Login) =>
+export const checkTokenValid = (login: Login) =>
     request<R>({
         url: `api/v3/token/check`,
         method: 'post',

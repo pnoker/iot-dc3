@@ -16,8 +16,8 @@
 
 import { defineComponent, reactive, ref, computed } from 'vue'
 
-import { pointAddApi, pointDeleteApi, pointListApi, pointUpdateApi } from '@/api/point'
-import { profileByIdsApi } from '@/api/profile'
+import { pointAddApi, pointDeleteApi, getPointList, getPointUpdate } from '@/api/point'
+import { getProfileByIds } from '@/api/profile'
 
 import { Order } from '@/config/types'
 
@@ -106,7 +106,7 @@ export default defineComponent({
                 }
             }
 
-            pointListApi({
+            getPointList({
                 page: reactiveData.page,
                 ...reactiveData.query,
             })
@@ -117,7 +117,7 @@ export default defineComponent({
 
                     // profile
                     const profileIds = Array.from(new Set(reactiveData.listData.map((point) => point.profileId)))
-                    profileByIdsApi(profileIds)
+                    getProfileByIds(profileIds)
                         .then((res) => {
                             reactiveData.profileTable = res.data.data
                         })
@@ -180,7 +180,7 @@ export default defineComponent({
         }
 
         const disableThing = (id, done) => {
-            pointUpdateApi({ id: id, enable: false })
+            getPointUpdate({ id: id, enable: false })
                 .then(() => {
                     list()
                     done()
@@ -191,7 +191,7 @@ export default defineComponent({
         }
 
         const enableThing = (id, done) => {
-            pointUpdateApi({ id: id, enable: true })
+            getPointUpdate({ id: id, enable: true })
                 .then(() => {
                     list()
                     done()

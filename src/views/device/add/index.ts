@@ -20,7 +20,7 @@ import { FormInstance, FormRules } from 'element-plus'
 import { Dictionary, Order } from '@/config/types'
 
 import { successMessage } from '@/utils/NotificationUtils'
-import { driverDictionaryApi, profileDictionaryApi } from '@/api/DictionaryApi'
+import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary'
 
 export default defineComponent({
     name: 'DeviceAddForm',
@@ -89,7 +89,7 @@ export default defineComponent({
         })
 
         const driverDictionary = () => {
-            driverDictionaryApi({
+            getDriverDictionary({
                 page: reactiveData.driverPage,
                 label: reactiveData.driverQuery,
             })
@@ -116,7 +116,7 @@ export default defineComponent({
         }
 
         const profileDictionary = () => {
-            profileDictionaryApi({
+            getProfileDictionary({
                 page: reactiveData.profilePage,
                 label: reactiveData.profileQuery,
             })

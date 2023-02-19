@@ -20,10 +20,10 @@ import { CollectionTag, Edit, List, Management, Promotion, Sunset } from '@eleme
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { driverByIdApi } from '@/api/DriverApi'
-import { profileByDeviceIdApi } from '@/api/profile'
-import { deviceByIdApi } from '@/api/DeviceApi'
-import { profileByIdsApi } from '@/api/profile'
+import { getDriverById } from '@/api/driver'
+import { getProfileByDeviceId } from '@/api/profile'
+import { getDeviceById } from '@/api/device'
+import { getProfileByIds } from '@/api/profile'
 
 import baseCard from '@/components/card/base/BaseCard.vue'
 import detailCard from '@/components/card/detail/DetailCard.vue'
@@ -106,12 +106,12 @@ export default defineComponent({
         })
 
         const device = () => {
-            deviceByIdApi(reactiveData.id)
+            getDeviceById(reactiveData.id)
                 .then((res) => {
                     reactiveData.data = res.data.data
                     reactiveData.deviceTable[reactiveData.data.id] = reactiveData.data.name
 
-                    driverByIdApi(reactiveData.data.driverId)
+                    getDriverById(reactiveData.data.driverId)
                         .then((res) => {
                             reactiveData.driver = res.data.data
                         })
@@ -125,13 +125,13 @@ export default defineComponent({
         }
 
         const profiles = () => {
-            profileByDeviceIdApi(reactiveData.id)
+            getProfileByDeviceId(reactiveData.id)
                 .then((res) => {
                     reactiveData.listProfileData = res.data.data
 
                     // profile
                     const profileIds = Array.from(new Set(reactiveData.listProfileData.map((pointValue) => pointValue.id)))
-                    profileByIdsApi(profileIds)
+                    getProfileByIds(profileIds)
                         .then((res) => {
                             reactiveData.profileTable = res.data.data
                         })

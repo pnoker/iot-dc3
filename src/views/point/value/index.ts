@@ -16,8 +16,8 @@
 
 import { defineComponent, reactive, computed } from 'vue'
 
-import { pointUnitApi, pointValueListApi, pointByIdsApi, pointValueLatestApi } from '@/api/point'
-import { deviceByIdsApi } from '@/api/DeviceApi'
+import { getPointUnit, getPointValueList, getPointByIds, getPointValueLatest } from '@/api/point'
+import { getDeviceByIds } from '@/api/device'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
@@ -77,7 +77,7 @@ export default defineComponent({
             }
 
             if (props.embedded == 'device') {
-                pointValueLatestApi({
+                getPointValueLatest({
                     page: reactiveData.page,
                     ...reactiveData.query,
                     history: true,
@@ -92,7 +92,7 @@ export default defineComponent({
                         reactiveData.loading = false
                     })
             } else {
-                pointValueListApi({
+                getPointValueList({
                     page: reactiveData.page,
                     ...reactiveData.query,
                 })
@@ -120,7 +120,7 @@ export default defineComponent({
             // device
             const deviceIds = Array.from(new Set(reactiveData.listData.map((pointValue) => pointValue.deviceId)))
             if (deviceIds.length > 0) {
-                deviceByIdsApi(deviceIds)
+                getDeviceByIds(deviceIds)
                     .then((res) => {
                         reactiveData.deviceTable = res.data.data
                     })
@@ -132,7 +132,7 @@ export default defineComponent({
             // point & unit
             const pointIds = Array.from(new Set(reactiveData.listData.map((pointValue) => pointValue.pointId)))
             if (pointIds.length > 0) {
-                pointByIdsApi(pointIds)
+                getPointByIds(pointIds)
                     .then((res) => {
                         reactiveData.pointTable = res.data.data
                     })
@@ -140,7 +140,7 @@ export default defineComponent({
                         // nothing to do
                     })
 
-                pointUnitApi(pointIds)
+                getPointUnit(pointIds)
                     .then((res) => {
                         reactiveData.unitTable = res.data.data
                     })

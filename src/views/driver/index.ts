@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, computed } from 'vue'
 
-import { driverListApi, driverStatusApi } from '@/api/DriverApi'
+import { getDriverList, getDriverStatus } from '@/api/driver'
 
 import { Order } from '@/config/types'
 
@@ -56,7 +56,7 @@ export default defineComponent({
         })
 
         const list = () => {
-            driverListApi({
+            getDriverList({
                 page: reactiveData.page,
                 ...reactiveData.query,
             })
@@ -72,7 +72,7 @@ export default defineComponent({
                     reactiveData.loading = false
                 })
 
-            driverStatusApi({
+            getDriverStatus({
                 page: reactiveData.page,
                 ...reactiveData.query,
             })

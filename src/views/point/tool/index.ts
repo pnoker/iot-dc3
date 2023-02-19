@@ -19,7 +19,7 @@ import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshLeft, Search, Sort, Back, Check } from '@element-plus/icons-vue'
 
 import { Dictionary, Order } from '@/config/types'
-import { profileDictionaryApi } from '@/api/DictionaryApi'
+import { getProfileDictionary } from '@/api/dictionary'
 
 export default defineComponent({
     name: 'PointTool',
@@ -84,7 +84,7 @@ export default defineComponent({
         })
 
         const profileDictionary = () => {
-            profileDictionaryApi({
+            getProfileDictionary({
                 page: reactiveData.profilePage,
                 label: reactiveData.profileQuery,
             })

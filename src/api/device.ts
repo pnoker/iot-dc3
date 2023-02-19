@@ -15,75 +15,139 @@
  */
 
 import request from '@/config/axios'
-import { R } from '@/config/types'
 
-export const deviceAddApi = (device: any) =>
+/**
+ * 新增设备
+ *
+ * @param device Device
+ * @returns MyAxiosPromise
+ */
+export const addDevice = (device: any) =>
     request<R>({
         url: `api/v3/manager/device/add`,
         method: 'post',
         data: device,
     })
 
-export const deviceDeleteApi = (id: string) =>
+/**
+ * 删除设备
+ *
+ * @param id 设备ID
+ * @returns MyAxiosPromise
+ */
+export const deleteDevice = (id: string) =>
     request<R>({
         url: `api/v3/manager/device/delete/${id}`,
         method: 'post',
     })
 
-export const deviceUpdateApi = (device: any) =>
+/**
+ * 更新设备
+ *
+ * @param device Device
+ * @returns MyAxiosPromise
+ */
+export const updateDevice = (device: any) =>
     request<R>({
         url: `api/v3/manager/device/update`,
         method: 'post',
         data: device,
     })
 
-export const deviceByIdApi = (id: string) =>
+/**
+ * 通过设备ID查询设备
+ *
+ * @param id 设备ID
+ * @returns MyAxiosPromise
+ */
+export const getDeviceById = (id: string) =>
     request<R>({
         url: `api/v3/manager/device/id/${id}`,
         method: 'get',
     })
 
-export const deviceByIdsApi = (deviceIds: any) =>
+/**
+ * 通过设备ID集查询设备
+ *
+ * @param deviceIds DeviceId Array
+ * @returns MyAxiosPromise
+ */
+export const getDeviceByIds = (deviceIds: any) =>
     request<R>({
         url: `api/v3/manager/device/ids`,
         method: 'post',
         data: deviceIds,
     })
 
-export const deviceByDriverIdApi = (driverId: string) =>
+/**
+ * 通过驱动ID查询设备
+ *
+ * @param driverId 驱动ID
+ * @returns MyAxiosPromise
+ */
+export const getDeviceByDriverId = (driverId: string) =>
     request<R>({
         url: `api/v3/manager/device/driver_id/${driverId}`,
         method: 'get',
     })
 
-export const deviceByProfileIdApi = (profileId: string) =>
+/**
+ * 通过模板ID查询设备
+ *
+ * @param profileId 模板ID
+ * @returns MyAxiosPromise
+ */
+export const getDeviceByProfileId = (profileId: string) =>
     request<R>({
         url: `api/v3/manager/device/profile_id/${profileId}`,
         method: 'get',
     })
 
-export const deviceListApi = (device: any) =>
+/**
+ * 分页查询设备
+ *
+ * @param device Device
+ * @returns MyAxiosPromise
+ */
+export const getDeviceList = (device: any) =>
     request<R>({
         url: `api/v3/manager/device/list`,
         method: 'post',
         data: device,
     })
 
-// device status
-export const deviceStatusApi = (device: any) =>
+/**
+ * 分页查询设备状态
+ *
+ * @param device Device
+ * @returns MyAxiosPromise
+ */
+export const getDeviceStatus = (device: any) =>
     request<R>({
         url: `api/v3/manager/status/device`,
         method: 'post',
         data: device,
     })
 
-export const deviceStatusByDriverIdApi = (driverId: string) =>
+/**
+ * 通过驱动ID查询设备状态
+ *
+ * @param driverId 驱动ID
+ * @returns MyAxiosPromise
+ */
+export const getDeviceStatusByDriverId = (driverId: string) =>
     request<R>({
         url: `api/v3/manager/status/device/driver_id/${driverId}`,
         method: 'get',
     })
 
-export const deviceStatusByProfileIdApi = (profileId: string) =>
+/**
+ * 通过模板ID查询设备状态
+ *
+ * @param profileId 模板ID
+ * @returns MyAxiosPromise
+ */
+export const getDeviceStatusByProfileId = (profileId: string) =>
     request<R>({
         url: `api/v3/manager/status/device/profile_id/${profileId}`,
         method: 'get',

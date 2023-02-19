@@ -20,8 +20,8 @@ import commonRouters from './common'
 import operateRouters from './operate'
 import viewsRouters from './views'
 
-import { checkTokenValidApi } from '@/api/token'
-import CommonConstant from '@/config/constant/CommonConstant'
+import { checkTokenValid } from '@/api/token'
+import CommonConstant from '@/config/constant/common'
 import { getStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'
 import { Login } from '../types/type'
@@ -52,7 +52,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
                 salt: token.salt,
                 token: token.token,
             } as Login
-            checkTokenValidApi(login)
+            checkTokenValid(login)
                 .then((res) => {
                     if (!res.data.ok) next({ path: '/login' })
                     next()

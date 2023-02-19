@@ -15,29 +15,28 @@
  */
 
 import request from '@/config/axios'
-import { R } from '@/config/types'
 
-export const driverByIdApi = (id: string) =>
+export const getDriverById = (id: string) =>
     request<R>({
         url: `api/v3/manager/driver/id/${id}`,
         method: 'get',
     })
 
-export const driverByIdsApi = (driverIds: any) =>
+export const getDriverByIds = (driverIds: any) =>
     request<R>({
         url: `api/v3/manager/driver/ids`,
         method: 'post',
         data: driverIds,
     })
 
-export const driverListApi = (driver: any) =>
+export const getDriverList = (driver: any) =>
     request<R>({
         url: `api/v3/manager/driver/list`,
         method: 'post',
         data: driver,
     })
 
-export const driverStatusApi = (driver: any) =>
+export const getDriverStatus = (driver: any) =>
     request<R>({
         url: `api/v3/manager/status/driver`,
         method: 'post',

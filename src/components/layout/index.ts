@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
+import router from '@/config/router'
 import menu from '@/config/router/views'
+import { warning } from '@/utils/MessageUtils'
 import { HomeFilled } from '@element-plus/icons-vue'
 import { computed, defineComponent } from 'vue'
-
-import router from '@/config/router'
-import { warning } from '@/utils/MessageUtils'
 import { useStore } from 'vuex'
 
 export default defineComponent({

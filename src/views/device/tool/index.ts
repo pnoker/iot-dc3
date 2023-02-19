@@ -19,7 +19,7 @@ import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
 
 import { Dictionary, Order } from '@/config/types'
-import { driverDictionaryApi } from '@/api/DictionaryApi'
+import { getDriverDictionary } from '@/api/dictionary'
 
 export default defineComponent({
     name: 'DeviceTool',
@@ -68,7 +68,7 @@ export default defineComponent({
         }
 
         const driverDictionary = () => {
-            driverDictionaryApi({
+            getDriverDictionary({
                 page: reactiveData.driverPage,
                 label: reactiveData.driverQuery,
             })

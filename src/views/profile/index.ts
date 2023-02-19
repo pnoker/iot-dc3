@@ -16,7 +16,7 @@
 
 import { reactive, ref, computed, defineComponent } from 'vue'
 
-import { profileAddApi, profileDeleteApi, profileListApi, profileUpdateApi } from '@/api/profile'
+import { addProfile, deleteProfile, getProfileList, updateProfile } from '@/api/profile'
 
 import { Order } from '@/config/types'
 
@@ -80,7 +80,7 @@ export default defineComponent({
                 }
             }
 
-            profileListApi({
+            getProfileList({
                 page: reactiveData.page,
                 ...reactiveData.query,
             })
@@ -123,28 +123,28 @@ export default defineComponent({
         }
 
         const addThing = (form, done) => {
-            profileAddApi(form).then(() => {
+            addProfile(form).then(() => {
                 list()
                 done()
             })
         }
 
         const disableThing = (id, done) => {
-            profileUpdateApi({ id: id, enable: false }).then(() => {
+            updateProfile({ id: id, enable: false }).then(() => {
                 list()
                 done()
             })
         }
 
         const enableThing = (id, done) => {
-            profileUpdateApi({ id: id, enable: true }).then(() => {
+            updateProfile({ id: id, enable: true }).then(() => {
                 list()
                 done()
             })
         }
 
         const deleteThing = (id, done) => {
-            profileDeleteApi(id)
+            deleteProfile(id)
                 .then((res) => {
                     if (res.data.ok) {
                         list()

@@ -16,28 +16,52 @@
 
 import request from '@/config/axios'
 
-export const driverDictionaryApi = (dictionary: any) =>
+/**
+ * 查询驱动字典
+ *
+ * @param dictionary Dictionary
+ * @returns MyAxiosPromise
+ */
+export const getDriverDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/driver`,
         method: 'post',
         data: dictionary,
     })
 
-export const deviceDictionaryApi = (dictionary: any) =>
+/**
+ * 查询设备字典
+ *
+ * @param dictionary Dictionary
+ * @returns MyAxiosPromise
+ */
+export const getDeviceDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/device`,
         method: 'post',
         data: dictionary,
     })
 
-export const profileDictionaryApi = (dictionary: any) =>
+/**
+ * 查询模板字典
+ *
+ * @param dictionary Dictionary
+ * @returns MyAxiosPromise
+ */
+export const getProfileDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/profile`,
         method: 'post',
         data: dictionary,
     })
 
-export const pointDictionaryApi = (dictionary: any) =>
+/**
+ * 查询位号字典
+ *
+ * @param dictionary Dictionary
+ * @returns MyAxiosPromise
+ */
+export const getPointDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/point`,
         method: 'post',

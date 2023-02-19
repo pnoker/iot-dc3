@@ -20,7 +20,7 @@ import { CollectionTag, Edit, List, Management, Sunset } from '@element-plus/ico
 import router from '@/config/router'
 import { useRoute } from 'vue-router'
 
-import { profileByIdApi } from '@/api/profile'
+import { getProfileById } from '@/api/profile'
 
 import baseCard from '@/components/card/base/BaseCard.vue'
 import detailCard from '@/components/card/detail/DetailCard.vue'
@@ -76,7 +76,7 @@ export default defineComponent({
         })
 
         const profile = () => {
-            profileByIdApi(reactiveData.id).then((res) => {
+            getProfileById(reactiveData.id).then((res) => {
                 reactiveData.data = res.data.data
             })
         }

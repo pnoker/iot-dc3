@@ -21,19 +21,19 @@ import { Back, Check, Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import router from '@/config/router'
 
-import { driverDictionaryApi, profileDictionaryApi } from '@/api/DictionaryApi'
-import { deviceByIdApi, deviceUpdateApi } from '@/api/DeviceApi'
-import { driverAttributeByDriverIdApi, pointAttributeByDriverIdApi } from '@/api/AttributeApi'
-import { driverInfoAddApi, driverInfoByDeviceIdApi, driverInfoUpdateApi, pointInfoAddApi, pointInfoByDeviceIdApi, pointInfoUpdateApi } from '@/api/InfoApi'
+import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary'
+import { getDeviceById, updateDevice } from '@/api/device'
+import { getDriverAttributeByDriverId, getPointAttributeByDriverId } from '@/api/attribute'
+import { addDriverInfo, getDriverInfoByDeviceId, updateDriverInfo, addPointInfo, getPointInfoByDeviceId, updatePointInfo } from '@/api/info'
 
 import { Dictionary, Order } from '@/config/types'
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue'
 import { isNull } from '@/utils/utils'
-import { driverByIdApi } from '@/api/DriverApi'
-import { profileByIdsApi } from '@/api/profile'
-import { pointByDeviceIdApi } from '@/api/point'
+import { getDriverById } from '@/api/driver'
+import { getProfileByIds } from '@/api/profile'
+import { getPointByDeviceId } from '@/api/point'
 
 export default defineComponent({
     name: 'DeviceEdit',
@@ -153,7 +153,7 @@ export default defineComponent({
         })
 
         const driverDictionary = () => {
-            driverDictionaryApi({
+            getDriverDictionary({
                 page: reactiveData.driverPage,
                 label: reactiveData.driverQuery,
             })
@@ -180,7 +180,7 @@ export default defineComponent({
         }
 
         const profileDictionary = () => {
-            profileDictionaryApi({
+            getProfileDictionary({
                 page: reactiveData.profilePage,
                 label: reactiveData.profileQuery,
             })
@@ -207,12 +207,12 @@ export default defineComponent({
         }
 
         const device = () => {
-            deviceByIdApi(reactiveData.id)
+            getDeviceById(reactiveData.id)
                 .then((res) => {
                     reactiveData.deviceFormData = res.data.data
                     reactiveData.oldDeviceFormData = { ...res.data.data }
 
-                    driverByIdApi(reactiveData.deviceFormData.driverId).then((res) => {
+                    getDriverById(reactiveData.deviceFormData.driverId).then((res) => {
                         const driver = res.data.data
                         reactiveData.driverDictionary.push({
                             label: driver.name,
@@ -220,7 +220,7 @@ export default defineComponent({
                         } as Dictionary)
                     })
 
-                    profileByIdsApi(reactiveData.deviceFormData.profileIds).then((res) => {
+                    getProfileByIds(reactiveData.deviceFormData.profileIds).then((res) => {
                         const profiles = res.data.data
                         for (const key in profiles) {
                             const profile = profiles[key]
@@ -243,7 +243,7 @@ export default defineComponent({
                 return
             }
 
-            driverAttributeByDriverIdApi(value)
+            getDriverAttributeByDriverId(value)
                 .then((res) => {
                     reactiveData.driverAttributes = res.data.data
                     reactiveData.driverAttributeTable = reactiveData.driverAttributes.reduce((pre, cur) => {
@@ -267,7 +267,7 @@ export default defineComponent({
                     // nothing to do
                 })
 
-            pointAttributeByDriverIdApi(value)
+            getPointAttributeByDriverId(value)
                 .then((res) => {
                     reactiveData.pointAttributes = res.data.data
                     reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce((pre, cur) => {
@@ -286,7 +286,7 @@ export default defineComponent({
         }
 
         const driverInfo = () => {
-            driverInfoByDeviceIdApi(reactiveData.id)
+            getDriverInfoByDeviceId(reactiveData.id)
                 .then((res) => {
                     const formData = {}
                     res.data.data.forEach((info) => {
@@ -305,7 +305,7 @@ export default defineComponent({
         }
 
         const pointInfo = () => {
-            pointByDeviceIdApi(reactiveData.id)
+            getPointByDeviceId(reactiveData.id)
                 .then((res) => {
                     reactiveData.pointInfoData = res.data.data.map((point) => {
                         const pointInfo = {
@@ -323,7 +323,7 @@ export default defineComponent({
                         return pointInfo
                     })
 
-                    pointInfoByDeviceIdApi(reactiveData.id)
+                    getPointInfoByDeviceId(reactiveData.id)
                         .then((res) => {
                             res.data.data.forEach((info) => {
                                 reactiveData.pointInfoData.forEach((pointInfo) => {
@@ -350,7 +350,7 @@ export default defineComponent({
             const form = unref(deviceFormRef)
             form?.validate((valid) => {
                 if (valid) {
-                    deviceUpdateApi(reactiveData.deviceFormData)
+                    updateDevice(reactiveData.deviceFormData)
                         .then((res) => {
                             reactiveData.oldDeviceFormData = { ...res.data.data }
                         })
@@ -375,12 +375,12 @@ export default defineComponent({
                         }
 
                         driverInfo.id
-                            ? driverInfoUpdateApi(driverInfo)
+                            ? updateDriverInfo(driverInfo)
                                   .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
                                   })
-                            : driverInfoAddApi(driverInfo)
+                            : addDriverInfo(driverInfo)
                                   .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
@@ -412,12 +412,12 @@ export default defineComponent({
                         }
 
                         pointInfo.id
-                            ? pointInfoUpdateApi(pointInfo)
+                            ? updatePointInfo(pointInfo)
                                   .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
                                   })
-                            : pointInfoAddApi(pointInfo)
+                            : addPointInfo(pointInfo)
                                   .then((res) => loadFormData(res))
                                   .catch(() => {
                                       // nothing to do
