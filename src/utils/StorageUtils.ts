@@ -16,7 +16,7 @@
 
 import { isNull } from '@/utils/utils'
 import { decode, encode } from 'js-base64'
-import Cookies from 'js-cookie'
+import Cookies from 'ts-cookie'
 
 /**
  * 获取 Cookies 值

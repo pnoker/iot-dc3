@@ -19,8 +19,8 @@ import { ElLoading } from 'element-plus'
 
 import { cancelToken, generateSalt, generateToken } from '@/api/token'
 
-import { Login } from '@/config/types'
 import CommonConstant from '@/config/constant/common'
+import { Login } from '@/config/types'
 import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'
 import { Md5 } from 'ts-md5'
@@ -30,6 +30,14 @@ const auth = {
     state: {
         tenant: 'default',
         name: 'pnoker',
+    },
+    getters: {
+        getTenant: () => {
+            return getStorage(CommonConstant.TENANT_HEADER)
+        },
+        getName: () => {
+            return getStorage(CommonConstant.USER_HEADER)
+        },
     },
     mutations: {
         setToken: (state: any, login: any) => {
@@ -80,9 +88,9 @@ const auth = {
                 })
                 .catch(() => loading.close())
         },
-        logout({ commit }: any) {
-            const tenant = getStorage(CommonConstant.TENANT_HEADER)
-            const user = getStorage(CommonConstant.USER_HEADER)
+        logout({ commit, getters }: any) {
+            const tenant = getters.getTenant(CommonConstant.TENANT_HEADER)
+            const user = getters.getName(CommonConstant.USER_HEADER)
             if (!isNull(tenant) && !isNull(user)) {
                 const login = {
                     tenant: tenant,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 import router from '@/config/router'
 import store from '@/config/store'
@@ -49,7 +49,7 @@ const request: AxiosInstance = axios.create({
 })
 
 request.interceptors.request.use(
-    (config: AxiosRequestConfig) => {
+    (config) => {
         NProgress.start()
 
         const tenant = getStorage(CommonConstant.TENANT_HEADER)

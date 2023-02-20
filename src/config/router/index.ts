@@ -24,7 +24,7 @@ import { checkTokenValid } from '@/api/token'
 import CommonConstant from '@/config/constant/common'
 import { getStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'
-import { Login } from '../types/type'
+import { Login } from '../types'
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),

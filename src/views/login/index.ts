@@ -39,12 +39,14 @@ export default defineComponent({
         }
 
         // 定义响应式数据
+        const tenant = store.getters['auth/getTenant'] || 'default'
+        const name = store.getters['auth/getName'] || 'pnoker'
         const reactiveData = reactive({
             isHide: 'View',
             passwordType: 'password',
             formData: {
-                tenant: 'default',
-                name: 'pnoker',
+                tenant: tenant,
+                name: name,
                 password: 'dc3dc3dc3',
             },
         })
