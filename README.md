@@ -84,7 +84,7 @@
 
 如果你在使用或者部署过程遇到任何问题，请联系作者微信。
 
-如果需要远程协助，请先安装[向日葵](https://sunlogin.oray.com/download?categ=personal)软件，然后微信约定时间（8:00~9:00,18:00~19:00），我们会远程协助你。
+如果需要远程协助，请先安装[向日葵](https://sunlogin.oray.com/download?categ=personal)软件，然后微信约定时间（8:00-9:00, 18:00-19:00），我们会远程协助你。
 
 🌟请记住我们不收费，如果你觉得很不错，请点个 [Start](https://gitee.com/pnoker/iot-dc3/star) 吧！🌟
 
