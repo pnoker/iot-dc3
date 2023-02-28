@@ -23,7 +23,7 @@ import io.github.pnoker.api.center.auth.dto.UserDto;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.entity.User;
+import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import lombok.extern.slf4j.Slf4j;

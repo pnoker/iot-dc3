@@ -23,7 +23,7 @@ import io.github.pnoker.center.auth.mapper.UserPasswordMapper;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
-import io.github.pnoker.common.entity.UserPassword;
+import io.github.pnoker.common.model.UserPassword;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;

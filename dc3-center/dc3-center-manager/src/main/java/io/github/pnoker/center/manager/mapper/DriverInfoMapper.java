@@ -15,7 +15,7 @@
 package io.github.pnoker.center.manager.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.entity.DriverInfo;
+import io.github.pnoker.common.model.DriverInfo;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

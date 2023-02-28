@@ -16,7 +16,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.api.center.manager.dto.PointDto;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.enums.UnitEnum;
 
 import java.util.List;

@@ -24,7 +24,7 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.enums.UnitEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;

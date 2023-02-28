@@ -24,7 +24,7 @@ import io.github.pnoker.api.center.auth.dto.UserExtDto;
 import io.github.pnoker.center.auth.mapper.UserExtMapper;
 import io.github.pnoker.center.auth.service.UserExtService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.entity.UserExt;
+import io.github.pnoker.common.model.UserExt;
 import io.github.pnoker.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

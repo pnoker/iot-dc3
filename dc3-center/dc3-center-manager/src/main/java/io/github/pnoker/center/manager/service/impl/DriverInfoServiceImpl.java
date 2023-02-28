@@ -19,14 +19,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
 import io.github.pnoker.center.manager.mapper.DriverInfoMapper;
 import io.github.pnoker.center.manager.service.DriverInfoService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
+import io.github.pnoker.common.model.DriverInfo;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +49,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     public DriverInfo add(DriverInfo driverInfo) {
         try {
-            selectByAttributeIdAndDeviceId(driverInfo.getDriverAttributeId(), driverInfo.getDeviceId());
+            selectByDeviceIdAndAttributeId(driverInfo.getDeviceId(), driverInfo.getDriverAttributeId());
             throw new ServiceException("The driver info already exists in the device");
         } catch (NotFoundException notFoundException) {
             if (driverInfoMapper.insert(driverInfo) > 0) {
@@ -77,7 +77,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         driverInfo.setUpdateTime(null);
         if (!oldDriverInfo.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) || !oldDriverInfo.getDeviceId().equals(driverInfo.getDeviceId())) {
             try {
-                selectByAttributeIdAndDeviceId(driverInfo.getDriverAttributeId(), driverInfo.getDeviceId());
+                selectByDeviceIdAndAttributeId(driverInfo.getDeviceId(), driverInfo.getDriverAttributeId());
                 throw new DuplicateException("The driver info already exists");
             } catch (NotFoundException ignored) {
                 // nothing to do
@@ -108,7 +108,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
      * {@inheritDoc}
      */
     @Override
-    public DriverInfo selectByAttributeIdAndDeviceId(String driverAttributeId, String deviceId) {
+    public DriverInfo selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId) {
         DriverInfoDto driverInfoDto = new DriverInfoDto();
         driverInfoDto.setDriverAttributeId(driverAttributeId);
         driverInfoDto.setDeviceId(deviceId);

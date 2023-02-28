@@ -16,7 +16,7 @@ package io.github.pnoker.api.center.auth.dto;
 
 import io.github.pnoker.common.base.Converter;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.entity.UserPassword;
+import io.github.pnoker.common.model.UserPassword;
 import lombok.*;
 import org.springframework.beans.BeanUtils;
 

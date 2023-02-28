@@ -31,7 +31,7 @@ import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.Profile;
+import io.github.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

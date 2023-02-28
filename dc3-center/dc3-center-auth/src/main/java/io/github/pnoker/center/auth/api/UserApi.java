@@ -22,7 +22,7 @@ import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.entity.User;
+import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.enums.ResponseEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.dto.GroupDto;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.entity.Group;
+import io.github.pnoker.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

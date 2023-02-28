@@ -53,7 +53,7 @@ create table dc3_tenant
     enable_flag tinyint(4)   default 1                                                   not null comment '使能标识',
     remark      varchar(512) default ''                                                  not null comment '描述',
     create_time datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted     tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_tenant_name (tenant_name) USING BTREE,
     INDEX idx_tenant_code (tenant_code) USING BTREE
@@ -78,7 +78,7 @@ create table dc3_driver
     tenant_id        bigint       default 0                                                   not null comment '租户ID',
     remark           varchar(512) default ''                                                  not null comment '描述',
     create_time      datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time      datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time      datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted          tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_driver_name (driver_name) USING BTREE,
     INDEX idx_driver_code (driver_code) USING BTREE
@@ -102,7 +102,7 @@ create table dc3_driver_attribute
     tenant_id           bigint       default 0                                                   not null comment '租户ID',
     remark              varchar(512) default ''                                                  not null comment '描述',
     create_time         datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time         datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time         datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted             tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_driver_id (driver_id) USING BTREE
 ) engine = InnoDB
@@ -125,7 +125,7 @@ create table dc3_point_attribute
     tenant_id           bigint       default 0                                                   not null comment '租户ID',
     remark              varchar(512) default ''                                                  not null comment '描述',
     create_time         datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time         datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time         datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted             tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_driver_id (driver_id) USING BTREE
 ) engine = InnoDB
@@ -148,7 +148,7 @@ create table dc3_profile
     tenant_id          bigint       default 0                                                   not null comment '租户ID',
     remark             varchar(512) default ''                                                  not null comment '描述',
     create_time        datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time        datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time        datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted            tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_profile_name (profile_name) USING BTREE,
     INDEX idx_profile_code (profile_code) USING BTREE
@@ -167,7 +167,7 @@ create table dc3_profile_bind
     device_id   bigint       default 0                                                   not null comment '设备ID',
     remark      varchar(512) default ''                                                  not null comment '描述',
     create_time datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted     tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_profile_id (profile_id) USING BTREE,
     INDEX idx_device_id (device_id) USING BTREE
@@ -197,7 +197,7 @@ create table dc3_point
     tenant_id       bigint         default 0                                                   not null comment '租户ID',
     remark          varchar(512)   default ''                                                  not null comment '描述',
     create_time     datetime       default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time     datetime       default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time     datetime       default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted         tinyint(4)     default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_point_name (point_name) USING BTREE,
     INDEX idx_point_code (point_code) USING BTREE,
@@ -222,7 +222,7 @@ create table dc3_device
     tenant_id   bigint       default 0                                                   not null comment '租户ID',
     remark      varchar(512) default ''                                                  not null comment '描述',
     create_time datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted     tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_device_name (device_name) USING BTREE,
     INDEX idx_device_code (device_code) USING BTREE,
@@ -245,7 +245,7 @@ create table dc3_driver_info
     tenant_id           bigint       default 0                                                   not null comment '租户ID',
     remark              varchar(512) default ''                                                  not null comment '描述',
     create_time         datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time         datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time         datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted             tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_driver_attribute_id (driver_attribute_id) USING BTREE,
     INDEX idx_device_id (device_id) USING BTREE
@@ -268,7 +268,7 @@ create table dc3_point_info
     tenant_id          bigint       default 0                                                   not null comment '租户ID',
     remark             varchar(512) default ''                                                  not null comment '描述',
     create_time        datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time        datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time        datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted            tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_point_attribute_id (point_attribute_id) USING BTREE,
     INDEX idx_device_id (device_id) USING BTREE,
@@ -290,7 +290,7 @@ create table dc3_user
     enable_flag      tinyint(4)   default 1                                                   not null comment '使能标识',
     remark           varchar(512) default ''                                                  not null comment '描述',
     create_time      datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time      datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time      datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted          tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_login_name (login_name) USING BTREE,
     INDEX idx_user_ext_id (user_ext_id) USING BTREE,
@@ -309,7 +309,7 @@ create table dc3_user_password
     login_password varchar(512) default ''                                                  not null comment '登录密码',
     remark         varchar(512) default ''                                                  not null comment '描述',
     create_time    datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time    datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time    datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted        tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除'
 ) engine = InnoDB
   character set = utf8
@@ -328,7 +328,7 @@ create table dc3_user_ext
     email       varchar(128) default ''                                                  not null comment '邮箱',
     remark      varchar(512) default ''                                                  not null comment '描述',
     create_time datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted     tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除'
 ) engine = InnoDB
   character set = utf8
@@ -345,7 +345,7 @@ create table dc3_tenant_bind
     user_id     bigint       default 0                                                   not null comment '用户ID',
     remark      varchar(512) default ''                                                  not null comment '描述',
     create_time datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted     tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_tenant_id (tenant_id) USING BTREE,
     INDEX idx_user_id (user_id) USING BTREE
@@ -367,7 +367,7 @@ create table dc3_group
     tenant_id       bigint       default 0                                                   not null comment '租户ID',
     remark          varchar(512) default ''                                                  not null comment '描述',
     create_time     datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time     datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time     datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted         tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_group_name (group_name) USING BTREE,
     INDEX idx_group_id (parent_group_id) USING BTREE
@@ -389,7 +389,7 @@ create table dc3_label
     tenant_id        bigint       default 0                                                   not null comment '租户ID',
     remark           varchar(512) default ''                                                  not null comment '描述',
     create_time      datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time      datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time      datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted          tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_label_name (label_name) USING BTREE
 ) engine = InnoDB
@@ -407,7 +407,7 @@ create table dc3_label_bind
     entity_id   bigint       default 0                                                   not null comment '实体ID',
     remark      varchar(512) default ''                                                  not null comment '描述',
     create_time datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted     tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_label_id (label_id) USING BTREE,
     INDEX idx_entity_id (entity_id) USING BTREE
@@ -427,7 +427,7 @@ create table dc3_black_ip
     tenant_id   bigint       default 0                                                   not null comment '租户ID',
     remark      varchar(512) default ''                                                  not null comment '描述',
     create_time datetime     default CURRENT_TIMESTAMP(0)                                not null comment '创建时间',
-    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '修改时间',
+    update_time datetime     default CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) not null comment '操作时间',
     deleted     tinyint(4)   default 0                                                   not null comment '逻辑删除标识,0:未删除,1:已删除',
     INDEX idx_ip (ip) USING BTREE
 ) engine = InnoDB

@@ -15,11 +15,11 @@
 package io.github.pnoker.api.center.manager.fallback;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
 import io.github.pnoker.api.center.manager.feign.DriverInfoClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
-import io.github.pnoker.common.entity.DriverInfo;
+import io.github.pnoker.common.model.DriverInfo;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -80,7 +80,7 @@ public class DriverInfoClientFallback implements FallbackFactory<DriverInfoClien
              * {@inheritDoc}
              */
             @Override
-            public R<DriverInfo> selectByAttributeIdAndDeviceId(String attributeId, String deviceId) {
+            public R<DriverInfo> selectByDeviceIdAndAttributeId(String deviceId, String attributeId) {
                 return R.fail(message);
             }
 

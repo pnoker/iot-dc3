@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.auth.feign.BlackIpClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.BlackIpDto;
-import io.github.pnoker.common.entity.BlackIp;
+import io.github.pnoker.common.model.BlackIp;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

@@ -16,7 +16,7 @@ package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.api.center.auth.dto.TenantDto;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.entity.Tenant;
+import io.github.pnoker.common.model.Tenant;
 
 /**
  * Tenant Interface
@@ -30,7 +30,7 @@ public interface TenantService extends Service<Tenant, TenantDto> {
      * 根据租户Code查询租户
      *
      * @param code 租户Code
-     * @return {@link io.github.pnoker.common.entity.Tenant}
+     * @return {@link io.github.pnoker.common.model.Tenant}
      */
     Tenant selectByCode(String code);
 }

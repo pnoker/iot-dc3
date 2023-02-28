@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.auth.feign.UserClient;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.UserDto;
-import io.github.pnoker.common.entity.User;
+import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

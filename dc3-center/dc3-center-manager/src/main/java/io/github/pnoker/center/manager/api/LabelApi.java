@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.manager.feign.LabelClient;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.common.entity.Label;
+import io.github.pnoker.common.model.Label;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

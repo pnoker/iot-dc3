@@ -16,7 +16,7 @@ package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.auth.dto.TenantBindDto;
-import io.github.pnoker.common.entity.TenantBind;
+import io.github.pnoker.common.model.TenantBind;
 
 /**
  * TenantBind Interface
