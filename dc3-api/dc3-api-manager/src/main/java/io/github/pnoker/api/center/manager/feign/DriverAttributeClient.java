@@ -19,7 +19,7 @@ import io.github.pnoker.api.center.manager.fallback.DriverAttributeClientFallbac
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.DriverAttributeDto;
-import io.github.pnoker.common.entity.DriverAttribute;
+import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;

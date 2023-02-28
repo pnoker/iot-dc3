@@ -16,14 +16,14 @@ package io.github.pnoker.center.manager.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
 import io.github.pnoker.api.center.manager.feign.DriverInfoClient;
 import io.github.pnoker.center.manager.service.DriverInfoService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
-import io.github.pnoker.common.entity.DriverInfo;
+import io.github.pnoker.common.model.DriverInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -104,9 +104,9 @@ public class DriverInfoApi implements DriverInfoClient {
     }
 
     @Override
-    public R<DriverInfo> selectByAttributeIdAndDeviceId(String attributeId, String deviceId) {
+    public R<DriverInfo> selectByDeviceIdAndAttributeId(String deviceId, String attributeId) {
         try {
-            DriverInfo select = driverInfoService.selectByAttributeIdAndDeviceId(attributeId, deviceId);
+            DriverInfo select = driverInfoService.selectByDeviceIdAndAttributeId(deviceId, attributeId);
             if (null != select) {
                 return R.ok(select);
             }

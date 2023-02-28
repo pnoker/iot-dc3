@@ -16,7 +16,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.api.center.manager.dto.ProfileDto;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.entity.Profile;
+import io.github.pnoker.common.model.Profile;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 
 import java.util.List;

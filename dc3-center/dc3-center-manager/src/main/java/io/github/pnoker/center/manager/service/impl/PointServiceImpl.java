@@ -26,7 +26,7 @@ import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.enums.UnitEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;

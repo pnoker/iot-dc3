@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.entity.Tenant;
+import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.enums.ResponseEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;

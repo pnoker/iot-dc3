@@ -17,8 +17,8 @@ package io.github.pnoker.center.manager.service.impl;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.bean.driver.AttributeInfo;
 import io.github.pnoker.common.bean.driver.DriverMetadata;
-import io.github.pnoker.common.bean.entity.BaseModel;
-import io.github.pnoker.common.entity.*;
+import io.github.pnoker.common.model.Base;
+import io.github.pnoker.common.model.*;
 import io.github.pnoker.common.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,7 +75,7 @@ public class BatchServiceImpl implements BatchService {
             driverMetadata.setPointAttributeMap(pointAttributeMap);
 
             List<Device> devices = deviceService.selectByDriverId(driver.getId());
-            Set<String> deviceIds = devices.stream().map(BaseModel::getId).collect(Collectors.toSet());
+            Set<String> deviceIds = devices.stream().map(Base::getId).collect(Collectors.toSet());
 
             Map<String, Map<String, AttributeInfo>> driverInfoMap = getDriverInfoMap(deviceIds, driverAttributeMap);
             driverMetadata.setDriverInfoMap(driverInfoMap);

@@ -14,9 +14,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
-import io.github.pnoker.common.entity.DriverInfo;
+import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.model.DriverInfo;
 
 import java.util.List;
 
@@ -31,11 +31,11 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
     /**
      * 根据驱动属性配置 ID 和 设备 ID 查询
      *
-     * @param driverAttributeId Driver Attribute ID
      * @param deviceId          设备ID
+     * @param driverAttributeId Driver Attribute ID
      * @return DriverInfo
      */
-    DriverInfo selectByAttributeIdAndDeviceId(String driverAttributeId, String deviceId);
+    DriverInfo selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId);
 
     /**
      * 根据驱动属性配置 ID 查询

@@ -25,13 +25,13 @@ import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.bean.entity.BaseModel;
+import io.github.pnoker.common.model.Base;
 import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.StorageConstant;
-import io.github.pnoker.common.entity.Point;
+import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.SneakyThrows;
@@ -107,7 +107,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (!pageR.isOk()) return pointValuePage;
 
         List<Point> points = pageR.getData().getRecords();
-        List<String> pointIds = points.stream().map(BaseModel::getId).collect(Collectors.toList());
+        List<String> pointIds = points.stream().map(Base::getId).collect(Collectors.toList());
         List<PointValue> pointValues = realtime(pointValueDto.getDeviceId(), pointIds);
         if (CollUtil.isEmpty(pointValues)) pointValues = latest(pointValueDto.getDeviceId(), pointIds);
         pointValuePage.setCurrent(pageR.getData().getCurrent()).setSize(pageR.getData().getSize()).setTotal(pageR.getData().getTotal()).setRecords(pointValues);

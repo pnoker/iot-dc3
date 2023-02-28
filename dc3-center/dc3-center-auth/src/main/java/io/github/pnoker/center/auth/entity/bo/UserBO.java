@@ -12,38 +12,45 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.api.center.auth.dto;
+package io.github.pnoker.center.auth.entity.bo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.base.Converter;
-import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.model.TenantBind;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
-import org.springframework.beans.BeanUtils;
+import lombok.experimental.SuperBuilder;
 
 /**
- * TenantBind DTO
+ * User
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TenantBindDto extends TenantBind implements Converter<TenantBind> {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class UserBO extends BaseBO {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
+    /**
+     * 登录名称
+     */
+    private String loginName;
 
-    @Override
-    public void convertDtoToDo(TenantBind bind) {
-        BeanUtils.copyProperties(this, bind);
-    }
+    /**
+     * 用户拓展ID
+     */
+    private String userExtId;
 
-    @Override
-    public void convertDoToDto(TenantBind bind) {
-        BeanUtils.copyProperties(bind, this);
-    }
+    /**
+     * 用户密码ID
+     */
+    private String userPasswordId;
+
+    /**
+     * 使能标识
+     */
+    private EnableFlagEnum enableFlag;
 }

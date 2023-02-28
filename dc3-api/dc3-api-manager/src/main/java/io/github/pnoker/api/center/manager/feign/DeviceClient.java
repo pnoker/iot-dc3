@@ -20,7 +20,7 @@ import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.DeviceDto;
-import io.github.pnoker.common.entity.Device;
+import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;

@@ -15,11 +15,11 @@
 package io.github.pnoker.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
 import io.github.pnoker.api.center.manager.fallback.DriverInfoClientFallback;
 import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
-import io.github.pnoker.common.entity.DriverInfo;
+import io.github.pnoker.common.model.DriverInfo;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -84,8 +84,8 @@ public interface DriverInfoClient {
      * @param deviceId    设备ID
      * @return DriverInfo
      */
-    @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}")
-    R<DriverInfo> selectByAttributeIdAndDeviceId(@NotNull @PathVariable(value = "attributeId") String attributeId, @NotNull @PathVariable(value = "deviceId") String deviceId);
+    @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
+    R<DriverInfo> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId, @NotNull @PathVariable(value = "attributeId") String attributeId);
 
     /**
      * 根据 设备ID 查询 DriverInfo
