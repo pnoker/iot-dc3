@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.api.center.manager.dto.LabelBindDto;
+import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.LabelBind;
 
 /**

@@ -15,7 +15,7 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.bean.driver.AttributeInfo;
+import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;

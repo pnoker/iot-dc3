@@ -15,10 +15,10 @@
 package io.github.pnoker.api.center.auth.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.fallback.BlackIpClientFallback;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.BlackIpDto;
+import io.github.pnoker.api.center.auth.fallback.BlackIpClientFallback;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.BlackIp;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -44,7 +44,7 @@ public interface BlackIpClient {
      * 新增 BlackIp
      *
      * @param blackIp BlackIp
-     * @return {@link io.github.pnoker.common.model.BlackIp}
+     * @return {@link BlackIp}
      */
     @PostMapping("/add")
     R<BlackIp> add(@Validated(Insert.class) @RequestBody BlackIp blackIp);
@@ -66,7 +66,7 @@ public interface BlackIpClient {
      * </ol>
      *
      * @param blackIp BlackIp
-     * @return {@link io.github.pnoker.common.model.BlackIp}
+     * @return {@link BlackIp}
      */
     @PostMapping("/update")
     R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp);
@@ -75,7 +75,7 @@ public interface BlackIpClient {
      * 根据 ID 查询 BlackIp
      *
      * @param id ID
-     * @return {@link io.github.pnoker.common.model.BlackIp}
+     * @return {@link BlackIp}
      */
     @GetMapping("/id/{id}")
     R<BlackIp> selectById(@NotNull @PathVariable(value = "id") String id);
@@ -84,7 +84,7 @@ public interface BlackIpClient {
      * 根据 Ip 查询 BlackIp
      *
      * @param ip Black Ip
-     * @return {@link io.github.pnoker.common.model.BlackIp}
+     * @return {@link BlackIp}
      */
     @GetMapping("/ip/{ip}")
     R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip);
@@ -93,7 +93,7 @@ public interface BlackIpClient {
      * 模糊分页查询 BlackIp
      *
      * @param blackIpDto BlackIp和分页参数
-     * @return 带分页的 {@link io.github.pnoker.common.model.BlackIp}
+     * @return 带分页的 {@link BlackIp}
      */
     @PostMapping("/list")
     R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpDto blackIpDto);

@@ -1,16 +1,17 @@
 ## `Mongo` 集群部署
 
-
-
 ### 1. 集群架构
 
 ![](../images/dc3/cluster/mongo/mongo-1.png)
 
-> - `mongos`：提供路由数据库集群请求的入口，所有的请求都通过 `mongos` 进行协调，不需要在应用程序添加一个路由选择器，`mongos` 自己就是一个请求分发中心，它负责把对应的数据请求转发到对应的 `shard` 服务器上。在生产环境通常有多 `mongos` 作为请求的入口，防止其中一个挂掉所有的 `mongodb` 请求都没有办法操作。
-> - `config server`：为配置服务器，存储所有数据库元信息（路由、分片）的配置。`mongos` 本身没有物理存储分片服务器和数据路由信息，只是缓存在内存里，配置服务器则实际存储这些数据。`mongos` 第一次启动或者关掉重启就会从 `config server` 加载配置信息，以后如果配置服务器信息变化会通知到所有的 `mongos` 更新自己的状态，这样 `mongos` 就能继续准确路由。在生产环境通常有多个 `config server` 配置服务器，因为它存储了分片路由的元数据，防止数据丢失！
-> - shard：分片（`sharding`）是指将数据库拆分，将其分散在不同的机器上的过程。将数据分散到不同的机器上，不需要功能强大的服务器就可以存储更多的数据和处理更大的负载。基本思想就是将集合切成小块，这些块分散到若干片里，每个片只负责总数据的一部分，最后通过一个均衡器来对各个分片进行均衡（数据迁移），从3.6版本开始，每个 `shard` 必须部署为副本集（`replica set`）架构。
-
-
+> - `mongos`：提供路由数据库集群请求的入口，所有的请求都通过 `mongos` 进行协调，不需要在应用程序添加一个路由选择器，`mongos`
+    自己就是一个请求分发中心，它负责把对应的数据请求转发到对应的 `shard` 服务器上。在生产环境通常有多 `mongos` 作为请求的入口，防止其中一个挂掉所有的 `mongodb` 请求都没有办法操作。
+> - `config server`：为配置服务器，存储所有数据库元信息（路由、分片）的配置。`mongos` 本身没有物理存储分片服务器和数据路由信息，只是缓存在内存里，配置服务器则实际存储这些数据。`mongos`
+    第一次启动或者关掉重启就会从 `config server` 加载配置信息，以后如果配置服务器信息变化会通知到所有的 `mongos` 更新自己的状态，这样 `mongos`
+    就能继续准确路由。在生产环境通常有多个 `config server` 配置服务器，因为它存储了分片路由的元数据，防止数据丢失！
+> - shard：分片（`sharding`
+    ）是指将数据库拆分，将其分散在不同的机器上的过程。将数据分散到不同的机器上，不需要功能强大的服务器就可以存储更多的数据和处理更大的负载。基本思想就是将集合切成小块，这些块分散到若干片里，每个片只负责总数据的一部分，最后通过一个均衡器来对各个分片进行均衡（数据迁移），从3.6版本开始，每个 `shard`
+    必须部署为副本集（`replica set`）架构。
 
 ### 2. 集群部署规划
 
@@ -24,8 +25,6 @@
 > `shard` 分片请使用至少包含三个成员的副本集。出于测试目的，您可以创建一个单成员副本集；
 > `mongos` 没有副本集概念，可以部署1个、2个或多个。
 
-
-
 ### 3. 下载安装文件
 
 > 下载文件
@@ -34,16 +33,12 @@
 
 - 其他系统下载：https://www.mongodb.com/try/download/community
 
-
-
 > 解压文件
 
 ```bash
 # 解压
 tar zxvf mongodb-linux-x86_64-ubuntu2004-5.0.5.tgz
 ```
-
-
 
 > 校验文件
 
@@ -53,21 +48,17 @@ cd bin
 ./mongod -h
 ```
 
-
-
 ### 4. 配置 `shard` 复制集
 
 #### 4.1 创建文件目录
 
->  分别创建两个复制集（`shard-cluster`）目录，多个以此类推 `shard-cluster-N`
+> 分别创建两个复制集（`shard-cluster`）目录，多个以此类推 `shard-cluster-N`
 
 ```bash
 cd /data
 
 mkdir -p mongodb/dc3/shard-cluster-01 mongodb/dc3/shard-cluster-02
 ```
-
-
 
 > 为每个复制集创建三个分片 `node` 节点目录，多个以此类推 `node-N`
 
@@ -77,8 +68,6 @@ cd shard-cluster-N
 mkdir node-01 node-02 node-03
 ```
 
-
-
 > 为每个分片节点创建配置、数据、日志和Key目录，其他节点操作一致
 
 ```bash
@@ -86,8 +75,6 @@ cd node-N
 
 mkdir data etc keys logs
 ```
-
-
 
 #### 4.2 配置文件
 
@@ -152,8 +139,6 @@ replication:
 #    authorization: enabled
 ```
 
-
-
 #### 4.3 启动
 
 ```bash
@@ -169,8 +154,6 @@ replication:
 
 /usr/local/mongodb/bin/mongod -f /data/mongodb/dc3/shard-cluster-02/node-03/etc/mongo.conf
 ```
-
-
 
 #### 4.4 分片 `node` 节点配置到 `shard` 复制集
 
@@ -237,21 +220,17 @@ rs.initiate(config);
 rs.status();
 ```
 
-
-
 ### 5. 配置 `config server` 集群
 
 #### 5.1 创建文件目录
 
->  创建一个配置服务（`config-cluster`）目录
+> 创建一个配置服务（`config-cluster`）目录
 
 ```bash
 cd /data
 
 mkdir -p mongodb/dc3/config-cluster
 ```
-
-
 
 > 为配置服务创建三个 `node` 节点目录，多个以此类推 `node-N`
 
@@ -261,8 +240,6 @@ cd mongodb/dc3/config-cluster
 mkdir node-01 node-02 node-03
 ```
 
-
-
 > 为每个节点创建配置、数据、日志和Key目录，其他节点操作一致
 
 ```bash
@@ -270,8 +247,6 @@ cd node-N
 
 mkdir data  etc  keys  logs
 ```
-
-
 
 #### 5.2 配置文件
 
@@ -334,8 +309,6 @@ replication:
 #    authorization: enabled
 ```
 
-
-
 #### 5.3 启动
 
 ```bash
@@ -345,8 +318,6 @@ replication:
 
 /usr/local/mongodb/bin/mongod -f /data/mongodb/dc3/config-cluster/node-03/etc/config.conf
 ```
-
-
 
 #### 5.4 配置 `node` 节点到 `config server` 服务
 
@@ -379,21 +350,17 @@ rs.initiate(config);
 rs.status();
 ```
 
-
-
 ### 6. 配置 `mongos` 服务
 
 #### 6.1 创建文件目录
 
->  创建一个路由服务（`mongos-cluster`）目录
+> 创建一个路由服务（`mongos-cluster`）目录
 
 ```bash
 cd /data
 
 mkdir -p mongodb/dc3/mongos-cluster
 ```
-
-
 
 > 为路由服务创建一个 `node` 节点目录，多个以此类推 `node-N`
 
@@ -403,8 +370,6 @@ cd mongodb/dc3/mongos-cluster
 mkdir node-01
 ```
 
-
-
 > 为每个节点创建配置、日志和Key目录，其他节点操作一致
 
 ```bash
@@ -412,8 +377,6 @@ cd node-N
 
 mkdir etc  keys  logs
 ```
-
-
 
 #### 6.2 配置文件
 
@@ -447,15 +410,11 @@ sharding:
 #    authorization: enabled
 ```
 
-
-
 #### 6.3 启动
 
 ```bash
 /usr/local/mongodb/bin/mongos -f /data/mongodb/dc3/mongos-cluster/node-01/etc/mongos.conf
 ```
-
-
 
 #### 6.4 配置 `shard` 复制集到 `mongos` 服务
 

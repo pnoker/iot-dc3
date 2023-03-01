@@ -15,9 +15,9 @@
 package io.github.pnoker.api.center.auth.feign;
 
 import io.github.pnoker.api.center.auth.fallback.TokenClientFallback;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.auth.Login;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.auth.Login;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Check;
 import io.github.pnoker.common.valid.Update;

@@ -544,6 +544,7 @@ drop table if exists dc3_api;
 create table dc3_api
 (
     id            bigint unsigned auto_increment primary key                               not null comment '主键ID',
+    api_type_flag tinyint(4)   default 0                                                   not null comment 'Api接口类型标识',
     api_name      varchar(128) default ''                                                  not null comment 'Api接口名称',
     api_code      varchar(256) default ''                                                  not null comment 'Api接口编号，一般为URL的MD5编码',
     api_ext       json                                                                     not null comment 'Api接口拓展信息',
@@ -575,6 +576,8 @@ create table dc3_menu
     menu_type_flag tinyint(4)   default 0                                                   not null comment '菜单类型标识',
     menu_name      varchar(128) default ''                                                  not null comment '菜单名称',
     menu_code      varchar(256) default ''                                                  not null comment '菜单编号，一般为URL的MD5编码',
+    menu_level     tinyint(4)   default 0                                                   not null comment '菜单层级',
+    menu_index     tinyint(4)   default 0                                                   not null comment '菜单顺序',
     menu_ext       json                                                                     not null comment '菜单拓展信息',
     enable_flag    tinyint(4)   default 1                                                   not null comment '使能标识',
     tenant_id      bigint       default 0                                                   not null comment '租户ID',

@@ -8,13 +8,9 @@
 >
 > **Mqtt**：基于客户端-服务器的消息发布/订阅传输协议。MQTT协议是轻量、简单、开放和易于实现的，这些特点使它适用范围非常广泛。在很多情况下，包括受限的环境中，如：机器与机器（M2M）通信和物联网（IoT）。其在，通过卫星链路通信传感器、偶尔拨号的医疗设备、智能家居、及一些小型化设备中已广泛使用。
 
-
-
 ### 配置文件
 
 > **位置**：iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\resources\application.yml
-
-
 
 #### 1. mqtt 服务器连接配置
 
@@ -49,13 +45,11 @@
     completion-timeout: 3000
 ```
 
-
-
 #### 2. driver.point-attribute
 
 > *point-attribute 用于配置读取一个 Mqtt 点位值所需要的基本参数*
 >
-> 
+>
 >
 > **读取一个 Mqtt 服务的点位值需要：指令Topic、指令Qos，那么  `dc3-mqtt` 驱动模块此处的 `point-attribute` 就应该如下:**
 
@@ -73,13 +67,11 @@
       remark: 测点/设备接收下行指令的Mqtt主题的Qos
 ```
 
-
-
 #### 3. driver.schedule
 
 > *schedule 用于设置 读 和 自定义方法的调度*
 >
-> 
+>
 >
 > **read**：用于配置周期性调用 iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\java\com\dc3\driver\service\impl\CustomDriverServiceImpl.java （read方法）
 >
@@ -99,8 +91,6 @@
       corn:  '0/5 * * * * ?'
 ```
 
-
-
 ### 小试牛刀
 
 #### 1. 启动依赖服务
@@ -108,11 +98,9 @@
 - 参考Idea开发环境启动 dc3-mysql、dc3-mongo、dc3-redis、dc3-rabbitmq、dc3-center-register、dc3-center-manager、dc3-center-data、dc3-center-auth、dc3-web
 - 启动 dc3-driver-mqtt
 
-
-
 #### 2. 启动 Mqtt 调试工具
 
- 安装并启动 Mqtt.fx 软件
+安装并启动 Mqtt.fx 软件
 
 下载链接：[百度云盘 Mqtt.fx](https://pan.baidu.com/s/1zcdKpBiYLOdwanqxn-GZWA)
 
@@ -120,15 +108,11 @@
 
 ![](../images/dc3/driver/mqtt/mqtt-2.png)
 
-
-
 #### 3. 驱动
 
 切换到 ''**驱动**" 菜单，当前 `Mqtt` 启动启动成功，并处于 **在线** 状态
 
 ![](../images/dc3/driver/mqtt/mqtt-3.png)
-
-
 
 #### 4. 驱动属性
 
@@ -136,15 +120,11 @@
 
 ![](../images/dc3/driver/mqtt/mqtt-4.png)
 
-
-
 #### 5. 位号属性
 
 切换到 “**位号属性**” 菜单，当前 位号属性 列表如下
 
 ![](../images/dc3/driver/mqtt/mqtt-5.png)
-
-
 
 #### 6. 模板
 
@@ -153,8 +133,6 @@
 ![](../images/dc3/driver/mqtt/mqtt-6.png)
 
 ![](../images/dc3/driver/mqtt/mqtt-7.png)
-
-
 
 #### 7. 位号
 
@@ -166,23 +144,17 @@
 
 ![](../images/dc3/driver/mqtt/mqtt-9.png)
 
-
-
 #### 8. 分组
 
 切换到 “**分组**” 菜单，新建一个设备分组，如下
 
 ![](../images/dc3/driver/mqtt/mqtt-10.png)
 
-
-
 #### 9. 设备
 
 切换到 “**设备**” 菜单，在刚刚新建的分组下，新建一个设备，如下
 
 ![](../images/dc3/driver/mqtt/mqtt-11.png)
-
-
 
 #### 10. 位号配置
 
@@ -203,7 +175,6 @@
 
 ![](../images/dc3/driver/mqtt/mqtt-14.png)
 
-
 #### 11. Mqtt.fx 设置
 
 ![](../images/dc3/driver/mqtt/mqtt-15.png)
@@ -211,12 +182,12 @@
 ![](../images/dc3/driver/mqtt/mqtt-17.png)
 ![](../images/dc3/driver/mqtt/mqtt-18.png)
 
-
 #### 12. 数据
 
 切换到 “数据” 菜单，在 `Mqtt.fx` 中 publish 就会采集到一条数据
 
 *例如：*
+
 ```json
 {
     deviceId:1,
@@ -233,7 +204,6 @@
 `Mqtt.fx` 配置如下：
 
 ![](../images/dc3/driver/mqtt/mqtt-21.png)
-
 
 使用 接口调用指令下发，向设备端写入数据
 

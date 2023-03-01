@@ -12,25 +12,20 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.auth.entity.convert;
 
-import io.github.pnoker.api.center.manager.dto.LabelDto;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.Label;
+import io.github.pnoker.center.auth.entity.bo.UserBO;
+import io.github.pnoker.common.model.User;
+import org.mapstruct.Mapper;
 
 /**
- * Label Interface
+ * User MapStruct Convert
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface LabelService extends Service<Label, LabelDto> {
-    /**
-     * 根据标签 NAME 查询
-     *
-     * @param name     Label Name
-     * @param tenantId 租户ID
-     * @return Label
-     */
-    Label selectByName(String name, String tenantId);
+@Mapper(componentModel = "spring")
+public interface UserConvert {
+
+    UserBO buildBOByDO(User entityDO);
 }

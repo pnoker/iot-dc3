@@ -26,7 +26,7 @@ driver:
       corn: '0/30 * * * * ?'
     custom:
       enable: true
-      corn:  '0/5 * * * * ?'
+      corn: '0/5 * * * * ?'
   point-attribute:
     - displayName: 指令Topic
       name: commandTopic
@@ -57,7 +57,7 @@ driver:
     client-key-pass: dc3-client
     client-key: classpath:/certs/client.key
     client-crt: classpath:/certs/client.crt
-    client:  ${spring.application.name}
+    client: ${spring.application.name}
     receive-topics:
       - qos: 1
         name: driver/${spring.application.name}/device/+

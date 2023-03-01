@@ -17,7 +17,6 @@ Common Name (e.g. server FQDN or YOUR name) []:IOT
 Email Address []:
 ```
 
-
 ## Server
 
 ```bash
@@ -45,7 +44,6 @@ An optional company name []:
 ```bash
 openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 3650
 ```
-
 
 ## Client
 

@@ -6,8 +6,6 @@
 yum group list
 ```
 
-
-
 ## 安装图形界面
 
 > 安装 "GNOME Desktop" 环境
@@ -15,8 +13,6 @@ yum group list
 ```bash
 yum group install "GNOME Desktop"
 ```
-
-
 
 ## 启动桌面环境
 
@@ -38,8 +34,6 @@ systemctl set-default graphical.target
 # 恢复默认
 systemctl set-default multi-user.target
 ```
-
-
 
 ## 卸载图形界面
 

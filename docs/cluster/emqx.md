@@ -1,14 +1,10 @@
 ## `EMQ X` 集群部署
 
-
-
 > `EMQ X` 消息服务器集群基于 `Erlang/OTP` 分布式设计，集群原理可简述为下述两条规则:
 >
 > `MQTT` 客户端订阅主题时，所在节点订阅成功后广播通知其他节点：某个主题(`Topic`)被本节点订阅。
 >
 > `MQTT` 客户端发布消息时，所在节点会根据消息主题(`Topic`)，检索订阅并路由消息到相关节点。
-
-
 
 ### 1. 集群架构
 
@@ -22,12 +18,10 @@
 > topic3 -> node-02, node-04
 > ```
 
-
-
 ### 2. 集群部署规划
 
 |       `item`        |     `node 1`      |     `node 2`      |     `node 3`      |
-| :-----------------: | :---------------: | :---------------: | :---------------: |
+|:-------------------:|:-----------------:|:-----------------:|:-----------------:|
 |     `node.name`     | node-01@127.0.0.1 | node-02@127.0.0.1 | node-03@127.0.0.1 |
 | `mqtt:tcp:external` |       3000        |       3100        |       3200        |
 | `mqtt:ssl:external` |       3010        |       3110        |       3210        |
@@ -37,11 +31,9 @@
 |  `http:dashboard`   |       3050        |       3150        |       3250        |
 | `mqtt:tcp:internal` |       13000       |       13100       |       13200       |
 
-
-
 ### 3. 安装文件
 
-> **下载文件** 
+> **下载文件**
 >
 > 请下载 `ubuntu zip` 版本
 
@@ -49,21 +41,17 @@
 
 - 其他版本下载：https://www.emqx.com/zh/try?product=broker
 
-
-
 > **解压文件**
 
 ```bash
 unzip emqx-ubuntu20.04-4.3.10-amd64.zip
 ```
 
-
-
 ### 4. 集群部署
 
 #### 4.1 创建文件目录
 
->  分别创建三个节点（`node`）目录，多个以此类推 `node-N`
+> 分别创建三个节点（`node`）目录，多个以此类推 `node-N`
 >
 
 ```bash
@@ -71,8 +59,6 @@ cd /data
 
 mkdir -p emqx/dc3/node-01 emqx/dc3/node-02 emqx/dc3/node-03
 ```
-
-
 
 > 将解压的 `emqx` 文件放入到每个节点中，其他节点操作一致
 
@@ -86,13 +72,9 @@ cp -r emqx* emqx/dc3/node-01/
 # bin data dynlibs erts-11.1.8 etc lib log releases
 ```
 
-
-
 #### 4.2 配置文件
 
->  在每个节点的 `etc` 下配置文件 `emqx.conf `、`plugins/emqx_dashboard.conf `、`plugins/emqx_management.conf `
-
-
+> 在每个节点的 `etc` 下配置文件 `emqx.conf `、`plugins/emqx_dashboard.conf `、`plugins/emqx_management.conf `
 
 ##### 4.2.1 `emqx.conf `
 
@@ -2559,8 +2541,6 @@ alarm.validity_period = 24h
 ## CONFIG_SECTION_END=sys_mon ==================================================
 ```
 
-
-
 ##### 4.2.2 `plugins/emqx_dashboard.conf`
 
 ```yaml
@@ -2695,8 +2675,6 @@ dashboard.listener.http.ipv6_v6only = false
 ## dashboard.listener.https.honor_cipher_order = on
 ```
 
-
-
 ##### 4.2.3 `plugins/emqx_management.conf`
 
 ```yaml
@@ -2755,8 +2733,6 @@ management.listener.http.ipv6_v6only = false
 ## management.listener.https.ipv6_v6only = false
 ```
 
-
-
 #### 4.3 启动
 
 ```bash
@@ -2767,8 +2743,6 @@ management.listener.http.ipv6_v6only = false
 /data/emqx/dc3/node-03/bin/emqx start
 ```
 
-
-
 #### 4.4 节点配置
 
 > **配置 `节点2` 加入 `节点1`**
@@ -2777,15 +2751,11 @@ management.listener.http.ipv6_v6only = false
 /data/emqx/dc3/node-02/bin/emqx_ctl cluster join node-01@127.0.0.1
 ```
 
-
-
 > **配置 `节点3` 加入 `节点1`**
 
 ```bash
 /data/emqx/dc3/node-03/bin/emqx_ctl cluster join node-01@127.0.0.1
 ```
-
-
 
 > **节点状态**
 

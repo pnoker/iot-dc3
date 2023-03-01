@@ -22,11 +22,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.dto.DriverAttributeDto;
 import io.github.pnoker.center.manager.mapper.DriverAttributeMapper;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
-import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.model.DriverAttribute;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

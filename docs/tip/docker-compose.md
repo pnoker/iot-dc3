@@ -6,15 +6,11 @@
 >
 > - Docker Compose 运行目录下的所有文件（docker-compose.yml）组成一个工程,一个工程包含多个服务，每个服务中定义了容器运行的镜像、参数、依赖，一个服务可包括多个容器实例
 
-
-
 ### 检测是否安装 docker compose
 
 ```bash
 docker-compose version
 ```
-
-
 
 ### 安装
 
@@ -34,12 +30,9 @@ docker-compose -v
 
 **或者**
 
-
 ```bash
 pip install docker-compose
 ```
-
-
 
 ### docker-compose.yml 属性
 
@@ -79,7 +72,7 @@ networks:
 - **version**：docker-compose的版本号
 - **context**：Dockerfile的文件路径，也可以是到链接到git仓库的url，当提供的值是相对路径时，被解析为相对于撰写文件的路径，此目录也是发送到Docker守护进程的context
 - **dockerfile**：使用dockerfile文件来构建，必须指定构建路径
-- **image**：指定服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像 
+- **image**：指定服务的镜像名称或镜像ID。如果镜像在本地不存在，Compose将会尝试拉取镜像
 - **restart**：重启策略
 - **ports**：端口映射列表，宿主机端口：容器端口
 - **container_name**：Compose容器名称格式是：<项目名称><服务名称><序号>
@@ -87,8 +80,6 @@ networks:
 - **hostname**：容器的hostname
 - **volumes**：挂载一个目录或者一个已存在的数据卷容器，可以直接使用 [HOST:CONTAINER]格式，或者使用[HOST:CONTAINER:ro]格式，后者对于容器来说，数据卷是只读的，可以有效保护宿主机的文件系统
 - **networks**：设置网络模式
-
-
 
 ### 常见指令
 

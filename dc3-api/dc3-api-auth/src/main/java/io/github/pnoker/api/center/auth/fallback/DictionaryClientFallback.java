@@ -15,9 +15,9 @@
 package io.github.pnoker.api.center.auth.fallback;
 
 import io.github.pnoker.api.center.auth.feign.DictionaryClient;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.common.Dictionary;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

@@ -12,32 +12,40 @@
  * limitations under the License.
  */
 
-PRAGMA foreign_keys = false;
+PRAGMA
+foreign_keys = false;
 
 -- ----------------------------
 -- Records of dc3_unit
 -- ----------------------------
-INSERT INTO "dc3_unit" VALUES (1, '摄氏度', '℃');
+INSERT INTO "dc3_unit"
+VALUES (1, '摄氏度', '℃');
 
 -- ----------------------------
 -- Records of dc3_wia_gateway
 -- ----------------------------
-INSERT INTO "dc3_wia_gateway" VALUES (1, '127.0.0.1', NULL, 6000, 6001, 0, '2019-07-31 00:42:14');
+INSERT INTO "dc3_wia_gateway"
+VALUES (1, '127.0.0.1', NULL, 6000, 6001, 0, '2019-07-31 00:42:14');
 
 -- ----------------------------
 -- Records of dc3_wia_device
 -- ----------------------------
-INSERT INTO "dc3_wia_device" VALUES (1, 1, NULL, 'Wia-Device-Test-01', 0, '2019-07-31 00:42:56');
+INSERT INTO "dc3_wia_device"
+VALUES (1, 1, NULL, 'Wia-Device-Test-01', 0, '2019-07-31 00:42:56');
 
 -- ----------------------------
 -- Records of dc3_wia_variable
 -- ----------------------------
-INSERT INTO "dc3_wia_variable" VALUES (1, 1, '温度', NULL, NULL, NULL, 1, 1.0);
+INSERT INTO "dc3_wia_variable"
+VALUES (1, 1, '温度', NULL, NULL, NULL, 1, 1.0);
 
 -- ----------------------------
 -- Records of dc3_wia_data
 -- ----------------------------
-INSERT INTO "dc3_wia_data" VALUES (1, 1, 100.0, '2019-07-31 09:44:48');
-INSERT INTO "dc3_wia_data" VALUES (2, 1, 100.0, '2019-07-31 09:01:15');
+INSERT INTO "dc3_wia_data"
+VALUES (1, 1, 100.0, '2019-07-31 09:44:48');
+INSERT INTO "dc3_wia_data"
+VALUES (2, 1, 100.0, '2019-07-31 09:01:15');
 
-PRAGMA foreign_keys = true;
+PRAGMA
+foreign_keys = true;

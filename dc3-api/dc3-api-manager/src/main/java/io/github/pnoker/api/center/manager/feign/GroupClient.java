@@ -15,11 +15,11 @@
 package io.github.pnoker.api.center.manager.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.GroupDto;
 import io.github.pnoker.api.center.manager.fallback.GroupClientFallback;
-import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.GroupDto;
+import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.Group;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;

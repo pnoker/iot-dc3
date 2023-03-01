@@ -15,9 +15,9 @@
 package io.github.pnoker.api.center.manager.fallback;
 
 import io.github.pnoker.api.center.manager.feign.AutoClient;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.point.PointDetail;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.point.PointDetail;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;

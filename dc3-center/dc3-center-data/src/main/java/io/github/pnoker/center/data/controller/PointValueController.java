@@ -18,9 +18,9 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.data.dto.PointValueDto;
 import io.github.pnoker.center.data.service.PointValueService;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +47,7 @@ public class PointValueController {
      *
      * @param pointValueDto 位号值和分页参数
      * @param tenantId      租户ID
-     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
+     * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/latest")
     public R<Page<PointValue>> latest(PointValueDto pointValueDto, String tenantId) {
@@ -70,7 +70,7 @@ public class PointValueController {
      *
      * @param pointValueDto 位号值和分页参数
      * @param tenantId      租户ID
-     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
+     * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/list")
     public R<Page<PointValue>> list(PointValueDto pointValueDto, String tenantId) {

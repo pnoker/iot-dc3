@@ -25,7 +25,7 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
-import io.github.pnoker.common.bean.driver.AttributeInfo;
+import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;

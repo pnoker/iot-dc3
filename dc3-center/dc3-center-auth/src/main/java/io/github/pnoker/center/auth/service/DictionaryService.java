@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.common.bean.common.Dictionary;
+import io.github.pnoker.common.entity.common.Dictionary;
 
 import java.util.List;
 

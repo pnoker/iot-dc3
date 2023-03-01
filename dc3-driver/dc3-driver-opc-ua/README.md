@@ -12,25 +12,21 @@
 - [x] 无权限认证方式
 - [ ] 其他权限认证方式
 
-
-
 ## 测试工具
 
 - Prosys OPC UA Simulation
-
-
 
 ## 配置项
 
 > src/main/resources/application.yml
 
-###  OpcUa Server 连接配置
+### OpcUa Server 连接配置
 
 - Host ：OpcUa 服务所在主机IP
 - Port ：OpcUa 服务所在主机Port
 - Path ：OpcUa 服务Path
 
-###  OpcUa Point 配置
+### OpcUa Point 配置
 
 - namespace ：namespace index
 - tag ：item name
@@ -43,8 +39,6 @@ schedule:
       enable: true
       corn: '0/30 * * * * ?'
 ```
-
-
 
 ## 接口测试
 

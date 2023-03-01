@@ -16,8 +16,8 @@ package io.github.pnoker.api.center.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.Converter;
-import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.bean.point.PointValue;
+import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;

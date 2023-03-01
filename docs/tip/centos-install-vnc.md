@@ -4,11 +4,7 @@
 > yum install tigervnc-server
 > ```
 
-
-
 ### 配置 VNC Server 实例
-
-
 
 ### root 用户
 
@@ -31,8 +27,6 @@
 > ExecStop=-/usr/bin/vncserver -kill %i
 > ```
 
-
-
 ### 其他用户，例如：pnoker
 
 > ```bash
@@ -54,10 +48,6 @@
 > ExecStop=-/usr/bin/vncserver -kill %i
 > ```
 
-
-
-
-
 ### 设置 VNC 密码
 
 > ```bash
@@ -67,8 +57,6 @@
 > ```
 >
 > 密码设置完成后回到root权限下，启动服务
-
-
 
 ### 启动服务
 
@@ -82,8 +70,6 @@
 > systemctl enable vncserver@:2.service 
 > ```
 
-
-
 ## 防火墙设置
 
 > ```bash
@@ -91,8 +77,6 @@
 > firewall-cmd --zone=public --add-port=5902/tcp
 > firewall-cmd --reload
 > ```
-
-
 
 ## 远程连接
 
