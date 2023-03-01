@@ -6,21 +6,15 @@
 >
 > 如果是在**生产环境**下，<u>建议直接在宿主机上安装数据库和消息组件</u>，数据库（MySQL、Redis、MongoDB）和消息组件（RabbitMQ）安装配置文件在 dc3/dependencies 中，可参考自行手动安装。
 
-
-
 ### 安装 Java 1.8
 
 > 其他版本的 JDK 理论也行，只要兼容 JDK1.8 即可。
 
 - Java JDK 1.8 [Java SE Development Kit 8 Downloads](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
 
-
-
 ### 安装 Maven 3.6
 
 - Maven 3.6 [Installing Apache Maven](http://maven.apache.org/install.html)
-
-
 
 ### 安装 Docker
 
@@ -30,8 +24,6 @@
 
 - Windows : [Docker Desktop For Windows](https://download.docker.com/win/edge/Docker%20Desktop%20Installer.exe)
 
-
-
 > **生产环境**: 推荐在宿主机上安装 Docker 服务
 
 - 推荐 Centos : [Install Docker Engine on CentOS](https://docs.docker.com/engine/install/centos/)
@@ -39,8 +31,6 @@
 - Ubuntu : [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 
 - Debian : [Install Docker Engine on Debian](https://docs.docker.com/engine/install/debian/)
-
-
 
 ### 安装 MySQL
 
@@ -59,13 +49,9 @@ docker-compose up -d mysql
 docker-compose stop mysql
 ```
 
-
-
 > **生产环境**: 推荐在宿主机上安装 MySQL 服务
 
 导入 iot-dc3 数据库脚本文件, dc3/dependencies/mysql/iot-dc3.sql ,使用 Navicat 之类的软件即可
-
-
 
 ### 安装 MongoDB
 
@@ -84,13 +70,9 @@ docker-compose up -d mongo
 docker-compose stop mongo
 ```
 
-
-
 > **生产环境**: 推荐在宿主机上安装 MongoDB 服务
 
 导入 iot-dc3.js 数据库脚本文件, dc3/dependencies/mongo/iot-dc3.js ,使用 Navicat 之类的软件即可
-
-
 
 ### 安装 Redis
 
@@ -109,13 +91,9 @@ docker-compose up -d redis
 docker-compose stop redis
 ```
 
-
-
 > **生产环境**: 推荐在宿主机上安装 MongoDB 服务
 
 Reids 配置文件在 dc3/dependencies/redis/redis.conf
-
-
 
 ### 安装 RabbitMQ
 
@@ -133,8 +111,6 @@ docker-compose up -d rabbitmq
 #停止
 docker-compose stop rabbitmq
 ```
-
-
 
 > **生产环境**: 推荐在宿主机上安装 MongoDB 服务
 

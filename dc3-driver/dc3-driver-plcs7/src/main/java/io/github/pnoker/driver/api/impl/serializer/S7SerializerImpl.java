@@ -13,14 +13,14 @@
  */
 package io.github.pnoker.driver.api.impl.serializer;
 
-import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import io.github.pnoker.driver.api.DaveArea;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.S7Serializer;
-import io.github.pnoker.driver.exception.S7Exception;
 import io.github.pnoker.driver.api.impl.serializer.parser.BeanEntry;
 import io.github.pnoker.driver.api.impl.serializer.parser.BeanParseResult;
 import io.github.pnoker.driver.api.impl.serializer.parser.BeanParser;
+import io.github.pnoker.driver.bean.PlcS7PointVariable;
+import io.github.pnoker.driver.exception.S7Exception;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Array;

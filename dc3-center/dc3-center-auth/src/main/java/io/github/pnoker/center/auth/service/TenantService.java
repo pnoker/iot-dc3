@@ -30,7 +30,7 @@ public interface TenantService extends Service<Tenant, TenantDto> {
      * 根据租户Code查询租户
      *
      * @param code 租户Code
-     * @return {@link io.github.pnoker.common.model.Tenant}
+     * @return {@link Tenant}
      */
     Tenant selectByCode(String code);
 }

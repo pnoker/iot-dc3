@@ -9,16 +9,11 @@ npm install -g yarn --registry=https://registry.npm.taobao.org
 yarn
 ```
 
-
-
 ### 启动 IoT DC3 Web UI
-
 
 ```bash
 yarn serve
 ```
-
-
 
 ### 访问 IoT DC3 Web UI
 

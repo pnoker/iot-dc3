@@ -14,12 +14,12 @@
 
 package io.github.pnoker.center.manager.api;
 
-import io.github.pnoker.api.center.manager.feign.StatusClient;
-import io.github.pnoker.center.manager.service.StatusService;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.DeviceDto;
 import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.api.center.manager.feign.StatusClient;
+import io.github.pnoker.center.manager.service.StatusService;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

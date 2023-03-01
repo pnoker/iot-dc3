@@ -10,12 +10,12 @@
 ```bash
 ffmpeg -ss 00:00:00 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split.mp4
 ```
+
 > 2.截取从 `00:00:30` 开始的 30 秒视频
+
 ```bash
 ffmpeg -ss 00:00:30 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split1.mp4
 ```
-
-
 
 ### 视频合并
 
@@ -24,8 +24,6 @@ ffmpeg -ss 00:00:30 -t 00:00:30 -i keyoutput.mp4 -vcodec copy -acodec copy split
 ```bash
 ffmpeg -f concat -i list.txt -c copy concat.mp4
 ```
-
-
 
 ### 视频转码
 
@@ -37,8 +35,6 @@ ffmpeg -f concat -i list.txt -c copy concat.mp4
 ffmpeg -i out.ogv -vcodec h264 out.mp4
 ```
 
-
-
 ### 视频添加水印
 
 > main_w-overlay_w-10 视频的宽度-水印的宽度-水印边距；
@@ -46,8 +42,6 @@ ffmpeg -i out.ogv -vcodec h264 out.mp4
 ```bash
 ffmpeg -i input.mp4 -i logo.jpg -filter_complex [0:v][1:v]overlay=main_w-overlay_w-10:main_h-overlay_h-10[out] -map [out] -map 0:a -codec:a copy output.mp4
 ```
-
-
 
 ### 提取视频中的音频
 
@@ -59,8 +53,6 @@ ffmpeg -i input.mp4 -i logo.jpg -filter_complex [0:v][1:v]overlay=main_w-overlay
 ffmpeg -i input.mp4 -acodec copy -vn output.mp3
 ```
 
-
-
 ### 音视频合成
 
 > -y 覆盖输出文件
@@ -68,8 +60,6 @@ ffmpeg -i input.mp4 -acodec copy -vn output.mp3
 ```bash
 ffmpeg -y –i input.mp4 –i input.mp3 –vcodec copy –acodec copy output.mp4
 ```
-
-
 
 ### 去掉视频中的音频
 
@@ -80,9 +70,6 @@ ffmpeg -y –i input.mp4 –i input.mp3 –vcodec copy –acodec copy output.mp4
 ```bash
 ffmpeg -i input.mp4 -vcodec copy -an output.mp4
 ```
-
-
-
 
 ### 其他
 

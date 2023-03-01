@@ -1,7 +1,5 @@
 ## `RabbitMQ` 集群部署
 
-
-
 > `RabbiMQ` 是用 `Erlang` 开发的，集群非常方便，因为 `Erlang` 天生就是一门分布式语言，但其本身并不支持负载均衡。
 >
 > `RabbitMQ` 的集群节点包括内存节点、磁盘节点。`RabbitMQ` 支持消息的持久化，也就是数据写在磁盘上，最合适的方案就是既有内存节点，又有磁盘节点。
@@ -11,9 +9,7 @@
 > - 单一模式；
 > - 普通模式（默认的集群模式）；
 > - 镜像模式（把需要的队列做成镜像队列，存在于多个节点，属于 `RabbiMQ` 的 `HA` 方案，在对业务可靠性要求较高的场合中比较适用）。
->   要实现镜像模式，需要先搭建一个普通集群模式，在这个模式的基础上再配置镜像模式以实现高可用。
-
-
+    > 要实现镜像模式，需要先搭建一个普通集群模式，在这个模式的基础上再配置镜像模式以实现高可用。
 
 ### 1. 集群架构
 
@@ -22,24 +18,20 @@
 ### 2. 集群部署规划
 
 |            `item`            | `node 1` | `node 2` | `node 3` |
-| :--------------------------: | :------: | :------: | :------: |
+|:----------------------------:|:--------:|:--------:|:--------:|
 |   `listeners.tcp.default`    |   5000   |   5100   |   5200   |
 |    `management.tcp.port`     |   5020   |   5120   |   5220   |
 | `mqtt.listeners.tcp.default` |   5040   |   5140   |   5240   |
 
-
-
 ### 3. 安装文件
 
-> **下载文件** 
+> **下载文件**
 >
 > 请下载 `unix generic` 版本
 
 - 以 `3.9.11` 版本为例： https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.11/rabbitmq-server-generic-unix-3.9.11.tar.xz
 
 - 其他版本下载：https://github.com/rabbitmq/rabbitmq-server/releases
-
-
 
 > **解压文件**
 
@@ -49,13 +41,11 @@ xz -d rabbitmq-server-generic-unix-3.9.11.tar.xz
 tar xvf rabbitmq-server-generic-unix-3.9.11.tar
 ```
 
-
-
 ### 4. 集群部署
 
 #### 4.1 创建文件目录
 
->  分别创建三个节点（`node`）目录，多个以此类推 `node-N`
+> 分别创建三个节点（`node`）目录，多个以此类推 `node-N`
 >
 
 ```bash
@@ -63,8 +53,6 @@ cd /data
 
 mkdir -p rabbitmq/dc3/node-01 rabbitmq/dc3/node-02 rabbitmq/dc3/node-03
 ```
-
-
 
 > 将解压的 `rabbitmq` 文件放入到每个节点中，其他节点操作一致
 
@@ -78,8 +66,6 @@ cp -r rabbitmq-server/* rabbitmq/dc3/node-01/
 # escript  etc  plugins  sbin  share
 ```
 
-
-
 > 为每个节点创建配置和 `keys` 目录，其他节点操作一致
 
 ```bash
@@ -88,13 +74,9 @@ cd node-N
 mkdir -p etc/rabbitmq keys
 ```
 
-
-
 #### 4.2 配置文件
 
->  在每个节点的 `etc/rabbitmq` 下添加配置文件 `advanced.config `、`rabbitmq.conf `、`rabbitmq-env.conf `、`enabled_plugins `
-
-
+> 在每个节点的 `etc/rabbitmq` 下添加配置文件 `advanced.config `、`rabbitmq.conf `、`rabbitmq-env.conf `、`enabled_plugins `
 
 ##### 4.2.1 `advanced.config `
 
@@ -206,8 +188,6 @@ mkdir -p etc/rabbitmq keys
   ]}
 ].
 ```
-
-
 
 ##### 4.2.2 `rabbitmq.conf`
 
@@ -1286,8 +1266,6 @@ mqtt.exchange = dc3.exchange.mqtt
 # -----------------------------
 ```
 
-
-
 ##### 4.2.3 `rabbitmq-env.conf`
 
 ```yaml
@@ -1308,15 +1286,11 @@ ADVANCED_CONFIG_FILE=$RABBITMQ_HOME/etc/rabbitmq/advanced.config
 CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf
 ```
 
-
-
 ##### 4.2.4 `enabled_plugins`
 
 ```yaml
 [rabbitmq_management,rabbitmq_mqtt,rabbitmq_stomp].
 ```
-
-
 
 #### 4.3 启动
 
@@ -1327,8 +1301,6 @@ CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf
 
 /data/rabbitmq/dc3/node-03/sbin/rabbitmq-server -detached
 ```
-
-
 
 #### 4.4 节点配置
 
@@ -1344,8 +1316,6 @@ CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl -n node-02@localhost start_app
 ```
 
-
-
 > **配置 `节点3` 加入 `节点1`**
 
 ```bash
@@ -1357,8 +1327,6 @@ CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq-env.conf
 
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl -n node-03@localhost start_app
 ```
-
-
 
 > **节点状态**
 

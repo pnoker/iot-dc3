@@ -15,10 +15,10 @@
 package io.github.pnoker.api.center.auth.feign;
 
 import io.github.pnoker.api.center.auth.fallback.DictionaryClientFallback;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.common.Dictionary;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

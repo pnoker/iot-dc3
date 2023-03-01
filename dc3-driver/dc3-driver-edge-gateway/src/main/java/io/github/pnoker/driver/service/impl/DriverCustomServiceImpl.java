@@ -14,7 +14,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.bean.driver.AttributeInfo;
+import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;

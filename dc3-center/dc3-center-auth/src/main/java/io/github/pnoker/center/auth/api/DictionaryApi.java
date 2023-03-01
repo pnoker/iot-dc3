@@ -16,9 +16,9 @@ package io.github.pnoker.center.auth.api;
 
 import io.github.pnoker.api.center.auth.feign.DictionaryClient;
 import io.github.pnoker.center.auth.service.DictionaryService;
-import io.github.pnoker.common.bean.common.Dictionary;
-import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.common.Dictionary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

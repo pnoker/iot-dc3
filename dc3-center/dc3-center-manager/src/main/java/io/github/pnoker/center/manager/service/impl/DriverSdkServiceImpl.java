@@ -16,14 +16,14 @@ package io.github.pnoker.center.manager.service.impl;
 
 import io.github.pnoker.api.center.auth.feign.TenantClient;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.driver.DriverRegister;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.driver.DriverRegister;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

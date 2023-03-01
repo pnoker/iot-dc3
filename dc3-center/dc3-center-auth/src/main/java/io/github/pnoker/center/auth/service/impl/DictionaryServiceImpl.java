@@ -20,7 +20,7 @@ import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.DictionaryService;
-import io.github.pnoker.common.bean.common.Dictionary;
+import io.github.pnoker.common.entity.common.Dictionary;
 import io.github.pnoker.common.model.BlackIp;
 import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.model.User;

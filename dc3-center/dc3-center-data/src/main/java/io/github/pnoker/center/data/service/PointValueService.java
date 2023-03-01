@@ -15,8 +15,8 @@
 package io.github.pnoker.center.data.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.api.center.data.dto.PointValueDto;
+import io.github.pnoker.common.entity.point.PointValue;
 
 import java.util.List;
 

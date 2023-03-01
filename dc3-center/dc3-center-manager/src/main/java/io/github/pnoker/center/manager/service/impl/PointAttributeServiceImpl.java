@@ -22,11 +22,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
 import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import io.github.pnoker.center.manager.service.PointAttributeService;
-import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.model.PointAttribute;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -15,12 +15,12 @@
 package io.github.pnoker.api.center.data.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.data.dto.PointValueDto;
 import io.github.pnoker.api.center.data.fallback.PointValueClientFallback;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
-import io.github.pnoker.api.center.data.dto.PointValueDto;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.point.PointValue;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,7 +42,7 @@ public interface PointValueClient {
      *
      * @param pointValueDto 位号值和分页参数
      * @param tenantId      租户ID
-     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
+     * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/latest")
     R<Page<PointValue>> latest(@RequestBody PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);
@@ -52,7 +52,7 @@ public interface PointValueClient {
      *
      * @param pointValueDto 位号值和分页参数
      * @param tenantId      租户ID
-     * @return 带分页的 {@link io.github.pnoker.common.bean.point.PointValue}
+     * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/list")
     R<Page<PointValue>> list(@RequestBody(required = false) PointValueDto pointValueDto, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId);

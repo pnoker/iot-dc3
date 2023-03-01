@@ -24,14 +24,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.dto.DeviceDto;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.bean.common.Pages;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.model.ProfileBind;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.model.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

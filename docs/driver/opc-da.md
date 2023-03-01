@@ -10,19 +10,15 @@
 >
 > **DCOM**：*Microsoft Distributed Component Object Model*，网络传输数据的COM协议，客户端也可以通过互联网分布在各个角落。
 
-
-
 ### 配置文件
 
 > **位置**：iot-dc3\dc3-driver\dc3-driver-opc-da\src\main\resources\application.yml
-
-
 
 #### 1. driver.driver-attribute
 
 > *driver-attribute 用于配置连接一个 Opc Da 服务所需要的基本参数*
 >
-> 
+>
 >
 > **连接一个 Opc Da 服务需要：主机、CLSID、用户名和密码信息，那么 `dc3-opc-da` 驱动模块此处的 `driver-attribute` 就应该如下：**
 
@@ -50,13 +46,11 @@
       remark: Opc Da Passward
 ```
 
-
-
 #### 2. driver.point-attribute
 
 > *point-attribute 用于配置读取一个 Opc Da 点位值所需要的基本参数*
 >
-> 
+>
 >
 > **读取一个 Opc Da 服务的点位值需要：分组、点位名称信息，那么  `dc3-opc-da` 驱动模块此处的 `point-attribute` 就应该如下:**
 
@@ -74,13 +68,11 @@
       remark: 位号名称
 ```
 
-
-
 #### 3. driver.schedule
 
 > *schedule 用于设置 读 和 自定义方法的调度*
 >
-> 
+>
 >
 > **read**：用于配置周期性调用 iot-dc3\dc3-driver\dc3-driver-opc-da\src\main\java\com\dc3\driver\service\impl\CustomDriverServiceImpl.java （read方法）
 >
@@ -100,8 +92,6 @@
       corn:  '0/5 * * * * ?'
 ```
 
-
-
 ### 小试牛刀
 
 #### 1. 启动依赖服务
@@ -109,11 +99,9 @@
 - 参考Idea开发环境启动 dc3-mysql、dc3-mongo、dc3-redis、dc3-rabbitmq、dc3-center-register、dc3-center-manager、dc3-center-data、dc3-center-auth、dc3-web
 - 启动 dc3-driver-opc-da
 
-
-
 #### 2. 启动 Opc Da 调试工具
 
- 安装并启动 Matrikon OPC Simulation Server 软件
+安装并启动 Matrikon OPC Simulation Server 软件
 
 下载链接：[百度云盘 Matrikon OPC Simulation Server](https://pan.baidu.com/s/1R9Cp6eeTdYQmv-Wz9W5UEQ)
 
@@ -121,15 +109,11 @@
 
 ![](../images/dc3/driver/opc/da/opc-da-2.png)
 
-
-
 #### 3. 驱动
 
 切换到 ''**驱动**" 菜单，当前 `Opc Da` 启动启动成功，并处于 **在线** 状态
 
 ![](../images/dc3/driver/opc/da/opc-da-3.png)
-
-
 
 #### 4. 驱动属性
 
@@ -137,15 +121,11 @@
 
 ![](../images/dc3/driver/opc/da/opc-da-4.png)
 
-
-
 #### 5. 位号属性
 
 切换到 “**位号属性**” 菜单，当前 位号属性 列表如下
 
 ![](../images/dc3/driver/opc/da/opc-da-5.png)
-
-
 
 #### 6. 模板
 
@@ -154,8 +134,6 @@
 ![](../images/dc3/driver/opc/da/opc-da-6.png)
 
 ![](../images/dc3/driver/opc/da/opc-da-7.png)
-
-
 
 #### 7. 驱动配置
 
@@ -169,7 +147,7 @@
 
 ![](../images/dc3/driver/opc/da/opc-da-9.png)
 
--  **密码** 属性值为：`dc3dc3`，以 `Matrikon OPC Simulation Server` 启动为主，该宿主机的登录密码（请以实际情况为主）
+- **密码** 属性值为：`dc3dc3`，以 `Matrikon OPC Simulation Server` 启动为主，该宿主机的登录密码（请以实际情况为主）
 
 ![](../images/dc3/driver/opc/da/opc-da-10.png)
 
@@ -185,15 +163,13 @@
   >
   > ![](../images/dc3/driver/opc/da/opc-da-11-4.png)
 
- 填写上述查询到的 CLSID 即可
+填写上述查询到的 CLSID 即可
 
 ![](../images/dc3/driver/opc/da/opc-da-11.png)
 
 - 以上的 主机、用户名、密码和CLSID均配置完之后，列表如下
 
 ![](../images/dc3/driver/opc/da/opc-da-12.png)
-
-
 
 #### 8. 位号
 
@@ -203,23 +179,17 @@
 
 ![](../images/dc3/driver/opc/da/opc-da-13.png)
 
-
-
 #### 9. 分组
 
 切换到 “**分组**” 菜单，新建一个设备分组，如下
 
 ![](../images/dc3/driver/opc/da/opc-da-14.png)
 
-
-
 #### 10. 设备
 
 切换到 “**设备**” 菜单，在刚刚新建的分组下，新建一个设备，如下
 
 ![](../images/dc3/driver/opc/da/opc-da-15.png)
-
-
 
 #### 11. 在Matrikon OPC Simulation Server中新建监控点位
 
@@ -232,8 +202,6 @@
 ![](../images/dc3/driver/opc/da/opc-da-18.png)
 
 最后点击 OK 即可。
-
-
 
 #### 12. 位号配置
 

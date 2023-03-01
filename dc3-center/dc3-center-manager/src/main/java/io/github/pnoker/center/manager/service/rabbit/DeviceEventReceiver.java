@@ -14,12 +14,12 @@
 
 package io.github.pnoker.center.manager.service.rabbit;
 
-import io.github.pnoker.center.manager.service.EventService;
-import io.github.pnoker.common.constant.driver.EventConstant;
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.bean.entity.DeviceEvent;
-import io.github.pnoker.common.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
+import io.github.pnoker.center.manager.service.EventService;
+import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.constant.driver.EventConstant;
+import io.github.pnoker.common.entity.DeviceEvent;
+import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;

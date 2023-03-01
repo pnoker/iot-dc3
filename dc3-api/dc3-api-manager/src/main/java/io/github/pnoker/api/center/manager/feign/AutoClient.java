@@ -15,10 +15,10 @@
 package io.github.pnoker.api.center.manager.feign;
 
 import io.github.pnoker.api.center.manager.fallback.AutoClientFallback;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.point.PointDetail;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.point.PointDetail;
 import io.github.pnoker.common.valid.Insert;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;

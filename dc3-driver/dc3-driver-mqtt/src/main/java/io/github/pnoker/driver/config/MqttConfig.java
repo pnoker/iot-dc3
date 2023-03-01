@@ -14,8 +14,8 @@
 
 package io.github.pnoker.driver.config;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.sdk.bean.mqtt.MqttProperties;
 import io.github.pnoker.common.sdk.utils.X509Util;

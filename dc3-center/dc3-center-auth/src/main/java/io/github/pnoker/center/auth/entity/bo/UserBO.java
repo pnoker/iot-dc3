@@ -15,8 +15,12 @@
 package io.github.pnoker.center.auth.entity.bo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -27,8 +31,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)

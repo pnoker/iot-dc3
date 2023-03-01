@@ -22,11 +22,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.auth.dto.TenantDto;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
-import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.common.model.Tenant;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.model.Tenant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

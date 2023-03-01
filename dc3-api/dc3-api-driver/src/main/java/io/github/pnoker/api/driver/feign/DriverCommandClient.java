@@ -15,12 +15,12 @@
 package io.github.pnoker.api.driver.feign;
 
 import io.github.pnoker.api.driver.fallback.DriverCommandFallback;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.bean.driver.CmdParameter;
-import io.github.pnoker.common.bean.point.PointValue;
 import io.github.pnoker.common.constant.service.DriverServiceConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.ValidatableList;
+import io.github.pnoker.common.entity.driver.CmdParameter;
+import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.valid.Read;
-import io.github.pnoker.common.bean.ValidatableList;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;

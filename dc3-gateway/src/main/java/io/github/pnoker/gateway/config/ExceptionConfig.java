@@ -14,9 +14,9 @@
 
 package io.github.pnoker.gateway.config;
 
-import io.github.pnoker.common.bean.R;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.pnoker.common.entity.R;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;

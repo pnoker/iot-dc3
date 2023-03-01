@@ -1,11 +1,9 @@
 ## 开发环境
 
-* Ubuntu 
+* Ubuntu
 * [nginx](http://nginx.org/en/download.html)
 * [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module)
 * [VLC media player](https://www.videolan.org/)
-
-
 
 ## 依赖
 
@@ -16,8 +14,6 @@ sudo apt-get update
 sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev
 ```
 
-
-
 ## 编译
 
 配置&编译Nginx,使用默认配置,并添加nginx-rtmp模块。
@@ -27,8 +23,6 @@ sudo apt-get install libpcre3 libpcre3-dev openssl libssl-dev
 make
 sudo make install
 ```
-
-
 
 ## Nginx 配置文件参考
 

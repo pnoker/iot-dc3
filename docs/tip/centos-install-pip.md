@@ -4,16 +4,12 @@
 pip --version
 ```
 
-
-
 ## 安装 pip
 
 ```bash
 yum -y install epel-release
 yum install -y python-pip
 ```
-
-
 
 ## 配置国内源
 
@@ -32,15 +28,11 @@ index-url = http://mirrors.aliyun.com/pypi/simple/
 trusted-host=mirrors.aliyun.com
 ```
 
-
-
 ## 升级 pip 建议不要升级
 
 ```bash
 pip install --upgrade pip
 ```
-
-
 
 ## 卸载 pip
 

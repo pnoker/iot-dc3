@@ -14,12 +14,12 @@
 
 package io.github.pnoker.api.center.manager.feign;
 
-import io.github.pnoker.api.center.manager.fallback.StatusClientFallback;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.api.center.manager.dto.DeviceDto;
 import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.api.center.manager.fallback.StatusClientFallback;
+import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.entity.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

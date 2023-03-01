@@ -14,15 +14,15 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.ProfileBindDto;
 import io.github.pnoker.center.manager.mapper.ProfileBindMapper;
 import io.github.pnoker.center.manager.service.ProfileBindService;
-import io.github.pnoker.common.bean.common.Pages;
-import io.github.pnoker.api.center.manager.dto.ProfileBindDto;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;

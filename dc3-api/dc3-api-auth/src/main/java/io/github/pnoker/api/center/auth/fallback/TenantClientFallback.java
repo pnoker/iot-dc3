@@ -15,10 +15,10 @@
 package io.github.pnoker.api.center.auth.fallback;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.feign.TenantClient;
-import io.github.pnoker.common.bean.R;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.api.center.auth.dto.TenantDto;
+import io.github.pnoker.api.center.auth.feign.TenantClient;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.utils.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;

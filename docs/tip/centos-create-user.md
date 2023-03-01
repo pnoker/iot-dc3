@@ -4,15 +4,11 @@
 adduser centos
 ```
 
-
-
 ## 为新用户初始化密码
 
 ```bash
 passwd centos
 ```
-
-
 
 ## 授权sudoers
 
@@ -21,8 +17,6 @@ whereis sudoers
 ls -l /etc/sudoers
 chmod -v u+w /etc/sudoers
 ```
-
-
 
 ## 修改&编辑sudoers
 
@@ -34,8 +28,6 @@ root    ALL=(ALL)       ALL
 centos  ALL=(ALL)       ALL
 #centos  ALL=(ALL)       NOPASSWD:ALL
 ```
-
-
 
 ## 回收权限
 

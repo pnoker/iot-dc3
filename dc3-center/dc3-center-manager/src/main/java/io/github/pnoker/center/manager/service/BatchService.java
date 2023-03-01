@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.bean.driver.DriverMetadata;
+import io.github.pnoker.common.entity.driver.DriverMetadata;
 
 /**
  * BatchService Interface

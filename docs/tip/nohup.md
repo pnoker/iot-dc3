@@ -4,23 +4,17 @@
 nohup java -jar dc3.jar >/dev/null 2>dc3/logs/dc3.log &
 ```
 
-
-
 ## 不输出任何信息
 
 ```bash
 nohup java -jar dc3.jar >/dev/null 2>&1 &
 ```
 
-
-
 ## Linux 中重定向
 
 - 0:标准输入
 - 1:标准输出，默认为标准输出
 - 2:错误信息输出
-
-
 
 ## 说明
 

@@ -16,12 +16,12 @@ package io.github.pnoker.center.manager.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.dto.DictionaryDto;
 import io.github.pnoker.api.center.manager.feign.DictionaryClient;
 import io.github.pnoker.center.manager.service.DictionaryService;
-import io.github.pnoker.common.bean.common.Dictionary;
-import io.github.pnoker.common.bean.R;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
-import io.github.pnoker.api.center.manager.dto.DictionaryDto;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.common.Dictionary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

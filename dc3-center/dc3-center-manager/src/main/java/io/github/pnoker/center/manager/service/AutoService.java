@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.bean.point.PointDetail;
+import io.github.pnoker.common.entity.point.PointDetail;
 
 /**
  * Auto Interface

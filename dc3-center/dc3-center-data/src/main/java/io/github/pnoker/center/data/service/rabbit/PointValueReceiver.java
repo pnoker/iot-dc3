@@ -18,7 +18,7 @@ import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.center.data.service.job.PointValueScheduleJob;
-import io.github.pnoker.common.bean.point.PointValue;
+import io.github.pnoker.common.entity.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;

@@ -15,7 +15,7 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.bean.driver.AttributeInfo;
+import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
@@ -30,7 +30,9 @@ import io.github.pnoker.driver.api.S7Serializer;
 import io.github.pnoker.driver.api.factory.S7ConnectorFactory;
 import io.github.pnoker.driver.api.factory.S7SerializerFactory;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +64,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private Map<String, MyS7Connector> s7ConnectorMap;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class MyS7Connector {
         private ReentrantReadWriteLock lock;
         private S7Connector connector;

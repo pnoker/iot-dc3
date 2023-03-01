@@ -15,11 +15,11 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.bean.driver.AttributeInfo;
-import io.github.pnoker.common.bean.driver.DriverMetadata;
-import io.github.pnoker.common.model.Base;
-import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.entity.base.Base;
+import io.github.pnoker.common.entity.driver.AttributeInfo;
+import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

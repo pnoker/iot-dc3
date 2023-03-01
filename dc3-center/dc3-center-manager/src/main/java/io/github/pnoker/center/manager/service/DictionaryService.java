@@ -15,8 +15,8 @@
 package io.github.pnoker.center.manager.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.bean.common.Dictionary;
 import io.github.pnoker.api.center.manager.dto.DictionaryDto;
+import io.github.pnoker.common.entity.common.Dictionary;
 
 /**
  * Dictionary Interface
