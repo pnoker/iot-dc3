@@ -17,6 +17,7 @@ cd iot-dc3/dc3
 docker-compose -f docker-compose-demo.yml up -d 
 
 # 2. 下载iot-dc3-web源码
+cd ../../
 git clone https://gitee.com/pnoker/iot-dc3-web.git
 cd iot-dc3-web/dc3
 # 2.1 启动前端容器
