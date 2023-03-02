@@ -15,16 +15,10 @@ version: '3'
 
 services:
   gateway:
-    build:
-      context: ../dc3-gateway/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:demo
     restart: always
     environment:
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
+      - NODE_ENV=test
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -40,17 +34,10 @@ services:
           - dc3-gateway
 
   register:
-    build:
-      context: ../dc3-center/dc3-center-register/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:demo
     restart: always
     environment:
-      - EUREKA_DASHBOARD_PATH=/
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
+      - NODE_ENV=test
     container_name: dc3-center-register
     hostname: dc3-center-register
     volumes:
@@ -65,52 +52,11 @@ services:
         aliases:
           - dc3-center-register
 
-  monitor:
-    build:
-      context: ../dc3-center/dc3-center-monitor/
-      dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-monitor:demo
-    restart: always
-    environment:
-      - MONITOR_CONTEXT_PATH=/
-      - MONITOR_PUBLIC_URL=/
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
-    container_name: dc3-center-monitor
-    hostname: dc3-center-monitor
-    volumes:
-      - demo_logs:/dc3-center/dc3-center-monitor/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3demonet:
-        aliases:
-          - dc3-center-monitor
-
   auth:
-    build:
-      context: ../dc3-center/dc3-center-auth/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:demo
     restart: always
     environment:
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
-      - REDIS_HOST=dc3-redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=dc3
-      - CACHE_REDIS_TIME_TO_LIVE=6H
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
+      - NODE_ENV=test
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -126,35 +72,10 @@ services:
           - dc3-center-auth
 
   manager:
-    build:
-      context: ../dc3-center/dc3-center-manager/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:demo
     restart: always
     environment:
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
-      - REDIS_HOST=dc3-redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=dc3
-      - MONGO_HOST=dc3-mongo
-      - MONGO_PORT=27017
-      - MONGO_DATABASE=dc3
-      - MONGO_AUTH_TYPE=password
-      - MONGO_USERNAME=dc3
-      - MONGO_PASSWORD=dc3
-      - RABBITMQ_VIRTUAL_HOST=dc3
-      - RABBITMQ_HOST=dc3-rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USERNAME=dc3
-      - RABBITMQ_PASSWORD=dc3
-      - CACHE_REDIS_TIME_TO_LIVE=6H
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
+      - NODE_ENV=test
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -170,35 +91,10 @@ services:
           - dc3-center-manager
 
   data:
-    build:
-      context: ../dc3-center/dc3-center-data/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:demo
     restart: always
     environment:
-      - MYSQL_HOST=dc3-mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=dc3
-      - REDIS_HOST=dc3-redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=dc3
-      - MONGO_HOST=dc3-mongo
-      - MONGO_PORT=27017
-      - MONGO_DATABASE=dc3
-      - MONGO_AUTH_TYPE=password
-      - MONGO_USERNAME=dc3
-      - MONGO_PASSWORD=dc3
-      - RABBITMQ_VIRTUAL_HOST=dc3
-      - RABBITMQ_HOST=dc3-rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USERNAME=dc3
-      - RABBITMQ_PASSWORD=dc3
-      - CACHE_REDIS_TIME_TO_LIVE=6H
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
+      - NODE_ENV=test
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -214,21 +110,10 @@ services:
           - dc3-center-data
 
   virtual:
-    build:
-      context: ../dc3-driver/dc3-driver-virtual/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:demo
     restart: always
     environment:
-      - RABBITMQ_VIRTUAL_HOST=dc3
-      - RABBITMQ_HOST=dc3-rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USERNAME=dc3
-      - RABBITMQ_PASSWORD=dc3
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
+      - NODE_ENV=test
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:
@@ -243,40 +128,7 @@ services:
         aliases:
           - dc3-driver-virtual
 
-  modbus-tcp:
-    build:
-      context: ../dc3-driver/dc3-driver-modbus-tcp/
-      dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:demo
-    restart: always
-    environment:
-      - RABBITMQ_VIRTUAL_HOST=dc3
-      - RABBITMQ_HOST=dc3-rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USERNAME=dc3
-      - RABBITMQ_PASSWORD=dc3
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
-    container_name: dc3-driver-modbus-tcp
-    hostname: dc3-driver-modbus-tcp
-    volumes:
-      - demo_logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3demonet:
-        aliases:
-          - dc3-driver-modbus-tcp
-
   mysql:
-    build:
-      context: ./dependencies/mysql/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:demo
     restart: always
     environment:
@@ -296,9 +148,6 @@ services:
           - dc3-mysql
 
   mongo:
-    build:
-      context: ./dependencies/mongo/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:demo
     restart: always
     container_name: dc3-mongo
@@ -317,9 +166,6 @@ services:
           - dc3-mongo
 
   redis:
-    build:
-      context: ./dependencies/redis/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:demo
     restart: always
     container_name: dc3-redis
@@ -337,9 +183,6 @@ services:
           - dc3-redis
 
   rabbitmq:
-    build:
-      context: ./dependencies/rabbitmq/
-      dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:demo
     restart: always
     container_name: dc3-rabbitmq
