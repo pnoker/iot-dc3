@@ -39,7 +39,6 @@
     - [3.7 Docker Compose](tip/docker-compose.md)
     - [3.8 FFmpeg](tip/ffmpeg.md)
     - [3.9 Nginx 代理](tip/nginx-prefix.md)
-    - [3.10 Nginx Rtmp](tip/nginx-rtmp.md)
     - [3.11 Nohup](tip/nohup.md)
     - [3.12 NodeJs](tip/nodejs-upgrade.md)
     - [3.13 Http Code](tip/http-code.md)

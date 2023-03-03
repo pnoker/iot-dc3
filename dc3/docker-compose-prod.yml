@@ -441,40 +441,6 @@ services:
         aliases:
           - dc3-driver-edge-gateway
 
-  rtmp:
-    build:
-      context: ../dc3-transfer/dc3-transfer-rtmp/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-transfer-rtmp:1.0.0
-    restart: always
-    ports:
-      - 8803:8803
-    environment:
-      - NODE_ENV=prod
-      - DB_HOST=dc3-mysql
-      - DB_PORT=3306
-      - DB_USERNAME=root
-      - DB_PASSWORD=dc3
-      - REDIS_HOST=dc3-redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=dc3
-      - CACHE_REDIS_TIME_TO_LIVE=6H
-      - EUREKA_HOST=dc3-center-register
-      - EUREKA_PORT=8100
-      - SECURITY_USER_NAME=dc3
-      - SECURITY_USER_PASSWORD=dc3
-    container_name: dc3-transfer-rtmp
-    hostname: dc3-transfer-rtmp
-    logging:
-      driver: json-file
-      options:
-        max-size: 20m
-        max-file: 20
-    networks:
-      dc3net:
-        aliases:
-          - dc3-transfer-rtmp
-
   mysql:
     build:
       context: ./dependencies/mysql/
@@ -757,23 +723,6 @@ services:
       dc3net:
         aliases:
           - dc3-kibana
-
-  nginx-rtmp:
-    image: pnoker/alpine-nginx:rtmp
-    restart: always
-    ports:
-      - 1935:1935
-    container_name: dc3-nginx
-    hostname: dc3-nginx
-    logging:
-      driver: json-file
-      options:
-        max-size: 20m
-        max-file: 20
-    networks:
-      dc3net:
-        aliases:
-          - dc3-nginx
 
   portainer:
     image: portainer/portainer:alpine
