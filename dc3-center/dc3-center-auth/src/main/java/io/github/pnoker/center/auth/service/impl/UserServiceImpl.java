@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.dto.UserDto;
+import io.github.pnoker.center.auth.entity.query.UserPageQuery;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -94,11 +94,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> list(UserDto userDto) {
-        if (ObjectUtil.isNull(userDto.getPage())) {
-            userDto.setPage(new Pages());
+    public Page<User> list(UserPageQuery userPageQuery) {
+        if (ObjectUtil.isNull(userPageQuery.getPage())) {
+            userPageQuery.setPage(new Pages());
         }
-        return userMapper.selectPage(userDto.getPage().convert(), fuzzyQuery(userDto));
+        return userMapper.selectPage(userPageQuery.getPage().convert(), fuzzyQuery(userPageQuery));
     }
 
     @Override
@@ -130,10 +130,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LambdaQueryWrapper<User> fuzzyQuery(UserDto userDto) {
+    public LambdaQueryWrapper<User> fuzzyQuery(UserPageQuery userPageQuery) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        if (ObjectUtil.isNotNull(userDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userDto.getLoginName()), User::getLoginName, userDto.getLoginName());
+        if (ObjectUtil.isNotNull(userPageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(userPageQuery.getLoginName()), User::getLoginName, userPageQuery.getLoginName());
         }
         return queryWrapper;
     }

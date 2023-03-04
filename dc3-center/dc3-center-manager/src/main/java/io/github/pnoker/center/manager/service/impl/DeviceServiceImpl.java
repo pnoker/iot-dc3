@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.DeviceDto;
+import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
@@ -157,9 +157,9 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public List<Device> selectByDriverId(String driverId) {
-        DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setDriverId(driverId);
-        List<Device> devices = deviceMapper.selectList(fuzzyQuery(deviceDto));
+        DevicePageQuery devicePageQuery = new DevicePageQuery();
+        devicePageQuery.setDriverId(driverId);
+        List<Device> devices = deviceMapper.selectList(fuzzyQuery(devicePageQuery));
         if (null == devices || devices.isEmpty()) {
             throw new NotFoundException();
         }
@@ -192,36 +192,36 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Device> list(DeviceDto deviceDto) {
-        if (ObjectUtil.isNull(deviceDto.getPage())) {
-            deviceDto.setPage(new Pages());
+    public Page<Device> list(DevicePageQuery devicePageQuery) {
+        if (ObjectUtil.isNull(devicePageQuery.getPage())) {
+            devicePageQuery.setPage(new Pages());
         }
-        return deviceMapper.selectPageWithProfile(deviceDto.getPage().convert(), customFuzzyQuery(deviceDto), deviceDto.getProfileId());
+        return deviceMapper.selectPageWithProfile(devicePageQuery.getPage().convert(), customFuzzyQuery(devicePageQuery), devicePageQuery.getProfileId());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<Device> fuzzyQuery(DeviceDto deviceDto) {
+    public LambdaQueryWrapper<Device> fuzzyQuery(DevicePageQuery devicePageQuery) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        if (ObjectUtil.isNotEmpty(deviceDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getDeviceName()), Device::getDeviceName, deviceDto.getDeviceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getDriverId()), Device::getDriverId, deviceDto.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(deviceDto.getEnableFlag()), Device::getEnableFlag, deviceDto.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getTenantId()), Device::getTenantId, deviceDto.getTenantId());
+        if (ObjectUtil.isNotEmpty(devicePageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), Device::getDeviceName, devicePageQuery.getDeviceName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), Device::getDriverId, devicePageQuery.getDriverId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(devicePageQuery.getEnableFlag()), Device::getEnableFlag, devicePageQuery.getEnableFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getTenantId()), Device::getTenantId, devicePageQuery.getTenantId());
         }
         return queryWrapper;
     }
 
-    public LambdaQueryWrapper<Device> customFuzzyQuery(DeviceDto deviceDto) {
+    public LambdaQueryWrapper<Device> customFuzzyQuery(DevicePageQuery devicePageQuery) {
         QueryWrapper<Device> queryWrapper = Wrappers.query();
         queryWrapper.eq("dd.deleted", 0);
-        if (ObjectUtil.isNotNull(deviceDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(deviceDto.getDeviceName()), "dd.name", deviceDto.getDeviceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getDriverId()), "dd.driver_id", deviceDto.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotNull(deviceDto.getEnableFlag()), "dd.enable", deviceDto.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(deviceDto.getTenantId()), "dd.tenant_id", deviceDto.getTenantId());
+        if (ObjectUtil.isNotNull(devicePageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), "dd.name", devicePageQuery.getDeviceName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), "dd.driver_id", devicePageQuery.getDriverId());
+            queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getEnableFlag()), "dd.enable", devicePageQuery.getEnableFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getTenantId()), "dd.tenant_id", devicePageQuery.getTenantId());
         }
         return queryWrapper.lambda();
     }

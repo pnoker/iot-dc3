@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.dto.UserExtDto;
+import io.github.pnoker.center.auth.entity.query.UserExtDto;
 import io.github.pnoker.center.auth.mapper.UserExtMapper;
 import io.github.pnoker.center.auth.service.UserExtService;
 import io.github.pnoker.common.entity.common.Pages;

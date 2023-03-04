@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.api.center.auth.dto.UserExtDto;
+import io.github.pnoker.center.auth.entity.query.UserExtDto;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.UserExt;
 

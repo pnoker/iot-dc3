@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
+import io.github.pnoker.center.manager.entity.query.DriverInfoPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.DriverInfo;
 
@@ -26,7 +26,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverInfoService extends Service<DriverInfo, DriverInfoDto> {
+public interface DriverInfoService extends Service<DriverInfo, DriverInfoPageQuery> {
 
     /**
      * 根据驱动属性配置 ID 和 设备 ID 查询

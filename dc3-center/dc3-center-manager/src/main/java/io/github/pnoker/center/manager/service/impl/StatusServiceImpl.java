@@ -15,8 +15,8 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.DeviceDto;
-import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
@@ -62,10 +62,10 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Map<String, String> driver(DriverDto driverDto) {
+    public Map<String, String> driver(DriverPageQuery driverPageQuery) {
         Map<String, String> statusMap = new HashMap<>(16);
 
-        Page<Driver> page = driverService.list(driverDto);
+        Page<Driver> page = driverService.list(driverPageQuery);
         page.getRecords().forEach(driver -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
             String status = redisUtil.getKey(key);
@@ -84,10 +84,10 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Map<String, String> device(DeviceDto deviceDto) {
+    public Map<String, String> device(DevicePageQuery devicePageQuery) {
         Map<String, String> statusMap = new HashMap<>(16);
 
-        Page<Device> page = deviceService.list(deviceDto);
+        Page<Device> page = deviceService.list(devicePageQuery);
         page.getRecords().forEach(device -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + device.getId();
             String status = redisUtil.getKey(key);

@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.api.center.auth.dto.UserDto;
+import io.github.pnoker.center.auth.entity.query.UserPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.User;
 
@@ -24,7 +24,7 @@ import io.github.pnoker.common.model.User;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserService extends Service<User, UserDto> {
+public interface UserService extends Service<User, UserPageQuery> {
 
     /**
      * 根据登录名称查询用户

@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.PointDto;
+import io.github.pnoker.center.manager.entity.query.PointPageQuery;
 import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
@@ -159,9 +159,9 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public List<Point> selectByProfileId(String profileId) {
-        PointDto pointDto = new PointDto();
-        pointDto.setProfileId(profileId);
-        List<Point> points = pointMapper.selectList(fuzzyQuery(pointDto));
+        PointPageQuery pointPageQuery = new PointPageQuery();
+        pointPageQuery.setProfileId(profileId);
+        List<Point> points = pointMapper.selectList(fuzzyQuery(pointPageQuery));
         if (null == points || points.isEmpty()) {
             throw new NotFoundException();
         }
@@ -175,9 +175,9 @@ public class PointServiceImpl implements PointService {
     public List<Point> selectByProfileIds(Set<String> profileIds) {
         List<Point> points = new ArrayList<>(16);
         profileIds.forEach(profileId -> {
-            PointDto pointDto = new PointDto();
-            pointDto.setProfileId(profileId);
-            List<Point> pointList = pointMapper.selectList(fuzzyQuery(pointDto));
+            PointPageQuery pointPageQuery = new PointPageQuery();
+            pointPageQuery.setProfileId(profileId);
+            List<Point> pointList = pointMapper.selectList(fuzzyQuery(pointPageQuery));
             if (null != pointList) {
                 points.addAll(pointList);
             }
@@ -192,11 +192,11 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Point> list(PointDto pointDto) {
-        if (ObjectUtil.isNull(pointDto.getPage())) {
-            pointDto.setPage(new Pages());
+    public Page<Point> list(PointPageQuery pointPageQuery) {
+        if (ObjectUtil.isNull(pointPageQuery.getPage())) {
+            pointPageQuery.setPage(new Pages());
         }
-        return pointMapper.selectPageWithDevice(pointDto.getPage().convert(), customFuzzyQuery(pointDto), pointDto.getDeviceId());
+        return pointMapper.selectPageWithDevice(pointPageQuery.getPage().convert(), customFuzzyQuery(pointPageQuery), pointPageQuery.getDeviceId());
     }
 
     /**
@@ -212,31 +212,31 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<Point> fuzzyQuery(PointDto pointDto) {
+    public LambdaQueryWrapper<Point> fuzzyQuery(PointPageQuery pointPageQuery) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        if (null != pointDto) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getPointName()), Point::getPointName, pointDto.getPointName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getPointTypeFlag()), Point::getPointTypeFlag, pointDto.getPointTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getRwFlag()), Point::getRwFlag, pointDto.getRwFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getAccrueFlag()), Point::getAccrueFlag, pointDto.getAccrueFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getProfileId()), Point::getProfileId, pointDto.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getEnableFlag()), Point::getEnableFlag, pointDto.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointDto.getTenantId()), Point::getTenantId, pointDto.getTenantId());
+        if (null != pointPageQuery) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), Point::getPointName, pointPageQuery.getPointName());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), Point::getPointTypeFlag, pointPageQuery.getPointTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getRwFlag()), Point::getRwFlag, pointPageQuery.getRwFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getAccrueFlag()), Point::getAccrueFlag, pointPageQuery.getAccrueFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointPageQuery.getProfileId()), Point::getProfileId, pointPageQuery.getProfileId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getEnableFlag()), Point::getEnableFlag, pointPageQuery.getEnableFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointPageQuery.getTenantId()), Point::getTenantId, pointPageQuery.getTenantId());
         }
         return queryWrapper;
     }
 
-    public LambdaQueryWrapper<Point> customFuzzyQuery(PointDto pointDto) {
+    public LambdaQueryWrapper<Point> customFuzzyQuery(PointPageQuery pointPageQuery) {
         QueryWrapper<Point> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
-        if (ObjectUtil.isNotNull(pointDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointDto.getPointName()), "dp.name", pointDto.getPointName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointDto.getPointTypeFlag()), "dp.type", pointDto.getPointTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getRwFlag()), "dp.rw", pointDto.getRwFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getAccrueFlag()), "dp.accrue", pointDto.getAccrueFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointDto.getProfileId()), "dp.profile_id", pointDto.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointDto.getEnableFlag()), "dp.enable", pointDto.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointDto.getTenantId()), "dp.tenant_id", pointDto.getTenantId());
+        if (ObjectUtil.isNotNull(pointPageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), "dp.name", pointPageQuery.getPointName());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.type", pointPageQuery.getPointTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw", pointPageQuery.getRwFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getAccrueFlag()), "dp.accrue", pointPageQuery.getAccrueFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getProfileId()), "dp.profile_id", pointPageQuery.getProfileId());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable", pointPageQuery.getEnableFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getTenantId()), "dp.tenant_id", pointPageQuery.getTenantId());
         }
         return queryWrapper.lambda();
     }

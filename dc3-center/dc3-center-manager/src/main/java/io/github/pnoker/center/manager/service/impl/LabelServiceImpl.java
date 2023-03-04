@@ -19,8 +19,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.LabelBindDto;
-import io.github.pnoker.api.center.manager.dto.LabelDto;
+import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
+import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
 import io.github.pnoker.center.manager.mapper.LabelMapper;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.center.manager.service.LabelService;
@@ -67,9 +67,9 @@ public class LabelServiceImpl implements LabelService {
      */
     @Override
     public Boolean delete(String id) {
-        LabelBindDto labelBindDto = new LabelBindDto();
-        labelBindDto.setLabelId(id);
-        Page<LabelBind> labelBindPage = labelBindService.list(labelBindDto);
+        LabelBindPageQuery labelBindPageQuery = new LabelBindPageQuery();
+        labelBindPageQuery.setLabelId(id);
+        Page<LabelBind> labelBindPage = labelBindService.list(labelBindPageQuery);
         if (labelBindPage.getTotal() > 0) {
             throw new ServiceException("The label already bound by the entity");
         }
@@ -126,23 +126,23 @@ public class LabelServiceImpl implements LabelService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Label> list(LabelDto labelDto) {
-        if (ObjectUtil.isNull(labelDto.getPage())) {
-            labelDto.setPage(new Pages());
+    public Page<Label> list(LabelPageQuery labelPageQuery) {
+        if (ObjectUtil.isNull(labelPageQuery.getPage())) {
+            labelPageQuery.setPage(new Pages());
         }
-        return labelMapper.selectPage(labelDto.getPage().convert(), fuzzyQuery(labelDto));
+        return labelMapper.selectPage(labelPageQuery.getPage().convert(), fuzzyQuery(labelPageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<Label> fuzzyQuery(LabelDto labelDto) {
+    public LambdaQueryWrapper<Label> fuzzyQuery(LabelPageQuery labelPageQuery) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        if (ObjectUtil.isNotNull(labelDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(labelDto.getLabelName()), Label::getLabelName, labelDto.getLabelName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(labelDto.getColor()), Label::getColor, labelDto.getColor());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelDto.getTenantId()), Label::getTenantId, labelDto.getTenantId());
+        if (ObjectUtil.isNotNull(labelPageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(labelPageQuery.getLabelName()), Label::getLabelName, labelPageQuery.getLabelName());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(labelPageQuery.getColor()), Label::getColor, labelPageQuery.getColor());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelPageQuery.getTenantId()), Label::getTenantId, labelPageQuery.getTenantId());
         }
         return queryWrapper;
     }

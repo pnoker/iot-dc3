@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.DriverInfoDto;
+import io.github.pnoker.center.manager.entity.query.DriverInfoPageQuery;
 import io.github.pnoker.center.manager.mapper.DriverInfoMapper;
 import io.github.pnoker.center.manager.service.DriverInfoService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -109,10 +109,10 @@ public class DriverInfoServiceImpl implements DriverInfoService {
      */
     @Override
     public DriverInfo selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId) {
-        DriverInfoDto driverInfoDto = new DriverInfoDto();
-        driverInfoDto.setDriverAttributeId(driverAttributeId);
-        driverInfoDto.setDeviceId(deviceId);
-        DriverInfo driverInfo = driverInfoMapper.selectOne(fuzzyQuery(driverInfoDto));
+        DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
+        driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
+        driverInfoPageQuery.setDeviceId(deviceId);
+        DriverInfo driverInfo = driverInfoMapper.selectOne(fuzzyQuery(driverInfoPageQuery));
         if (null == driverInfo) {
             throw new NotFoundException();
         }
@@ -124,9 +124,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
      */
     @Override
     public List<DriverInfo> selectByAttributeId(String driverAttributeId) {
-        DriverInfoDto driverInfoDto = new DriverInfoDto();
-        driverInfoDto.setDriverAttributeId(driverAttributeId);
-        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));
+        DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
+        driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
+        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
         if (null == driverInfos || driverInfos.isEmpty()) {
             throw new NotFoundException();
         }
@@ -138,9 +138,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
      */
     @Override
     public List<DriverInfo> selectByDeviceId(String deviceId) {
-        DriverInfoDto driverInfoDto = new DriverInfoDto();
-        driverInfoDto.setDeviceId(deviceId);
-        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoDto));
+        DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
+        driverInfoPageQuery.setDeviceId(deviceId);
+        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
         if (null == driverInfos || driverInfos.isEmpty()) {
             throw new NotFoundException();
         }
@@ -151,22 +151,22 @@ public class DriverInfoServiceImpl implements DriverInfoService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverInfo> list(DriverInfoDto driverInfoDto) {
-        if (ObjectUtil.isNull(driverInfoDto.getPage())) {
-            driverInfoDto.setPage(new Pages());
+    public Page<DriverInfo> list(DriverInfoPageQuery driverInfoPageQuery) {
+        if (ObjectUtil.isNull(driverInfoPageQuery.getPage())) {
+            driverInfoPageQuery.setPage(new Pages());
         }
-        return driverInfoMapper.selectPage(driverInfoDto.getPage().convert(), fuzzyQuery(driverInfoDto));
+        return driverInfoMapper.selectPage(driverInfoPageQuery.getPage().convert(), fuzzyQuery(driverInfoPageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoDto driverInfoDto) {
+    public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoPageQuery driverInfoPageQuery) {
         LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
-        if (ObjectUtil.isNotNull(driverInfoDto)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoDto.getDriverAttributeId()), DriverInfo::getDriverAttributeId, driverInfoDto.getDriverAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoDto.getDeviceId()), DriverInfo::getDeviceId, driverInfoDto.getDeviceId());
+        if (ObjectUtil.isNotNull(driverInfoPageQuery)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoPageQuery.getDriverAttributeId()), DriverInfo::getDriverAttributeId, driverInfoPageQuery.getDriverAttributeId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoPageQuery.getDeviceId()), DriverInfo::getDeviceId, driverInfoPageQuery.getDeviceId());
         }
         return queryWrapper;
     }

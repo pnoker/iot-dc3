@@ -16,15 +16,14 @@ package io.github.pnoker.center.data.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.data.dto.PointValueDto;
+import io.github.pnoker.center.data.entity.query.PointValuePageQuery;
 import io.github.pnoker.center.data.service.PointValueService;
+import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -45,17 +44,17 @@ public class PointValueController {
     /**
      * 查询最新 PointValue 集合
      *
-     * @param pointValueDto 位号值和分页参数
+     * @param pointValuePageQuery 位号值和分页参数
      * @param tenantId      租户ID
      * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/latest")
-    public R<Page<PointValue>> latest(PointValueDto pointValueDto, String tenantId) {
+    public R<Page<PointValue>> latest(@RequestBody PointValuePageQuery pointValuePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
         try {
-            if (ObjectUtil.isEmpty(pointValueDto)) {
-                pointValueDto = new PointValueDto();
+            if (ObjectUtil.isEmpty(pointValuePageQuery)) {
+                pointValuePageQuery = new PointValuePageQuery();
             }
-            Page<PointValue> page = pointValueService.latest(pointValueDto, tenantId);
+            Page<PointValue> page = pointValueService.latest(pointValuePageQuery, tenantId);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -68,17 +67,17 @@ public class PointValueController {
     /**
      * 模糊分页查询 PointValue
      *
-     * @param pointValueDto 位号值和分页参数
+     * @param pointValuePageQuery 位号值和分页参数
      * @param tenantId      租户ID
      * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/list")
-    public R<Page<PointValue>> list(PointValueDto pointValueDto, String tenantId) {
+    public R<Page<PointValue>> list(@RequestBody(required = false) PointValuePageQuery pointValuePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
         try {
-            if (ObjectUtil.isEmpty(pointValueDto)) {
-                pointValueDto = new PointValueDto();
+            if (ObjectUtil.isEmpty(pointValuePageQuery)) {
+                pointValuePageQuery = new PointValuePageQuery();
             }
-            Page<PointValue> page = pointValueService.list(pointValueDto, tenantId);
+            Page<PointValue> page = pointValueService.list(pointValuePageQuery, tenantId);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

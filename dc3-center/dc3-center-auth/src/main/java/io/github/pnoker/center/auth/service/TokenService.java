@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.bean.TokenValid;
+import io.github.pnoker.center.auth.entity.bean.TokenValid;
 
 /**
  * Token Interface

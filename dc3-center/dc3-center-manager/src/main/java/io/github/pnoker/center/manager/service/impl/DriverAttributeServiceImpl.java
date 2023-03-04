@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.DriverAttributeDto;
+import io.github.pnoker.center.manager.entity.query.DriverAttributePageQuery;
 import io.github.pnoker.center.manager.mapper.DriverAttributeMapper;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -119,9 +119,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     @Override
     public List<DriverAttribute> selectByDriverId(String driverId) {
-        DriverAttributeDto driverAttributeDto = new DriverAttributeDto();
-        driverAttributeDto.setDriverId(driverId);
-        List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributeDto));
+        DriverAttributePageQuery driverAttributePageQuery = new DriverAttributePageQuery();
+        driverAttributePageQuery.setDriverId(driverId);
+        List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributePageQuery));
         if (null == driverAttributes || driverAttributes.isEmpty()) {
             throw new NotFoundException();
         }
@@ -132,24 +132,24 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverAttribute> list(DriverAttributeDto driverAttributeDto) {
-        if (null == driverAttributeDto.getPage()) {
-            driverAttributeDto.setPage(new Pages());
+    public Page<DriverAttribute> list(DriverAttributePageQuery driverAttributePageQuery) {
+        if (null == driverAttributePageQuery.getPage()) {
+            driverAttributePageQuery.setPage(new Pages());
         }
-        return driverAttributeMapper.selectPage(driverAttributeDto.getPage().convert(), fuzzyQuery(driverAttributeDto));
+        return driverAttributeMapper.selectPage(driverAttributePageQuery.getPage().convert(), fuzzyQuery(driverAttributePageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributeDto driverAttributeDto) {
+    public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributePageQuery driverAttributePageQuery) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        if (ObjectUtil.isNotNull(driverAttributeDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getAttributeName()), DriverAttribute::getAttributeName, driverAttributeDto.getAttributeName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributeDto.getDisplayName()), DriverAttribute::getDisplayName, driverAttributeDto.getDisplayName());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverAttributeDto.getAttributeTypeFlag()), DriverAttribute::getAttributeTypeFlag, driverAttributeDto.getAttributeTypeFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributeDto.getDriverId()), DriverAttribute::getDriverId, driverAttributeDto.getDriverId());
+        if (ObjectUtil.isNotNull(driverAttributePageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributePageQuery.getAttributeName()), DriverAttribute::getAttributeName, driverAttributePageQuery.getAttributeName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributePageQuery.getDisplayName()), DriverAttribute::getDisplayName, driverAttributePageQuery.getDisplayName());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverAttributePageQuery.getAttributeTypeFlag()), DriverAttribute::getAttributeTypeFlag, driverAttributePageQuery.getAttributeTypeFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributePageQuery.getDriverId()), DriverAttribute::getDriverId, driverAttributePageQuery.getDriverId());
         }
         return queryWrapper;
     }

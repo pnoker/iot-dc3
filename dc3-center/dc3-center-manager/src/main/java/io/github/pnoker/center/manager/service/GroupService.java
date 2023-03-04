@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.GroupDto;
+import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.Group;
 
@@ -24,7 +24,7 @@ import io.github.pnoker.common.model.Group;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface GroupService extends Service<Group, GroupDto> {
+public interface GroupService extends Service<Group, GroupPageQuery> {
     /**
      * 根据分组 NAME 查询
      *

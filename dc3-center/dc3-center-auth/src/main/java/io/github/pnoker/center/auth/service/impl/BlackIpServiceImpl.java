@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.dto.BlackIpDto;
+import io.github.pnoker.center.auth.entity.query.BlackIpPageQuery;
 import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -90,11 +90,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public Page<BlackIp> list(BlackIpDto blackIpDto) {
-        if (null == blackIpDto.getPage()) {
-            blackIpDto.setPage(new Pages());
+    public Page<BlackIp> list(BlackIpPageQuery blackIpPageQuery) {
+        if (null == blackIpPageQuery.getPage()) {
+            blackIpPageQuery.setPage(new Pages());
         }
-        return blackIpMapper.selectPage(blackIpDto.getPage().convert(), fuzzyQuery(blackIpDto));
+        return blackIpMapper.selectPage(blackIpPageQuery.getPage().convert(), fuzzyQuery(blackIpPageQuery));
     }
 
     @Override
@@ -107,10 +107,10 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpDto blackIpDto) {
+    public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpPageQuery blackIpPageQuery) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
-        if (ObjectUtil.isNotNull(blackIpDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(blackIpDto.getIp()), BlackIp::getIp, blackIpDto.getIp());
+        if (ObjectUtil.isNotNull(blackIpPageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(blackIpPageQuery.getIp()), BlackIp::getIp, blackIpPageQuery.getIp());
         }
         return queryWrapper;
     }

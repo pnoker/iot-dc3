@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.GroupDto;
+import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.center.manager.mapper.GroupMapper;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -117,22 +117,22 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Group> list(GroupDto groupDto) {
-        if (ObjectUtil.isNull(groupDto.getPage())) {
-            groupDto.setPage(new Pages());
+    public Page<Group> list(GroupPageQuery groupPageQuery) {
+        if (ObjectUtil.isNull(groupPageQuery.getPage())) {
+            groupPageQuery.setPage(new Pages());
         }
-        return groupMapper.selectPage(groupDto.getPage().convert(), fuzzyQuery(groupDto));
+        return groupMapper.selectPage(groupPageQuery.getPage().convert(), fuzzyQuery(groupPageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<Group> fuzzyQuery(GroupDto groupDto) {
+    public LambdaQueryWrapper<Group> fuzzyQuery(GroupPageQuery groupPageQuery) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        if (ObjectUtil.isNotNull(groupDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(groupDto.getGroupName()), Group::getGroupName, groupDto.getGroupName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(groupDto.getTenantId()), Group::getTenantId, groupDto.getTenantId());
+        if (ObjectUtil.isNotNull(groupPageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(groupPageQuery.getGroupName()), Group::getGroupName, groupPageQuery.getGroupName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(groupPageQuery.getTenantId()), Group::getTenantId, groupPageQuery.getTenantId());
         }
         return queryWrapper;
     }

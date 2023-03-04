@@ -24,6 +24,6 @@
     <artifactId>dc3-api-auth</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Auth Feign Client API。</description>
+    <description>IOT DC3 平台 Auth Service gRpc API。</description>
 
 </project>

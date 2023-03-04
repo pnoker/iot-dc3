@@ -14,8 +14,8 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.DeviceDto;
-import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 
 import java.util.Map;
 
@@ -38,10 +38,10 @@ public interface StatusService {
     /**
      * 模糊分页查询 Driver 服务状态，同驱动模糊分页查询配套使用
      *
-     * @param driverDto 驱动和分页参数
+     * @param driverPageQuery 驱动和分页参数
      * @return Map String:String
      */
-    Map<String, String> driver(DriverDto driverDto);
+    Map<String, String> driver(DriverPageQuery driverPageQuery);
 
     /**
      * 根据 设备Id 查询 Device 服务状态
@@ -54,10 +54,10 @@ public interface StatusService {
     /**
      * 模糊分页查询 Device 服务状态，同设备分页查询配套使用
      *
-     * @param deviceDto 设备和分页参数
+     * @param devicePageQuery 设备和分页参数
      * @return Map String:String
      */
-    Map<String, String> device(DeviceDto deviceDto);
+    Map<String, String> device(DevicePageQuery devicePageQuery);
 
     /**
      * 根据 模板ID 查询 Device 服务状态

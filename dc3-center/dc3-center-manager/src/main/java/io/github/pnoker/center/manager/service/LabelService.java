@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.LabelDto;
+import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.Label;
 
@@ -24,7 +24,7 @@ import io.github.pnoker.common.model.Label;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface LabelService extends Service<Label, LabelDto> {
+public interface LabelService extends Service<Label, LabelPageQuery> {
     /**
      * 根据标签 NAME 查询
      *

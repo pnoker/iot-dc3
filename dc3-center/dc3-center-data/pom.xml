@@ -88,6 +88,10 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-quartz</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
 
     </dependencies>
 
