@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.model.Driver;
@@ -28,7 +28,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverService extends Service<Driver, DriverDto> {
+public interface DriverService extends Service<Driver, DriverPageQuery> {
 
     /**
      * 根据 驱动ServiceName 查询 驱动

@@ -18,7 +18,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.dto.UserPasswordDto;
+import io.github.pnoker.center.auth.entity.query.UserPasswordPageQuery;
 import io.github.pnoker.center.auth.mapper.UserPasswordMapper;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
@@ -50,7 +50,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     @Transactional
     public UserPassword add(UserPassword userPassword) {
-        userPassword.setPassword(DecodeUtil.md5(userPassword.getPassword()));
+        userPassword.setLoginPassword(DecodeUtil.md5(userPassword.getLoginPassword()));
         // 插入 userPassword 数据，并返回插入后的 userPassword
         if (userPasswordMapper.insert(userPassword) > 0) {
             return userPasswordMapper.selectById(userPassword.getId());
@@ -75,7 +75,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         if (null == selectById) {
             throw new NotFoundException();
         }
-        userPassword.setPassword(DecodeUtil.md5(userPassword.getPassword()));
+        userPassword.setLoginPassword(DecodeUtil.md5(userPassword.getLoginPassword()));
         userPassword.setUpdateTime(null);
         if (userPasswordMapper.updateById(userPassword) > 0) {
             return userPasswordMapper.selectById(userPassword.getId());
@@ -89,25 +89,25 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public Page<UserPassword> list(UserPasswordDto userPasswordDto) {
-        if (ObjectUtil.isNull(userPasswordDto.getPage())) {
-            userPasswordDto.setPage(new Pages());
+    public Page<UserPassword> list(UserPasswordPageQuery userPasswordPageQuery) {
+        if (ObjectUtil.isNull(userPasswordPageQuery.getPage())) {
+            userPasswordPageQuery.setPage(new Pages());
         }
-        return userPasswordMapper.selectPage(userPasswordDto.getPage().convert(), fuzzyQuery(userPasswordDto));
+        return userPasswordMapper.selectPage(userPasswordPageQuery.getPage().convert(), fuzzyQuery(userPasswordPageQuery));
     }
 
     @Override
     public Boolean restPassword(String id) {
         UserPassword userPassword = selectById(id);
         if (ObjectUtil.isNotNull(userPassword)) {
-            userPassword.setPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
+            userPassword.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
             return null != update(userPassword);
         }
         return false;
     }
 
     @Override
-    public LambdaQueryWrapper<UserPassword> fuzzyQuery(UserPasswordDto userPasswordDto) {
+    public LambdaQueryWrapper<UserPassword> fuzzyQuery(UserPasswordPageQuery userPasswordPageQuery) {
         return Wrappers.<UserPassword>query().lambda();
     }
 

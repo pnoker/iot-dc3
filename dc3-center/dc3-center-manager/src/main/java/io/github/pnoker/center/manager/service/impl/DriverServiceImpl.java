@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.DriverDto;
+import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
@@ -177,30 +177,30 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Driver> list(DriverDto driverDto) {
-        if (null == driverDto.getPage()) {
-            driverDto.setPage(new Pages());
+    public Page<Driver> list(DriverPageQuery driverPageQuery) {
+        if (null == driverPageQuery.getPage()) {
+            driverPageQuery.setPage(new Pages());
         }
-        return driverMapper.selectPage(driverDto.getPage().convert(), fuzzyQuery(driverDto));
+        return driverMapper.selectPage(driverPageQuery.getPage().convert(), fuzzyQuery(driverPageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<Driver> fuzzyQuery(DriverDto driverDto) {
+    public LambdaQueryWrapper<Driver> fuzzyQuery(DriverPageQuery driverPageQuery) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        if (ObjectUtil.isNotNull(driverDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getDriverName()), Driver::getDriverName, driverDto.getDriverName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceName()), Driver::getServiceName, driverDto.getServiceName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverDto.getServiceHost()), Driver::getServiceHost, driverDto.getServiceHost());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getServicePort()), Driver::getServicePort, driverDto.getServicePort());
-            if (ObjectUtil.isNull(driverDto.getDriverTypeFlag())) {
-                driverDto.setDriverTypeFlag(DriverTypeFlagEnum.DRIVER);
+        if (ObjectUtil.isNotNull(driverPageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getDriverName()), Driver::getDriverName, driverPageQuery.getDriverName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getServiceName()), Driver::getServiceName, driverPageQuery.getServiceName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getServiceHost()), Driver::getServiceHost, driverPageQuery.getServiceHost());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getServicePort()), Driver::getServicePort, driverPageQuery.getServicePort());
+            if (ObjectUtil.isNull(driverPageQuery.getDriverTypeFlag())) {
+                driverPageQuery.setDriverTypeFlag(DriverTypeFlagEnum.DRIVER);
             }
-            queryWrapper.like(Driver::getDriverTypeFlag, driverDto.getDriverTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverDto.getEnableFlag()), Driver::getEnableFlag, driverDto.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverDto.getTenantId()), Driver::getTenantId, driverDto.getTenantId());
+            queryWrapper.like(Driver::getDriverTypeFlag, driverPageQuery.getDriverTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getEnableFlag()), Driver::getEnableFlag, driverPageQuery.getEnableFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverPageQuery.getTenantId()), Driver::getTenantId, driverPageQuery.getTenantId());
         }
         return queryWrapper;
     }

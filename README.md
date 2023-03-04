@@ -61,3 +61,10 @@
 
 `IOT DC3` 开源平台遵循 [Apache 2.0 协议](https://www.apache.org/licenses/LICENSE-2.0.html)。 允许商业使用，但务必保留类作者、Copyright
 信息。
+
+### 合作伙伴
+
+![IoT DC3](https://gitee.com/pnoker/iot-dc3/raw/master/docs/images/dc3/logo-blue.png)
+
+DC3 是基于 Spring Cloud 的开源可分布式物联网 (IOT) 平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。
+

@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
+import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.PointAttribute;
 
@@ -26,7 +26,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointAttributeService extends Service<PointAttribute, PointAttributeDto> {
+public interface PointAttributeService extends Service<PointAttribute, PointAttributePageQuery> {
     /**
      * 根据位号配置属性 NAME 和 驱动 ID 查询
      *

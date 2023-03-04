@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.ProfileDto;
+import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.model.Profile;
@@ -28,7 +28,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface ProfileService extends Service<Profile, ProfileDto> {
+public interface ProfileService extends Service<Profile, ProfilePageQuery> {
 
     /**
      * 根据 模板Name 查询模版

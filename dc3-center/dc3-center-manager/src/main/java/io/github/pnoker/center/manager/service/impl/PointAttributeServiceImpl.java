@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.PointAttributeDto;
+import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
 import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -119,9 +119,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     @Override
     public List<PointAttribute> selectByDriverId(String driverId) {
-        PointAttributeDto pointAttributeDto = new PointAttributeDto();
-        pointAttributeDto.setDriverId(driverId);
-        List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributeDto));
+        PointAttributePageQuery pointAttributePageQuery = new PointAttributePageQuery();
+        pointAttributePageQuery.setDriverId(driverId);
+        List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributePageQuery));
         if (null == pointAttributes || pointAttributes.isEmpty()) {
             throw new NotFoundException();
         }
@@ -132,24 +132,24 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttribute> list(PointAttributeDto pointAttributeDto) {
-        if (ObjectUtil.isNull(pointAttributeDto.getPage())) {
-            pointAttributeDto.setPage(new Pages());
+    public Page<PointAttribute> list(PointAttributePageQuery pointAttributePageQuery) {
+        if (ObjectUtil.isNull(pointAttributePageQuery.getPage())) {
+            pointAttributePageQuery.setPage(new Pages());
         }
-        return pointAttributeMapper.selectPage(pointAttributeDto.getPage().convert(), fuzzyQuery(pointAttributeDto));
+        return pointAttributeMapper.selectPage(pointAttributePageQuery.getPage().convert(), fuzzyQuery(pointAttributePageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributeDto pointAttributeDto) {
+    public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery pointAttributePageQuery) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        if (ObjectUtil.isNotNull(pointAttributeDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getAttributeName()), PointAttribute::getAttributeName, pointAttributeDto.getAttributeName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributeDto.getDisplayName()), PointAttribute::getDisplayName, pointAttributeDto.getDisplayName());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointAttributeDto.getAttributeTypeFlag()), PointAttribute::getAttributeTypeFlag, pointAttributeDto.getAttributeTypeFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributeDto.getDriverId()), PointAttribute::getDriverId, pointAttributeDto.getDriverId());
+        if (ObjectUtil.isNotNull(pointAttributePageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributePageQuery.getAttributeName()), PointAttribute::getAttributeName, pointAttributePageQuery.getAttributeName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributePageQuery.getDisplayName()), PointAttribute::getDisplayName, pointAttributePageQuery.getDisplayName());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointAttributePageQuery.getAttributeTypeFlag()), PointAttribute::getAttributeTypeFlag, pointAttributePageQuery.getAttributeTypeFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributePageQuery.getDriverId()), PointAttribute::getDriverId, pointAttributePageQuery.getDriverId());
         }
         return queryWrapper;
     }

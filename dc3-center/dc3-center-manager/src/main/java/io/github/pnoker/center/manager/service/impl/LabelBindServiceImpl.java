@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.LabelBindDto;
+import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
 import io.github.pnoker.center.manager.mapper.LabelBindMapper;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -93,22 +93,22 @@ public class LabelBindServiceImpl implements LabelBindService {
      * {@inheritDoc}
      */
     @Override
-    public Page<LabelBind> list(LabelBindDto labelBindDto) {
-        if (ObjectUtil.isNull(labelBindDto.getPage())) {
-            labelBindDto.setPage(new Pages());
+    public Page<LabelBind> list(LabelBindPageQuery labelBindPageQuery) {
+        if (ObjectUtil.isNull(labelBindPageQuery.getPage())) {
+            labelBindPageQuery.setPage(new Pages());
         }
-        return labelBindMapper.selectPage(labelBindDto.getPage().convert(), fuzzyQuery(labelBindDto));
+        return labelBindMapper.selectPage(labelBindPageQuery.getPage().convert(), fuzzyQuery(labelBindPageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindDto labelBindDto) {
+    public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindPageQuery labelBindPageQuery) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
-        if (ObjectUtil.isNotNull(labelBindDto)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindDto.getLabelId()), LabelBind::getLabelId, labelBindDto.getLabelId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindDto.getEntityId()), LabelBind::getEntityId, labelBindDto.getEntityId());
+        if (ObjectUtil.isNotNull(labelBindPageQuery)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindPageQuery.getLabelId()), LabelBind::getLabelId, labelBindPageQuery.getLabelId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindPageQuery.getEntityId()), LabelBind::getEntityId, labelBindPageQuery.getEntityId());
         }
         return queryWrapper;
     }

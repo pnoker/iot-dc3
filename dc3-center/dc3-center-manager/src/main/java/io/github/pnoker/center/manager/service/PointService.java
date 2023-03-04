@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.PointDto;
+import io.github.pnoker.center.manager.entity.query.PointPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.enums.UnitEnum;
 import io.github.pnoker.common.model.Point;
@@ -29,7 +29,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointService extends Service<Point, PointDto> {
+public interface PointService extends Service<Point, PointPageQuery> {
 
     /**
      * 根据 位号Name 、 模板Id 查询位号

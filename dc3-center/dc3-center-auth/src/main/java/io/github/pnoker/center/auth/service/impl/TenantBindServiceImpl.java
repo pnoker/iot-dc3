@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.dto.TenantBindDto;
+import io.github.pnoker.center.auth.entity.query.TenantBindPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantBindMapper;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -90,19 +90,19 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public Page<TenantBind> list(TenantBindDto tenantBindDto) {
-        if (ObjectUtil.isNull(tenantBindDto.getPage())) {
-            tenantBindDto.setPage(new Pages());
+    public Page<TenantBind> list(TenantBindPageQuery tenantBindPageQuery) {
+        if (ObjectUtil.isNull(tenantBindPageQuery.getPage())) {
+            tenantBindPageQuery.setPage(new Pages());
         }
-        return tenantBindMapper.selectPage(tenantBindDto.getPage().convert(), fuzzyQuery(tenantBindDto));
+        return tenantBindMapper.selectPage(tenantBindPageQuery.getPage().convert(), fuzzyQuery(tenantBindPageQuery));
     }
 
     @Override
-    public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindDto tenantBindDto) {
+    public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery tenantBindPageQuery) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
-        if (ObjectUtil.isNotNull(tenantBindDto)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindDto.getTenantId()), TenantBind::getTenantId, tenantBindDto.getTenantId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindDto.getUserId()), TenantBind::getUserId, tenantBindDto.getUserId());
+        if (ObjectUtil.isNotNull(tenantBindPageQuery)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindPageQuery.getTenantId()), TenantBind::getTenantId, tenantBindPageQuery.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindPageQuery.getUserId()), TenantBind::getUserId, tenantBindPageQuery.getUserId());
         }
         return queryWrapper;
     }

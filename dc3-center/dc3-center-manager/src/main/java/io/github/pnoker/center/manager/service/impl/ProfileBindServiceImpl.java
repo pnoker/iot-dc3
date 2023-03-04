@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.ProfileBindDto;
+import io.github.pnoker.center.manager.entity.query.ProfileBindPageQuery;
 import io.github.pnoker.center.manager.mapper.ProfileBindMapper;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -78,9 +78,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Boolean deleteByDeviceId(String deviceId) {
-        ProfileBindDto profileBindDto = new ProfileBindDto();
-        profileBindDto.setDeviceId(deviceId);
-        return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
+        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        profileBindPageQuery.setDeviceId(deviceId);
+        return profileBindMapper.delete(fuzzyQuery(profileBindPageQuery)) > 0;
     }
 
     /**
@@ -88,10 +88,10 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId) {
-        ProfileBindDto profileBindDto = new ProfileBindDto();
-        profileBindDto.setProfileId(profileId);
-        profileBindDto.setDeviceId(deviceId);
-        return profileBindMapper.delete(fuzzyQuery(profileBindDto)) > 0;
+        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        profileBindPageQuery.setProfileId(profileId);
+        profileBindPageQuery.setDeviceId(deviceId);
+        return profileBindMapper.delete(fuzzyQuery(profileBindPageQuery)) > 0;
     }
 
     /**
@@ -124,10 +124,10 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public ProfileBind selectByDeviceIdAndProfileId(String deviceId, String profileId) {
-        ProfileBindDto profileBindDto = new ProfileBindDto();
-        profileBindDto.setDeviceId(deviceId);
-        profileBindDto.setProfileId(profileId);
-        ProfileBind profileBind = profileBindMapper.selectOne(fuzzyQuery(profileBindDto));
+        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        profileBindPageQuery.setDeviceId(deviceId);
+        profileBindPageQuery.setProfileId(profileId);
+        ProfileBind profileBind = profileBindMapper.selectOne(fuzzyQuery(profileBindPageQuery));
         if (null == profileBind) {
             throw new NotFoundException();
         }
@@ -139,9 +139,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Set<String> selectDeviceIdsByProfileId(String profileId) {
-        ProfileBindDto profileBindDto = new ProfileBindDto();
-        profileBindDto.setProfileId(profileId);
-        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));
+        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        profileBindPageQuery.setProfileId(profileId);
+        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
         return profileBinds.stream().map(ProfileBind::getDeviceId).collect(Collectors.toSet());
     }
 
@@ -150,9 +150,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Set<String> selectProfileIdsByDeviceId(String deviceId) {
-        ProfileBindDto profileBindDto = new ProfileBindDto();
-        profileBindDto.setDeviceId(deviceId);
-        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindDto));
+        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        profileBindPageQuery.setDeviceId(deviceId);
+        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
         return profileBinds.stream().map(ProfileBind::getProfileId).collect(Collectors.toSet());
     }
 
@@ -160,22 +160,22 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public Page<ProfileBind> list(ProfileBindDto profileBindDto) {
-        if (ObjectUtil.isNull(profileBindDto.getPage())) {
-            profileBindDto.setPage(new Pages());
+    public Page<ProfileBind> list(ProfileBindPageQuery profileBindPageQuery) {
+        if (ObjectUtil.isNull(profileBindPageQuery.getPage())) {
+            profileBindPageQuery.setPage(new Pages());
         }
-        return profileBindMapper.selectPage(profileBindDto.getPage().convert(), fuzzyQuery(profileBindDto));
+        return profileBindMapper.selectPage(profileBindPageQuery.getPage().convert(), fuzzyQuery(profileBindPageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindDto profileBindDto) {
+    public LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindPageQuery profileBindPageQuery) {
         LambdaQueryWrapper<ProfileBind> queryWrapper = Wrappers.<ProfileBind>query().lambda();
-        if (ObjectUtil.isNotNull(profileBindDto)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileBindDto.getProfileId()), ProfileBind::getProfileId, profileBindDto.getProfileId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileBindDto.getDeviceId()), ProfileBind::getDeviceId, profileBindDto.getDeviceId());
+        if (ObjectUtil.isNotNull(profileBindPageQuery)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileBindPageQuery.getProfileId()), ProfileBind::getProfileId, profileBindPageQuery.getProfileId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileBindPageQuery.getDeviceId()), ProfileBind::getDeviceId, profileBindPageQuery.getDeviceId());
         }
         return queryWrapper;
     }

@@ -14,7 +14,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.api.center.manager.dto.DeviceDto;
+import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.Device;
 
@@ -27,7 +27,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DeviceService extends Service<Device, DeviceDto> {
+public interface DeviceService extends Service<Device, DevicePageQuery> {
 
     /**
      * 根据 设备Name 和 租户Id 查询设备

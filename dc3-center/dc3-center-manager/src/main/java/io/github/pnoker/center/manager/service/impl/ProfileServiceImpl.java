@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.ProfileDto;
+import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
@@ -134,33 +134,33 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Page<Profile> list(ProfileDto profileDto) {
-        if (ObjectUtil.isNull(profileDto.getPage())) {
-            profileDto.setPage(new Pages());
+    public Page<Profile> list(ProfilePageQuery profilePageQuery) {
+        if (ObjectUtil.isNull(profilePageQuery.getPage())) {
+            profilePageQuery.setPage(new Pages());
         }
-        return profileMapper.selectPageWithDevice(profileDto.getPage().convert(), customFuzzyQuery(profileDto), profileDto.getDeviceId());
+        return profileMapper.selectPageWithDevice(profilePageQuery.getPage().convert(), customFuzzyQuery(profilePageQuery), profilePageQuery.getDeviceId());
     }
 
     @Override
-    public LambdaQueryWrapper<Profile> fuzzyQuery(ProfileDto profileDto) {
+    public LambdaQueryWrapper<Profile> fuzzyQuery(ProfilePageQuery profilePageQuery) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        if (ObjectUtil.isNotEmpty(profileDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getProfileName()), Profile::getProfileName, profileDto.getProfileName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getProfileShareFlag()), Profile::getProfileShareFlag, profileDto.getProfileShareFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(profileDto.getEnableFlag()), Profile::getEnableFlag, profileDto.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(profileDto.getTenantId()), Profile::getTenantId, profileDto.getTenantId());
+        if (ObjectUtil.isNotEmpty(profilePageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(profilePageQuery.getProfileName()), Profile::getProfileName, profilePageQuery.getProfileName());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(profilePageQuery.getProfileShareFlag()), Profile::getProfileShareFlag, profilePageQuery.getProfileShareFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(profilePageQuery.getEnableFlag()), Profile::getEnableFlag, profilePageQuery.getEnableFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotBlank(profilePageQuery.getTenantId()), Profile::getTenantId, profilePageQuery.getTenantId());
         }
         return queryWrapper;
     }
 
-    public LambdaQueryWrapper<Profile> customFuzzyQuery(ProfileDto profileDto) {
+    public LambdaQueryWrapper<Profile> customFuzzyQuery(ProfilePageQuery profilePageQuery) {
         QueryWrapper<Profile> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
-        if (ObjectUtil.isNotNull(profileDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(profileDto.getProfileName()), "dp.name", profileDto.getProfileName());
-            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getProfileShareFlag()), "dp.share", profileDto.getProfileShareFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(profileDto.getEnableFlag()), "dp.enable", profileDto.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profileDto.getTenantId()), "dp.tenant_id", profileDto.getTenantId());
+        if (ObjectUtil.isNotNull(profilePageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(profilePageQuery.getProfileName()), "dp.name", profilePageQuery.getProfileName());
+            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileShareFlag()), "dp.share", profilePageQuery.getProfileShareFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getEnableFlag()), "dp.enable", profilePageQuery.getEnableFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profilePageQuery.getTenantId()), "dp.tenant_id", profilePageQuery.getTenantId());
         }
         return queryWrapper.lambda();
     }

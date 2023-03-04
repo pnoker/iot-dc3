@@ -17,8 +17,6 @@ package io.github.pnoker.center.data.init;
 import io.github.pnoker.center.data.service.ScheduleService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,12 +26,6 @@ import javax.annotation.Resource;
  * @since 2022.1.0
  */
 @Component
-@EnableFeignClients(basePackages = {
-        "io.github.pnoker.api.center.manager.*"
-})
-@ComponentScan(basePackages = {
-        "io.github.pnoker.api.center.manager"
-})
 public class DataInitRunner implements ApplicationRunner {
 
     @Resource

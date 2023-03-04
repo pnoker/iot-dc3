@@ -16,8 +16,6 @@ package io.github.pnoker.gateway.init;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,12 +25,6 @@ import org.springframework.stereotype.Component;
  * @since 2022.1.0
  */
 @Component
-@EnableFeignClients(basePackages = {
-        "io.github.pnoker.api.center.auth.*",
-})
-@ComponentScan(basePackages = {
-        "io.github.pnoker.api.center.auth",
-})
 public class GatewayInitRunner implements ApplicationRunner {
 
     @Override

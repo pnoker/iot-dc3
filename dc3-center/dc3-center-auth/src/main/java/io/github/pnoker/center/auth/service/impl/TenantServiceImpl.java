@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.auth.dto.TenantDto;
+import io.github.pnoker.center.auth.entity.query.TenantPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -95,18 +95,18 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Page<Tenant> list(TenantDto tenantDto) {
-        if (ObjectUtil.isNull(tenantDto.getPage())) {
-            tenantDto.setPage(new Pages());
+    public Page<Tenant> list(TenantPageQuery tenantPageQuery) {
+        if (ObjectUtil.isNull(tenantPageQuery.getPage())) {
+            tenantPageQuery.setPage(new Pages());
         }
-        return tenantMapper.selectPage(tenantDto.getPage().convert(), fuzzyQuery(tenantDto));
+        return tenantMapper.selectPage(tenantPageQuery.getPage().convert(), fuzzyQuery(tenantPageQuery));
     }
 
     @Override
-    public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantDto tenantDto) {
+    public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery tenantPageQuery) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        if (ObjectUtil.isNotNull(tenantDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(tenantDto.getTenantName()), Tenant::getTenantName, tenantDto.getTenantName());
+        if (ObjectUtil.isNotNull(tenantPageQuery)) {
+            queryWrapper.like(CharSequenceUtil.isNotBlank(tenantPageQuery.getTenantName()), Tenant::getTenantName, tenantPageQuery.getTenantName());
         }
         return queryWrapper;
     }

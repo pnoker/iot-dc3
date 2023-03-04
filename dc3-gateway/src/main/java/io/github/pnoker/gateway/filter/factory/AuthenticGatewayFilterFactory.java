@@ -28,7 +28,7 @@ import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.gateway.bean.TokenRequestHeader;
+import io.github.pnoker.gateway.entity.bean.TokenRequestHeader;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;

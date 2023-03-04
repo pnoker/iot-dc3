@@ -15,7 +15,7 @@
 package io.github.pnoker.center.manager.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.DictionaryDto;
+import io.github.pnoker.center.manager.entity.query.DictionaryPageQuery;
 import io.github.pnoker.common.entity.common.Dictionary;
 
 /**
@@ -29,34 +29,34 @@ public interface DictionaryService {
     /**
      * 获取驱动字典带分页的列表
      *
-     * @param dictionaryDto 字典和分页参数
-     * @return 带分页的 {@link DictionaryDto}
+     * @param dictionaryPageQuery 字典和分页参数
+     * @return 带分页的 {@link DictionaryPageQuery}
      */
-    Page<Dictionary> driverDictionary(DictionaryDto dictionaryDto);
+    Page<Dictionary> driverDictionary(DictionaryPageQuery dictionaryPageQuery);
 
     /**
      * 获取设备字典带分页的列表
      *
-     * @param dictionaryDto 字典和分页参数
-     * @return 带分页的 {@link DictionaryDto}
+     * @param dictionaryPageQuery 字典和分页参数
+     * @return 带分页的 {@link DictionaryPageQuery}
      */
-    Page<Dictionary> deviceDictionary(DictionaryDto dictionaryDto);
+    Page<Dictionary> deviceDictionary(DictionaryPageQuery dictionaryPageQuery);
 
     /**
      * 获取模板字典带分页的列表
      *
-     * @param dictionaryDto 字典和分页参数
-     * @return 带分页的 {@link DictionaryDto}
+     * @param dictionaryPageQuery 字典和分页参数
+     * @return 带分页的 {@link DictionaryPageQuery}
      */
-    Page<Dictionary> profileDictionary(DictionaryDto dictionaryDto);
+    Page<Dictionary> profileDictionary(DictionaryPageQuery dictionaryPageQuery);
 
     /**
      * 带分页的列表
      * profile/device
      *
-     * @param dictionaryDto 字典和分页参数
-     * @return 带分页的 {@link DictionaryDto}
+     * @param dictionaryPageQuery 字典和分页参数
+     * @return 带分页的 {@link DictionaryPageQuery}
      */
-    Page<Dictionary> pointDictionary(DictionaryDto dictionaryDto);
+    Page<Dictionary> pointDictionary(DictionaryPageQuery dictionaryPageQuery);
 
 }

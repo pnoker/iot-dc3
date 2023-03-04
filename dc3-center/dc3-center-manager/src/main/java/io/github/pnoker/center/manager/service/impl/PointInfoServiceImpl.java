@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.PointInfoDto;
+import io.github.pnoker.center.manager.entity.query.PointInfoPageQuery;
 import io.github.pnoker.center.manager.mapper.PointInfoMapper;
 import io.github.pnoker.center.manager.service.PointInfoService;
 import io.github.pnoker.center.manager.service.PointService;
@@ -181,23 +181,23 @@ public class PointInfoServiceImpl implements PointInfoService {
      * {@inheritDoc}
      */
     @Override
-    public Page<PointInfo> list(PointInfoDto pointInfoDto) {
-        if (ObjectUtil.isNull(pointInfoDto.getPage())) {
-            pointInfoDto.setPage(new Pages());
+    public Page<PointInfo> list(PointInfoPageQuery pointInfoPageQuery) {
+        if (ObjectUtil.isNull(pointInfoPageQuery.getPage())) {
+            pointInfoPageQuery.setPage(new Pages());
         }
-        return pointInfoMapper.selectPage(pointInfoDto.getPage().convert(), fuzzyQuery(pointInfoDto));
+        return pointInfoMapper.selectPage(pointInfoPageQuery.getPage().convert(), fuzzyQuery(pointInfoPageQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<PointInfo> fuzzyQuery(PointInfoDto pointInfoDto) {
+    public LambdaQueryWrapper<PointInfo> fuzzyQuery(PointInfoPageQuery pointInfoPageQuery) {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        if (ObjectUtil.isNotNull(pointInfoDto)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoDto.getPointAttributeId()), PointInfo::getPointAttributeId, pointInfoDto.getPointAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoDto.getDeviceId()), PointInfo::getDeviceId, pointInfoDto.getDeviceId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoDto.getPointId()), PointInfo::getPointId, pointInfoDto.getPointId());
+        if (ObjectUtil.isNotNull(pointInfoPageQuery)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointAttributeId()), PointInfo::getPointAttributeId, pointInfoPageQuery.getPointAttributeId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getDeviceId()), PointInfo::getDeviceId, pointInfoPageQuery.getDeviceId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointId()), PointInfo::getPointId, pointInfoPageQuery.getPointId());
         }
         return queryWrapper;
     }

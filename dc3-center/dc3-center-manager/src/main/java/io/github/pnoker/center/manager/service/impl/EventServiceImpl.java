@@ -17,8 +17,8 @@ package io.github.pnoker.center.manager.service.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.dto.DeviceEventDto;
-import io.github.pnoker.api.center.manager.dto.DriverEventDto;
+import io.github.pnoker.center.manager.entity.query.DeviceEventPageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverEventPageQuery;
 import io.github.pnoker.center.manager.service.EventService;
 import io.github.pnoker.common.entity.DeviceEvent;
 import io.github.pnoker.common.entity.DriverEvent;
@@ -88,7 +88,7 @@ public class EventServiceImpl implements EventService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverEvent> driverEvent(DriverEventDto driverEventDto) {
+    public Page<DriverEvent> driverEvent(DriverEventPageQuery driverEventPageQuery) {
         return null;
     }
 
@@ -96,19 +96,19 @@ public class EventServiceImpl implements EventService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DeviceEvent> deviceEvent(DeviceEventDto deviceEventDto) {
+    public Page<DeviceEvent> deviceEvent(DeviceEventPageQuery deviceEventPageQuery) {
         Criteria criteria = new Criteria();
-        if (null == deviceEventDto) {
-            deviceEventDto = new DeviceEventDto();
+        if (null == deviceEventPageQuery) {
+            deviceEventPageQuery = new DeviceEventPageQuery();
         }
-        if (CharSequenceUtil.isNotEmpty(deviceEventDto.getDeviceId())) {
-            criteria.and("deviceId").is(deviceEventDto.getDeviceId());
+        if (CharSequenceUtil.isNotEmpty(deviceEventPageQuery.getDeviceId())) {
+            criteria.and("deviceId").is(deviceEventPageQuery.getDeviceId());
         }
-        if (CharSequenceUtil.isNotEmpty(deviceEventDto.getPointId())) {
-            criteria.and("pointId").is(deviceEventDto.getPointId());
+        if (CharSequenceUtil.isNotEmpty(deviceEventPageQuery.getPointId())) {
+            criteria.and("pointId").is(deviceEventPageQuery.getPointId());
         }
 
-        Pages pages = null == deviceEventDto.getPage() ? new Pages() : deviceEventDto.getPage();
+        Pages pages = null == deviceEventPageQuery.getPage() ? new Pages() : deviceEventPageQuery.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and("createTime").gte(pages.getStartTime()).lte(pages.getEndTime());
         }
