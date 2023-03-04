@@ -93,5 +93,4 @@ public interface UserBuilder {
      * @return EntityVO Array
      */
     List<UserVO> buildVOListByBOList(List<UserBO> entityBOList);
-
 }

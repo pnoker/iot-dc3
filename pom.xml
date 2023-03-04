@@ -151,6 +151,17 @@
             </snapshots>
         </repository>
         <repository>
+            <id>maven</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>sonatype</id>
             <name>Sonatype Repository</name>
             <url>https://s01.oss.sonatype.org/content/groups/public</url>
