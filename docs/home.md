@@ -17,7 +17,7 @@
 
 <p align="center">
 <a href='http://ccflow.org/?frm=ZHY'>
-<img src="http://ccflow.org/AD/Bar2023.jpg"  width="400"></img>
+<img src="https://ccfast.cc/AD/Bar2023.jpg"  width="400"></img>
 </a>
 </p>
 
