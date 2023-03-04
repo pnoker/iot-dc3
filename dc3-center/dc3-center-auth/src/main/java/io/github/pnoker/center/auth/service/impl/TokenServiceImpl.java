@@ -91,7 +91,7 @@ public class TokenServiceImpl implements TokenService {
             String redisSaltValue = redisUtil.getKey(redisSaltKey);
             if (CharSequenceUtil.isNotEmpty(redisSaltValue)
                     && redisSaltValue.equals(salt)
-                    && DecodeUtil.md5(userPassword.getPassword() + redisSaltValue).equals(password)) {
+                    && DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue).equals(password)) {
                 String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.DOUBLE_COLON + username + SymbolConstant.HASHTAG + tenant.getId();
                 String token = KeyUtil.generateToken(username, redisSaltValue, tenant.getId());
                 redisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);

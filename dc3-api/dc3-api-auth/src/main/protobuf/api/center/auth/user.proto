@@ -1,0 +1,51 @@
+/*
+ * Copyright 2016-present Pnoker All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.center.auth;
+
+// 配置相关
+option java_package = "io.github.pnoker.api.center.auth";
+option java_outer_classname = "UserProto";
+option objc_class_prefix = "Auth";
+option java_multiple_files = true;
+
+import "api/common/r.proto";
+import "api/common/common.proto";
+import "api/common/enable_flag_enum.proto";
+
+// 接口类
+service UserApi {
+  rpc selectByName (NameQuery) returns (RUser);
+}
+
+// selectByName Query
+message NameQuery {
+  string name = 1;
+}
+
+// R of User
+message RUser {
+  api.common.R result = 1; // 结果
+  User data = 2; // 数据
+}
+
+// User
+message User {
+  string login_name = 1; // 登录名称
+  string user_ext_id = 2; // 用户拓展ID
+  string user_password_id = 3; // 用户密码ID
+  api.common.EnableFlagEnum enable_flag = 4; // 使能标识
+}

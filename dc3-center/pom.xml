@@ -40,6 +40,12 @@
 
     <dependencies>
 
+        <!-- gRpc Server + Client -->
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-spring-boot-starter</artifactId>
+        </dependency>
+
         <!-- DC3 Center Register Client Starter -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
