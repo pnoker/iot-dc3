@@ -14,7 +14,12 @@
 
 
 ### 合作伙伴
-[![驰骋工作流](http://ccflow.org/AD/ADccflowTitle.gif)](http://ccflow.org/?frm=ZHY)
+
+<p align="center">
+<a href='http://ccflow.org/?frm=ZHY'>
+<img src="http://ccflow.org/AD/Bar2023.jpg"  width="400"></img>
+</a>
+</p>
 
 
 
