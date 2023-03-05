@@ -16,17 +16,14 @@ package io.github.pnoker.center.auth.api;
 
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.NameQuery;
-import io.github.pnoker.api.center.auth.RUserDTO;
-import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.center.auth.UserDTO;
-import io.github.pnoker.api.common.BaseDTO;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
+import io.github.pnoker.api.center.auth.LoginQuery;
+import io.github.pnoker.api.center.auth.RTokenDTO;
+import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.api.common.RDTO;
-import io.github.pnoker.center.auth.service.UserService;
-import io.github.pnoker.center.auth.utils.BuilderUtil;
+import io.github.pnoker.center.auth.entity.bean.TokenValid;
+import io.github.pnoker.center.auth.service.TokenService;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.utils.TimeUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -34,55 +31,42 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import javax.annotation.Resource;
 
 /**
- * User Api
+ * Token Api
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @GrpcService
-public class UserApi extends UserApiGrpc.UserApiImplBase {
+public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
 
     @Resource
-    private UserService userService;
+    private TokenService tokenService;
 
     @Override
-    public void selectByName(NameQuery request, StreamObserver<RUserDTO> responseObserver) {
-        RUserDTO.Builder builder = RUserDTO.newBuilder();
+    public void checkTokenValid(LoginQuery request, StreamObserver<RTokenDTO> responseObserver) {
+        RTokenDTO.Builder builder = RTokenDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
         builder.setResult(rBuilder);
-        User select = userService.selectByLoginName(request.getName(), false);
+        TokenValid select = tokenService.checkTokenValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
+        } else if (!select.isValid()) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.TOKEN_INVALID.getCode());
+            rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getMessage());
         } else {
+            String expireTime = TimeUtil.completeFormat(select.getExpireTime());
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
-            UserDTO user = buildDTOByDO(select);
-            builder.setData(user);
+            builder.setData(expireTime);
         }
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
 
-
-    /**
-     * DO to DTO
-     *
-     * @param entityDO User
-     * @return UserDTO
-     */
-    private UserDTO buildDTOByDO(User entityDO) {
-        UserDTO.Builder builder = UserDTO.newBuilder();
-        BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
-        builder.setBase(baseDTO);
-        builder.setLoginName(entityDO.getLoginName());
-        builder.setUserExtId(entityDO.getUserExtId());
-        builder.setUserPasswordId(entityDO.getUserPasswordId());
-        builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
-        return builder.build();
-    }
 }

@@ -14,17 +14,18 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import io.github.pnoker.api.center.auth.feign.TenantClient;
+import io.github.pnoker.api.center.auth.CodeQuery;
+import io.github.pnoker.api.center.auth.RTenantDTO;
+import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.driver.DriverRegister;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.PointAttribute;
-import io.github.pnoker.common.model.Tenant;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -42,8 +43,8 @@ import java.util.Map;
 @Service
 public class DriverSdkServiceImpl implements DriverSdkService {
 
-    @Resource
-    private TenantClient tenantClient;
+    @GrpcClient("tenantApi")
+    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
     @Resource
     private DriverService driverService;
@@ -78,14 +79,14 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      */
     private Driver registerDriver(DriverRegister driverRegister) {
         // check tenant
-        R<Tenant> tenantR = tenantClient.selectByCode(driverRegister.getTenant());
-        if (!tenantR.isOk()) {
-            throw new ServiceException("Invalid {}, {}", driverRegister.getTenant(), tenantR.getMessage());
+        RTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(driverRegister.getTenant()).build());
+        if (!rTenantDTO.getResult().getOk()) {
+            throw new ServiceException("Invalid {}, {}", driverRegister.getTenant(), rTenantDTO.getResult().getMessage());
         }
 
         // register driver
         Driver driver = driverRegister.getDriver();
-        driver.setTenantId(tenantR.getData().getId());
+        driver.setTenantId(rTenantDTO.getData().getBase().getId());
         log.info("Register driver {}", driver);
         try {
             Driver byServiceName = driverService.selectByServiceName(driver.getServiceName());

@@ -55,6 +55,7 @@ public class TokenController {
      */
     @PostMapping("/salt")
     public R<String> generateSalt(@Validated(Update.class) @RequestBody Login login) {
+        // todo 没有校验tenant参数，请拆分为独立的VO
         String salt = tokenService.generateSalt(login.getName(), login.getTenant());
         return null != salt ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }

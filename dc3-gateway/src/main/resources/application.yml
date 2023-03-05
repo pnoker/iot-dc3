@@ -20,6 +20,13 @@ server:
       worker: 20
     buffer-size: 512
 
+grpc:
+  client:
+    dc3-center-auth:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
 spring:
   application:
     name: @project.artifactId@
