@@ -152,7 +152,7 @@ public class PointValueServiceImpl implements PointValueService {
             return Collections.emptyList();
         }
 
-        String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.UNDERSCORE;
+        String prefix = CacheConstant.Prefix.REAL_TIME_VALUE_KEY_PREFIX + deviceId + CommonConstant.Symbol.DOT;
         List<String> keys = pointIds.stream().map(pointId -> prefix + pointId).collect(Collectors.toList());
         List<PointValue> pointValues = redisUtil.getKey(keys, PointValue.class);
         return pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
