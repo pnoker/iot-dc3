@@ -16,21 +16,17 @@ package io.github.pnoker.gateway.filter.factory;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.feign.TenantClient;
-import io.github.pnoker.api.center.auth.feign.TokenClient;
-import io.github.pnoker.api.center.auth.feign.UserClient;
+import io.github.pnoker.api.center.auth.*;
+import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.auth.Login;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.model.User;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.gateway.entity.bean.TokenRequestHeader;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -45,7 +41,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 
 /**
@@ -67,12 +62,12 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
     static class AuthenticGatewayFilter implements GatewayFilter {
         private static AuthenticGatewayFilter gatewayFilter;
 
-        @Resource
-        private TenantClient tenantClient;
-        @Resource
-        private UserClient userClient;
-        @Resource
-        private TokenClient tokenClient;
+        @GrpcClient("dc3-center-auth")
+        private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
+        @GrpcClient("dc3-center-auth")
+        private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
+        @GrpcClient("dc3-center-auth")
+        private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
 
         @PostConstruct
         public void init() {
@@ -89,9 +84,9 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 if (ObjectUtil.isEmpty(tenant)) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
-                // todo 后期全部替换为grpc
-                R<Tenant> tenantR = gatewayFilter.tenantClient.selectByCode(tenant);
-                if (!tenantR.isOk() || !EnableFlagEnum.ENABLE.equals(tenantR.getData().getEnableFlag())) {
+
+                RTenantDTO rTenantDTO = gatewayFilter.tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(tenant).build());
+                if (!rTenantDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(rTenantDTO.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
 
@@ -100,9 +95,9 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 if (ObjectUtil.isEmpty(user)) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
-                // todo 后期全部替换为grpc
-                R<User> userR = gatewayFilter.userClient.selectByName(user);
-                if (!userR.isOk() || !EnableFlagEnum.ENABLE.equals(userR.getData().getEnableFlag())) {
+
+                RUserDTO rUserDTO = gatewayFilter.userApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
+                if (!rUserDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(rUserDTO.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 
@@ -111,23 +106,22 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                 if (ObjectUtil.isEmpty(token) || !CharSequenceUtil.isAllNotEmpty(token.getSalt(), token.getToken())) {
                     throw new UnAuthorizedException("Invalid request token header");
                 }
-                Login login = new Login();
-                login.setTenant(tenantR.getData().getTenantName());
-                login.setName(userR.getData().getLoginName());
-                login.setSalt(token.getSalt());
-                login.setToken(token.getToken());
-                // todo 后期全部替换为grpc
-                R<String> tokenR = gatewayFilter.tokenClient.checkTokenValid(login);
-                if (!tokenR.isOk()) {
+
+                LoginQuery login = LoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantName())
+                        .setName(rUserDTO.getData().getLoginName())
+                        .setSalt(token.getSalt())
+                        .setToken(token.getToken()).build();
+                RTokenDTO rTokenDTO = gatewayFilter.tokenApiBlockingStub.checkTokenValid(login);
+                if (!rTokenDTO.getResult().getOk()) {
                     throw new UnAuthorizedException("Invalid request token header");
                 }
 
                 ServerHttpRequest build = request.mutate().headers(
                         httpHeader -> {
-                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT_ID, tenantR.getData().getId());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT, tenantR.getData().getTenantName());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_USER_ID, userR.getData().getId());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_USER, userR.getData().getLoginName());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT_ID, rTenantDTO.getData().getBase().getId());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT, rTenantDTO.getData().getTenantName());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_USER_ID, rUserDTO.getData().getBase().getId());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_USER, rUserDTO.getData().getLoginName());
                         }
                 ).build();
 

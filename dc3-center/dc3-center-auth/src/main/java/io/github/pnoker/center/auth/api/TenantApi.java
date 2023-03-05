@@ -16,17 +16,17 @@ package io.github.pnoker.center.auth.api;
 
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.NameQuery;
-import io.github.pnoker.api.center.auth.RUserDTO;
-import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.center.auth.UserDTO;
+import io.github.pnoker.api.center.auth.CodeQuery;
+import io.github.pnoker.api.center.auth.RTenantDTO;
+import io.github.pnoker.api.center.auth.TenantApiGrpc;
+import io.github.pnoker.api.center.auth.TenantDTO;
 import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.RDTO;
-import io.github.pnoker.center.auth.service.UserService;
+import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.center.auth.utils.BuilderUtil;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.model.Tenant;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -34,24 +34,24 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import javax.annotation.Resource;
 
 /**
- * User Api
+ * Tenant Api
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @GrpcService
-public class UserApi extends UserApiGrpc.UserApiImplBase {
+public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
 
     @Resource
-    private UserService userService;
+    private TenantService tenantService;
 
     @Override
-    public void selectByName(NameQuery request, StreamObserver<RUserDTO> responseObserver) {
-        RUserDTO.Builder builder = RUserDTO.newBuilder();
+    public void selectByCode(CodeQuery request, StreamObserver<RTenantDTO> responseObserver) {
+        RTenantDTO.Builder builder = RTenantDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
         builder.setResult(rBuilder);
-        User select = userService.selectByLoginName(request.getName(), false);
+        Tenant select = tenantService.selectByCode(request.getCode());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -60,8 +60,8 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
-            UserDTO user = buildDTOByDO(select);
-            builder.setData(user);
+            TenantDTO tenant = buildDTOByDO(select);
+            builder.setData(tenant);
         }
 
         responseObserver.onNext(builder.build());
@@ -72,16 +72,15 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
     /**
      * DO to DTO
      *
-     * @param entityDO User
-     * @return UserDTO
+     * @param entityDO Tenant
+     * @return TenantDTO
      */
-    private UserDTO buildDTOByDO(User entityDO) {
-        UserDTO.Builder builder = UserDTO.newBuilder();
+    private TenantDTO buildDTOByDO(Tenant entityDO) {
+        TenantDTO.Builder builder = TenantDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
-        builder.setLoginName(entityDO.getLoginName());
-        builder.setUserExtId(entityDO.getUserExtId());
-        builder.setUserPasswordId(entityDO.getUserPasswordId());
+        builder.setTenantName(entityDO.getTenantName());
+        builder.setTenantCode(entityDO.getTenantCode());
         builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
         return builder.build();
     }

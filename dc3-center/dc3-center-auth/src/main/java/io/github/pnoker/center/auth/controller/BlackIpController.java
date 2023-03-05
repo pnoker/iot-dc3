@@ -171,7 +171,7 @@ public class BlackIpController {
     @GetMapping("/check/{ip}")
     public R<Boolean> checkBlackIpValid(@NotNull @PathVariable(value = "ip") String ip) {
         try {
-            return blackIpService.checkBlackIpValid(ip) ? R.ok() : R.fail();
+            return Boolean.TRUE.equals(blackIpService.checkBlackIpValid(ip)) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

@@ -195,7 +195,7 @@ create table dc3_point
     point_code      varchar(128)   default ''                                                  not null comment '位号编号',
     point_type_flag tinyint(4)     default 0                                                   not null comment '位号类型标识',
     rw_flag         tinyint(4)     default 0                                                   not null comment '读写标识',
-    base            decimal(15, 6) default 0                                                   not null comment '基础值',
+    base_value      decimal(15, 6) default 0                                                   not null comment '基础值',
     multiple        decimal(15, 6) default 1                                                   not null comment '比例系数',
     accrue_flag     tinyint(4)     default 0                                                   not null comment '累计标识',
     value_decimal   tinyint(4)     default 6                                                   not null comment '数据精度',
@@ -687,13 +687,15 @@ VALUES (0, 'pnoker', 0, 0, 1, '用户', 0, 'dc3', '2016-10-01 00:00:00', 0, 'dc3
 -- Records of dc3_user
 -- ----------------------------
 INSERT INTO dc3_user_password
-VALUES (0, '10e339be1130a90dc1b9ff0332abced6', '用户密码', 0, 'dc3', '2016-10-01 00:00:00', 0, 'dc3', '2016-10-01 00:00:00', 0);
+VALUES (0, '10e339be1130a90dc1b9ff0332abced6', '用户密码', 0, 'dc3', '2016-10-01 00:00:00', 0, 'dc3',
+        '2016-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_user
 -- ----------------------------
 INSERT INTO dc3_user_ext
-VALUES (0, '张红元', 'pnoker', '18304071393', 'pnokers@icloud.com', '用户拓展信息', 0, 'dc3', '2016-10-01 00:00:00', 0, 'dc3', '2016-10-01 00:00:00', 0);
+VALUES (0, '张红元', 'pnoker', '18304071393', 'pnokers@icloud.com', '用户拓展信息', 0, 'dc3', '2016-10-01 00:00:00', 0,
+        'dc3', '2016-10-01 00:00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_tenant_bind

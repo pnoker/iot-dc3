@@ -14,10 +14,12 @@
 
 package io.github.pnoker.gateway.filter;
 
-import io.github.pnoker.api.center.auth.feign.BlackIpClient;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.api.center.auth.BlackIpApiGrpc;
+import io.github.pnoker.api.center.auth.IpQuery;
+import io.github.pnoker.api.center.auth.RBlackIpDTO;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -25,8 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import javax.annotation.Resource;
 
 /**
  * 自定义Ip黑名单过滤器
@@ -37,8 +37,8 @@ import javax.annotation.Resource;
 @Slf4j
 public class BlackIpGlobalFilter implements GlobalFilter, Ordered {
 
-    @Resource
-    private BlackIpClient blackIpClient;
+    @GrpcClient("dc3-center-auth")
+    private BlackIpApiGrpc.BlackIpApiBlockingStub blackIpApiBlockingStub;
 
     @Override
     public int getOrder() {
@@ -50,8 +50,8 @@ public class BlackIpGlobalFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         String remoteIp = GatewayUtil.getRemoteIp(request);
 
-        R<Boolean> blackIpValid = blackIpClient.checkBlackIpValid(remoteIp);
-        if (blackIpValid.isOk()) {
+        RBlackIpDTO rBlackIpDTO = blackIpApiBlockingStub.checkBlackIpValid(IpQuery.newBuilder().setIp(remoteIp).build());
+        if (rBlackIpDTO.getResult().getOk()) {
             log.error("Forbidden Ip: {}", remoteIp);
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             return exchange.getResponse().setComplete();

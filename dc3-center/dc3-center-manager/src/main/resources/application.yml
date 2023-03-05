@@ -15,6 +15,15 @@
 server:
   port: ${SERVER_PORT:8400}
 
+grpc:
+  server:
+    port: ${GRPC_SERVER_PORT:9400}
+  client:
+    dc3-center-auth:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
 spring:
   application:
     name: @project.artifactId@
