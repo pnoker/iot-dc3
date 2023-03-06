@@ -43,7 +43,7 @@ import java.util.Map;
 @Service
 public class DriverSdkServiceImpl implements DriverSdkService {
 
-    @GrpcClient("tenantApi")
+    @GrpcClient("dc3-center-auth")
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
     @Resource
