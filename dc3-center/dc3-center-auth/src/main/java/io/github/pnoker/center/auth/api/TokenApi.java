@@ -47,7 +47,6 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
     public void checkTokenValid(LoginQuery request, StreamObserver<RTokenDTO> responseObserver) {
         RTokenDTO.Builder builder = RTokenDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        builder.setResult(rBuilder);
         TokenValid select = tokenService.checkTokenValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
@@ -65,6 +64,7 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
             builder.setData(expireTime);
         }
 
+        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

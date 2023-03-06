@@ -44,7 +44,6 @@ public class BlackIpApi extends BlackIpApiGrpc.BlackIpApiImplBase {
     public void checkBlackIpValid(IpQuery request, StreamObserver<RBlackIpDTO> responseObserver) {
         RBlackIpDTO.Builder builder = RBlackIpDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        builder.setResult(rBuilder);
         Boolean ipValid = blackIpService.checkBlackIpValid(request.getIp());
         if (!Boolean.TRUE.equals(ipValid)) {
             rBuilder.setOk(false);
@@ -57,6 +56,7 @@ public class BlackIpApi extends BlackIpApiGrpc.BlackIpApiImplBase {
             builder.setData(true);
         }
 
+        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
