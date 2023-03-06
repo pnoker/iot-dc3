@@ -38,8 +38,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -70,8 +70,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -112,8 +112,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -154,8 +154,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -183,8 +183,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -212,8 +212,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -241,8 +241,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -270,8 +270,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -299,8 +299,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -328,8 +328,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -357,8 +357,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -386,8 +386,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -407,8 +407,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -431,8 +431,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -454,8 +454,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -478,8 +478,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -502,8 +502,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -524,8 +524,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -550,8 +550,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -577,8 +577,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -597,8 +597,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -621,8 +621,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -642,8 +642,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -668,8 +668,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -691,8 +691,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -712,8 +712,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
