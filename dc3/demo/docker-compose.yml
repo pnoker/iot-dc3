@@ -80,7 +80,7 @@ services:
     restart: always
     environment:
       - DB_HOST=dc3-mysql
-      - DB_PORT=3306
+      - MYSQL_PORT=3306
       - DB_USERNAME=root
       - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
@@ -110,7 +110,7 @@ services:
     restart: always
     environment:
       - DB_HOST=dc3-mysql
-      - DB_PORT=3306
+      - MYSQL_PORT=3306
       - DB_USERNAME=root
       - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
@@ -150,7 +150,7 @@ services:
     restart: always
     environment:
       - DB_HOST=dc3-mysql
-      - DB_PORT=3306
+      - MYSQL_PORT=3306
       - DB_USERNAME=root
       - DB_PASSWORD=dc3
       - REDIS_HOST=dc3-redis
