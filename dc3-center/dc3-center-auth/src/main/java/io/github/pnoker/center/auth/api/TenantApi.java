@@ -50,7 +50,6 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
     public void selectByCode(CodeQuery request, StreamObserver<RTenantDTO> responseObserver) {
         RTenantDTO.Builder builder = RTenantDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        builder.setResult(rBuilder);
         Tenant select = tenantService.selectByCode(request.getCode());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
@@ -64,6 +63,7 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
             builder.setData(tenant);
         }
 
+        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

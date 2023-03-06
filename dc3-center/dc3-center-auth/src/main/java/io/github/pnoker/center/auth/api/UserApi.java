@@ -50,7 +50,6 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
     public void selectByName(NameQuery request, StreamObserver<RUserDTO> responseObserver) {
         RUserDTO.Builder builder = RUserDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        builder.setResult(rBuilder);
         User select = userService.selectByLoginName(request.getName(), false);
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
@@ -64,6 +63,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
             builder.setData(user);
         }
 
+        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
