@@ -19,13 +19,13 @@ services:
     build:
       context: ../
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3:2023.1.5.dev
 
   gateway:
     build:
       context: ../dc3-gateway/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2023.1.5.dev
     restart: always
     ports:
       - '8000:8000'
@@ -38,8 +38,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -49,7 +49,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-auth/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2023.1.5.dev
     restart: always
     ports:
       - '8300:8300'
@@ -70,8 +70,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -81,7 +81,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-manager/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2023.1.5.dev
     restart: always
     ports:
       - '8400:8400'
@@ -112,8 +112,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -123,7 +123,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-data/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2023.1.5.dev
     restart: always
     ports:
       - '8500:8500'
@@ -154,8 +154,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -165,7 +165,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-virtual/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2023.1.5.dev
     restart: always
     ports:
       - '8600:8600'
@@ -183,8 +183,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -194,7 +194,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-plcs7/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2023.1.5.dev
     restart: always
     ports:
       - '8601:8601'
@@ -212,8 +212,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -223,7 +223,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-da/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2023.1.5.dev
     restart: always
     ports:
       - '8602:8602'
@@ -241,8 +241,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -252,7 +252,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-ua/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2023.1.5.dev
     restart: always
     ports:
       - '8603:8603'
@@ -270,8 +270,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -281,7 +281,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-listening-virtual/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:2023.1.5.dev
     restart: always
     ports:
       - '8700:8700'
@@ -299,8 +299,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -310,7 +310,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-mqtt/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2023.1.5.dev
     restart: always
     ports:
       - '8701:8701'
@@ -328,8 +328,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -339,7 +339,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-modbus-tcp/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2023.1.5.dev
     restart: always
     ports:
       - '8604:8604'
@@ -357,8 +357,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -368,7 +368,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-edge-gateway/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:2023.1.5.dev
     restart: always
     ports:
       - '8702:8702'
@@ -386,15 +386,15 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
           - dc3-driver-edge-gateway
 
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.3.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.5.dev
     restart: always
     ports:
       - '8100:8100'
@@ -407,8 +407,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -418,7 +418,7 @@ services:
     build:
       context: ./dependencies/mysql/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.1.5.dev
     restart: always
     ports:
       - '3306:3306'
@@ -431,8 +431,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -442,7 +442,7 @@ services:
     build:
       context: ./dependencies/mongo/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.1.5.dev
     restart: always
     ports:
       - '27017:27017'
@@ -454,8 +454,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -465,7 +465,7 @@ services:
     build:
       context: ./dependencies/opentsdb/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-opentsdb:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-opentsdb:2023.1.5.dev
     restart: always
     ports:
       - '4242:4242'
@@ -478,8 +478,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -489,7 +489,7 @@ services:
     build:
       context: ./dependencies/influxdb/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-influxdb:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-influxdb:2023.1.5.dev
     restart: always
     ports:
       - '8086:8086'
@@ -502,8 +502,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -513,7 +513,7 @@ services:
     build:
       context: ./dependencies/redis/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.1.5.dev
     restart: always
     ports:
       - '6379:6379'
@@ -524,8 +524,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -535,7 +535,7 @@ services:
     build:
       context: ./dependencies/rabbitmq/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.1.5.dev
     restart: always
     ports:
       - '5672:5672'
@@ -550,8 +550,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -561,7 +561,7 @@ services:
     build:
       context: ./dependencies/emqx/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2023.1.5.dev
     restart: always
     ports:
       - '1883:1883'
@@ -577,8 +577,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -588,7 +588,7 @@ services:
     build:
       context: ./dependencies/grafana/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2023.1.5.dev
     restart: always
     ports:
       - '3000:3000'
@@ -597,8 +597,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -621,8 +621,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -642,8 +642,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -653,7 +653,7 @@ services:
     build:
       context: ./dependencies/elasticsearch/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-elasticsearch:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-elasticsearch:2023.1.5.dev
     restart: always
     ports:
       - '9200:9200'
@@ -668,8 +668,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -679,7 +679,7 @@ services:
     build:
       context: ./dependencies/kibana/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-kibana:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-kibana:2023.1.5.dev
     restart: always
     ports:
       - '5601:5601'
@@ -691,8 +691,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -712,8 +712,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 20m
-        max-file: 20
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
