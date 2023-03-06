@@ -14,6 +14,22 @@
 
 # Development environment, customizable configuration
 spring:
+  datasource:
+    # Customize MySQL configuration
+    url: jdbc:mysql://${DB_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${DB_NAME:dc3}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+  rabbitmq:
+    # Customize Rabbitmq configuration
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
+    port: ${RABBITMQ_PORT:35672}
+  redis:
+    # Customize Redis configuration
+    host: ${REDIS_HOST:dc3-redis}
+    port: ${REDIS_PORT:36379}
+  data:
+    mongodb:
+      # Customize Mongo configuration
+      host: ${MONGO_HOST:dc3-mongo}
+      port: ${MONGO_PORT:37017}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
