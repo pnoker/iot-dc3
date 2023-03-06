@@ -13,6 +13,18 @@
 #
 
 # Development environment, customizable configuration
+# Development environment, customizable configuration
+driver:
+  schedule:
+    read:
+      corn: '0/5 * * * * ?'
+
+spring:
+  rabbitmq:
+    # Customize Rabbitmq configuration
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
+    port: ${RABBITMQ_PORT:35672}
+
 # Log config
 logging:
   level:

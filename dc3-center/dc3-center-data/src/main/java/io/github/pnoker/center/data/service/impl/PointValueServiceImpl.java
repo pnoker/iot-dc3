@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
 @Service
 public class PointValueServiceImpl implements PointValueService {
 
-    @GrpcClient("pointApi")
+    @GrpcClient("dc3-center-manager")
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
     @Resource
