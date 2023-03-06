@@ -418,7 +418,7 @@ services:
     build:
       context: ./dependencies/mysql/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.1.3.dev
     restart: always
     ports:
       - '3306:3306'
@@ -442,7 +442,7 @@ services:
     build:
       context: ./dependencies/mongo/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.1.3.dev
     restart: always
     ports:
       - '27017:27017'
@@ -513,7 +513,7 @@ services:
     build:
       context: ./dependencies/redis/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.1.3.dev
     restart: always
     ports:
       - '6379:6379'
@@ -535,7 +535,7 @@ services:
     build:
       context: ./dependencies/rabbitmq/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.1.3.dev
     restart: always
     ports:
       - '5672:5672'
