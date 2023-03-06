@@ -62,6 +62,11 @@
             <properties>
                 <!-- You can configure environment variables commonly used in development -->
                 <NODE_ENV>dev</NODE_ENV>
+                <DB_PORT>33306</DB_PORT>
+                <RABBITMQ_PORT>35672</RABBITMQ_PORT>
+                <REDIS_PORT>36379</REDIS_PORT>
+                <REDIS_PORT>37017</REDIS_PORT>
+                <MQTT_PORT>31883</MQTT_PORT>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
