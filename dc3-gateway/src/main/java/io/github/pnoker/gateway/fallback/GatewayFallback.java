@@ -14,6 +14,8 @@
 
 package io.github.pnoker.gateway.fallback;
 
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.HttpStatus;
@@ -40,11 +42,13 @@ public class GatewayFallback implements HandlerFunction<ServerResponse> {
 
     @Override
     public Mono<ServerResponse> handle(ServerRequest serverRequest) {
+        log.info(serverRequest.toString());
         Optional<Object> originalUris = serverRequest.attribute(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
         originalUris.ifPresent(originalUri -> log.error("Request Url:{} , Service Fallback", originalUri));
+        R<String> response = R.fail("No available server for this request");
         return ServerResponse
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(BodyInserters.fromValue("No available server for this request"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(response));
     }
 }

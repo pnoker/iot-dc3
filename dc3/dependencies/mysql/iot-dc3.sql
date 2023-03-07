@@ -918,9 +918,9 @@ CREATE TABLE `permissions`
 );
 
 INSERT INTO users (username, password, enabled)
-VALUES ('nacos', '$2a$10$EuWPZHzz32dJN7jexM34MOeYirDdFAZm2kuWj7VEOJhhZkDrxfvUu', TRUE);
+VALUES ('dc3', '$2a$10$wM3B4eTqtsbD0GQzPcSdnOVFCTY/eB1VTJqnLbQWq/Xk/PVyCz13i', TRUE);
 
 INSERT INTO roles (username, role)
-VALUES ('nacos', 'ROLE_ADMIN');
+VALUES ('dc3', 'ROLE_ADMIN');
 
 SET FOREIGN_KEY_CHECKS = 1;

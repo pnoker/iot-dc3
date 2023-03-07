@@ -24,8 +24,8 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
-
-eureka:
-  client:
-    tls:
-      enabled: ${EUREKA_TLS_ENABLE:false}
+  cloud:
+    nacos:
+      discovery:
+        group: ${user.name}
+        watch-delay: 5000

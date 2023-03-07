@@ -73,7 +73,7 @@ public class GatewayConfig {
 
     @Bean
     public RouterFunction<ServerResponse> routerFunction() {
-        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), gatewayFallback);
+        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), gatewayFallback);
     }
 
 }

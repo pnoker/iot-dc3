@@ -16,10 +16,10 @@ version: '3'
 
 services:
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.1.5.dev
-    restart: always
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.1.6.dev
+    restart: on-failure
     ports:
-      - '3306:3306'
+      - '33306:3306'
     environment:
       - MYSQL_ROOT_PASSWORD=dc3
     container_name: dc3-mysql
@@ -37,10 +37,10 @@ services:
           - dc3-mysql
 
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.1.5.dev
-    restart: always
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.1.6.dev
+    restart: on-failure
     ports:
-      - '27017:27017'
+      - '37017:27017'
     container_name: dc3-mongo
     hostname: dc3-mongo
     volumes:
@@ -57,10 +57,10 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.1.5.dev
-    restart: always
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.1.6.dev
+    restart: on-failure
     ports:
-      - '6379:6379'
+      - '36379:6379'
     container_name: dc3-redis
     hostname: dc3-redis
     volumes:
@@ -76,8 +76,8 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.1.5.dev
-    restart: always
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.1.6.dev
+    restart: on-failure
     ports:
       - '5672:5672'
       - '1883:1883'
@@ -97,6 +97,31 @@ services:
       dc3net:
         aliases:
           - dc3-rabbitmq
+
+  nacos:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.6.nacos.dev
+    restart: on-failure
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9555:9555"
+    environment:
+      - PREFER_HOST_MODE=hostname
+      - MODE=standalone
+      - SPRING_DATASOURCE_PLATFORM=mysql
+    container_name: dc3-center-register
+    hostname: dc3-center-register
+    volumes:
+      - logs:/home/nacos/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-register
 
 volumes:
   logs:

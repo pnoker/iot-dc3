@@ -17,7 +17,7 @@ version: '3'
 services:
   web:
     image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:demo
-    restart: always
+    restart: on-failure
     ports:
       - 80:80
       - 443:443
@@ -32,7 +32,7 @@ services:
 
   gateway:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:demo
-    restart: always
+    restart: on-failure
     environment:
       - EUREKA_HOST=dc3-center-register
       - EUREKA_PORT=8100
@@ -54,7 +54,7 @@ services:
 
   register:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:demo
-    restart: always
+    restart: on-failure
     environment:
       - EUREKA_DASHBOARD_PATH=/
       - EUREKA_HOST=dc3-center-register
@@ -77,7 +77,7 @@ services:
 
   auth:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:demo
-    restart: always
+    restart: on-failure
     environment:
       - DB_HOST=dc3-mysql
       - MYSQL_PORT=3306
@@ -107,7 +107,7 @@ services:
 
   manager:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:demo
-    restart: always
+    restart: on-failure
     environment:
       - DB_HOST=dc3-mysql
       - MYSQL_PORT=3306
@@ -147,7 +147,7 @@ services:
 
   data:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:demo
-    restart: always
+    restart: on-failure
     environment:
       - DB_HOST=dc3-mysql
       - MYSQL_PORT=3306
@@ -187,7 +187,7 @@ services:
 
   mysql:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:demo
-    restart: always
+    restart: on-failure
     environment:
       - MYSQL_ROOT_PASSWORD=dc3
     container_name: dc3-mysql
@@ -206,7 +206,7 @@ services:
 
   mongo:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:demo
-    restart: always
+    restart: on-failure
     container_name: dc3-mongo
     hostname: dc3-mongo
     volumes:
@@ -224,7 +224,7 @@ services:
 
   redis:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:demo
-    restart: always
+    restart: on-failure
     container_name: dc3-redis
     hostname: dc3-redis
     volumes:
@@ -241,7 +241,7 @@ services:
 
   rabbitmq:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:demo
-    restart: always
+    restart: on-failure
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
     volumes:
