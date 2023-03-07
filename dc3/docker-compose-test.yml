@@ -19,14 +19,14 @@ services:
     build:
       context: ../
       dockerfile: ./Dockerfile
-    image: pnoker/dc3:2023.1.5.test
+    image: pnoker/dc3:2023.1.6.test
 
   gateway:
     build:
       context: ../dc3-gateway/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-gateway:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-gateway:2023.1.6.test
+    restart: on-failure
     ports:
       - 8000:8000
     environment:
@@ -53,8 +53,8 @@ services:
     build:
       context: ../dc3-center/dc3-center-auth/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-center-auth:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-center-auth:2023.1.6.test
+    restart: on-failure
     ports:
       - 8300:8300
     environment:
@@ -89,8 +89,8 @@ services:
     build:
       context: ../dc3-center/dc3-center-manager/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-center-manager:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-center-manager:2023.1.6.test
+    restart: on-failure
     ports:
       - 8400:8400
     environment:
@@ -135,8 +135,8 @@ services:
     build:
       context: ../dc3-center/dc3-center-data/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-center-data:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-center-data:2023.1.6.test
+    restart: on-failure
     ports:
       - 8500:8500
     environment:
@@ -181,8 +181,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-virtual/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-virtual:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-virtual:2023.1.6.test
+    restart: on-failure
     ports:
       - 8600:8600
     environment:
@@ -214,8 +214,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-plcs7/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-plcs7:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-plcs7:2023.1.6.test
+    restart: on-failure
     ports:
       - 8601:8601
     environment:
@@ -247,8 +247,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-da/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-opc-da:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-opc-da:2023.1.6.test
+    restart: on-failure
     ports:
       - 8602:8602
     environment:
@@ -280,8 +280,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-ua/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-opc-ua:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-opc-ua:2023.1.6.test
+    restart: on-failure
     ports:
       - 8603:8603
     environment:
@@ -313,8 +313,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-listening-virtual/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-listening-virtual:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-listening-virtual:2023.1.6.test
+    restart: on-failure
     ports:
       - 8700:8700
     environment:
@@ -346,8 +346,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-mqtt/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-mqtt:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-mqtt:2023.1.6.test
+    restart: on-failure
     ports:
       - 8701:8701
     environment:
@@ -379,8 +379,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-modbus-tcp/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-modbus-tcp:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-modbus-tcp:2023.1.6.test
+    restart: on-failure
     ports:
       - 8604:8604
     environment:
@@ -412,8 +412,8 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-edge-gateway/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-edge-gateway:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-driver-edge-gateway:2023.1.6.test
+    restart: on-failure
     ports:
       - 8702:8702
     environment:
@@ -445,8 +445,8 @@ services:
     build:
       context: ./dependencies/mysql/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-mysql:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-mysql:2023.1.6.test
+    restart: on-failure
     ports:
       - 3306:3306
     environment:
@@ -469,8 +469,8 @@ services:
     build:
       context: ./dependencies/mongo/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-mongo:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-mongo:2023.1.6.test
+    restart: on-failure
     ports:
       - 27017:27017
     container_name: dc3-mongo
@@ -492,8 +492,8 @@ services:
     build:
       context: ./dependencies/opentsdb/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-opentsdb:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-opentsdb:2023.1.6.test
+    restart: on-failure
     ports:
       - 4242:4242
     container_name: dc3-opentsdb
@@ -516,8 +516,8 @@ services:
     build:
       context: ./dependencies/influxdb/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-influxdb:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-influxdb:2023.1.6.test
+    restart: on-failure
     ports:
       - 8086:8086
     container_name: dc3-influxdb
@@ -540,8 +540,8 @@ services:
     build:
       context: ./dependencies/redis/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-redis:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-redis:2023.1.6.test
+    restart: on-failure
     ports:
       - 6379:6379
     container_name: dc3-redis
@@ -562,8 +562,8 @@ services:
     build:
       context: ./dependencies/rabbitmq/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-rabbitmq:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-rabbitmq:2023.1.6.test
+    restart: on-failure
     ports:
       - 5672:5672
       - 1883:1883
@@ -587,8 +587,8 @@ services:
     build:
       context: ./dependencies/emqx/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-emqx:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-emqx:2023.1.6.test
+    restart: on-failure
     ports:
       #- 1883:1883
       - 8883:8883
@@ -614,8 +614,8 @@ services:
     build:
       context: ./dependencies/grafana/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-grafana:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-grafana:2023.1.6.test
+    restart: on-failure
     ports:
       - 3000:3000
     container_name: dc3-grafana
@@ -633,7 +633,7 @@ services:
   flink:
     image: flink:1.10
     command: taskmanager
-    restart: always
+    restart: on-failure
     expose:
       - 6121
       - 6122
@@ -657,7 +657,7 @@ services:
   jobmanager:
     image: flink:1.10
     command: jobmanager
-    restart: always
+    restart: on-failure
     expose:
       - 6123
     ports:
@@ -679,8 +679,8 @@ services:
     build:
       context: ./dependencies/elasticsearch/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-elasticsearch:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-elasticsearch:2023.1.6.test
+    restart: on-failure
     ports:
       - 9200:9200
     environment:
@@ -705,8 +705,8 @@ services:
     build:
       context: ./dependencies/kibana/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-kibana:2023.1.5.test
-    restart: always
+    image: pnoker/dc3-kibana:2023.1.6.test
+    restart: on-failure
     ports:
       - 5601:5601
     container_name: dc3-kibana
@@ -727,7 +727,7 @@ services:
   portainer:
     image: portainer/portainer:alpine
     command: -H unix:///var/run/docker.sock
-    restart: always
+    restart: on-failure
     ports:
       - 9000:9000
     container_name: portainer

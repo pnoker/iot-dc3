@@ -17,8 +17,13 @@ spring:
   redis:
     # Customize Redis configuration
     host: ${REDIS_HOST:dc3-redis}
-    port: ${REDIS_PORT:6379}
+    port: ${REDIS_PORT:36379}
   cache:
     redis:
       # Customize Cache configuration
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
+  cloud:
+    nacos:
+      discovery:
+        group: ${user.name}
+        watch-delay: 5000

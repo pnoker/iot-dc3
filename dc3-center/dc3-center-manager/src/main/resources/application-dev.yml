@@ -20,7 +20,7 @@ spring:
   rabbitmq:
     # Customize Rabbitmq configuration
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
-    port: ${RABBITMQ_PORT:35672}
+    port: ${RABBITMQ_PORT:5672}
   redis:
     # Customize Redis configuration
     host: ${REDIS_HOST:dc3-redis}
@@ -33,8 +33,8 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
-
-eureka:
-  client:
-    tls:
-      enabled: ${EUREKA_TLS_ENABLE:false}
+  cloud:
+    nacos:
+      discovery:
+        group: ${user.name}
+        watch-delay: 5000

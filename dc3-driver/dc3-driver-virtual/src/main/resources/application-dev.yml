@@ -22,7 +22,7 @@ spring:
   rabbitmq:
     # Customize Rabbitmq configuration
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
-    port: ${RABBITMQ_PORT:35672}
+    port: ${RABBITMQ_PORT:5672}
 
 # Log config
 logging:

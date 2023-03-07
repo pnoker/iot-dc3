@@ -17,11 +17,3 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
-
-eureka:
-  instance:
-    # Custom node registration ip, dedicated to the test environment
-    ip-address: ${SERVICE_HOST}
-  client:
-    tls:
-      enabled: ${EUREKA_TLS_ENABLE:true}

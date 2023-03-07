@@ -60,7 +60,7 @@ spring:
         - id: auth_route
           uri: lb://dc3-center-auth
           predicates:
-            - Path=/api/v3/auth/user/**,/api/v3/auth/black_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
+            - Path=/api/v3/auth/**
           filters:
             - StripPrefix=2
             - Authentic
@@ -107,12 +107,6 @@ spring:
               args:
                 name: default
                 fallbackUri: 'forward:/fallback'
-
-resilience4j:
-  timelimiter:
-    configs:
-      default:
-        timeout-duration: 15S
 
 logging:
   level:
