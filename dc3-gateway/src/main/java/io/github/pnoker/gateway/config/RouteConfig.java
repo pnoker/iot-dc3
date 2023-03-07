@@ -14,14 +14,9 @@
 
 package io.github.pnoker.gateway.config;
 
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
-import org.springframework.cloud.gateway.filter.factory.SpringCloudCircuitBreakerFilterFactory;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
-import org.springframework.cloud.gateway.route.RouteLocator;
-import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
@@ -57,78 +52,4 @@ public class RouteConfig {
     RedisRateLimiter redisRateLimiter() {
         return new RedisRateLimiter(100, 2000);
     }
-
-    /**
-     * 自定义 RouteLocator
-     *
-     * @param builder RouteLocatorBuilder
-     * @return RouteLocator
-     */
-    @Bean
-    public RouteLocator gatewayRouteLocator(RouteLocatorBuilder builder) {
-        String v3ApiPrefix = "/api/v3";
-        String lbPrefix = "lb://";
-        String authUri = lbPrefix + AuthServiceConstant.SERVICE_NAME;
-        return builder.routes()
-                .route("token_salt",
-                        r -> r.path(v3ApiPrefix + "/token/salt")
-                                .filters(
-                                        f -> f.setPath("/auth/token/salt")
-                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
-                                                .circuitBreaker(this::setDefaultCircuitBreaker)
-                                ).uri(authUri)
-                )
-                .route("generate_token",
-                        r -> r.path(v3ApiPrefix + "/token/generate")
-                                .filters(
-                                        f -> f.setPath("/auth/token/generate")
-                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
-                                                .circuitBreaker(this::setDefaultCircuitBreaker)
-                                ).uri(authUri)
-                )
-                .route("check_token",
-                        r -> r.path(v3ApiPrefix + "/token/check")
-                                .filters(
-                                        f -> f.setPath("/auth/token/check")
-                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
-                                                .circuitBreaker(this::setDefaultCircuitBreaker)
-                                ).uri(authUri)
-                )
-                .route("cancel_token",
-                        r -> r.path(v3ApiPrefix + "/token/cancel")
-                                .filters(
-                                        f -> f.setPath("/auth/token/cancel")
-                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
-                                                .circuitBreaker(this::setDefaultCircuitBreaker)
-                                ).uri(authUri)
-                )
-                .route("register_user",
-                        r -> r.path(v3ApiPrefix + "/register")
-                                .filters(
-                                        f -> f.setPath("/auth/user/add")
-                                                .requestRateLimiter(this::setDefaultRequestRateLimiter)
-                                                .circuitBreaker(this::setDefaultCircuitBreaker)
-                                ).uri(authUri)
-                )
-                .build();
-    }
-
-    /**
-     * 设置默认的接口速率限制
-     *
-     * @param config Request Rate Limiter Config
-     */
-    private void setDefaultRequestRateLimiter(RequestRateLimiterGatewayFilterFactory.Config config) {
-        config.setKeyResolver(hostKeyResolver()).setRateLimiter(redisRateLimiter());
-    }
-
-    /**
-     * 设置默认的熔断地址
-     *
-     * @param config CircuitBreaker Config
-     */
-    private void setDefaultCircuitBreaker(SpringCloudCircuitBreakerFilterFactory.Config config) {
-        config.setName("default").setFallbackUri("forward:/fallback");
-    }
-
 }
