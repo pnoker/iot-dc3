@@ -15,7 +15,7 @@
 ### --------------------- Driver ---------------------
 ### 新增 Driver
 #/manager/driver/add
-POST http://localhost:8400/manager/driver/add
+POST http://{{dc3-manager}}/manager/driver/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -32,17 +32,17 @@ X-Auth-Tenant-Id: -1
 
 ### 批量新增 Driver
 #/manager/driver/batch_import
-POST http://localhost:8400/manager/driver/batch_import
+POST http://{{dc3-manager}}/manager/driver/batch_import
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
-< ./file/batch-import.json
+< ../../files/batch-import.json
 
 
 ### 修改 Driver
 #/manager/driver/update
-POST http://localhost:8400/manager/driver/update
+POST http://{{dc3-manager}}/manager/driver/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -60,14 +60,14 @@ X-Auth-Tenant-Id: -1
 
 ### 根据 ID 查询 Driver
 #/manager/driver/id/:id
-GET http://localhost:8400/manager/driver/id/1399921716049756161
+GET http://{{dc3-manager}}/manager/driver/id/1399921716049756161
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 ServiceName 查询 Driver
 #/manager/driver/service/:serviceName
-GET http://localhost:8400/manager/driver/service/dc3-driver-test
+GET http://{{dc3-manager}}/manager/driver/service/dc3-driver-test
 Accept: */*
 Cache-Control: no-cache
 X-Auth-Tenant-Id: -1
@@ -75,7 +75,7 @@ X-Auth-Tenant-Id: -1
 
 ### 查询 Driver 服务状态
 #/manager/status/driver，支持name\serverName\host模糊查询，port精准查询
-POST http://localhost:8400/manager/status/driver
+POST http://{{dc3-manager}}/manager/status/driver
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -98,7 +98,7 @@ X-Auth-Tenant-Id: -1
 
 ### 分页查询 Driver
 #/manager/driver/list，支持name\serverName\host模糊查询，port精准查询
-POST http://localhost:8400/manager/driver/list
+POST http://{{dc3-manager}}/manager/driver/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -120,7 +120,7 @@ X-Auth-Tenant-Id: -1
 
 ### 根据 ID 删除 Driver
 #/manager/driver/delete/:id
-POST http://localhost:8400/manager/driver/delete/1
+POST http://{{dc3-manager}}/manager/driver/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

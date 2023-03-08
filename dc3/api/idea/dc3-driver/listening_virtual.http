@@ -12,14 +12,34 @@
 # limitations under the License.
 #
 
-### --------------------- Import ---------------------
-### 批量导入 All, 包含：驱动->模版->驱动配置->位号->设备->位号配置
-#/manager/import/all
-POST http://localhost:8400/manager/batch/import
+### 读取指定设备位号值
+#driver/command/read
+POST http://{{dc3-driver-listening-virtual}}/driver/command/read
 Accept: */*
-Content-Type: multipart/form-data
+Content-Type: application/json
 Cache-Control: no-cache
 
-< ./files/batch-import.json
-# 请使用 postman 进行测试 key=file,value=./files/batch-import.json
+[
+  {
+    "deviceId": 1,
+    "pointId": 1
+  }
+]
+
+
+### 写入指定设备位号值
+#driver/command/write
+POST http://{{dc3-driver-listening-virtual}}/driver/command/write
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+[
+  {
+    "deviceId": 1,
+    "pointId": 1,
+    "value": "34"
+  }
+]
+
 ###

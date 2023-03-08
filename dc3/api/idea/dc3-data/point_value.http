@@ -12,10 +12,9 @@
 # limitations under the License.
 #
 
-### --------------------- Point ---------------------
 ### 分页查询 Point Value
 #/data/list
-POST http://localhost:8500/data/point_value/list
+POST http://{{dc3-data}}/data/point_value/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -31,28 +30,28 @@ Cache-Control: no-cache
 
 ### 根据 Device ID 查询 最新值
 #/latest/device_id/:deviceId
-GET http://localhost:8500/data/point_value/latest/device_id/1
+GET http://{{dc3-data}}/data/point_value/latest/device_id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Device ID 和 Point ID 查询 最新值
 #/latest/device_id/:deviceId/point_id/:pointId
-GET http://localhost:8500/data/point_value/latest/device_id/1/point_id/1
+GET http://{{dc3-data}}/data/point_value/latest/device_id/1/point_id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Device ID 查询 实时值
 #/realtime/device_id/:deviceId
-GET http://localhost:8500/data/point_value/realtime/device_id/1379432247010025473
+GET http://{{dc3-data}}/data/point_value/realtime/device_id/1379432247010025473
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Device ID 和 Point ID 查询 实时值
 #/realtime/device_id/:deviceId/point_id/:pointId
-GET http://localhost:8500/data/point_value/realtime/device_id/1/point_id/1
+GET http://{{dc3-data}}/data/point_value/realtime/device_id/1/point_id/1
 Accept: */*
 Cache-Control: no-cache
 
