@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="./docs/images/dc3/logo-blue.png" width="400"><br>
+	<img src="./dc3/images/logo-blue.png" width="400"><br>
   <a href='https://gitee.com/pnoker/iot-dc3/stargazers'><img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'></img></a>
 	<a href='https://gitee.com/pnoker/iot-dc3/members'><img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'></img></a>
 	<br>
@@ -14,7 +14,7 @@
 
 ### 1 DC3 架构设计
 
-![iot-dc3-architecture](./docs/images/dc3/architecture1.jpg)
+![iot-dc3-architecture](./dc3/images/architecture1.jpg)
 
 #### DC3 模块划分，四层架构
 
@@ -42,7 +42,7 @@
 `DC3` 平台是基于 `Spring Cloud` 架构开发的,是一系列松耦合、开源的微服务集合。
 微服务集合由4个微服务层和两个增强的基础系统服务组成,提供从物理域数据采集到信息域数据处理等一系列的服务。
 
-![iot-dc3-architecture](./docs/images/dc3/architecture2.jpg)
+![iot-dc3-architecture](./dc3/images/architecture2.jpg)
 
 ### 3 项目文档
 
