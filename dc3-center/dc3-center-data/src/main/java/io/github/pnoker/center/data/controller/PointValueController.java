@@ -45,7 +45,7 @@ public class PointValueController {
      * 查询最新 PointValue 集合
      *
      * @param pointValuePageQuery 位号值和分页参数
-     * @param tenantId      租户ID
+     * @param tenantId            租户ID
      * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/latest")
@@ -68,7 +68,7 @@ public class PointValueController {
      * 模糊分页查询 PointValue
      *
      * @param pointValuePageQuery 位号值和分页参数
-     * @param tenantId      租户ID
+     * @param tenantId            租户ID
      * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
      */
     @PostMapping("/list")

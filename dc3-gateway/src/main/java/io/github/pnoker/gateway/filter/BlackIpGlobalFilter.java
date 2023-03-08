@@ -17,6 +17,7 @@ package io.github.pnoker.gateway.filter;
 import io.github.pnoker.api.center.auth.BlackIpApiGrpc;
 import io.github.pnoker.api.center.auth.IpQuery;
 import io.github.pnoker.api.center.auth.RBlackIpDTO;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -37,7 +38,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class BlackIpGlobalFilter implements GlobalFilter, Ordered {
 
-    @GrpcClient("dc3-center-auth")
+    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
     private BlackIpApiGrpc.BlackIpApiBlockingStub blackIpApiBlockingStub;
 
     @Override
