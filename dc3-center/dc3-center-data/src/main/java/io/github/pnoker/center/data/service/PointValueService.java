@@ -44,7 +44,7 @@ public interface PointValueService {
      * 获取带分页、排序
      *
      * @param pointValuePageQuery PointValueDto
-     * @param tenantId      租户ID
+     * @param tenantId            租户ID
      * @return Page Of PointValue
      */
     Page<PointValue> latest(PointValuePageQuery pointValuePageQuery, String tenantId);
@@ -53,7 +53,7 @@ public interface PointValueService {
      * 获取带分页、排序
      *
      * @param pointValuePageQuery PointValueDto
-     * @param tenantId      租户ID
+     * @param tenantId            租户ID
      * @return Page Of PointValue
      */
     Page<PointValue> list(PointValuePageQuery pointValuePageQuery, String tenantId);

@@ -19,6 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.DecodeUtil;
@@ -62,11 +63,11 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
     static class AuthenticGatewayFilter implements GatewayFilter {
         private static AuthenticGatewayFilter gatewayFilter;
 
-        @GrpcClient("dc3-center-auth")
+        @GrpcClient(AuthServiceConstant.SERVICE_NAME)
         private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
-        @GrpcClient("dc3-center-auth")
+        @GrpcClient(AuthServiceConstant.SERVICE_NAME)
         private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
-        @GrpcClient("dc3-center-auth")
+        @GrpcClient(AuthServiceConstant.SERVICE_NAME)
         private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
 
         @PostConstruct

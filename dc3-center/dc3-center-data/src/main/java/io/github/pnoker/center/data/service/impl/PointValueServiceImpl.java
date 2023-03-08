@@ -31,6 +31,7 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.StorageConstant;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.utils.FieldUtil;
@@ -61,7 +62,7 @@ import java.util.stream.Collectors;
 @Service
 public class PointValueServiceImpl implements PointValueService {
 
-    @GrpcClient("dc3-center-manager")
+    @GrpcClient(ManagerServiceConstant.SERVICE_NAME)
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
     @Resource

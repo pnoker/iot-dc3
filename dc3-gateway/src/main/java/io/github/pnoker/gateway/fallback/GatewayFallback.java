@@ -15,7 +15,6 @@
 package io.github.pnoker.gateway.fallback;
 
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.HttpStatus;

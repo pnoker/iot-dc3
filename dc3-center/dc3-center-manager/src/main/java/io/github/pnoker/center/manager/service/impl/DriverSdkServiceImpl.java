@@ -18,6 +18,7 @@ import io.github.pnoker.api.center.auth.CodeQuery;
 import io.github.pnoker.api.center.auth.RTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.service.*;
+import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.driver.DriverRegister;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -43,7 +44,7 @@ import java.util.Map;
 @Service
 public class DriverSdkServiceImpl implements DriverSdkService {
 
-    @GrpcClient("dc3-center-auth")
+    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
     @Resource
