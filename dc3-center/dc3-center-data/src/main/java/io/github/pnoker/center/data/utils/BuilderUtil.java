@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.utils;
+package io.github.pnoker.center.data.utils;
 
 import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.common.constant.common.ExceptionConstant;

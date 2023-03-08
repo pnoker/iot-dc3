@@ -12,10 +12,9 @@
 # limitations under the License.
 #
 
-### --------------------- Token ---------------------
 ### 生成用户 Salt
 #/auth/token/salt
-POST http://localhost:8300/auth/token/salt
+POST http://{{dc3-auth}}/auth/token/salt
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -29,7 +28,7 @@ Cache-Control: no-cache
 #/auth/token/generate
 # pnoker/10e339be1130a90dc1b9ff0332abced6
 # DC3Util.md5("10e339be1130a90dc1b9ff0332abced6"+"verfdkkq")
-POST http://localhost:8300/auth/token/generate
+POST http://{{dc3-auth}}/auth/token/generate
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -44,7 +43,7 @@ Cache-Control: no-cache
 
 ### 检测用户 Token 令牌是否有效
 #/auth/token/:token
-POST http://localhost:8300/auth/token/check
+POST http://{{dc3-auth}}/auth/token/check
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -58,7 +57,7 @@ Cache-Control: no-cache
 
 ### 注销用户 Token 令牌
 #/auth/token/cancel
-POST http://localhost:8300/auth/token/cancel
+POST http://{{dc3-auth}}/auth/token/cancel
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

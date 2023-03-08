@@ -12,67 +12,61 @@
 # limitations under the License.
 #
 
-### --------------------- User ---------------------
-### 新增 User
-#/auth/user/add
-POST http://localhost:8300/auth/user/add
+### 新增 BlackIp
+#/auth/black_ip/add
+POST http://{{dc3-auth}}/auth/black_ip/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
 
 {
-  "name": "dc3",
-  "password": "dc3dc3dc3",
-  "description": "平台开发者账号"
+  "ip": "127.0.0.1",
+  "description": "测试黑名单Ip"
 }
 
 
-### 修改 User
-#/auth/user/update
-POST http://localhost:8300/auth/user/update
+### 修改 BlackIp
+#/auth/black_ip/update
+POST http://{{dc3-auth}}/auth/black_ip/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
+X-Auth-Tenant-Id: -1
 
 {
   "id": 1,
-  "password": "dc3dc3dc3",
+  "ip": "192.168.0.1",
   "enable": true,
-  "description": "平台开发者账号"
+  "description": "测试黑名单Ip"
 }
 
 
-### 根据 ID 重置 User 密码
-#/auth/user/reset/:id
-POST http://localhost:8300/auth/user/reset/1
+### 根据 ID 查询 BlackIp
+#/auth/black_ip/id/:id
+GET http://{{dc3-auth}}/auth/black_ip/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 根据 Ip 查询 BlackIp
+#/auth/user/ip/:ip
+GET http://{{dc3-auth}}/auth/black_ip/ip/127.0.0.1
+Accept: */*
+Cache-Control: no-cache
+X-Auth-Tenant-Id:-1
+
+
+### 分页查询 BlackIp
+#/auth/black_ip/list，支持ip模糊查询
+POST http://{{dc3-auth}}/auth/black_ip/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
-
-
-### 根据 ID 查询 User
-#/auth/user/id/:id
-GET http://localhost:8300/auth/user/id/1
-Accept: */*
-Cache-Control: no-cache
-
-
-### 根据 Name 查询 User
-#/auth/user/name/:name
-GET http://localhost:8300/auth/user/name/dc3
-Accept: */*
-Cache-Control: no-cache
-
-
-### 分页查询 User
-#/auth/user/list，支持name模糊查询
-POST http://localhost:8300/auth/user/list
-Accept: */*
-Content-Type: application/json
-Cache-Control: no-cache
+X-Auth-Tenant-Id:-1
 
 {
-  "name": "",
+  "ip": "",
   "page": {
     "current": 1,
     "size": 500,
@@ -86,18 +80,17 @@ Cache-Control: no-cache
 }
 
 
-### 检测 User 是否存在并有效
-#/auth/user/check/:name
-GET http://localhost:8300/auth/user/check/dc3
+### 查询 BlackIp 是否存在并有效
+#/auth/black_ip/check/:ip
+GET http://{{dc3-auth}}/auth/black_ip/check/192.168.0.1
 Accept: */*
 Cache-Control: no-cache
+X-Auth-Tenant-Id:-1
 
 
-### 根据 ID 删除 User
-#/auth/user/delete/:id
-POST http://localhost:8300/auth/user/delete/1
+### 根据 ID 删除 BlackIp
+#/auth/black_ip/delete/:id
+POST http://{{dc3-auth}}/auth/black_ip/delete/1383257757074976769
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
-
-###
