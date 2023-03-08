@@ -1,3 +1,0 @@
-{emqx_mod_acl_internal, true}.
-{emqx_mod_presence, true}.
-{emqx_mod_topic_metrics, true}.

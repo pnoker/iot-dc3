@@ -19,35 +19,46 @@
 
 .PHONY: build clean
 
+help:
+	echo 'You can use make to execute the following commands:' \
+	&& echo 'Usage: make [clean | package | deploy | dev | tag]' \
+	&& echo ' - make demo: build & push demo images' \
+	&& echo ' - make dev: run local development environment' \
+	&& echo ' - make clean: mvn clean' \
+	&& echo ' - make package: mvn package' \
+	&& echo ' - make build: build images' \
+	&& echo ' - make deploy.N: mvn deploy N' \
+	&& echo ' - make tag: git tag' \
+
+demo:
+	mvn clean package \
+	&& cd dc3 \
+	&& docker-compose -f docker-compose-demo.yml build \
+	&& docker-compose -f docker-compose-demo.yml push \
+
 dev:
-	cd dc3/bin \
-	&& chmod +x mvn-clean.sh \
-	&& chmod +x mvn-package.sh \
-	&& ./mvn-clean.sh \
-	&& ./mvn-package.sh \
-	&& cd dev \
-	&& chmod +x docker-compose-build.sh \
-	&& chmod +x docker-compose-up.sh \
-	&& ./docker-compose-build.sh \
-	&& ./docker-compose-up.sh \
-
-deploy:
-	cd dc3/bin \
-	&& chmod +x mvn-clean.sh \
-	&& chmod +x mvn-package.sh \
-	&& chmod +x mvn-deploy.sh \
-	&& ./mvn-clean.sh \
-	&& ./mvn-package.sh \
-	&& ./mvn-deploy.sh
-
-package:
-	cd dc3/bin \
-	&& chmod +x mvn-clean.sh \
-	&& chmod +x mvn-package.sh \
-	&& ./mvn-clean.sh \
-	&& ./mvn-package.sh
+	cd dc3 \
+	&& docker-compose -f docker-compose-dev.yml up -d \
 
 clean:
-	cd dc3/bin \
-	&& chmod +x mvn-clean.sh \
-	&& ./mvn-clean.sh
+	mvn clean \
+
+package:
+	mvn package \
+
+build:
+	mvn clean package \
+    && cd dc3 \
+	&& docker-compose build \
+
+deploy.api:
+	cd dc3-api \
+	&& mvn clean deploy \
+
+deploy.common:
+	cd dc3-common \
+	&& mvn clean deploy \
+
+deploy.sdk:
+	cd dc3-driver-sdk \
+	&& mvn clean deploy \
