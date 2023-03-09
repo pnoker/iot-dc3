@@ -20,7 +20,7 @@
 
     <groupId>io.github.pnoker</groupId>
     <artifactId>iot-dc3</artifactId>
-    <version>2022.1.0</version>
+    <version>2022.1.1</version>
     <packaging>pom</packaging>
 
     <developers>

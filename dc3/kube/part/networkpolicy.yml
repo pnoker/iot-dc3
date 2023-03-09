@@ -17,7 +17,7 @@ metadata:
   name: dc3net
   namespace: dc3
   labels:
-    dc3.version: 2022.1.0
+    dc3.version: 2022.1.1
 spec:
   podSelector:
     matchLabels:

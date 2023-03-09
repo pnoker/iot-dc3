@@ -18,7 +18,7 @@ metadata:
   name: dc3-center-register
   namespace: dc3
   labels:
-    dc3.version: 2022.1.0
+    dc3.version: 2022.1.1
     dc3.service: dc3-center-register
 spec:
   ports:

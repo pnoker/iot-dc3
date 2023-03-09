@@ -16,4 +16,4 @@ kind: Namespace
 metadata:
   name: dc3
   labels:
-    dc3.version: 2022.1.0
+    dc3.version: 2022.1.1

@@ -23,7 +23,7 @@
     <parent>
         <artifactId>iot-dc3</artifactId>
         <groupId>io.github.pnoker</groupId>
-        <version>2022.1.0</version>
+        <version>2022.1.1</version>
     </parent>
 
     <artifactId>dc3-gateway</artifactId>

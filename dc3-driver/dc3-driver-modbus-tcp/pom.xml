@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2022.1.0</version>
+        <version>2022.1.1</version>
     </parent>
 
     <artifactId>dc3-driver-modbus-tcp</artifactId>

@@ -15,7 +15,7 @@
 eureka:
   instance:
     # Custom node registration IP
-    ip-address: ${SERVICE_HOST:192.168.0.101}
+    #ip-address: ${SERVICE_HOST:192.168.0.101}
 
 spring:
   datasource:

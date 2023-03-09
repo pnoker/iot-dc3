@@ -18,7 +18,7 @@ metadata:
   name: dc3-ingress-class
   namespace: dc3
   labels:
-    dc3.version: 2022.1.0
+    dc3.version: 2022.1.1
 spec:
   controller: k8s.io/ingress-nginx
 
@@ -29,7 +29,7 @@ metadata:
   name: dc3-ingress
   namespace: dc3
   labels:
-    dc3.version: 2022.1.0
+    dc3.version: 2022.1.1
 spec:
   ingressClassName: dc3-ingress-class
   rules:

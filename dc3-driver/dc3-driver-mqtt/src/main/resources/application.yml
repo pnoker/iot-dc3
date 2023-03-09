@@ -48,8 +48,8 @@ driver:
         data-type: static/url
         data: jsonString
   mqtt:
-    url: ssl://dc3-emqx:8883
-    auth-type: X509
+    url: tcp://dc3-rabbitmq:1883
+    auth-type: username
     username: dc3
     password: dc3
     ca-crt: classpath:/certs/ca.crt

@@ -18,7 +18,7 @@ metadata:
   name: dc3-persistent-volume
   namespace: dc3
   labels:
-    dc3.version: 2022.1.0
+    dc3.version: 2022.1.1
 spec:
   storageClassName: manual
   persistentVolumeReclaimPolicy: Recycle
@@ -36,7 +36,7 @@ metadata:
   name: dc3-persistent-volume-claim
   namespace: dc3
   labels:
-    dc3.version: 2022.1.0
+    dc3.version: 2022.1.1
 spec:
   storageClassName: manual
   accessModes:
