@@ -19,7 +19,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2023.1.6</version>
+        <version>2023.1.9</version>
     </parent>
 
     <name>${project.artifactId}</name>
@@ -56,6 +56,10 @@
         <developerConnection>https://github.com/pnoker/iot-dc3.git</developerConnection>
     </scm>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <profiles>
         <profile>
             <id>dev</id>
@@ -71,7 +75,6 @@
             <id>test</id>
             <properties>
                 <NODE_ENV>test</NODE_ENV>
-                <SERVICE_HOST>192.168.0.103</SERVICE_HOST>
             </properties>
         </profile>
         <profile>

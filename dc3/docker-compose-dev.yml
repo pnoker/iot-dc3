@@ -16,7 +16,7 @@ version: '3'
 
 services:
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.1.6.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.1.9.dev
     restart: on-failure
     ports:
       - '33306:3306'
@@ -37,7 +37,7 @@ services:
           - dc3-mysql
 
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.1.6.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.1.9.dev
     restart: on-failure
     ports:
       - '37017:27017'
@@ -57,7 +57,7 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.1.6.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.1.9.dev
     restart: on-failure
     ports:
       - '36379:6379'
@@ -76,7 +76,7 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.1.6.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.1.9.dev
     restart: on-failure
     ports:
       - '5672:5672'
@@ -99,7 +99,7 @@ services:
           - dc3-rabbitmq
 
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.6.nacos.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.9.nacos.dev
     restart: on-failure
     ports:
       - "8848:8848"

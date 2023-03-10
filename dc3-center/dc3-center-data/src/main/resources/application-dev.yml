@@ -13,21 +13,9 @@
 #
 
 # Development environment, customizable configuration
-data:
-  point:
-    sava:
-      influxdb:
-        enable: false
-      opentsdb:
-        enable: false
-        host: dc3-opentsdb
-        port: 4242
-      elasticsearch:
-        enable: false
-        host: dc3-elasticsearch
-        port: 9200
-
 spring:
+  env: dev
+  group: ${user.name}
   datasource:
     # Customize MySQL configuration
     url: jdbc:mysql://${DB_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${DB_NAME:dc3}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
@@ -51,5 +39,19 @@ spring:
   cloud:
     nacos:
       discovery:
-        group: ${user.name}
+        group: ${spring.group}
         watch-delay: 5000
+
+data:
+  point:
+    sava:
+      influxdb:
+        enable: false
+      opentsdb:
+        enable: false
+        host: dc3-opentsdb
+        port: 4242
+      elasticsearch:
+        enable: false
+        host: dc3-elasticsearch
+        port: 9200
