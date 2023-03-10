@@ -14,6 +14,8 @@
 
 # Development environment, customizable configuration
 spring:
+  env: dev
+  group: ${user.name}
   redis:
     # Customize Redis configuration
     host: ${REDIS_HOST:dc3-redis}
@@ -25,5 +27,5 @@ spring:
   cloud:
     nacos:
       discovery:
-        group: ${user.name}
+        group: ${spring.group}
         watch-delay: 5000

@@ -17,8 +17,3 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
-  cloud:
-    nacos:
-      discovery:
-        # Custom node registration ip, dedicated to the development environment
-        ip: ${SERVICE_HOST}

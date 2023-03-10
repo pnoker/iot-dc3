@@ -13,13 +13,15 @@
 #
 
 # Development environment, customizable configuration
-# Development environment, customizable configuration
 driver:
   schedule:
     read:
       corn: '0/5 * * * * ?'
 
 spring:
+  #当开启env和group时，需要本地启动auth，manager和data服务
+  #env: dev
+  #group: ${user.name}
   rabbitmq:
     # Customize Rabbitmq configuration
     host: ${RABBITMQ_HOST:dc3-rabbitmq}

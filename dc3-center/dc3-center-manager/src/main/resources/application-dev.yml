@@ -14,6 +14,8 @@
 
 # Development environment, customizable configuration
 spring:
+  env: dev
+  group: ${user.name}
   datasource:
     # Customize MySQL configuration
     url: jdbc:mysql://${DB_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${DB_NAME:dc3}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
@@ -36,5 +38,5 @@ spring:
   cloud:
     nacos:
       discovery:
-        group: ${user.name}
+        group: ${spring.group}
         watch-delay: 5000
