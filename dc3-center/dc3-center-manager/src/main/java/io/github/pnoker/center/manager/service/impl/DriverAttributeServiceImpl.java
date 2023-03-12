@@ -107,6 +107,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         queryWrapper.eq(DriverAttribute::getAttributeName, name);
         queryWrapper.eq(DriverAttribute::getDriverId, driverId);
+        queryWrapper.last("limit 1");
         DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
         if (null == driverAttribute) {
             throw new NotFoundException();

@@ -107,6 +107,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         queryWrapper.eq(PointAttribute::getAttributeName, name);
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
+        queryWrapper.last("limit 1");
         PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
         if (null == pointAttribute) {
             throw new NotFoundException();

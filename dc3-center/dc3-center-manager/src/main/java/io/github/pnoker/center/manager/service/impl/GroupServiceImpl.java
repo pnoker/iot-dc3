@@ -106,6 +106,7 @@ public class GroupServiceImpl implements GroupService {
     public Group selectByName(String name, String tenantId) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         queryWrapper.eq(Group::getGroupName, name);
+        queryWrapper.last("limit 1");
         Group group = groupMapper.selectOne(queryWrapper);
         if (null == group) {
             throw new NotFoundException();

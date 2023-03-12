@@ -127,7 +127,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
         profileBindPageQuery.setDeviceId(deviceId);
         profileBindPageQuery.setProfileId(profileId);
-        ProfileBind profileBind = profileBindMapper.selectOne(fuzzyQuery(profileBindPageQuery));
+        LambdaQueryWrapper<ProfileBind> queryWrapper = fuzzyQuery(profileBindPageQuery);
+        queryWrapper.last("limit 1");
+        ProfileBind profileBind = profileBindMapper.selectOne(queryWrapper);
         if (null == profileBind) {
             throw new NotFoundException();
         }

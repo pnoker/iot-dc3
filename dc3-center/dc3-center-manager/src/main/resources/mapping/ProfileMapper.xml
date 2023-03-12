@@ -17,14 +17,19 @@
 <mapper namespace="io.github.pnoker.center.manager.mapper.ProfileMapper">
     <select id="selectPageWithDevice" resultType="io.github.pnoker.common.model.Profile">
         select dp.id,
-        dp.name,
-        share,
-        type,
-        dp.enable,
+        dp.profile_name,
+        dp.profile_code,
+        dp.profile_share_flag,
+        dp.profile_type_flag,
         dp.group_id,
+        dp.enable_flag,
         dp.tenant_id,
-        dp.description,
+        dp.remark,
+        dp.creator_id,
+        dp.creator_name,
         dp.create_time,
+        dp.operator_id,
+        dp.operator_name,
         dp.update_time,
         dp.deleted
         from dc3_profile dp

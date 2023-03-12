@@ -115,6 +115,7 @@ public class LabelServiceImpl implements LabelService {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         queryWrapper.eq(Label::getLabelName, name);
         queryWrapper.eq(Label::getTenantId, tenantId);
+        queryWrapper.last("limit 1");
         Label label = labelMapper.selectOne(queryWrapper);
         if (null == label) {
             throw new NotFoundException();

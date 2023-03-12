@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.entity.query.TenantPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -87,11 +88,9 @@ public class TenantServiceImpl implements TenantService {
     public Tenant selectByCode(String code) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
         queryWrapper.eq(Tenant::getTenantCode, code);
-        Tenant tenant = tenantMapper.selectOne(queryWrapper);
-        if (null == tenant) {
-            throw new NotFoundException();
-        }
-        return tenant;
+        queryWrapper.eq(Tenant::getEnableFlag, EnableFlagEnum.ENABLE);
+        queryWrapper.last("limit 1");
+        return tenantMapper.selectOne(queryWrapper);
     }
 
     @Override

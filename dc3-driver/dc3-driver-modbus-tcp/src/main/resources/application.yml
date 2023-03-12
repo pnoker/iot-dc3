@@ -29,7 +29,7 @@ driver:
       corn: '0/5 * * * * ?'
   driver-attribute:
     - displayName: 主机
-      name: host
+      attributeName: host
       type: string
       value: localhost
       remark: Modbus IP
@@ -39,7 +39,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 端口
-      name: port
+      attributeName: port
       type: int
       value: 502
       remark: Modbus Port
@@ -50,7 +50,7 @@ driver:
         data: jsonString
   point-attribute:
     - displayName: 从站编号
-      name: slaveId
+      attributeName: slaveId
       type: int
       value: 1
       remark: 从站编号
@@ -60,7 +60,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 功能码
-      name: functionCode
+      attributeName: functionCode
       type: int
       value: 1
       remark: 功能码 [1、2、3、4]
@@ -70,7 +70,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 偏移量
-      name: offset
+      attributeName: offset
       type: int
       value: 0
       remark: 偏移量

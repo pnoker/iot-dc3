@@ -29,7 +29,7 @@ driver:
       corn: '0/5 * * * * ?'
   driver-attribute:
     - displayName: 主机
-      name: host
+      attributeName: host
       type: string
       value: localhost
       remark: Opc Ua IP
@@ -39,7 +39,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 端口
-      name: port
+      attributeName: port
       type: int
       value: 18600
       remark: Opc Ua Port
@@ -49,7 +49,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 路径
-      name: path
+      attributeName: path
       type: string
       value: /
       remark: Opc Ua Path
@@ -60,7 +60,7 @@ driver:
         data: jsonString
   point-attribute:
     - displayName: 命名空间
-      name: namespace
+      attributeName: namespace
       type: int
       value: 5
       remark: 命名空间索引
@@ -70,7 +70,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 位号
-      name: tag
+      attributeName: tag
       type: string
       value: TAG
       remark: 位号名称

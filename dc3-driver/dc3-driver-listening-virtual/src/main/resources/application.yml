@@ -34,7 +34,7 @@ driver:
       corn: '0/5 * * * * ?'
   point-attribute:
     - displayName: 关键字
-      name: key
+      attributeName: key
       type: string
       value: 62
       remark: 报文关键字
@@ -44,7 +44,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 起始字节
-      name: start
+      attributeName: start
       type: int
       value: 0
       remark: 起始字节，包含该字节
@@ -54,7 +54,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 结束字节
-      name: end
+      attributeName: end
       type: int
       value: 8
       remark: 结束字节，不包含该字节
@@ -64,7 +64,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 类型
-      name: type
+      attributeName: type
       type: string
       value: string
       remark: 解析类型，short、int、long、float、double、boolean、string

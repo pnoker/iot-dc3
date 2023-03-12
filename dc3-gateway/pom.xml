@@ -72,10 +72,15 @@
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
-        <!-- Resilience4j reactive -->
+        <!-- &lt;!&ndash; Resilience4j reactive &ndash;&gt;
+         <dependency>
+             <groupId>org.springframework.cloud</groupId>
+             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+         </dependency>-->
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
         <!-- DC3 Api Auth -->

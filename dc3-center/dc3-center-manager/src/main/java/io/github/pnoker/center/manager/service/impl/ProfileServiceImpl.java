@@ -108,6 +108,7 @@ public class ProfileServiceImpl implements ProfileService {
         queryWrapper.eq(Profile::getProfileName, name);
         queryWrapper.eq(Profile::getProfileTypeFlag, type);
         queryWrapper.eq(Profile::getTenantId, tenantId);
+        queryWrapper.last("limit 1");
         Profile profile = profileMapper.selectOne(queryWrapper);
         if (null == profile) {
             throw new NotFoundException();
@@ -157,9 +158,10 @@ public class ProfileServiceImpl implements ProfileService {
         QueryWrapper<Profile> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(profilePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(profilePageQuery.getProfileName()), "dp.name", profilePageQuery.getProfileName());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileShareFlag()), "dp.share", profilePageQuery.getProfileShareFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getEnableFlag()), "dp.enable", profilePageQuery.getEnableFlag());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(profilePageQuery.getProfileName()), "dp.profile_name", profilePageQuery.getProfileName());
+            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileCode()), "dp.profile_code", profilePageQuery.getProfileCode());
+            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileShareFlag()), "dp.profile_share_flag", profilePageQuery.getProfileShareFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getEnableFlag()), "dp.enable_flag", profilePageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(profilePageQuery.getTenantId()), "dp.tenant_id", profilePageQuery.getTenantId());
         }
         return queryWrapper.lambda();

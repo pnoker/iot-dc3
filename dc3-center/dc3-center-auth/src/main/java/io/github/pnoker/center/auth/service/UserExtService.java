@@ -29,27 +29,27 @@ public interface UserExtService extends Service<UserExt, UserExtDto> {
     /**
      * 根据用户名查询用户
      *
-     * @param userName 用户名称
-     * @param isEx     Throw Exception
+     * @param userName       用户名称
+     * @param throwException Throw Exception
      * @return UserExt
      */
-    UserExt selectByUserName(String userName, boolean isEx);
+    UserExt selectByUserName(String userName, boolean throwException);
 
     /**
      * 根据手机号查询用户
      *
-     * @param phone Phone
-     * @param isEx  Throw Exception
+     * @param phone          Phone
+     * @param throwException Throw Exception
      * @return UserExt
      */
-    UserExt selectByPhone(String phone, boolean isEx);
+    UserExt selectByPhone(String phone, boolean throwException);
 
     /**
      * 根据邮箱查询用户
      *
-     * @param email Email
-     * @param isEx  Throw Exception
+     * @param email          Email
+     * @param throwException Throw Exception
      * @return UserExt
      */
-    UserExt selectByEmail(String email, boolean isEx);
+    UserExt selectByEmail(String email, boolean throwException);
 }

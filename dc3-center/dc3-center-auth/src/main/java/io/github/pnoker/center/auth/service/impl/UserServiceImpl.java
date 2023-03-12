@@ -102,9 +102,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User selectByLoginName(String loginName, boolean isEx) {
+    public User selectByLoginName(String loginName, boolean throwException) {
         if (CharSequenceUtil.isEmpty(loginName)) {
-            if (isEx) {
+            if (throwException) {
                 throw new EmptyException("The login name is empty");
             }
             return null;
@@ -112,6 +112,8 @@ public class UserServiceImpl implements UserService {
 
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         queryWrapper.eq(User::getLoginName, loginName);
+        queryWrapper.eq(User::getEnableFlag, EnableFlagEnum.ENABLE);
+        queryWrapper.last("limit 1");
         User user = userMapper.selectOne(queryWrapper);
         if (null == user) {
             throw new NotFoundException();

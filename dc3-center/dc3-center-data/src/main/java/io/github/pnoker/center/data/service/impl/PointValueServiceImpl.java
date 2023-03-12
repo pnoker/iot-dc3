@@ -17,6 +17,7 @@ package io.github.pnoker.center.data.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.PagePointQuery;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
@@ -101,14 +102,16 @@ public class PointValueServiceImpl implements PointValueService {
         if (ObjectUtil.isEmpty(pointValuePageQuery.getPage())) pointValuePageQuery.setPage(new Pages());
         pointValuePage.setCurrent(pointValuePageQuery.getPage().getCurrent()).setSize(pointValuePageQuery.getPage().getSize());
 
-        PageDTO page = PageDTO.newBuilder()
+        PageDTO.Builder page = PageDTO.newBuilder()
                 .setSize(pointValuePageQuery.getPage().getSize())
-                .setCurrent(pointValuePageQuery.getPage().getCurrent())
-                .build();
-        PointDTO point = PointDTO.newBuilder()
-                .setPointName(pointValuePageQuery.getPointName())
-                .setEnableFlag(EnableFlagDTOEnum.valueOf(pointValuePageQuery.getEnableFlag().name()))
-                .build();
+                .setCurrent(pointValuePageQuery.getPage().getCurrent());
+        PointDTO.Builder point = PointDTO.newBuilder();
+        if (ObjectUtil.isNotNull(pointValuePageQuery.getEnableFlag())) {
+            point.setEnableFlag(EnableFlagDTOEnum.valueOf(pointValuePageQuery.getEnableFlag().name()));
+        }
+        if (StrUtil.isNotEmpty(pointValuePageQuery.getPointName())) {
+            point.setPointName(pointValuePageQuery.getPointName());
+        }
         PagePointQuery query = PagePointQuery.newBuilder()
                 .setTenantId(tenantId)
                 .setDeviceId(pointValuePageQuery.getDeviceId())

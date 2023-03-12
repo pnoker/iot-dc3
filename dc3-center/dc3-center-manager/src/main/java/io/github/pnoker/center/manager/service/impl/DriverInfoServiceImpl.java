@@ -14,6 +14,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -112,7 +114,9 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
         driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
         driverInfoPageQuery.setDeviceId(deviceId);
-        DriverInfo driverInfo = driverInfoMapper.selectOne(fuzzyQuery(driverInfoPageQuery));
+        LambdaQueryWrapper<DriverInfo> queryWrapper = fuzzyQuery(driverInfoPageQuery);
+        queryWrapper.last("limit 1");
+        DriverInfo driverInfo = driverInfoMapper.selectOne(queryWrapper);
         if (null == driverInfo) {
             throw new NotFoundException();
         }
@@ -141,8 +145,8 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
         driverInfoPageQuery.setDeviceId(deviceId);
         List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
-        if (null == driverInfos || driverInfos.isEmpty()) {
-            throw new NotFoundException();
+        if (CollUtil.isEmpty(driverInfos)) {
+            return Collections.emptyList();
         }
         return driverInfos;
     }
