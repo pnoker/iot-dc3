@@ -29,11 +29,11 @@ public interface UserService extends Service<User, UserPageQuery> {
     /**
      * 根据登录名称查询用户
      *
-     * @param loginName 登录名称
-     * @param isEx      Throw Exception
+     * @param loginName      登录名称
+     * @param throwException Throw Exception
      * @return User
      */
-    User selectByLoginName(String loginName, boolean isEx);
+    User selectByLoginName(String loginName, boolean throwException);
 
     /**
      * 判断登录名称是否有效

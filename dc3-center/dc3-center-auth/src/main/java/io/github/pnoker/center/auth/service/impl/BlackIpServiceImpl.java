@@ -24,6 +24,7 @@ import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.BlackIp;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public BlackIp add(BlackIp blackIp) {
-        BlackIp select = selectByIp(blackIp.getIp());
+        BlackIp select = selectByIp(blackIp.getIp(), false);
         if (ObjectUtil.isNotNull(select)) {
             throw new ServiceException("The ip already exists in the blacklist");
         }
@@ -83,10 +84,15 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public BlackIp selectByIp(String ip) {
+    public BlackIp selectByIp(String ip, boolean throwException) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         queryWrapper.eq(BlackIp::getIp, ip);
-        return blackIpMapper.selectOne(queryWrapper);
+        queryWrapper.last("limit 1");
+        BlackIp blackIp = blackIpMapper.selectOne(queryWrapper);
+        if (throwException && ObjectUtil.isNull(blackIp)) {
+            throw new NotFoundException();
+        }
+        return blackIp;
     }
 
     @Override
@@ -99,7 +105,7 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public Boolean checkBlackIpValid(String ip) {
-        BlackIp blackIp = selectByIp(ip);
+        BlackIp blackIp = selectByIp(ip, false);
         if (ObjectUtil.isNotNull(blackIp)) {
             return EnableFlagEnum.ENABLE.equals(blackIp.getEnableFlag());
         }

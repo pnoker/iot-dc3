@@ -29,7 +29,7 @@ driver:
       corn: '0/5 * * * * ?'
   driver-attribute:
     - displayName: 主机
-      name: host
+      attributeName: host
       type: string
       value: 192.168.0.20
       remark: Ip
@@ -39,7 +39,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 端口
-      name: port
+      attributeName: port
       type: int
       value: 102
       remark: Port
@@ -50,7 +50,7 @@ driver:
         data: jsonString
   point-attribute:
     - displayName: DB序号
-      name: dbNum
+      attributeName: dbNum
       type: int
       value: 0
       remark: 数据块号，从 0 开始计数
@@ -60,7 +60,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 字偏移
-      name: byteOffset
+      attributeName: byteOffset
       type: int
       value: 0
       remark: 字偏移
@@ -70,7 +70,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 位偏移
-      name: bitOffset
+      attributeName: bitOffset
       type: int
       value: 0
       remark: 位偏移
@@ -80,7 +80,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 数据块长度
-      name: blockSize
+      attributeName: blockSize
       type: int
       value: 8
       remark: 数据块长度

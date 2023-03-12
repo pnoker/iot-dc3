@@ -82,11 +82,8 @@ public class TenantBindServiceImpl implements TenantBindService {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
         queryWrapper.eq(TenantBind::getTenantId, tenantId);
         queryWrapper.eq(TenantBind::getUserId, userId);
-        TenantBind tenantBind = tenantBindMapper.selectOne(queryWrapper);
-        if (null == tenantBind) {
-            throw new NotFoundException();
-        }
-        return tenantBind;
+        queryWrapper.last("limit 1");
+        return tenantBindMapper.selectOne(queryWrapper);
     }
 
     @Override

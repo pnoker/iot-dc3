@@ -144,6 +144,7 @@ public class DeviceServiceImpl implements DeviceService {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         queryWrapper.eq(Device::getDeviceName, name);
         queryWrapper.eq(Device::getTenantId, tenantId);
+        queryWrapper.last("limit 1");
         Device device = deviceMapper.selectOne(queryWrapper);
         if (null == device) {
             throw new NotFoundException();
@@ -207,6 +208,7 @@ public class DeviceServiceImpl implements DeviceService {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         if (ObjectUtil.isNotEmpty(devicePageQuery)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), Device::getDeviceName, devicePageQuery.getDeviceName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceCode()), Device::getDeviceCode, devicePageQuery.getDeviceCode());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), Device::getDriverId, devicePageQuery.getDriverId());
             queryWrapper.eq(ObjectUtil.isNotEmpty(devicePageQuery.getEnableFlag()), Device::getEnableFlag, devicePageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getTenantId()), Device::getTenantId, devicePageQuery.getTenantId());
@@ -218,9 +220,10 @@ public class DeviceServiceImpl implements DeviceService {
         QueryWrapper<Device> queryWrapper = Wrappers.query();
         queryWrapper.eq("dd.deleted", 0);
         if (ObjectUtil.isNotNull(devicePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), "dd.name", devicePageQuery.getDeviceName());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), "dd.device_name", devicePageQuery.getDeviceName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceCode()), "dd.device_code", devicePageQuery.getDeviceCode());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), "dd.driver_id", devicePageQuery.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getEnableFlag()), "dd.enable", devicePageQuery.getEnableFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getEnableFlag()), "dd.enable_flag", devicePageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getTenantId()), "dd.tenant_id", devicePageQuery.getTenantId());
         }
         return queryWrapper.lambda();

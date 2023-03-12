@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -127,6 +128,7 @@ public class DriverServiceImpl implements DriverService {
     public Driver selectByServiceName(String serviceName) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getServiceName, serviceName);
+        queryWrapper.last("limit 1");
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
             throw new NotFoundException();
@@ -144,6 +146,7 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(Driver::getServiceHost, host);
         queryWrapper.eq(Driver::getServicePort, port);
         queryWrapper.eq(Driver::getTenantId, tenantId);
+        queryWrapper.last("limit 1");
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (null == driver) {
             throw new NotFoundException();
@@ -156,11 +159,10 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public List<Driver> selectByIds(Set<String> ids) {
-        List<Driver> drivers = driverMapper.selectBatchIds(ids);
-        if (CollUtil.isEmpty(drivers)) {
-            throw new NotFoundException();
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
         }
-        return drivers;
+        return driverMapper.selectBatchIds(ids);
     }
 
     /**
@@ -170,7 +172,11 @@ public class DriverServiceImpl implements DriverService {
     public List<Driver> selectByProfileId(String profileId) {
         List<Device> devices = deviceService.selectByProfileId(profileId);
         Set<String> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
-        return selectByIds(driverIds);
+        List<Driver> driverList = selectByIds(driverIds);
+        if (CollUtil.isEmpty(driverList)) {
+            return Collections.emptyList();
+        }
+        return driverList;
     }
 
     /**
@@ -195,10 +201,7 @@ public class DriverServiceImpl implements DriverService {
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getServiceName()), Driver::getServiceName, driverPageQuery.getServiceName());
             queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getServiceHost()), Driver::getServiceHost, driverPageQuery.getServiceHost());
             queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getServicePort()), Driver::getServicePort, driverPageQuery.getServicePort());
-            if (ObjectUtil.isNull(driverPageQuery.getDriverTypeFlag())) {
-                driverPageQuery.setDriverTypeFlag(DriverTypeFlagEnum.DRIVER);
-            }
-            queryWrapper.like(Driver::getDriverTypeFlag, driverPageQuery.getDriverTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getDriverTypeFlag()), Driver::getDriverTypeFlag, driverPageQuery.getDriverTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getEnableFlag()), Driver::getEnableFlag, driverPageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverPageQuery.getTenantId()), Driver::getTenantId, driverPageQuery.getTenantId());
         }

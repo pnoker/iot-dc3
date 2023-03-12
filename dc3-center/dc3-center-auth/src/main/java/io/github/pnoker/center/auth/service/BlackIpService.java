@@ -28,10 +28,11 @@ public interface BlackIpService extends Service<BlackIp, BlackIpPageQuery> {
     /**
      * 根据 Ip 查询 BlackIp
      *
-     * @param ip IP
+     * @param ip             IP
+     * @param throwException Throw Exception
      * @return BlackIp
      */
-    BlackIp selectByIp(String ip);
+    BlackIp selectByIp(String ip, boolean throwException);
 
     /**
      * 根据 Ip 是否在Ip黑名单列表

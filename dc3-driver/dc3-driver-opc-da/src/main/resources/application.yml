@@ -29,7 +29,7 @@ driver:
       corn: '0/5 * * * * ?'
   driver-attribute:
     - displayName: 主机
-      name: host
+      attributeName: host
       type: string
       value: localhost
       remark: Opc Da Host
@@ -39,7 +39,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: CLSID
-      name: clsId
+      attributeName: clsId
       type: string
       value: F8582CF2-88FB-11D0-B850-00C0F0104305
       remark: Opc Da Server CLAID
@@ -49,7 +49,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 用户名
-      name: username
+      attributeName: username
       type: string
       value: dc3
       remark: Opc Da UserName
@@ -59,7 +59,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 密码
-      name: password
+      attributeName: password
       type: string
       value: dc3dc3
       remark: Opc Da Passward
@@ -70,7 +70,7 @@ driver:
         data: jsonString
   point-attribute:
     - displayName: 分组
-      name: group
+      attributeName: group
       type: string
       value: GROUP
       remark: 分组名称
@@ -80,7 +80,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 位号
-      name: tag
+      attributeName: tag
       type: string
       value: TAG
       remark: 位号名称

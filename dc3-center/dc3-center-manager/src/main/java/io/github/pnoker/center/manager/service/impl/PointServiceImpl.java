@@ -138,6 +138,7 @@ public class PointServiceImpl implements PointService {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         queryWrapper.eq(Point::getPointName, name);
         queryWrapper.eq(Point::getProfileId, profileId);
+        queryWrapper.last("limit 1");
         Point point = pointMapper.selectOne(queryWrapper);
         if (null == point) {
             throw new NotFoundException();
@@ -216,6 +217,7 @@ public class PointServiceImpl implements PointService {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (null != pointPageQuery) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), Point::getPointName, pointPageQuery.getPointName());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), Point::getPointCode, pointPageQuery.getPointCode());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), Point::getPointTypeFlag, pointPageQuery.getPointTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getRwFlag()), Point::getRwFlag, pointPageQuery.getRwFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getAccrueFlag()), Point::getAccrueFlag, pointPageQuery.getAccrueFlag());
@@ -230,12 +232,13 @@ public class PointServiceImpl implements PointService {
         QueryWrapper<Point> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(pointPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), "dp.name", pointPageQuery.getPointName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.type", pointPageQuery.getPointTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw", pointPageQuery.getRwFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getAccrueFlag()), "dp.accrue", pointPageQuery.getAccrueFlag());
+            queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), "dp.point_name", pointPageQuery.getPointName());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), "dp.point_code", pointPageQuery.getPointTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.point_type_flag", pointPageQuery.getPointTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw_flag", pointPageQuery.getRwFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getAccrueFlag()), "dp.accrue_flag", pointPageQuery.getAccrueFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getProfileId()), "dp.profile_id", pointPageQuery.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable", pointPageQuery.getEnableFlag());
+            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable_flag", pointPageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getTenantId()), "dp.tenant_id", pointPageQuery.getTenantId());
         }
         return queryWrapper.lambda();

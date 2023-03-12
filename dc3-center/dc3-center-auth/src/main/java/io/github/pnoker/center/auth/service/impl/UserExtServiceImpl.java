@@ -131,39 +131,39 @@ public class UserExtServiceImpl implements UserExtService {
         return userExtMapper.selectById(id);
     }
 
-    public UserExt selectByUserName(String userName, boolean isEx) {
+    public UserExt selectByUserName(String userName, boolean throwException) {
         if (CharSequenceUtil.isEmpty(userName)) {
-            if (isEx) {
+            if (throwException) {
                 throw new EmptyException("The name is empty");
             }
             return null;
         }
 
-        return selectByKey(UserExt::getUserName, userName, isEx);
+        return selectByKey(UserExt::getUserName, userName, throwException);
     }
 
     @Override
-    public UserExt selectByPhone(String phone, boolean isEx) {
+    public UserExt selectByPhone(String phone, boolean throwException) {
         if (CharSequenceUtil.isEmpty(phone)) {
-            if (isEx) {
+            if (throwException) {
                 throw new EmptyException("The phone is empty");
             }
             return null;
         }
 
-        return selectByKey(UserExt::getPhone, phone, isEx);
+        return selectByKey(UserExt::getPhone, phone, throwException);
     }
 
     @Override
-    public UserExt selectByEmail(String email, boolean isEx) {
+    public UserExt selectByEmail(String email, boolean throwException) {
         if (CharSequenceUtil.isEmpty(email)) {
-            if (isEx) {
+            if (throwException) {
                 throw new EmptyException("The phone is empty");
             }
             return null;
         }
 
-        return selectByKey(UserExt::getEmail, email, isEx);
+        return selectByKey(UserExt::getEmail, email, throwException);
     }
 
     @Override
@@ -186,12 +186,13 @@ public class UserExtServiceImpl implements UserExtService {
         return queryWrapper;
     }
 
-    private UserExt selectByKey(SFunction<UserExt, ?> key, String value, boolean isEx) {
+    private UserExt selectByKey(SFunction<UserExt, ?> key, String value, boolean throwException) {
         LambdaQueryWrapper<UserExt> queryWrapper = Wrappers.<UserExt>query().lambda();
         queryWrapper.eq(key, value);
+        queryWrapper.last("limit 1");
         UserExt userExt = userExtMapper.selectOne(queryWrapper);
         if (ObjectUtil.isNull(userExt)) {
-            if (isEx) {
+            if (throwException) {
                 throw new NotFoundException();
             }
             return null;

@@ -29,7 +29,7 @@ driver:
       corn: '0/5 * * * * ?'
   point-attribute:
     - displayName: 指令Topic
-      name: commandTopic
+      attributeName: commandTopic
       type: string
       value: commandTopic
       remark: 测点/设备接收下行指令的Mqtt主题
@@ -39,7 +39,7 @@ driver:
         data-type: static/url
         data: jsonString
     - displayName: 指令Qos
-      name: commandQos
+      attributeName: commandQos
       type: int
       value: 2
       remark: 测点/设备接收下行指令的Mqtt主题的Qos

@@ -108,7 +108,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request token header");
                 }
 
-                LoginQuery login = LoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantName())
+                LoginQuery login = LoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode())
                         .setName(rUserDTO.getData().getLoginName())
                         .setSalt(token.getSalt())
                         .setToken(token.getToken()).build();

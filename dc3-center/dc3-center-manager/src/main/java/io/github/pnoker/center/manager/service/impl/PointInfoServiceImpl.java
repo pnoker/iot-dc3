@@ -124,6 +124,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
         queryWrapper.eq(PointInfo::getPointId, pointId);
+        queryWrapper.last("limit 1");
         PointInfo pointInfo = pointInfoMapper.selectOne(queryWrapper);
         if (null == pointInfo) {
             throw new NotFoundException();
