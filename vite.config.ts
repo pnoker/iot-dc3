@@ -44,7 +44,7 @@ export default (configEnv: ConfigEnv) => {
     const apiPrefix = process.env.APP_API_PREFIX as string
     const proxy = {
         [apiPrefix]: {
-            ws: true,
+            ws: false,
             changeOrigin: true,
             target: `${process.env.APP_API_PATH}:${process.env.APP_API_PORT}`,
             rewrite: (path: string) => path.replace(new RegExp(`^${apiPrefix}`), apiPrefix),

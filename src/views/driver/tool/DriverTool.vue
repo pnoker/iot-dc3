@@ -20,17 +20,17 @@
             <el-form ref="formDataRef" class="tool-card-body" :rules="formRule" :model="reactiveData.formData" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="name" label="驱动名称">
-                        <el-input v-model="reactiveData.formData.name" class="edit-form-default" placeholder="请输入驱动名称" clearable @keyup.enter="search"></el-input>
+                        <el-input v-model="reactiveData.formData.driverName" class="edit-form-default" placeholder="请输入驱动名称" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item prop="serviceName" label="服务名称">
                         <el-input v-model="reactiveData.formData.serviceName" class="edit-form-default" placeholder="请输入服务名称" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item prop="host" label="主机">
-                        <el-input v-model="reactiveData.formData.host" class="edit-form-default" placeholder="请输入主机" clearable @keyup.enter="search"></el-input>
+                        <el-input v-model="reactiveData.formData.serviceHost" class="edit-form-default" placeholder="请输入主机" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item prop="port" label="端口">
                         <el-input
-                            v-model.number="reactiveData.formData.port"
+                            v-model.number="reactiveData.formData.servicePort"
                             class="edit-form-small"
                             placeholder="请输入端口"
                             autocomplete="off"
@@ -38,10 +38,10 @@
                             @keyup.enter="search"
                         ></el-input>
                     </el-form-item>
-                    <el-form-item prop="enable" label="使能">
-                        <el-select v-model="reactiveData.formData.enable" class="edit-form-small" placeholder="请选择使能" clearable>
-                            <el-option label="启用" :value="true"></el-option>
-                            <el-option label="停用" :value="false"></el-option>
+                    <el-form-item label="使能" prop="enableFlag">
+                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                            <el-option label="启用" value="ENABLE"></el-option>
+                            <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>
                     </el-form-item>
                 </div>

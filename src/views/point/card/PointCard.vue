@@ -21,15 +21,15 @@
                 <div
                     class="things-card__header"
                     :class="{
-                        'header-enable': data.enable,
-                        'header-disable': !data.enable,
+                        'header-enable': 'ENABLE' === data.enableFlag,
+                        'header-disable': 'ENABLE' !== data.enableFlag,
                     }"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.name" />
+                        <img :src="icon" :alt="data.pointName" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '位号ID')">
-                        {{ data.name }}
+                        {{ data.pointName }}
                     </div>
                     <div title="状态" class="things-card-header-status"></div>
                 </div>
@@ -39,27 +39,22 @@
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><List /></el-icon> 所属模板: </span
-                                >{{ profile.name }}
+                                >{{ profile.profileName }}
                             </li>
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 累计标识: </span
-                                >{{ data.accrue ? '累计' : '不累计' }}
+                                >{{ accrueFlag }}
                             </li>
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 基值: </span
-                                >{{ data.base }}
+                                >{{ data.baseValue }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 格式: </span
-                                >{{ data.format }}
-                            </li>
-                            <li class="nowrap-item">
-                                <span
-                                    ><el-icon><Bottom /></el-icon> 最小值: </span
-                                >{{ data.minimum }}
+                                    ><el-icon><Location /></el-icon> 数据精度: </span
+                                >{{ data.valueDecimal }}
                             </li>
                             <li class="nowrap-item">
                                 <span
@@ -71,12 +66,12 @@
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 数据类型: </span
-                                >{{ type }}
+                                >{{ pointTypeFlag }}
                             </li>
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 读写类型: </span
-                                >{{ rw }}
+                                >{{ rwFlag }}
                             </li>
                             <li class="nowrap-item">
                                 <span
@@ -86,12 +81,7 @@
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 单位: </span
-                                >{{ data.unit }}
-                            </li>
-                            <li class="nowrap-item">
-                                <span
-                                    ><el-icon><Top /></el-icon> 最大值: </span
-                                >{{ data.maximum }}
+                                >{{ unit }}
                             </li>
                             <li class="nowrap-item">
                                 <span
@@ -102,7 +92,7 @@
                     </div>
                     <div title="位号描述信息" class="things-card-body-content">
                         <p class="nowrap-description">
-                            {{ data.description ? data.description : '无描述信息' }}
+                            {{ data.remark ? data.remark : '无描述信息' }}
                         </p>
                     </div>
                 </div>
@@ -110,12 +100,12 @@
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该位号？" placement="top" :icon="SwitchButton" icon-color="#e6a23c" @confirm="disableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="!data.enable" link>停用</el-button>
+                                <el-button type="primary" :disabled="'ENABLE' !== data.enableFlag" link>停用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm title="是否确定启用该位号？" placement="top" :icon="CircleCheck" icon-color="#67c23a" @confirm="enableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="data.enable" link>启用</el-button>
+                                <el-button type="primary" :disabled="'ENABLE' === data.enableFlag" link>启用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm

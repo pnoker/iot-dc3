@@ -16,8 +16,8 @@
 
 import { createStore } from 'vuex'
 
-import auth from '@/config/store/modules/auth'
-import interval from '@/config/store/modules/interval'
+import auth from '@/store/modules/auth'
+import interval from '@/store/modules/interval'
 
 export default createStore({
     modules: {

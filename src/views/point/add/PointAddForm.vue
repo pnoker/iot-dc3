@@ -25,53 +25,53 @@
         :close-on-press-escape="false"
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-            <el-form-item class="things-dialog-form-item" label="位号名称" prop="name">
-                <el-input v-model="reactiveData.formData.name" placeholder="请输入位号名称" clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="位号名称" prop="pointName">
+                <el-input v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable></el-input>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="数据类型" prop="type">
-                <el-select v-model="reactiveData.formData.type" placeholder="请选择数据类型" clearable>
-                    <el-option label="字节(byte)" value="byte"></el-option>
-                    <el-option label="短整数(short)" value="short"></el-option>
-                    <el-option label="整数(int)" value="int"></el-option>
-                    <el-option label="长整数(long)" value="long"></el-option>
-                    <el-option label="浮点数(float)" value="float"></el-option>
-                    <el-option label="双精度浮点数(double)" value="double"></el-option>
-                    <el-option label="布尔量(boolean)" value="boolean"></el-option>
+            <el-form-item class="things-dialog-form-item" label="数据类型" prop="pointTypeFlag">
+                <el-select v-model="reactiveData.formData.pointTypeFlag" placeholder="请选择数据类型" clearable>
+                    <el-option label="字节(byte)" value="BYTE"></el-option>
+                    <el-option label="短整数(short)" value="SHORT"></el-option>
+                    <el-option label="整数(int)" value="INT"></el-option>
+                    <el-option label="长整数(long)" value="LONG"></el-option>
+                    <el-option label="浮点数(float)" value="FLOAT"></el-option>
+                    <el-option label="双精度浮点数(double)" value="DOUBLE"></el-option>
+                    <el-option label="布尔量(boolean)" value="BOOLEAN"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="读写类型" prop="rw">
-                <el-select v-model="reactiveData.formData.rw" placeholder="请选择读写类型" clearable>
-                    <el-option label="只读" :value="0"></el-option>
-                    <el-option label="只写" :value="1"></el-option>
-                    <el-option label="读写" :value="2"></el-option>
+            <el-form-item class="things-dialog-form-item" label="读写类型" prop="rwFlag">
+                <el-select v-model="reactiveData.formData.rwFlag" placeholder="请选择读写类型" clearable>
+                    <el-option label="只读" value="R"></el-option>
+                    <el-option label="只写" value="W"></el-option>
+                    <el-option label="读写" value="RW"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="累计标识" prop="accrue">
-                <el-select v-model="reactiveData.formData.accrue" placeholder="请选择累计标识" clearable>
-                    <el-option label="累计" :value="true"></el-option>
-                    <el-option label="不累计" :value="false"></el-option>
+            <el-form-item class="things-dialog-form-item" label="累计标识" prop="accrueFlag">
+                <el-select v-model="reactiveData.formData.accrueFlag" placeholder="请选择累计标识" clearable>
+                    <el-option label="无规律" value="NONE"></el-option>
+                    <el-option label="递增" value="INCREMENT"></el-option>
+                    <el-option label="递减" value="DECREMENT"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="数据格式" prop="format">
-                <el-input v-model="reactiveData.formData.format" placeholder="请输入数据格式" clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="数据精度" prop="valueDecimal">
+                <el-input v-model="reactiveData.formData.valueDecimal" placeholder="请输入数据精度" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="单位" prop="unit">
-                <el-input v-model="reactiveData.formData.unit" placeholder="请输入单位" clearable></el-input>
+                <el-select v-model="reactiveData.formData.unit" placeholder="请输入单位" clearable>
+                    <el-option label="无单位" value="NULL"></el-option>
+                    <el-option label="摄氏度" value="CENTIGRADE"></el-option>
+                    <el-option label="克" value="G"></el-option>
+                    <el-option label="千克" value="KG"></el-option>
+                </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="基值" prop="base">
-                <el-input v-model="reactiveData.formData.base" placeholder="请输入基值" clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="基值" prop="baseValue">
+                <el-input v-model="reactiveData.formData.baseValue" placeholder="请输入基值" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="倍数" prop="multiple">
                 <el-input v-model="reactiveData.formData.multiple" placeholder="请输入倍数" clearable></el-input>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="最小值" prop="minimum">
-                <el-input v-model="reactiveData.formData.minimum" placeholder="请输入最小值" clearable></el-input>
-            </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="最大值" prop="maximum">
-                <el-input v-model="reactiveData.formData.maximum" placeholder="请输入最大值" clearable></el-input>
-            </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="描述" prop="description">
-                <el-input v-model="reactiveData.formData.description" placeholder="请输入位号描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
+                <el-input v-model="reactiveData.formData.remark" placeholder="请输入位号描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">

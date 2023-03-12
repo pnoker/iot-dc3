@@ -113,7 +113,7 @@ export default defineComponent({
         }
 
         const deviceName = () => {
-            return reactiveData.listDeviceData.map((device) => device.name).join(', ')
+            return reactiveData.listDeviceData.map((device) => device.pointName).join(', ')
         }
 
         const changeActive = (tab) => {

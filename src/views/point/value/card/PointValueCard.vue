@@ -26,15 +26,15 @@
                     }"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.name" />
+                        <img :src="icon" :alt="data.pointName" />
                     </div>
-                    <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '位号值ID')">
-                        {{ point.name }}
+                    <div class="things-card-header-name nowrap-name" @click="copyId(data.pointId, '位号值ID')">
+                        {{ point.pointName }}
                     </div>
                     <div title="读写类型" class="things-card-header-status">
-                        <el-tag v-if="data.rw === 0" type="warning" effect="plain">只读</el-tag>
-                        <el-tag v-else-if="data.rw === 1" type="info" effect="plain">只写</el-tag>
-                        <el-tag v-else-if="data.rw === 2" type="success" effect="plain">读写</el-tag>
+                        <el-tag v-if="data.rwFlag === 'R'" type="warning" effect="plain">只读</el-tag>
+                        <el-tag v-else-if="data.rwFlagrw === 'W'" type="info" effect="plain">只写</el-tag>
+                        <el-tag v-else-if="data.rwFlag === 'RW'" type="success" effect="plain">读写</el-tag>
                     </div>
                 </div>
                 <div class="things-card__body">
@@ -48,7 +48,7 @@
                                 <el-icon><Sunrise /></el-icon> 原始值: {{ data.rawValue }}
                             </li>
                             <li v-if="embedded == ''" class="nowrap-item value-point">
-                                <el-icon> <Management /> </el-icon> 所属设备: {{ device.name }}
+                                <el-icon> <Management /> </el-icon> 所属设备: {{ device.deviceName }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon><Timer /></el-icon> 数据延时: {{ data.interval }} ms
@@ -62,7 +62,7 @@
                         </ul>
                     </div>
                     <div v-if="embedded != ''" class="things-card-body-content-time">
-                        <div :id="data.id"></div>
+                        <div :id="data.pointId"></div>
                     </div>
                 </div>
                 <div v-if="embedded == ''" class="things-card__footer">

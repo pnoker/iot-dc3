@@ -108,7 +108,7 @@ export default defineComponent({
                 return
             }
 
-            const tinyArea = new TinyArea(props.data.id, {
+            const tinyArea = new TinyArea(props.data.pointId, {
                 height: 60,
                 data: props.historyData,
                 autoFit: true,

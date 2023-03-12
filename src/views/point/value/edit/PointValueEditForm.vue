@@ -28,8 +28,8 @@
             <el-form-item class="things-dialog-form-item" label="位号值" prop="value">
                 <el-input v-model="formData.value" placeholder="请输入位号值" clearable></el-input>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="操作描述" prop="description">
-                <el-input v-model="reactiveData.description" type="textarea" maxlength="300" show-word-limit placeholder="请输入本次操作描述" clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="操作描述" prop="remark">
+                <el-input v-model="reactiveData.remark" type="textarea" maxlength="300" show-word-limit placeholder="请输入本次操作描述" clearable></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">

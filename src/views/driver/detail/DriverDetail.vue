@@ -25,7 +25,7 @@
                                 <el-icon>
                                     <Position />
                                 </el-icon>
-                                驱动名称: {{ reactiveData.data.name }}
+                                驱动名称: {{ reactiveData.data.driverName }}
                             </li>
                             <li>
                                 <el-icon>
@@ -37,13 +37,13 @@
                                 <el-icon>
                                     <Connection />
                                 </el-icon>
-                                端口: {{ reactiveData.data.port }}
+                                端口: {{ reactiveData.data.servicePort }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
                                     <Monitor />
                                 </el-icon>
-                                主机: {{ reactiveData.data.host }}
+                                主机: {{ reactiveData.data.serviceHost }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>

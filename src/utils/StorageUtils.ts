@@ -16,15 +16,16 @@
 
 import { isNull } from '@/utils/utils'
 import { decode, encode } from 'js-base64'
-import Cookies from 'ts-cookie'
+import Cookies from 'js-cookie'
 
 /**
  * 获取 Cookies 值
  *
  * @param key key
  */
-export const getCookies = (key) => {
-    return JSON.parse(decode(Cookies.get(key)))
+export const getCookies = (key: string) => {
+    const cookieString = Cookies.get(key) as string | ''
+    return JSON.parse(decode(cookieString))
 }
 
 /**
@@ -33,7 +34,7 @@ export const getCookies = (key) => {
  * @param key key
  * @param value cookies
  */
-export const setCookies = (key, value) => {
+export const setCookies = (key: string, value: any) => {
     return Cookies.set(key, encode(JSON.stringify(value)))
 }
 
@@ -42,7 +43,7 @@ export const setCookies = (key, value) => {
  *
  * @param key key
  */
-export const removeCookies = (key) => {
+export const removeCookies = (key: string) => {
     return Cookies.remove(key)
 }
 
@@ -83,7 +84,7 @@ export const getStorage = (key: string, isSession?: boolean) => {
  * @param value storage
  * @param isSession 是否为 Session Storage，默认 false: Local Storage
  */
-export const setStorage = (key, value, isSession?: boolean) => {
+export const setStorage = (key: string, value: any, isSession?: boolean) => {
     const obj = {
         dataType: typeof value,
         content: value,
@@ -100,7 +101,7 @@ export const setStorage = (key, value, isSession?: boolean) => {
  * @param key key
  * @param isSession 是否为 Session Storage，默认 false: Local Storage
  */
-export const removeStorage = (key, isSession?: boolean) => {
+export const removeStorage = (key: string, isSession?: boolean) => {
     if (isSession) window.sessionStorage.removeItem(key)
     else window.localStorage.removeItem(key)
 }

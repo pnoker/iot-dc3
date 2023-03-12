@@ -21,15 +21,15 @@
                 <div
                     class="things-card__header"
                     :class="{
-                        'header-enable': data.enable,
-                        'header-disable': !data.enable,
+                        'header-enable': 'ENABLE' === data.enableFlag,
+                        'header-disable': 'ENABLE' !== data.enableFlag,
                     }"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.name" />
+                        <img :src="icon" :alt="data.deviceName" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '设备ID')">
-                        {{ data.name }}
+                        {{ data.deviceName }}
                     </div>
                     <div title="状态" class="things-card-header-status">
                         <el-tag v-if="status === 'ONLINE'" type="success" effect="plain">在线</el-tag>
@@ -46,13 +46,13 @@
                                 <el-icon>
                                     <Promotion />
                                 </el-icon>
-                                所属驱动: {{ driver.name }}
+                                所属驱动: {{ driver.driverName }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
                                     <Coin />
                                 </el-icon>
-                                存储类型: {{ data.multi ? '结构数据' : '单点数据' }}
+                                结构化标识: {{ multiFlag }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
@@ -70,7 +70,7 @@
                     </div>
                     <div title="设备描述信息" class="things-card-body-content">
                         <p class="nowrap-description">
-                            {{ data.description ? data.description : '无描述信息' }}
+                            {{ data.remark ? data.remark : '无描述信息' }}
                         </p>
                     </div>
                 </div>
@@ -78,12 +78,12 @@
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该设备？" placement="top" :icon="SwitchButton" icon-color="#e6a23c" @confirm="disableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="!data.enable" link>停用</el-button>
+                                <el-button type="primary" :disabled="'ENABLE' !== data.enableFlag" link>停用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm title="是否确定启用该设备？" placement="top" :icon="CircleCheck" icon-color="#67c23a" @confirm="enableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="data.enable" link>启用</el-button>
+                                <el-button type="primary" :disabled="'ENABLE' === data.enableFlag" link>启用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm

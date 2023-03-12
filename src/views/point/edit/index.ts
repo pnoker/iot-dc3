@@ -51,7 +51,7 @@ export default defineComponent({
 
         // 定义表单校验规则
         const pointFormRule = reactive<FormRules>({
-            name: [
+            pointName: [
                 {
                     required: true,
                     message: '请输入位号名称',
@@ -75,7 +75,7 @@ export default defineComponent({
                     trigger: 'change',
                 },
             ],
-            description: [
+            remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',

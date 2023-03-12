@@ -21,15 +21,15 @@
                 <div
                     class="things-card__header"
                     :class="{
-                        'header-enable': data.enable,
-                        'header-disable': !data.enable,
+                        'header-enable': 'ENABLE' === data.enableFlag,
+                        'header-disable': 'ENABLE' !== data.enableFlag,
                     }"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.name" />
+                        <img :src="icon" :alt="data.driverName" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '驱动ID')">
-                        {{ data.name }}
+                        {{ data.driverName }}
                     </div>
                     <div title="状态" class="things-card-header-status">
                         <el-tag v-if="status === 'ONLINE'" type="success" effect="plain">在线</el-tag>
@@ -47,13 +47,13 @@
                                 <el-icon>
                                     <Connection />
                                 </el-icon>
-                                端口: {{ data.port }}
+                                端口: {{ data.servicePort }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
                                     <Monitor />
                                 </el-icon>
-                                主机: {{ data.host }}
+                                主机: {{ data.serviceHost }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
@@ -75,9 +75,9 @@
                             </li>
                         </ul>
                     </div>
-                    <div :title="data.description ? data.description : '驱动描述信息'" class="things-card-body-content">
+                    <div :title="data.remark ? data.remark : '驱动描述信息'" class="things-card-body-content">
                         <p class="nowrap-description">
-                            {{ data.description ? data.description : '无描述信息' }}
+                            {{ data.remark ? data.remark : '无描述信息' }}
                         </p>
                     </div>
                 </div>

@@ -22,13 +22,38 @@ import { isNull } from './utils'
  *
  * @param message
  */
-export const successMessage = (message?: string) => {
+export const successMessage = (message?: string, title = '成功') => {
     if (isNull(message)) {
         message = '操作成功!'
     }
 
-    ElNotification.success({
-        title: '成功',
+    ElNotification({
+        type: 'success',
+        title: title,
+        dangerouslyUseHTMLString: true,
+        message: message,
+    })
+}
+
+/**
+ * 警告操作
+ *
+ * @param message
+ * @param error
+ */
+export const warnMessage = (message?: string, title = '警告', error?: any) => {
+    if (isNull(message)) {
+        message = '操作警告!'
+    }
+
+    if ('dev' === import.meta.env.MODE && error) {
+        console.error(error)
+    }
+
+    ElNotification({
+        type: 'warning',
+        title: title,
+        dangerouslyUseHTMLString: true,
         message: message,
     })
 }
@@ -39,18 +64,19 @@ export const successMessage = (message?: string) => {
  * @param message
  * @param error
  */
-export const failMessage = (message?: string, error?: any) => {
+export const failMessage = (message?: string, title = '错误', error?: any) => {
     if (isNull(message)) {
         message = '操作失败!'
     }
 
-    if (error) {
+    if ('dev' === import.meta.env.MODE && error) {
         console.error(error)
     }
 
-    ElNotification.error({
-        title: '错误',
+    ElNotification({
+        type: 'error',
+        title: title,
         dangerouslyUseHTMLString: true,
-        message: `${message}`,
+        message: message,
     })
 }

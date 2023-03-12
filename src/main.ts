@@ -17,7 +17,7 @@
 import App from '@/App.vue'
 import plugins from '@/config/plugins/index'
 import router from '@/config/router'
-import store from '@/config/store'
+import store from '@/store'
 import { createApp } from 'vue'
 
 // config app

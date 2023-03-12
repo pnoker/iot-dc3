@@ -29,9 +29,9 @@ export default defineComponent({
             type: Object,
             default: () => {
                 return {
-                    name: '',
-                    value: '',
-                    description: '',
+                    attributeName: '',
+                    defaultValue: '',
+                    remark: '',
                     createTime: '',
                     updateTime: '',
                 }
@@ -53,7 +53,7 @@ export default defineComponent({
         const isConfig = computed(() => {
             for (let i = 0; i < props.attributes.length; i++) {
                 const attribute = props.attributes[i] as any
-                if (props.data[attribute.name].value === '') {
+                if (props.data[attribute.attributeName].configValue === '') {
                     return false
                 }
             }

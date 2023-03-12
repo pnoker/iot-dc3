@@ -25,7 +25,7 @@ import { Login } from '@/config/types'
  */
 export const generateSalt = (login: Login) =>
     request<R>({
-        url: `api/v3/token/salt`,
+        url: `api/v3/auth/token/salt`,
         method: 'post',
         data: login,
     })
@@ -38,7 +38,7 @@ export const generateSalt = (login: Login) =>
  */
 export const generateToken = (login: Login) =>
     request<R>({
-        url: `api/v3/token/generate`,
+        url: `api/v3/auth/token/generate`,
         method: 'post',
         data: login,
     })
@@ -51,7 +51,7 @@ export const generateToken = (login: Login) =>
  */
 export const cancelToken = (login: Login) =>
     request<R>({
-        url: `api/v3/token/cancel`,
+        url: `api/v3/auth/token/cancel`,
         method: 'post',
         data: login,
     })
@@ -64,7 +64,7 @@ export const cancelToken = (login: Login) =>
  */
 export const checkTokenValid = (login: Login) =>
     request<R>({
-        url: `api/v3/token/check`,
+        url: `api/v3/auth/token/check`,
         method: 'post',
         data: login,
     })

@@ -48,7 +48,7 @@ export default defineComponent({
                     trigger: 'blur',
                 },
             ],
-            description: [
+            remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',

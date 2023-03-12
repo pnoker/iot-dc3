@@ -25,7 +25,7 @@
                                 <el-icon>
                                     <Management />
                                 </el-icon>
-                                设备名称: {{ reactiveData.data.name }}
+                                设备名称: {{ reactiveData.data.deviceName }}
                             </li>
                             <li>
                                 <el-icon>
@@ -43,7 +43,7 @@
                                 <el-icon>
                                     <Promotion />
                                 </el-icon>
-                                所属驱动: {{ reactiveData.driver.name }}
+                                所属驱动: {{ reactiveData.driver.driverName }}
                             </li>
                             <li>
                                 <el-icon>

@@ -179,8 +179,8 @@ export default defineComponent({
                 })
         }
 
-        const disableThing = (id, done) => {
-            getPointUpdate({ id: id, enable: false })
+        const disableThing = (id, profileId, done) => {
+            getPointUpdate({ id: id, profileId: profileId, enableFlag: 'DISABLE' })
                 .then(() => {
                     list()
                     done()
@@ -190,8 +190,8 @@ export default defineComponent({
                 })
         }
 
-        const enableThing = (id, done) => {
-            getPointUpdate({ id: id, enable: true })
+        const enableThing = (id, profileId, done) => {
+            getPointUpdate({ id: id, profileId: profileId, enableFlag: 'ENABLE' })
                 .then(() => {
                     list()
                     done()

@@ -25,8 +25,8 @@
         :close-on-press-escape="false"
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-            <el-form-item class="things-dialog-form-item" label="设备名称" prop="name">
-                <el-input v-model="reactiveData.formData.name" placeholder="请输入设备名称" clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="设备名称" prop="deviceName">
+                <el-input v-model="reactiveData.formData.deviceName" placeholder="请输入设备名称" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
                 <el-select v-model="reactiveData.formData.driverId" class="edit-form-special" placeholder="请选择所属驱动" clearable @visible-change="driverDictionaryVisible">
@@ -79,14 +79,14 @@
                     <el-option v-for="dictionary in reactiveData.profileDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="存储类型" prop="multi">
-                <el-select v-model="reactiveData.formData.multi" placeholder="请选择存储类型" clearable>
-                    <el-option label="单点数据" :value="false"></el-option>
-                    <el-option label="结构数据" :value="true"></el-option>
+            <el-form-item class="things-dialog-form-item" label="结构化标识" prop="multiFlag">
+                <el-select v-model="reactiveData.formData.multiFlag" placeholder="请选择结构化标识" clearable>
+                    <el-option label="单点" value="SINGLE"></el-option>
+                    <el-option label="多点" value="MULTIPLE"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="描述" prop="description">
-                <el-input v-model="reactiveData.formData.description" placeholder="请输入设备描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
+                <el-input v-model="reactiveData.formData.remark" placeholder="请输入设备描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">

@@ -21,15 +21,15 @@
                 <div
                     class="things-card__header"
                     :class="{
-                        'header-enable': data.enable,
-                        'header-disable': !data.enable,
+                        'header-enable': 'ENABLE' === data.enableFlag,
+                        'header-disable': 'ENABLE' !== data.enableFlag,
                     }"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.name" />
+                        <img :src="icon" :alt="data.profileName" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '模板ID')">
-                        {{ data.name }}
+                        {{ data.profileName }}
                     </div>
                     <div title="状态" class="things-card-header-status"></div>
                 </div>
@@ -52,7 +52,7 @@
                     </div>
                     <div title="模板描述信息" class="things-card-body-content">
                         <p class="nowrap-description">
-                            {{ data.description ? data.description : '无描述信息' }}
+                            {{ data.remark ? data.remark : '无描述信息' }}
                         </p>
                     </div>
                 </div>
@@ -60,12 +60,12 @@
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该模板？" placement="top" :icon="SwitchButton" icon-color="#e6a23c" @confirm="disableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="!data.enable" link>停用</el-button>
+                                <el-button type="primary" :disabled="'ENABLE' !== data.enableFlag" link>停用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm title="是否确定启用该模板？" placement="top" :icon="CircleCheck" icon-color="#67c23a" @confirm="enableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="data.enable" link>启用</el-button>
+                                <el-button type="primary" :disabled="'ENABLE' === data.enableFlag" link>启用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm

@@ -36,23 +36,21 @@ export default defineComponent({
         // 定义响应式数据
         const reactiveData = reactive({
             formData: {
-                profileId: props.profileId,
-                type: 'float',
-                rw: 0,
-                accrue: false,
-                base: 0,
+                pointTypeFlag: 'FLOAT',
+                rwFlag: 'R',
+                baseValue: 0,
                 multiple: 1,
-                format: '%.3f',
-                unit: '*',
-                minimum: '',
-                maximum: '',
+                accrueFlag: 'NONE',
+                valueDecimal: 3,
+                unit: 'NULL',
+                profileId: props.profileId,
             } as any,
             formVisible: false,
         })
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            name: [
+            pointName: [
                 {
                     required: true,
                     message: '请输入位号名称',
@@ -69,28 +67,28 @@ export default defineComponent({
                     message: '请输入正确格式的位号名称',
                 },
             ],
-            type: [
+            pointTypeFlag: [
                 {
                     required: true,
                     message: '请选择位号数据类型',
                     trigger: 'change',
                 },
             ],
-            rw: [
+            rwFlag: [
                 {
                     required: true,
                     message: '请选择位号读写类型',
                     trigger: 'change',
                 },
             ],
-            accrue: [
+            accrueFlag: [
                 {
                     required: true,
                     message: '请选择位号是否为累计数据',
                     trigger: 'change',
                 },
             ],
-            base: [
+            baseValue: [
                 {
                     pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
                     message: '请输入 正确格式的基值',
@@ -102,26 +100,14 @@ export default defineComponent({
                     message: '请输入 正确格式的倍数',
                 },
             ],
-            format: [
+            valueDecimal: [
                 {
                     required: true,
                     message: '请输入 数据格式',
                     trigger: 'blur',
                 },
             ],
-            minimum: [
-                {
-                    pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-                    message: '请输入 正确格式的最小值',
-                },
-            ],
-            maximum: [
-                {
-                    pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-                    message: '请输入 正确格式的最大值',
-                },
-            ],
-            description: [
+            remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',

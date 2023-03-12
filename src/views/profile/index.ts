@@ -130,14 +130,14 @@ export default defineComponent({
         }
 
         const disableThing = (id, done) => {
-            updateProfile({ id: id, enable: false }).then(() => {
+            updateProfile({ id: id, enableFlag: 'DISABLE' }).then(() => {
                 list()
                 done()
             })
         }
 
         const enableThing = (id, done) => {
-            updateProfile({ id: id, enable: true }).then(() => {
+            updateProfile({ id: id, enableFlag: 'ENABLE' }).then(() => {
                 list()
                 done()
             })

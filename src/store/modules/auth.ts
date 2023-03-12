@@ -89,8 +89,8 @@ const auth = {
                 .catch(() => loading.close())
         },
         logout({ commit, getters }: any) {
-            const tenant = getters.getTenant(CommonConstant.TENANT_HEADER)
-            const user = getters.getName(CommonConstant.USER_HEADER)
+            const tenant = getters.getTenant
+            const user = getters.getName
             if (!isNull(tenant) && !isNull(user)) {
                 const login = {
                     tenant: tenant,

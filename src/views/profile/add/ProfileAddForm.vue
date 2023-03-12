@@ -25,11 +25,11 @@
         :close-on-press-escape="false"
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-            <el-form-item class="things-dialog-form-item" label="模板名称" prop="name">
-                <el-input v-model="reactiveData.formData.name" placeholder="请输入模板名称" clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="模板名称" prop="profileName">
+                <el-input v-model="reactiveData.formData.profileName" placeholder="请输入模板名称" clearable></el-input>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="描述" prop="description">
-                <el-input v-model="reactiveData.formData.description" type="textarea" maxlength="300" show-word-limit placeholder="请输入模板描述" clearable></el-input>
+            <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
+                <el-input v-model="reactiveData.formData.remark" type="textarea" maxlength="300" show-word-limit placeholder="请输入模板描述" clearable></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">

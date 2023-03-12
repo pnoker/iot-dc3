@@ -61,7 +61,7 @@ export default defineComponent({
         CollectionTag,
     },
     props: {
-        name: {
+        deviceName: {
             type: String,
             default: '',
         },
@@ -109,7 +109,7 @@ export default defineComponent({
             getDeviceById(reactiveData.id)
                 .then((res) => {
                     reactiveData.data = res.data.data
-                    reactiveData.deviceTable[reactiveData.data.id] = reactiveData.data.name
+                    reactiveData.deviceTable[reactiveData.data.id] = reactiveData.data.deviceName
 
                     getDriverById(reactiveData.data.driverId)
                         .then((res) => {

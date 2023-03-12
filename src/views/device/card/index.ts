@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
 import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchButton } from '@element-plus/icons-vue'
+import { computed, defineComponent } from 'vue'
 
 import router from '@/config/router'
 
-import { successMessage } from '@/utils/NotificationUtils'
 import { copyId, timestamp } from '@/utils/CommonUtils'
+import { successMessage } from '@/utils/NotificationUtils'
 
 export default defineComponent({
     name: 'DeviceCard',
@@ -70,14 +70,24 @@ export default defineComponent({
             CircleClose,
         }
 
+        const multiFlag = computed(() => {
+            const multiFlag = props.data.multiFlag
+            if (multiFlag === 'SINGLE') {
+                return '单点'
+            } else if (multiFlag === 'MULTIPLE') {
+                return '多点'
+            }
+            return '未知'
+        })
+
         const disableThing = () => {
-            emit('disable-thing', props.data.id, () => {
+            emit('disable-thing', props.data.id, props.data.driverId, () => {
                 successMessage()
             })
         }
 
         const enableThing = () => {
-            emit('enable-thing', props.data.id, () => {
+            emit('enable-thing', props.data.id, props.data.driverId, () => {
                 successMessage()
             })
         }
@@ -101,6 +111,7 @@ export default defineComponent({
         }
 
         return {
+            multiFlag,
             disableThing,
             enableThing,
             deleteThing,

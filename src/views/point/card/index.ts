@@ -43,9 +43,9 @@ export default defineComponent({
             type: Object,
             default: () => {
                 return {
-                    name: '',
+                    pointName: '',
                     enable: '',
-                    description: '',
+                    remark: '',
                     createTime: '',
                     updateTime: '',
                 }
@@ -71,46 +71,74 @@ export default defineComponent({
             CircleClose,
         }
 
-        const type = computed(() => {
-            const type = props.data.type
-            if (type === 'int') {
-                return '整数'
-            } else if (type === 'double') {
-                return '双精度浮点数'
-            } else if (type === 'float') {
-                return '浮点数'
-            } else if (type === 'long') {
-                return '长整型'
-            } else if (type === 'boolean') {
-                return '布尔量'
-            } else if (type === 'short') {
-                return '短整型'
-            } else if (type === 'byte') {
+        const pointTypeFlag = computed(() => {
+            const pointTypeFlag = props.data.pointTypeFlag
+            if (pointTypeFlag === 'STRING') {
+                return '字符串'
+            } else if (pointTypeFlag === 'BYTE') {
                 return '字节'
+            } else if (pointTypeFlag === 'SHORT') {
+                return '短整数'
+            } else if (pointTypeFlag === 'INT') {
+                return '整数'
+            } else if (pointTypeFlag === 'LONG') {
+                return '长整数'
+            } else if (pointTypeFlag === 'FLOAT') {
+                return '浮点数'
+            } else if (pointTypeFlag === 'DOUBLE') {
+                return '双精度浮点数'
+            } else if (pointTypeFlag === 'BOOLEAN') {
+                return '布尔量'
             }
             return '未知'
         })
 
-        const rw = computed(() => {
-            const rw = props.data.rw
-            if (rw === 0) {
+        const accrueFlag = computed(() => {
+            const accrueFlag = props.data.accrueFlag
+            if (accrueFlag === 'NONE') {
+                return '无规律'
+            } else if (accrueFlag === 'INCREMENT') {
+                return '递增'
+            } else if (accrueFlag === 'DECREMENT') {
+                return '递减'
+            }
+            return '未知'
+        })
+
+        const rwFlag = computed(() => {
+            const rwFlag = props.data.rwFlag
+            if (rwFlag === 'R') {
                 return '只读'
-            } else if (rw === 1) {
+            } else if (rwFlag === 'W') {
                 return '只写'
-            } else if (rw === 2) {
+            } else if (rwFlag === 'RW') {
                 return '读写'
             }
             return '未知'
         })
 
+        const unit = computed(() => {
+            const unit = props.data.unit
+            if (unit === 'NULL') {
+                return '无单位'
+            } else if (unit === 'CENTIGRADE') {
+                return '摄氏度'
+            } else if (unit === 'G') {
+                return '克'
+            } else if (unit === 'KG') {
+                return '千克'
+            }
+            return '未知'
+        })
+
         const disableThing = () => {
-            emit('disable-thing', props.data.id, () => {
+            emit('disable-thing', props.data.id, props.data.profileId, () => {
                 successMessage()
             })
         }
 
         const enableThing = () => {
-            emit('enable-thing', props.data.id, () => {
+            emit('enable-thing', props.data.id, props.data.profileId, () => {
                 successMessage()
             })
         }
@@ -134,8 +162,10 @@ export default defineComponent({
         }
 
         return {
-            type,
-            rw,
+            pointTypeFlag,
+            accrueFlag,
+            rwFlag,
+            unit,
             disableThing,
             enableThing,
             deleteThing,

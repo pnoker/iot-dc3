@@ -6,6 +6,7 @@
     "description": "DC3 IoT 平台前端页面",
     "scripts": {
         "serve": "vite --host --mode dev",
+        "pre": "vite --host --mode pre",
         "build": "vite build --mode pro",
         "build:dev": "vue-tsc && vite build --mode dev",
         "build:mock": "vue-tsc && vite build --mode mock",
@@ -42,6 +43,8 @@
     },
     "devDependencies": {
         "@types/highlight.js": "^10.1.0",
+        "@types/js-base64": "^3.3.1",
+        "@types/js-cookie": "^3.0.3",
         "@types/node": "^18.13.0",
         "@types/nprogress": "^0.2.0",
         "@typescript-eslint/eslint-plugin": "^5.52.0",

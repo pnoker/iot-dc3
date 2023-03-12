@@ -180,8 +180,9 @@ export default defineComponent({
                 })
         }
 
-        const disableThing = (id, done) => {
-            updateDevice({ id: id, enable: false })
+        const disableThing = (id, driverId, done) => {
+            console.log(props)
+            updateDevice({ id: id, driverId: driverId, enableFlag: 'DISABLE' })
                 .then(() => {
                     list()
                     done()
@@ -191,8 +192,8 @@ export default defineComponent({
                 })
         }
 
-        const enableThing = (id, done) => {
-            updateDevice({ id: id, enable: true })
+        const enableThing = (id, driverId, done) => {
+            updateDevice({ id: id, driverId: driverId, enableFlag: 'ENABLE' })
                 .then(() => {
                     list()
                     done()

@@ -70,13 +70,13 @@
                             <el-option v-for="dictionary in reactiveData.pointDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item v-if="embedded == 'device'" prop="name" label="位号名称">
-                        <el-input v-model="reactiveData.formData.name" class="edit-form-default" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
+                    <el-form-item v-if="embedded == 'device'" prop="pointName" label="位号名称">
+                        <el-input v-model="reactiveData.formData.pointName" class="edit-form-default" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
                     </el-form-item>
-                    <el-form-item v-if="embedded == 'device'" prop="enable" label="使能">
-                        <el-select v-model="reactiveData.formData.enable" class="edit-form-small" placeholder="请选择使能" clearable>
-                            <el-option label="启用" :value="true"></el-option>
-                            <el-option label="停用" :value="false"></el-option>
+                    <el-form-item v-if="embedded == 'device'" prop="enableFlag" label="使能">
+                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                            <el-option label="启用" value="ENABLE"></el-option>
+                            <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>
                     </el-form-item>
                 </div>

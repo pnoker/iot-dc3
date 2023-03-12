@@ -26,7 +26,7 @@
                                     <CollectionTag />
                                 </el-icon>
                                 位号名称:
-                                {{ reactiveData.data.name }}
+                                {{ reactiveData.data.pointName }}
                             </li>
                             <li>
                                 <el-icon>

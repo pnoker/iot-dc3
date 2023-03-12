@@ -32,7 +32,7 @@ export default defineComponent({
         // 定义响应式数据
         const reactiveData = reactive({
             formData: {
-                multi: false,
+                multiFlag: 'SINGLE',
             } as any,
             formVisible: false,
             driverQuery: '',
@@ -55,7 +55,7 @@ export default defineComponent({
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            name: [
+            deviceName: [
                 {
                     required: true,
                     message: '请输入设备名称',
@@ -79,7 +79,7 @@ export default defineComponent({
                     trigger: 'change',
                 },
             ],
-            description: [
+            remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',

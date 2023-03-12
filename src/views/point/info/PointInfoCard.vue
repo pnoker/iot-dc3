@@ -26,9 +26,9 @@
                     }"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="isSelect" :alt="data.name" />
+                        <img :src="isSelect" :alt="data.attributeName" />
                     </div>
-                    <div class="things-card-header-name nowrap-name">{{ data.name }}</div>
+                    <div class="things-card-header-name nowrap-name">{{ data.pointName }}</div>
                 </div>
                 <div class="things-card__body">
                     <div class="things-card-body-content">
@@ -37,7 +37,7 @@
                                 <el-icon>
                                     <Goblet />
                                 </el-icon>
-                                {{ attribute.displayName }}: {{ data[attribute.name].value }}
+                                {{ attribute.displayName }}: {{ data[attribute.attributeName].configValue }}
                             </li>
                         </ul>
                     </div>

@@ -32,8 +32,8 @@
                 <el-divider content-position="left">设备信息配置</el-divider>
                 <el-form ref="deviceFormRef" :inline="true" :model="reactiveData.deviceFormData" :rules="deviceFormRule">
                     <div class="edit-form-item">
-                        <el-form-item label="设备名称" prop="name">
-                            <el-input v-model="reactiveData.deviceFormData.name" class="edit-form-default" placeholder="请输入设备名称" clearable></el-input>
+                        <el-form-item label="设备名称" prop="deviceName">
+                            <el-input v-model="reactiveData.deviceFormData.deviceName" class="edit-form-default" placeholder="请输入设备名称" clearable></el-input>
                         </el-form-item>
                         <el-form-item label="所属驱动" prop="driverId">
                             <el-select
@@ -69,16 +69,16 @@
                                 ></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="存储类型" prop="multi">
-                            <el-select v-model="reactiveData.deviceFormData.multi" class="edit-form-medium" placeholder="请选择存储类型" clearable>
-                                <el-option label="单点数据" :value="false"></el-option>
-                                <el-option label="结构数据" :value="true"></el-option>
+                        <el-form-item label="结构化标识" prop="multiFlag">
+                            <el-select v-model="reactiveData.deviceFormData.multiFlag" class="edit-form-medium" placeholder="请选择结构化标识" clearable>
+                                <el-option label="单点" value="SINGLE"></el-option>
+                                <el-option label="多点" value="MULTIPLE"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="使能" prop="enable">
-                            <el-select v-model="reactiveData.deviceFormData.enable" class="edit-form-small" placeholder="请选择使能" clearable>
-                                <el-option label="启用" :value="true"></el-option>
-                                <el-option label="停用" :value="false"></el-option>
+                        <el-form-item label="使能" prop="enableFlag">
+                            <el-select v-model="reactiveData.deviceFormData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                                <el-option label="启用" value="ENABLE"></el-option>
+                                <el-option label="停用" value="DISABLE"></el-option>
                             </el-select>
                         </el-form-item>
                     </div>
@@ -119,9 +119,9 @@
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="设备描述" prop="description">
+                        <el-form-item label="设备描述" prop="remark">
                             <el-input
-                                v-model="reactiveData.deviceFormData.description"
+                                v-model="reactiveData.deviceFormData.remark"
                                 class="edit-form-large"
                                 placeholder="请输入设备描述"
                                 type="textarea"
@@ -145,11 +145,11 @@
                 <el-form ref="driverFormRef" :inline="true" :model="reactiveData.driverFormData" :v-if="reactiveData.driverFormData.length > 0">
                     <div class="edit-form-item">
                         <el-row>
-                            <el-form-item v-for="attribute in reactiveData.driverAttributes" :key="attribute.id" :label="attribute.displayName" :prop="attribute.name">
+                            <el-form-item v-for="attribute in reactiveData.driverAttributes" :key="attribute.id" :label="attribute.displayName" :prop="attribute.attributeName">
                                 <el-input
-                                    v-if="reactiveData.driverFormData[attribute.name]"
-                                    :key="reactiveData.driverFormData[attribute.name].id"
-                                    v-model="reactiveData.driverFormData[attribute.name].value"
+                                    v-if="reactiveData.driverFormData[attribute.attributeName]"
+                                    :key="reactiveData.driverFormData[attribute.attributeName].id"
+                                    v-model="reactiveData.driverFormData[attribute.attributeName].configValue"
                                     class="edit-form-default"
                                     :placeholder="'请输入' + attribute.displayName"
                                     clearable
@@ -170,17 +170,17 @@
                 <el-alert :closable="false" title="设备位号配置说明" type="success" description="设备位号配置用于配置采集设备该位号的数据所需的基本参数信息。"></el-alert>
                 <el-form ref="pointFormRef" :inline="true" :model="reactiveData.pointFormData" :v-if="reactiveData.pointFormData.length > 0">
                     <div class="edit-form-item">
-                        <el-form-item label="位号名称" prop="name">
-                            <el-input v-model="reactiveData.pointFormData.name" class="edit-form-default" disabled></el-input>
+                        <el-form-item label="位号名称" prop="pointName">
+                            <el-input v-model="reactiveData.pointFormData.pointName" class="edit-form-default" disabled></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
                         <el-row>
-                            <el-form-item v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" :label="attribute.displayName" :prop="attribute.name">
+                            <el-form-item v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" :label="attribute.displayName" :prop="attribute.attributeName">
                                 <el-input
-                                    v-if="reactiveData.pointFormData[attribute.name]"
-                                    :key="reactiveData.pointFormData[attribute.name].id"
-                                    v-model="reactiveData.pointFormData[attribute.name].value"
+                                    v-if="reactiveData.pointFormData[attribute.attributeName]"
+                                    :key="reactiveData.pointFormData[attribute.attributeName].id"
+                                    v-model="reactiveData.pointFormData[attribute.attributeName].configValue"
                                     class="edit-form-default"
                                     :placeholder="'请输入' + attribute.displayName"
                                     clearable

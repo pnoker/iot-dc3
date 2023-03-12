@@ -25,7 +25,7 @@
                                 <el-icon>
                                     <List />
                                 </el-icon>
-                                模板名称: {{ reactiveData.data.name }}
+                                模板名称: {{ reactiveData.data.profileName }}
                             </li>
                             <li>
                                 <el-icon>

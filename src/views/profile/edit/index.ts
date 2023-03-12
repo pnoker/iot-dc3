@@ -51,7 +51,7 @@ export default defineComponent({
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            name: [
+            profileName: [
                 {
                     required: true,
                     message: '请输入模板名称',
@@ -68,14 +68,14 @@ export default defineComponent({
                     message: '请输入正确格式的模板名称',
                 },
             ],
-            enable: [
+            enableFlag: [
                 {
                     required: true,
                     message: '请选择使能',
                     trigger: 'change',
                 },
             ],
-            description: [
+            remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',

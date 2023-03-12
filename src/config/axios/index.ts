@@ -17,16 +17,16 @@
 import axios, { AxiosInstance } from 'axios'
 
 import router from '@/config/router'
-import store from '@/config/store'
+import store from '@/store'
 
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 import CommonConstant from '@/config/constant/common'
-import { warning } from '@/utils/MessageUtils'
 import { getStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'
 
+import { failMessage, warnMessage } from '@/utils/NotificationUtils'
 import { encode } from 'js-base64'
 
 NProgress.configure({
@@ -34,18 +34,11 @@ NProgress.configure({
     showSpinner: false,
 })
 
-const noAuthMessage = '检测到您未登录或登陆凭证已失效，请重新登录'
-
 const request: AxiosInstance = axios.create({
     timeout: 15000,
     withCredentials: true,
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-    },
-    validateStatus(status): boolean {
-        return status >= 200 && status <= 500
-    },
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    validateStatus: (status) => status >= 200 && status <= 500,
 })
 
 request.interceptors.request.use(
@@ -79,13 +72,15 @@ request.interceptors.response.use(
         const ok = response.data.ok || false
         const status = response.status || 401
 
-        if (!ok && status === 401) {
-            warning(noAuthMessage)
-            store.dispatch('auth/logout').then(() => router.push({ path: '/login' }))
-            return Promise.reject(noAuthMessage)
-        }
+        if (ok) return response
 
-        return response
+        if (status === 401) {
+            warnMessage('检测到您未登录或登陆凭证已失效，请重新登录!', '登录凭证失效')
+            store.dispatch('auth/logout').then(() => router.push({ path: '/login' }))
+        } else {
+            failMessage('接口请求异常，请联系系统管理员。', response.data.code, response.data)
+        }
+        return Promise.reject()
     },
     (error: any) => {
         NProgress.done()
