@@ -1,10 +1,12 @@
 #
-# Copyright 2016-present Pnoker All Rights Reserved
+# Copyright 2016-present the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +16,7 @@
 
 driver:
   name: PlcS7Driver
-  type: driver
+  type: DRIVER
   project: @project.artifactId@
   remark: @project.description@
   schedule:
@@ -28,8 +30,8 @@ driver:
       enable: true
       corn: '0/5 * * * * ?'
   driver-attribute:
-    - displayName: 主机
-      attributeName: host
+    - display-name: 主机
+      attribute-name: host
       type: string
       value: 192.168.0.20
       remark: Ip
@@ -38,8 +40,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 端口
-      attributeName: port
+    - display-name: 端口
+      attribute-name: port
       type: int
       value: 102
       remark: Port
@@ -49,8 +51,8 @@ driver:
         data-type: static/url
         data: jsonString
   point-attribute:
-    - displayName: DB序号
-      attributeName: dbNum
+    - display-name: DB序号
+      attribute-name: dbNum
       type: int
       value: 0
       remark: 数据块号，从 0 开始计数
@@ -59,8 +61,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 字偏移
-      attributeName: byteOffset
+    - display-name: 字偏移
+      attribute-name: byteOffset
       type: int
       value: 0
       remark: 字偏移
@@ -69,8 +71,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 位偏移
-      attributeName: bitOffset
+    - display-name: 位偏移
+      attribute-name: bitOffset
       type: int
       value: 0
       remark: 位偏移
@@ -79,8 +81,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 数据块长度
-      attributeName: blockSize
+    - display-name: 数据块长度
+      attribute-name: blockSize
       type: int
       value: 8
       remark: 数据块长度

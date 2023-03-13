@@ -1,10 +1,12 @@
 #
-# Copyright 2016-present Pnoker All Rights Reserved
+# Copyright 2016-present the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +16,7 @@
 
 driver:
   name: OpcDaDriver
-  type: driver
+  type: DRIVER
   project: @project.artifactId@
   remark: @project.description@
   schedule:
@@ -28,8 +30,8 @@ driver:
       enable: true
       corn: '0/5 * * * * ?'
   driver-attribute:
-    - displayName: 主机
-      attributeName: host
+    - display-name: 主机
+      attribute-name: host
       type: string
       value: localhost
       remark: Opc Da Host
@@ -38,8 +40,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: CLSID
-      attributeName: clsId
+    - display-name: CLSID
+      attribute-name: clsId
       type: string
       value: F8582CF2-88FB-11D0-B850-00C0F0104305
       remark: Opc Da Server CLAID
@@ -48,8 +50,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 用户名
-      attributeName: username
+    - display-name: 用户名
+      attribute-name: username
       type: string
       value: dc3
       remark: Opc Da UserName
@@ -58,8 +60,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 密码
-      attributeName: password
+    - display-name: 密码
+      attribute-name: password
       type: string
       value: dc3dc3
       remark: Opc Da Passward
@@ -69,8 +71,8 @@ driver:
         data-type: static/url
         data: jsonString
   point-attribute:
-    - displayName: 分组
-      attributeName: group
+    - display-name: 分组
+      attribute-name: group
       type: string
       value: GROUP
       remark: 分组名称
@@ -79,8 +81,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 位号
-      attributeName: tag
+    - display-name: 位号
+      attribute-name: tag
       type: string
       value: TAG
       remark: 位号名称
