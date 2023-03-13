@@ -35,6 +35,7 @@
         <module>dc3-driver-mqtt</module>
         <module>dc3-driver-modbus-tcp</module>
         <module>dc3-driver-edge-gateway</module>
+        <module>dc3-driver-lwm2m</module>
     </modules>
 
     <dependencies>
