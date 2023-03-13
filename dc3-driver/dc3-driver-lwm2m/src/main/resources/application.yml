@@ -33,8 +33,8 @@ driver:
       enable: false
       corn: '0/5 * * * * ?'
   point-attribute:
-    - displayName: 消息上行
-      name: messageUp
+    - display-name: 消息上行
+      attribute-name: messageUp
       type: string
       value: /19/0/0
       remark: 消息上行资源对象(未适配)
@@ -43,8 +43,8 @@ driver:
         required: true
         data-type: static/url
         data: jsonString
-    - displayName: 消息下行
-      name: messageDown
+    - display-name: 消息下行
+      attribute-name: messageDown
       type: string
       value: /19/1/0
       remark: 消息下行资源对象(未适配)
