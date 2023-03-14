@@ -25,12 +25,15 @@ driver:
     coaps:
       port: 5684
   schedule:
+    # 状态更新定时任务 本驱动未使用
     status:
       enable: true
-      corn: '0/3 * * * * ?'
+      corn: '0/10 * * * * ?'
+    # 数据读取定时任务 需开启才能看到数据
     read:
-      enable: true
+      enable: false
       corn: '0/30 * * * * ?'
+    # 自定义定时任务 本驱动未使用
     custom:
       enable: false
       corn: '0/5 * * * * ?'
@@ -39,7 +42,7 @@ driver:
       attribute-name: messageUp
       type: string
       value: /19/0/0
-      remark: 消息上行资源对象(未适配)
+      remark: 消息上行资源对象
       option:
         type: input\select\checkox\switch\time...
         required: true
@@ -49,7 +52,17 @@ driver:
       attribute-name: messageDown
       type: string
       value: /19/1/0
-      remark: 消息下行资源对象(未适配)
+      remark: 消息下行资源对象
+      option:
+        type: input\select\checkox\switch\time...
+        required: true
+        data-type: static/url
+        data: jsonString
+    - display-name: 命令下行
+      attribute-name: execDown
+      type: commod
+      value: /19/2/0
+      remark: 命令下行资源对象
       option:
         type: input\select\checkox\switch\time...
         required: true
