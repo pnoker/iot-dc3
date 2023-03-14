@@ -26,10 +26,7 @@ import org.eclipse.leshan.core.observation.CompositeObservation;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.observation.SingleObservation;
 import org.eclipse.leshan.core.request.*;
-import org.eclipse.leshan.core.response.ObserveCompositeResponse;
-import org.eclipse.leshan.core.response.ObserveResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
+import org.eclipse.leshan.core.response.*;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.observation.ObservationListener;
@@ -42,6 +39,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.Collection;
 
+/**
+ * Lwm2mServer 已经实现coap方式接入 待实现coaps方式
+ *
+ * @author xwh1998
+ */
 @Component
 @Slf4j
 public class Lwm2mServer {
@@ -59,6 +61,17 @@ public class Lwm2mServer {
     @Resource
     private DriverService driverService;
 
+    public void startServer() {
+        LeshanServerBuilder builder = new LeshanServerBuilder();
+        builder.setLocalAddress(null, coapPort);
+        builder.setLocalSecureAddress(null, coapsPort);
+        server = builder.build();
+        server.getRegistrationService().addListener(getRegistrationListener());
+        server.getObservationService().addListener(getObservationListener());
+        server.start();
+        log.debug("server start success:coap:{} coaps:{}", coapPort, coapsPort);
+    }
+
     /**
      * 读取某个资源
      *
@@ -75,7 +88,7 @@ public class Lwm2mServer {
                 return String.valueOf(((LwM2mSingleResource) response.getContent()).getValue());
             }
         } catch (RuntimeException | InterruptedException e) {
-            log.error("read exception :{}", e.getMessage());
+            log.error("read exception :{},{},{}", clientEndpoint, path, e.getMessage());
         }
         return "nil";
     }
@@ -139,26 +152,16 @@ public class Lwm2mServer {
      * @param params
      * @return
      */
-    public String execute(String clientEndpoint, String path, String params) {
+    public boolean execute(String clientEndpoint, String path, String params) {
         Registration registration = server.getRegistrationService().getByEndpoint(clientEndpoint);
         try {
             ExecuteRequest request = new ExecuteRequest(path, params);
-            server.send(registration, request);
+            ExecuteResponse response = server.send(registration, request);
+            return response.isSuccess();
         } catch (RuntimeException | InterruptedException e) {
             log.error("execute exception :{}", e.getMessage());
         }
-        return "";
-    }
-
-    public void startServer() {
-        LeshanServerBuilder builder = new LeshanServerBuilder();
-        builder.setLocalAddress(null, coapPort);
-        builder.setLocalSecureAddress(null, coapsPort);
-        server = builder.build();
-        server.getRegistrationService().addListener(getRegistrationListener());
-        server.getObservationService().addListener(getObservationListener());
-        server.start();
-        log.debug("server start success:coap:{} coaps:{}", coapPort, coapsPort);
+        return false;
     }
 
 

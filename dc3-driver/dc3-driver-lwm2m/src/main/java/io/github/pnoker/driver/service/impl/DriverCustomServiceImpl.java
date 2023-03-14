@@ -16,6 +16,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import com.mchange.v2.lang.StringUtils;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
@@ -58,6 +59,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param device     Device
      * @param point      Point
      * @return
+     * @see Lwm2mServer#getObservationListener() 订阅资源
      */
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
@@ -67,6 +69,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     /**
      * 写入值 or 执行函数
+     * <p>
+     * 注意配置只写位号时,只可以配消息下行或命令下行其中一个
      *
      * @param driverInfo Driver Attribute Info
      * @param pointInfo  Point Attribute Info
@@ -76,8 +80,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
-
-
+        if (StringUtils.nonEmptyString(attribute(pointInfo, "execDown"))) {
+            //执行函数
+            return lwm2mServer.execute(device.getId(), attribute(pointInfo, "execDown"), value.getValue());
+        }
         return lwm2mServer.writeValueByPath(device.getId(), attribute(pointInfo, "messageDown"), value.getValue(), false);
     }
 }
