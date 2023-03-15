@@ -20,9 +20,10 @@ driver:
   project: @project.artifactId@
   remark: @project.description@
   schedule:
+    # 定时发送设备心跳
     status:
       enable: true
-      corn: '0/10 * * * * ?'
+      corn: '0/15 * * * * ?'
     read:
       enable: true
       corn: '0/30 * * * * ?'

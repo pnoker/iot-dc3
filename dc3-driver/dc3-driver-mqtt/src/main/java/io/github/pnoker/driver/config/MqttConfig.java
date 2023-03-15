@@ -17,6 +17,7 @@
 package io.github.pnoker.driver.config;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.sdk.bean.mqtt.MqttProperties;
@@ -71,7 +72,7 @@ public class MqttConfig {
     public MessageProducer mqttInbound() {
         // set default receive topic
         String topicName = "dc3/mc/" + mqttProperties.getClient();
-        if (null == mqttProperties.getReceiveTopics()) {
+        if (ObjectUtil.isNull(mqttProperties.getReceiveTopics())) {
             mqttProperties.setReceiveTopics(new ArrayList<>());
         }
         boolean match = mqttProperties.getReceiveTopics().stream().anyMatch(topic -> topic.getName().equals(topicName));

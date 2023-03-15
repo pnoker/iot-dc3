@@ -108,7 +108,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver selectById(String id) {
         Driver driver = driverMapper.selectById(id);
-        if (null == driver) {
+        if (ObjectUtil.isNull(driver)) {
             throw new NotFoundException();
         }
         return driver;
@@ -132,7 +132,7 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(Driver::getServiceName, serviceName);
         queryWrapper.last("limit 1");
         Driver driver = driverMapper.selectOne(queryWrapper);
-        if (null == driver) {
+        if (ObjectUtil.isNull(driver)) {
             throw new NotFoundException();
         }
         return driver;
@@ -150,7 +150,7 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(Driver::getTenantId, tenantId);
         queryWrapper.last("limit 1");
         Driver driver = driverMapper.selectOne(queryWrapper);
-        if (null == driver) {
+        if (ObjectUtil.isNull(driver)) {
             throw new NotFoundException();
         }
         return driver;
@@ -186,7 +186,7 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public Page<Driver> list(DriverPageQuery driverPageQuery) {
-        if (null == driverPageQuery.getPage()) {
+        if (ObjectUtil.isNull(driverPageQuery.getPage())) {
             driverPageQuery.setPage(new Pages());
         }
         return driverMapper.selectPage(driverPageQuery.getPage().convert(), fuzzyQuery(driverPageQuery));

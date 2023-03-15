@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.CodeQuery;
 import io.github.pnoker.api.center.auth.RTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
@@ -116,7 +117,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      */
     private void registerDriverAttribute(DriverRegister driverRegister, Driver driver) {
         Map<String, DriverAttribute> newDriverAttributeMap = new HashMap<>(8);
-        if (null != driverRegister.getDriverAttributes() && !driverRegister.getDriverAttributes().isEmpty()) {
+        if (ObjectUtil.isNotNull(driverRegister.getDriverAttributes()) && !driverRegister.getDriverAttributes().isEmpty()) {
             driverRegister.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         }
 
@@ -164,7 +165,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      */
     private void registerPointAttribute(DriverRegister driverRegister, Driver driver) {
         Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);
-        if (null != driverRegister.getPointAttributes() && !driverRegister.getPointAttributes().isEmpty()) {
+        if (ObjectUtil.isNotNull(driverRegister.getPointAttributes()) && !driverRegister.getPointAttributes().isEmpty()) {
             driverRegister.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         }
 

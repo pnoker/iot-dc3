@@ -234,7 +234,7 @@ public class PointController {
     public R<Map<String, String>> unit(@RequestBody Set<String> pointIds) {
         try {
             Map<String, UnitEnum> units = pointService.unit(pointIds);
-            if (null != units) {
+            if (ObjectUtil.isNotNull(units)) {
                 Map<String, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getCode()));
                 return R.ok(unitCodeMap);
             }

@@ -111,7 +111,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private OpcUaClient getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
         log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
         OpcUaClient opcUaClient = connectMap.get(deviceId);
-        if (null == opcUaClient) {
+        if (ObjectUtil.isNull(opcUaClient)) {
             String host = attribute(driverInfo, "host");
             String port = attribute(driverInfo, "port");
             String path = attribute(driverInfo, "path");
@@ -231,7 +231,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                 break;
         }
 
-        if (null != status && null != status.get()) {
+        if (ObjectUtil.isNotNull(status) && ObjectUtil.isNotNull(status.get())) {
             return status.get().getValue() > 0;
         }
         return false;

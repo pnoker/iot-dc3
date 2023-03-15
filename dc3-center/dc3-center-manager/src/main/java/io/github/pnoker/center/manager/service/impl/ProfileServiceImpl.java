@@ -98,7 +98,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public Profile selectById(String id) {
         Profile profile = profileMapper.selectById(id);
-        if (null == profile) {
+        if (ObjectUtil.isNull(profile)) {
             throw new NotFoundException();
         }
         return profile;
@@ -112,7 +112,7 @@ public class ProfileServiceImpl implements ProfileService {
         queryWrapper.eq(Profile::getTenantId, tenantId);
         queryWrapper.last("limit 1");
         Profile profile = profileMapper.selectOne(queryWrapper);
-        if (null == profile) {
+        if (ObjectUtil.isNull(profile)) {
             throw new NotFoundException();
         }
         return profile;

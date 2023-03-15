@@ -95,7 +95,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     public PointAttribute selectById(String id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
-        if (null == pointAttribute) {
+        if (ObjectUtil.isNull(pointAttribute)) {
             throw new NotFoundException();
         }
         return pointAttribute;
@@ -111,7 +111,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
         queryWrapper.last("limit 1");
         PointAttribute pointAttribute = pointAttributeMapper.selectOne(queryWrapper);
-        if (null == pointAttribute) {
+        if (ObjectUtil.isNull(pointAttribute)) {
             throw new NotFoundException();
         }
         return pointAttribute;
@@ -125,7 +125,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         PointAttributePageQuery pointAttributePageQuery = new PointAttributePageQuery();
         pointAttributePageQuery.setDriverId(driverId);
         List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributePageQuery));
-        if (null == pointAttributes || pointAttributes.isEmpty()) {
+        if (ObjectUtil.isNull(pointAttributes) || pointAttributes.isEmpty()) {
             throw new NotFoundException();
         }
         return pointAttributes;

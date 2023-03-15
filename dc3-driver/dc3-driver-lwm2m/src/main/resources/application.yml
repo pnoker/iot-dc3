@@ -15,7 +15,7 @@
 #
 
 driver:
-  name: Lwm2mDriver_T1
+  name: Lwm2mDriver
   type: DRIVER
   project: @project.artifactId@
   remark: @project.description@
@@ -25,10 +25,10 @@ driver:
     coaps:
       port: 5684
   schedule:
-    # 状态更新定时任务 本驱动未使用
+    # 定时发送设备心跳
     status:
       enable: true
-      corn: '0/10 * * * * ?'
+      corn: '0/15 * * * * ?'
     # 数据读取定时任务 需开启才能看到数据
     read:
       enable: false

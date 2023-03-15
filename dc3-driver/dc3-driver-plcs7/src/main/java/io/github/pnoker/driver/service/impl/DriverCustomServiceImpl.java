@@ -142,7 +142,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private MyS7Connector getS7Connector(String deviceId, Map<String, AttributeInfo> driverInfo) {
         MyS7Connector myS7Connector = s7ConnectorMap.get(deviceId);
-        if (null == myS7Connector) {
+        if (ObjectUtil.isNull(myS7Connector)) {
             myS7Connector = new MyS7Connector();
 
             log.debug("Plc S7 Connection Info {}", JsonUtil.toJsonString(driverInfo));

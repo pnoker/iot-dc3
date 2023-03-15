@@ -65,7 +65,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Transactional
     public Boolean delete(String id) {
         UserPassword userPassword = selectById(id);
-        if (null == userPassword) {
+        if (ObjectUtil.isNull(userPassword)) {
             throw new NotFoundException();
         }
         return userPasswordMapper.deleteById(id) > 0;
@@ -74,7 +74,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     public UserPassword update(UserPassword userPassword) {
         UserPassword selectById = selectById(userPassword.getId());
-        if (null == selectById) {
+        if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
         userPassword.setLoginPassword(DecodeUtil.md5(userPassword.getLoginPassword()));
@@ -103,7 +103,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         UserPassword userPassword = selectById(id);
         if (ObjectUtil.isNotNull(userPassword)) {
             userPassword.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
-            return null != update(userPassword);
+            return ObjectUtil.isNotNull(update(userPassword));
         }
         return false;
     }

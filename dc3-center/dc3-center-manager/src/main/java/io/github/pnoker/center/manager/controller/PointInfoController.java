@@ -102,7 +102,7 @@ public class PointInfoController {
     public R<PointInfo> update(@Validated(Update.class) @RequestBody PointInfo pointInfo) {
         try {
             PointInfo update = pointInfoService.update(pointInfo);
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 notifyService.notifyDriverPointInfo(MetadataConstant.PointInfo.UPDATE, update);
                 return R.ok(update);
             }
@@ -122,7 +122,7 @@ public class PointInfoController {
     public R<PointInfo> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
             PointInfo select = pointInfoService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -145,7 +145,7 @@ public class PointInfoController {
                                                                  @NotNull @PathVariable(value = "pointId") String pointId) {
         try {
             PointInfo select = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -166,7 +166,7 @@ public class PointInfoController {
                                                          @NotNull @PathVariable(value = "pointId") String pointId) {
         try {
             List<PointInfo> select = pointInfoService.selectByDeviceIdAndPointId(deviceId, pointId);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -185,7 +185,7 @@ public class PointInfoController {
     public R<List<PointInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
         try {
             List<PointInfo> select = pointInfoService.selectByDeviceId(deviceId);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -207,7 +207,7 @@ public class PointInfoController {
                 pointInfoPageQuery = new PointInfoPageQuery();
             }
             Page<PointInfo> page = pointInfoService.list(pointInfoPageQuery);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

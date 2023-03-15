@@ -90,7 +90,7 @@ public class DeviceController {
     public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             Device device = deviceService.selectById(id);
-            if (null != device && deviceService.delete(id)) {
+            if (ObjectUtil.isNotNull(device) && deviceService.delete(id)) {
                 // 通知驱动删除设备
                 notifyService.notifyDriverDevice(MetadataConstant.Device.DELETE, device);
                 return R.ok();
