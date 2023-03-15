@@ -5,7 +5,7 @@ services:
     build:
       context: ../
       dockerfile: ./Dockerfile
-    image: pnoker/iot-dc3-web:1.0.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:2023.1.9.dev
     restart: always
     ports:
       - 8080:80
