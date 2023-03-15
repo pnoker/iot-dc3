@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Boolean delete(String id) {
         User user = selectById(id);
-        if (null == user) {
+        if (ObjectUtil.isNull(user)) {
             throw new NotFoundException();
         }
         return userMapper.deleteById(id) > 0;
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         User selectById = selectById(user.getId());
-        if (null == selectById) {
+        if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
         user.setLoginName(null);
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
         queryWrapper.eq(User::getEnableFlag, EnableFlagEnum.ENABLE);
         queryWrapper.last("limit 1");
         User user = userMapper.selectOne(queryWrapper);
-        if (null == user) {
+        if (ObjectUtil.isNull(user)) {
             throw new NotFoundException();
         }
         return user;

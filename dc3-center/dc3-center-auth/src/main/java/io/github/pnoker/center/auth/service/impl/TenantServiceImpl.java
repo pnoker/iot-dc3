@@ -63,7 +63,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public Boolean delete(String id) {
         Tenant tenant = selectById(id);
-        if (null == tenant) {
+        if (ObjectUtil.isNull(tenant)) {
             throw new NotFoundException();
         }
         return tenantMapper.deleteById(id) > 0;

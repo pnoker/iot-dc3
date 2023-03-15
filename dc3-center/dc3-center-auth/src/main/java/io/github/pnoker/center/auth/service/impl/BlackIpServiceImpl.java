@@ -62,7 +62,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     public Boolean delete(String id) {
         BlackIp blackIp = selectById(id);
-        if (null == blackIp) {
+        if (ObjectUtil.isNull(blackIp)) {
             throw new ServiceException("The ip does not exist in the blacklist");
         }
         return blackIpMapper.deleteById(id) > 0;
@@ -99,7 +99,7 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public Page<BlackIp> list(BlackIpPageQuery blackIpPageQuery) {
-        if (null == blackIpPageQuery.getPage()) {
+        if (ObjectUtil.isNull(blackIpPageQuery.getPage())) {
             blackIpPageQuery.setPage(new Pages());
         }
         return blackIpMapper.selectPage(blackIpPageQuery.getPage().convert(), fuzzyQuery(blackIpPageQuery));

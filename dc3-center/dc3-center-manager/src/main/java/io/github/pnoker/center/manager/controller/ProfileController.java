@@ -168,7 +168,7 @@ public class ProfileController {
     public R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
         try {
             List<Profile> select = profileService.selectByDeviceId(deviceId);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {

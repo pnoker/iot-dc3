@@ -18,6 +18,7 @@ package io.github.pnoker.center.manager.service.rabbit;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.manager.service.BatchService;
 import io.github.pnoker.center.manager.service.DriverSdkService;
@@ -73,7 +74,7 @@ public class DriverEventReceiver {
         try {
             MessageProperties properties = message.getMessageProperties();
             channel.basicAck(properties.getDeliveryTag(), true);
-            if (null == driverEvent || CharSequenceUtil.isEmpty(driverEvent.getServiceName())) {
+            if (ObjectUtil.isNull(driverEvent) || CharSequenceUtil.isEmpty(driverEvent.getServiceName())) {
                 log.error("Invalid driver event {}", driverEvent);
                 return;
             }

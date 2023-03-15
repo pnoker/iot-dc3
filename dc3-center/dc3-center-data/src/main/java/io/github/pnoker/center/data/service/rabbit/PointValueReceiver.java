@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.data.service.rabbit;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
@@ -59,7 +60,7 @@ public class PointValueReceiver {
     public void pointValueReceive(Channel channel, Message message, PointValue pointValue) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (null == pointValue || null == pointValue.getDeviceId()) {
+            if (ObjectUtil.isNull(pointValue) || ObjectUtil.isNull(pointValue.getDeviceId())) {
                 log.error("Invalid point value: {}", pointValue);
                 return;
             }

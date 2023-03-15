@@ -95,7 +95,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group selectById(String id) {
         Group group = groupMapper.selectById(id);
-        if (null == group) {
+        if (ObjectUtil.isNull(group)) {
             throw new NotFoundException();
         }
         return group;
@@ -110,7 +110,7 @@ public class GroupServiceImpl implements GroupService {
         queryWrapper.eq(Group::getGroupName, name);
         queryWrapper.last("limit 1");
         Group group = groupMapper.selectOne(queryWrapper);
-        if (null == group) {
+        if (ObjectUtil.isNull(group)) {
             throw new NotFoundException();
         }
         return group;

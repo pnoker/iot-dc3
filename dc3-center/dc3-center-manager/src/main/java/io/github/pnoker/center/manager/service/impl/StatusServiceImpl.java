@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
@@ -59,7 +60,7 @@ public class StatusServiceImpl implements StatusService {
     public String driver(String serviceName) {
         String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + serviceName;
         String status = redisUtil.getKey(key);
-        status = null != status ? status : StatusEnum.OFFLINE.getCode();
+        status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
         return status;
     }
 
@@ -71,7 +72,7 @@ public class StatusServiceImpl implements StatusService {
         page.getRecords().forEach(driver -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
             String status = redisUtil.getKey(key);
-            status = null != status ? status : StatusEnum.OFFLINE.getCode();
+            status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
             statusMap.put(driver.getId(), status);
         });
         return statusMap;
@@ -81,7 +82,7 @@ public class StatusServiceImpl implements StatusService {
     public String device(String id) {
         String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
         String status = redisUtil.getKey(key);
-        status = null != status ? status : StatusEnum.OFFLINE.getCode();
+        status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
         return status;
     }
 
@@ -93,7 +94,7 @@ public class StatusServiceImpl implements StatusService {
         page.getRecords().forEach(device -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + device.getId();
             String status = redisUtil.getKey(key);
-            status = null != status ? status : StatusEnum.OFFLINE.getCode();
+            status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
             statusMap.put(device.getId(), status);
         });
         return statusMap;
@@ -106,7 +107,7 @@ public class StatusServiceImpl implements StatusService {
         profileBindService.selectDeviceIdsByProfileId(profileId).forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisUtil.getKey(key);
-            status = null != status ? status : StatusEnum.OFFLINE.getCode();
+            status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });
         return statusMap;

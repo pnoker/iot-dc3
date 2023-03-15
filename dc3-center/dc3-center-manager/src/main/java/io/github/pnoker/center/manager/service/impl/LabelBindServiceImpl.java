@@ -85,7 +85,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     public LabelBind selectById(String id) {
         LabelBind labelBind = labelBindMapper.selectById(id);
-        if (null == labelBind) {
+        if (ObjectUtil.isNull(labelBind)) {
             throw new NotFoundException();
         }
         return labelBind;

@@ -113,7 +113,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private Server getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
         log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
         Server server = connectMap.get(deviceId);
-        if (null == server) {
+        if (ObjectUtil.isNull(server)) {
             String host = attribute(driverInfo, "host");
             String clsId = attribute(driverInfo, "clsId");
             String user = attribute(driverInfo, "username");

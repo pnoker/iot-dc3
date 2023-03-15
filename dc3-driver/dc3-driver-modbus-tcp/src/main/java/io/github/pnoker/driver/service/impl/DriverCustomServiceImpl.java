@@ -118,7 +118,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private ModbusMaster getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
         log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverInfo));
         ModbusMaster modbusMaster = connectMap.get(deviceId);
-        if (null == modbusMaster) {
+        if (ObjectUtil.isNull(modbusMaster)) {
             IpParameters params = new IpParameters();
             params.setHost(attribute(driverInfo, "host"));
             params.setPort(attribute(driverInfo, "port"));

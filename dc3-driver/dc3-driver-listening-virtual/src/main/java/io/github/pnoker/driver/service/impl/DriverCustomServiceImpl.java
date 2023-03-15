@@ -16,6 +16,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.Device;
@@ -103,7 +104,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
         // TODO 获取设备的Channel，并向下发送数据
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
-        if (null != channel) {
+        if (ObjectUtil.isNotNull(channel)) {
             channel.writeAndFlush(DecodeUtil.stringToByte(value.getValue()));
         }
         return true;

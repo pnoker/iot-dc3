@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.rabbit;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.manager.service.EventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -54,7 +55,7 @@ public class DeviceEventReceiver {
     public void deviceEventReceive(Channel channel, Message message, DeviceEvent deviceEvent) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (null == deviceEvent || null == deviceEvent.getDeviceId()) {
+            if (ObjectUtil.isNull(deviceEvent) || ObjectUtil.isNull(deviceEvent.getDeviceId())) {
                 log.error("Invalid device event: {}", deviceEvent);
                 return;
             }

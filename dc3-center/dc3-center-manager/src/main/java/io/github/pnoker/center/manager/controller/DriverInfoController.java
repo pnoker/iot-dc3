@@ -62,7 +62,7 @@ public class DriverInfoController {
     public R<DriverInfo> add(@Validated(Insert.class) @RequestBody DriverInfo driverInfo) {
         try {
             DriverInfo add = driverInfoService.add(driverInfo);
-            if (null != add) {
+            if (ObjectUtil.isNotNull(add)) {
                 notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.ADD, add);
                 return R.ok(add);
             }
@@ -82,7 +82,7 @@ public class DriverInfoController {
     public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             DriverInfo driverInfo = driverInfoService.selectById(id);
-            if (null != driverInfo && driverInfoService.delete(id)) {
+            if (ObjectUtil.isNotNull(driverInfo) && driverInfoService.delete(id)) {
                 notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.DELETE, driverInfo);
                 return R.ok();
             }
@@ -102,7 +102,7 @@ public class DriverInfoController {
     public R<DriverInfo> update(@Validated(Update.class) @RequestBody DriverInfo driverInfo) {
         try {
             DriverInfo update = driverInfoService.update(driverInfo);
-            if (null != update) {
+            if (ObjectUtil.isNotNull(update)) {
                 notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.UPDATE, update);
                 return R.ok(update);
             }
@@ -122,7 +122,7 @@ public class DriverInfoController {
     public R<DriverInfo> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
             DriverInfo select = driverInfoService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -143,7 +143,7 @@ public class DriverInfoController {
                                                         @NotNull @PathVariable(value = "attributeId") String attributeId) {
         try {
             DriverInfo select = driverInfoService.selectByDeviceIdAndAttributeId(deviceId, attributeId);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -162,7 +162,7 @@ public class DriverInfoController {
     public R<List<DriverInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
         try {
             List<DriverInfo> select = driverInfoService.selectByDeviceId(deviceId);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -184,7 +184,7 @@ public class DriverInfoController {
                 driverInfoPageQuery = new DriverInfoPageQuery();
             }
             Page<DriverInfo> page = driverInfoService.list(driverInfoPageQuery);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

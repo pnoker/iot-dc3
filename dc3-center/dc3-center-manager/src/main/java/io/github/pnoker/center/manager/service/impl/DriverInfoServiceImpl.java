@@ -102,7 +102,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     public DriverInfo selectById(String id) {
         DriverInfo driverInfo = driverInfoMapper.selectById(id);
-        if (null == driverInfo) {
+        if (ObjectUtil.isNull(driverInfo)) {
             throw new NotFoundException();
         }
         return driverInfo;
@@ -119,7 +119,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         LambdaQueryWrapper<DriverInfo> queryWrapper = fuzzyQuery(driverInfoPageQuery);
         queryWrapper.last("limit 1");
         DriverInfo driverInfo = driverInfoMapper.selectOne(queryWrapper);
-        if (null == driverInfo) {
+        if (ObjectUtil.isNull(driverInfo)) {
             throw new NotFoundException();
         }
         return driverInfo;
@@ -133,7 +133,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
         DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
         driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
         List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
-        if (null == driverInfos || driverInfos.isEmpty()) {
+        if (ObjectUtil.isNull(driverInfos) || driverInfos.isEmpty()) {
             throw new NotFoundException();
         }
         return driverInfos;

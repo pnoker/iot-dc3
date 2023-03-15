@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.service.DictionaryService;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
@@ -53,7 +54,7 @@ public class DictionaryController {
     public R<List<Dictionary>> tenantDictionary() {
         try {
             List<Dictionary> dictionaryList = dictionaryService.tenantDictionary();
-            if (null != dictionaryList) {
+            if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
         } catch (Exception e) {
@@ -72,7 +73,7 @@ public class DictionaryController {
     public R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.userDictionary(tenantId);
-            if (null != dictionaryList) {
+            if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
         } catch (Exception e) {
@@ -91,7 +92,7 @@ public class DictionaryController {
     public R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.blackIpDictionary(tenantId);
-            if (null != dictionaryList) {
+            if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
         } catch (Exception e) {

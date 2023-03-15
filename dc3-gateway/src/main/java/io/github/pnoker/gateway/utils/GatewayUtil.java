@@ -18,6 +18,7 @@ package io.github.pnoker.gateway.utils;
 
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.NotFoundException;
 import org.springframework.http.HttpCookie;
@@ -84,7 +85,7 @@ public class GatewayUtil {
      */
     public static String getRequestCookie(ServerHttpRequest request, String key) {
         HttpCookie cookie = request.getCookies().getFirst(key);
-        if (null == cookie || !CharSequenceUtil.isNotEmpty(cookie.getValue())) {
+        if (ObjectUtil.isNull(cookie) || !CharSequenceUtil.isNotEmpty(cookie.getValue())) {
             throw new NotFoundException("Invalid request cookie of " + key);
         }
         return cookie.getValue();

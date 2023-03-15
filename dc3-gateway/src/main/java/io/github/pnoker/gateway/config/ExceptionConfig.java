@@ -66,7 +66,7 @@ public class ExceptionConfig implements ErrorWebExceptionHandler {
             try {
                 return bufferFactory.wrap(objectMapper.writeValueAsBytes(R.fail(throwable.getMessage())));
             } catch (JsonProcessingException e) {
-                log.error(throwable.getMessage(), throwable);
+                log.error(e.getMessage(), e);
                 return bufferFactory.wrap(new byte[0]);
             }
         }));

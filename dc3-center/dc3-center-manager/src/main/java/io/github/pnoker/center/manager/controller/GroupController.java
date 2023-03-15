@@ -116,7 +116,7 @@ public class GroupController {
     public R<Group> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
             Group select = groupService.selectById(id);
-            if (null != select) {
+            if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -141,7 +141,7 @@ public class GroupController {
             }
             groupPageQuery.setTenantId(tenantId);
             Page<Group> page = groupService.list(groupPageQuery);
-            if (null != page) {
+            if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

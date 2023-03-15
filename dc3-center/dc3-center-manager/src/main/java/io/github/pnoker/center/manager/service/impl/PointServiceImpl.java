@@ -114,7 +114,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public Point selectById(String id) {
         Point point = pointMapper.selectById(id);
-        if (null == point) {
+        if (ObjectUtil.isNull(point)) {
             throw new NotFoundException();
         }
         return point;
@@ -142,7 +142,7 @@ public class PointServiceImpl implements PointService {
         queryWrapper.eq(Point::getProfileId, profileId);
         queryWrapper.last("limit 1");
         Point point = pointMapper.selectOne(queryWrapper);
-        if (null == point) {
+        if (ObjectUtil.isNull(point)) {
             throw new NotFoundException();
         }
         return point;
@@ -165,7 +165,7 @@ public class PointServiceImpl implements PointService {
         PointPageQuery pointPageQuery = new PointPageQuery();
         pointPageQuery.setProfileId(profileId);
         List<Point> points = pointMapper.selectList(fuzzyQuery(pointPageQuery));
-        if (null == points || points.isEmpty()) {
+        if (ObjectUtil.isNull(points) || points.isEmpty()) {
             throw new NotFoundException();
         }
         return points;
@@ -181,7 +181,7 @@ public class PointServiceImpl implements PointService {
             PointPageQuery pointPageQuery = new PointPageQuery();
             pointPageQuery.setProfileId(profileId);
             List<Point> pointList = pointMapper.selectList(fuzzyQuery(pointPageQuery));
-            if (null != pointList) {
+            if (ObjectUtil.isNotNull(pointList)) {
                 points.addAll(pointList);
             }
         });
@@ -217,7 +217,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public LambdaQueryWrapper<Point> fuzzyQuery(PointPageQuery pointPageQuery) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
-        if (null != pointPageQuery) {
+        if (ObjectUtil.isNotNull(pointPageQuery)) {
             queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), Point::getPointName, pointPageQuery.getPointName());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), Point::getPointCode, pointPageQuery.getPointCode());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), Point::getPointTypeFlag, pointPageQuery.getPointTypeFlag());

@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.service.TokenService;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
@@ -58,7 +59,7 @@ public class TokenController {
     @PostMapping("/salt")
     public R<String> generateSalt(@Validated(Update.class) @RequestBody Login login) {
         String salt = tokenService.generateSalt(login.getName(), login.getTenant());
-        return null != salt ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
+        return ObjectUtil.isNotNull(salt) ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }
 
     /**
@@ -70,7 +71,7 @@ public class TokenController {
     @PostMapping("/generate")
     public R<String> generateToken(@Validated(Auth.class) @RequestBody Login login) {
         String token = tokenService.generateToken(login.getName(), login.getSalt(), login.getPassword(), login.getTenant());
-        return null != token ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
+        return ObjectUtil.isNotNull(token) ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
     }
 
     /**

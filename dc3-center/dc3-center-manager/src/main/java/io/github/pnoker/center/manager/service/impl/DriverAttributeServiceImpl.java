@@ -95,7 +95,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     public DriverAttribute selectById(String id) {
         DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
-        if (null == driverAttribute) {
+        if (ObjectUtil.isNull(driverAttribute)) {
             throw new NotFoundException();
         }
         return driverAttribute;
@@ -111,7 +111,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         queryWrapper.eq(DriverAttribute::getDriverId, driverId);
         queryWrapper.last("limit 1");
         DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
-        if (null == driverAttribute) {
+        if (ObjectUtil.isNull(driverAttribute)) {
             throw new NotFoundException();
         }
         return driverAttribute;
@@ -125,7 +125,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         DriverAttributePageQuery driverAttributePageQuery = new DriverAttributePageQuery();
         driverAttributePageQuery.setDriverId(driverId);
         List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributePageQuery));
-        if (null == driverAttributes || driverAttributes.isEmpty()) {
+        if (ObjectUtil.isNull(driverAttributes) || driverAttributes.isEmpty()) {
             throw new NotFoundException();
         }
         return driverAttributes;
@@ -136,7 +136,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     @Override
     public Page<DriverAttribute> list(DriverAttributePageQuery driverAttributePageQuery) {
-        if (null == driverAttributePageQuery.getPage()) {
+        if (ObjectUtil.isNull(driverAttributePageQuery.getPage())) {
             driverAttributePageQuery.setPage(new Pages());
         }
         return driverAttributeMapper.selectPage(driverAttributePageQuery.getPage().convert(), fuzzyQuery(driverAttributePageQuery));

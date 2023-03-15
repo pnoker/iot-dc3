@@ -85,7 +85,7 @@ public class UserExtServiceImpl implements UserExtService {
     @Transactional
     public Boolean delete(String id) {
         UserExt userExt = selectById(id);
-        if (null == userExt) {
+        if (ObjectUtil.isNull(userExt)) {
             throw new NotFoundException();
         }
         return userExtMapper.deleteById(id) > 0;

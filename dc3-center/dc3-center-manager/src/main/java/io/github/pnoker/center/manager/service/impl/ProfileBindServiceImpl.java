@@ -115,7 +115,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Override
     public ProfileBind selectById(String id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
-        if (null == profileBind) {
+        if (ObjectUtil.isNull(profileBind)) {
             throw new NotFoundException();
         }
         return profileBind;
@@ -132,7 +132,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         LambdaQueryWrapper<ProfileBind> queryWrapper = fuzzyQuery(profileBindPageQuery);
         queryWrapper.last("limit 1");
         ProfileBind profileBind = profileBindMapper.selectOne(queryWrapper);
-        if (null == profileBind) {
+        if (ObjectUtil.isNull(profileBind)) {
             throw new NotFoundException();
         }
         return profileBind;

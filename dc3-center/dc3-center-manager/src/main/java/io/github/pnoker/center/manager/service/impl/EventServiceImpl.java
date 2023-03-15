@@ -61,7 +61,7 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public void addDriverEvents(List<DriverEvent> driverEvents) {
-        if (null != driverEvents && !driverEvents.isEmpty()) {
+        if (ObjectUtil.isNotNull(driverEvents) && !driverEvents.isEmpty()) {
             mongoTemplate.insert(driverEvents, DriverEvent.class);
         }
     }
@@ -81,7 +81,7 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public void addDeviceEvents(List<DeviceEvent> deviceEvents) {
-        if (null != deviceEvents && !deviceEvents.isEmpty()) {
+        if (ObjectUtil.isNotNull(deviceEvents) && !deviceEvents.isEmpty()) {
             mongoTemplate.insert(deviceEvents, DeviceEvent.class);
         }
     }
@@ -100,7 +100,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Page<DeviceEvent> deviceEvent(DeviceEventPageQuery deviceEventPageQuery) {
         Criteria criteria = new Criteria();
-        if (null == deviceEventPageQuery) {
+        if (ObjectUtil.isNull(deviceEventPageQuery)) {
             deviceEventPageQuery = new DeviceEventPageQuery();
         }
         if (CharSequenceUtil.isNotEmpty(deviceEventPageQuery.getDeviceId())) {
@@ -110,7 +110,7 @@ public class EventServiceImpl implements EventService {
             criteria.and("pointId").is(deviceEventPageQuery.getPointId());
         }
 
-        Pages pages = null == deviceEventPageQuery.getPage() ? new Pages() : deviceEventPageQuery.getPage();
+        Pages pages = ObjectUtil.isNull(deviceEventPageQuery.getPage()) ? new Pages() : deviceEventPageQuery.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and("createTime").gte(pages.getStartTime()).lte(pages.getEndTime());
         }

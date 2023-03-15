@@ -17,6 +17,7 @@
 package io.github.pnoker.driver.service.netty;
 
 import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.model.Device;
@@ -114,7 +115,7 @@ public class NettyServerHandler {
                     default:
                         break;
                 }
-                if (null != pointValue) {
+                if (ObjectUtil.isNotNull(pointValue)) {
                     pointValues.add(pointValue);
                 }
             }

@@ -111,7 +111,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Override
     public PointInfo selectById(String id) {
         PointInfo pointInfo = pointInfoMapper.selectById(id);
-        if (null == pointInfo) {
+        if (ObjectUtil.isNull(pointInfo)) {
             throw new NotFoundException();
         }
         return pointInfo;
@@ -128,7 +128,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getPointId, pointId);
         queryWrapper.last("limit 1");
         PointInfo pointInfo = pointInfoMapper.selectOne(queryWrapper);
-        if (null == pointInfo) {
+        if (ObjectUtil.isNull(pointInfo)) {
             throw new NotFoundException();
         }
         return pointInfo;
@@ -142,7 +142,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
         queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
-        if (null == pointInfos || pointInfos.isEmpty()) {
+        if (ObjectUtil.isNull(pointInfos) || pointInfos.isEmpty()) {
             throw new NotFoundException();
         }
         return pointInfos;
@@ -159,7 +159,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
         queryWrapper.in(PointInfo::getPointId, pointIds);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
-        if (null == pointInfos) {
+        if (ObjectUtil.isNull(pointInfos)) {
             throw new NotFoundException();
         }
         return pointInfos;
@@ -174,7 +174,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointInfo::getDeviceId, deviceId);
         queryWrapper.eq(PointInfo::getPointId, pointId);
         List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
-        if (null == pointInfos) {
+        if (ObjectUtil.isNull(pointInfos)) {
             throw new NotFoundException();
         }
         return pointInfos;

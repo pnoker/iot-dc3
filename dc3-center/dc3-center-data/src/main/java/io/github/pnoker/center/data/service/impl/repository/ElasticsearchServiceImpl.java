@@ -17,6 +17,7 @@
 package io.github.pnoker.center.data.service.impl.repository;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
@@ -88,7 +89,7 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
         BulkResponse response = elasticsearchClient.bulk(bulkRequestBuilder.build());
         if (response.errors()) {
             for (BulkResponseItem item : response.items()) {
-                if (null != item.error()) {
+                if (ObjectUtil.isNotNull(item.error())) {
                     // todo 存在没有保存成功的数据怎么办
                     log.error("Send pointValues to elasticsearch error: {}", item.error().reason());
                 }

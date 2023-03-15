@@ -73,7 +73,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Override
     public TenantBind selectById(String id) {
         TenantBind tenantBind = tenantBindMapper.selectById(id);
-        if (null == tenantBind) {
+        if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException();
         }
         return tenantBind;

@@ -17,6 +17,7 @@
 package io.github.pnoker.center.data.service.impl.repository;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.google.common.collect.Lists;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
@@ -130,7 +131,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) {
-                if (null != response.body()) {
+                if (ObjectUtil.isNotNull(response.body())) {
                     log.debug("Send pointValues to opentsdb, Response: {}", response.message());
                 }
             }

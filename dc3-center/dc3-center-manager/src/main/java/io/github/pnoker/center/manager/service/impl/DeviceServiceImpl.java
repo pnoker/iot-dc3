@@ -101,7 +101,7 @@ public class DeviceServiceImpl implements DeviceService {
     public Device update(Device device) {
         selectById(device.getId());
 
-        Set<String> newProfileIds = null != device.getProfileIds() ? device.getProfileIds() : new HashSet<>();
+        Set<String> newProfileIds = ObjectUtil.isNotNull(device.getProfileIds()) ? device.getProfileIds() : new HashSet<>();
         Set<String> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(device.getId());
 
         // 新增的模板
@@ -131,7 +131,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public Device selectById(String id) {
         Device device = deviceMapper.selectById(id);
-        if (null == device) {
+        if (ObjectUtil.isNull(device)) {
             throw new NotFoundException();
         }
         device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
@@ -148,7 +148,7 @@ public class DeviceServiceImpl implements DeviceService {
         queryWrapper.eq(Device::getTenantId, tenantId);
         queryWrapper.last("limit 1");
         Device device = deviceMapper.selectOne(queryWrapper);
-        if (null == device) {
+        if (ObjectUtil.isNull(device)) {
             throw new NotFoundException();
         }
         device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId()));
@@ -163,7 +163,7 @@ public class DeviceServiceImpl implements DeviceService {
         DevicePageQuery devicePageQuery = new DevicePageQuery();
         devicePageQuery.setDriverId(driverId);
         List<Device> devices = deviceMapper.selectList(fuzzyQuery(devicePageQuery));
-        if (null == devices || devices.isEmpty()) {
+        if (ObjectUtil.isNull(devices) || devices.isEmpty()) {
             throw new NotFoundException();
         }
         devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
@@ -232,7 +232,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     private void addProfileBind(String deviceId, Set<String> profileIds) {
-        if (null != profileIds) {
+        if (ObjectUtil.isNotNull(profileIds)) {
             profileIds.forEach(profileId -> {
                 try {
                     profileService.selectById(profileId);
