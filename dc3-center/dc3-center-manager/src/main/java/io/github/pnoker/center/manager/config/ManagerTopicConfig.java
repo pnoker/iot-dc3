@@ -57,14 +57,6 @@ public class ManagerTopicConfig {
     }
 
     @Bean
-    Queue deviceEventQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 15秒：15 * 1000 = 15000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
-        return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, EnvironmentUtil.isDev(env), arguments);
-    }
-
-    @Bean
     Binding driverEventBinding(Queue driverEventQueue) {
         return BindingBuilder
                 .bind(driverEventQueue)
@@ -73,7 +65,15 @@ public class ManagerTopicConfig {
     }
 
     @Bean
-    Binding deviceEventBinding(TopicExchange eventExchange, Queue deviceEventQueue) {
+    Queue deviceEventQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        // 15秒：15 * 1000 = 15000L
+        arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
+        return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, EnvironmentUtil.isDev(env), arguments);
+    }
+
+    @Bean
+    Binding deviceEventBinding(Queue deviceEventQueue) {
         return BindingBuilder
                 .bind(deviceEventQueue)
                 .to(eventExchange)

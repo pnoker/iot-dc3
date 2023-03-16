@@ -20,7 +20,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-import io.github.pnoker.common.sdk.bean.mqtt.MqttProperties;
+import io.github.pnoker.common.sdk.config.property.MqttProperties;
 import io.github.pnoker.common.sdk.utils.X509Util;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;

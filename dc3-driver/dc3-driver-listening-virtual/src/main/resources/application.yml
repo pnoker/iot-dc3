@@ -25,10 +25,6 @@ driver:
     udp:
       port: 6271
   schedule:
-    # 定时发送设备心跳
-    status:
-      enable: true
-      corn: '0/15 * * * * ?'
     read:
       enable: false
       corn: '0/30 * * * * ?'

@@ -22,7 +22,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.manager.service.BatchService;
 import io.github.pnoker.center.manager.service.DriverSdkService;
-import io.github.pnoker.center.manager.service.EventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
@@ -41,7 +40,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 接收驱动发送过来的驱动事件数据
@@ -57,16 +55,12 @@ public class DriverEventReceiver {
     @Resource
     private RedisUtil redisUtil;
     @Resource
-    private EventService eventService;
-    @Resource
     private BatchService batchService;
     @Resource
     private DriverSdkService driverSdkService;
 
     @Resource
     private RabbitTemplate rabbitTemplate;
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverEventQueue.name}")
@@ -80,24 +74,13 @@ public class DriverEventReceiver {
             }
 
             log.debug("Driver {} event, From: {}, Received: {}", driverEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
-            String routingKey = RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName();
 
             switch (driverEvent.getType()) {
-                case EventConstant.Driver.HANDSHAKE:
-                    handshakeEvent(routingKey);
-                    break;
                 case EventConstant.Driver.REGISTER:
-                    registerEvent(driverEvent, routingKey);
-                    break;
-                case EventConstant.Driver.METADATA_SYNC:
-                    metadataEvent(driverEvent, routingKey);
+                    registerEvent(driverEvent);
                     break;
                 case EventConstant.Driver.STATUS:
                     statusEvent(driverEvent);
-                    break;
-                case EventConstant.Driver.ERROR:
-                    //TODO 去重
-                    threadPoolExecutor.execute(() -> eventService.addDriverEvent(driverEvent));
                     break;
                 default:
                     log.error("Invalid event type, {}", driverEvent.getType());
@@ -109,72 +92,29 @@ public class DriverEventReceiver {
     }
 
     /**
-     * 处理握手事件
-     *
-     * @param routingKey Routing Key
-     */
-    private void handshakeEvent(String routingKey) {
-        DriverConfiguration driverConfiguration = new DriverConfiguration(
-                PrefixConstant.DRIVER,
-                EventConstant.Driver.HANDSHAKE_BACK,
-                null,
-                ResponseEnum.OK
-        );
-        rabbitTemplate.convertAndSend(
-                RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                routingKey,
-                driverConfiguration
-        );
-    }
-
-    /**
      * 处理注册事件
      *
      * @param driverEvent DriverEvent
-     * @param routingKey  Routing Key
      */
-    private void registerEvent(DriverEvent driverEvent, String routingKey) {
+    private void registerEvent(DriverEvent driverEvent) {
         DriverConfiguration driverConfiguration = new DriverConfiguration(
                 PrefixConstant.DRIVER,
                 EventConstant.Driver.REGISTER_BACK,
                 null,
                 ResponseEnum.OK
         );
+
         try {
             driverSdkService.driverRegister(Convert.convert(DriverRegister.class, driverEvent.getContent()));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            driverConfiguration.setResponse(ResponseEnum.FAILURE);
-        }
-        rabbitTemplate.convertAndSend(
-                RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                routingKey,
-                driverConfiguration
-        );
-    }
-
-    /**
-     * 处理元数据同步事件
-     *
-     * @param driverEvent DriverEvent
-     * @param routingKey  Routing Key
-     */
-    private void metadataEvent(DriverEvent driverEvent, String routingKey) {
-        DriverConfiguration driverConfiguration = new DriverConfiguration(
-                PrefixConstant.DRIVER,
-                EventConstant.Driver.METADATA_SYNC_BACK,
-                null,
-                ResponseEnum.OK
-        );
-        try {
             driverConfiguration.setContent(batchService.batchDriverMetadata(driverEvent.getServiceName()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             driverConfiguration.setResponse(ResponseEnum.FAILURE);
         }
+
         rabbitTemplate.convertAndSend(
                 RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                routingKey,
+                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName(),
                 driverConfiguration
         );
     }
