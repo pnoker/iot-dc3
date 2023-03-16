@@ -21,7 +21,6 @@ driver:
   remark: @project.description@
   schedule:
     # 定时发送设备心跳
-    # 定时发送设备心跳
     status:
       enable: true
       corn: '0/15 * * * * ?'

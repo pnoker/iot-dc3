@@ -25,10 +25,6 @@ driver:
     coaps:
       port: 5684
   schedule:
-    # 定时发送设备心跳
-    status:
-      enable: true
-      corn: '0/15 * * * * ?'
     # 数据读取定时任务 需开启才能看到数据
     read:
       enable: false
