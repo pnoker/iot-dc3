@@ -233,6 +233,32 @@ services:
         aliases:
           - dc3-driver-listening-virtual
 
+  dtu-yeecom:
+    build:
+      context: ../dc3-driver/dc3-driver-dtu-yeecom/
+      dockerfile: ./Dockerfile
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-dtu-yeecom:2023.1.9.dev
+    restart: on-failure
+    ports:
+      - '8702:8702'
+      - '9001:9001'
+      - '9002:9002'
+    environment:
+      - NODE_ENV=dev
+    container_name: dc3-driver-dtu-yeecom
+    hostname: dc3-driver-dtu-yeecom
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dtu-yeecom/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dtu-yeecom
+
   mqtt:
     build:
       context: ../dc3-driver/dc3-driver-mqtt/
