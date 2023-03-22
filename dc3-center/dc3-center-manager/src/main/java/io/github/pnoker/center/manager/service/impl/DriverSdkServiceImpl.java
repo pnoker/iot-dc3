@@ -65,7 +65,7 @@ public class DriverSdkServiceImpl implements DriverSdkService {
      * {@inheritDoc}
      */
     @Override
-    public void driverRegister(DriverRegister driverRegister) {
+    public void register(DriverRegister driverRegister) {
         // register driver
         Driver driver = registerDriver(driverRegister);
 

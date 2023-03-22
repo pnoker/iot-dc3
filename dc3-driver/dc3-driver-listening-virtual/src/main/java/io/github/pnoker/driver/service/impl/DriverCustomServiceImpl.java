@@ -21,7 +21,7 @@ import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.StatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.bean.driver.DriverContext;
+import io.github.pnoker.common.sdk.bean.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
 import io.github.pnoker.common.utils.DecodeUtil;
