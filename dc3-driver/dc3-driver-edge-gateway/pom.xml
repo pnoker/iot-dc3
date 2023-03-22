@@ -48,6 +48,12 @@
             <artifactId>bcprov-jdk16</artifactId>
         </dependency>
 
+        <!-- DC3 Common Mqtt -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mqtt</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

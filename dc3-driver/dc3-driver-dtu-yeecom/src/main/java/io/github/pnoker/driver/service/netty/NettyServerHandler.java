@@ -16,13 +16,10 @@
 
 package io.github.pnoker.driver.service.netty;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.sdk.bean.driver.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
-import io.github.pnoker.common.utils.DecodeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +40,6 @@ public class NettyServerHandler {
     private DriverContext driverContext;
 
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
-        log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
+        log.info("1.{}->\n{}", context.channel().remoteAddress(), ByteBufUtil.prettyHexDump(byteBuf));
     }
 }

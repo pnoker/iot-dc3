@@ -22,7 +22,7 @@ import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.bean.driver.DriverContext;
+import io.github.pnoker.common.sdk.bean.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
 import io.github.pnoker.common.sdk.utils.ConvertUtil;
 import io.github.pnoker.common.sdk.utils.DriverUtil;

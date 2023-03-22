@@ -31,5 +31,5 @@ public interface DriverSdkService {
      *
      * @param driverRegister DriverRegister
      */
-    void driverRegister(DriverRegister driverRegister);
+    void register(DriverRegister driverRegister);
 }
