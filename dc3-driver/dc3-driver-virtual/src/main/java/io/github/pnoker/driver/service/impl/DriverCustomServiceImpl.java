@@ -24,7 +24,7 @@ import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.bean.DriverContext;
+import io.github.pnoker.common.sdk.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverCustomService;
 import io.github.pnoker.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;

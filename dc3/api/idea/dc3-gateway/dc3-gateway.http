@@ -126,8 +126,8 @@ Cache-Control: no-cache
 
 
 ### 查询 Driver 服务状态
-#/api/v3/manager/driver/status，支持name\serverName\host模糊查询，port精准查询
-POST http://{{dc3-gateway}}/api/v3/manager/driver/status
+#/api/v3/manager/driver/driverStatus，支持name\serverName\host模糊查询，port精准查询
+POST http://{{dc3-gateway}}/api/v3/manager/driver/driverStatus
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

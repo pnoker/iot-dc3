@@ -29,58 +29,30 @@ driver:
   driver-attribute:
     - display-name: 主机
       attribute-name: host
-      type: string
+      attribute-type-flag: STRING
       value: localhost
       remark: Opc Ua IP
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 端口
       attribute-name: port
-      type: int
+      attribute-type-flag: INT
       value: 18600
       remark: Opc Ua Port
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 路径
       attribute-name: path
-      type: string
+      attribute-type-flag: STRING
       value: /
       remark: Opc Ua Path
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
   point-attribute:
     - display-name: 命名空间
       attribute-name: namespace
-      type: int
+      attribute-type-flag: INT
       value: 5
       remark: 命名空间索引
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 位号
       attribute-name: tag
-      type: string
+      attribute-type-flag: STRING
       value: TAG
       remark: 位号名称
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
-
-server:
-  port: 8603
 
 spring:
   profiles:

@@ -29,68 +29,35 @@ driver:
   driver-attribute:
     - display-name: 主机
       attribute-name: host
-      type: string
+      attribute-type-flag: STRING
       value: localhost
       remark: Opc Da Host
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: CLSID
       attribute-name: clsId
-      type: string
+      attribute-type-flag: STRING
       value: F8582CF2-88FB-11D0-B850-00C0F0104305
       remark: Opc Da Server CLAID
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 用户名
       attribute-name: username
-      type: string
+      attribute-type-flag: STRING
       value: dc3
       remark: Opc Da UserName
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 密码
       attribute-name: password
-      type: string
+      attribute-type-flag: STRING
       value: dc3dc3
       remark: Opc Da Passward
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
   point-attribute:
     - display-name: 分组
       attribute-name: group
-      type: string
+      attribute-type-flag: STRING
       value: GROUP
       remark: 分组名称
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 位号
       attribute-name: tag
-      type: string
+      attribute-type-flag: STRING
       value: TAG
       remark: 位号名称
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
-
-server:
-  port: 8602
 
 spring:
   profiles:

@@ -17,7 +17,7 @@
 package io.github.pnoker.driver.server;
 
 import io.github.pnoker.common.enums.DriverStatusEnum;
-import io.github.pnoker.common.sdk.bean.DriverContext;
+import io.github.pnoker.common.sdk.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.core.node.LwM2mNode;

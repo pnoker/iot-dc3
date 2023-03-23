@@ -29,24 +29,14 @@ driver:
   point-attribute:
     - display-name: 指令Topic
       attribute-name: commandTopic
-      type: string
+      attribute-type-flag: STRING
       value: commandTopic
       remark: 测点/设备接收下行指令的Mqtt主题
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 指令Qos
       attribute-name: commandQos
-      type: int
+      attribute-type-flag: INT
       value: 2
       remark: 测点/设备接收下行指令的Mqtt主题的Qos
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
   mqtt:
     url: ssl://dc3-rabbitmq:8883
     auth-type: X509
@@ -65,9 +55,6 @@ driver:
       name: dc3-mqtt-topic
     keep-alive: 15
     completion-timeout: 3000
-
-server:
-  port: 8702
 
 spring:
   profiles:
