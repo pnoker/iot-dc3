@@ -22,9 +22,9 @@ import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.Profile;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -90,7 +90,7 @@ public class ProfileController {
         try {
             Profile profile = profileService.selectById(id);
             if (ObjectUtil.isNotNull(profile) && profileService.delete(id)) {
-                notifyService.notifyDriverProfile(MetadataConstant.Profile.DELETE, profile);
+                notifyService.notifyDriverProfile(MetadataCommandTypeEnum.DELETE, profile);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -113,7 +113,7 @@ public class ProfileController {
             profile.setTenantId(tenantId);
             Profile update = profileService.update(profile);
             if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverProfile(MetadataConstant.Profile.UPDATE, update);
+                notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

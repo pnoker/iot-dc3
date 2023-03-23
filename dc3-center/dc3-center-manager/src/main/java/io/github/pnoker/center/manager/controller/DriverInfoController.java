@@ -24,6 +24,7 @@ import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.DriverInfo;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -63,7 +64,7 @@ public class DriverInfoController {
         try {
             DriverInfo add = driverInfoService.add(driverInfo);
             if (ObjectUtil.isNotNull(add)) {
-                notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.ADD, add);
+                notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -83,7 +84,7 @@ public class DriverInfoController {
         try {
             DriverInfo driverInfo = driverInfoService.selectById(id);
             if (ObjectUtil.isNotNull(driverInfo) && driverInfoService.delete(id)) {
-                notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.DELETE, driverInfo);
+                notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.DELETE, driverInfo);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -103,7 +104,7 @@ public class DriverInfoController {
         try {
             DriverInfo update = driverInfoService.update(driverInfo);
             if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverDriverInfo(MetadataConstant.DriverInfo.UPDATE, update);
+                notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

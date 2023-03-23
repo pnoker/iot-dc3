@@ -16,20 +16,27 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.entity.driver.DriverRegister;
+import io.github.pnoker.common.dto.DriverEventDTO;
 
 /**
- * Driver Sdk Interface
+ * 驱动事件相关接口
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverSdkService {
+public interface DriverEventService {
 
     /**
-     * 驱动注册
+     * 驱动注册事件
      *
-     * @param driverRegister DriverRegister
+     * @param entityDTO DriverEventDTO
      */
-    void register(DriverRegister driverRegister);
+    void registerEvent(DriverEventDTO entityDTO);
+
+    /**
+     * 驱动心跳事件
+     *
+     * @param entityDTO DriverEventDTO
+     */
+    void heartbeatEvent(DriverEventDTO entityDTO);
 }

@@ -16,7 +16,7 @@
 
 package io.github.pnoker.driver.service.netty;
 
-import io.github.pnoker.common.sdk.bean.driver.DriverContext;
+import io.github.pnoker.common.sdk.bean.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;

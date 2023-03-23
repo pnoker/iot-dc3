@@ -21,15 +21,26 @@ import io.github.pnoker.api.center.auth.CodeQuery;
 import io.github.pnoker.api.center.auth.RTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.service.*;
+import io.github.pnoker.common.constant.common.PrefixConstant;
+import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.dto.DriverEventDTO;
+import io.github.pnoker.common.dto.DriverMetadataDTO;
+import io.github.pnoker.common.dto.DriverStatusDTO;
+import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.entity.driver.DriverRegister;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.PointAttribute;
+import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,10 +56,13 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class DriverSdkServiceImpl implements DriverSdkService {
+public class DriverEventServiceImpl implements DriverEventService {
 
     @GrpcClient(AuthServiceConstant.SERVICE_NAME)
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
+
+    @Resource
+    private BatchService batchService;
 
     @Resource
     private DriverService driverService;
@@ -61,19 +75,48 @@ public class DriverSdkServiceImpl implements DriverSdkService {
     @Resource
     private PointInfoService pointInfoService;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Resource
+    private RedisUtil redisUtil;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+
     @Override
-    public void register(DriverRegister driverRegister) {
-        // register driver
-        Driver driver = registerDriver(driverRegister);
+    public void registerEvent(DriverEventDTO entityDTO) {
+        DriverRegister driverRegister = JsonUtil.parseObject(entityDTO.getContent(), DriverRegister.class);
+        if (ObjectUtil.isNull(driverRegister) || ObjectUtil.isNull(driverRegister.getDriver())) {
+            return;
+        }
 
-        //register driver attribute
-        registerDriverAttribute(driverRegister, driver);
+        DriverMetadataDTO driverConfiguration = new DriverMetadataDTO(
+                MetadataTypeEnum.DRIVER,
+                MetadataCommandTypeEnum.SYNC,
+                null
+        );
 
-        // register point attribute
-        registerPointAttribute(driverRegister, driver);
+        try {
+            Driver driver = registerDriver(driverRegister);
+            registerDriverAttribute(driverRegister, driver);
+            registerPointAttribute(driverRegister, driver);
+            DriverMetadata driverMetadata = batchService.batchDriverMetadata(driverRegister.getDriver().getServiceName());
+            driverConfiguration.setContent(JsonUtil.toJsonString(driverMetadata));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        rabbitTemplate.convertAndSend(
+                RabbitConstant.TOPIC_EXCHANGE_METADATA,
+                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverRegister.getDriver().getServiceName(),
+                driverConfiguration
+        );
+    }
+
+    @Override
+    public void heartbeatEvent(DriverEventDTO entityDTO) {
+        DriverStatusDTO driverStatusDTO = JsonUtil.parseObject(entityDTO.getContent(), DriverStatusDTO.class);
+        if (ObjectUtil.isNull(driverStatusDTO)) {
+            return;
+        }
+        redisUtil.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatusDTO.getServiceName(), driverStatusDTO.getStatus());
     }
 
     /**

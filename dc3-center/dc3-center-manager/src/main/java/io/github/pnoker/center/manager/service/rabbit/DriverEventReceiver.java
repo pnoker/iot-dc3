@@ -16,25 +16,16 @@
 
 package io.github.pnoker.center.manager.service.rabbit;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.center.manager.service.BatchService;
-import io.github.pnoker.center.manager.service.DriverSdkService;
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.driver.EventConstant;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.entity.DriverEvent;
-import io.github.pnoker.common.entity.driver.DriverConfiguration;
-import io.github.pnoker.common.entity.driver.DriverRegister;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.center.manager.service.DriverEventService;
+import io.github.pnoker.common.dto.DriverEventDTO;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -52,81 +43,36 @@ import java.io.IOException;
 public class DriverEventReceiver {
 
     @Resource
-    private RedisUtil redisUtil;
-    @Resource
-    private BatchService batchService;
-    @Resource
-    private DriverSdkService driverSdkService;
-
-    @Resource
-    private RabbitTemplate rabbitTemplate;
+    private DriverEventService driverEventService;
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverEventQueue.name}")
-    public void driverEventReceive(Channel channel, Message message, DriverEvent driverEvent) {
+    public void driverEventReceive(Channel channel, Message message, DriverEventDTO entityDTO) {
         try {
-            MessageProperties properties = message.getMessageProperties();
-            channel.basicAck(properties.getDeliveryTag(), true);
-            if (ObjectUtil.isNull(driverEvent) || CharSequenceUtil.isEmpty(driverEvent.getServiceName())) {
-                log.error("Invalid driver event {}", driverEvent);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+            log.debug("Receive driver event: {}", JsonUtil.toPrettyJsonString(entityDTO));
+            if (ObjectUtil.isNull(entityDTO)
+                    || ObjectUtil.isNull(entityDTO.getEventType())
+                    || CharSequenceUtil.isEmpty(entityDTO.getContent())) {
+                log.error("Invalid driver event: {}", entityDTO);
                 return;
             }
 
-            log.debug("Driver {} event, From: {}, Received: {}", driverEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), driverEvent);
-
-            switch (driverEvent.getType()) {
-                case EventConstant.Driver.REGISTER:
-                    registerEvent(driverEvent);
+            switch (entityDTO.getEventType()) {
+                case REGISTER:
+                    driverEventService.registerEvent(entityDTO);
                     break;
-                case EventConstant.Driver.STATUS:
-                    statusEvent(driverEvent);
+                case HEARTBEAT:
+                    driverEventService.heartbeatEvent(entityDTO);
+                    break;
+                case ALARM:
+                    //statusEvent(entityDTO);
                     break;
                 default:
-                    log.error("Invalid event type, {}", driverEvent.getType());
                     break;
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
-    }
-
-    /**
-     * 处理注册事件
-     *
-     * @param driverEvent DriverEvent
-     */
-    private void registerEvent(DriverEvent driverEvent) {
-        DriverConfiguration driverConfiguration = new DriverConfiguration(
-                PrefixConstant.DRIVER,
-                EventConstant.Driver.REGISTER_BACK,
-                null
-        );
-
-        try {
-            driverSdkService.register(Convert.convert(DriverRegister.class, driverEvent.getContent()));
-            driverConfiguration.setContent(batchService.batchDriverMetadata(driverEvent.getServiceName()));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-
-        rabbitTemplate.convertAndSend(
-                RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverEvent.getServiceName(),
-                driverConfiguration
-        );
-    }
-
-    /**
-     * 处理状态事件
-     *
-     * @param driverEvent DriverEvent
-     */
-    private void statusEvent(DriverEvent driverEvent) {
-        redisUtil.setKey(
-                PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverEvent.getServiceName(),
-                driverEvent.getContent(),
-                driverEvent.getTimeOut(),
-                driverEvent.getTimeUnit()
-        );
     }
 }

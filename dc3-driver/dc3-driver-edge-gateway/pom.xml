@@ -30,24 +30,6 @@
 
     <dependencies>
 
-        <!-- Spring Integration Stream -->
-        <dependency>
-            <groupId>org.springframework.integration</groupId>
-            <artifactId>spring-integration-stream</artifactId>
-        </dependency>
-
-        <!-- Spring Integration Mqtt -->
-        <dependency>
-            <groupId>org.springframework.integration</groupId>
-            <artifactId>spring-integration-mqtt</artifactId>
-        </dependency>
-
-        <!-- Tls Cert 相关 -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
-        </dependency>
-
         <!-- DC3 Common Mqtt -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
