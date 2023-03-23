@@ -18,10 +18,10 @@ package io.github.pnoker.driver.mqtt.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.sdk.bean.mqtt.MessageHeader;
-import io.github.pnoker.common.sdk.bean.mqtt.MessagePayload;
-import io.github.pnoker.common.sdk.bean.mqtt.MessageType;
-import io.github.pnoker.common.sdk.bean.mqtt.MqttMessage;
+import io.github.pnoker.common.mqtt.bean.MessageHeader;
+import io.github.pnoker.common.mqtt.bean.MessagePayload;
+import io.github.pnoker.common.mqtt.bean.MessageType;
+import io.github.pnoker.common.mqtt.bean.MqttMessage;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.mqtt.job.MqttScheduleJob;
 import io.github.pnoker.driver.mqtt.service.MqttReceiveService;

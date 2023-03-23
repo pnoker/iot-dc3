@@ -25,6 +25,7 @@ import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -71,7 +72,7 @@ public class DeviceController {
             Device add = deviceService.add(device);
             if (ObjectUtil.isNotNull(add)) {
                 // 通知驱动新增设备
-                notifyService.notifyDriverDevice(MetadataConstant.Device.ADD, add);
+                notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -92,7 +93,7 @@ public class DeviceController {
             Device device = deviceService.selectById(id);
             if (ObjectUtil.isNotNull(device) && deviceService.delete(id)) {
                 // 通知驱动删除设备
-                notifyService.notifyDriverDevice(MetadataConstant.Device.DELETE, device);
+                notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, device);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -115,7 +116,7 @@ public class DeviceController {
             Device update = deviceService.update(device);
             if (ObjectUtil.isNotNull(update)) {
                 // 通知驱动更新设备
-                notifyService.notifyDriverDevice(MetadataConstant.Device.UPDATE, update);
+                notifyService.notifyDriverDevice(MetadataCommandTypeEnum.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

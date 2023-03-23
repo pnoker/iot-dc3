@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service;
 
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.*;
 
 /**
@@ -32,7 +33,7 @@ public interface NotifyService {
      * @param command Operation Type
      * @param profile Profile
      */
-    void notifyDriverProfile(String command, Profile profile);
+    void notifyDriverProfile(MetadataCommandTypeEnum command, Profile profile);
 
     /**
      * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 修改位号(UPDATE)
@@ -40,7 +41,7 @@ public interface NotifyService {
      * @param command Operation Type
      * @param point   Point
      */
-    void notifyDriverPoint(String command, Point point);
+    void notifyDriverPoint(MetadataCommandTypeEnum command, Point point);
 
     /**
      * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 修改设备(UPDATE)
@@ -48,7 +49,7 @@ public interface NotifyService {
      * @param command Operation Type
      * @param device  Device
      */
-    void notifyDriverDevice(String command, Device device);
+    void notifyDriverDevice(MetadataCommandTypeEnum command, Device device);
 
     /**
      * 通知驱动 新增驱动配置(ADD) / 删除驱动配置(DELETE) / 更新驱动配置(UPDATE)
@@ -56,7 +57,7 @@ public interface NotifyService {
      * @param command    Operation Type
      * @param driverInfo Driver Info
      */
-    void notifyDriverDriverInfo(String command, DriverInfo driverInfo);
+    void notifyDriverDriverInfo(MetadataCommandTypeEnum command, DriverInfo driverInfo);
 
     /**
      * 通知驱动 新增位号配置(ADD) / 删除位号配置(DELETE) / 更新位号配置(UPDATE)
@@ -64,6 +65,6 @@ public interface NotifyService {
      * @param command   Operation Type
      * @param pointInfo PointInfo
      */
-    void notifyDriverPointInfo(String command, PointInfo pointInfo);
+    void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointInfo pointInfo);
 
 }

@@ -26,6 +26,7 @@ import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.UnitEnum;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.valid.Insert;
@@ -73,7 +74,7 @@ public class PointController {
             point.setTenantId(tenantId);
             Point add = pointService.add(point);
             if (ObjectUtil.isNotNull(add)) {
-                notifyService.notifyDriverPoint(MetadataConstant.Point.ADD, add);
+                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, add);
                 return R.ok(add);
             }
         } catch (Exception e) {
@@ -93,7 +94,7 @@ public class PointController {
         try {
             Point point = pointService.selectById(id);
             if (ObjectUtil.isNotNull(point) && pointService.delete(id)) {
-                notifyService.notifyDriverPoint(MetadataConstant.Point.DELETE, point);
+                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, point);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -116,7 +117,7 @@ public class PointController {
             point.setTenantId(tenantId);
             Point update = pointService.update(point);
             if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverPoint(MetadataConstant.Point.UPDATE, update);
+                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, update);
                 return R.ok(update);
             }
         } catch (Exception e) {

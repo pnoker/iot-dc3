@@ -25,7 +25,7 @@ import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.center.manager.service.StatusService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.enums.StatusEnum;
+import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.utils.RedisUtil;
@@ -60,7 +60,7 @@ public class StatusServiceImpl implements StatusService {
     public String driver(String serviceName) {
         String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + serviceName;
         String status = redisUtil.getKey(key);
-        status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
+        status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
         return status;
     }
 
@@ -72,7 +72,7 @@ public class StatusServiceImpl implements StatusService {
         page.getRecords().forEach(driver -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driver.getServiceName();
             String status = redisUtil.getKey(key);
-            status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
+            status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
             statusMap.put(driver.getId(), status);
         });
         return statusMap;
@@ -82,7 +82,7 @@ public class StatusServiceImpl implements StatusService {
     public String device(String id) {
         String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
         String status = redisUtil.getKey(key);
-        status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
+        status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
         return status;
     }
 
@@ -94,7 +94,7 @@ public class StatusServiceImpl implements StatusService {
         page.getRecords().forEach(device -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + device.getId();
             String status = redisUtil.getKey(key);
-            status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
+            status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
             statusMap.put(device.getId(), status);
         });
         return statusMap;
@@ -107,7 +107,7 @@ public class StatusServiceImpl implements StatusService {
         profileBindService.selectDeviceIdsByProfileId(profileId).forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisUtil.getKey(key);
-            status = ObjectUtil.isNotNull(status) ? status : StatusEnum.OFFLINE.getCode();
+            status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });
         return statusMap;

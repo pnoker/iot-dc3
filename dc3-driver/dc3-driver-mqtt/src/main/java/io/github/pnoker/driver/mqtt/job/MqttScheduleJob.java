@@ -16,7 +16,7 @@
 
 package io.github.pnoker.driver.mqtt.job;
 
-import io.github.pnoker.common.sdk.bean.mqtt.MqttMessage;
+import io.github.pnoker.common.mqtt.bean.MqttMessage;
 import io.github.pnoker.driver.mqtt.service.MqttReceiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;

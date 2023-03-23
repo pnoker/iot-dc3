@@ -28,6 +28,7 @@ import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -240,7 +241,7 @@ public class DeviceServiceImpl implements DeviceService {
 
                     List<Point> points = pointService.selectByProfileId(profileId);
                     // 通知驱动新增位号
-                    points.forEach(point -> notifyService.notifyDriverPoint(MetadataConstant.Point.ADD, point));
+                    points.forEach(point -> notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point));
                 } catch (Exception ignored) {
                     // nothing to do
                 }

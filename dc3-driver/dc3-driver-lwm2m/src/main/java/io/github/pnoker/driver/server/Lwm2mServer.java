@@ -16,7 +16,7 @@
 
 package io.github.pnoker.driver.server;
 
-import io.github.pnoker.common.enums.StatusEnum;
+import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.sdk.bean.DriverContext;
 import io.github.pnoker.common.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
@@ -220,7 +220,7 @@ public class Lwm2mServer {
             @Override
             public void registered(Registration registration, Registration previousReg, Collection<Observation> previousObservations) {
                 log.debug("new device {} registered", registration.getEndpoint());
-                driverService.deviceStatusSender(registration.getEndpoint(), StatusEnum.ONLINE);
+                driverService.deviceStatusSender(registration.getEndpoint(), DriverStatusEnum.ONLINE);
             }
 
             /**
@@ -232,7 +232,7 @@ public class Lwm2mServer {
             @Override
             public void updated(RegistrationUpdate registrationUpdate, Registration updatedRegistration, Registration registration1) {
                 log.debug("device is still here:{}", updatedRegistration.getEndpoint());
-                driverService.deviceStatusSender(updatedRegistration.getEndpoint(), StatusEnum.ONLINE);
+                driverService.deviceStatusSender(updatedRegistration.getEndpoint(), DriverStatusEnum.ONLINE);
             }
 
             /**
@@ -245,7 +245,7 @@ public class Lwm2mServer {
             @Override
             public void unregistered(Registration registration, Collection<Observation> observations, boolean expired, Registration newReg) {
                 log.debug("device left: " + registration.getEndpoint());
-                driverService.deviceStatusSender(registration.getEndpoint(), StatusEnum.OFFLINE);
+                driverService.deviceStatusSender(registration.getEndpoint(), DriverStatusEnum.OFFLINE);
             }
 
 

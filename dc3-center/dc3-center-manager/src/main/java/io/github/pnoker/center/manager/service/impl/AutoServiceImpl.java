@@ -18,8 +18,8 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.entity.point.PointDetail;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -69,7 +69,7 @@ public class AutoServiceImpl implements AutoService {
             device = deviceService.add(device);
 
             // 通知驱动新增设备
-            notifyService.notifyDriverDevice(MetadataConstant.Device.ADD, device);
+            notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, device);
         } catch (DuplicateException duplicateException) {
             device = deviceService.selectByName(deviceName, tenantId);
         } catch (Exception ignored) {
@@ -111,7 +111,7 @@ public class AutoServiceImpl implements AutoService {
                 point = pointService.add(point);
 
                 // 同时驱动新增位号
-                notifyService.notifyDriverPoint(MetadataConstant.Point.ADD, point);
+                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point);
             } catch (DuplicateException duplicateException) {
                 point = pointService.selectByNameAndProfileId(pointName, profile.getId());
             } catch (Exception ignored) {

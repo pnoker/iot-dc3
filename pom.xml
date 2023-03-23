@@ -123,12 +123,6 @@
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-api-driver</artifactId>
-                <version>${project.version}</version>
-                <scope>compile</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
