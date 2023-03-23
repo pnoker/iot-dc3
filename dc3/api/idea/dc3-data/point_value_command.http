@@ -14,26 +14,25 @@
 # limitations under the License.
 #
 
-# Development environment, customizable configuration
-driver:
-  schedule:
-    read:
-      corn: '0/1 * * * * ?'
+### 读位号值
+POST http://{{dc3-data}}/data/point_value_command/read
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
 
-spring:
-  #当开启env和group时，需要本地启动auth，manager和data服务
-  env: dev
-  group: ${user.name}
-  rabbitmq:
-    # Customize Rabbitmq configuration
-    host: ${RABBITMQ_HOST:dc3-rabbitmq}
-    port: ${RABBITMQ_PORT:5672}
+{
+  "deviceId": "1638973565432291330",
+  "pointId": "1638973497627172866"
+}
 
-# Log config
-logging:
-  level:
-    io.github.pnoker: DEBUG
-    io.github.pnoker.common.sdk: DEBUG
-    io.github.pnoker.common.sdk.service: DEBUG
-    io.github.pnoker.common.sdk.service.job: DEBUG
-    io.github.pnoker.common.sdk.service.rabbit: DEBUG
+### 写位号值
+POST http://{{dc3-data}}/data/point_value_command/write
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "deviceId": "1638973565432291330",
+  "pointId": "1638973497627172866",
+  "value": 10
+}

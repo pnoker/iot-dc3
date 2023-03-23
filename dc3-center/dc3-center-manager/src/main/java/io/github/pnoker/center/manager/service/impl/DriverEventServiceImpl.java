@@ -26,7 +26,6 @@ import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.dto.DriverEventDTO;
 import io.github.pnoker.common.dto.DriverMetadataDTO;
-import io.github.pnoker.common.dto.DriverStatusDTO;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.entity.driver.DriverRegister;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
@@ -47,6 +46,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * DriverService Impl
@@ -112,11 +112,11 @@ public class DriverEventServiceImpl implements DriverEventService {
 
     @Override
     public void heartbeatEvent(DriverEventDTO entityDTO) {
-        DriverStatusDTO driverStatusDTO = JsonUtil.parseObject(entityDTO.getContent(), DriverStatusDTO.class);
-        if (ObjectUtil.isNull(driverStatusDTO)) {
+        DriverEventDTO.DriverStatus driverStatus = JsonUtil.parseObject(entityDTO.getContent(), DriverEventDTO.DriverStatus.class);
+        if (ObjectUtil.isNull(driverStatus)) {
             return;
         }
-        redisUtil.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatusDTO.getServiceName(), driverStatusDTO.getStatus());
+        redisUtil.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getServiceName(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
     }
 
     /**
@@ -142,12 +142,7 @@ public class DriverEventServiceImpl implements DriverEventService {
             driver = driverService.update(driver);
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", driver);
-            try {
-                Driver byHostPort = driverService.selectByHostPort(driver.getDriverTypeFlag(), driver.getServiceHost(), driver.getServicePort(), driver.getTenantId());
-                throw new ServiceException("The port(" + driver.getServicePort() + ") is already occupied by driver(" + byHostPort.getServiceName() + "/" + byHostPort.getDriverName() + ")");
-            } catch (NotFoundException notFoundException2) {
-                driver = driverService.add(driver);
-            }
+            driver = driverService.add(driver);
         }
         return driver;
     }

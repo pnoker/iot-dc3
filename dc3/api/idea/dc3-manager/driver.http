@@ -76,8 +76,8 @@ X-Auth-Tenant-Id: -1
 
 
 ### 查询 Driver 服务状态
-#/manager/status/driver，支持name\serverName\host模糊查询，port精准查询
-POST http://{{dc3-manager}}/manager/status/driver
+#/manager/driverStatus/driver，支持name\serverName\host模糊查询，port精准查询
+POST http://{{dc3-manager}}/manager/driverStatus/driver
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

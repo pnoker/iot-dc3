@@ -52,13 +52,13 @@ public class DriverEventReceiver {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             log.debug("Receive driver event: {}", JsonUtil.toPrettyJsonString(entityDTO));
             if (ObjectUtil.isNull(entityDTO)
-                    || ObjectUtil.isNull(entityDTO.getEventType())
+                    || ObjectUtil.isNull(entityDTO.getType())
                     || CharSequenceUtil.isEmpty(entityDTO.getContent())) {
                 log.error("Invalid driver event: {}", entityDTO);
                 return;
             }
 
-            switch (entityDTO.getEventType()) {
+            switch (entityDTO.getType()) {
                 case REGISTER:
                     driverEventService.registerEvent(entityDTO);
                     break;

@@ -34,47 +34,24 @@ driver:
   point-attribute:
     - display-name: 关键字
       attribute-name: key
-      type: string
+      attribute-type-flag: STRING
       value: 62
       remark: 报文关键字
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 起始字节
       attribute-name: start
-      type: int
+      attribute-type-flag: INT
       value: 0
       remark: 起始字节，包含该字节
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 结束字节
       attribute-name: end
-      type: int
+      attribute-type-flag: INT
       value: 8
       remark: 结束字节，不包含该字节
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
     - display-name: 类型
       attribute-name: type
-      type: string
+      attribute-type-flag: STRING
       value: string
       remark: 解析类型，short、int、long、float、double、boolean、string
-      option:
-        type: input\select\checkox\switch\time...
-        required: true
-        data-type: static/url
-        data: jsonString
-
-server:
-  port: 8702
 
 spring:
   profiles:

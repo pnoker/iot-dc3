@@ -49,7 +49,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
     private PointService pointService;
 
     @Override
-    public void list(PagePointQuery request, StreamObserver<RPagePointDTO> responseObserver) {
+    public void list(PagePointQueryDTO request, StreamObserver<RPagePointDTO> responseObserver) {
         RPagePointDTO.Builder builder = RPagePointDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
@@ -65,17 +65,17 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            PagePointDTO.Builder ppb = PagePointDTO.newBuilder();
-            PageDTO.Builder pb = PageDTO.newBuilder();
-            pb.setCurrent(pointPage.getCurrent());
-            pb.setSize(pointPage.getSize());
-            pb.setPages(pointPage.getPages());
-            pb.setTotal(pointPage.getTotal());
-            ppb.setPage(pb);
+            PagePointDTO.Builder pagePointBuilder = PagePointDTO.newBuilder();
+            PageDTO.Builder pageBuilder = PageDTO.newBuilder();
+            pageBuilder.setCurrent(pointPage.getCurrent());
+            pageBuilder.setSize(pointPage.getSize());
+            pageBuilder.setPages(pointPage.getPages());
+            pageBuilder.setTotal(pointPage.getTotal());
+            pagePointBuilder.setPage(pageBuilder);
             List<PointDTO> collect = pointPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
-            ppb.addAllData(collect);
+            pagePointBuilder.addAllData(collect);
 
-            builder.setData(ppb);
+            builder.setData(pagePointBuilder);
         }
 
         builder.setResult(rBuilder);
@@ -110,7 +110,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         return builder.build();
     }
 
-    private PointPageQuery buildPageQuery(PagePointQuery request) {
+    private PointPageQuery buildPageQuery(PagePointQueryDTO request) {
         PointPageQuery pageQuery = new PointPageQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());

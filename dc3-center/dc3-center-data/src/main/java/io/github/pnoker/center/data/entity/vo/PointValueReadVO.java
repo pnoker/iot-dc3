@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.query;
+package io.github.pnoker.center.data.entity.vo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.valid.Insert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
- * Point Value Page Query
+ * Point Value Read VO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -34,27 +33,12 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PointValuePageQuery implements Serializable {
+public class PointValueReadVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @NotBlank(message = "Driver id can't be empty")
     private String deviceId;
+
+    @NotBlank(message = "Point id can't be empty")
     private String pointId;
-
-    /**
-     * 位号名称
-     */
-    private String pointName;
-
-    /**
-     * 使能标识
-     */
-    private EnableFlagEnum enableFlag;
-
-    /**
-     * 是否返回最近历史数据
-     */
-    private Boolean history = false;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
 }
