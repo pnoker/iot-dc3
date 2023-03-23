@@ -288,7 +288,7 @@ export default defineComponent({
         const driverInfo = () => {
             getDriverInfoByDeviceId(reactiveData.id)
                 .then((res) => {
-                    const formData = {}
+                    const formData = reactiveData.driverFormData
                     res.data.data.forEach((info) => {
                         formData[reactiveData.driverAttributeTable[info.driverAttributeId]] = {
                             id: info.id,
@@ -526,6 +526,7 @@ export default defineComponent({
             profileCurrentChange,
             profileDictionaryVisible,
             changeAttribute,
+            driverUpdate,
             pointUpdate,
             selectPoint,
             pre,

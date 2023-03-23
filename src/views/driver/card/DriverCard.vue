@@ -36,14 +36,14 @@
                         <el-tag v-else-if="status === 'MAINTAIN'" type="warning" effect="plain">维护</el-tag>
                         <el-tag v-else-if="status === 'FAULT'" type="danger" effect="plain">故障</el-tag>
                         <el-tag v-else-if="status === 'DISABLE'" type="info" effect="plain">停用</el-tag>
-                        <el-tag v-else-if="status === 'UNREGISTERED'" type="info" effect="plain">未注册</el-tag>
+                        <el-tag v-else-if="status === 'REGISTERING'" type="info" effect="plain">注册中</el-tag>
                         <el-tag v-else type="info" effect="plain">离线</el-tag>
                     </div>
                 </div>
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <ul>
-                            <li class="nowrap-item">
+                            <li class="nowrap-item" v-if="data.servicePort > 0">
                                 <el-icon>
                                     <Connection />
                                 </el-icon>

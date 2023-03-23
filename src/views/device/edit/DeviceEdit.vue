@@ -153,6 +153,7 @@
                                     class="edit-form-default"
                                     :placeholder="'请输入' + attribute.displayName"
                                     clearable
+                                    @keyup.enter="driverUpdate"
                                 ></el-input>
                             </el-form-item>
                         </el-row>

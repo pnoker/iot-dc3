@@ -154,3 +154,29 @@ export const getPointValueList = (pointValue: any) =>
         method: 'post',
         data: pointValue,
     })
+
+/**
+ * 读位号值
+ *
+ * @param pointValueReadVO PointValueReadVO
+ * @returns MyAxiosPromise
+ */
+export const readPointValue = (pointValueReadVO: any) =>
+    request<R>({
+        url: `api/v3/data/point_value_command/read`,
+        method: 'post',
+        data: pointValueReadVO,
+    })
+
+/**
+ * 写位号值
+ *
+ * @param pointValueWriteVO PointValueWriteVO
+ * @returns MyAxiosPromise
+ */
+export const writePointValue = (pointValueWriteVO: any) =>
+    request<R>({
+        url: `api/v3/data/point_value_command/write`,
+        method: 'post',
+        data: pointValueWriteVO,
+    })
