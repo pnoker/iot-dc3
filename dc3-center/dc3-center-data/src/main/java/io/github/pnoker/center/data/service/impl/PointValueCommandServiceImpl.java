@@ -26,7 +26,6 @@ import io.github.pnoker.center.data.service.PointValueCommandService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DeviceCommandDTO;
-import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.enums.DeviceCommandTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -53,30 +52,30 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public PointValue read(PointValueReadVO entityVO) {
-        ByDeviceQueryDTO queryDTO = ByDeviceQueryDTO.newBuilder().setDeviceId(entityVO.getDeviceId()).build();
-        RDriverDTO rDriverDTO = driverApiBlockingStub.selectByDeviceId(queryDTO);
+    public void read(PointValueReadVO entityVO) {
+        ByDeviceQueryDTO.Builder builder = ByDeviceQueryDTO.newBuilder();
+        builder.setDeviceId(entityVO.getDeviceId());
+        RDriverDTO rDriverDTO = driverApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
-            return null;
+            return;
         }
 
         DeviceCommandDTO.DeviceRead deviceRead = new DeviceCommandDTO.DeviceRead(entityVO.getDeviceId(), entityVO.getPointId());
         DeviceCommandDTO deviceCommandDTO = new DeviceCommandDTO(DeviceCommandTypeEnum.READ, JsonUtil.toJsonString(deviceRead));
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND, RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + rDriverDTO.getData().getServiceName(), deviceCommandDTO);
-        return null;
     }
 
     @Override
-    public PointValue write(PointValueWriteVO entityVO) {
-        ByDeviceQueryDTO queryDTO = ByDeviceQueryDTO.newBuilder().setDeviceId(entityVO.getDeviceId()).build();
-        RDriverDTO rDriverDTO = driverApiBlockingStub.selectByDeviceId(queryDTO);
+    public void write(PointValueWriteVO entityVO) {
+        ByDeviceQueryDTO.Builder builder = ByDeviceQueryDTO.newBuilder();
+        builder.setDeviceId(entityVO.getDeviceId());
+        RDriverDTO rDriverDTO = driverApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
-            return null;
+            return;
         }
 
         DeviceCommandDTO.DeviceWrite deviceWrite = new DeviceCommandDTO.DeviceWrite(entityVO.getDeviceId(), entityVO.getPointId(), entityVO.getValue());
         DeviceCommandDTO deviceCommandDTO = new DeviceCommandDTO(DeviceCommandTypeEnum.WRITE, JsonUtil.toJsonString(deviceWrite));
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND, RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + rDriverDTO.getData().getServiceName(), deviceCommandDTO);
-        return null;
     }
 }

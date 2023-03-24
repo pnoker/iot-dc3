@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service.rabbit;
+package io.github.pnoker.center.data.service.rabbit;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.center.manager.service.DriverEventService;
+import io.github.pnoker.center.data.service.DriverEventService;
 import io.github.pnoker.common.dto.DriverEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +59,6 @@ public class DriverEventReceiver {
             }
 
             switch (entityDTO.getType()) {
-                case REGISTER:
-                    driverEventService.registerEvent(entityDTO);
-                    break;
                 case HEARTBEAT:
                     driverEventService.heartbeatEvent(entityDTO);
                     break;

@@ -16,13 +16,14 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.center.data.entity.vo.PointValueWriteVO;
-import io.github.pnoker.center.data.service.PointValueCommandService;
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.data.entity.vo.query.DriverEventPageQuery;
+import io.github.pnoker.center.data.service.EventService;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
+import io.github.pnoker.common.entity.DriverEvent;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,49 +32,39 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * PointValue Controller
+ * 驱动事件 Controller
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @RestController
-@RequestMapping(DataServiceConstant.VALUE_COMMAND_URL_PREFIX)
-public class PointValueCommandController {
+@RequestMapping(DataServiceConstant.DRIVER_EVENT_URL_PREFIX)
+public class DriverEventController {
 
     @Resource
-    private PointValueCommandService pointValueCommandService;
+    private EventService eventService;
 
     /**
-     * 读指令
+     * 模糊分页查询 DriverEvent
      *
-     * @param entityVO PointValueReadVO
-     * @return PointValue
+     * @param driverEventPageQuery DriverEventDto
+     * @return Page Of DriverEvent
      */
-    @PostMapping("/read")
-    public R<Boolean> read(@Validated @RequestBody PointValueReadVO entityVO) {
+    @PostMapping("/driver")
+    public R<Page<DriverEvent>> driverEvent(@RequestBody(required = false) DriverEventPageQuery driverEventPageQuery) {
         try {
-            pointValueCommandService.read(entityVO);
+            if (ObjectUtil.isEmpty(driverEventPageQuery)) {
+                driverEventPageQuery = new DriverEventPageQuery();
+            }
+            Page<DriverEvent> page = eventService.driverEvent(driverEventPageQuery);
+            if (ObjectUtil.isNotNull(page)) {
+                return R.ok(page);
+            }
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.ok();
-    }
-
-    /**
-     * 写指令
-     *
-     * @param entityVO PointValueWriteVO
-     * @return PointValue
-     */
-    @PostMapping("/write")
-    public R<Boolean> write(@Validated @RequestBody PointValueWriteVO entityVO) {
-        try {
-            pointValueCommandService.write(entityVO);
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.ok();
+        return R.fail();
     }
 
 }

@@ -19,13 +19,11 @@ package io.github.pnoker.center.manager.config;
 import io.github.pnoker.common.config.TopicConfig;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.utils.EnvironmentUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,42 +40,24 @@ import java.util.Map;
 @Configuration
 @ConditionalOnClass(TopicConfig.class)
 public class ManagerTopicConfig {
-    @Value("${spring.env:}")
-    private String env;
 
     @Resource
-    private TopicExchange eventExchange;
+    private TopicExchange registerExchange;
 
     @Bean
-    Queue driverEventQueue() {
+    Queue driverRegisterQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 15秒：15 * 1000 = 15000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_EVENT, true, false, EnvironmentUtil.isDev(env), arguments);
+        // 30秒：30 * 1000 = 30000L
+        arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_REGISTER, true, false, false, arguments);
     }
 
     @Bean
-    Binding driverEventBinding(Queue driverEventQueue) {
+    Binding driverRegisterBinding(Queue driverRegisterQueue) {
         return BindingBuilder
-                .bind(driverEventQueue)
-                .to(eventExchange)
-                .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
-    }
-
-    @Bean
-    Queue deviceEventQueue() {
-        Map<String, Object> arguments = new HashMap<>();
-        // 15秒：15 * 1000 = 15000L
-        arguments.put(RabbitConstant.MESSAGE_TTL, 15000L);
-        return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, EnvironmentUtil.isDev(env), arguments);
-    }
-
-    @Bean
-    Binding deviceEventBinding(Queue deviceEventQueue) {
-        return BindingBuilder
-                .bind(deviceEventQueue)
-                .to(eventExchange)
-                .with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
+                .bind(driverRegisterQueue)
+                .to(registerExchange)
+                .with(RabbitConstant.ROUTING_DRIVER_REGISTER_PREFIX + SymbolConstant.ASTERISK);
     }
 
 }

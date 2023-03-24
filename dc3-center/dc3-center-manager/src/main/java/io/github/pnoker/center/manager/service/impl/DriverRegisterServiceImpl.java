@@ -21,13 +21,11 @@ import io.github.pnoker.api.center.auth.CodeQuery;
 import io.github.pnoker.api.center.auth.RTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.dto.DriverEventDTO;
 import io.github.pnoker.common.dto.DriverMetadataDTO;
+import io.github.pnoker.common.dto.DriverRegisterDTO;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
-import io.github.pnoker.common.entity.driver.DriverRegister;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -36,7 +34,6 @@ import io.github.pnoker.common.model.Driver;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -46,17 +43,16 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
- * DriverService Impl
+ * 驱动注册相关接口实现
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @Service
-public class DriverEventServiceImpl implements DriverEventService {
+public class DriverRegisterServiceImpl implements DriverRegisterService {
 
     @GrpcClient(AuthServiceConstant.SERVICE_NAME)
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
@@ -76,14 +72,11 @@ public class DriverEventServiceImpl implements DriverEventService {
     private PointInfoService pointInfoService;
 
     @Resource
-    private RedisUtil redisUtil;
-    @Resource
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void registerEvent(DriverEventDTO entityDTO) {
-        DriverRegister driverRegister = JsonUtil.parseObject(entityDTO.getContent(), DriverRegister.class);
-        if (ObjectUtil.isNull(driverRegister) || ObjectUtil.isNull(driverRegister.getDriver())) {
+    public void register(DriverRegisterDTO entityDTO) {
+        if (ObjectUtil.isNull(entityDTO) || ObjectUtil.isNull(entityDTO.getDriver())) {
             return;
         }
 
@@ -94,10 +87,10 @@ public class DriverEventServiceImpl implements DriverEventService {
         );
 
         try {
-            Driver driver = registerDriver(driverRegister);
-            registerDriverAttribute(driverRegister, driver);
-            registerPointAttribute(driverRegister, driver);
-            DriverMetadata driverMetadata = batchService.batchDriverMetadata(driverRegister.getDriver().getServiceName());
+            Driver driver = registerDriver(entityDTO);
+            registerDriverAttribute(entityDTO, driver);
+            registerPointAttribute(entityDTO, driver);
+            DriverMetadata driverMetadata = batchService.batchDriverMetadata(entityDTO.getDriver().getServiceName());
             driverConfiguration.setContent(JsonUtil.toJsonString(driverMetadata));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -105,34 +98,25 @@ public class DriverEventServiceImpl implements DriverEventService {
 
         rabbitTemplate.convertAndSend(
                 RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverRegister.getDriver().getServiceName(),
+                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + entityDTO.getDriver().getServiceName(),
                 driverConfiguration
         );
-    }
-
-    @Override
-    public void heartbeatEvent(DriverEventDTO entityDTO) {
-        DriverEventDTO.DriverStatus driverStatus = JsonUtil.parseObject(entityDTO.getContent(), DriverEventDTO.DriverStatus.class);
-        if (ObjectUtil.isNull(driverStatus)) {
-            return;
-        }
-        redisUtil.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getServiceName(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
     }
 
     /**
      * 注册驱动
      *
-     * @param driverRegister DriverRegister
+     * @param driverRegisterDTO DriverRegisterDTO
      */
-    private Driver registerDriver(DriverRegister driverRegister) {
+    private Driver registerDriver(DriverRegisterDTO driverRegisterDTO) {
         // check tenant
-        RTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(driverRegister.getTenant()).build());
+        RTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(driverRegisterDTO.getTenant()).build());
         if (!rTenantDTO.getResult().getOk()) {
-            throw new ServiceException("Invalid {}, {}", driverRegister.getTenant(), rTenantDTO.getResult().getMessage());
+            throw new ServiceException("Invalid {}, {}", driverRegisterDTO.getTenant(), rTenantDTO.getResult().getMessage());
         }
 
         // register driver
-        Driver driver = driverRegister.getDriver();
+        Driver driver = driverRegisterDTO.getDriver();
         driver.setTenantId(rTenantDTO.getData().getBase().getId());
         log.info("Register driver {}", driver);
         try {
@@ -150,13 +134,13 @@ public class DriverEventServiceImpl implements DriverEventService {
     /**
      * 注册驱动属性
      *
-     * @param driverRegister DriverRegister
-     * @param driver         Driver
+     * @param driverRegisterDTO DriverRegisterDTO
+     * @param driver            Driver
      */
-    private void registerDriverAttribute(DriverRegister driverRegister, Driver driver) {
+    private void registerDriverAttribute(DriverRegisterDTO driverRegisterDTO, Driver driver) {
         Map<String, DriverAttribute> newDriverAttributeMap = new HashMap<>(8);
-        if (ObjectUtil.isNotNull(driverRegister.getDriverAttributes()) && !driverRegister.getDriverAttributes().isEmpty()) {
-            driverRegister.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
+        if (ObjectUtil.isNotNull(driverRegisterDTO.getDriverAttributes()) && !driverRegisterDTO.getDriverAttributes().isEmpty()) {
+            driverRegisterDTO.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         }
 
         Map<String, DriverAttribute> oldDriverAttributeMap = new HashMap<>(8);
@@ -198,13 +182,13 @@ public class DriverEventServiceImpl implements DriverEventService {
     /**
      * 注册位号属性
      *
-     * @param driverRegister DriverRegister
-     * @param driver         Driver
+     * @param driverRegisterDTO DriverRegisterDTO
+     * @param driver            Driver
      */
-    private void registerPointAttribute(DriverRegister driverRegister, Driver driver) {
+    private void registerPointAttribute(DriverRegisterDTO driverRegisterDTO, Driver driver) {
         Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);
-        if (ObjectUtil.isNotNull(driverRegister.getPointAttributes()) && !driverRegister.getPointAttributes().isEmpty()) {
-            driverRegister.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
+        if (ObjectUtil.isNotNull(driverRegisterDTO.getPointAttributes()) && !driverRegisterDTO.getPointAttributes().isEmpty()) {
+            driverRegisterDTO.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         }
 
         Map<String, PointAttribute> oldPointAttributeMap = new HashMap<>(8);

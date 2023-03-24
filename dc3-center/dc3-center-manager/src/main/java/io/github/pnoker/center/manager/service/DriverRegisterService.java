@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.manager.service;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
+import io.github.pnoker.common.dto.DriverRegisterDTO;
 
 /**
+ * 驱动注册相关接口
+ *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DriverEventPageQuery implements Serializable {
-    private static final long serialVersionUID = 1L;
+public interface DriverRegisterService {
 
-    private String serviceName;
+    /**
+     * 驱动注册
+     *
+     * @param entityDTO DriverRegisterDTO
+     */
+    void register(DriverRegisterDTO entityDTO);
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
 }
