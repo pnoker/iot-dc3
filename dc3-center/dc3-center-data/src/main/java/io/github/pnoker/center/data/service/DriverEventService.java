@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.common.dto.DriverEventDTO;
 
@@ -25,13 +25,6 @@ import io.github.pnoker.common.dto.DriverEventDTO;
  * @since 2022.1.0
  */
 public interface DriverEventService {
-
-    /**
-     * 驱动注册事件
-     *
-     * @param entityDTO DriverEventDTO
-     */
-    void registerEvent(DriverEventDTO entityDTO);
 
     /**
      * 驱动心跳事件

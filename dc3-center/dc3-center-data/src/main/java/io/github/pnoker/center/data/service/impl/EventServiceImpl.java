@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service.impl;
+package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DeviceEventPageQuery;
-import io.github.pnoker.center.manager.entity.query.DriverEventPageQuery;
-import io.github.pnoker.center.manager.service.EventService;
+import io.github.pnoker.center.data.entity.vo.query.DeviceEventPageQuery;
+import io.github.pnoker.center.data.entity.vo.query.DriverEventPageQuery;
+import io.github.pnoker.center.data.service.EventService;
 import io.github.pnoker.common.entity.DeviceEvent;
 import io.github.pnoker.common.entity.DriverEvent;
 import io.github.pnoker.common.entity.common.Pages;

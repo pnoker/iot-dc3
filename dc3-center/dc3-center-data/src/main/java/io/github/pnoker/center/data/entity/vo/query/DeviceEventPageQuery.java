@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.service;
+package io.github.pnoker.center.data.entity.vo.query;
 
-import io.github.pnoker.center.data.entity.vo.PointValueReadVO;
-import io.github.pnoker.center.data.entity.vo.PointValueWriteVO;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.common.Pages;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointValueCommandService {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class DeviceEventPageQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 读指令
-     *
-     * @param entityVO PointValueReadVO
-     */
-    void read(PointValueReadVO entityVO);
+    private String deviceId;
+    private String pointId;
 
-    /**
-     * 写指令
-     *
-     * @param entityVO PointValueWriteVO
-     */
-    void write(PointValueWriteVO entityVO);
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
 }

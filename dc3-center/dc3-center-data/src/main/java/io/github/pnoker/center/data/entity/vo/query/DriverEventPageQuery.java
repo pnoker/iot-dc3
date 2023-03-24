@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.data.entity.vo.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
@@ -31,11 +31,10 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeviceEventPageQuery implements Serializable {
+public class DriverEventPageQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String deviceId;
-    private String pointId;
+    private String serviceName;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.data.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DeviceEventPageQuery;
-import io.github.pnoker.center.manager.entity.query.DriverEventPageQuery;
+import io.github.pnoker.center.data.entity.vo.query.DeviceEventPageQuery;
+import io.github.pnoker.center.data.entity.vo.query.DriverEventPageQuery;
 import io.github.pnoker.common.entity.DeviceEvent;
 import io.github.pnoker.common.entity.DriverEvent;
 

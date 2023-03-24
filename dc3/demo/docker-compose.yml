@@ -18,7 +18,7 @@ version: '3'
 
 services:
   web:
-    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:2023.1.9.demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:2023.2.1.demo
     restart: on-failure
     ports:
       - '8080:80'
@@ -32,7 +32,7 @@ services:
           - dc3-web
 
   gateway:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2023.1.9.demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2023.2.1.demo
     restart: on-failure
     container_name: dc3-gateway
     hostname: dc3-gateway
@@ -66,7 +66,7 @@ services:
           - dc3-center-register
 
   auth:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2023.1.9.demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2023.2.1.demo
     restart: on-failure
     container_name: dc3-center-auth
     hostname: dc3-center-auth
@@ -83,7 +83,7 @@ services:
           - dc3-center-auth
 
   manager:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2023.1.9.demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2023.2.1.demo
     restart: on-failure
     container_name: dc3-center-manager
     hostname: dc3-center-manager
@@ -100,7 +100,7 @@ services:
           - dc3-center-manager
 
   data:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2023.1.9.demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2023.2.1.demo
     restart: on-failure
     container_name: dc3-center-data
     hostname: dc3-center-data

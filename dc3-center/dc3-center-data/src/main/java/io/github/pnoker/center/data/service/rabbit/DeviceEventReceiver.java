@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service.rabbit;
+package io.github.pnoker.center.data.service.rabbit;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.center.manager.service.EventService;
+import io.github.pnoker.center.data.service.EventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.entity.DeviceEvent;

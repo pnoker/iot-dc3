@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.controller;
+package io.github.pnoker.center.data.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DeviceEventPageQuery;
-import io.github.pnoker.center.manager.entity.query.DriverEventPageQuery;
-import io.github.pnoker.center.manager.service.EventService;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.center.data.entity.vo.query.DeviceEventPageQuery;
+import io.github.pnoker.center.data.service.EventService;
+import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.DeviceEvent;
-import io.github.pnoker.common.entity.DriverEvent;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,40 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * 事件 Controller
+ * 设备事件 Controller
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.EVENT_URL_PREFIX)
-public class EventController {
+@RequestMapping(DataServiceConstant.DEVICE_EVENT_URL_PREFIX)
+public class DeviceEventController {
 
     @Resource
     private EventService eventService;
-
-    /**
-     * 模糊分页查询 DriverEvent
-     *
-     * @param driverEventPageQuery DriverEventDto
-     * @return Page Of DriverEvent
-     */
-    @PostMapping("/driver")
-    public R<Page<DriverEvent>> driverEvent(@RequestBody(required = false) DriverEventPageQuery driverEventPageQuery) {
-        try {
-            if (ObjectUtil.isEmpty(driverEventPageQuery)) {
-                driverEventPageQuery = new DriverEventPageQuery();
-            }
-            Page<DriverEvent> page = eventService.driverEvent(driverEventPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
 
     /**
      * 模糊分页查询 DeviceEvent
