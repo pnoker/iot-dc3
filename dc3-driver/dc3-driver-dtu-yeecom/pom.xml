@@ -20,13 +20,13 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2023.2.1</version>
+        <version>2023.2.2</version>
     </parent>
 
     <artifactId>dc3-driver-dtu-yeecom</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 DTU 驱动，监听模式，提供 Tcp 和 Udp 两种模式，仅用于移讯通DTU用途。</description>
+    <description>IOT DC3 平台 移讯通DTU 驱动，监听模式，提供 Tcp 和 Udp 两种模式。</description>
 
     <dependencies>
 

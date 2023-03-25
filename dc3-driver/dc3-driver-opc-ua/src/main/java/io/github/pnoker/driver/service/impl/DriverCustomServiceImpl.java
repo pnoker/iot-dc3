@@ -197,7 +197,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws InterruptedException InterruptedException
      */
     private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeInfo value) throws ExecutionException, InterruptedException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.of(value.getType().getCode());
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());
         }

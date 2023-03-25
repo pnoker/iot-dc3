@@ -48,7 +48,7 @@ public class DriverEventServiceImpl implements DriverEventService {
         if (ObjectUtil.isNull(driverStatus)) {
             return;
         }
-        redisUtil.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getServiceName(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
+        redisUtil.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
     }
 
 }

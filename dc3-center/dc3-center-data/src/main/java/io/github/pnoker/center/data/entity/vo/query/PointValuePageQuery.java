@@ -18,6 +18,7 @@ package io.github.pnoker.center.data.entity.vo.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,24 +26,34 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
+ * Point Value Page Query VO
+ *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeviceEventPageQuery implements Serializable {
+public class PointValuePageQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 设备ID
-     */
     private String deviceId;
+    private String pointId;
 
     /**
-     * 位号ID
+     * 位号名称
      */
-    private String pointId;
+    private String pointName;
+
+    /**
+     * 使能标识
+     */
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 是否返回最近历史数据
+     */
+    private Boolean history = false;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

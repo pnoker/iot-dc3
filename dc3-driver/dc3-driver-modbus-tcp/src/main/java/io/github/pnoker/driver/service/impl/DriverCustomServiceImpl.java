@@ -222,7 +222,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return Modbus Data Type
      */
     private int getValueType(String type) {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.of(type);
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + type);
         }

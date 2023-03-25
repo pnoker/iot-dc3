@@ -25,7 +25,7 @@ import io.github.pnoker.center.manager.entity.query.PointPageQuery;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.utils.BuilderUtil;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.*;
 import io.github.pnoker.common.model.Point;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +33,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -93,7 +94,6 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         PointDTO.Builder builder = PointDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
-        builder.setId(entityDO.getId());
         builder.setPointName(entityDO.getPointName());
         builder.setPointCode(entityDO.getPointCode());
         builder.setPointTypeFlag(PointTypeFlagDTOEnum.valueOf(entityDO.getPointTypeFlag().name()));
@@ -115,7 +115,17 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
-        pageQuery.setDeviceId(request.getDeviceId());
+        pageQuery.setPage(pages);
+
+        pageQuery.setDeviceId(Optional.of(request.getDeviceId()).orElse(null));
+        pageQuery.setPointName(Optional.of(request.getPoint().getPointName()).orElse(null));
+        pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofName(request.getPoint().getPointTypeFlag().name()));
+        pageQuery.setRwFlag(RwFlagEnum.ofName(request.getPoint().getRwFlag().name()));
+        pageQuery.setAccrueFlag(AccrueFlagEnum.ofName(request.getPoint().getAccrueFlag().name()));
+        pageQuery.setProfileId(Optional.of(request.getPoint().getProfileId()).orElse(null));
+        pageQuery.setEnableFlag(EnableFlagEnum.ofName(request.getPoint().getEnableFlag().name()));
+        pageQuery.setTenantId(Optional.of(request.getPoint().getTenantId()).orElse(null));
+
         return pageQuery;
     }
 }

@@ -18,15 +18,11 @@ package io.github.pnoker.center.data.entity.vo.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EnableFlagEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
+import io.github.pnoker.common.model.Driver;
+import lombok.*;
 
 /**
- * Point Value Page Query VO
+ * Driver DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -34,26 +30,9 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PointValuePageQueryVO implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private String deviceId;
-    private String pointId;
-
-    /**
-     * 位号名称
-     */
-    private String pointName;
-
-    /**
-     * 使能标识
-     */
-    private EnableFlagEnum enableFlag;
-
-    /**
-     * 是否返回最近历史数据
-     */
-    private Boolean history = false;
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class DriverPageQuery extends Driver {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

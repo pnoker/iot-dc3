@@ -176,7 +176,7 @@ public class DriverController {
                                       @NotNull @PathVariable(value = "port") Integer port,
                                       @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
         try {
-            DriverTypeFlagEnum typeEnum = DriverTypeFlagEnum.of(type);
+            DriverTypeFlagEnum typeEnum = DriverTypeFlagEnum.ofCode(type);
             Driver select = driverService.selectByHostPort(typeEnum, host, port, tenantId);
             return R.ok(select);
         } catch (Exception e) {

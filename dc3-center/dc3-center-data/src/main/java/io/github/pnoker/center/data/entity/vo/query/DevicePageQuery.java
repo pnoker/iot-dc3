@@ -18,32 +18,24 @@ package io.github.pnoker.center.data.entity.vo.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
+import io.github.pnoker.common.model.Device;
+import lombok.*;
 
 /**
+ * Device DTO
+ *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeviceEventPageQuery implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 设备ID
-     */
-    private String deviceId;
-
-    /**
-     * 位号ID
-     */
-    private String pointId;
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class DevicePageQuery extends Device {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    private String profileId;
 }

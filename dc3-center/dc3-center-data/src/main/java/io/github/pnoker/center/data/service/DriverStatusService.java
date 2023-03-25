@@ -14,36 +14,26 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.vo.query;
+package io.github.pnoker.center.data.service;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+import io.github.pnoker.center.data.entity.vo.query.DriverPageQuery;
+
+import java.util.Map;
 
 /**
+ * Device Interface
+ *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DeviceEventPageQuery implements Serializable {
-    private static final long serialVersionUID = 1L;
+public interface DriverStatusService {
 
     /**
-     * 设备ID
+     * 模糊分页查询 Driver 服务状态，同驱动模糊分页查询配套使用
+     *
+     * @param driverPageQuery 驱动和分页参数
+     * @return Map String:String
      */
-    private String deviceId;
-
-    /**
-     * 位号ID
-     */
-    private String pointId;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
+    Map<String, String> driver(DriverPageQuery driverPageQuery);
 }
