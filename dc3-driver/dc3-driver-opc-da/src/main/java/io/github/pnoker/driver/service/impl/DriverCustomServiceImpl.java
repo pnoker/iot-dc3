@@ -237,7 +237,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws JIException OpcDa JIException
      */
     private boolean writeItem(Item item, AttributeInfo value) throws JIException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.of(value.getType().getCode());
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());
         }

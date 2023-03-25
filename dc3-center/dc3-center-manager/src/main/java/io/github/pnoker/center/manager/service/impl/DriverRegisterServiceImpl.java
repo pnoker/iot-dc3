@@ -81,7 +81,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         }
 
         DriverMetadataDTO driverConfiguration = new DriverMetadataDTO(
-                MetadataTypeEnum.DRIVER,
+                MetadataTypeEnum.METADATA,
                 MetadataCommandTypeEnum.SYNC,
                 null
         );

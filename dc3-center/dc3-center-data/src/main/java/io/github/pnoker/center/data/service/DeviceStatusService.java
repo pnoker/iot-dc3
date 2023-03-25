@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.data.service;
 
-import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
+import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
 
 import java.util.Map;
 
@@ -27,31 +26,7 @@ import java.util.Map;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface StatusService {
-
-    /**
-     * 根据 驱动ServiceName 查询 Driver 服务状态
-     *
-     * @param serviceName Driver ServiceName
-     * @return String
-     */
-    String driver(String serviceName);
-
-    /**
-     * 模糊分页查询 Driver 服务状态，同驱动模糊分页查询配套使用
-     *
-     * @param driverPageQuery 驱动和分页参数
-     * @return Map String:String
-     */
-    Map<String, String> driver(DriverPageQuery driverPageQuery);
-
-    /**
-     * 根据 设备Id 查询 Device 服务状态
-     *
-     * @param id 设备ID
-     * @return String
-     */
-    String device(String id);
+public interface DeviceStatusService {
 
     /**
      * 模糊分页查询 Device 服务状态，同设备分页查询配套使用

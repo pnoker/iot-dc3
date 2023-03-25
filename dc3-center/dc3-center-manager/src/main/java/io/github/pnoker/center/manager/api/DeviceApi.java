@@ -17,18 +17,19 @@
 package io.github.pnoker.center.manager.api;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.*;
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
-import io.github.pnoker.center.manager.service.DriverService;
+import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
+import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.utils.BuilderUtil;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.MultiTypeEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.model.Device;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -39,27 +40,27 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Driver Api
+ * Device Api
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @GrpcService
-public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
+public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
 
     @Resource
-    private DriverService driverService;
+    private DeviceService deviceService;
 
     @Override
-    public void list(PageDriverQueryDTO request, StreamObserver<RPageDriverDTO> responseObserver) {
-        RPageDriverDTO.Builder builder = RPageDriverDTO.newBuilder();
+    public void list(PageDeviceQueryDTO request, StreamObserver<RPageDeviceDTO> responseObserver) {
+        RPageDeviceDTO.Builder builder = RPageDeviceDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        DriverPageQuery pageQuery = buildPageQuery(request);
+        DevicePageQuery pageQuery = buildPageQuery(request);
 
-        Page<Driver> driverPage = driverService.list(pageQuery);
-        if (ObjectUtil.isNull(driverPage)) {
+        Page<Device> devicePage = deviceService.list(pageQuery);
+        if (ObjectUtil.isNull(devicePage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
@@ -68,17 +69,17 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            PageDriverDTO.Builder pageDriverBuilder = PageDriverDTO.newBuilder();
+            PageDeviceDTO.Builder pageDeviceBuilder = PageDeviceDTO.newBuilder();
             PageDTO.Builder pageBuilder = PageDTO.newBuilder();
-            pageBuilder.setCurrent(driverPage.getCurrent());
-            pageBuilder.setSize(driverPage.getSize());
-            pageBuilder.setPages(driverPage.getPages());
-            pageBuilder.setTotal(driverPage.getTotal());
-            pageDriverBuilder.setPage(pageBuilder);
-            List<DriverDTO> collect = driverPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
-            pageDriverBuilder.addAllData(collect);
+            pageBuilder.setCurrent(devicePage.getCurrent());
+            pageBuilder.setSize(devicePage.getSize());
+            pageBuilder.setPages(devicePage.getPages());
+            pageBuilder.setTotal(devicePage.getTotal());
+            pageDeviceBuilder.setPage(pageBuilder);
+            List<DeviceDTO> collect = devicePage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            pageDeviceBuilder.addAllData(collect);
 
-            builder.setData(pageDriverBuilder);
+            builder.setData(pageDeviceBuilder);
         }
 
         builder.setResult(rBuilder);
@@ -87,12 +88,12 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
     }
 
     @Override
-    public void selectByDeviceId(ByDeviceQueryDTO request, StreamObserver<RDriverDTO> responseObserver) {
-        RDriverDTO.Builder builder = RDriverDTO.newBuilder();
+    public void selectByProfileId(ByProfileQueryDTO request, StreamObserver<RDeviceListDTO> responseObserver) {
+        RDeviceListDTO.Builder builder = RDeviceListDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        Driver driver = driverService.selectByDeviceId(request.getDeviceId());
-        if (ObjectUtil.isNull(driver)) {
+        List<Device> devices = deviceService.selectByProfileId(request.getProfileId());
+        if (CollUtil.isEmpty(devices)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
@@ -101,9 +102,9 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            DriverDTO driverDTO = buildDTOByDO(driver);
+            List<DeviceDTO> deviceDTOS = devices.stream().map(this::buildDTOByDO).collect(Collectors.toList());
 
-            builder.setData(driverDTO);
+            builder.addAllData(deviceDTOS);
         }
 
         builder.setResult(rBuilder);
@@ -114,38 +115,36 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
     /**
      * DO to DTO
      *
-     * @param entityDO Driver
-     * @return DriverDTO
+     * @param entityDO Device
+     * @return DeviceDTO
      */
-    private DriverDTO buildDTOByDO(Driver entityDO) {
-        DriverDTO.Builder builder = DriverDTO.newBuilder();
+    private DeviceDTO buildDTOByDO(Device entityDO) {
+        DeviceDTO.Builder builder = DeviceDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
-        builder.setDriverName(entityDO.getDriverName());
-        builder.setDriverCode(entityDO.getDriverCode());
-        builder.setServiceName(entityDO.getServiceName());
-        builder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(entityDO.getDriverTypeFlag().name()));
-        builder.setServiceHost(entityDO.getServiceHost());
-        builder.setServicePort(entityDO.getServicePort());
+        builder.setDeviceName(entityDO.getDeviceName());
+        builder.setDeviceCode(entityDO.getDeviceCode());
+        builder.setMultiFlag(MultiFlagDTOEnum.valueOf(entityDO.getMultiFlag().name()));
+        builder.setDriverId(entityDO.getDriverId());
+        builder.setGroupId(entityDO.getGroupId());
         builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
         builder.setTenantId(entityDO.getTenantId());
         return builder.build();
     }
 
-    private DriverPageQuery buildPageQuery(PageDriverQueryDTO request) {
-        DriverPageQuery pageQuery = new DriverPageQuery();
+    private DevicePageQuery buildPageQuery(PageDeviceQueryDTO request) {
+        DevicePageQuery pageQuery = new DevicePageQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
         pageQuery.setPage(pages);
 
-        pageQuery.setDriverName(Optional.of(request.getDriver().getDriverName()).orElse(null));
-        pageQuery.setServiceName(Optional.of(request.getDriver().getServiceName()).orElse(null));
-        pageQuery.setServiceHost(Optional.of(request.getDriver().getServiceHost()).orElse(null));
-        pageQuery.setServicePort(Optional.of(request.getDriver().getServicePort()).orElse(null));
-        pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.ofName(request.getDriver().getDriverTypeFlag().name()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofName(request.getDriver().getEnableFlag().name()));
-        pageQuery.setTenantId(Optional.of(request.getDriver().getTenantId()).orElse(null));
+        pageQuery.setProfileId(Optional.of(request.getProfileId()).orElse(null));
+        pageQuery.setDeviceName(Optional.of(request.getDevice().getDeviceName()).orElse(null));
+        pageQuery.setDriverId(Optional.of(request.getDevice().getDriverId()).orElse(null));
+        pageQuery.setMultiFlag(MultiTypeEnum.ofName(request.getDevice().getMultiFlag().name()));
+        pageQuery.setEnableFlag(EnableFlagEnum.ofName(request.getDevice().getEnableFlag().name()));
+        pageQuery.setTenantId(Optional.of(request.getDevice().getTenantId()).orElse(null));
 
         return pageQuery;
     }

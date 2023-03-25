@@ -226,6 +226,7 @@ public class DeviceServiceImpl implements DeviceService {
             queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), "dd.device_name", devicePageQuery.getDeviceName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceCode()), "dd.device_code", devicePageQuery.getDeviceCode());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), "dd.driver_id", devicePageQuery.getDriverId());
+            queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getMultiFlag()), "dd.multi_flag", devicePageQuery.getMultiFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getEnableFlag()), "dd.enable_flag", devicePageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getTenantId()), "dd.tenant_id", devicePageQuery.getTenantId());
         }

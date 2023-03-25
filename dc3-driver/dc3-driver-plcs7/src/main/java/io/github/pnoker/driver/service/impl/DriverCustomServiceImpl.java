@@ -181,7 +181,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value              String Value
      */
     private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.of(type);
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + type);
         }

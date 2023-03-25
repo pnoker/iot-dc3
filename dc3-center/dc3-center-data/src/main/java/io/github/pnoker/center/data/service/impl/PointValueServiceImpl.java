@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.PointDTO;
 import io.github.pnoker.api.center.manager.RPagePointDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.PageDTO;
-import io.github.pnoker.center.data.entity.vo.query.PointValuePageQueryVO;
+import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -52,7 +52,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -98,27 +97,22 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public Page<PointValue> latest(PointValuePageQueryVO pointValuePageQueryVO, String tenantId) {
+    public Page<PointValue> latest(PointValuePageQuery pageQuery) {
         Page<PointValue> pointValuePage = new Page<>();
-        if (ObjectUtil.isEmpty(pointValuePageQueryVO.getPage())) pointValuePageQueryVO.setPage(new Pages());
-        pointValuePage.setCurrent(pointValuePageQueryVO.getPage().getCurrent()).setSize(pointValuePageQueryVO.getPage().getSize());
+        if (ObjectUtil.isEmpty(pageQuery.getPage())) pageQuery.setPage(new Pages());
+        pointValuePage.setCurrent(pageQuery.getPage().getCurrent()).setSize(pageQuery.getPage().getSize());
 
         PageDTO.Builder page = PageDTO.newBuilder()
-                .setSize(pointValuePageQueryVO.getPage().getSize())
-                .setCurrent(pointValuePageQueryVO.getPage().getCurrent());
-        PointDTO.Builder point = PointDTO.newBuilder();
-        if (ObjectUtil.isNotNull(pointValuePageQueryVO.getEnableFlag())) {
-            point.setEnableFlag(EnableFlagDTOEnum.valueOf(pointValuePageQueryVO.getEnableFlag().name()));
-        }
-        if (CharSequenceUtil.isNotEmpty(pointValuePageQueryVO.getPointName())) {
-            point.setPointName(pointValuePageQueryVO.getPointName());
-        }
-        PagePointQueryDTO query = PagePointQueryDTO.newBuilder()
-                .setDeviceId(pointValuePageQueryVO.getDeviceId())
+                .setSize(pageQuery.getPage().getSize())
+                .setCurrent(pageQuery.getPage().getCurrent());
+        PointDTO.Builder builder = buildDTOByQuery(pageQuery);
+        PagePointQueryDTO.Builder query = PagePointQueryDTO.newBuilder()
                 .setPage(page)
-                .setPoint(point)
-                .build();
-        RPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query);
+                .setPoint(builder);
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceId())) {
+            query.setDeviceId(pageQuery.getDeviceId());
+        }
+        RPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query.build());
 
         if (!rPagePointDTO.getResult().getOk()) {
             return pointValuePage;
@@ -126,15 +120,15 @@ public class PointValueServiceImpl implements PointValueService {
 
         List<PointDTO> points = rPagePointDTO.getData().getDataList();
         List<String> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
-        List<PointValue> pointValues = realtime(pointValuePageQueryVO.getDeviceId(), pointIds);
+        List<PointValue> pointValues = realtime(pageQuery.getDeviceId(), pointIds);
         if (CollUtil.isEmpty(pointValues)) {
-            pointValues = latest(pointValuePageQueryVO.getDeviceId(), pointIds);
+            pointValues = latest(pageQuery.getDeviceId(), pointIds);
         }
         pointValuePage.setCurrent(rPagePointDTO.getData().getPage().getCurrent()).setSize(rPagePointDTO.getData().getPage().getSize()).setTotal(rPagePointDTO.getData().getPage().getTotal()).setRecords(pointValues);
 
         // 返回最近100个非字符类型的历史值
-        if (Boolean.TRUE.equals(pointValuePageQueryVO.getHistory())) {
-            pointValues.parallelStream().forEach(pointValue -> pointValue.setChildren(historyPointValue(pointValuePageQueryVO.getDeviceId(), pointValue.getPointId(), 100)));
+        if (Boolean.TRUE.equals(pageQuery.getHistory())) {
+            pointValues.parallelStream().forEach(pointValue -> pointValue.setChildren(historyPointValue(pageQuery.getDeviceId(), pointValue.getPointId(), 100)));
         }
 
         return pointValuePage;
@@ -142,33 +136,41 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     @SneakyThrows
-    public Page<PointValue> list(PointValuePageQueryVO pointValuePageQueryVO, String tenantId) {
+    public Page<PointValue> list(PointValuePageQuery pageQuery) {
         Page<PointValue> pointValuePage = new Page<>();
-        if (ObjectUtil.isEmpty(pointValuePageQueryVO.getPage())) pointValuePageQueryVO.setPage(new Pages());
+        if (ObjectUtil.isEmpty(pageQuery.getPage())) pageQuery.setPage(new Pages());
 
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
-        if (CharSequenceUtil.isNotEmpty(pointValuePageQueryVO.getDeviceId()))
-            criteria.and(FieldUtil.getField(PointValue::getDeviceId)).is(pointValuePageQueryVO.getDeviceId());
-        if (CharSequenceUtil.isNotEmpty(pointValuePageQueryVO.getPointId()))
-            criteria.and(FieldUtil.getField(PointValue::getPointId)).is(pointValuePageQueryVO.getPointId());
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceId()))
+            criteria.and(FieldUtil.getField(PointValue::getDeviceId)).is(pageQuery.getDeviceId());
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getPointId()))
+            criteria.and(FieldUtil.getField(PointValue::getPointId)).is(pageQuery.getPointId());
 
-        Pages pages = pointValuePageQueryVO.getPage();
+        Pages pages = pageQuery.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and(FieldUtil.getField(PointValue::getCreateTime)).gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
-        final String collection = CharSequenceUtil.isNotEmpty(pointValuePageQueryVO.getDeviceId()) ? StorageConstant.POINT_VALUE_PREFIX + pointValuePageQueryVO.getDeviceId() : PrefixConstant.POINT + SuffixConstant.VALUE;
-        Future<Long> count = threadPoolExecutor.submit(() -> mongoTemplate.count(query, collection));
-
-        Future<List<PointValue>> pointValues = threadPoolExecutor.submit(() -> {
-            query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
-            query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
-            return mongoTemplate.find(query, PointValue.class, collection);
-        });
-
-        pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count.get()).setRecords(pointValues.get());
+        final String collection = CharSequenceUtil.isNotEmpty(pageQuery.getDeviceId()) ? StorageConstant.POINT_VALUE_PREFIX + pageQuery.getDeviceId() : PrefixConstant.POINT + SuffixConstant.VALUE;
+        long count = mongoTemplate.count(query, collection);
+        query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
+        query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
+        List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class, collection);
+        pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);
         return pointValuePage;
+    }
+
+    private static PointDTO.Builder buildDTOByQuery(PointValuePageQuery pageQuery) {
+        PointDTO.Builder builder = PointDTO.newBuilder();
+
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getPointName())) {
+            builder.setPointName(pageQuery.getPointName());
+        }
+        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
+            builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+        }
+        return builder;
     }
 
     public List<PointValue> realtime(String deviceId, List<String> pointIds) {

@@ -115,7 +115,7 @@ spring:
             - Path=/api/v3/data/**
           filters:
             - StripPrefix=2
-            #- Authentic
+            - Authentic
             - name: RequestRateLimiter
               args:
                 key-resolver: '#{@hostKeyResolver}'

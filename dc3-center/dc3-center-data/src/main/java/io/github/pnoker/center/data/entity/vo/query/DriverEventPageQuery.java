@@ -34,7 +34,10 @@ import java.io.Serializable;
 public class DriverEventPageQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String serviceName;
+    /**
+     * 驱动ID
+     */
+    private String driverId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.controller;
+package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
-import io.github.pnoker.center.manager.service.StatusService;
+import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
+import io.github.pnoker.center.data.service.DeviceStatusService;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -37,46 +36,24 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.STATUS_URL_PREFIX)
-public class StatusController {
+@RequestMapping(DataServiceConstant.DEVICE_STATUS_URL_PREFIX)
+public class DeviceStatusController {
 
     @Resource
-    private StatusService statusService;
-
-    /**
-     * 查询 Driver 服务状态
-     * ONLINE, OFFLINE
-     *
-     * @param driverPageQuery 驱动和分页参数
-     * @param tenantId        租户ID
-     * @return Map String:String
-     */
-    @PostMapping("/driver")
-    public R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery,
-                                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
-        try {
-            driverPageQuery.setTenantId(tenantId);
-            Map<String, String> statuses = statusService.driver(driverPageQuery);
-            return R.ok(statuses);
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-    }
+    private DeviceStatusService deviceStatusService;
 
     /**
      * 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param devicePageQuery Device Dto
-     * @param tenantId        租户ID
      * @return Map String:String
      */
     @PostMapping("/device")
-    public R<Map<String, String>> deviceStatus(@RequestBody(required = false) DevicePageQuery devicePageQuery,
-                                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<Map<String, String>> deviceStatus(@RequestBody(required = false) DevicePageQuery devicePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
         try {
             devicePageQuery.setTenantId(tenantId);
-            Map<String, String> statuses = statusService.device(devicePageQuery);
+            Map<String, String> statuses = deviceStatusService.device(devicePageQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -95,7 +72,7 @@ public class StatusController {
         try {
             DevicePageQuery devicePageQuery = new DevicePageQuery();
             devicePageQuery.setDriverId(driverId);
-            Map<String, String> statuses = statusService.device(devicePageQuery);
+            Map<String, String> statuses = deviceStatusService.device(devicePageQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -112,7 +89,7 @@ public class StatusController {
     @GetMapping("/device/profile_id/{profileId}")
     public R<Map<String, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") String profileId) {
         try {
-            Map<String, String> statuses = statusService.deviceByProfileId(profileId);
+            Map<String, String> statuses = deviceStatusService.deviceByProfileId(profileId);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
