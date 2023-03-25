@@ -17,12 +17,13 @@
 <template>
     <el-dialog
         v-model="reactiveData.formVisible"
-        custom-class="things-dialog"
+        class="things-dialog"
         title="新增模板"
         :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        draggable
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
             <el-form-item class="things-dialog-form-item" label="模板名称" prop="profileName">

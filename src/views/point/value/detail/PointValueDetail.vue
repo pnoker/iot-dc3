@@ -17,12 +17,13 @@
 <template>
     <el-dialog
         v-model="detailVisible"
-        custom-class="things-dialog"
+        class="things-dialog"
         title="数据信息"
         :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        draggable
     >
         <pre v-highlightjs>
             <code class="json">{{ detailData }}</code>

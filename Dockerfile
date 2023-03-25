@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-FROM pnoker/alpine-nginx:1.18.0
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-nginx:1.22
 MAINTAINER pnoker pnokers@icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime

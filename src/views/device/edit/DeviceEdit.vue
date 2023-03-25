@@ -32,13 +32,15 @@
                 <el-divider content-position="left">设备信息配置</el-divider>
                 <el-form ref="deviceFormRef" :inline="true" :model="reactiveData.deviceFormData" :rules="deviceFormRule">
                     <div class="edit-form-item">
-                        <el-form-item label="设备名称" prop="deviceName">
-                            <el-input v-model="reactiveData.deviceFormData.deviceName" class="edit-form-default" placeholder="请输入设备名称" clearable></el-input>
+                        <el-form-item label="设备名称" prop="deviceName" class="edit-form-large">
+                            <el-input v-model="reactiveData.deviceFormData.deviceName" placeholder="请输入设备名称" clearable></el-input>
                         </el-form-item>
-                        <el-form-item label="所属驱动" prop="driverId">
+                    </div>
+                    <div class="edit-form-item">
+                        <el-form-item label="所属驱动" prop="driverId" class="edit-form-large">
                             <el-select
                                 v-model="reactiveData.deviceFormData.driverId"
-                                class="edit-form-special"
+                                class="edit-form-large"
                                 placeholder="请选择所属驱动"
                                 clearable
                                 @change="changeAttribute"
@@ -69,21 +71,25 @@
                                 ></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="结构化标识" prop="multiFlag">
-                            <el-select v-model="reactiveData.deviceFormData.multiFlag" class="edit-form-medium" placeholder="请选择结构化标识" clearable>
+                    </div>
+                    <div class="edit-form-item">
+                        <el-form-item label="结构化" prop="multiFlag" class="edit-form-large">
+                            <el-select v-model="reactiveData.deviceFormData.multiFlag" class="edit-form-large" placeholder="请选择结构化标识" clearable>
                                 <el-option label="单点" value="SINGLE"></el-option>
                                 <el-option label="多点" value="MULTIPLE"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="使能" prop="enableFlag">
-                            <el-select v-model="reactiveData.deviceFormData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                    </div>
+                    <div class="edit-form-item">
+                        <el-form-item label="使能" prop="enableFlag" class="edit-form-large">
+                            <el-select v-model="reactiveData.deviceFormData.enableFlag" class="edit-form-large" placeholder="请选择使能" clearable>
                                 <el-option label="启用" value="ENABLE"></el-option>
                                 <el-option label="停用" value="DISABLE"></el-option>
                             </el-select>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="关联模板" prop="profileIds">
+                        <el-form-item label="关联模板" prop="profileIds" class="edit-form-large">
                             <el-select
                                 v-model="reactiveData.deviceFormData.profileIds"
                                 class="edit-form-large"
@@ -119,10 +125,9 @@
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="设备描述" prop="remark">
+                        <el-form-item label="设备描述" prop="remark" class="edit-form-large">
                             <el-input
                                 v-model="reactiveData.deviceFormData.remark"
-                                class="edit-form-large"
                                 placeholder="请输入设备描述"
                                 type="textarea"
                                 maxlength="300"

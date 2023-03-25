@@ -38,7 +38,7 @@ export const getDriverList = (driver: any) =>
 
 export const getDriverStatus = (driver: any) =>
     request<R>({
-        url: `api/v3/manager/status/driver`,
+        url: `api/v3/data/driver/status/driver`,
         method: 'post',
         data: driver,
     })
