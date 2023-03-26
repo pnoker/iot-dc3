@@ -17,15 +17,16 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.DriverContext;
-import io.github.pnoker.common.sdk.service.DriverCustomService;
-import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.driver.sdk.DriverContext;
+import io.github.pnoker.driver.sdk.service.DriverCustomService;
+import io.github.pnoker.driver.sdk.service.DriverService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.S7Serializer;
@@ -43,8 +44,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
-import static io.github.pnoker.common.sdk.utils.DriverUtil.value;
+import static io.github.pnoker.driver.sdk.utils.DriverUtil.attribute;
+import static io.github.pnoker.driver.sdk.utils.DriverUtil.value;
 
 /**
  * @author pnoker
@@ -90,7 +91,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             return String.valueOf(serializer.dispense(plcs7PointVariable));
         } catch (Exception e) {
             log.error("Plc S7 Read Error: {}", e.getMessage());
-            return "nil";
+            return DefaultConstant.DEFAULT_VALUE;
         } finally {
             myS7Connector.lock.writeLock().unlock();
         }

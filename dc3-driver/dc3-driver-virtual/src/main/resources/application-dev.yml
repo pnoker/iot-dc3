@@ -33,7 +33,7 @@ spring:
 logging:
   level:
     io.github.pnoker: DEBUG
-    io.github.pnoker.common.sdk: DEBUG
-    io.github.pnoker.common.sdk.service: DEBUG
-    io.github.pnoker.common.sdk.service.job: DEBUG
-    io.github.pnoker.common.sdk.service.rabbit: DEBUG
+    io.github.pnoker.driver.sdk: DEBUG
+    io.github.pnoker.driver.sdk.service: DEBUG
+    io.github.pnoker.driver.sdk.service.job: DEBUG
+    io.github.pnoker.driver.sdk.service.rabbit: DEBUG

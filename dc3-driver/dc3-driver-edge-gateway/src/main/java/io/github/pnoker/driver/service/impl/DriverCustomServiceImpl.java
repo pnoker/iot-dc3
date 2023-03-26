@@ -16,22 +16,22 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.DriverContext;
-import io.github.pnoker.common.sdk.service.DriverCustomService;
-import io.github.pnoker.common.sdk.service.DriverService;
-import io.github.pnoker.driver.mqtt.service.MqttScheduleService;
-import io.github.pnoker.driver.mqtt.service.MqttSendService;
+import io.github.pnoker.common.mqtt.service.MqttSendService;
+import io.github.pnoker.driver.sdk.DriverContext;
+import io.github.pnoker.driver.sdk.service.DriverCustomService;
+import io.github.pnoker.driver.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
 
-import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
+import static io.github.pnoker.driver.sdk.utils.DriverUtil.attribute;
 
 /**
  * @author pnoker
@@ -46,13 +46,30 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverService driverService;
     @Resource
-    private MqttScheduleService mqttScheduleService;
-    @Resource
     private MqttSendService mqttSendService;
 
     @Override
     public void initial() {
-        mqttScheduleService.initial();
+    }
+
+    @Override
+    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+        // 因为 MQTT 的数据来源是被动接收的，所以无需实现该 Read 方法
+        // 接收数据处理函数在 io.github.pnoker.driver.mqtt.handler.MqttReceiveHandler.handlerValue
+        return DefaultConstant.DEFAULT_VALUE;
+    }
+
+    @Override
+    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) {
+        String commandTopic = attribute(pointInfo, "commandTopic");
+        String value = values.getValue();
+        try {
+            int commandQos = attribute(pointInfo, "commandQos");
+            mqttSendService.sendToMqtt(commandTopic, commandQos, value);
+        } catch (Exception e) {
+            mqttSendService.sendToMqtt(commandTopic, value);
+        }
+        return true;
     }
 
     @Override
@@ -70,26 +87,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         FAULT:故障
          */
         driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, DriverStatusEnum.ONLINE));
-    }
-
-    @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
-        // 因为 MQTT 的数据来源是被动接收的，所以无需实现该 Read 方法
-        // 接收数据处理函数在 io.github.pnoker.driver.mqtt.handler.MqttReceiveHandler.handlerValue
-        return "nil";
-    }
-
-    @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo values) {
-        String commandTopic = attribute(pointInfo, "commandTopic");
-        String value = values.getValue();
-        try {
-            int commandQos = attribute(pointInfo, "commandQos");
-            mqttSendService.sendToMqtt(commandTopic, commandQos, value);
-        } catch (Exception e) {
-            mqttSendService.sendToMqtt(commandTopic, value);
-        }
-        return true;
     }
 
 }

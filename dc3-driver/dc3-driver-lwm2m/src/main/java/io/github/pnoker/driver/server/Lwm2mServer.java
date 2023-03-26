@@ -16,9 +16,10 @@
 
 package io.github.pnoker.driver.server;
 
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.enums.DriverStatusEnum;
-import io.github.pnoker.common.sdk.DriverContext;
-import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.driver.sdk.DriverContext;
+import io.github.pnoker.driver.sdk.service.DriverService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
@@ -90,7 +91,7 @@ public class Lwm2mServer {
         } catch (RuntimeException | InterruptedException e) {
             log.error("read exception :{},{},{}", clientEndpoint, path, e.getMessage());
         }
-        return "nil";
+        return DefaultConstant.DEFAULT_VALUE;
     }
 
 

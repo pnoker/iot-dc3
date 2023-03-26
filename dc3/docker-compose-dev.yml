@@ -126,7 +126,7 @@ services:
           - dc3-center-register
 
   portainer:
-    image: portainer/portainer:alpine
+    image: portainer/portainer:1.24.2
     command: -H unix:///var/run/docker.sock
     restart: on-failure
     ports:

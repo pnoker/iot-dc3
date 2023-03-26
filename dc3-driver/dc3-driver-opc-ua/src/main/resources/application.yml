@@ -15,6 +15,7 @@
 #
 
 driver:
+  tenant: default
   name: OpcUaDriver
   type: DRIVER
   project: @project.artifactId@
@@ -30,28 +31,28 @@ driver:
     - display-name: 主机
       attribute-name: host
       attribute-type-flag: STRING
-      value: localhost
+      default-value: localhost
       remark: Opc Ua IP
     - display-name: 端口
       attribute-name: port
       attribute-type-flag: INT
-      value: 18600
+      default-value: 18600
       remark: Opc Ua Port
     - display-name: 路径
       attribute-name: path
       attribute-type-flag: STRING
-      value: /
+      default-value: /
       remark: Opc Ua Path
   point-attribute:
     - display-name: 命名空间
       attribute-name: namespace
       attribute-type-flag: INT
-      value: 5
+      default-value: 5
       remark: 命名空间索引
     - display-name: 位号
       attribute-name: tag
       attribute-type-flag: STRING
-      value: TAG
+      default-value: TAG
       remark: 位号名称
 
 spring:

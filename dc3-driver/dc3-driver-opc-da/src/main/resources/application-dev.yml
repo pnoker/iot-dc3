@@ -15,7 +15,6 @@
 #
 
 # Development environment, customizable configuration
-# Development environment, customizable configuration
 driver:
   schedule:
     read:
@@ -34,5 +33,5 @@ spring:
 logging:
   level:
     io.github.pnoker: DEBUG
-    io.github.pnoker.common.sdk: DEBUG
+    io.github.pnoker.driver.sdk: DEBUG
     com.freud.dcom.utgard.cases.*: INFO

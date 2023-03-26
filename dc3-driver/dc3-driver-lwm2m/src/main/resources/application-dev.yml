@@ -21,7 +21,7 @@
 logging:
   level:
     io.github.pnoker: DEBUG
-    io.github.pnoker.common.sdk: DEBUG
+    io.github.pnoker.driver.sdk: DEBUG
 
 #spring:
 #  env: dev

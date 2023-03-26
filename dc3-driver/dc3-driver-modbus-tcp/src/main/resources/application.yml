@@ -15,6 +15,7 @@
 #
 
 driver:
+  tenant: default
   name: ModbusDriver
   type: DRIVER
   project: @project.artifactId@
@@ -30,28 +31,28 @@ driver:
     - display-name: 主机
       attribute-name: host
       attribute-type-flag: STRING
-      value: localhost
+      default-value: localhost
       remark: Modbus IP
     - display-name: 端口
       attribute-name: port
       attribute-type-flag: INT
-      value: 502
+      default-value: 502
       remark: Modbus Port
   point-attribute:
     - display-name: 从站编号
       attribute-name: slaveId
       attribute-type-flag: INT
-      value: 1
+      default-value: 1
       remark: 从站编号
     - display-name: 功能码
       attribute-name: functionCode
       attribute-type-flag: INT
-      value: 1
+      default-value: 1
       remark: 功能码 [1、2、3、4]
     - display-name: 偏移量
       attribute-name: offset
       attribute-type-flag: INT
-      value: 0
+      default-value: 0
       remark: 偏移量
 
 spring:
