@@ -218,14 +218,14 @@ public class PointServiceImpl implements PointService {
     public LambdaQueryWrapper<Point> fuzzyQuery(PointPageQuery pointPageQuery) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (ObjectUtil.isNotNull(pointPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), Point::getPointName, pointPageQuery.getPointName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(pointPageQuery.getPointName()), Point::getPointName, pointPageQuery.getPointName());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), Point::getPointCode, pointPageQuery.getPointCode());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), Point::getPointTypeFlag, pointPageQuery.getPointTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getRwFlag()), Point::getRwFlag, pointPageQuery.getRwFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getAccrueFlag()), Point::getAccrueFlag, pointPageQuery.getAccrueFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointPageQuery.getProfileId()), Point::getProfileId, pointPageQuery.getProfileId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getProfileId()), Point::getProfileId, pointPageQuery.getProfileId());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getEnableFlag()), Point::getEnableFlag, pointPageQuery.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(pointPageQuery.getTenantId()), Point::getTenantId, pointPageQuery.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getTenantId()), Point::getTenantId, pointPageQuery.getTenantId());
         }
         return queryWrapper;
     }
@@ -234,7 +234,7 @@ public class PointServiceImpl implements PointService {
         QueryWrapper<Point> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(pointPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointPageQuery.getPointName()), "dp.point_name", pointPageQuery.getPointName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(pointPageQuery.getPointName()), "dp.point_name", pointPageQuery.getPointName());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), "dp.point_code", pointPageQuery.getPointTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.point_type_flag", pointPageQuery.getPointTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw_flag", pointPageQuery.getRwFlag());

@@ -210,7 +210,7 @@ public class DeviceServiceImpl implements DeviceService {
     public LambdaQueryWrapper<Device> fuzzyQuery(DevicePageQuery devicePageQuery) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         if (ObjectUtil.isNotEmpty(devicePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), Device::getDeviceName, devicePageQuery.getDeviceName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceName()), Device::getDeviceName, devicePageQuery.getDeviceName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceCode()), Device::getDeviceCode, devicePageQuery.getDeviceCode());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), Device::getDriverId, devicePageQuery.getDriverId());
             queryWrapper.eq(ObjectUtil.isNotEmpty(devicePageQuery.getEnableFlag()), Device::getEnableFlag, devicePageQuery.getEnableFlag());
@@ -223,7 +223,7 @@ public class DeviceServiceImpl implements DeviceService {
         QueryWrapper<Device> queryWrapper = Wrappers.query();
         queryWrapper.eq("dd.deleted", 0);
         if (ObjectUtil.isNotNull(devicePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(devicePageQuery.getDeviceName()), "dd.device_name", devicePageQuery.getDeviceName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceName()), "dd.device_name", devicePageQuery.getDeviceName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceCode()), "dd.device_code", devicePageQuery.getDeviceCode());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), "dd.driver_id", devicePageQuery.getDriverId());
             queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getMultiFlag()), "dd.multi_flag", devicePageQuery.getMultiFlag());

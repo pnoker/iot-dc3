@@ -36,7 +36,6 @@ import net.devh.boot.grpc.server.service.GrpcService;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -113,6 +112,30 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     /**
+     * DTO to Query
+     *
+     * @param request PageDeviceQueryDTO
+     * @return DevicePageQuery
+     */
+    private DevicePageQuery buildPageQuery(PageDeviceQueryDTO request) {
+        DevicePageQuery pageQuery = new DevicePageQuery();
+        Pages pages = new Pages();
+        pages.setCurrent(request.getPage().getCurrent());
+        pages.setSize(request.getPage().getSize());
+        pageQuery.setPage(pages);
+
+        DeviceDTO device = request.getDevice();
+        pageQuery.setProfileId(request.getProfileId());
+        pageQuery.setDeviceName(device.getDeviceName());
+        pageQuery.setDriverId(device.getDriverId());
+        pageQuery.setTenantId(device.getTenantId());
+        pageQuery.setMultiFlag(MultiTypeEnum.ofName(device.getMultiFlag().name()));
+        pageQuery.setEnableFlag(EnableFlagEnum.ofName(device.getEnableFlag().name()));
+
+        return pageQuery;
+    }
+
+    /**
      * DO to DTO
      *
      * @param entityDO Device
@@ -130,23 +153,6 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
         builder.setTenantId(entityDO.getTenantId());
         return builder.build();
-    }
-
-    private DevicePageQuery buildPageQuery(PageDeviceQueryDTO request) {
-        DevicePageQuery pageQuery = new DevicePageQuery();
-        Pages pages = new Pages();
-        pages.setCurrent(request.getPage().getCurrent());
-        pages.setSize(request.getPage().getSize());
-        pageQuery.setPage(pages);
-
-        pageQuery.setProfileId(Optional.of(request.getProfileId()).orElse(null));
-        pageQuery.setDeviceName(Optional.of(request.getDevice().getDeviceName()).orElse(null));
-        pageQuery.setDriverId(Optional.of(request.getDevice().getDriverId()).orElse(null));
-        pageQuery.setMultiFlag(MultiTypeEnum.ofName(request.getDevice().getMultiFlag().name()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofName(request.getDevice().getEnableFlag().name()));
-        pageQuery.setTenantId(Optional.of(request.getDevice().getTenantId()).orElse(null));
-
-        return pageQuery;
     }
 
 }

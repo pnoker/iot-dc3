@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.center.manager.service.GroupService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -56,7 +57,7 @@ public class GroupController {
      */
     @PostMapping("/add")
     public R<Group> add(@Validated(Insert.class) @RequestBody Group group,
-                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             group.setTenantId(tenantId);
             Group add = groupService.add(group);
@@ -93,7 +94,7 @@ public class GroupController {
      */
     @PostMapping("/update")
     public R<Group> update(@Validated(Update.class) @RequestBody Group group,
-                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             group.setTenantId(tenantId);
             Group update = groupService.update(group);
@@ -134,7 +135,7 @@ public class GroupController {
      */
     @PostMapping("/list")
     public R<Page<Group>> list(@RequestBody(required = false) GroupPageQuery groupPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(groupPageQuery)) {
                 groupPageQuery = new GroupPageQuery();

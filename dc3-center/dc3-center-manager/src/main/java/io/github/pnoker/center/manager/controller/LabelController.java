@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
 import io.github.pnoker.center.manager.service.LabelService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -56,7 +57,7 @@ public class LabelController {
      */
     @PostMapping("/add")
     public R<Label> add(@Validated(Insert.class) @RequestBody Label label,
-                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             label.setTenantId(tenantId);
             Label add = labelService.add(label);
@@ -93,7 +94,7 @@ public class LabelController {
      */
     @PostMapping("/update")
     public R<Label> update(@Validated(Update.class) @RequestBody Label label,
-                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             label.setTenantId(tenantId);
             Label update = labelService.update(label);
@@ -134,7 +135,7 @@ public class LabelController {
      */
     @PostMapping("/list")
     public R<Page<Label>> list(@RequestBody(required = false) LabelPageQuery labelPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(labelPageQuery)) {
                 labelPageQuery = new LabelPageQuery();

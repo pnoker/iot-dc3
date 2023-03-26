@@ -149,8 +149,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributePageQuery driverAttributePageQuery) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
         if (ObjectUtil.isNotNull(driverAttributePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributePageQuery.getAttributeName()), DriverAttribute::getAttributeName, driverAttributePageQuery.getAttributeName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverAttributePageQuery.getDisplayName()), DriverAttribute::getDisplayName, driverAttributePageQuery.getDisplayName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(driverAttributePageQuery.getAttributeName()), DriverAttribute::getAttributeName, driverAttributePageQuery.getAttributeName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(driverAttributePageQuery.getDisplayName()), DriverAttribute::getDisplayName, driverAttributePageQuery.getDisplayName());
             queryWrapper.eq(ObjectUtil.isNotNull(driverAttributePageQuery.getAttributeTypeFlag()), DriverAttribute::getAttributeTypeFlag, driverAttributePageQuery.getAttributeTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributePageQuery.getDriverId()), DriverAttribute::getDriverId, driverAttributePageQuery.getDriverId());
         }

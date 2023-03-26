@@ -118,7 +118,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpPageQuery blackIpPageQuery) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         if (ObjectUtil.isNotNull(blackIpPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(blackIpPageQuery.getIp()), BlackIp::getIp, blackIpPageQuery.getIp());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(blackIpPageQuery.getIp()), BlackIp::getIp, blackIpPageQuery.getIp());
         }
         return queryWrapper;
     }

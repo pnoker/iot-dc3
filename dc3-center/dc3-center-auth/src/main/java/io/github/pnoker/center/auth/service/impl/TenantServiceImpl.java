@@ -107,7 +107,7 @@ public class TenantServiceImpl implements TenantService {
     public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery tenantPageQuery) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
         if (ObjectUtil.isNotNull(tenantPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(tenantPageQuery.getTenantName()), Tenant::getTenantName, tenantPageQuery.getTenantName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(tenantPageQuery.getTenantName()), Tenant::getTenantName, tenantPageQuery.getTenantName());
         }
         return queryWrapper;
     }

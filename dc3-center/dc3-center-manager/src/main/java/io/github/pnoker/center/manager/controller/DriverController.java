@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.center.manager.service.DriverService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -62,7 +63,7 @@ public class DriverController {
      */
     @PostMapping("/add")
     public R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver,
-                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             driver.setTenantId(tenantId);
             Driver add = driverService.add(driver);
@@ -99,7 +100,7 @@ public class DriverController {
      */
     @PostMapping("/update")
     public R<Driver> update(@Validated(Update.class) @RequestBody Driver driver,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             driver.setTenantId(tenantId);
             Driver update = driverService.update(driver);
@@ -174,7 +175,7 @@ public class DriverController {
     public R<Driver> selectByHostPort(@NotNull @PathVariable(value = "type") String type,
                                       @NotNull @PathVariable(value = "host") String host,
                                       @NotNull @PathVariable(value = "port") Integer port,
-                                      @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                                      @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             DriverTypeFlagEnum typeEnum = DriverTypeFlagEnum.ofCode(type);
             Driver select = driverService.selectByHostPort(typeEnum, host, port, tenantId);
@@ -193,7 +194,7 @@ public class DriverController {
      */
     @PostMapping("/list")
     public R<Page<Driver>> list(@RequestBody(required = false) DriverPageQuery driverPageQuery,
-                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(driverPageQuery)) {
                 driverPageQuery = new DriverPageQuery();

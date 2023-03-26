@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
     public LambdaQueryWrapper<User> fuzzyQuery(UserPageQuery userPageQuery) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         if (ObjectUtil.isNotNull(userPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userPageQuery.getLoginName()), User::getLoginName, userPageQuery.getLoginName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(userPageQuery.getLoginName()), User::getLoginName, userPageQuery.getLoginName());
         }
         return queryWrapper;
     }

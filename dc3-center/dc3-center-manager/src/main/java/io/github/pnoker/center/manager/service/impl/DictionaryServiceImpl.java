@@ -89,7 +89,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             dictionaryPageQuery.setPage(new Pages());
         }
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotBlank(dictionaryPageQuery.getLabel()), Device::getDeviceName, dictionaryPageQuery.getLabel());
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), Device::getDeviceName, dictionaryPageQuery.getLabel());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getParentValue1()), Device::getDriverId, dictionaryPageQuery.getParentValue1());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), Device::getTenantId, dictionaryPageQuery.getTenantId());
         Page<Device> devicePage = deviceMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
