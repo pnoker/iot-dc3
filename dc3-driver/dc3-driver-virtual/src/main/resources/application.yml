@@ -15,6 +15,7 @@
 #
 
 driver:
+  tenant: default
   name: VirtualDriver
   type: DRIVER
   project: @project.artifactId@
@@ -34,18 +35,18 @@ driver:
     - display-name: 主机
       attribute-name: host
       attribute-type-flag: STRING
-      value: localhost
+      default-value: localhost
       remark: Ip
     - display-name: 端口
       attribute-name: port
       attribute-type-flag: INT
-      value: 18600
+      default-value: 18600
       remark: Port
   point-attribute:
     - display-name: 位号
       attribute-name: tag
       attribute-type-flag: STRING
-      value: TAG
+      default-value: TAG
       remark: 位号名称
 
 spring:

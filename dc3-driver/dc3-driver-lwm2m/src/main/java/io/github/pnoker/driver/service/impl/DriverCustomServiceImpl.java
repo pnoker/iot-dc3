@@ -20,7 +20,7 @@ import com.mchange.v2.lang.StringUtils;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.service.DriverCustomService;
+import io.github.pnoker.driver.sdk.service.DriverCustomService;
 import io.github.pnoker.driver.server.Lwm2mServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Map;
 
-import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
+import static io.github.pnoker.driver.sdk.utils.DriverUtil.attribute;
 
 
 /**

@@ -15,6 +15,7 @@
 #
 
 driver:
+  tenant: default
   name: OpcDaDriver
   type: DRIVER
   project: @project.artifactId@
@@ -30,33 +31,33 @@ driver:
     - display-name: 主机
       attribute-name: host
       attribute-type-flag: STRING
-      value: localhost
+      default-value: localhost
       remark: Opc Da Host
     - display-name: CLSID
       attribute-name: clsId
       attribute-type-flag: STRING
-      value: F8582CF2-88FB-11D0-B850-00C0F0104305
+      default-value: F8582CF2-88FB-11D0-B850-00C0F0104305
       remark: Opc Da Server CLAID
     - display-name: 用户名
       attribute-name: username
       attribute-type-flag: STRING
-      value: dc3
+      default-value: dc3
       remark: Opc Da UserName
     - display-name: 密码
       attribute-name: password
       attribute-type-flag: STRING
-      value: dc3dc3
+      default-value: dc3dc3
       remark: Opc Da Passward
   point-attribute:
     - display-name: 分组
       attribute-name: group
       attribute-type-flag: STRING
-      value: GROUP
+      default-value: GROUP
       remark: 分组名称
     - display-name: 位号
       attribute-name: tag
       attribute-type-flag: STRING
-      value: TAG
+      default-value: TAG
       remark: 位号名称
 
 spring:

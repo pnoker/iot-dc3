@@ -17,13 +17,14 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.DriverContext;
-import io.github.pnoker.common.sdk.service.DriverCustomService;
-import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.driver.sdk.DriverContext;
+import io.github.pnoker.driver.sdk.service.DriverCustomService;
+import io.github.pnoker.driver.sdk.service.DriverService;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
@@ -95,7 +96,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         // 接收数据处理函数在
         // - io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler.channelRead
         // - io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler.channelRead0
-        return "nil";
+        return DefaultConstant.DEFAULT_VALUE;
     }
 
     @Override

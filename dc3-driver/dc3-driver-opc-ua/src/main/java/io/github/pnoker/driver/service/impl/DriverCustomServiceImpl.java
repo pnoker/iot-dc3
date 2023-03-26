@@ -25,9 +25,9 @@ import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.DriverContext;
-import io.github.pnoker.common.sdk.service.DriverCustomService;
-import io.github.pnoker.common.sdk.service.DriverService;
+import io.github.pnoker.driver.sdk.DriverContext;
+import io.github.pnoker.driver.sdk.service.DriverCustomService;
+import io.github.pnoker.driver.sdk.service.DriverService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
@@ -44,8 +44,8 @@ import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.*;
 
-import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
-import static io.github.pnoker.common.sdk.utils.DriverUtil.value;
+import static io.github.pnoker.driver.sdk.utils.DriverUtil.attribute;
+import static io.github.pnoker.driver.sdk.utils.DriverUtil.value;
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
 
 /**
