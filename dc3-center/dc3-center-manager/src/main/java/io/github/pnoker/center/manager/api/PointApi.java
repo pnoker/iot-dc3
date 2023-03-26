@@ -33,7 +33,6 @@ import net.devh.boot.grpc.server.service.GrpcService;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -85,6 +84,32 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
     }
 
     /**
+     * DTO to Query
+     *
+     * @param request PagePointQueryDTO
+     * @return PointPageQuery
+     */
+    private PointPageQuery buildPageQuery(PagePointQueryDTO request) {
+        PointPageQuery pageQuery = new PointPageQuery();
+        Pages pages = new Pages();
+        pages.setCurrent(request.getPage().getCurrent());
+        pages.setSize(request.getPage().getSize());
+        pageQuery.setPage(pages);
+
+        PointDTO point = request.getPoint();
+        pageQuery.setDeviceId(request.getDeviceId());
+        pageQuery.setPointName(point.getPointName());
+        pageQuery.setProfileId(point.getProfileId());
+        pageQuery.setTenantId(point.getTenantId());
+        pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofName(point.getPointTypeFlag().name()));
+        pageQuery.setRwFlag(RwFlagEnum.ofName(point.getRwFlag().name()));
+        pageQuery.setAccrueFlag(AccrueFlagEnum.ofName(point.getAccrueFlag().name()));
+        pageQuery.setEnableFlag(EnableFlagEnum.ofName(point.getEnableFlag().name()));
+
+        return pageQuery;
+    }
+
+    /**
      * DO to DTO
      *
      * @param entityDO Point
@@ -110,22 +135,4 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         return builder.build();
     }
 
-    private PointPageQuery buildPageQuery(PagePointQueryDTO request) {
-        PointPageQuery pageQuery = new PointPageQuery();
-        Pages pages = new Pages();
-        pages.setCurrent(request.getPage().getCurrent());
-        pages.setSize(request.getPage().getSize());
-        pageQuery.setPage(pages);
-
-        pageQuery.setDeviceId(Optional.of(request.getDeviceId()).orElse(null));
-        pageQuery.setPointName(Optional.of(request.getPoint().getPointName()).orElse(null));
-        pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofName(request.getPoint().getPointTypeFlag().name()));
-        pageQuery.setRwFlag(RwFlagEnum.ofName(request.getPoint().getRwFlag().name()));
-        pageQuery.setAccrueFlag(AccrueFlagEnum.ofName(request.getPoint().getAccrueFlag().name()));
-        pageQuery.setProfileId(Optional.of(request.getPoint().getProfileId()).orElse(null));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofName(request.getPoint().getEnableFlag().name()));
-        pageQuery.setTenantId(Optional.of(request.getPoint().getTenantId()).orElse(null));
-
-        return pageQuery;
-    }
 }

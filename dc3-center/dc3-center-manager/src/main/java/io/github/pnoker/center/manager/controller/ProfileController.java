@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -66,7 +67,7 @@ public class ProfileController {
      */
     @PostMapping("/add")
     public R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile,
-                          @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                          @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             profile.setTenantId(tenantId);
             Profile add = profileService.add(profile);
@@ -108,7 +109,7 @@ public class ProfileController {
      */
     @PostMapping("/update")
     public R<Profile> update(@Validated(Update.class) @RequestBody Profile profile,
-                             @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                             @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             profile.setTenantId(tenantId);
             Profile update = profileService.update(profile);
@@ -186,7 +187,7 @@ public class ProfileController {
      */
     @PostMapping("/list")
     public R<Page<Profile>> list(@RequestBody(required = false) ProfilePageQuery profilePageQuery,
-                                 @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                                 @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(profilePageQuery)) {
                 profilePageQuery = new ProfilePageQuery();

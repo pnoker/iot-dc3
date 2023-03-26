@@ -149,8 +149,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery pointAttributePageQuery) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         if (ObjectUtil.isNotNull(pointAttributePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributePageQuery.getAttributeName()), PointAttribute::getAttributeName, pointAttributePageQuery.getAttributeName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributePageQuery.getDisplayName()), PointAttribute::getDisplayName, pointAttributePageQuery.getDisplayName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(pointAttributePageQuery.getAttributeName()), PointAttribute::getAttributeName, pointAttributePageQuery.getAttributeName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(pointAttributePageQuery.getDisplayName()), PointAttribute::getDisplayName, pointAttributePageQuery.getDisplayName());
             queryWrapper.eq(ObjectUtil.isNotNull(pointAttributePageQuery.getAttributeTypeFlag()), PointAttribute::getAttributeTypeFlag, pointAttributePageQuery.getAttributeTypeFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributePageQuery.getDriverId()), PointAttribute::getDriverId, pointAttributePageQuery.getDriverId());
         }

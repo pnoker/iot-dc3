@@ -24,6 +24,7 @@ import io.github.pnoker.api.common.MultiFlagDTOEnum;
 import io.github.pnoker.api.common.PageDTO;
 import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
 import io.github.pnoker.center.data.service.DeviceStatusService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.enums.DriverStatusEnum;
@@ -91,26 +92,42 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         return getStatusMap(devices);
     }
 
+    /**
+     * Query to DTO
+     *
+     * @param pageQuery DevicePageQuery
+     * @return DeviceDTO Builder
+     */
     private static DeviceDTO.Builder buildDTOByQuery(DevicePageQuery pageQuery) {
-        DeviceDTO.Builder dtoBuilder = DeviceDTO.newBuilder();
+        DeviceDTO.Builder builder = DeviceDTO.newBuilder();
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
-            dtoBuilder.setDeviceName(pageQuery.getDeviceName());
+            builder.setDeviceName(pageQuery.getDeviceName());
         }
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverId())) {
-            dtoBuilder.setDriverId(pageQuery.getDriverId());
+            builder.setDriverId(pageQuery.getDriverId());
+        }
+        if (ObjectUtil.isNotNull(pageQuery.getMultiFlag())) {
+            builder.setMultiFlag(MultiFlagDTOEnum.valueOf(pageQuery.getMultiFlag().name()));
+        } else {
+            builder.setMultiFlagValue(DefaultConstant.DEFAULT_INT);
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            dtoBuilder.setMultiFlag(MultiFlagDTOEnum.valueOf(pageQuery.getMultiFlag().name()));
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            dtoBuilder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+            builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+        } else {
+            builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
         }
         if (CharSequenceUtil.isNotEmpty(pageQuery.getTenantId())) {
-            dtoBuilder.setTenantId(pageQuery.getTenantId());
+            builder.setTenantId(pageQuery.getTenantId());
         }
-        return dtoBuilder;
+        return builder;
     }
 
+    /**
+     * Get status map
+     *
+     * @param devices DeviceDTO Array
+     * @return Status Map
+     */
     private Map<String, String> getStatusMap(List<DeviceDTO> devices) {
         Map<String, String> statusMap = new HashMap<>(16);
         Set<String> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());

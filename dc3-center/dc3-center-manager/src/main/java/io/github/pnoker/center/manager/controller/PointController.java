@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointPageQuery;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -69,7 +70,7 @@ public class PointController {
      */
     @PostMapping("/add")
     public R<Point> add(@Validated(Insert.class) @RequestBody Point point,
-                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             point.setTenantId(tenantId);
             Point add = pointService.add(point);
@@ -112,7 +113,7 @@ public class PointController {
      */
     @PostMapping("/update")
     public R<Point> update(@Validated(Update.class) @RequestBody Point point,
-                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             point.setTenantId(tenantId);
             Point update = pointService.update(point);
@@ -209,7 +210,7 @@ public class PointController {
      */
     @PostMapping("/list")
     public R<Page<Point>> list(@RequestBody(required = false) PointPageQuery pointPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(pointPageQuery)) {
                 pointPageQuery = new PointPageQuery();

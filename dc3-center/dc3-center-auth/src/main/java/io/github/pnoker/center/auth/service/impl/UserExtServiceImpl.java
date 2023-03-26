@@ -58,7 +58,7 @@ public class UserExtServiceImpl implements UserExtService {
         }
 
         // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
-        if (CharSequenceUtil.isNotBlank(userExt.getPhone())) {
+        if (CharSequenceUtil.isNotEmpty(userExt.getPhone())) {
             UserExt selectByPhone = selectByPhone(userExt.getPhone(), false);
             if (ObjectUtil.isNotNull(selectByPhone)) {
                 throw new DuplicateException("The user already exists with phone: {}", userExt.getPhone());
@@ -66,7 +66,7 @@ public class UserExtServiceImpl implements UserExtService {
         }
 
         // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
-        if (CharSequenceUtil.isNotBlank(userExt.getEmail())) {
+        if (CharSequenceUtil.isNotEmpty(userExt.getEmail())) {
             UserExt selectByEmail = selectByEmail(userExt.getEmail(), false);
             if (ObjectUtil.isNotNull(selectByEmail)) {
                 throw new DuplicateException("The user already exists with email: {}", userExt.getEmail());
@@ -95,7 +95,7 @@ public class UserExtServiceImpl implements UserExtService {
     public UserExt update(UserExt userExt) {
         UserExt selectById = selectById(userExt.getId());
         // 判断 phone 是否修改
-        if (CharSequenceUtil.isNotBlank(userExt.getPhone())) {
+        if (CharSequenceUtil.isNotEmpty(userExt.getPhone())) {
             if (!userExt.getPhone().equals(selectById.getPhone())) {
                 UserExt selectByPhone = selectByPhone(userExt.getPhone(), false);
                 if (ObjectUtil.isNotNull(selectByPhone)) {
@@ -107,7 +107,7 @@ public class UserExtServiceImpl implements UserExtService {
         }
 
         // 判断 email 是否修改
-        if (CharSequenceUtil.isNotBlank(userExt.getEmail())) {
+        if (CharSequenceUtil.isNotEmpty(userExt.getEmail())) {
             if (!userExt.getEmail().equals(selectById.getEmail())) {
                 UserExt selectByEmail = selectByEmail(userExt.getEmail(), false);
                 if (ObjectUtil.isNotNull(selectByEmail)) {
@@ -180,10 +180,10 @@ public class UserExtServiceImpl implements UserExtService {
     public LambdaQueryWrapper<UserExt> fuzzyQuery(UserExtDto userExtDto) {
         LambdaQueryWrapper<UserExt> queryWrapper = Wrappers.<UserExt>query().lambda();
         if (ObjectUtil.isNotNull(userExtDto)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userExtDto.getNickName()), UserExt::getNickName, userExtDto.getNickName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userExtDto.getUserName()), UserExt::getUserName, userExtDto.getUserName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userExtDto.getPhone()), UserExt::getPhone, userExtDto.getPhone());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userExtDto.getEmail()), UserExt::getEmail, userExtDto.getEmail());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(userExtDto.getNickName()), UserExt::getNickName, userExtDto.getNickName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(userExtDto.getUserName()), UserExt::getUserName, userExtDto.getUserName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(userExtDto.getPhone()), UserExt::getPhone, userExtDto.getPhone());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(userExtDto.getEmail()), UserExt::getEmail, userExtDto.getEmail());
         }
         return queryWrapper;
     }

@@ -199,9 +199,9 @@ public class DriverServiceImpl implements DriverService {
     public LambdaQueryWrapper<Driver> fuzzyQuery(DriverPageQuery driverPageQuery) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         if (ObjectUtil.isNotNull(driverPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getDriverName()), Driver::getDriverName, driverPageQuery.getDriverName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getServiceName()), Driver::getServiceName, driverPageQuery.getServiceName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(driverPageQuery.getServiceHost()), Driver::getServiceHost, driverPageQuery.getServiceHost());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(driverPageQuery.getDriverName()), Driver::getDriverName, driverPageQuery.getDriverName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(driverPageQuery.getServiceName()), Driver::getServiceName, driverPageQuery.getServiceName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(driverPageQuery.getServiceHost()), Driver::getServiceHost, driverPageQuery.getServiceHost());
             queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getServicePort()), Driver::getServicePort, driverPageQuery.getServicePort());
             queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getDriverTypeFlag()), Driver::getDriverTypeFlag, driverPageQuery.getDriverTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getEnableFlag()), Driver::getEnableFlag, driverPageQuery.getEnableFlag());

@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.NotifyService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
@@ -66,7 +66,7 @@ public class DeviceController {
      * @return Device
      */
     @PostMapping("/add")
-    public R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             device.setTenantId(tenantId);
             Device add = deviceService.add(device);
@@ -110,7 +110,7 @@ public class DeviceController {
      * @return Device
      */
     @PostMapping("/update")
-    public R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             device.setTenantId(tenantId);
             Device update = deviceService.update(device);
@@ -169,7 +169,7 @@ public class DeviceController {
      * @return Page Of Device
      */
     @PostMapping("/list")
-    public R<Page<Device>> list(@RequestBody(required = false) DevicePageQuery devicePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<Page<Device>> list(@RequestBody(required = false) DevicePageQuery devicePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(devicePageQuery)) {
                 devicePageQuery = new DevicePageQuery();

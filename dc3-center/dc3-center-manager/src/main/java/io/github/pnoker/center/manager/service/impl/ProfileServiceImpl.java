@@ -148,10 +148,10 @@ public class ProfileServiceImpl implements ProfileService {
     public LambdaQueryWrapper<Profile> fuzzyQuery(ProfilePageQuery profilePageQuery) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         if (ObjectUtil.isNotEmpty(profilePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(profilePageQuery.getProfileName()), Profile::getProfileName, profilePageQuery.getProfileName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(profilePageQuery.getProfileName()), Profile::getProfileName, profilePageQuery.getProfileName());
             queryWrapper.eq(ObjectUtil.isNotEmpty(profilePageQuery.getProfileShareFlag()), Profile::getProfileShareFlag, profilePageQuery.getProfileShareFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(profilePageQuery.getEnableFlag()), Profile::getEnableFlag, profilePageQuery.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(profilePageQuery.getTenantId()), Profile::getTenantId, profilePageQuery.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profilePageQuery.getTenantId()), Profile::getTenantId, profilePageQuery.getTenantId());
         }
         return queryWrapper;
     }
@@ -160,7 +160,7 @@ public class ProfileServiceImpl implements ProfileService {
         QueryWrapper<Profile> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(profilePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(profilePageQuery.getProfileName()), "dp.profile_name", profilePageQuery.getProfileName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(profilePageQuery.getProfileName()), "dp.profile_name", profilePageQuery.getProfileName());
             queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileCode()), "dp.profile_code", profilePageQuery.getProfileCode());
             queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileShareFlag()), "dp.profile_share_flag", profilePageQuery.getProfileShareFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getEnableFlag()), "dp.enable_flag", profilePageQuery.getEnableFlag());

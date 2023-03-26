@@ -27,6 +27,7 @@ import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.PageDTO;
 import io.github.pnoker.center.data.entity.vo.query.DriverPageQuery;
 import io.github.pnoker.center.data.service.DriverStatusService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.enums.DriverStatusEnum;
@@ -77,33 +78,51 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         return getStatusMap(drivers);
     }
 
+    /**
+     * Query to DTO
+     *
+     * @param pageQuery DriverPageQuery
+     * @return DriverDTO Builder
+     */
     private static DriverDTO.Builder buildDTOByQuery(DriverPageQuery pageQuery) {
-        DriverDTO.Builder dtoBuilder = DriverDTO.newBuilder();
+        DriverDTO.Builder builder = DriverDTO.newBuilder();
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {
-            dtoBuilder.setDriverName(pageQuery.getDriverName());
+            builder.setDriverName(pageQuery.getDriverName());
         }
         if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceName())) {
-            dtoBuilder.setServiceName(pageQuery.getServiceName());
+            builder.setServiceName(pageQuery.getServiceName());
         }
         if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
-            dtoBuilder.setServiceHost(pageQuery.getServiceHost());
+            builder.setServiceHost(pageQuery.getServiceHost());
         }
         if (ObjectUtil.isNotNull(pageQuery.getServicePort())) {
-            dtoBuilder.setServicePort(pageQuery.getServicePort());
+            builder.setServicePort(pageQuery.getServicePort());
+        } else {
+            builder.setServicePort(DefaultConstant.DEFAULT_INT);
         }
         if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
-            dtoBuilder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(pageQuery.getDriverTypeFlag().name()));
+            builder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(pageQuery.getDriverTypeFlag().name()));
+        } else {
+            builder.setDriverTypeFlagValue(DefaultConstant.DEFAULT_INT);
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            dtoBuilder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+            builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+        } else {
+            builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
         }
         if (CharSequenceUtil.isNotEmpty(pageQuery.getTenantId())) {
-            dtoBuilder.setTenantId(pageQuery.getTenantId());
+            builder.setTenantId(pageQuery.getTenantId());
         }
 
-        return dtoBuilder;
+        return builder;
     }
 
+    /**
+     * Get status map
+     *
+     * @param drivers DriverDTO Array
+     * @return Status Map
+     */
     private Map<String, String> getStatusMap(List<DriverDTO> drivers) {
         Map<String, String> statusMap = new HashMap<>(16);
         Set<String> driverIds = drivers.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());

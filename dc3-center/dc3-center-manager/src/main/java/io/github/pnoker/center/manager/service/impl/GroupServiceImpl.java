@@ -134,7 +134,7 @@ public class GroupServiceImpl implements GroupService {
     public LambdaQueryWrapper<Group> fuzzyQuery(GroupPageQuery groupPageQuery) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
         if (ObjectUtil.isNotNull(groupPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(groupPageQuery.getGroupName()), Group::getGroupName, groupPageQuery.getGroupName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(groupPageQuery.getGroupName()), Group::getGroupName, groupPageQuery.getGroupName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(groupPageQuery.getTenantId()), Group::getTenantId, groupPageQuery.getTenantId());
         }
         return queryWrapper;

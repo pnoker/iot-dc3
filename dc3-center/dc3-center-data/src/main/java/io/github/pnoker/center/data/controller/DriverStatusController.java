@@ -18,6 +18,7 @@ package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.query.DriverPageQuery;
 import io.github.pnoker.center.data.service.DriverStatusService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -49,7 +50,7 @@ public class DriverStatusController {
      * @return Map String:String
      */
     @PostMapping("/driver")
-    public R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             driverPageQuery.setTenantId(tenantId);
             Map<String, String> statuses = driverStatusService.driver(driverPageQuery);

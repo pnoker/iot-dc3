@@ -143,8 +143,8 @@ public class LabelServiceImpl implements LabelService {
     public LambdaQueryWrapper<Label> fuzzyQuery(LabelPageQuery labelPageQuery) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         if (ObjectUtil.isNotNull(labelPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(labelPageQuery.getLabelName()), Label::getLabelName, labelPageQuery.getLabelName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(labelPageQuery.getColor()), Label::getColor, labelPageQuery.getColor());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(labelPageQuery.getLabelName()), Label::getLabelName, labelPageQuery.getLabelName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelPageQuery.getColor()), Label::getColor, labelPageQuery.getColor());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelPageQuery.getTenantId()), Label::getTenantId, labelPageQuery.getTenantId());
         }
         return queryWrapper;
