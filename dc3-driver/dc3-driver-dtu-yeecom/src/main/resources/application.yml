@@ -18,7 +18,6 @@ driver:
   tenant: default
   name: DtuYeeComDriver
   type: DRIVER
-  project: @project.artifactId@
   remark: @project.description@
   custom:
     tcp:
@@ -55,6 +54,8 @@ driver:
       remark: 解析类型，short、int、long、float、double、boolean、string
 
 spring:
+  application:
+    name: @project.artifactId@
   profiles:
     active:
       - ${NODE_ENV:dev}
