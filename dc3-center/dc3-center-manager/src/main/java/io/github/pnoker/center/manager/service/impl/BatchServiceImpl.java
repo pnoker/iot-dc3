@@ -63,9 +63,9 @@ public class BatchServiceImpl implements BatchService {
      * {@inheritDoc}
      */
     @Override
-    public DriverMetadata batchDriverMetadata(String serviceName) {
+    public DriverMetadata batchDriverMetadata(String serviceName, String tenantId) {
         DriverMetadata driverMetadata = new DriverMetadata();
-        Driver driver = driverService.selectByServiceName(serviceName);
+        Driver driver = driverService.selectByServiceName(serviceName, tenantId);
         driverMetadata.setDriverId(driver.getId());
         driverMetadata.setTenantId(driver.getTenantId());
 

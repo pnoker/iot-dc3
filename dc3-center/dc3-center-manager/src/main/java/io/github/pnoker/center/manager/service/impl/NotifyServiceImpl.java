@@ -149,7 +149,7 @@ public class NotifyServiceImpl implements NotifyService {
      */
     private void notifyDriver(Driver driver, DriverMetadataDTO entityDTO) {
         log.info("Notify driver[{}]: {}", driver.getServiceName(), entityDTO);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA, RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driver.getServiceName(), entityDTO);
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA, RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driver.getId(), entityDTO);
     }
 
 }

@@ -80,47 +80,46 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             return;
         }
 
-        DriverMetadataDTO driverConfiguration = new DriverMetadataDTO(
-                MetadataTypeEnum.METADATA,
-                MetadataCommandTypeEnum.SYNC,
-                null
-        );
-
         try {
             Driver driver = registerDriver(entityDTO);
             registerDriverAttribute(entityDTO, driver);
             registerPointAttribute(entityDTO, driver);
-            DriverMetadata driverMetadata = batchService.batchDriverMetadata(entityDTO.getDriver().getServiceName());
-            driverConfiguration.setContent(JsonUtil.toJsonString(driverMetadata));
+            DriverMetadata driverMetadata = batchService.batchDriverMetadata(driver.getServiceName(), driver.getTenantId());
+
+            DriverMetadataDTO driverConfiguration = new DriverMetadataDTO(
+                    MetadataTypeEnum.METADATA,
+                    MetadataCommandTypeEnum.SYNC,
+                    JsonUtil.toJsonString(driverMetadata)
+            );
+
+            rabbitTemplate.convertAndSend(
+                    RabbitConstant.TOPIC_EXCHANGE_METADATA,
+                    RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driver.getId(),
+                    driverConfiguration
+            );
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
-        rabbitTemplate.convertAndSend(
-                RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + entityDTO.getDriver().getServiceName(),
-                driverConfiguration
-        );
     }
 
     /**
      * 注册驱动
      *
-     * @param driverRegisterDTO DriverRegisterDTO
+     * @param entityDTO DriverRegisterDTO
      */
-    private Driver registerDriver(DriverRegisterDTO driverRegisterDTO) {
+    private Driver registerDriver(DriverRegisterDTO entityDTO) {
         // check tenant
-        RTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(driverRegisterDTO.getTenant()).build());
+        RTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(entityDTO.getTenant()).build());
         if (!rTenantDTO.getResult().getOk()) {
-            throw new ServiceException("Invalid {}, {}", driverRegisterDTO.getTenant(), rTenantDTO.getResult().getMessage());
+            throw new ServiceException("Invalid {}, {}", entityDTO.getTenant(), rTenantDTO.getResult().getMessage());
         }
 
         // register driver
-        Driver driver = driverRegisterDTO.getDriver();
+        Driver driver = entityDTO.getDriver();
         driver.setTenantId(rTenantDTO.getData().getBase().getId());
         log.info("Register driver {}", driver);
         try {
-            Driver byServiceName = driverService.selectByServiceName(driver.getServiceName());
+            Driver byServiceName = driverService.selectByServiceName(driver.getServiceName(), driver.getTenantId());
             log.debug("Driver already registered, updating {} ", driver);
             driver.setId(byServiceName.getId());
             driver = driverService.update(driver);
