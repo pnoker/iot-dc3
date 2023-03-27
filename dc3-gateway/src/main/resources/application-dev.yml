@@ -19,12 +19,11 @@ spring:
   env: dev
   group: ${user.name}
   redis:
-    # Customize Redis configuration
     host: ${REDIS_HOST:dc3-redis}
     port: ${REDIS_PORT:36379}
+    password: ${REDIS_PASSWORD:dc3}
   cache:
     redis:
-      # Customize Cache configuration
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
   cloud:
     nacos:

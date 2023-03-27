@@ -18,7 +18,6 @@ driver:
   tenant: default
   name: OpcDaDriver
   type: DRIVER
-  project: @project.artifactId@
   remark: @project.description@
   schedule:
     read:
@@ -61,6 +60,8 @@ driver:
       remark: 位号名称
 
 spring:
+  application:
+    name: @project.artifactId@
   profiles:
     active:
       - ${NODE_ENV:dev}

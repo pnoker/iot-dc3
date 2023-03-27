@@ -17,8 +17,7 @@
 driver:
   tenant: default
   name: EdgeGateway
-  type: gateway
-  project: @project.artifactId@
+  type: GATEWAY
   remark: @project.description@
   schedule:
     read:
@@ -38,21 +37,10 @@ driver:
       attribute-type-flag: INT
       default-value: 2
       remark: 测点/设备接收下行指令的Mqtt主题的Qos
-  mqtt:
-    url: ssl://dc3-rabbitmq:8883
-    auth-type: X509
-    username: dc3
-    password: dc3
-    receive-topics:
-      - qos: 0
-        name: mqtt/group/device/#
-    default-send-topic:
-      qos: 1
-      name: dc3-mqtt-topic
-    keep-alive: 15
-    completion-timeout: 3000
 
 spring:
+  application:
+    name: @project.artifactId@
   profiles:
     active:
       - ${NODE_ENV:dev}
