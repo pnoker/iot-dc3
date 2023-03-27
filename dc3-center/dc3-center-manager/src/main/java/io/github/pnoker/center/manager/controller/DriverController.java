@@ -149,13 +149,14 @@ public class DriverController {
     /**
      * 根据 SERVICENAME 查询 Driver
      *
-     * @param serviceName Driver Service Name
+     * @param serviceName 驱动服务名称
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
-    public R<Driver> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
+    public R<Driver> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName,
+                                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
-            Driver select = driverService.selectByServiceName(serviceName);
+            Driver select = driverService.selectByServiceName(serviceName, tenantId);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());

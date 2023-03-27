@@ -66,7 +66,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver add(Driver driver) {
         try {
-            selectByServiceName(driver.getServiceName());
+            selectByServiceName(driver.getServiceName(), driver.getTenantId());
             throw new DuplicateException("The driver already exists");
         } catch (NotFoundException notFoundException) {
             if (driverMapper.insert(driver) > 0) {
@@ -127,9 +127,10 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public Driver selectByServiceName(String serviceName) {
+    public Driver selectByServiceName(String serviceName, String tenantId) {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getServiceName, serviceName);
+        queryWrapper.eq(Driver::getTenantId, tenantId);
         queryWrapper.last("limit 1");
         Driver driver = driverMapper.selectOne(queryWrapper);
         if (ObjectUtil.isNull(driver)) {

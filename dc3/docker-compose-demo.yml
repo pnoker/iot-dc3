@@ -119,8 +119,6 @@ services:
       dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2023.2.3.demo
     restart: on-failure
-    ports:
-      - '8600:8600'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-virtual
@@ -143,8 +141,6 @@ services:
       dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2023.2.3.demo
     restart: on-failure
-    ports:
-      - '8601:8601'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-plcs7
@@ -167,8 +163,6 @@ services:
       dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2023.2.3.demo
     restart: on-failure
-    ports:
-      - '8602:8602'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-opc-da
@@ -191,8 +185,6 @@ services:
       dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2023.2.3.demo
     restart: on-failure
-    ports:
-      - '8603:8603'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-opc-ua
@@ -216,7 +208,8 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:2023.2.3.demo
     restart: on-failure
     ports:
-      - '8700:8700'
+      - '6270:6270'
+      - '6271:6271'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-listening-virtual
@@ -239,8 +232,6 @@ services:
       dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2023.2.3.demo
     restart: on-failure
-    ports:
-      - '8701:8701'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-mqtt
@@ -263,8 +254,6 @@ services:
       dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2023.2.3.demo
     restart: on-failure
-    ports:
-      - '8604:8604'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-modbus-tcp
@@ -287,8 +276,6 @@ services:
       dockerfile: ./Dockerfile
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:2023.2.3.demo
     restart: on-failure
-    ports:
-      - '8702:8702'
     environment:
       - NODE_ENV=dev
     container_name: dc3-driver-edge-gateway
