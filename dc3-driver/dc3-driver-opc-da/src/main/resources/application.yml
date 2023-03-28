@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: OpcDaDriver
+  name: OpcDa驱动
+  code: OpcDaDriver
   type: DRIVER
   remark: @project.description@
   schedule:

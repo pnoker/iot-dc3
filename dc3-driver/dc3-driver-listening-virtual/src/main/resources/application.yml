@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: ListeningVirtualDriver
+  name: 模拟Tcp/Udp驱动
+  code: ListeningVirtualDriver
   type: DRIVER
   remark: @project.description@
   custom:

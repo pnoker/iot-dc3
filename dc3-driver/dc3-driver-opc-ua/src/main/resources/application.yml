@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: OpcUaDriver
+  name: OpcUa驱动
+  code: OpcUaDriver
   type: DRIVER
   remark: @project.description@
   schedule:

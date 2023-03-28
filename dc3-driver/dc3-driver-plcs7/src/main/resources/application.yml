@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: PlcS7Driver
+  name: PlcS7驱动
+  code: PlcS7Driver
   type: DRIVER
   remark: @project.description@
   schedule:

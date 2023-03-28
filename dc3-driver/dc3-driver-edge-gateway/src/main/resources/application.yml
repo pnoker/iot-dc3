@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: EdgeGateway
+  name: 边缘网关
+  code: EdgeGateway
   type: GATEWAY
   remark: @project.description@
   schedule:

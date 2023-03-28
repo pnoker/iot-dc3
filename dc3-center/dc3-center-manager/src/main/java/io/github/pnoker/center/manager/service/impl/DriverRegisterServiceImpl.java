@@ -93,8 +93,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             );
 
             rabbitTemplate.convertAndSend(
-                    RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                    RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driver.getId(),
+                    RabbitConstant.TOPIC_EXCHANGE_SYNC,
+                    RabbitConstant.ROUTING_DRIVER_SYNC_PREFIX + entityDTO.getClient(),
                     driverConfiguration
             );
         } catch (Exception e) {

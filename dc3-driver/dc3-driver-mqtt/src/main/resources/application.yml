@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: MqttDriver
+  name: Mqtt驱动
+  code: MqttDriver
   type: DRIVER
   remark: @project.description@
   schedule:
