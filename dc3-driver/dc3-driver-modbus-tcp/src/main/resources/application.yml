@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: ModbusDriver
+  name: Modbus-Tcp驱动
+  code: ModbusTcpDriver
   type: DRIVER
   remark: @project.description@
   schedule:

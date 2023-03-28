@@ -16,7 +16,8 @@
 
 driver:
   tenant: default
-  name: DtuYeeComDriver
+  name: 联讯通Dtu驱动
+  code: DtuYeeComDriver
   type: DRIVER
   remark: @project.description@
   custom:

@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.config;
 
-import io.github.pnoker.common.config.TopicConfig;
+import io.github.pnoker.common.config.ExchangeConfig;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass(TopicConfig.class)
+@ConditionalOnClass(ExchangeConfig.class)
 public class DataTopicConfig {
 
     @Resource

@@ -26,7 +26,7 @@ services:
     ports:
       - '8000:8000'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -50,7 +50,7 @@ services:
     ports:
       - '8300:8300'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -74,7 +74,7 @@ services:
     ports:
       - '8400:8400'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -98,7 +98,7 @@ services:
     ports:
       - '8500:8500'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -120,7 +120,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2023.2.3.dev
     restart: on-failure
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:
@@ -142,7 +142,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2023.2.3.dev
     restart: on-failure
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -164,7 +164,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2023.2.3.dev
     restart: on-failure
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -186,7 +186,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2023.2.3.dev
     restart: on-failure
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -211,7 +211,7 @@ services:
       - '6270:6270'
       - '6271:6271'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -236,7 +236,7 @@ services:
       - '9001:9001'
       - '9002:9002'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-dtu-yeecom
     hostname: dc3-driver-dtu-yeecom
     volumes:
@@ -261,7 +261,7 @@ services:
       - '5683:5683'
       - '5684:5684'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-lwm2m
     hostname: dc3-driver-lwm2m
     volumes:
@@ -283,7 +283,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2023.2.3.dev
     restart: on-failure
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -305,7 +305,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:2023.2.3.dev
     restart: on-failure
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-edge-gateway
     hostname: dc3-driver-edge-gateway
     volumes:
@@ -327,7 +327,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2023.2.3.dev
     restart: on-failure
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
