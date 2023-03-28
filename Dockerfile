@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-nginx:1.22
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-nginx:1.22.1
 MAINTAINER pnoker pnokers@icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -26,4 +26,4 @@ COPY ./dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
 EXPOSE 80 443
 VOLUME /var/log/nginx
 
-CMD envsubst < /etc/nginx/location/default.env > /etc/nginx/location/default.conf ; /bin/wait-for ${APP_API_PATH}:${APP_API_PORT} -t 5 --  nginx -g "daemon off;"
+CMD envsubst < /etc/nginx/location/default.env > /etc/nginx/location/default.conf ; nginx -g "daemon off;"
