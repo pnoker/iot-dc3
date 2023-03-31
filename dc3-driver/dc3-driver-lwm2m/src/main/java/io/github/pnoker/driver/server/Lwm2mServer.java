@@ -19,7 +19,7 @@ package io.github.pnoker.driver.server;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.driver.sdk.DriverContext;
-import io.github.pnoker.driver.sdk.service.DriverService;
+import io.github.pnoker.driver.sdk.service.DriverSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
@@ -60,7 +60,7 @@ public class Lwm2mServer {
     @Resource
     private DriverContext driverContext;
     @Resource
-    private DriverService driverService;
+    private DriverSenderService driverSenderService;
 
     public void startServer() {
         LeshanServerBuilder builder = new LeshanServerBuilder();
@@ -221,7 +221,7 @@ public class Lwm2mServer {
             @Override
             public void registered(Registration registration, Registration previousReg, Collection<Observation> previousObservations) {
                 log.debug("new device {} registered", registration.getEndpoint());
-                driverService.deviceStatusSender(registration.getEndpoint(), DriverStatusEnum.ONLINE);
+                driverSenderService.deviceStatusSender(registration.getEndpoint(), DriverStatusEnum.ONLINE);
             }
 
             /**
@@ -233,7 +233,7 @@ public class Lwm2mServer {
             @Override
             public void updated(RegistrationUpdate registrationUpdate, Registration updatedRegistration, Registration registration1) {
                 log.debug("device is still here:{}", updatedRegistration.getEndpoint());
-                driverService.deviceStatusSender(updatedRegistration.getEndpoint(), DriverStatusEnum.ONLINE);
+                driverSenderService.deviceStatusSender(updatedRegistration.getEndpoint(), DriverStatusEnum.ONLINE);
             }
 
             /**
@@ -246,7 +246,7 @@ public class Lwm2mServer {
             @Override
             public void unregistered(Registration registration, Collection<Observation> observations, boolean expired, Registration newReg) {
                 log.debug("device left: " + registration.getEndpoint());
-                driverService.deviceStatusSender(registration.getEndpoint(), DriverStatusEnum.OFFLINE);
+                driverSenderService.deviceStatusSender(registration.getEndpoint(), DriverStatusEnum.OFFLINE);
             }
 
 

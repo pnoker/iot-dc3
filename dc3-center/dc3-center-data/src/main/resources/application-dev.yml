@@ -61,3 +61,7 @@ data:
         enable: false
         host: dc3-elasticsearch
         port: 9200
+
+logging:
+  level:
+    io.github.pnoker: DEBUG
