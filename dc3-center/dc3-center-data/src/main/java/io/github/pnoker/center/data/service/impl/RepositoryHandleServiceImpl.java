@@ -62,6 +62,8 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
         // 保存单个数据到 Influxdb
         if (Boolean.TRUE.equals(enableInfluxdb)) {
             // nothing to do
+            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
+            savePointValueToRepository(pointValue, repositoryService);
         }
 
         // 保存单个数据到 Opentsdb
@@ -88,6 +90,8 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
             // 保存批量数据到 Influxdb
             if (Boolean.TRUE.equals(enableInfluxdb)) {
                 // nothing to do
+                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
+                savePointValuesToRepository(deviceId, pointValues, repositoryService);
             }
 
             // 保存批量数据到 Opentsdb
