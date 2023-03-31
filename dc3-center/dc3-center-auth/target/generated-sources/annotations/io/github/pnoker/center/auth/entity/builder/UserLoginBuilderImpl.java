@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-04-01T00:38:38+0800",
+    date = "2023-04-01T00:41:57+0800",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 1.8.0_321 (Oracle Corporation)"
 )
 @Component
@@ -48,7 +48,7 @@ public class UserLoginBuilderImpl implements UserLoginBuilder {
 
         List<UserLoginBO> list = new ArrayList<UserLoginBO>( entityVOList.size() );
         for ( UserLoginVO userLoginVO : entityVOList ) {
-            list.add( buildBOByVO(userLoginVO) );
+            list.add( buildBOByVO( userLoginVO ) );
         }
 
         return list;
@@ -132,22 +132,22 @@ public class UserLoginBuilderImpl implements UserLoginBuilder {
             return null;
         }
 
-        UserLoginVO.UserVOBuilder<?, ?> userVO = UserLoginVO.builder();
+        UserLoginVO.UserLoginVOBuilder<?, ?> userLoginVO = UserLoginVO.builder();
 
-        userVO.id( entityBO.getId() );
-        userVO.remark( entityBO.getRemark() );
-        userVO.creatorId( entityBO.getCreatorId() );
-        userVO.creatorName( entityBO.getCreatorName() );
-        userVO.createTime( entityBO.getCreateTime() );
-        userVO.operatorId( entityBO.getOperatorId() );
-        userVO.operatorName( entityBO.getOperatorName() );
-        userVO.updateTime( entityBO.getUpdateTime() );
-        userVO.loginName( entityBO.getLoginName() );
-        userVO.userExtId( entityBO.getUserExtId() );
-        userVO.userPasswordId( entityBO.getUserPasswordId() );
-        userVO.enableFlag( entityBO.getEnableFlag() );
+        userLoginVO.id( entityBO.getId() );
+        userLoginVO.remark( entityBO.getRemark() );
+        userLoginVO.creatorId( entityBO.getCreatorId() );
+        userLoginVO.creatorName( entityBO.getCreatorName() );
+        userLoginVO.createTime( entityBO.getCreateTime() );
+        userLoginVO.operatorId( entityBO.getOperatorId() );
+        userLoginVO.operatorName( entityBO.getOperatorName() );
+        userLoginVO.updateTime( entityBO.getUpdateTime() );
+        userLoginVO.loginName( entityBO.getLoginName() );
+        userLoginVO.userExtId( entityBO.getUserExtId() );
+        userLoginVO.userPasswordId( entityBO.getUserPasswordId() );
+        userLoginVO.enableFlag( entityBO.getEnableFlag() );
 
-        return userVO.build();
+        return userLoginVO.build();
     }
 
     @Override
