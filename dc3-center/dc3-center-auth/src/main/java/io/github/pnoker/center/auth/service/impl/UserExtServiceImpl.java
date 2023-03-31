@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
 /**
- * 用户拓展服务接口实现类
+ * 用户服务接口实现类
  *
  * @author pnoker
  * @since 2022.1.0

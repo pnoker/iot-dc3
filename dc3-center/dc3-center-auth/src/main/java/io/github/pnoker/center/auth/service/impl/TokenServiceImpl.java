@@ -30,7 +30,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.model.TenantBind;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.model.UserLogin;
 import io.github.pnoker.common.model.UserPassword;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
@@ -59,7 +59,7 @@ public class TokenServiceImpl implements TokenService {
     @Resource
     private TenantService tenantService;
     @Resource
-    private UserService userService;
+    private UserLoginService userLoginService;
     @Resource
     private UserPasswordService userPasswordService;
     @Resource
@@ -90,15 +90,15 @@ public class TokenServiceImpl implements TokenService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
         checkUserLimit(username, tenant.getId());
-        User user = userService.selectByLoginName(username, false);
-        if (ObjectUtil.isNull(user)) {
+        UserLogin userLogin = userLoginService.selectByLoginName(username, false);
+        if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        TenantBind tenantBind = tenantBindService.selectByTenantIdAndUserId(tenant.getId(), user.getId());
+        TenantBind tenantBind = tenantBindService.selectByTenantIdAndUserId(tenant.getId(), userLogin.getId());
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        UserPassword userPassword = userPasswordService.selectById(user.getUserPasswordId());
+        UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.DOUBLE_COLON + username + SymbolConstant.HASHTAG + tenant.getId();
         String redisSaltValue = redisUtil.getKey(redisSaltKey);
         String md5Password = DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue);

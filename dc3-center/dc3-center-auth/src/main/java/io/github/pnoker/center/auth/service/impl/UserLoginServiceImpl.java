@@ -21,13 +21,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.UserPageQuery;
-import io.github.pnoker.center.auth.mapper.UserMapper;
-import io.github.pnoker.center.auth.service.UserService;
+import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
+import io.github.pnoker.center.auth.mapper.UserLoginMapper;
+import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.model.UserLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,69 +42,69 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class UserLoginServiceImpl implements UserLoginService {
 
     @Resource
-    private UserMapper userMapper;
+    private UserLoginMapper userLoginMapper;
 
     @Override
     @Transactional
-    public User add(User user) {
+    public UserLogin add(UserLogin userLogin) {
         // 判断登录名称是否存在
-        User selectByLoginName = selectByLoginName(user.getLoginName(), false);
+        UserLogin selectByLoginName = selectByLoginName(userLogin.getLoginName(), false);
         if (ObjectUtil.isNotNull(selectByLoginName)) {
-            throw new DuplicateException("The user already exists with login name: {}", user.getLoginName());
+            throw new DuplicateException("The user already exists with login name: {}", userLogin.getLoginName());
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(user) > 0) {
-            return userMapper.selectById(user.getId());
+        if (userLoginMapper.insert(userLogin) > 0) {
+            return userLoginMapper.selectById(userLogin.getId());
         }
 
-        throw new AddException("The user add failed: {}", user.toString());
+        throw new AddException("The user add failed: {}", userLogin.toString());
     }
 
     @Override
     @Transactional
     public Boolean delete(String id) {
-        User user = selectById(id);
-        if (ObjectUtil.isNull(user)) {
+        UserLogin userLogin = selectById(id);
+        if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException();
         }
-        return userMapper.deleteById(id) > 0;
+        return userLoginMapper.deleteById(id) > 0;
     }
 
     @Override
-    public User update(User user) {
-        User selectById = selectById(user.getId());
+    public UserLogin update(UserLogin userLogin) {
+        UserLogin selectById = selectById(userLogin.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
-        user.setLoginName(null);
-        user.setOperateTime(null);
-        if (userMapper.updateById(user) > 0) {
-            User select = userMapper.selectById(user.getId());
-            user.setLoginName(select.getLoginName());
+        userLogin.setLoginName(null);
+        userLogin.setOperateTime(null);
+        if (userLoginMapper.updateById(userLogin) > 0) {
+            UserLogin select = userLoginMapper.selectById(userLogin.getId());
+            userLogin.setLoginName(select.getLoginName());
             return select;
         }
         throw new ServiceException("The user update failed");
     }
 
     @Override
-    public User selectById(String id) {
-        return userMapper.selectById(id);
+    public UserLogin selectById(String id) {
+        return userLoginMapper.selectById(id);
     }
 
     @Override
-    public Page<User> list(UserPageQuery userPageQuery) {
+    public Page<UserLogin> list(UserLoginPageQuery userPageQuery) {
         if (ObjectUtil.isNull(userPageQuery.getPage())) {
             userPageQuery.setPage(new Pages());
         }
-        return userMapper.selectPage(userPageQuery.getPage().convert(), fuzzyQuery(userPageQuery));
+        return userLoginMapper.selectPage(userPageQuery.getPage().convert(), fuzzyQuery(userPageQuery));
     }
 
     @Override
-    public User selectByLoginName(String loginName, boolean throwException) {
+    public UserLogin selectByLoginName(String loginName, boolean throwException) {
         if (CharSequenceUtil.isEmpty(loginName)) {
             if (throwException) {
                 throw new EmptyException("The login name is empty");
@@ -112,32 +112,32 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(User::getLoginName, loginName);
-        queryWrapper.eq(User::getEnableFlag, EnableFlagEnum.ENABLE);
+        LambdaQueryWrapper<UserLogin> queryWrapper = Wrappers.<UserLogin>query().lambda();
+        queryWrapper.eq(UserLogin::getLoginName, loginName);
+        queryWrapper.eq(UserLogin::getEnableFlag, EnableFlagEnum.ENABLE);
         queryWrapper.last("limit 1");
-        User user = userMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(user)) {
+        UserLogin userLogin = userLoginMapper.selectOne(queryWrapper);
+        if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException();
         }
-        return user;
+        return userLogin;
     }
 
     @Override
     public Boolean checkLoginNameValid(String loginName) {
-        User user = selectByLoginName(loginName, false);
-        if (ObjectUtil.isNotNull(user)) {
-            return EnableFlagEnum.ENABLE.equals(user.getEnableFlag());
+        UserLogin userLogin = selectByLoginName(loginName, false);
+        if (ObjectUtil.isNotNull(userLogin)) {
+            return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
         }
 
         return false;
     }
 
     @Override
-    public LambdaQueryWrapper<User> fuzzyQuery(UserPageQuery userPageQuery) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
+    public LambdaQueryWrapper<UserLogin> fuzzyQuery(UserLoginPageQuery userPageQuery) {
+        LambdaQueryWrapper<UserLogin> queryWrapper = Wrappers.<UserLogin>query().lambda();
         if (ObjectUtil.isNotNull(userPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(userPageQuery.getLoginName()), User::getLoginName, userPageQuery.getLoginName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(userPageQuery.getLoginName()), UserLogin::getLoginName, userPageQuery.getLoginName());
         }
         return queryWrapper;
     }

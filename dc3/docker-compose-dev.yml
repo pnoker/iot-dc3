@@ -18,7 +18,7 @@ version: '3'
 
 services:
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.2.3.dev
     restart: on-failure
     ports:
       - '33306:3306'
@@ -101,7 +101,7 @@ services:
           - dc3-rabbitmq
 
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.9.nacos.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.2.3.nacos.dev
     restart: on-failure
     ports:
       - "8848:8848"

@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.model.UserLogin;
 import lombok.*;
 
 /**
@@ -31,7 +31,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class UserPageQuery extends User {
+public class UserLoginPageQuery extends UserLogin {
 
     private Pages page;
 }

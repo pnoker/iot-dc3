@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.bo;
+package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,7 +37,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class UserBO extends BaseBO {
+public class UserLoginVO extends BaseVO {
 
     /**
      * 登录名称
@@ -45,7 +45,7 @@ public class UserBO extends BaseBO {
     private String loginName;
 
     /**
-     * 用户拓展ID
+     * 用户ID
      */
     private String userExtId;
 
