@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.DriverInfoPageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.DriverInfo;
+import io.github.pnoker.common.model.DriverAttributeConfig;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverInfoService extends Service<DriverInfo, DriverInfoPageQuery> {
+public interface DriverInfoService extends Service<DriverAttributeConfig, DriverAttributeConfigPageQuery> {
 
     /**
      * 根据驱动属性配置 ID 和 设备 ID 查询
@@ -37,7 +37,7 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoPageQue
      * @param driverAttributeId Driver Attribute ID
      * @return DriverInfo
      */
-    DriverInfo selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId);
+    DriverAttributeConfig selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId);
 
     /**
      * 根据驱动属性配置 ID 查询
@@ -45,7 +45,7 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoPageQue
      * @param driverAttributeId Driver Attribute ID
      * @return DriverInfo Array
      */
-    List<DriverInfo> selectByAttributeId(String driverAttributeId);
+    List<DriverAttributeConfig> selectByAttributeId(String driverAttributeId);
 
     /**
      * 根据设备 ID 查询
@@ -53,5 +53,5 @@ public interface DriverInfoService extends Service<DriverInfo, DriverInfoPageQue
      * @param deviceId 设备ID
      * @return DriverInfo Array
      */
-    List<DriverInfo> selectByDeviceId(String deviceId);
+    List<DriverAttributeConfig> selectByDeviceId(String deviceId);
 }

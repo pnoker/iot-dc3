@@ -163,7 +163,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             if (!newDriverAttributeMap.containsKey(name)) {
                 try {
                     driverInfoService.selectByAttributeId(oldDriverAttributeMap.get(name).getId());
-                    throw new ServiceException("The driver attribute(" + name + ") used by driver info and cannot be deleted");
+                    throw new ServiceException("The driver attribute(" + name + ") used by driver attribute config and cannot be deleted");
                 } catch (NotFoundException notFoundException) {
                     log.debug("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
                     driverAttributeService.delete(oldDriverAttributeMap.get(name).getId());
@@ -211,7 +211,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             if (!newPointAttributeMap.containsKey(name)) {
                 try {
                     pointInfoService.selectByAttributeId(oldPointAttributeMap.get(name).getId());
-                    throw new ServiceException("The point attribute(" + name + ") used by point info and cannot be deleted");
+                    throw new ServiceException("The point attribute(" + name + ") used by point attribute config and cannot be deleted");
                 } catch (NotFoundException notFoundException1) {
                     log.debug("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));
                     pointAttributeService.delete(oldPointAttributeMap.get(name).getId());

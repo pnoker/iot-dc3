@@ -160,7 +160,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 
-### --------------------- Point Info ---------------------
+### --------------------- Point Attribute Config ---------------------
 ### 新增 PointInfo
 POST http://{{dc3-manager}}/manager/point_info/add
 Accept: */*

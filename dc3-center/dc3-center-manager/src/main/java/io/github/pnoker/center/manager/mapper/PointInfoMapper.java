@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.model.PointAttributeConfig;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -27,5 +27,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022.1.0
  */
 @Mapper
-public interface PointInfoMapper extends BaseMapper<PointInfo> {
+public interface PointInfoMapper extends BaseMapper<PointAttributeConfig> {
 }

@@ -109,13 +109,13 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverDriverInfo(MetadataCommandTypeEnum command, DriverInfo driverInfo) {
+    public void notifyDriverDriverInfo(MetadataCommandTypeEnum command, DriverAttributeConfig driverAttributeConfig) {
         try {
-            Driver driver = driverService.selectByDeviceId(driverInfo.getDeviceId());
+            Driver driver = driverService.selectByDeviceId(driverAttributeConfig.getDeviceId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
                     MetadataTypeEnum.DRIVER_INFO,
                     command,
-                    JsonUtil.toJsonString(driverInfo)
+                    JsonUtil.toJsonString(driverAttributeConfig)
             );
             notifyDriver(driver, entityDTO);
         } catch (Exception e) {
@@ -127,13 +127,13 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointInfo pointInfo) {
+    public void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfig pointAttributeConfig) {
         try {
-            Driver driver = driverService.selectByDeviceId(pointInfo.getDeviceId());
+            Driver driver = driverService.selectByDeviceId(pointAttributeConfig.getDeviceId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
                     MetadataTypeEnum.POINT_INFO,
                     command,
-                    JsonUtil.toJsonString(pointInfo)
+                    JsonUtil.toJsonString(pointAttributeConfig)
             );
             notifyDriver(driver, entityDTO);
         } catch (Exception e) {

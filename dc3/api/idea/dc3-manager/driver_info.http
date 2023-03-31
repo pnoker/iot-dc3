@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-### --------------------- Driver Info ---------------------
+### --------------------- Driver Attribute Config ---------------------
 ### 新增 DriverInfo
 #/manager/driver_info/add
 POST http://{{dc3-manager}}/manager/driver_info/add
