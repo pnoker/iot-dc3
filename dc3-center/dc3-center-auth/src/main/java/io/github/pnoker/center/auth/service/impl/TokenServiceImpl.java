@@ -94,7 +94,7 @@ public class TokenServiceImpl implements TokenService {
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        TenantBind tenantBind = tenantBindService.selectByTenantIdAndUserId(tenant.getId(), userLogin.getId());
+        TenantBind tenantBind = tenantBindService.selectByTenantIdAndUserId(tenant.getId(), userLogin.getUserId());
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }

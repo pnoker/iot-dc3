@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.query;
+package io.github.pnoker.center.auth.mapper;
 
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.UserExt;
-import lombok.*;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.github.pnoker.common.model.User;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * UserExt DTO
+ * Mapper
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class UserExtDto extends UserExt {
-
-    private Pages page;
+@Mapper
+public interface UserMapper extends BaseMapper<User> {
 }

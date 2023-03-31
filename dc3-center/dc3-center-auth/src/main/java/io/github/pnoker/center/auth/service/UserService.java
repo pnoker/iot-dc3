@@ -16,35 +16,35 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.UserExtDto;
+import io.github.pnoker.center.auth.entity.query.UserDto;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.UserExt;
+import io.github.pnoker.common.model.User;
 
 /**
- * UserExt Interface
+ * User Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserExtService extends Service<UserExt, UserExtDto> {
+public interface UserService extends Service<User, UserDto> {
 
     /**
      * 根据用户名查询用户
      *
      * @param userName       用户名称
      * @param throwException Throw Exception
-     * @return UserExt
+     * @return User
      */
-    UserExt selectByUserName(String userName, boolean throwException);
+    User selectByUserName(String userName, boolean throwException);
 
     /**
      * 根据手机号查询用户
      *
      * @param phone          Phone
      * @param throwException Throw Exception
-     * @return UserExt
+     * @return User
      */
-    UserExt selectByPhone(String phone, boolean throwException);
+    User selectByPhone(String phone, boolean throwException);
 
     /**
      * 根据邮箱查询用户
@@ -53,5 +53,5 @@ public interface UserExtService extends Service<UserExt, UserExtDto> {
      * @param throwException Throw Exception
      * @return UserExt
      */
-    UserExt selectByEmail(String email, boolean throwException);
+    User selectByEmail(String email, boolean throwException);
 }
