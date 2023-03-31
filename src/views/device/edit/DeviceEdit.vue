@@ -73,14 +73,6 @@
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="结构化" prop="multiFlag" class="edit-form-large">
-                            <el-select v-model="reactiveData.deviceFormData.multiFlag" class="edit-form-large" placeholder="请选择结构化标识" clearable>
-                                <el-option label="单点" value="SINGLE"></el-option>
-                                <el-option label="多点" value="MULTIPLE"></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </div>
-                    <div class="edit-form-item">
                         <el-form-item label="使能" prop="enableFlag" class="edit-form-large">
                             <el-select v-model="reactiveData.deviceFormData.enableFlag" class="edit-form-large" placeholder="请选择使能" clearable>
                                 <el-option label="启用" value="ENABLE"></el-option>

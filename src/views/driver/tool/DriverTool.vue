@@ -28,16 +28,6 @@
                     <el-form-item prop="host" label="主机">
                         <el-input v-model="reactiveData.formData.serviceHost" class="edit-form-default" placeholder="请输入主机" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
-                    <el-form-item prop="port" label="端口">
-                        <el-input
-                            v-model.number="reactiveData.formData.servicePort"
-                            class="edit-form-small"
-                            placeholder="请输入端口"
-                            autocomplete="off"
-                            clearable
-                            @keyup.enter="search"
-                        ></el-input>
-                    </el-form-item>
                     <el-form-item label="使能" prop="enableFlag">
                         <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
                             <el-option label="启用" value="ENABLE"></el-option>

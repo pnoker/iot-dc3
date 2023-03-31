@@ -43,12 +43,6 @@
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <ul>
-                            <li class="nowrap-item" v-if="data.servicePort > 0">
-                                <el-icon>
-                                    <Connection />
-                                </el-icon>
-                                端口: {{ data.servicePort }}
-                            </li>
                             <li class="nowrap-item">
                                 <el-icon>
                                     <Monitor />
@@ -65,7 +59,7 @@
                                 <el-icon>
                                     <Edit />
                                 </el-icon>
-                                修改日期: {{ timestamp(data.updateTime) }}
+                                修改日期: {{ timestamp(data.operateTime) }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>

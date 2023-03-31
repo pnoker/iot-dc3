@@ -31,9 +31,7 @@ export default defineComponent({
 
         // 定义响应式数据
         const reactiveData = reactive({
-            formData: {
-                multiFlag: 'SINGLE',
-            } as any,
+            formData: {} as any,
             formVisible: false,
             driverQuery: '',
             driverDictionary: [] as Dictionary[],

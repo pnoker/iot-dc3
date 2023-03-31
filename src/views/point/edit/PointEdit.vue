@@ -57,15 +57,6 @@
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="累计标识" prop="accrueFlag" class="edit-form-large">
-                            <el-select v-model="reactiveData.pointFormData.accrueFlag" class="edit-form-large" placeholder="请选择累计标识" clearable>
-                                <el-option label="无规律" value="NONE"></el-option>
-                                <el-option label="递增" value="INCREMENT"></el-option>
-                                <el-option label="递减" value="DECREMENT"></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </div>
-                    <div class="edit-form-item">
                         <el-form-item label="使能" prop="enableFlag" class="edit-form-large">
                             <el-select v-model="reactiveData.pointFormData.enableFlag" class="edit-form-large" placeholder="请选择使能" clearable>
                                 <el-option label="启用" value="ENABLE"></el-option>
@@ -80,12 +71,7 @@
                     </div>
                     <div class="edit-form-item">
                         <el-form-item label="单位" prop="unit" class="edit-form-large">
-                            <el-select v-model="reactiveData.pointFormData.unit" class="edit-form-large" placeholder="请输入单位" clearable>
-                                <el-option label="无单位" value="NULL"></el-option>
-                                <el-option label="摄氏度" value="CENTIGRADE"></el-option>
-                                <el-option label="克" value="G"></el-option>
-                                <el-option label="千克" value="KG"></el-option>
-                            </el-select>
+                            <el-input v-model="reactiveData.pointFormData.unit" class="edit-form-large" placeholder="请输入单位" clearable> </el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">

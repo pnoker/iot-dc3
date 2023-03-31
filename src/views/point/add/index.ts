@@ -40,9 +40,8 @@ export default defineComponent({
                 rwFlag: 'R',
                 baseValue: 0,
                 multiple: 1,
-                accrueFlag: 'NONE',
                 valueDecimal: 3,
-                unit: 'NULL',
+                unit: '',
                 profileId: props.profileId,
             } as any,
             formVisible: false,
@@ -78,13 +77,6 @@ export default defineComponent({
                 {
                     required: true,
                     message: '请选择位号读写类型',
-                    trigger: 'change',
-                },
-            ],
-            accrueFlag: [
-                {
-                    required: true,
-                    message: '请选择位号是否为累计数据',
                     trigger: 'change',
                 },
             ],

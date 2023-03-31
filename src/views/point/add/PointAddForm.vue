@@ -47,23 +47,11 @@
                     <el-option label="读写" value="RW"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="累计标识" prop="accrueFlag">
-                <el-select v-model="reactiveData.formData.accrueFlag" placeholder="请选择累计标识" clearable>
-                    <el-option label="无规律" value="NONE"></el-option>
-                    <el-option label="递增" value="INCREMENT"></el-option>
-                    <el-option label="递减" value="DECREMENT"></el-option>
-                </el-select>
-            </el-form-item>
             <el-form-item class="things-dialog-form-item" label="数据精度" prop="valueDecimal">
                 <el-input v-model="reactiveData.formData.valueDecimal" placeholder="请输入数据精度" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="单位" prop="unit">
-                <el-select v-model="reactiveData.formData.unit" placeholder="请输入单位" clearable>
-                    <el-option label="无单位" value="NULL"></el-option>
-                    <el-option label="摄氏度" value="CENTIGRADE"></el-option>
-                    <el-option label="克" value="G"></el-option>
-                    <el-option label="千克" value="KG"></el-option>
-                </el-select>
+                <el-input v-model="reactiveData.formData.unit" placeholder="请输入单位" clearable> </el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="基值" prop="baseValue">
                 <el-input v-model="reactiveData.formData.baseValue" placeholder="请输入基值" clearable></el-input>

@@ -19,7 +19,7 @@ import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from '@
 
 import { TinyArea } from '@antv/g2plot'
 
-import { copyId, timestamp } from '@/utils/CommonUtils'
+import { copy, timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'PointValueCard',
@@ -100,7 +100,7 @@ export default defineComponent({
                 pointId: data.pointId,
                 value: data.value,
             }
-            copyId(JSON.stringify(content, null, 2), '位号值')
+            copy(JSON.stringify(content, null, 2), '位号值')
         }
 
         onMounted(() => {
@@ -121,7 +121,7 @@ export default defineComponent({
         return {
             reactiveData,
             showEdit,
-            copyId,
+            copyId: copy,
             copyValue,
             timestamp,
             ...Icon,

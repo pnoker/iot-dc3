@@ -19,7 +19,7 @@ import { computed, defineComponent } from 'vue'
 
 import router from '@/config/router'
 
-import { copyId, timestamp } from '@/utils/CommonUtils'
+import { copy, timestamp } from '@/utils/CommonUtils'
 import { successMessage } from '@/utils/NotificationUtils'
 
 export default defineComponent({
@@ -70,16 +70,6 @@ export default defineComponent({
             CircleClose,
         }
 
-        const multiFlag = computed(() => {
-            const multiFlag = props.data.multiFlag
-            if (multiFlag === 'SINGLE') {
-                return '单点'
-            } else if (multiFlag === 'MULTIPLE') {
-                return '多点'
-            }
-            return '未知'
-        })
-
         const disableThing = () => {
             emit('disable-thing', props.data.id, props.data.driverId, () => {
                 successMessage()
@@ -111,13 +101,12 @@ export default defineComponent({
         }
 
         return {
-            multiFlag,
             disableThing,
             enableThing,
             deleteThing,
             edit,
             detail,
-            copyId,
+            copyId: copy,
             timestamp,
             ...Icon,
         }

@@ -33,7 +33,7 @@ export default defineComponent({
                     defaultValue: '',
                     remark: '',
                     createTime: '',
-                    updateTime: '',
+                    operateTime: '',
                 }
             },
         },

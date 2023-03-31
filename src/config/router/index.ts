@@ -16,9 +16,20 @@
 
 import { createRouter, createWebHashHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
+import CommonConstant from '@/config/constant/common'
+import { logout } from '@/utils/CommonUtils'
+import { getStorage } from '@/utils/StorageUtils'
+import { isNull } from '@/utils/utils'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 import commonRouters from './common'
 import operateRouters from './operate'
 import viewsRouters from './views'
+
+NProgress.configure({
+    easing: 'ease',
+    showSpinner: false,
+})
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -26,12 +37,32 @@ const router = createRouter({
 })
 
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    NProgress.start()
+
+    if (to.path !== '/login') {
+        const tenant = getStorage(CommonConstant.TENANT_HEADER)
+        const user = getStorage(CommonConstant.USER_HEADER)
+        const token = getStorage(CommonConstant.TOKEN_HEADER)
+
+        if (isNull(tenant) || isNull(user) || isNull(token)) {
+            logout()
+        }
+    }
+
     const meta = to.meta || {}
     if (meta.title) {
         document.title = to.meta.title as string
     }
 
     next()
+})
+
+router.afterEach(() => {
+    NProgress.done()
+})
+
+router.onError(() => {
+    NProgress.remove()
 })
 
 export default router

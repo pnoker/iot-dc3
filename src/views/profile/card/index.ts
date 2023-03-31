@@ -20,7 +20,7 @@ import { CircleCheck, CircleClose, CollectionTag, Edit, IceCreamSquare, Right, S
 import router from '@/config/router'
 
 import { successMessage } from '@/utils/NotificationUtils'
-import { copyId, timestamp } from '@/utils/CommonUtils'
+import { copy, timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'ProfileCard',
@@ -92,7 +92,7 @@ export default defineComponent({
             deleteThing,
             edit,
             detail,
-            copyId,
+            copyId: copy,
             timestamp,
             ...Icon,
         }

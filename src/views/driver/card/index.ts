@@ -18,7 +18,7 @@ import { computed, defineComponent } from 'vue'
 import { CircleCheck, CircleClose, Connection, Edit, Monitor, Promotion, Sunset, SwitchButton } from '@element-plus/icons-vue'
 
 import router from '@/config/router'
-import { copyId, timestamp } from '@/utils/CommonUtils'
+import { copy, timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'DriverCard',
@@ -84,7 +84,7 @@ export default defineComponent({
             status,
             detail,
             select,
-            copyId,
+            copyId: copy,
             timestamp,
             ...Icon,
         }

@@ -20,7 +20,7 @@ import { Bottom, CircleCheck, CircleClose, Edit, List, Location, Sunset, SwitchB
 import router from '@/config/router'
 
 import { successMessage } from '@/utils/NotificationUtils'
-import { copyId, timestamp } from '@/utils/CommonUtils'
+import { copy, timestamp } from '@/utils/CommonUtils'
 
 export default defineComponent({
     name: 'PointCard',
@@ -47,7 +47,7 @@ export default defineComponent({
                     enable: '',
                     remark: '',
                     createTime: '',
-                    updateTime: '',
+                    operateTime: '',
                 }
             },
         },
@@ -93,18 +93,6 @@ export default defineComponent({
             return '未知'
         })
 
-        const accrueFlag = computed(() => {
-            const accrueFlag = props.data.accrueFlag
-            if (accrueFlag === 'NONE') {
-                return '无规律'
-            } else if (accrueFlag === 'INCREMENT') {
-                return '递增'
-            } else if (accrueFlag === 'DECREMENT') {
-                return '递减'
-            }
-            return '未知'
-        })
-
         const rwFlag = computed(() => {
             const rwFlag = props.data.rwFlag
             if (rwFlag === 'R') {
@@ -113,20 +101,6 @@ export default defineComponent({
                 return '只写'
             } else if (rwFlag === 'RW') {
                 return '读写'
-            }
-            return '未知'
-        })
-
-        const unit = computed(() => {
-            const unit = props.data.unit
-            if (unit === 'NULL') {
-                return '无单位'
-            } else if (unit === 'CENTIGRADE') {
-                return '摄氏度'
-            } else if (unit === 'G') {
-                return '克'
-            } else if (unit === 'KG') {
-                return '千克'
             }
             return '未知'
         })
@@ -163,15 +137,13 @@ export default defineComponent({
 
         return {
             pointTypeFlag,
-            accrueFlag,
             rwFlag,
-            unit,
             disableThing,
             enableThing,
             deleteThing,
             edit,
             detail,
-            copyId,
+            copyId: copy,
             timestamp,
             ...Icon,
         }

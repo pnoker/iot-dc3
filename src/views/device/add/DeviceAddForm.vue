@@ -80,12 +80,6 @@
                     <el-option v-for="dictionary in reactiveData.profileDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item class="things-dialog-form-item" label="结构化标识" prop="multiFlag">
-                <el-select v-model="reactiveData.formData.multiFlag" placeholder="请选择结构化标识" clearable>
-                    <el-option label="单点" value="SINGLE"></el-option>
-                    <el-option label="多点" value="MULTIPLE"></el-option>
-                </el-select>
-            </el-form-item>
             <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
                 <el-input v-model="reactiveData.formData.remark" placeholder="请输入设备描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
             </el-form-item>

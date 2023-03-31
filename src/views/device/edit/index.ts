@@ -125,13 +125,6 @@ export default defineComponent({
                     trigger: 'change',
                 },
             ],
-            multiFlag: [
-                {
-                    required: true,
-                    message: '请选择结构化标识',
-                    trigger: 'change',
-                },
-            ],
             enableFlag: [
                 {
                     required: true,

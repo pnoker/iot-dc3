@@ -50,12 +50,6 @@
                             <el-option v-for="dictionary in reactiveData.driverDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item prop="multiFlag" label="结构化标识">
-                        <el-select v-model="reactiveData.formData.multiFlag" class="edit-form-medium" placeholder="请选择结构化标识" clearable>
-                            <el-option label="单点" value="SINGLE"></el-option>
-                            <el-option label="多点" value="MULTIPLE"></el-option>
-                        </el-select>
-                    </el-form-item>
                     <el-form-item label="使能" prop="enableFlag">
                         <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
                             <el-option label="启用" value="ENABLE"></el-option>

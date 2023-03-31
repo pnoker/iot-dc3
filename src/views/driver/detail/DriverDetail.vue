@@ -35,12 +35,6 @@
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
-                                    <Connection />
-                                </el-icon>
-                                端口: {{ reactiveData.data.servicePort }}
-                            </li>
-                            <li class="nowrap-item">
-                                <el-icon>
                                     <Monitor />
                                 </el-icon>
                                 主机: {{ reactiveData.data.serviceHost }}
@@ -61,7 +55,7 @@
                                 <el-icon>
                                     <Sunset />
                                 </el-icon>
-                                创建日期: {{ timestamp(reactiveData.data.updateTime) }}
+                                创建日期: {{ timestamp(reactiveData.data.operateTime) }}
                             </li>
                         </ul>
                     </detail-card>

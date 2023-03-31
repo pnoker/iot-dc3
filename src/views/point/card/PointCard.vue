@@ -43,13 +43,8 @@
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 累计标识: </span
-                                >{{ accrueFlag }}
-                            </li>
-                            <li class="nowrap-item">
-                                <span
-                                    ><el-icon><Location /></el-icon> 基值: </span
-                                >{{ data.baseValue }}
+                                    ><el-icon><Location /></el-icon> 倍数: </span
+                                >{{ data.multiple }}
                             </li>
                             <li class="nowrap-item">
                                 <span
@@ -58,8 +53,13 @@
                             </li>
                             <li class="nowrap-item">
                                 <span
+                                    ><el-icon><Location /></el-icon> 读写类型: </span
+                                >{{ rwFlag }}
+                            </li>
+                            <li class="nowrap-item">
+                                <span
                                     ><el-icon><Edit /></el-icon> 修改日期: </span
-                                >{{ timestamp(data.updateTime) }}
+                                >{{ timestamp(data.operateTime) }}
                             </li>
                         </ul>
                         <ul class="things-body-content-item-column-2">
@@ -70,18 +70,18 @@
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 读写类型: </span
-                                >{{ rwFlag }}
-                            </li>
-                            <li class="nowrap-item">
-                                <span
-                                    ><el-icon><Location /></el-icon> 倍数: </span
-                                >{{ data.multiple }}
+                                    ><el-icon><Location /></el-icon> 基值: </span
+                                >{{ data.baseValue }}
                             </li>
                             <li class="nowrap-item">
                                 <span
                                     ><el-icon><Location /></el-icon> 单位: </span
-                                >{{ unit }}
+                                >{{ data.unit }}
+                            </li>
+                            <li class="nowrap-item">
+                                <span
+                                    ><el-icon><Location /></el-icon> 读写类型: </span
+                                >{{ rwFlag }}
                             </li>
                             <li class="nowrap-item">
                                 <span

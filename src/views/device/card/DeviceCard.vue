@@ -50,15 +50,9 @@
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
-                                    <Coin />
-                                </el-icon>
-                                结构化标识: {{ multiFlag }}
-                            </li>
-                            <li class="nowrap-item">
-                                <el-icon>
                                     <Edit />
                                 </el-icon>
-                                修改日期: {{ timestamp(data.updateTime) }}
+                                修改日期: {{ timestamp(data.operateTime) }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon>
