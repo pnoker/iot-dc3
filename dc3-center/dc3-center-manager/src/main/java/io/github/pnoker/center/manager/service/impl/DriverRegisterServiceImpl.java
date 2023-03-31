@@ -63,11 +63,11 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     @Resource
     private DriverAttributeService driverAttributeService;
     @Resource
-    private DriverInfoService driverInfoService;
+    private DriverAttributeConfigService driverAttributeConfigService;
     @Resource
     private PointAttributeService pointAttributeService;
     @Resource
-    private PointInfoService pointInfoService;
+    private PointAttributeConfigService pointAttributeConfigService;
 
     @Resource
     private RabbitTemplate rabbitTemplate;
@@ -162,7 +162,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             String name = entry.getKey();
             if (!newDriverAttributeMap.containsKey(name)) {
                 try {
-                    driverInfoService.selectByAttributeId(oldDriverAttributeMap.get(name).getId());
+                    driverAttributeConfigService.selectByAttributeId(oldDriverAttributeMap.get(name).getId());
                     throw new ServiceException("The driver attribute(" + name + ") used by driver attribute config and cannot be deleted");
                 } catch (NotFoundException notFoundException) {
                     log.debug("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
@@ -210,7 +210,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             String name = entry.getKey();
             if (!newPointAttributeMap.containsKey(name)) {
                 try {
-                    pointInfoService.selectByAttributeId(oldPointAttributeMap.get(name).getId());
+                    pointAttributeConfigService.selectByAttributeId(oldPointAttributeMap.get(name).getId());
                     throw new ServiceException("The point attribute(" + name + ") used by point attribute config and cannot be deleted");
                 } catch (NotFoundException notFoundException1) {
                     log.debug("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));

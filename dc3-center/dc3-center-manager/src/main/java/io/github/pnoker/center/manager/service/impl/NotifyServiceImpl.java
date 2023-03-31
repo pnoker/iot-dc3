@@ -113,7 +113,7 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             Driver driver = driverService.selectByDeviceId(driverAttributeConfig.getDeviceId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
-                    MetadataTypeEnum.DRIVER_INFO,
+                    MetadataTypeEnum.DRIVER_ATTRIBUTE_CONFIG,
                     command,
                     JsonUtil.toJsonString(driverAttributeConfig)
             );
@@ -131,7 +131,7 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             Driver driver = driverService.selectByDeviceId(pointAttributeConfig.getDeviceId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
-                    MetadataTypeEnum.POINT_INFO,
+                    MetadataTypeEnum.POINT_ATTRIBUTE_CONFIG,
                     command,
                     JsonUtil.toJsonString(pointAttributeConfig)
             );

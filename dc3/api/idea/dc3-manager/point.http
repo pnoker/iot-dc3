@@ -162,7 +162,7 @@ Cache-Control: no-cache
 
 ### --------------------- Point Attribute Config ---------------------
 ### 新增 PointInfo
-POST http://{{dc3-manager}}/manager/point_info/add
+POST http://{{dc3-manager}}/manager/point_attribute_config/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -177,7 +177,7 @@ Cache-Control: no-cache
 
 
 ### 修改 PointInfo
-POST http://{{dc3-manager}}/manager/point_info/update
+POST http://{{dc3-manager}}/manager/point_attribute_config/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -193,14 +193,14 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 PointInfo
-GET http://{{dc3-manager}}/manager/point_info/id/1
+GET http://{{dc3-manager}}/manager/point_attribute_config/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 PointInfo
-POST http://{{dc3-manager}}/manager/point_info/list
+POST http://{{dc3-manager}}/manager/point_attribute_config/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -219,7 +219,7 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 PointInfo
-POST http://{{dc3-manager}}/manager/point_info/delete/1
+POST http://{{dc3-manager}}/manager/point_attribute_config/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

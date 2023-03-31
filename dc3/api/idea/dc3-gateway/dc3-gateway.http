@@ -250,7 +250,7 @@ Cache-Control: no-cache
 
 ### --------------------- Gateway Driver Attribute Config ---------------------
 ### 新增 DriverInfo
-POST http://{{dc3-gateway}}/api/v3/manager/driver_info/add
+POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -264,7 +264,7 @@ Cache-Control: no-cache
 
 
 ### 修改 DriverInfo
-POST http://{{dc3-gateway}}/api/v3/manager/driver_info/update
+POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -279,14 +279,14 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 DriverInfo
-GET http://{{dc3-gateway}}/api/v3/manager/driver_info/id/1
+GET http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 DriverInfo
-POST http://{{dc3-gateway}}/api/v3/manager/driver_info/list
+POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -305,7 +305,7 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 DriverInfo
-POST http://{{dc3-gateway}}/api/v3/manager/driver_info/delete/1
+POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

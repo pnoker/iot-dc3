@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverInfoService extends Service<DriverAttributeConfig, DriverAttributeConfigPageQuery> {
+public interface DriverAttributeConfigService extends Service<DriverAttributeConfig, DriverAttributeConfigPageQuery> {
 
     /**
      * 根据驱动属性配置 ID 和 设备 ID 查询

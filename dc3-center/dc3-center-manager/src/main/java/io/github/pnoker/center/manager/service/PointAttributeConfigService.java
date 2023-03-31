@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointInfoService extends Service<PointAttributeConfig, PointAttributeConfigPageQuery> {
+public interface PointAttributeConfigService extends Service<PointAttributeConfig, PointAttributeConfigPageQuery> {
 
     /**
      * 根据位号配置信息 ID 、 设备 ID 、 位号 ID 查询
