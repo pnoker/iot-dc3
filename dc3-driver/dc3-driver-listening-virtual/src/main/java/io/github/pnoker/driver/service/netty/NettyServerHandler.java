@@ -23,7 +23,7 @@ import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.driver.sdk.DriverContext;
-import io.github.pnoker.driver.sdk.service.DriverService;
+import io.github.pnoker.driver.sdk.service.DriverSenderService;
 import io.github.pnoker.driver.sdk.utils.ConvertUtil;
 import io.github.pnoker.driver.sdk.utils.DriverUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
@@ -47,7 +47,7 @@ import java.util.Map;
 public class NettyServerHandler {
 
     @Resource
-    private DriverService driverService;
+    private DriverSenderService driverSenderService;
     @Resource
     private DriverContext driverContext;
 
@@ -120,6 +120,6 @@ public class NettyServerHandler {
                 }
             }
         }
-        driverService.pointValueSender(pointValues);
+        driverSenderService.pointValueSender(pointValues);
     }
 }

@@ -23,11 +23,9 @@ import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.dto.DriverMetadataDTO;
 import io.github.pnoker.common.dto.DriverRegisterDTO;
+import io.github.pnoker.common.dto.DriverSyncDTO;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Driver;
@@ -86,16 +84,12 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             registerPointAttribute(entityDTO, driver);
             DriverMetadata driverMetadata = batchService.batchDriverMetadata(driver.getServiceName(), driver.getTenantId());
 
-            DriverMetadataDTO driverConfiguration = new DriverMetadataDTO(
-                    MetadataTypeEnum.METADATA,
-                    MetadataCommandTypeEnum.SYNC,
-                    JsonUtil.toJsonString(driverMetadata)
-            );
+            DriverSyncDTO driverSyncDTO = new DriverSyncDTO(JsonUtil.toJsonString(driverMetadata));
 
             rabbitTemplate.convertAndSend(
                     RabbitConstant.TOPIC_EXCHANGE_SYNC,
                     RabbitConstant.ROUTING_DRIVER_SYNC_PREFIX + entityDTO.getClient(),
-                    driverConfiguration
+                    driverSyncDTO
             );
         } catch (Exception e) {
             log.error(e.getMessage(), e);

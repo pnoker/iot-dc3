@@ -24,7 +24,7 @@ import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.driver.sdk.DriverContext;
 import io.github.pnoker.driver.sdk.service.DriverCustomService;
-import io.github.pnoker.driver.sdk.service.DriverService;
+import io.github.pnoker.driver.sdk.service.DriverSenderService;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
@@ -53,7 +53,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverContext driverContext;
     @Resource
-    private DriverService driverService;
+    private DriverSenderService driverSenderService;
     @Resource
     private NettyTcpServer nettyTcpServer;
     @Resource
@@ -87,7 +87,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MAINTAIN:维护
         FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, DriverStatusEnum.ONLINE));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DriverStatusEnum.ONLINE));
     }
 
     @Override
