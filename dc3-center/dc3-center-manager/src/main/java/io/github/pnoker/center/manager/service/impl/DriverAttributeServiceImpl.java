@@ -79,7 +79,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     public DriverAttribute update(DriverAttribute driverAttribute) {
         selectById(driverAttribute.getId());
-        driverAttribute.setUpdateTime(null);
+        driverAttribute.setOperateTime(null);
         if (driverAttributeMapper.updateById(driverAttribute) > 0) {
             DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
             driverAttribute.setAttributeName(select.getAttributeName());

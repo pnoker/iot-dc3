@@ -102,7 +102,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Override
     public ProfileBind update(ProfileBind profileBind) {
         selectById(profileBind.getId());
-        profileBind.setUpdateTime(null);
+        profileBind.setOperateTime(null);
         if (profileBindMapper.updateById(profileBind) > 0) {
             return profileBindMapper.selectById(profileBind.getId());
         }

@@ -63,7 +63,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     @Override
     public TenantBind update(TenantBind tenantBind) {
         selectById(tenantBind.getId());
-        tenantBind.setUpdateTime(null);
+        tenantBind.setOperateTime(null);
         if (tenantBindMapper.updateById(tenantBind) > 0) {
             return tenantBindMapper.selectById(tenantBind.getId());
         }

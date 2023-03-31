@@ -91,7 +91,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver update(Driver driver) {
         selectById(driver.getId());
-        driver.setUpdateTime(null);
+        driver.setOperateTime(null);
         if (driverMapper.updateById(driver) > 0) {
             Driver select = driverMapper.selectById(driver.getId());
             driver.setServiceName(select.getServiceName());

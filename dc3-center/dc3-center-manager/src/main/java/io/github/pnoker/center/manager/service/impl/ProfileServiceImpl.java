@@ -88,7 +88,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public Profile update(Profile profile) {
         selectById(profile.getId());
-        profile.setUpdateTime(null);
+        profile.setOperateTime(null);
         if (profileMapper.updateById(profile) > 0) {
             return profileMapper.selectById(profile.getId());
         }

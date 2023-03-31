@@ -86,7 +86,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Override
     public PointInfo update(PointInfo pointInfo) {
         PointInfo old = selectById(pointInfo.getId());
-        pointInfo.setUpdateTime(null);
+        pointInfo.setOperateTime(null);
         if (!old.getPointAttributeId().equals(pointInfo.getPointAttributeId()) || !old.getDeviceId().equals(pointInfo.getDeviceId()) || !old.getPointId().equals(pointInfo.getPointId())) {
             try {
                 selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());

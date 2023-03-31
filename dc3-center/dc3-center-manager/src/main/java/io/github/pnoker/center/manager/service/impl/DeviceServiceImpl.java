@@ -26,7 +26,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -116,7 +115,7 @@ public class DeviceServiceImpl implements DeviceService {
         addProfileBind(device.getId(), add);
         delete.forEach(profileId -> profileBindService.deleteByDeviceIdAndProfileId(device.getId(), profileId));
 
-        device.setUpdateTime(null);
+        device.setOperateTime(null);
         if (deviceMapper.updateById(device) > 0) {
             Device select = deviceMapper.selectById(device.getId());
             select.setProfileIds(newProfileIds);

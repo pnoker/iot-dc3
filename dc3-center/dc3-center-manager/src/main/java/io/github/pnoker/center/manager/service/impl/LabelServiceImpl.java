@@ -88,7 +88,7 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public Label update(Label label) {
         selectById(label.getId());
-        label.setUpdateTime(null);
+        label.setOperateTime(null);
         if (labelMapper.updateById(label) > 0) {
             Label select = labelMapper.selectById(label.getId());
             label.setLabelName(select.getLabelName());

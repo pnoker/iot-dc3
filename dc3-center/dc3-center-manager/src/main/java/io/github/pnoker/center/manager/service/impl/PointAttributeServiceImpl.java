@@ -79,7 +79,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     public PointAttribute update(PointAttribute pointAttribute) {
         selectById(pointAttribute.getId());
-        pointAttribute.setUpdateTime(null);
+        pointAttribute.setOperateTime(null);
         if (pointAttributeMapper.updateById(pointAttribute) > 0) {
             PointAttribute select = pointAttributeMapper.selectById(pointAttribute.getId());
             pointAttribute.setAttributeName(select.getAttributeName());

@@ -72,7 +72,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public Tenant update(Tenant tenant) {
         tenant.setTenantName(null);
-        tenant.setUpdateTime(null);
+        tenant.setOperateTime(null);
         if (tenantMapper.updateById(tenant) > 0) {
             Tenant select = tenantMapper.selectById(tenant.getId());
             tenant.setTenantName(select.getTenantName());

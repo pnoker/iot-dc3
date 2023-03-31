@@ -119,7 +119,7 @@ public class UserExtServiceImpl implements UserExtService {
         }
 
         userExt.setUserName(null);
-        userExt.setUpdateTime(null);
+        userExt.setOperateTime(null);
         if (userExtMapper.updateById(userExt) > 0) {
             UserExt select = userExtMapper.selectById(userExt.getId());
             userExt.setUserName(select.getUserName());

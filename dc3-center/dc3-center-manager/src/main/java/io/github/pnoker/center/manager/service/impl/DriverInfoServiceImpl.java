@@ -78,7 +78,7 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     @Override
     public DriverInfo update(DriverInfo driverInfo) {
         DriverInfo oldDriverInfo = selectById(driverInfo.getId());
-        driverInfo.setUpdateTime(null);
+        driverInfo.setOperateTime(null);
         if (!oldDriverInfo.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) || !oldDriverInfo.getDeviceId().equals(driverInfo.getDeviceId())) {
             try {
                 selectByDeviceIdAndAttributeId(driverInfo.getDeviceId(), driverInfo.getDriverAttributeId());
