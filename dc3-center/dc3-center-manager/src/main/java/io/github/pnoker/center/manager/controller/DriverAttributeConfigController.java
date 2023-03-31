@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
-import io.github.pnoker.center.manager.service.DriverInfoService;
+import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -36,18 +36,18 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * 位号配置信息 Controller
+ * 驱动属性配置信息 Controller
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.DRIVER_INFO_URL_PREFIX)
-public class DriverInfoController {
+@RequestMapping(ManagerServiceConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
+public class DriverAttributeConfigController {
 
     @Resource
-    private DriverInfoService driverInfoService;
+    private DriverAttributeConfigService driverAttributeConfigService;
 
     @Resource
     private NotifyService notifyService;
@@ -61,7 +61,7 @@ public class DriverInfoController {
     @PostMapping("/add")
     public R<DriverAttributeConfig> add(@Validated(Insert.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
         try {
-            DriverAttributeConfig add = driverInfoService.add(driverAttributeConfig);
+            DriverAttributeConfig add = driverAttributeConfigService.add(driverAttributeConfig);
             if (ObjectUtil.isNotNull(add)) {
                 notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.ADD, add);
                 return R.ok(add);
@@ -81,8 +81,8 @@ public class DriverInfoController {
     @PostMapping("/delete/{id}")
     public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttributeConfig driverAttributeConfig = driverInfoService.selectById(id);
-            if (ObjectUtil.isNotNull(driverAttributeConfig) && driverInfoService.delete(id)) {
+            DriverAttributeConfig driverAttributeConfig = driverAttributeConfigService.selectById(id);
+            if (ObjectUtil.isNotNull(driverAttributeConfig) && driverAttributeConfigService.delete(id)) {
                 notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);
                 return R.ok();
             }
@@ -101,7 +101,7 @@ public class DriverInfoController {
     @PostMapping("/update")
     public R<DriverAttributeConfig> update(@Validated(Update.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
         try {
-            DriverAttributeConfig update = driverInfoService.update(driverAttributeConfig);
+            DriverAttributeConfig update = driverAttributeConfigService.update(driverAttributeConfig);
             if (ObjectUtil.isNotNull(update)) {
                 notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.UPDATE, update);
                 return R.ok(update);
@@ -121,7 +121,7 @@ public class DriverInfoController {
     @GetMapping("/id/{id}")
     public R<DriverAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttributeConfig select = driverInfoService.selectById(id);
+            DriverAttributeConfig select = driverAttributeConfigService.selectById(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -142,7 +142,7 @@ public class DriverInfoController {
     public R<DriverAttributeConfig> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
                                                                    @NotNull @PathVariable(value = "attributeId") String attributeId) {
         try {
-            DriverAttributeConfig select = driverInfoService.selectByDeviceIdAndAttributeId(deviceId, attributeId);
+            DriverAttributeConfig select = driverAttributeConfigService.selectByDeviceIdAndAttributeId(deviceId, attributeId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -161,7 +161,7 @@ public class DriverInfoController {
     @GetMapping("/device_id/{deviceId}")
     public R<List<DriverAttributeConfig>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
         try {
-            List<DriverAttributeConfig> select = driverInfoService.selectByDeviceId(deviceId);
+            List<DriverAttributeConfig> select = driverAttributeConfigService.selectByDeviceId(deviceId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -183,7 +183,7 @@ public class DriverInfoController {
             if (ObjectUtil.isEmpty(driverInfoPageQuery)) {
                 driverInfoPageQuery = new DriverAttributeConfigPageQuery();
             }
-            Page<DriverAttributeConfig> page = driverInfoService.list(driverInfoPageQuery);
+            Page<DriverAttributeConfig> page = driverAttributeConfigService.list(driverInfoPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

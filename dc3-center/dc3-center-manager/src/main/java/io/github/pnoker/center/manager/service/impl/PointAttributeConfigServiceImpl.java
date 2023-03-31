@@ -22,8 +22,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
-import io.github.pnoker.center.manager.mapper.PointInfoMapper;
-import io.github.pnoker.center.manager.service.PointInfoService;
+import io.github.pnoker.center.manager.mapper.PointAttributeConfigMapper;
+import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -47,10 +47,10 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class PointInfoServiceImpl implements PointInfoService {
+public class PointAttributeConfigServiceImpl implements PointAttributeConfigService {
 
     @Resource
-    private PointInfoMapper pointInfoMapper;
+    private PointAttributeConfigMapper pointAttributeConfigMapper;
 
     @Resource
     private PointService pointService;
@@ -64,8 +64,8 @@ public class PointInfoServiceImpl implements PointInfoService {
             selectByAttributeIdAndDeviceIdAndPointId(pointAttributeConfig.getPointAttributeId(), pointAttributeConfig.getDeviceId(), pointAttributeConfig.getPointId());
             throw new DuplicateException("The point attribute config already exists");
         } catch (NotFoundException notFoundException) {
-            if (pointInfoMapper.insert(pointAttributeConfig) > 0) {
-                return pointInfoMapper.selectById(pointAttributeConfig.getId());
+            if (pointAttributeConfigMapper.insert(pointAttributeConfig) > 0) {
+                return pointAttributeConfigMapper.selectById(pointAttributeConfig.getId());
             }
             throw new ServiceException("The point attribute config add failed");
         }
@@ -77,7 +77,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     @Override
     public Boolean delete(String id) {
         selectById(id);
-        return pointInfoMapper.deleteById(id) > 0;
+        return pointAttributeConfigMapper.deleteById(id) > 0;
     }
 
     /**
@@ -95,8 +95,8 @@ public class PointInfoServiceImpl implements PointInfoService {
                 // nothing to do
             }
         }
-        if (pointInfoMapper.updateById(pointAttributeConfig) > 0) {
-            PointAttributeConfig select = pointInfoMapper.selectById(pointAttributeConfig.getId());
+        if (pointAttributeConfigMapper.updateById(pointAttributeConfig) > 0) {
+            PointAttributeConfig select = pointAttributeConfigMapper.selectById(pointAttributeConfig.getId());
             pointAttributeConfig.setPointAttributeId(select.getPointAttributeId());
             pointAttributeConfig.setDeviceId(select.getDeviceId());
             pointAttributeConfig.setPointId(select.getPointId());
@@ -110,7 +110,7 @@ public class PointInfoServiceImpl implements PointInfoService {
      */
     @Override
     public PointAttributeConfig selectById(String id) {
-        PointAttributeConfig pointAttributeConfig = pointInfoMapper.selectById(id);
+        PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectById(id);
         if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException();
         }
@@ -127,7 +127,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
         queryWrapper.eq(PointAttributeConfig::getPointId, pointId);
         queryWrapper.last("limit 1");
-        PointAttributeConfig pointAttributeConfig = pointInfoMapper.selectOne(queryWrapper);
+        PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectOne(queryWrapper);
         if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException();
         }
@@ -141,7 +141,7 @@ public class PointInfoServiceImpl implements PointInfoService {
     public List<PointAttributeConfig> selectByAttributeId(String pointAttributeId) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         queryWrapper.eq(PointAttributeConfig::getPointAttributeId, pointAttributeId);
-        List<PointAttributeConfig> pointAttributeConfigs = pointInfoMapper.selectList(queryWrapper);
+        List<PointAttributeConfig> pointAttributeConfigs = pointAttributeConfigMapper.selectList(queryWrapper);
         if (ObjectUtil.isNull(pointAttributeConfigs) || pointAttributeConfigs.isEmpty()) {
             throw new NotFoundException();
         }
@@ -158,7 +158,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         Set<String> pointIds = points.stream().map(Point::getId).collect(Collectors.toSet());
         queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
         queryWrapper.in(PointAttributeConfig::getPointId, pointIds);
-        List<PointAttributeConfig> pointAttributeConfigs = pointInfoMapper.selectList(queryWrapper);
+        List<PointAttributeConfig> pointAttributeConfigs = pointAttributeConfigMapper.selectList(queryWrapper);
         if (ObjectUtil.isNull(pointAttributeConfigs)) {
             throw new NotFoundException();
         }
@@ -173,7 +173,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
         queryWrapper.eq(PointAttributeConfig::getPointId, pointId);
-        List<PointAttributeConfig> pointAttributeConfigs = pointInfoMapper.selectList(queryWrapper);
+        List<PointAttributeConfig> pointAttributeConfigs = pointAttributeConfigMapper.selectList(queryWrapper);
         if (ObjectUtil.isNull(pointAttributeConfigs)) {
             throw new NotFoundException();
         }
@@ -188,7 +188,7 @@ public class PointInfoServiceImpl implements PointInfoService {
         if (ObjectUtil.isNull(pointInfoPageQuery.getPage())) {
             pointInfoPageQuery.setPage(new Pages());
         }
-        return pointInfoMapper.selectPage(pointInfoPageQuery.getPage().convert(), fuzzyQuery(pointInfoPageQuery));
+        return pointAttributeConfigMapper.selectPage(pointInfoPageQuery.getPage().convert(), fuzzyQuery(pointInfoPageQuery));
     }
 
     /**
