@@ -22,14 +22,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DriverInfoPageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.mapper.DriverInfoMapper;
 import io.github.pnoker.center.manager.service.DriverInfoService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.DriverInfo;
+import io.github.pnoker.common.model.DriverAttributeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -51,15 +51,15 @@ public class DriverInfoServiceImpl implements DriverInfoService {
     private DriverInfoMapper driverInfoMapper;
 
     @Override
-    public DriverInfo add(DriverInfo driverInfo) {
+    public DriverAttributeConfig add(DriverAttributeConfig driverAttributeConfig) {
         try {
-            selectByDeviceIdAndAttributeId(driverInfo.getDeviceId(), driverInfo.getDriverAttributeId());
-            throw new ServiceException("The driver info already exists in the device");
+            selectByDeviceIdAndAttributeId(driverAttributeConfig.getDeviceId(), driverAttributeConfig.getDriverAttributeId());
+            throw new ServiceException("The driver attribute config already exists in the device");
         } catch (NotFoundException notFoundException) {
-            if (driverInfoMapper.insert(driverInfo) > 0) {
-                return driverInfoMapper.selectById(driverInfo.getId());
+            if (driverInfoMapper.insert(driverAttributeConfig) > 0) {
+                return driverInfoMapper.selectById(driverAttributeConfig.getId());
             }
-            throw new ServiceException("The driver info add failed");
+            throw new ServiceException("The driver attribute config add failed");
         }
     }
 
@@ -76,88 +76,88 @@ public class DriverInfoServiceImpl implements DriverInfoService {
      * {@inheritDoc}
      */
     @Override
-    public DriverInfo update(DriverInfo driverInfo) {
-        DriverInfo oldDriverInfo = selectById(driverInfo.getId());
-        driverInfo.setOperateTime(null);
-        if (!oldDriverInfo.getDriverAttributeId().equals(driverInfo.getDriverAttributeId()) || !oldDriverInfo.getDeviceId().equals(driverInfo.getDeviceId())) {
+    public DriverAttributeConfig update(DriverAttributeConfig driverAttributeConfig) {
+        DriverAttributeConfig oldDriverAttributeConfig = selectById(driverAttributeConfig.getId());
+        driverAttributeConfig.setOperateTime(null);
+        if (!oldDriverAttributeConfig.getDriverAttributeId().equals(driverAttributeConfig.getDriverAttributeId()) || !oldDriverAttributeConfig.getDeviceId().equals(driverAttributeConfig.getDeviceId())) {
             try {
-                selectByDeviceIdAndAttributeId(driverInfo.getDeviceId(), driverInfo.getDriverAttributeId());
-                throw new DuplicateException("The driver info already exists");
+                selectByDeviceIdAndAttributeId(driverAttributeConfig.getDeviceId(), driverAttributeConfig.getDriverAttributeId());
+                throw new DuplicateException("The driver attribute config already exists");
             } catch (NotFoundException ignored) {
                 // nothing to do
             }
         }
-        if (driverInfoMapper.updateById(driverInfo) > 0) {
-            DriverInfo select = driverInfoMapper.selectById(driverInfo.getId());
-            driverInfo.setDriverAttributeId(select.getDriverAttributeId());
-            driverInfo.setDeviceId(select.getDeviceId());
+        if (driverInfoMapper.updateById(driverAttributeConfig) > 0) {
+            DriverAttributeConfig select = driverInfoMapper.selectById(driverAttributeConfig.getId());
+            driverAttributeConfig.setDriverAttributeId(select.getDriverAttributeId());
+            driverAttributeConfig.setDeviceId(select.getDeviceId());
             return select;
         }
-        throw new ServiceException("The driver info update failed");
+        throw new ServiceException("The driver attribute config update failed");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DriverInfo selectById(String id) {
-        DriverInfo driverInfo = driverInfoMapper.selectById(id);
-        if (ObjectUtil.isNull(driverInfo)) {
+    public DriverAttributeConfig selectById(String id) {
+        DriverAttributeConfig driverAttributeConfig = driverInfoMapper.selectById(id);
+        if (ObjectUtil.isNull(driverAttributeConfig)) {
             throw new NotFoundException();
         }
-        return driverInfo;
+        return driverAttributeConfig;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DriverInfo selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId) {
-        DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
+    public DriverAttributeConfig selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId) {
+        DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
         driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
         driverInfoPageQuery.setDeviceId(deviceId);
-        LambdaQueryWrapper<DriverInfo> queryWrapper = fuzzyQuery(driverInfoPageQuery);
+        LambdaQueryWrapper<DriverAttributeConfig> queryWrapper = fuzzyQuery(driverInfoPageQuery);
         queryWrapper.last("limit 1");
-        DriverInfo driverInfo = driverInfoMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(driverInfo)) {
+        DriverAttributeConfig driverAttributeConfig = driverInfoMapper.selectOne(queryWrapper);
+        if (ObjectUtil.isNull(driverAttributeConfig)) {
             throw new NotFoundException();
         }
-        return driverInfo;
+        return driverAttributeConfig;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<DriverInfo> selectByAttributeId(String driverAttributeId) {
-        DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
+    public List<DriverAttributeConfig> selectByAttributeId(String driverAttributeId) {
+        DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
         driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
-        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
-        if (ObjectUtil.isNull(driverInfos) || driverInfos.isEmpty()) {
+        List<DriverAttributeConfig> driverAttributeConfigs = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
+        if (ObjectUtil.isNull(driverAttributeConfigs) || driverAttributeConfigs.isEmpty()) {
             throw new NotFoundException();
         }
-        return driverInfos;
+        return driverAttributeConfigs;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<DriverInfo> selectByDeviceId(String deviceId) {
-        DriverInfoPageQuery driverInfoPageQuery = new DriverInfoPageQuery();
+    public List<DriverAttributeConfig> selectByDeviceId(String deviceId) {
+        DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
         driverInfoPageQuery.setDeviceId(deviceId);
-        List<DriverInfo> driverInfos = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
-        if (CollUtil.isEmpty(driverInfos)) {
+        List<DriverAttributeConfig> driverAttributeConfigs = driverInfoMapper.selectList(fuzzyQuery(driverInfoPageQuery));
+        if (CollUtil.isEmpty(driverAttributeConfigs)) {
             return Collections.emptyList();
         }
-        return driverInfos;
+        return driverAttributeConfigs;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverInfo> list(DriverInfoPageQuery driverInfoPageQuery) {
+    public Page<DriverAttributeConfig> list(DriverAttributeConfigPageQuery driverInfoPageQuery) {
         if (ObjectUtil.isNull(driverInfoPageQuery.getPage())) {
             driverInfoPageQuery.setPage(new Pages());
         }
@@ -168,11 +168,11 @@ public class DriverInfoServiceImpl implements DriverInfoService {
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<DriverInfo> fuzzyQuery(DriverInfoPageQuery driverInfoPageQuery) {
-        LambdaQueryWrapper<DriverInfo> queryWrapper = Wrappers.<DriverInfo>query().lambda();
+    public LambdaQueryWrapper<DriverAttributeConfig> fuzzyQuery(DriverAttributeConfigPageQuery driverInfoPageQuery) {
+        LambdaQueryWrapper<DriverAttributeConfig> queryWrapper = Wrappers.<DriverAttributeConfig>query().lambda();
         if (ObjectUtil.isNotNull(driverInfoPageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoPageQuery.getDriverAttributeId()), DriverInfo::getDriverAttributeId, driverInfoPageQuery.getDriverAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoPageQuery.getDeviceId()), DriverInfo::getDeviceId, driverInfoPageQuery.getDeviceId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoPageQuery.getDriverAttributeId()), DriverAttributeConfig::getDriverAttributeId, driverInfoPageQuery.getDriverAttributeId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverInfoPageQuery.getDeviceId()), DriverAttributeConfig::getDeviceId, driverInfoPageQuery.getDeviceId());
         }
         return queryWrapper;
     }

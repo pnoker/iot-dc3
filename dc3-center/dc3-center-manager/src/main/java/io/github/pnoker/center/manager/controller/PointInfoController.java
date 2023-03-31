@@ -18,14 +18,13 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointInfoPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointInfoService;
-import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.model.PointAttributeConfig;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -56,13 +55,13 @@ public class PointInfoController {
     /**
      * 新增 PointInfo
      *
-     * @param pointInfo PointInfo
+     * @param pointAttributeConfig PointInfo
      * @return PointInfo
      */
     @PostMapping("/add")
-    public R<PointInfo> add(@Validated(Insert.class) @RequestBody PointInfo pointInfo) {
+    public R<PointAttributeConfig> add(@Validated(Insert.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
         try {
-            PointInfo add = pointInfoService.add(pointInfo);
+            PointAttributeConfig add = pointInfoService.add(pointAttributeConfig);
             if (ObjectUtil.isNotNull(add)) {
                 notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, add);
                 return R.ok(add);
@@ -82,9 +81,9 @@ public class PointInfoController {
     @PostMapping("/delete/{id}")
     public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointInfo pointInfo = pointInfoService.selectById(id);
-            if (ObjectUtil.isNotNull(pointInfo) && pointInfoService.delete(id)) {
-                notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointInfo);
+            PointAttributeConfig pointAttributeConfig = pointInfoService.selectById(id);
+            if (ObjectUtil.isNotNull(pointAttributeConfig) && pointInfoService.delete(id)) {
+                notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfig);
                 return R.ok();
             }
         } catch (Exception e) {
@@ -96,13 +95,13 @@ public class PointInfoController {
     /**
      * 修改 PointInfo
      *
-     * @param pointInfo PointInfo
+     * @param pointAttributeConfig PointInfo
      * @return PointInfo
      */
     @PostMapping("/update")
-    public R<PointInfo> update(@Validated(Update.class) @RequestBody PointInfo pointInfo) {
+    public R<PointAttributeConfig> update(@Validated(Update.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
         try {
-            PointInfo update = pointInfoService.update(pointInfo);
+            PointAttributeConfig update = pointInfoService.update(pointAttributeConfig);
             if (ObjectUtil.isNotNull(update)) {
                 notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, update);
                 return R.ok(update);
@@ -120,9 +119,9 @@ public class PointInfoController {
      * @return PointInfo
      */
     @GetMapping("/id/{id}")
-    public R<PointInfo> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointInfo select = pointInfoService.selectById(id);
+            PointAttributeConfig select = pointInfoService.selectById(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -141,11 +140,11 @@ public class PointInfoController {
      * @return PointInfo
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
-    public R<PointInfo> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") String attributeId,
-                                                                 @NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                                 @NotNull @PathVariable(value = "pointId") String pointId) {
+    public R<PointAttributeConfig> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") String attributeId,
+                                                                            @NotNull @PathVariable(value = "deviceId") String deviceId,
+                                                                            @NotNull @PathVariable(value = "pointId") String pointId) {
         try {
-            PointInfo select = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
+            PointAttributeConfig select = pointInfoService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -163,10 +162,10 @@ public class PointInfoController {
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
-    public R<List<PointInfo>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                         @NotNull @PathVariable(value = "pointId") String pointId) {
+    public R<List<PointAttributeConfig>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") String deviceId,
+                                                                    @NotNull @PathVariable(value = "pointId") String pointId) {
         try {
-            List<PointInfo> select = pointInfoService.selectByDeviceIdAndPointId(deviceId, pointId);
+            List<PointAttributeConfig> select = pointInfoService.selectByDeviceIdAndPointId(deviceId, pointId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -183,9 +182,9 @@ public class PointInfoController {
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<PointInfo>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
+    public R<List<PointAttributeConfig>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
         try {
-            List<PointInfo> select = pointInfoService.selectByDeviceId(deviceId);
+            List<PointAttributeConfig> select = pointInfoService.selectByDeviceId(deviceId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -202,12 +201,12 @@ public class PointInfoController {
      * @return Page Of PointInfo
      */
     @PostMapping("/list")
-    public R<Page<PointInfo>> list(@RequestBody(required = false) PointInfoPageQuery pointInfoPageQuery) {
+    public R<Page<PointAttributeConfig>> list(@RequestBody(required = false) PointAttributeConfigPageQuery pointInfoPageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointInfoPageQuery)) {
-                pointInfoPageQuery = new PointInfoPageQuery();
+                pointInfoPageQuery = new PointAttributeConfigPageQuery();
             }
-            Page<PointInfo> page = pointInfoService.list(pointInfoPageQuery);
+            Page<PointAttributeConfig> page = pointInfoService.list(pointInfoPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

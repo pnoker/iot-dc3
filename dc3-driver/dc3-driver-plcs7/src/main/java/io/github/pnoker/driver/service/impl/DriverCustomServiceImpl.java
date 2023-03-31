@@ -169,7 +169,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return Plcs7PointVariable
      */
     private PlcS7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo, String type) {
-        log.debug("Plc S7 Point Info {}", JsonUtil.toJsonString(pointInfo));
+        log.debug("Plc S7 Point Attribute Config {}", JsonUtil.toJsonString(pointInfo));
         return new PlcS7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), type);
     }
 

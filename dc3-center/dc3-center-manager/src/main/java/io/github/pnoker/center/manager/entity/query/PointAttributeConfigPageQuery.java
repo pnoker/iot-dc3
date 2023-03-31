@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.model.PointAttributeConfig;
 import lombok.*;
 
 /**
@@ -32,7 +32,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class PointInfoPageQuery extends PointInfo {
+public class PointAttributeConfigPageQuery extends PointAttributeConfig {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

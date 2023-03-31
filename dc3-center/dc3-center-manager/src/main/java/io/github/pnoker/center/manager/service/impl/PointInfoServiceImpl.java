@@ -21,7 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointInfoPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.mapper.PointInfoMapper;
 import io.github.pnoker.center.manager.service.PointInfoService;
 import io.github.pnoker.center.manager.service.PointService;
@@ -30,7 +30,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.model.PointAttributeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -59,15 +59,15 @@ public class PointInfoServiceImpl implements PointInfoService {
      * {@inheritDoc}
      */
     @Override
-    public PointInfo add(PointInfo pointInfo) {
+    public PointAttributeConfig add(PointAttributeConfig pointAttributeConfig) {
         try {
-            selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
-            throw new DuplicateException("The point info already exists");
+            selectByAttributeIdAndDeviceIdAndPointId(pointAttributeConfig.getPointAttributeId(), pointAttributeConfig.getDeviceId(), pointAttributeConfig.getPointId());
+            throw new DuplicateException("The point attribute config already exists");
         } catch (NotFoundException notFoundException) {
-            if (pointInfoMapper.insert(pointInfo) > 0) {
-                return pointInfoMapper.selectById(pointInfo.getId());
+            if (pointInfoMapper.insert(pointAttributeConfig) > 0) {
+                return pointInfoMapper.selectById(pointAttributeConfig.getId());
             }
-            throw new ServiceException("The point info add failed");
+            throw new ServiceException("The point attribute config add failed");
         }
     }
 
@@ -84,107 +84,107 @@ public class PointInfoServiceImpl implements PointInfoService {
      * {@inheritDoc}
      */
     @Override
-    public PointInfo update(PointInfo pointInfo) {
-        PointInfo old = selectById(pointInfo.getId());
-        pointInfo.setOperateTime(null);
-        if (!old.getPointAttributeId().equals(pointInfo.getPointAttributeId()) || !old.getDeviceId().equals(pointInfo.getDeviceId()) || !old.getPointId().equals(pointInfo.getPointId())) {
+    public PointAttributeConfig update(PointAttributeConfig pointAttributeConfig) {
+        PointAttributeConfig old = selectById(pointAttributeConfig.getId());
+        pointAttributeConfig.setOperateTime(null);
+        if (!old.getPointAttributeId().equals(pointAttributeConfig.getPointAttributeId()) || !old.getDeviceId().equals(pointAttributeConfig.getDeviceId()) || !old.getPointId().equals(pointAttributeConfig.getPointId())) {
             try {
-                selectByAttributeIdAndDeviceIdAndPointId(pointInfo.getPointAttributeId(), pointInfo.getDeviceId(), pointInfo.getPointId());
-                throw new DuplicateException("The point info already exists");
+                selectByAttributeIdAndDeviceIdAndPointId(pointAttributeConfig.getPointAttributeId(), pointAttributeConfig.getDeviceId(), pointAttributeConfig.getPointId());
+                throw new DuplicateException("The point attribute config already exists");
             } catch (NotFoundException ignored) {
                 // nothing to do
             }
         }
-        if (pointInfoMapper.updateById(pointInfo) > 0) {
-            PointInfo select = pointInfoMapper.selectById(pointInfo.getId());
-            pointInfo.setPointAttributeId(select.getPointAttributeId());
-            pointInfo.setDeviceId(select.getDeviceId());
-            pointInfo.setPointId(select.getPointId());
+        if (pointInfoMapper.updateById(pointAttributeConfig) > 0) {
+            PointAttributeConfig select = pointInfoMapper.selectById(pointAttributeConfig.getId());
+            pointAttributeConfig.setPointAttributeId(select.getPointAttributeId());
+            pointAttributeConfig.setDeviceId(select.getDeviceId());
+            pointAttributeConfig.setPointId(select.getPointId());
             return select;
         }
-        throw new ServiceException("The point info update failed");
+        throw new ServiceException("The point attribute config update failed");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointInfo selectById(String id) {
-        PointInfo pointInfo = pointInfoMapper.selectById(id);
-        if (ObjectUtil.isNull(pointInfo)) {
+    public PointAttributeConfig selectById(String id) {
+        PointAttributeConfig pointAttributeConfig = pointInfoMapper.selectById(id);
+        if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException();
         }
-        return pointInfo;
+        return pointAttributeConfig;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointInfo selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId) {
-        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
-        queryWrapper.eq(PointInfo::getDeviceId, deviceId);
-        queryWrapper.eq(PointInfo::getPointId, pointId);
+    public PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId) {
+        LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
+        queryWrapper.eq(PointAttributeConfig::getPointAttributeId, pointAttributeId);
+        queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
+        queryWrapper.eq(PointAttributeConfig::getPointId, pointId);
         queryWrapper.last("limit 1");
-        PointInfo pointInfo = pointInfoMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(pointInfo)) {
+        PointAttributeConfig pointAttributeConfig = pointInfoMapper.selectOne(queryWrapper);
+        if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException();
         }
-        return pointInfo;
+        return pointAttributeConfig;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<PointInfo> selectByAttributeId(String pointAttributeId) {
-        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        queryWrapper.eq(PointInfo::getPointAttributeId, pointAttributeId);
-        List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
-        if (ObjectUtil.isNull(pointInfos) || pointInfos.isEmpty()) {
+    public List<PointAttributeConfig> selectByAttributeId(String pointAttributeId) {
+        LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
+        queryWrapper.eq(PointAttributeConfig::getPointAttributeId, pointAttributeId);
+        List<PointAttributeConfig> pointAttributeConfigs = pointInfoMapper.selectList(queryWrapper);
+        if (ObjectUtil.isNull(pointAttributeConfigs) || pointAttributeConfigs.isEmpty()) {
             throw new NotFoundException();
         }
-        return pointInfos;
+        return pointAttributeConfigs;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<PointInfo> selectByDeviceId(String deviceId) {
-        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
+    public List<PointAttributeConfig> selectByDeviceId(String deviceId) {
+        LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         List<Point> points = pointService.selectByDeviceId(deviceId);
         Set<String> pointIds = points.stream().map(Point::getId).collect(Collectors.toSet());
-        queryWrapper.eq(PointInfo::getDeviceId, deviceId);
-        queryWrapper.in(PointInfo::getPointId, pointIds);
-        List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
-        if (ObjectUtil.isNull(pointInfos)) {
+        queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
+        queryWrapper.in(PointAttributeConfig::getPointId, pointIds);
+        List<PointAttributeConfig> pointAttributeConfigs = pointInfoMapper.selectList(queryWrapper);
+        if (ObjectUtil.isNull(pointAttributeConfigs)) {
             throw new NotFoundException();
         }
-        return pointInfos;
+        return pointAttributeConfigs;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<PointInfo> selectByDeviceIdAndPointId(String deviceId, String pointId) {
-        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
-        queryWrapper.eq(PointInfo::getDeviceId, deviceId);
-        queryWrapper.eq(PointInfo::getPointId, pointId);
-        List<PointInfo> pointInfos = pointInfoMapper.selectList(queryWrapper);
-        if (ObjectUtil.isNull(pointInfos)) {
+    public List<PointAttributeConfig> selectByDeviceIdAndPointId(String deviceId, String pointId) {
+        LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
+        queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
+        queryWrapper.eq(PointAttributeConfig::getPointId, pointId);
+        List<PointAttributeConfig> pointAttributeConfigs = pointInfoMapper.selectList(queryWrapper);
+        if (ObjectUtil.isNull(pointAttributeConfigs)) {
             throw new NotFoundException();
         }
-        return pointInfos;
+        return pointAttributeConfigs;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<PointInfo> list(PointInfoPageQuery pointInfoPageQuery) {
+    public Page<PointAttributeConfig> list(PointAttributeConfigPageQuery pointInfoPageQuery) {
         if (ObjectUtil.isNull(pointInfoPageQuery.getPage())) {
             pointInfoPageQuery.setPage(new Pages());
         }
@@ -195,12 +195,12 @@ public class PointInfoServiceImpl implements PointInfoService {
      * {@inheritDoc}
      */
     @Override
-    public LambdaQueryWrapper<PointInfo> fuzzyQuery(PointInfoPageQuery pointInfoPageQuery) {
-        LambdaQueryWrapper<PointInfo> queryWrapper = Wrappers.<PointInfo>query().lambda();
+    public LambdaQueryWrapper<PointAttributeConfig> fuzzyQuery(PointAttributeConfigPageQuery pointInfoPageQuery) {
+        LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         if (ObjectUtil.isNotNull(pointInfoPageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointAttributeId()), PointInfo::getPointAttributeId, pointInfoPageQuery.getPointAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getDeviceId()), PointInfo::getDeviceId, pointInfoPageQuery.getDeviceId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointId()), PointInfo::getPointId, pointInfoPageQuery.getPointId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointAttributeId()), PointAttributeConfig::getPointAttributeId, pointInfoPageQuery.getPointAttributeId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getDeviceId()), PointAttributeConfig::getDeviceId, pointInfoPageQuery.getDeviceId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointId()), PointAttributeConfig::getPointId, pointInfoPageQuery.getPointId());
         }
         return queryWrapper;
     }

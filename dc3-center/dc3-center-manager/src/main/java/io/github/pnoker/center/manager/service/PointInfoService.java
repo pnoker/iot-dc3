@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.PointInfoPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.PointInfo;
+import io.github.pnoker.common.model.PointAttributeConfig;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointInfoService extends Service<PointInfo, PointInfoPageQuery> {
+public interface PointInfoService extends Service<PointAttributeConfig, PointAttributeConfigPageQuery> {
 
     /**
      * 根据位号配置信息 ID 、 设备 ID 、 位号 ID 查询
@@ -38,7 +38,7 @@ public interface PointInfoService extends Service<PointInfo, PointInfoPageQuery>
      * @param pointId          Point ID
      * @return PointInfo
      */
-    PointInfo selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId);
+    PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId);
 
     /**
      * 根据位号配置信息 ID 查询
@@ -46,7 +46,7 @@ public interface PointInfoService extends Service<PointInfo, PointInfoPageQuery>
      * @param pointAttributeId Point Attribute ID
      * @return PointInfo Array
      */
-    List<PointInfo> selectByAttributeId(String pointAttributeId);
+    List<PointAttributeConfig> selectByAttributeId(String pointAttributeId);
 
     /**
      * 根据 设备 ID 查询
@@ -54,7 +54,7 @@ public interface PointInfoService extends Service<PointInfo, PointInfoPageQuery>
      * @param deviceId 设备ID
      * @return PointInfo Array
      */
-    List<PointInfo> selectByDeviceId(String deviceId);
+    List<PointAttributeConfig> selectByDeviceId(String deviceId);
 
     /**
      * 根据 设备 ID 、 位号 ID 查询
@@ -63,5 +63,5 @@ public interface PointInfoService extends Service<PointInfo, PointInfoPageQuery>
      * @param pointId  位号ID
      * @return PointInfo Array
      */
-    List<PointInfo> selectByDeviceIdAndPointId(String deviceId, String pointId);
+    List<PointAttributeConfig> selectByDeviceIdAndPointId(String deviceId, String pointId);
 }

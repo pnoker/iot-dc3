@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.model.DriverInfo;
+import io.github.pnoker.common.model.DriverAttributeConfig;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -27,5 +27,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022.1.0
  */
 @Mapper
-public interface DriverInfoMapper extends BaseMapper<DriverInfo> {
+public interface DriverInfoMapper extends BaseMapper<DriverAttributeConfig> {
 }

@@ -139,7 +139,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 获取 Value
      *
      * @param modbusMaster ModbusMaster
-     * @param pointInfo    Point Info
+     * @param pointInfo    Point Attribute Config
      * @param type         Value Type
      * @return String Value
      */
@@ -190,7 +190,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 写入 ModbusMaster 值
      *
      * @param modbusMaster ModbusMaster
-     * @param pointInfo    Point Info
+     * @param pointInfo    Point Attribute Config
      * @param value        Value
      * @return Write Result
      */

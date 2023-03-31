@@ -136,7 +136,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 获取 Opc Da Item
      *
      * @param server    Server
-     * @param pointInfo Point Info Map
+     * @param pointInfo Point Attribute Config Map
      * @return Item
      * @throws NotConnectedException   NotConnectedException
      * @throws JIException             JIException

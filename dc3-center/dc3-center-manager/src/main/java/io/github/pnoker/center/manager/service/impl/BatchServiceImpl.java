@@ -134,7 +134,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     /**
-     * Get driver info map
+     * Get driver attribute config map
      *
      * @param deviceList         Device Set
      * @param driverAttributeMap Driver Attribute Map
@@ -152,7 +152,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     /**
-     * Get driver info map
+     * Get driver attribute config map
      *
      * @param deviceId           设备ID
      * @param driverAttributeMap Driver Attribute Map
@@ -161,8 +161,8 @@ public class BatchServiceImpl implements BatchService {
     public Map<String, AttributeInfo> getDriverInfoMap(String deviceId, Map<String, DriverAttribute> driverAttributeMap) {
         Map<String, AttributeInfo> attributeInfoMap = new ConcurrentHashMap<>(16);
         try {
-            List<DriverInfo> driverInfos = driverInfoService.selectByDeviceId(deviceId);
-            driverInfos.forEach(driverInfo -> {
+            List<DriverAttributeConfig> driverAttributeConfigs = driverInfoService.selectByDeviceId(deviceId);
+            driverAttributeConfigs.forEach(driverInfo -> {
                 DriverAttribute attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
                 attributeInfoMap.put(attribute.getAttributeName(), new AttributeInfo(driverInfo.getConfigValue(), attribute.getAttributeTypeFlag()));
             });
@@ -173,7 +173,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     /**
-     * Get point info map
+     * Get point attribute config map
      *
      * @param devices           Device Array
      * @param profilePointMap   Profile Point Map
@@ -192,7 +192,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     /**
-     * Get point info map
+     * Get point attribute config map
      *
      * @param device            Device
      * @param profilePointMap   Profile Point Map
@@ -204,9 +204,9 @@ public class BatchServiceImpl implements BatchService {
         device.getProfileIds().forEach(profileId -> profilePointMap.get(profileId).keySet()
                 .forEach(pointId -> {
                     try {
-                        List<PointInfo> pointInfos = pointInfoService.selectByDeviceIdAndPointId(device.getId(), pointId);
+                        List<PointAttributeConfig> pointAttributeConfigs = pointInfoService.selectByDeviceIdAndPointId(device.getId(), pointId);
                         Map<String, AttributeInfo> infoMap = new ConcurrentHashMap<>(16);
-                        pointInfos.forEach(pointInfo -> {
+                        pointAttributeConfigs.forEach(pointInfo -> {
                             PointAttribute attribute = pointAttributeMap.get(pointInfo.getPointAttributeId());
                             infoMap.put(attribute.getAttributeName(), new AttributeInfo(pointInfo.getConfigValue(), attribute.getAttributeTypeFlag()));
                         });
