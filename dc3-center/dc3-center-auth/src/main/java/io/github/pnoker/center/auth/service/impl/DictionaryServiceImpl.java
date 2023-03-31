@@ -20,12 +20,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
-import io.github.pnoker.center.auth.mapper.UserMapper;
+import io.github.pnoker.center.auth.mapper.UserLoginMapper;
 import io.github.pnoker.center.auth.service.DictionaryService;
 import io.github.pnoker.common.entity.common.Dictionary;
 import io.github.pnoker.common.model.BlackIp;
 import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.model.UserLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +44,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Resource
     private TenantMapper tenantMapper;
     @Resource
-    private UserMapper userMapper;
+    private UserLoginMapper userLoginMapper;
     @Resource
     private BlackIpMapper blackIpMapper;
 
@@ -65,12 +65,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<Dictionary> userDictionary(String tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        List<User> userList = userMapper.selectList(queryWrapper);
-        for (User user : userList) {
+        LambdaQueryWrapper<UserLogin> queryWrapper = Wrappers.<UserLogin>query().lambda();
+        List<UserLogin> userLoginList = userLoginMapper.selectList(queryWrapper);
+        for (UserLogin userLogin : userLoginList) {
             Dictionary driverDictionary = new Dictionary();
-            driverDictionary.setLabel(user.getLoginName());
-            driverDictionary.setValue(user.getId());
+            driverDictionary.setLabel(userLogin.getLoginName());
+            driverDictionary.setValue(userLogin.getId());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;

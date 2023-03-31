@@ -18,13 +18,13 @@ package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.UserPageQuery;
+import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
 import io.github.pnoker.center.auth.service.UserPasswordService;
-import io.github.pnoker.center.auth.service.UserService;
+import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.model.UserLogin;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -43,23 +43,23 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(AuthServiceConstant.USER_URL_PREFIX)
-public class UserController {
+public class UserLoginController {
 
     @Resource
-    private UserService userService;
+    private UserLoginService userLoginService;
     @Resource
     private UserPasswordService userPasswordService;
 
     /**
      * 新增用户
      *
-     * @param user 用户
-     * @return {@link User}
+     * @param userLogin 用户
+     * @return {@link UserLogin}
      */
     @PostMapping("/add")
-    public R<User> add(@Validated(Insert.class) @RequestBody User user) {
+    public R<UserLogin> add(@Validated(Insert.class) @RequestBody UserLogin userLogin) {
         try {
-            User add = userService.add(user);
+            UserLogin add = userLoginService.add(userLogin);
             if (ObjectUtil.isNotNull(add)) {
                 return R.ok(add);
             }
@@ -78,7 +78,7 @@ public class UserController {
     @PostMapping("/delete/{id}")
     public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return userService.delete(id) ? R.ok() : R.fail();
+            return userLoginService.delete(id) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -91,14 +91,14 @@ public class UserController {
      * <li>不支持修改: Name</li>
      * </ol>
      *
-     * @param user 用户
-     * @return {@link User}
+     * @param userLogin 用户
+     * @return {@link UserLogin}
      */
     @PostMapping("/update")
-    public R<User> update(@Validated(Update.class) @RequestBody User user) {
+    public R<UserLogin> update(@Validated(Update.class) @RequestBody UserLogin userLogin) {
         try {
-            user.setLoginName(null);
-            User update = userService.update(user);
+            userLogin.setLoginName(null);
+            UserLogin update = userLoginService.update(userLogin);
             if (ObjectUtil.isNotNull(update)) {
                 return R.ok(update);
             }
@@ -127,12 +127,12 @@ public class UserController {
      * 根据 ID 查询用户
      *
      * @param id 用户ID
-     * @return {@link User}
+     * @return {@link UserLogin}
      */
     @GetMapping("/id/{id}")
-    public R<User> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<UserLogin> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            User select = userService.selectById(id);
+            UserLogin select = userLoginService.selectById(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -146,12 +146,12 @@ public class UserController {
      * 根据 Name 查询 User
      *
      * @param name 用户名称
-     * @return {@link User}
+     * @return {@link UserLogin}
      */
     @GetMapping("/name/{name}")
-    public R<User> selectByName(@NotNull @PathVariable(value = "name") String name) {
+    public R<UserLogin> selectByName(@NotNull @PathVariable(value = "name") String name) {
         try {
-            User select = userService.selectByLoginName(name, false);
+            UserLogin select = userLoginService.selectByLoginName(name, false);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -165,15 +165,15 @@ public class UserController {
      * 模糊分页查询 User
      *
      * @param userPageQuery 用户和分页参数
-     * @return 带分页的 {@link User}
+     * @return 带分页的 {@link UserLogin}
      */
     @PostMapping("/list")
-    public R<Page<User>> list(@RequestBody(required = false) UserPageQuery userPageQuery) {
+    public R<Page<UserLogin>> list(@RequestBody(required = false) UserLoginPageQuery userPageQuery) {
         try {
             if (ObjectUtil.isEmpty(userPageQuery)) {
-                userPageQuery = new UserPageQuery();
+                userPageQuery = new UserLoginPageQuery();
             }
-            Page<User> page = userService.list(userPageQuery);
+            Page<UserLogin> page = userLoginService.list(userPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -192,7 +192,7 @@ public class UserController {
     @GetMapping("/check/{name}")
     public R<Boolean> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {
         try {
-            return userService.checkLoginNameValid(name) ? R.ok() : R.fail();
+            return userLoginService.checkLoginNameValid(name) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

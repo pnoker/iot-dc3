@@ -66,7 +66,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
         private static AuthenticGatewayFilter gatewayFilter;
 
         @GrpcClient(AuthServiceConstant.SERVICE_NAME)
-        private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
+        private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
         @GrpcClient(AuthServiceConstant.SERVICE_NAME)
         private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
         @GrpcClient(AuthServiceConstant.SERVICE_NAME)
@@ -99,7 +99,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 
-                RUserDTO rUserDTO = gatewayFilter.userApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
+                RUserLoginDTO rUserDTO = gatewayFilter.userLoginApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
                 if (!rUserDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(rUserDTO.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }

@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import io.github.pnoker.center.auth.entity.bo.UserBO;
-import io.github.pnoker.center.auth.entity.vo.UserVO;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
+import io.github.pnoker.center.auth.entity.vo.UserLoginVO;
+import io.github.pnoker.common.model.UserLogin;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.List;
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface UserBuilder {
+public interface UserLoginBuilder {
 
     /**
      * VO to BO
@@ -38,7 +38,7 @@ public interface UserBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
-    UserBO buildBOByVO(UserVO entityVO);
+    UserLoginBO buildBOByVO(UserLoginVO entityVO);
 
     /**
      * VOList to BOList
@@ -46,7 +46,7 @@ public interface UserBuilder {
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
      */
-    List<UserBO> buildBOListByVOList(List<UserVO> entityVOList);
+    List<UserLoginBO> buildBOListByVOList(List<UserLoginVO> entityVOList);
 
     /**
      * BO to DO
@@ -54,7 +54,7 @@ public interface UserBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
-    User buildDOByBO(UserBO entityBO);
+    UserLogin buildDOByBO(UserLoginBO entityBO);
 
     /**
      * BOList to DOList
@@ -62,7 +62,7 @@ public interface UserBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
      */
-    List<User> buildDOListByBOList(List<UserBO> entityBOList);
+    List<UserLogin> buildDOListByBOList(List<UserLoginBO> entityBOList);
 
     /**
      * DO to BO
@@ -70,7 +70,7 @@ public interface UserBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
-    UserBO buildBOByDO(User entityDO);
+    UserLoginBO buildBOByDO(UserLogin entityDO);
 
     /**
      * DOList to BOList
@@ -78,7 +78,7 @@ public interface UserBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<UserBO> buildBOByDO(List<User> entityDOList);
+    List<UserLoginBO> buildBOByDO(List<UserLogin> entityDOList);
 
     /**
      * BO to VO
@@ -86,7 +86,7 @@ public interface UserBuilder {
      * @param entityBO EntityBO
      * @return EntityVO
      */
-    UserVO buildVOByBO(UserBO entityBO);
+    UserLoginVO buildVOByBO(UserLoginBO entityBO);
 
     /**
      * BOList to VOList
@@ -94,5 +94,5 @@ public interface UserBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
      */
-    List<UserVO> buildVOListByBOList(List<UserBO> entityBOList);
+    List<UserLoginVO> buildVOListByBOList(List<UserLoginBO> entityBOList);
 }
