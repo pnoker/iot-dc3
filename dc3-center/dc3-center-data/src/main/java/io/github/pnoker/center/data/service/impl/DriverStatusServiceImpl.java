@@ -95,11 +95,6 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
             builder.setServiceHost(pageQuery.getServiceHost());
         }
-        if (ObjectUtil.isNotNull(pageQuery.getServicePort())) {
-            builder.setServicePort(pageQuery.getServicePort());
-        } else {
-            builder.setServicePort(DefaultConstant.DEFAULT_INT);
-        }
         if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
             builder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(pageQuery.getDriverTypeFlag().name()));
         } else {
