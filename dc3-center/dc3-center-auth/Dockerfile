@@ -15,7 +15,7 @@
 #
 
 # runtime
-FROM registry.cn-beijing.aliyuncs.com/dc3/jre:8 AS runtime
+FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runtime
 MAINTAINER pnoker <pnokers.icloud.com>
 
 # default env
