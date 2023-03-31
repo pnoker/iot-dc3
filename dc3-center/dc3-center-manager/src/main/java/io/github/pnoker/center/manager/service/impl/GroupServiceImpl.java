@@ -80,7 +80,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group update(Group group) {
         selectById(group.getId());
-        group.setUpdateTime(null);
+        group.setOperateTime(null);
         if (groupMapper.updateById(group) > 0) {
             Group select = groupMapper.selectById(group.getId());
             group.setGroupName(select.getGroupName());

@@ -72,7 +72,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     public LabelBind update(LabelBind labelBind) {
         selectById(labelBind.getId());
-        labelBind.setUpdateTime(null);
+        labelBind.setOperateTime(null);
         if (labelBindMapper.updateById(labelBind) > 0) {
             return labelBindMapper.selectById(labelBind.getId());
         }

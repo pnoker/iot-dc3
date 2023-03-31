@@ -71,7 +71,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     @Override
     public BlackIp update(BlackIp blackIp) {
         blackIp.setIp(null);
-        blackIp.setUpdateTime(null);
+        blackIp.setOperateTime(null);
         if (blackIpMapper.updateById(blackIp) > 0) {
             BlackIp select = blackIpMapper.selectById(blackIp.getId());
             blackIp.setIp(select.getIp());

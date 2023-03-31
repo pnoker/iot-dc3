@@ -78,7 +78,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             throw new NotFoundException();
         }
         userPassword.setLoginPassword(DecodeUtil.md5(userPassword.getLoginPassword()));
-        userPassword.setUpdateTime(null);
+        userPassword.setOperateTime(null);
         if (userPasswordMapper.updateById(userPassword) > 0) {
             return userPasswordMapper.selectById(userPassword.getId());
         }

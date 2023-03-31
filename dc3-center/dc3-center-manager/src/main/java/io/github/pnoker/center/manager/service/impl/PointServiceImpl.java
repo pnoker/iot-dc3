@@ -90,7 +90,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public Point update(Point point) {
         Point old = selectById(point.getId());
-        point.setUpdateTime(null);
+        point.setOperateTime(null);
         if (!old.getProfileId().equals(point.getProfileId()) || !old.getPointName().equals(point.getPointName())) {
             try {
                 selectByNameAndProfileId(point.getPointName(), point.getProfileId());

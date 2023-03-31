@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException();
         }
         user.setLoginName(null);
-        user.setUpdateTime(null);
+        user.setOperateTime(null);
         if (userMapper.updateById(user) > 0) {
             User select = userMapper.selectById(user.getId());
             user.setLoginName(select.getLoginName());

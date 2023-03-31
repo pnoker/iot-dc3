@@ -41,7 +41,7 @@ public class BuilderUtil {
         builder.setCreateTime(entityDO.getCreateTime().getTime());
         builder.setOperatorId(entityDO.getOperatorId());
         builder.setOperatorName(entityDO.getOperatorName());
-        builder.setUpdateTime(entityDO.getUpdateTime().getTime());
+        builder.setUpdateTime(entityDO.getOperateTime().getTime());
         return builder.build();
     }
 }
