@@ -176,7 +176,6 @@ public class PointValueServiceImpl implements PointValueService {
         }
         builder.setPointTypeFlagValue(DefaultConstant.DEFAULT_INT);
         builder.setRwFlagValue(DefaultConstant.DEFAULT_INT);
-        builder.setAccrueFlagValue(DefaultConstant.DEFAULT_INT);
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
             builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
         } else {

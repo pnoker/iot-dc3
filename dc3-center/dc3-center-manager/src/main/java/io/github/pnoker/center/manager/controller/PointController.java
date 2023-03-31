@@ -24,11 +24,9 @@ import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.enums.UnitEnum;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -235,9 +233,9 @@ public class PointController {
     @PostMapping("/unit")
     public R<Map<String, String>> unit(@RequestBody Set<String> pointIds) {
         try {
-            Map<String, UnitEnum> units = pointService.unit(pointIds);
+            Map<String, String> units = pointService.unit(pointIds);
             if (ObjectUtil.isNotNull(units)) {
-                Map<String, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getCode()));
+                Map<String, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 return R.ok(unitCodeMap);
             }
         } catch (Exception e) {
