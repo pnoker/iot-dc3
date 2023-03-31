@@ -96,7 +96,6 @@ public class DriverServiceImpl implements DriverService {
             Driver select = driverMapper.selectById(driver.getId());
             driver.setServiceName(select.getServiceName());
             driver.setServiceHost(select.getServiceHost());
-            driver.setServicePort(select.getServicePort());
             return select;
         }
         throw new ServiceException("The driver update failed");
@@ -147,7 +146,6 @@ public class DriverServiceImpl implements DriverService {
         LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
         queryWrapper.eq(Driver::getDriverTypeFlag, type);
         queryWrapper.eq(Driver::getServiceHost, host);
-        queryWrapper.eq(Driver::getServicePort, port);
         queryWrapper.eq(Driver::getTenantId, tenantId);
         queryWrapper.last("limit 1");
         Driver driver = driverMapper.selectOne(queryWrapper);
@@ -203,7 +201,6 @@ public class DriverServiceImpl implements DriverService {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(driverPageQuery.getDriverName()), Driver::getDriverName, driverPageQuery.getDriverName());
             queryWrapper.like(CharSequenceUtil.isNotEmpty(driverPageQuery.getServiceName()), Driver::getServiceName, driverPageQuery.getServiceName());
             queryWrapper.like(CharSequenceUtil.isNotEmpty(driverPageQuery.getServiceHost()), Driver::getServiceHost, driverPageQuery.getServiceHost());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getServicePort()), Driver::getServicePort, driverPageQuery.getServicePort());
             queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getDriverTypeFlag()), Driver::getDriverTypeFlag, driverPageQuery.getDriverTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(driverPageQuery.getEnableFlag()), Driver::getEnableFlag, driverPageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverPageQuery.getTenantId()), Driver::getTenantId, driverPageQuery.getTenantId());

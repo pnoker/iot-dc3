@@ -131,9 +131,6 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         pageQuery.setTenantId(driver.getTenantId());
         pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.ofName(driver.getDriverTypeFlag().name()));
         pageQuery.setEnableFlag(EnableFlagEnum.ofName(driver.getEnableFlag().name()));
-        if (driver.getServicePort() > DefaultConstant.DEFAULT_INT) {
-            pageQuery.setServicePort(driver.getServicePort());
-        }
         return pageQuery;
     }
 
@@ -152,7 +149,6 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         builder.setServiceName(entityDO.getServiceName());
         builder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(entityDO.getDriverTypeFlag().name()));
         builder.setServiceHost(entityDO.getServiceHost());
-        builder.setServicePort(entityDO.getServicePort());
         builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
         builder.setTenantId(entityDO.getTenantId());
         return builder.build();
