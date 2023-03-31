@@ -47,7 +47,7 @@ public class UserLoginVO extends BaseVO {
     /**
      * 用户ID
      */
-    private String userExtId;
+    private String userId;
 
     /**
      * 用户密码ID
