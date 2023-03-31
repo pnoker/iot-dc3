@@ -28,7 +28,6 @@ import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.UnitEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -206,7 +205,7 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, UnitEnum> unit(Set<String> pointIds) {
+    public Map<String, String> unit(Set<String> pointIds) {
         List<Point> points = pointMapper.selectBatchIds(pointIds);
         return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
     }
@@ -222,7 +221,6 @@ public class PointServiceImpl implements PointService {
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), Point::getPointCode, pointPageQuery.getPointCode());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), Point::getPointTypeFlag, pointPageQuery.getPointTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getRwFlag()), Point::getRwFlag, pointPageQuery.getRwFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getAccrueFlag()), Point::getAccrueFlag, pointPageQuery.getAccrueFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getProfileId()), Point::getProfileId, pointPageQuery.getProfileId());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getEnableFlag()), Point::getEnableFlag, pointPageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getTenantId()), Point::getTenantId, pointPageQuery.getTenantId());
@@ -238,7 +236,6 @@ public class PointServiceImpl implements PointService {
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), "dp.point_code", pointPageQuery.getPointTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.point_type_flag", pointPageQuery.getPointTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw_flag", pointPageQuery.getRwFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getAccrueFlag()), "dp.accrue_flag", pointPageQuery.getAccrueFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getProfileId()), "dp.profile_id", pointPageQuery.getProfileId());
             queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable_flag", pointPageQuery.getEnableFlag());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointPageQuery.getTenantId()), "dp.tenant_id", pointPageQuery.getTenantId());

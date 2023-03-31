@@ -25,7 +25,10 @@ import io.github.pnoker.center.manager.entity.query.PointPageQuery;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.utils.BuilderUtil;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.*;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.RwFlagEnum;
 import io.github.pnoker.common.model.Point;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -103,7 +106,6 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         pageQuery.setTenantId(point.getTenantId());
         pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofName(point.getPointTypeFlag().name()));
         pageQuery.setRwFlag(RwFlagEnum.ofName(point.getRwFlag().name()));
-        pageQuery.setAccrueFlag(AccrueFlagEnum.ofName(point.getAccrueFlag().name()));
         pageQuery.setEnableFlag(EnableFlagEnum.ofName(point.getEnableFlag().name()));
 
         return pageQuery;
@@ -125,9 +127,8 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         builder.setRwFlag(RwFlagDTOEnum.valueOf(entityDO.getRwFlag().name()));
         builder.setBaseValue(entityDO.getBaseValue().doubleValue());
         builder.setMultiple(entityDO.getMultiple().doubleValue());
-        builder.setAccrueFlag(AccrueFlagDTOEnum.valueOf(entityDO.getAccrueFlag().name()));
         builder.setValueDecimal(entityDO.getValueDecimal());
-        builder.setUnit(UnitDTOEnum.valueOf(entityDO.getUnit().name()));
+        builder.setUnit(entityDO.getUnit());
         builder.setProfileId(entityDO.getProfileId());
         builder.setGroupId(entityDO.getGroupId());
         builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));

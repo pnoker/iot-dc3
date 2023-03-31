@@ -26,7 +26,6 @@
         dp.rw_flag,
         dp.base_value,
         dp.multiple,
-        dp.accrue_flag,
         dp.value_decimal,
         dp.unit,
         dp.profile_id,
