@@ -20,7 +20,6 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
-import io.github.pnoker.api.common.MultiFlagDTOEnum;
 import io.github.pnoker.api.common.PageDTO;
 import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
 import io.github.pnoker.center.data.service.DeviceStatusService;
@@ -105,11 +104,6 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         }
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverId())) {
             builder.setDriverId(pageQuery.getDriverId());
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getMultiFlag())) {
-            builder.setMultiFlag(MultiFlagDTOEnum.valueOf(pageQuery.getMultiFlag().name()));
-        } else {
-            builder.setMultiFlagValue(DefaultConstant.DEFAULT_INT);
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
             builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));

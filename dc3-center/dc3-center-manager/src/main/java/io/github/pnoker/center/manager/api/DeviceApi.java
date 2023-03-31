@@ -21,13 +21,15 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.*;
+import io.github.pnoker.api.common.BaseDTO;
+import io.github.pnoker.api.common.EnableFlagDTOEnum;
+import io.github.pnoker.api.common.PageDTO;
+import io.github.pnoker.api.common.RDTO;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.utils.BuilderUtil;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.MultiTypeEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.model.Device;
 import io.grpc.stub.StreamObserver;
@@ -129,7 +131,6 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         pageQuery.setDeviceName(device.getDeviceName());
         pageQuery.setDriverId(device.getDriverId());
         pageQuery.setTenantId(device.getTenantId());
-        pageQuery.setMultiFlag(MultiTypeEnum.ofName(device.getMultiFlag().name()));
         pageQuery.setEnableFlag(EnableFlagEnum.ofName(device.getEnableFlag().name()));
 
         return pageQuery;
@@ -147,7 +148,6 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         builder.setBase(baseDTO);
         builder.setDeviceName(entityDO.getDeviceName());
         builder.setDeviceCode(entityDO.getDeviceCode());
-        builder.setMultiFlag(MultiFlagDTOEnum.valueOf(entityDO.getMultiFlag().name()));
         builder.setDriverId(entityDO.getDriverId());
         builder.setGroupId(entityDO.getGroupId());
         builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
