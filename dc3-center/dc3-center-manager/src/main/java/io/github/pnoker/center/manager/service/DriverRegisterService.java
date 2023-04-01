@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.dto.DriverRegisterDTO;
+import io.github.pnoker.common.dto.DriverSyncUpDTO;
 
 /**
  * 驱动注册相关接口
@@ -31,6 +31,6 @@ public interface DriverRegisterService {
      *
      * @param entityDTO DriverRegisterDTO
      */
-    void register(DriverRegisterDTO entityDTO);
+    void register(DriverSyncUpDTO entityDTO);
 
 }
