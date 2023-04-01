@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.service.rabbit;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.manager.service.DriverRegisterService;
-import io.github.pnoker.common.dto.DriverRegisterDTO;
+import io.github.pnoker.common.dto.DriverSyncUpDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -44,8 +44,8 @@ public class DriverRegisterReceiver {
     private DriverRegisterService driverRegisterService;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{driverRegisterQueue.name}")
-    public void driverRegisterReceive(Channel channel, Message message, DriverRegisterDTO entityDTO) {
+    @RabbitListener(queues = "#{syncUpQueue.name}")
+    public void driverRegisterReceive(Channel channel, Message message, DriverSyncUpDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             log.debug("Receive driver register: {}", JsonUtil.toPrettyJsonString(entityDTO));

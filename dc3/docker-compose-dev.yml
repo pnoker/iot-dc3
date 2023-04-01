@@ -111,6 +111,11 @@ services:
       - PREFER_HOST_MODE=hostname
       - MODE=standalone
       - SPRING_DATASOURCE_PLATFORM=mysql
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - JVM_XMN=256m
+      - JVM_MS=128m
+      - JVM_MMS=256m
     container_name: dc3-center-register
     hostname: dc3-center-register
     volumes:
