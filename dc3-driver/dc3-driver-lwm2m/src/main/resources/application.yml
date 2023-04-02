@@ -27,6 +27,7 @@ driver:
       port: 5684
   schedule:
     # 数据读取定时任务 需开启才能看到数据
+    # 定时读数据
     read:
       enable: false
       corn: '0/30 * * * * ?'

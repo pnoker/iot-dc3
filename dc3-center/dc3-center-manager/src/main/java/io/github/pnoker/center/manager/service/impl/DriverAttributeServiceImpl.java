@@ -121,12 +121,14 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public List<DriverAttribute> selectByDriverId(String driverId) {
+    public List<DriverAttribute> selectByDriverId(String driverId, boolean throwException) {
         DriverAttributePageQuery driverAttributePageQuery = new DriverAttributePageQuery();
         driverAttributePageQuery.setDriverId(driverId);
         List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributePageQuery));
-        if (ObjectUtil.isNull(driverAttributes) || driverAttributes.isEmpty()) {
-            throw new NotFoundException();
+        if (throwException) {
+            if (ObjectUtil.isNull(driverAttributes) || driverAttributes.isEmpty()) {
+                throw new NotFoundException();
+            }
         }
         return driverAttributes;
     }

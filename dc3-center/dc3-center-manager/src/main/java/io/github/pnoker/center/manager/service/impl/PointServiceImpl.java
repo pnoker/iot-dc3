@@ -153,7 +153,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public List<Point> selectByDeviceId(String deviceId) {
         Set<String> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
-        return selectByProfileIds(profileIds);
+        return selectByProfileIds(profileIds, true);
     }
 
     /**
@@ -174,7 +174,7 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public List<Point> selectByProfileIds(Set<String> profileIds) {
+    public List<Point> selectByProfileIds(Set<String> profileIds, boolean throwException) {
         List<Point> points = new ArrayList<>(16);
         profileIds.forEach(profileId -> {
             PointPageQuery pointPageQuery = new PointPageQuery();
@@ -184,8 +184,10 @@ public class PointServiceImpl implements PointService {
                 points.addAll(pointList);
             }
         });
-        if (points.isEmpty()) {
-            throw new NotFoundException();
+        if (throwException) {
+            if (points.isEmpty()) {
+                throw new NotFoundException();
+            }
         }
         return points;
     }

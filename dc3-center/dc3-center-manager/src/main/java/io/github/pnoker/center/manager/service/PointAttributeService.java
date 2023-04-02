@@ -41,8 +41,9 @@ public interface PointAttributeService extends Service<PointAttribute, PointAttr
     /**
      * 根据驱动 ID 查询
      *
-     * @param driverId 驱动ID
+     * @param driverId       驱动ID
+     * @param throwException Throw Exception
      * @return PointAttribute Array
      */
-    List<PointAttribute> selectByDriverId(String driverId);
+    List<PointAttribute> selectByDriverId(String driverId, boolean throwException);
 }

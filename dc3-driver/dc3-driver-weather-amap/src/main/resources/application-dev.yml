@@ -19,23 +19,7 @@ driver:
   schedule:
     # 定时读数据
     read:
-      corn: '0/5 * * * * ?'
-  mqtt:
-    url: ${MQTT_BROKER_URL:ssl://dc3-rabbitmq:8883}
-    auth-type: X509
-    username: dc3
-    password: dc3
-    receive-topics:
-      - qos: 1
-        name: data
-    default-send-topic:
-      qos: 1
-      name: command
-    keep-alive: 15
-    completion-timeout: 3000
-    batch:
-      speed: ${MQTT_BATCH_SPEED:100}
-      interval: ${MQTT_BATCH_INTERVAL:5}
+      corn: '0/10 * * * * ?'
 
 spring:
   # 当开启env和group时，需要本地启动auth，manager和data服务
@@ -52,3 +36,6 @@ logging:
   level:
     io.github.pnoker: DEBUG
     io.github.pnoker.driver.sdk: DEBUG
+    io.github.pnoker.driver.sdk.service: DEBUG
+    io.github.pnoker.driver.sdk.service.job: DEBUG
+    io.github.pnoker.driver.sdk.service.rabbit: DEBUG

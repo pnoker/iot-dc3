@@ -26,6 +26,7 @@ driver:
     udp:
       port: 6271
   schedule:
+    # 定时读数据
     read:
       enable: false
       corn: '0/30 * * * * ?'
