@@ -131,7 +131,7 @@ public class DriverAttributeController {
     @GetMapping("/driver_id/{id}")
     public R<List<DriverAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<DriverAttribute> select = driverAttributeService.selectByDriverId(id);
+            List<DriverAttribute> select = driverAttributeService.selectByDriverId(id, true);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }

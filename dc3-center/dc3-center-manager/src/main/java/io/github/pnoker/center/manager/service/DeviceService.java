@@ -19,7 +19,9 @@ package io.github.pnoker.center.manager.service;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.Device;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
@@ -64,4 +66,19 @@ public interface DeviceService extends Service<Device, DevicePageQuery> {
      */
     List<Device> selectByIds(Set<String> ids);
 
+    /**
+     * 导入设备
+     *
+     * @param device        Device
+     * @param multipartFile MultipartFile
+     */
+    void importDevice(Device device, MultipartFile multipartFile);
+
+    /**
+     * 导入设备模板
+     *
+     * @param device Device
+     * @return File Path
+     */
+    Path importTemplate(Device device);
 }

@@ -131,7 +131,7 @@ public class PointAttributeController {
     @GetMapping("/driver_id/{id}")
     public R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<PointAttribute> select = pointAttributeService.selectByDriverId(id);
+            List<PointAttribute> select = pointAttributeService.selectByDriverId(id, true);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }

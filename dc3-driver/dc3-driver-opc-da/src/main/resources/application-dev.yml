@@ -17,6 +17,7 @@
 # Development environment, customizable configuration
 driver:
   schedule:
+    # 定时读数据
     read:
       corn: '0/5 * * * * ?'
 

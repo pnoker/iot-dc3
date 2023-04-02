@@ -108,7 +108,7 @@ public class BatchServiceImpl implements BatchService {
     public Map<String, DriverAttribute> getDriverAttributeMap(String driverId) {
         Map<String, DriverAttribute> driverAttributeMap = new ConcurrentHashMap<>(16);
         try {
-            List<DriverAttribute> driverAttributes = driverAttributeService.selectByDriverId(driverId);
+            List<DriverAttribute> driverAttributes = driverAttributeService.selectByDriverId(driverId, true);
             driverAttributes.forEach(driverAttribute -> driverAttributeMap.put(driverAttribute.getId(), driverAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
@@ -125,7 +125,7 @@ public class BatchServiceImpl implements BatchService {
     public Map<String, PointAttribute> getPointAttributeMap(String driverId) {
         Map<String, PointAttribute> pointAttributeMap = new ConcurrentHashMap<>(16);
         try {
-            List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(driverId);
+            List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(driverId, true);
             pointAttributes.forEach(pointAttribute -> pointAttributeMap.put(pointAttribute.getId(), pointAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do

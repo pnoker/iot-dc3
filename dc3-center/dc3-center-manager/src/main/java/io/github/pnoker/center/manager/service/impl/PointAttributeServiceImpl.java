@@ -121,12 +121,14 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public List<PointAttribute> selectByDriverId(String driverId) {
+    public List<PointAttribute> selectByDriverId(String driverId, boolean throwException) {
         PointAttributePageQuery pointAttributePageQuery = new PointAttributePageQuery();
         pointAttributePageQuery.setDriverId(driverId);
         List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributePageQuery));
-        if (ObjectUtil.isNull(pointAttributes) || pointAttributes.isEmpty()) {
-            throw new NotFoundException();
+        if (throwException) {
+            if (ObjectUtil.isNull(pointAttributes) || pointAttributes.isEmpty()) {
+                throw new NotFoundException();
+            }
         }
         return pointAttributes;
     }

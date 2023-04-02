@@ -60,10 +60,11 @@ public interface PointService extends Service<Point, PointPageQuery> {
     /**
      * 根据 模板Id 集查询位号
      *
-     * @param profileIds Profile ID Set
+     * @param profileIds     Profile ID Set
+     * @param throwException Throw Exception
      * @return Point Array
      */
-    List<Point> selectByProfileIds(Set<String> profileIds);
+    List<Point> selectByProfileIds(Set<String> profileIds, boolean throwException);
 
     /**
      * 根据 设备Id集 查询设备

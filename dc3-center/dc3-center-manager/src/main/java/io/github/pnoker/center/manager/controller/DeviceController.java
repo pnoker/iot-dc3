@@ -27,14 +27,18 @@ import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.utils.RequestUtil;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -183,6 +187,42 @@ public class DeviceController {
             return R.fail(e.getMessage());
         }
         return R.fail();
+    }
+
+    /**
+     * 导入 Device
+     *
+     * @param device   Device
+     * @param tenantId 租户ID
+     * @return Device
+     */
+    @PostMapping("/import")
+    public R<String> importDevice(@Validated(Update.class) Device device, @RequestParam("file") MultipartFile multipartFile, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+        try {
+            device.setTenantId(tenantId);
+            deviceService.importDevice(device, multipartFile);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.ok();
+    }
+
+    /**
+     * 导入 Device 模板
+     *
+     * @param device   Device
+     * @param tenantId 租户ID
+     * @return Device
+     */
+    @PostMapping("/import/template")
+    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+        try {
+            device.setTenantId(tenantId);
+            Path filePath = deviceService.importTemplate(device);
+            return RequestUtil.responseFile(filePath);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

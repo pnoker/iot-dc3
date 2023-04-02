@@ -42,8 +42,9 @@ public interface DriverAttributeService extends Service<DriverAttribute, DriverA
     /**
      * 根据驱动 ID 查询
      *
-     * @param driverId 驱动ID
+     * @param driverId       驱动ID
+     * @param throwException Throw Exception
      * @return DriverAttribute Array
      */
-    List<DriverAttribute> selectByDriverId(String driverId);
+    List<DriverAttribute> selectByDriverId(String driverId, boolean throwException);
 }

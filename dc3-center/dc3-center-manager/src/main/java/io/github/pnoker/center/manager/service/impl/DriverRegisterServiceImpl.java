@@ -138,7 +138,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
         Map<String, DriverAttribute> oldDriverAttributeMap = new HashMap<>(8);
         try {
-            List<DriverAttribute> byDriverId = driverAttributeService.selectByDriverId(driver.getId());
+            List<DriverAttribute> byDriverId = driverAttributeService.selectByDriverId(driver.getId(), true);
             byDriverId.forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
@@ -186,7 +186,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
         Map<String, PointAttribute> oldPointAttributeMap = new HashMap<>(8);
         try {
-            List<PointAttribute> byDriverId = pointAttributeService.selectByDriverId(driver.getId());
+            List<PointAttribute> byDriverId = pointAttributeService.selectByDriverId(driver.getId(), true);
             byDriverId.forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do

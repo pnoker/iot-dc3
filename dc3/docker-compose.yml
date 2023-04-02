@@ -342,6 +342,28 @@ services:
         aliases:
           - dc3-driver-modbus-tcp
 
+  weather-amap:
+    build:
+      context: ../dc3-driver/dc3-driver-weather-amap/
+      dockerfile: ./Dockerfile
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-weather-amap:2023.2.3.dev
+    restart: on-failure
+    environment:
+      - NODE_ENV=test
+    container_name: dc3-driver-weather-amap
+    hostname: dc3-driver-weather-amap
+    volumes:
+      - logs:/dc3-driver/dc3-driver-weather-amap/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-weather-amap
+
 volumes:
   logs:
 

@@ -39,6 +39,7 @@
         <module>dc3-driver-edge-gateway</module>
         <module>dc3-driver-lwm2m</module>
         <module>dc3-driver-dtu-yeecom</module>
+        <module>dc3-driver-weather-amap</module>
     </modules>
 
     <dependencies>
