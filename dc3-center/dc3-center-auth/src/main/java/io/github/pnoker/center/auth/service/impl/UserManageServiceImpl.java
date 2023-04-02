@@ -16,6 +16,7 @@ import io.github.pnoker.common.utils.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +46,9 @@ public class UserManageServiceImpl implements UserManageService {
 
     @Resource
     private RoleUserBindService roleUserBindService;
+
+    @Resource
+    private RoleResourceBindService roleResourceBindService;
 
     @Resource
     private UserRedisUtil userRedisUtil;
@@ -105,6 +109,16 @@ public class UserManageServiceImpl implements UserManageService {
         userRedisUtil.setSetValue(redisRoleKey, roleCodeSet, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
 
         //3. save resources
-
+        Set<io.github.pnoker.common.model.Resource> resourceSet = new HashSet<>();
+        for (Role role : roles){
+            List<io.github.pnoker.common.model.Resource> resources = roleResourceBindService.listResourceByRoleId(role.getId());
+            resourceSet.addAll(resources);
+        }
+        if (CollUtil.isEmpty(resourceSet)){
+            throw new ServiceException("请先为用户{}分配权限", login.getName());
+        }
+        Set<String> resourceCodeSet = resourceSet.stream().map(io.github.pnoker.common.model.Resource::getResourceCode).collect(Collectors.toSet());
+        String redisResourceKey = userRedisUtil.getKey(SuffixConstant.RESOURCE, login.getName(), tenant.getId());
+        userRedisUtil.setSetValue(redisResourceKey, resourceCodeSet, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
     }
 }
