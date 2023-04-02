@@ -49,81 +49,78 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User add(User user) {
+    public void add(User entityDO) {
         // todo 不通过，会返回密码数据
         // 判断用户是否存在
-        User selectByUserName = selectByUserName(user.getUserName(), false);
+        User selectByUserName = selectByUserName(entityDO.getUserName(), false);
         if (ObjectUtil.isNotNull(selectByUserName)) {
-            throw new DuplicateException("The user already exists with username: {}", user.getUserName());
+            throw new DuplicateException("The user already exists with username: {}", entityDO.getUserName());
         }
 
         // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
-        if (CharSequenceUtil.isNotEmpty(user.getPhone())) {
-            User selectByPhone = selectByPhone(user.getPhone(), false);
+        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
+            User selectByPhone = selectByPhone(entityDO.getPhone(), false);
             if (ObjectUtil.isNotNull(selectByPhone)) {
-                throw new DuplicateException("The user already exists with phone: {}", user.getPhone());
+                throw new DuplicateException("The user already exists with phone: {}", entityDO.getPhone());
             }
         }
 
         // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
-        if (CharSequenceUtil.isNotEmpty(user.getEmail())) {
-            User selectByEmail = selectByEmail(user.getEmail(), false);
+        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
+            User selectByEmail = selectByEmail(entityDO.getEmail(), false);
             if (ObjectUtil.isNotNull(selectByEmail)) {
-                throw new DuplicateException("The user already exists with email: {}", user.getEmail());
+                throw new DuplicateException("The user already exists with email: {}", entityDO.getEmail());
             }
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(user) > 0) {
-            return userMapper.selectById(user.getId());
-        }
+        userMapper.insert(entityDO);
 
-        throw new AddException("The user add failed: {}", user.toString());
+        throw new AddException("The user add failed: {}", entityDO.toString());
     }
 
     @Override
     @Transactional
-    public Boolean delete(String id) {
+    public void delete(String id) {
         User user = selectById(id);
         if (ObjectUtil.isNull(user)) {
             throw new NotFoundException();
         }
-        return userMapper.deleteById(id) > 0;
+        userMapper.deleteById(id);
     }
 
     @Override
-    public User update(User user) {
-        User selectById = selectById(user.getId());
+    public void update(User entityDO) {
+        User selectById = selectById(entityDO.getId());
         // 判断 phone 是否修改
-        if (CharSequenceUtil.isNotEmpty(user.getPhone())) {
-            if (!user.getPhone().equals(selectById.getPhone())) {
-                User selectByPhone = selectByPhone(user.getPhone(), false);
+        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
+            if (!entityDO.getPhone().equals(selectById.getPhone())) {
+                User selectByPhone = selectByPhone(entityDO.getPhone(), false);
                 if (ObjectUtil.isNotNull(selectByPhone)) {
-                    throw new DuplicateException("The user already exists with phone {}", user.getPhone());
+                    throw new DuplicateException("The user already exists with phone {}", entityDO.getPhone());
                 }
             }
         } else {
-            user.setPhone(null);
+            entityDO.setPhone(null);
         }
 
         // 判断 email 是否修改
-        if (CharSequenceUtil.isNotEmpty(user.getEmail())) {
-            if (!user.getEmail().equals(selectById.getEmail())) {
-                User selectByEmail = selectByEmail(user.getEmail(), false);
+        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
+            if (!entityDO.getEmail().equals(selectById.getEmail())) {
+                User selectByEmail = selectByEmail(entityDO.getEmail(), false);
                 if (ObjectUtil.isNotNull(selectByEmail)) {
-                    throw new DuplicateException("The user already exists with email {}", user.getEmail());
+                    throw new DuplicateException("The user already exists with email {}", entityDO.getEmail());
                 }
             }
         } else {
-            user.setEmail(null);
+            entityDO.setEmail(null);
         }
 
-        user.setUserName(null);
-        user.setOperateTime(null);
-        if (userMapper.updateById(user) > 0) {
-            User select = userMapper.selectById(user.getId());
-            user.setUserName(select.getUserName());
-            return select;
+        entityDO.setUserName(null);
+        entityDO.setOperateTime(null);
+        if (userMapper.updateById(entityDO) > 0) {
+            User select = userMapper.selectById(entityDO.getId());
+            entityDO.setUserName(select.getUserName());
         }
         throw new ServiceException("The user update failed");
     }
@@ -169,21 +166,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> list(UserDto entityDTO) {
-        if (ObjectUtil.isNull(entityDTO.getPage())) {
-            entityDTO.setPage(new Pages());
+    public Page<User> list(UserDto queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return userMapper.selectPage(entityDTO.getPage().convert(), fuzzyQuery(entityDTO));
+        return userMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    @Override
-    public LambdaQueryWrapper<User> fuzzyQuery(UserDto entityDTO) {
+    public LambdaQueryWrapper<User> fuzzyQuery(UserDto query) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        if (ObjectUtil.isNotNull(entityDTO)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(entityDTO.getNickName()), User::getNickName, entityDTO.getNickName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(entityDTO.getUserName()), User::getUserName, entityDTO.getUserName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(entityDTO.getPhone()), User::getPhone, entityDTO.getPhone());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(entityDTO.getEmail()), User::getEmail, entityDTO.getEmail());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), User::getNickName, query.getNickName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), User::getUserName, query.getUserName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), User::getPhone, query.getPhone());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), User::getEmail, query.getEmail());
         }
         return queryWrapper;
     }

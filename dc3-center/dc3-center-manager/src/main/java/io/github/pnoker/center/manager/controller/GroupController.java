@@ -56,18 +56,15 @@ public class GroupController {
      * @return Group
      */
     @PostMapping("/add")
-    public R<Group> add(@Validated(Insert.class) @RequestBody Group group,
-                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Group group,
+                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             group.setTenantId(tenantId);
-            Group add = groupService.add(group);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            groupService.add(group);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -77,9 +74,10 @@ public class GroupController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return groupService.delete(id) ? R.ok() : R.fail();
+            groupService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -93,18 +91,15 @@ public class GroupController {
      * @return Group
      */
     @PostMapping("/update")
-    public R<Group> update(@Validated(Update.class) @RequestBody Group group,
-                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Group group,
+                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             group.setTenantId(tenantId);
-            Group update = groupService.update(group);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            groupService.update(group);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service.rabbit;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.center.manager.service.DriverRegisterService;
+import io.github.pnoker.center.manager.service.DriverSyncService;
 import io.github.pnoker.common.dto.DriverSyncUpDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ import java.io.IOException;
 public class DriverRegisterReceiver {
 
     @Resource
-    private DriverRegisterService driverRegisterService;
+    private DriverSyncService driverSyncService;
 
     @RabbitHandler
     @RabbitListener(queues = "#{syncUpQueue.name}")
@@ -54,7 +54,7 @@ public class DriverRegisterReceiver {
                 return;
             }
 
-            driverRegisterService.register(entityDTO);
+            driverSyncService.up(entityDTO);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }

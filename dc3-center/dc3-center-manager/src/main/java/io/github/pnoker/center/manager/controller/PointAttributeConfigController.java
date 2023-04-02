@@ -19,11 +19,9 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
-import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.PointAttributeConfig;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -49,9 +47,6 @@ public class PointAttributeConfigController {
     @Resource
     private PointAttributeConfigService pointAttributeConfigService;
 
-    @Resource
-    private NotifyService notifyService;
-
     /**
      * 新增 PointInfo
      *
@@ -59,17 +54,13 @@ public class PointAttributeConfigController {
      * @return PointInfo
      */
     @PostMapping("/add")
-    public R<PointAttributeConfig> add(@Validated(Insert.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
+    public R<String> add(@Validated(Insert.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
         try {
-            PointAttributeConfig add = pointAttributeConfigService.add(pointAttributeConfig);
-            if (ObjectUtil.isNotNull(add)) {
-                notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, add);
-                return R.ok(add);
-            }
+            pointAttributeConfigService.add(pointAttributeConfig);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -79,17 +70,13 @@ public class PointAttributeConfigController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointAttributeConfig pointAttributeConfig = pointAttributeConfigService.selectById(id);
-            if (ObjectUtil.isNotNull(pointAttributeConfig) && pointAttributeConfigService.delete(id)) {
-                notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfig);
-                return R.ok();
-            }
+            pointAttributeConfigService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -99,17 +86,13 @@ public class PointAttributeConfigController {
      * @return PointInfo
      */
     @PostMapping("/update")
-    public R<PointAttributeConfig> update(@Validated(Update.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
+    public R<String> update(@Validated(Update.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
         try {
-            PointAttributeConfig update = pointAttributeConfigService.update(pointAttributeConfig);
-            if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, update);
-                return R.ok(update);
-            }
+            pointAttributeConfigService.update(pointAttributeConfig);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

@@ -20,13 +20,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointPageQuery;
-import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -56,9 +54,6 @@ public class PointController {
     @Resource
     private PointService pointService;
 
-    @Resource
-    private NotifyService notifyService;
-
     /**
      * 新增 Point
      *
@@ -71,11 +66,8 @@ public class PointController {
                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             point.setTenantId(tenantId);
-            Point add = pointService.add(point);
-            if (ObjectUtil.isNotNull(add)) {
-                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, add);
-                return R.ok(add);
-            }
+            pointService.add(point);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -89,17 +81,13 @@ public class PointController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Point point = pointService.selectById(id);
-            if (ObjectUtil.isNotNull(point) && pointService.delete(id)) {
-                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, point);
-                return R.ok();
-            }
+            pointService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -110,19 +98,14 @@ public class PointController {
      * @return Point
      */
     @PostMapping("/update")
-    public R<Point> update(@Validated(Update.class) @RequestBody Point point,
-                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             point.setTenantId(tenantId);
-            Point update = pointService.update(point);
-            if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, update);
-                return R.ok(update);
-            }
+            pointService.update(point);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

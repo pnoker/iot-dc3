@@ -54,16 +54,13 @@ public class BlackIpController {
      * @return {@link BlackIp}
      */
     @PostMapping("/add")
-    public R<BlackIp> add(@Validated(Insert.class) @RequestBody BlackIp blackIp) {
+    public R<String> add(@Validated(Insert.class) @RequestBody BlackIp blackIp) {
         try {
-            BlackIp add = blackIpService.add(blackIp);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            blackIpService.add(blackIp);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -73,9 +70,10 @@ public class BlackIpController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return blackIpService.delete(id) ? R.ok() : R.fail();
+            blackIpService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -92,16 +90,13 @@ public class BlackIpController {
      * @return {@link BlackIp}
      */
     @PostMapping("/update")
-    public R<BlackIp> update(@Validated(Update.class) @RequestBody BlackIp blackIp) {
+    public R<String> update(@Validated(Update.class) @RequestBody BlackIp blackIp) {
         try {
-            BlackIp update = blackIpService.update(blackIp);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            blackIpService.update(blackIp);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

@@ -48,34 +48,31 @@ public class BlackIpServiceImpl implements BlackIpService {
     private BlackIpMapper blackIpMapper;
 
     @Override
-    public BlackIp add(BlackIp blackIp) {
-        BlackIp select = selectByIp(blackIp.getIp(), false);
+    public void add(BlackIp entityDO) {
+        BlackIp select = selectByIp(entityDO.getIp(), false);
         if (ObjectUtil.isNotNull(select)) {
             throw new ServiceException("The ip already exists in the blacklist");
         }
-        if (blackIpMapper.insert(blackIp) > 0) {
-            return blackIpMapper.selectById(blackIp.getId());
-        }
+        blackIpMapper.insert(entityDO);
         throw new ServiceException("The ip add to the blacklist failed");
     }
 
     @Override
-    public Boolean delete(String id) {
+    public void delete(String id) {
         BlackIp blackIp = selectById(id);
         if (ObjectUtil.isNull(blackIp)) {
             throw new ServiceException("The ip does not exist in the blacklist");
         }
-        return blackIpMapper.deleteById(id) > 0;
+        blackIpMapper.deleteById(id);
     }
 
     @Override
-    public BlackIp update(BlackIp blackIp) {
-        blackIp.setIp(null);
-        blackIp.setOperateTime(null);
-        if (blackIpMapper.updateById(blackIp) > 0) {
-            BlackIp select = blackIpMapper.selectById(blackIp.getId());
-            blackIp.setIp(select.getIp());
-            return select;
+    public void update(BlackIp entityDO) {
+        entityDO.setIp(null);
+        entityDO.setOperateTime(null);
+        if (blackIpMapper.updateById(entityDO) > 0) {
+            BlackIp select = blackIpMapper.selectById(entityDO.getId());
+            entityDO.setIp(select.getIp());
         }
         throw new ServiceException("The ip update failed in the blacklist");
     }
@@ -98,11 +95,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public Page<BlackIp> list(BlackIpPageQuery blackIpPageQuery) {
-        if (ObjectUtil.isNull(blackIpPageQuery.getPage())) {
-            blackIpPageQuery.setPage(new Pages());
+    public Page<BlackIp> list(BlackIpPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return blackIpMapper.selectPage(blackIpPageQuery.getPage().convert(), fuzzyQuery(blackIpPageQuery));
+        return blackIpMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
     @Override
@@ -114,11 +111,10 @@ public class BlackIpServiceImpl implements BlackIpService {
         return false;
     }
 
-    @Override
-    public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpPageQuery blackIpPageQuery) {
+    public LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpPageQuery query) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
-        if (ObjectUtil.isNotNull(blackIpPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(blackIpPageQuery.getIp()), BlackIp::getIp, blackIpPageQuery.getIp());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIp::getIp, query.getIp());
         }
         return queryWrapper;
     }

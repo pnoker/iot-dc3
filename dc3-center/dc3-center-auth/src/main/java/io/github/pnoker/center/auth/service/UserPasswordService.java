@@ -32,7 +32,6 @@ public interface UserPasswordService extends Service<UserPassword, UserPasswordP
      * 重置密码
      *
      * @param id ID
-     * @return Boolean
      */
-    Boolean restPassword(String id);
+    void restPassword(String id);
 }

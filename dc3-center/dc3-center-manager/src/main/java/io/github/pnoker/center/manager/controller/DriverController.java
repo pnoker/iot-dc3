@@ -62,18 +62,14 @@ public class DriverController {
      * @return Driver
      */
     @PostMapping("/add")
-    public R<Driver> add(@Validated(Insert.class) @RequestBody Driver driver,
-                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Driver driver, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             driver.setTenantId(tenantId);
-            Driver add = driverService.add(driver);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            driverService.add(driver);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -83,9 +79,10 @@ public class DriverController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return driverService.delete(id) ? R.ok() : R.fail();
+            driverService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -99,18 +96,15 @@ public class DriverController {
      * @return Driver
      */
     @PostMapping("/update")
-    public R<Driver> update(@Validated(Update.class) @RequestBody Driver driver,
+    public R<String> update(@Validated(Update.class) @RequestBody Driver driver,
                             @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             driver.setTenantId(tenantId);
-            Driver update = driverService.update(driver);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            driverService.update(driver);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

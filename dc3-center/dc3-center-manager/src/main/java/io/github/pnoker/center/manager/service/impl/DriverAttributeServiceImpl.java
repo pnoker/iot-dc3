@@ -52,14 +52,12 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public DriverAttribute add(DriverAttribute driverAttribute) {
+    public void add(DriverAttribute entityDO) {
         try {
-            selectByNameAndDriverId(driverAttribute.getAttributeName(), driverAttribute.getDriverId());
+            selectByNameAndDriverId(entityDO.getAttributeName(), entityDO.getDriverId());
             throw new DuplicateException("The driver attribute already exists");
         } catch (NotFoundException notFoundException) {
-            if (driverAttributeMapper.insert(driverAttribute) > 0) {
-                return driverAttributeMapper.selectById(driverAttribute.getId());
-            }
+            driverAttributeMapper.insert(entityDO);
             throw new ServiceException("The driver attribute add failed");
         }
     }
@@ -68,7 +66,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Boolean delete(String id) {
+    public boolean delete(String id) {
         selectById(id);
         return driverAttributeMapper.deleteById(id) > 0;
     }
@@ -77,13 +75,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public DriverAttribute update(DriverAttribute driverAttribute) {
-        selectById(driverAttribute.getId());
-        driverAttribute.setOperateTime(null);
-        if (driverAttributeMapper.updateById(driverAttribute) > 0) {
-            DriverAttribute select = driverAttributeMapper.selectById(driverAttribute.getId());
-            driverAttribute.setAttributeName(select.getAttributeName());
-            driverAttribute.setDriverId(select.getDriverId());
+    public boolean update(DriverAttribute entityDO) {
+        selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        if (driverAttributeMapper.updateById(entityDO) > 0) {
+            DriverAttribute select = driverAttributeMapper.selectById(entityDO.getId());
+            entityDO.setAttributeName(select.getAttributeName());
+            entityDO.setDriverId(select.getDriverId());
             return select;
         }
         throw new ServiceException("The driver attribute update failed");
@@ -137,24 +135,20 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverAttribute> list(DriverAttributePageQuery driverAttributePageQuery) {
-        if (ObjectUtil.isNull(driverAttributePageQuery.getPage())) {
-            driverAttributePageQuery.setPage(new Pages());
+    public Page<DriverAttribute> list(DriverAttributePageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return driverAttributeMapper.selectPage(driverAttributePageQuery.getPage().convert(), fuzzyQuery(driverAttributePageQuery));
+        return driverAttributeMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributePageQuery driverAttributePageQuery) {
+    public LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributePageQuery query) {
         LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        if (ObjectUtil.isNotNull(driverAttributePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(driverAttributePageQuery.getAttributeName()), DriverAttribute::getAttributeName, driverAttributePageQuery.getAttributeName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(driverAttributePageQuery.getDisplayName()), DriverAttribute::getDisplayName, driverAttributePageQuery.getDisplayName());
-            queryWrapper.eq(ObjectUtil.isNotNull(driverAttributePageQuery.getAttributeTypeFlag()), DriverAttribute::getAttributeTypeFlag, driverAttributePageQuery.getAttributeTypeFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(driverAttributePageQuery.getDriverId()), DriverAttribute::getDriverId, driverAttributePageQuery.getDriverId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getAttributeName()), DriverAttribute::getAttributeName, query.getAttributeName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDisplayName()), DriverAttribute::getDisplayName, query.getDisplayName());
+            queryWrapper.eq(ObjectUtil.isNotNull(query.getAttributeTypeFlag()), DriverAttribute::getAttributeTypeFlag, query.getAttributeTypeFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDriverId()), DriverAttribute::getDriverId, query.getDriverId());
         }
         return queryWrapper;
     }

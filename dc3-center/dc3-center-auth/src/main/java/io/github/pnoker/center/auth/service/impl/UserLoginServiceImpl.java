@@ -49,24 +49,22 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     @Transactional
-    public UserLogin add(UserLogin userLogin) {
+    public void add(UserLogin entityDO) {
         // 判断登录名称是否存在
-        UserLogin selectByLoginName = selectByLoginName(userLogin.getLoginName(), false);
+        UserLogin selectByLoginName = selectByLoginName(entityDO.getLoginName(), false);
         if (ObjectUtil.isNotNull(selectByLoginName)) {
-            throw new DuplicateException("The user already exists with login name: {}", userLogin.getLoginName());
+            throw new DuplicateException("The user already exists with login name: {}", entityDO.getLoginName());
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userLoginMapper.insert(userLogin) > 0) {
-            return userLoginMapper.selectById(userLogin.getId());
-        }
+        userLoginMapper.insert(entityDO);
 
-        throw new AddException("The user add failed: {}", userLogin.toString());
+        throw new AddException("The user add failed: {}", entityDO.toString());
     }
 
     @Override
     @Transactional
-    public Boolean delete(String id) {
+    public void delete(String id) {
         UserLogin userLogin = selectById(id);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException();
@@ -75,16 +73,16 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public UserLogin update(UserLogin userLogin) {
-        UserLogin selectById = selectById(userLogin.getId());
+    public void update(UserLogin entityDO) {
+        UserLogin selectById = selectById(entityDO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
-        userLogin.setLoginName(null);
-        userLogin.setOperateTime(null);
-        if (userLoginMapper.updateById(userLogin) > 0) {
-            UserLogin select = userLoginMapper.selectById(userLogin.getId());
-            userLogin.setLoginName(select.getLoginName());
+        entityDO.setLoginName(null);
+        entityDO.setOperateTime(null);
+        if (userLoginMapper.updateById(entityDO) > 0) {
+            UserLogin select = userLoginMapper.selectById(entityDO.getId());
+            entityDO.setLoginName(select.getLoginName());
             return select;
         }
         throw new ServiceException("The user update failed");
@@ -96,11 +94,11 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Page<UserLogin> list(UserLoginPageQuery userPageQuery) {
-        if (ObjectUtil.isNull(userPageQuery.getPage())) {
-            userPageQuery.setPage(new Pages());
+    public Page<UserLogin> list(UserLoginPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return userLoginMapper.selectPage(userPageQuery.getPage().convert(), fuzzyQuery(userPageQuery));
+        return userLoginMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
     @Override
@@ -133,11 +131,10 @@ public class UserLoginServiceImpl implements UserLoginService {
         return false;
     }
 
-    @Override
-    public LambdaQueryWrapper<UserLogin> fuzzyQuery(UserLoginPageQuery userPageQuery) {
+    public LambdaQueryWrapper<UserLogin> fuzzyQuery(UserLoginPageQuery query) {
         LambdaQueryWrapper<UserLogin> queryWrapper = Wrappers.<UserLogin>query().lambda();
-        if (ObjectUtil.isNotNull(userPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(userPageQuery.getLoginName()), UserLogin::getLoginName, userPageQuery.getLoginName());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLogin::getLoginName, query.getLoginName());
         }
         return queryWrapper;
     }

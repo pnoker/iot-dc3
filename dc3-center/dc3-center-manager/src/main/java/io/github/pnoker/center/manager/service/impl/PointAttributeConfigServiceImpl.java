@@ -23,9 +23,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.mapper.PointAttributeConfigMapper;
+import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -54,18 +56,22 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Resource
     private PointService pointService;
+    @Resource
+    private NotifyService notifyService;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointAttributeConfig add(PointAttributeConfig pointAttributeConfig) {
+    public String add(PointAttributeConfig entityDO) {
         try {
-            selectByAttributeIdAndDeviceIdAndPointId(pointAttributeConfig.getPointAttributeId(), pointAttributeConfig.getDeviceId(), pointAttributeConfig.getPointId());
+            selectByAttributeIdAndDeviceIdAndPointId(entityDO.getPointAttributeId(), entityDO.getDeviceId(), entityDO.getPointId());
             throw new DuplicateException("The point attribute config already exists");
         } catch (NotFoundException notFoundException) {
-            if (pointAttributeConfigMapper.insert(pointAttributeConfig) > 0) {
-                return pointAttributeConfigMapper.selectById(pointAttributeConfig.getId());
+            if (pointAttributeConfigMapper.insert(entityDO) > 0) {
+                PointAttributeConfig add = pointAttributeConfigMapper.selectById(entityDO.getId());
+                notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, add);
+                return entityDO.getId();
             }
             throw new ServiceException("The point attribute config add failed");
         }
@@ -75,32 +81,37 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public Boolean delete(String id) {
-        selectById(id);
-        return pointAttributeConfigMapper.deleteById(id) > 0;
+    public boolean delete(String id) {
+        PointAttributeConfig pointAttributeConfig = selectById(id);
+        boolean delete = pointAttributeConfigMapper.deleteById(id) > 0;
+        if (delete) {
+            notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfig);
+        }
+        return delete;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointAttributeConfig update(PointAttributeConfig pointAttributeConfig) {
-        PointAttributeConfig old = selectById(pointAttributeConfig.getId());
-        pointAttributeConfig.setOperateTime(null);
-        if (!old.getPointAttributeId().equals(pointAttributeConfig.getPointAttributeId()) || !old.getDeviceId().equals(pointAttributeConfig.getDeviceId()) || !old.getPointId().equals(pointAttributeConfig.getPointId())) {
+    public boolean update(PointAttributeConfig entityDO) {
+        PointAttributeConfig old = selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        if (!old.getPointAttributeId().equals(entityDO.getPointAttributeId()) || !old.getDeviceId().equals(entityDO.getDeviceId()) || !old.getPointId().equals(entityDO.getPointId())) {
             try {
-                selectByAttributeIdAndDeviceIdAndPointId(pointAttributeConfig.getPointAttributeId(), pointAttributeConfig.getDeviceId(), pointAttributeConfig.getPointId());
+                selectByAttributeIdAndDeviceIdAndPointId(entityDO.getPointAttributeId(), entityDO.getDeviceId(), entityDO.getPointId());
                 throw new DuplicateException("The point attribute config already exists");
             } catch (NotFoundException ignored) {
                 // nothing to do
             }
         }
-        if (pointAttributeConfigMapper.updateById(pointAttributeConfig) > 0) {
-            PointAttributeConfig select = pointAttributeConfigMapper.selectById(pointAttributeConfig.getId());
-            pointAttributeConfig.setPointAttributeId(select.getPointAttributeId());
-            pointAttributeConfig.setDeviceId(select.getDeviceId());
-            pointAttributeConfig.setPointId(select.getPointId());
-            return select;
+        if (pointAttributeConfigMapper.updateById(entityDO) > 0) {
+            PointAttributeConfig select = pointAttributeConfigMapper.selectById(entityDO.getId());
+            entityDO.setPointAttributeId(select.getPointAttributeId());
+            entityDO.setDeviceId(select.getDeviceId());
+            entityDO.setPointId(select.getPointId());
+            notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, select);
+            return true;
         }
         throw new ServiceException("The point attribute config update failed");
     }
@@ -184,23 +195,19 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttributeConfig> list(PointAttributeConfigPageQuery pointInfoPageQuery) {
-        if (ObjectUtil.isNull(pointInfoPageQuery.getPage())) {
-            pointInfoPageQuery.setPage(new Pages());
+    public Page<PointAttributeConfig> list(PointAttributeConfigPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return pointAttributeConfigMapper.selectPage(pointInfoPageQuery.getPage().convert(), fuzzyQuery(pointInfoPageQuery));
+        return pointAttributeConfigMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LambdaQueryWrapper<PointAttributeConfig> fuzzyQuery(PointAttributeConfigPageQuery pointInfoPageQuery) {
+    public LambdaQueryWrapper<PointAttributeConfig> fuzzyQuery(PointAttributeConfigPageQuery query) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
-        if (ObjectUtil.isNotNull(pointInfoPageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointAttributeId()), PointAttributeConfig::getPointAttributeId, pointInfoPageQuery.getPointAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getDeviceId()), PointAttributeConfig::getDeviceId, pointInfoPageQuery.getDeviceId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointInfoPageQuery.getPointId()), PointAttributeConfig::getPointId, pointInfoPageQuery.getPointId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getPointAttributeId()), PointAttributeConfig::getPointAttributeId, query.getPointAttributeId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDeviceId()), PointAttributeConfig::getDeviceId, query.getDeviceId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getPointId()), PointAttributeConfig::getPointId, query.getPointId());
         }
         return queryWrapper;
     }

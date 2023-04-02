@@ -57,10 +57,12 @@ public class DataTopicConfig {
 
     @Bean
     Binding driverEventBinding(Queue driverEventQueue) {
-        return BindingBuilder
+        Binding binding = BindingBuilder
                 .bind(driverEventQueue)
                 .to(eventExchange)
                 .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        return binding;
     }
 
     @Bean
@@ -73,10 +75,12 @@ public class DataTopicConfig {
 
     @Bean
     Binding deviceEventBinding(Queue deviceEventQueue) {
-        return BindingBuilder
+        Binding binding = BindingBuilder
                 .bind(deviceEventQueue)
                 .to(eventExchange)
                 .with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        return binding;
     }
 
     @Bean
@@ -89,10 +93,12 @@ public class DataTopicConfig {
 
     @Bean
     Binding pointValueBinding(Queue pointValueQueue) {
-        return BindingBuilder
+        Binding binding = BindingBuilder
                 .bind(pointValueQueue)
                 .to(valueExchange)
                 .with(RabbitConstant.ROUTING_POINT_VALUE_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        return binding;
     }
 
 }
