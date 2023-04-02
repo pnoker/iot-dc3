@@ -43,14 +43,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 驱动注册相关接口实现
+ * 驱动同步相关接口实现
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @Service
-public class DriverRegisterServiceImpl implements DriverRegisterService {
+public class DriverSyncServiceImpl implements DriverSyncService {
 
     @GrpcClient(AuthServiceConstant.SERVICE_NAME)
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
@@ -73,7 +73,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void register(DriverSyncUpDTO entityDTO) {
+    public void up(DriverSyncUpDTO entityDTO) {
         if (ObjectUtil.isNull(entityDTO) || ObjectUtil.isNull(entityDTO.getDriver())) {
             return;
         }
@@ -116,12 +116,12 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             Driver byServiceName = driverService.selectByServiceName(driver.getServiceName(), driver.getTenantId());
             log.debug("Driver already registered, updating {} ", driver);
             driver.setId(byServiceName.getId());
-            driver = driverService.update(driver);
+            driverService.update(driver);
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", driver);
-            driver = driverService.add(driver);
+            driverService.add(driver);
         }
-        return driver;
+        return driverService.selectById(driver.getId());
     }
 
     /**

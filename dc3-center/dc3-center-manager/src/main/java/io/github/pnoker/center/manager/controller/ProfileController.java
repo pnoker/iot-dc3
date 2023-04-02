@@ -19,13 +19,11 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
-import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.Profile;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -55,9 +53,6 @@ public class ProfileController {
     @Resource
     private ProfileService profileService;
 
-    @Resource
-    private NotifyService notifyService;
-
     /**
      * 新增 Profile
      *
@@ -66,18 +61,15 @@ public class ProfileController {
      * @return Profile
      */
     @PostMapping("/add")
-    public R<Profile> add(@Validated(Insert.class) @RequestBody Profile profile,
-                          @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Profile profile,
+                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             profile.setTenantId(tenantId);
-            Profile add = profileService.add(profile);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            profileService.add(profile);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -87,17 +79,13 @@ public class ProfileController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Profile profile = profileService.selectById(id);
-            if (ObjectUtil.isNotNull(profile) && profileService.delete(id)) {
-                notifyService.notifyDriverProfile(MetadataCommandTypeEnum.DELETE, profile);
-                return R.ok();
-            }
+            profileService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -108,19 +96,15 @@ public class ProfileController {
      * @return Profile
      */
     @PostMapping("/update")
-    public R<Profile> update(@Validated(Update.class) @RequestBody Profile profile,
-                             @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Profile profile,
+                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             profile.setTenantId(tenantId);
-            Profile update = profileService.update(profile);
-            if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, update);
-                return R.ok(update);
-            }
+            profileService.update(profile);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

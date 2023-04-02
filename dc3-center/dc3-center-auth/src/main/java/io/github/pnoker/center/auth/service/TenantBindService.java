@@ -32,7 +32,7 @@ public interface TenantBindService extends Service<TenantBind, TenantBindPageQue
      * 根据 租户ID 和 关联的用户ID 查询
      *
      * @param tenantId 租户ID
-     * @param userId   User Id
+     * @param userId   User ID
      * @return TenantBind
      */
     TenantBind selectByTenantIdAndUserId(String tenantId, String userId);

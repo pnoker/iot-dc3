@@ -54,7 +54,7 @@ public class ManagerTopicConfig {
         Map<String, Object> arguments = new HashMap<>();
         // 30秒：30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_SYNC_UP, true, false, false, arguments);
+        return new Queue(RabbitConstant.QUEUE_SYNC_UP, false, false, false, arguments);
     }
 
     /**
@@ -65,10 +65,12 @@ public class ManagerTopicConfig {
      */
     @Bean
     Binding driverRegisterBinding(Queue syncUpQueue) {
-        return BindingBuilder
+        Binding binding = BindingBuilder
                 .bind(syncUpQueue)
                 .to(syncExchange)
                 .with(RabbitConstant.ROUTING_SYNC_UP_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        return binding;
     }
 
 }

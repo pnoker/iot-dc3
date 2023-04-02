@@ -71,9 +71,9 @@ spring:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
             #- name: CircuitBreaker
-             # args:
-             #   name: default
-             #   fallbackUri: 'forward:/fallback'
+            # args:
+            #   name: default
+            #   fallbackUri: 'forward:/fallback'
         # auth other
         - id: auth_route_other
           uri: lb://dc3-center-auth
@@ -88,9 +88,9 @@ spring:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
             #- name: CircuitBreaker
-             # args:
-             #   name: default
-             #   fallbackUri: 'forward:/fallback'
+            # args:
+            #   name: default
+            #   fallbackUri: 'forward:/fallback'
         # manager
         - id: manager_route
           uri: lb://dc3-center-manager
@@ -105,9 +105,9 @@ spring:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
             #- name: CircuitBreaker
-             # args:
-             #   name: default
-             #   fallbackUri: 'forward:/fallback'
+            # args:
+            #   name: default
+            #   fallbackUri: 'forward:/fallback'
         # data
         - id: data_route
           uri: lb://dc3-center-data
@@ -122,9 +122,9 @@ spring:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
             #- name: CircuitBreaker
-             # args:
-             #   name: default
-             #   fallbackUri: 'forward:/fallback'
+            # args:
+            #   name: default
+            #   fallbackUri: 'forward:/fallback'
 
 logging:
   level:

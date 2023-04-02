@@ -16,23 +16,21 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.entity.point.PointDetail;
+import io.github.pnoker.common.dto.DriverSyncUpDTO;
 
 /**
- * Auto Interface
+ * 驱动同步相关接口
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface AutoService {
+public interface DriverSyncService {
+
     /**
-     * 自动创建设备和位号
+     * 驱动注册
      *
-     * @param deviceName Device Name
-     * @param pointName  Point Name
-     * @param driverId   Driver ID
-     * @param tenantId   租户ID
-     * @return booleaDevicePointn
+     * @param entityDTO DriverRegisterDTO
      */
-    PointDetail autoCreateDeviceAndPoint(String deviceName, String pointName, String driverId, String tenantId);
+    void up(DriverSyncUpDTO entityDTO);
+
 }

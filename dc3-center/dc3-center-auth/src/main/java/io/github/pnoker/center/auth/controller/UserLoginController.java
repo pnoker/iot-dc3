@@ -19,8 +19,8 @@ package io.github.pnoker.center.auth.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
-import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.center.auth.service.UserLoginService;
+import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -57,16 +57,13 @@ public class UserLoginController {
      * @return {@link UserLogin}
      */
     @PostMapping("/add")
-    public R<UserLogin> add(@Validated(Insert.class) @RequestBody UserLogin userLogin) {
+    public R<String> add(@Validated(Insert.class) @RequestBody UserLogin userLogin) {
         try {
-            UserLogin add = userLoginService.add(userLogin);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            userLoginService.add(userLogin);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -76,9 +73,10 @@ public class UserLoginController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return userLoginService.delete(id) ? R.ok() : R.fail();
+            userLoginService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -95,17 +93,14 @@ public class UserLoginController {
      * @return {@link UserLogin}
      */
     @PostMapping("/update")
-    public R<UserLogin> update(@Validated(Update.class) @RequestBody UserLogin userLogin) {
+    public R<String> update(@Validated(Update.class) @RequestBody UserLogin userLogin) {
         try {
             userLogin.setLoginName(null);
-            UserLogin update = userLoginService.update(userLogin);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            userLoginService.update(userLogin);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -117,7 +112,8 @@ public class UserLoginController {
     @PostMapping("/reset/{id}")
     public R<Boolean> restPassword(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return userPasswordService.restPassword(id) ? R.ok() : R.fail();
+            userPasswordService.restPassword(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

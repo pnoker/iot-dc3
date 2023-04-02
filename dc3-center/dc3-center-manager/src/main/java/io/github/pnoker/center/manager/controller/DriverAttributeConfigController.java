@@ -20,10 +20,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.DriverAttributeConfig;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -49,9 +47,6 @@ public class DriverAttributeConfigController {
     @Resource
     private DriverAttributeConfigService driverAttributeConfigService;
 
-    @Resource
-    private NotifyService notifyService;
-
     /**
      * 新增 DriverInfo
      *
@@ -59,17 +54,13 @@ public class DriverAttributeConfigController {
      * @return DriverInfo
      */
     @PostMapping("/add")
-    public R<DriverAttributeConfig> add(@Validated(Insert.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
+    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
         try {
-            DriverAttributeConfig add = driverAttributeConfigService.add(driverAttributeConfig);
-            if (ObjectUtil.isNotNull(add)) {
-                notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.ADD, add);
-                return R.ok(add);
-            }
+            driverAttributeConfigService.add(driverAttributeConfig);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -79,17 +70,13 @@ public class DriverAttributeConfigController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttributeConfig driverAttributeConfig = driverAttributeConfigService.selectById(id);
-            if (ObjectUtil.isNotNull(driverAttributeConfig) && driverAttributeConfigService.delete(id)) {
-                notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);
-                return R.ok();
-            }
+            driverAttributeConfigService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -99,17 +86,13 @@ public class DriverAttributeConfigController {
      * @return DriverInfo
      */
     @PostMapping("/update")
-    public R<DriverAttributeConfig> update(@Validated(Update.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
+    public R<String> update(@Validated(Update.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
         try {
-            DriverAttributeConfig update = driverAttributeConfigService.update(driverAttributeConfig);
-            if (ObjectUtil.isNotNull(update)) {
-                notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.UPDATE, update);
-                return R.ok(update);
-            }
+            driverAttributeConfigService.update(driverAttributeConfig);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

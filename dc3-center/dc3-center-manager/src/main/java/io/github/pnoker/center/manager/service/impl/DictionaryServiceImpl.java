@@ -23,7 +23,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DictionaryPageQuery;
 import io.github.pnoker.center.manager.entity.query.PointPageQuery;
-import io.github.pnoker.center.manager.mapper.*;
+import io.github.pnoker.center.manager.mapper.DeviceMapper;
+import io.github.pnoker.center.manager.mapper.DriverMapper;
+import io.github.pnoker.center.manager.mapper.ProfileMapper;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Dictionary;
@@ -49,18 +51,14 @@ import java.util.stream.Collectors;
 public class DictionaryServiceImpl implements DictionaryService {
 
     @Resource
-    private PointService pointService;
-
-    @Resource
     private DriverMapper driverMapper;
-    @Resource
-    private DriverAttributeMapper driverAttributeMapper;
-    @Resource
-    private PointAttributeMapper pointAttributeMapper;
     @Resource
     private ProfileMapper profileMapper;
     @Resource
     private DeviceMapper deviceMapper;
+
+    @Resource
+    private PointService pointService;
 
     @Override
     public Page<Dictionary> driverDictionary(DictionaryPageQuery dictionaryPageQuery) {

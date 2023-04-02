@@ -54,7 +54,7 @@ public interface NotifyService {
     /**
      * 通知驱动 新增驱动配置(ADD) / 删除驱动配置(DELETE) / 更新驱动配置(UPDATE)
      *
-     * @param command    Operation Type
+     * @param command               Operation Type
      * @param driverAttributeConfig Driver Attribute Config
      */
     void notifyDriverDriverInfo(MetadataCommandTypeEnum command, DriverAttributeConfig driverAttributeConfig);
@@ -62,7 +62,7 @@ public interface NotifyService {
     /**
      * 通知驱动 新增位号配置(ADD) / 删除位号配置(DELETE) / 更新位号配置(UPDATE)
      *
-     * @param command   Operation Type
+     * @param command              Operation Type
      * @param pointAttributeConfig PointInfo
      */
     void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfig pointAttributeConfig);

@@ -47,26 +47,22 @@ public class TenantBindServiceImpl implements TenantBindService {
     private TenantBindMapper tenantBindMapper;
 
     @Override
-    public TenantBind add(TenantBind tenantBind) {
-        if (tenantBindMapper.insert(tenantBind) > 0) {
-            return tenantBindMapper.selectById(tenantBind.getId());
-        }
+    public void add(TenantBind entityDO) {
+        tenantBindMapper.insert(entityDO);
         throw new ServiceException("The tenant bind add failed");
     }
 
     @Override
-    public Boolean delete(String id) {
+    public void delete(String id) {
         selectById(id);
-        return tenantBindMapper.deleteById(id) > 0;
+        tenantBindMapper.deleteById(id);
     }
 
     @Override
-    public TenantBind update(TenantBind tenantBind) {
-        selectById(tenantBind.getId());
-        tenantBind.setOperateTime(null);
-        if (tenantBindMapper.updateById(tenantBind) > 0) {
-            return tenantBindMapper.selectById(tenantBind.getId());
-        }
+    public void update(TenantBind entityDO) {
+        selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        tenantBindMapper.updateById(entityDO);
         throw new ServiceException("The tenant bind update failed");
     }
 
@@ -89,19 +85,18 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public Page<TenantBind> list(TenantBindPageQuery tenantBindPageQuery) {
-        if (ObjectUtil.isNull(tenantBindPageQuery.getPage())) {
-            tenantBindPageQuery.setPage(new Pages());
+    public Page<TenantBind> list(TenantBindPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return tenantBindMapper.selectPage(tenantBindPageQuery.getPage().convert(), fuzzyQuery(tenantBindPageQuery));
+        return tenantBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    @Override
-    public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery tenantBindPageQuery) {
+    public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery query) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
-        if (ObjectUtil.isNotNull(tenantBindPageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindPageQuery.getTenantId()), TenantBind::getTenantId, tenantBindPageQuery.getTenantId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindPageQuery.getUserId()), TenantBind::getUserId, tenantBindPageQuery.getUserId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), TenantBind::getTenantId, query.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getUserId()), TenantBind::getUserId, query.getUserId());
         }
         return queryWrapper;
     }

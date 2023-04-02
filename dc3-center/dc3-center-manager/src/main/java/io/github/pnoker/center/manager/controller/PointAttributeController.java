@@ -59,14 +59,11 @@ public class PointAttributeController {
     @PostMapping("/add")
     public R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute) {
         try {
-            PointAttribute add = pointAttributeService.add(pointAttribute);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            pointAttributeService.add(pointAttribute);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -76,9 +73,10 @@ public class PointAttributeController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return pointAttributeService.delete(id) ? R.ok() : R.fail();
+            pointAttributeService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -91,16 +89,13 @@ public class PointAttributeController {
      * @return PointAttribute
      */
     @PostMapping("/update")
-    public R<PointAttribute> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute) {
+    public R<String> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute) {
         try {
-            PointAttribute update = pointAttributeService.update(pointAttribute);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            pointAttributeService.update(pointAttribute);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

@@ -75,10 +75,10 @@ public interface DeviceService extends Service<Device, DevicePageQuery> {
     void importDevice(Device device, MultipartFile multipartFile);
 
     /**
-     * 导入设备模板
+     * 生成导入设备模板
      *
      * @param device Device
      * @return File Path
      */
-    Path importTemplate(Device device);
+    Path generateImportTemplate(Device device);
 }

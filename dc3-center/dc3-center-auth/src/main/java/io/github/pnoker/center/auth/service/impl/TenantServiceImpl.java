@@ -49,33 +49,31 @@ public class TenantServiceImpl implements TenantService {
     private TenantMapper tenantMapper;
 
     @Override
-    public Tenant add(Tenant tenant) {
-        Tenant select = selectByCode(tenant.getTenantName());
+    public void add(Tenant entityDO) {
+        Tenant select = selectByCode(entityDO.getTenantName());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
-        if (tenantMapper.insert(tenant) > 0) {
-            return tenantMapper.selectById(tenant.getId());
-        }
+        tenantMapper.insert(entityDO);
         throw new ServiceException("The tenant add failed");
     }
 
     @Override
-    public Boolean delete(String id) {
+    public void delete(String id) {
         Tenant tenant = selectById(id);
         if (ObjectUtil.isNull(tenant)) {
             throw new NotFoundException();
         }
-        return tenantMapper.deleteById(id) > 0;
+        tenantMapper.deleteById(id);
     }
 
     @Override
-    public Tenant update(Tenant tenant) {
-        tenant.setTenantName(null);
-        tenant.setOperateTime(null);
-        if (tenantMapper.updateById(tenant) > 0) {
-            Tenant select = tenantMapper.selectById(tenant.getId());
-            tenant.setTenantName(select.getTenantName());
+    public void update(Tenant entityDO) {
+        entityDO.setTenantName(null);
+        entityDO.setOperateTime(null);
+        if (tenantMapper.updateById(entityDO) > 0) {
+            Tenant select = tenantMapper.selectById(entityDO.getId());
+            entityDO.setTenantName(select.getTenantName());
             return select;
         }
         throw new ServiceException("The tenant update failed");
@@ -96,18 +94,17 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Page<Tenant> list(TenantPageQuery tenantPageQuery) {
-        if (ObjectUtil.isNull(tenantPageQuery.getPage())) {
-            tenantPageQuery.setPage(new Pages());
+    public Page<Tenant> list(TenantPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return tenantMapper.selectPage(tenantPageQuery.getPage().convert(), fuzzyQuery(tenantPageQuery));
+        return tenantMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    @Override
-    public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery tenantPageQuery) {
+    public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery query) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        if (ObjectUtil.isNotNull(tenantPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(tenantPageQuery.getTenantName()), Tenant::getTenantName, tenantPageQuery.getTenantName());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), Tenant::getTenantName, query.getTenantName());
         }
         return queryWrapper;
     }
