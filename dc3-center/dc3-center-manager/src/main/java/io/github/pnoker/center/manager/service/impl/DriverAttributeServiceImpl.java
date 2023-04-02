@@ -66,23 +66,22 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(String id) {
+    public void delete(String id) {
         selectById(id);
-        return driverAttributeMapper.deleteById(id) > 0;
+         driverAttributeMapper.deleteById(id);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean update(DriverAttribute entityDO) {
+    public void update(DriverAttribute entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
         if (driverAttributeMapper.updateById(entityDO) > 0) {
             DriverAttribute select = driverAttributeMapper.selectById(entityDO.getId());
             entityDO.setAttributeName(select.getAttributeName());
             entityDO.setDriverId(select.getDriverId());
-            return select;
         }
         throw new ServiceException("The driver attribute update failed");
     }

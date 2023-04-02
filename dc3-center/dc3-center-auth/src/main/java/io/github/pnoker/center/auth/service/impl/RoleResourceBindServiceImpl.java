@@ -14,9 +14,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Role;
 import io.github.pnoker.common.model.RoleResourceBind;
-import io.github.pnoker.common.model.RoleUserBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -39,25 +37,25 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private ResourceMapper resourceMapper;
 
     @Override
-    public RoleResourceBind add(RoleResourceBind roleResourceBind) {
-        if (bindMapper.insert(roleResourceBind) > 0){
-            return bindMapper.selectById(roleResourceBind.getId());
+    public void add(RoleResourceBind roleResourceBind) {
+        if (bindMapper.insert(roleResourceBind) > 0) {
+            return;
         }
         throw new ServiceException("The tenant bind add failed");
     }
 
     @Override
-    public Boolean delete(String id) {
+    public void delete(String id) {
         selectById(id);
-        return bindMapper.deleteById(id) > 0;
+        bindMapper.deleteById(id);
     }
 
     @Override
-    public RoleResourceBind update(RoleResourceBind bind) {
+    public void update(RoleResourceBind bind) {
         selectById(bind.getId());
         bind.setOperateTime(null);
         if (bindMapper.updateById(bind) > 0) {
-            return bindMapper.selectById(bind.getId());
+            return;
         }
         throw new ServiceException("The role resource bind update failed");
     }
@@ -79,7 +77,6 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         return bindMapper.selectPage(pageQuery.getPage().convert(), fuzzyQuery(pageQuery));
     }
 
-    @Override
     public LambdaQueryWrapper<RoleResourceBind> fuzzyQuery(RoleResourceBindPageQuery pageQuery) {
         LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
@@ -94,7 +91,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
         queryWrapper.eq(RoleResourceBind::getRoleId, RoleId);
         List<RoleResourceBind> roleResourceBinds = bindMapper.selectList(queryWrapper);
-        if (CollUtil.isNotEmpty(roleResourceBinds)){
+        if (CollUtil.isNotEmpty(roleResourceBinds)) {
             List<io.github.pnoker.common.model.Resource> resources = resourceMapper.selectBatchIds(roleResourceBinds.stream()
                     .map(RoleResourceBind::getResourceId).collect(Collectors.toList()));
             return resources.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()))

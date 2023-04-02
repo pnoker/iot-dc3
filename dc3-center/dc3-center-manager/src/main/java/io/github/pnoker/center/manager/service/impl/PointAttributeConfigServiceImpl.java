@@ -63,7 +63,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public String add(PointAttributeConfig entityDO) {
+    public void add(PointAttributeConfig entityDO) {
         try {
             selectByAttributeIdAndDeviceIdAndPointId(entityDO.getPointAttributeId(), entityDO.getDeviceId(), entityDO.getPointId());
             throw new DuplicateException("The point attribute config already exists");
@@ -71,7 +71,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             if (pointAttributeConfigMapper.insert(entityDO) > 0) {
                 PointAttributeConfig add = pointAttributeConfigMapper.selectById(entityDO.getId());
                 notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, add);
-                return entityDO.getId();
             }
             throw new ServiceException("The point attribute config add failed");
         }
@@ -81,20 +80,19 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public boolean delete(String id) {
+    public void delete(String id) {
         PointAttributeConfig pointAttributeConfig = selectById(id);
         boolean delete = pointAttributeConfigMapper.deleteById(id) > 0;
         if (delete) {
             notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfig);
         }
-        return delete;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean update(PointAttributeConfig entityDO) {
+    public void update(PointAttributeConfig entityDO) {
         PointAttributeConfig old = selectById(entityDO.getId());
         entityDO.setOperateTime(null);
         if (!old.getPointAttributeId().equals(entityDO.getPointAttributeId()) || !old.getDeviceId().equals(entityDO.getDeviceId()) || !old.getPointId().equals(entityDO.getPointId())) {
@@ -111,7 +109,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             entityDO.setDeviceId(select.getDeviceId());
             entityDO.setPointId(select.getPointId());
             notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, select);
-            return true;
         }
         throw new ServiceException("The point attribute config update failed");
     }
