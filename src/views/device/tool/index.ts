@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from 'vue'
+import { Plus, Refresh, RefreshRight, Search, Sort, Upload } from '@element-plus/icons-vue'
 import { FormInstance, FormRules } from 'element-plus'
-import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
+import { defineComponent, reactive, ref, unref } from 'vue'
 
-import { Dictionary, Order } from '@/config/types'
 import { getDriverDictionary } from '@/api/dictionary'
+import { Dictionary, Order } from '@/config/types'
 
 export default defineComponent({
     name: 'DeviceTool',
@@ -37,7 +37,7 @@ export default defineComponent({
             },
         },
     },
-    emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change'],
+    emits: ['search', 'reset', 'show-add', 'show-import', 'refresh', 'sort', 'size-change', 'current-change'],
     setup(props, { emit }) {
         // 定义表单引用
         const formDataRef = ref<FormInstance>()
@@ -61,6 +61,7 @@ export default defineComponent({
         // 图标
         const Icon = {
             Plus,
+            Upload,
             Search,
             RefreshRight,
             Refresh,
@@ -113,6 +114,10 @@ export default defineComponent({
             emit('show-add')
         }
 
+        const showImport = () => {
+            emit('show-import')
+        }
+
         const refresh = () => {
             emit('refresh')
         }
@@ -139,6 +144,7 @@ export default defineComponent({
             search,
             reset,
             showAdd,
+            showImport,
             refresh,
             sort,
             sizeChange,

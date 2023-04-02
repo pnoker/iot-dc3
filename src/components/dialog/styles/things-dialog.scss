@@ -15,7 +15,6 @@
  */
 
 .things-dialog {
-
     .things-dialog-form-item {
         display: flex;
 
@@ -29,8 +28,29 @@
         .el-form-item__label::after {
             display: inline-block;
             width: 100%;
-            content: "";
+            content: '';
         }
+    }
+
+    .things-dialog-upload {
+        margin-top: 20px;
+
+        .el-upload__icon {
+            font-size: 71px;
+            color: var(--el-text-color-placeholder);
+            margin-bottom: 16px;
+            line-height: 35px;
+        }
+
+        .el-upload__text {
+            color: var(--el-text-color-regular);
+            font-size: 14px;
+            text-align: center;
+        }
+    }
+
+    .things-dialog-form-alert {
+        margin-bottom: 10px;
     }
 
     .things-dialog-footer {
@@ -46,7 +66,7 @@
     .el-dialog__body {
         padding: 30px 30px 15px 30px;
 
-        pre{
+        pre {
             margin: auto;
         }
     }

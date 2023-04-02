@@ -43,7 +43,7 @@
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 倍数: </span
+                                    ><el-icon><Location /></el-icon> 比例系数: </span
                                 >{{ data.multiple }}
                             </li>
                             <li class="nowrap-item">
@@ -53,8 +53,8 @@
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 读写类型: </span
-                                >{{ rwFlag }}
+                                    ><el-icon><Location /></el-icon> 单位: </span
+                                >{{ data.unit }}
                             </li>
                             <li class="nowrap-item">
                                 <span
@@ -70,17 +70,17 @@
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 基值: </span
+                                    ><el-icon><Location /></el-icon> 基础值: </span
                                 >{{ data.baseValue }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 单位: </span
-                                >{{ data.unit }}
+                                    ><el-icon><Location /></el-icon> 处理值: </span
+                                >Y = {{ data.multiple }}X + {{ data.baseValue }}, 保留{{ data.valueDecimal }}位小数
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                    ><el-icon><Location /></el-icon> 读写类型: </span
+                                    ><el-icon><Location /></el-icon> 读写标识: </span
                                 >{{ rwFlag }}
                             </li>
                             <li class="nowrap-item">

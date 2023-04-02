@@ -20,8 +20,8 @@
             <el-card shadow="hover">
                 <el-steps :active="reactiveData.active" finish-status="success" align-center>
                     <el-step title="设备信息配置"></el-step>
-                    <el-step title="设备驱动配置"></el-step>
-                    <el-step title="设备位号配置"></el-step>
+                    <el-step title="驱动属性配置"></el-step>
+                    <el-step title="位号属性配置"></el-step>
                     <el-step title="设备配置完成"></el-step>
                 </el-steps>
             </el-card>
@@ -137,8 +137,8 @@
             </el-card>
 
             <el-card v-if="reactiveData.active === 1 && reactiveData.driverAttributes && reactiveData.driverAttributes.length > 0" shadow="hover">
-                <el-divider content-position="left">设备驱动配置</el-divider>
-                <el-alert :closable="false" title="设备驱动配置说明" type="success" description="设备驱动配置用于配置连接到该设备所需的基本参数信息。"></el-alert>
+                <el-divider content-position="left">驱动属性配置</el-divider>
+                <el-alert :closable="false" title="驱动属性配置说明" type="success" description="驱动属性配置用于配置连接到该设备所需的基本参数信息。"></el-alert>
                 <el-form ref="driverFormRef" :inline="true" :model="reactiveData.driverFormData" :v-if="reactiveData.driverFormData.length > 0">
                     <div class="edit-form-item">
                         <el-row>
@@ -164,8 +164,8 @@
             </el-card>
 
             <el-card v-if="reactiveData.active === 2" shadow="hover">
-                <el-divider content-position="left">设备位号配置</el-divider>
-                <el-alert :closable="false" title="设备位号配置说明" type="success" description="设备位号配置用于配置采集设备该位号的数据所需的基本参数信息。"></el-alert>
+                <el-divider content-position="left">位号属性配置</el-divider>
+                <el-alert :closable="false" title="位号属性配置说明" type="success" description="位号属性配置用于配置采集设备该位号的数据所需的基本参数信息。"></el-alert>
                 <el-form ref="pointFormRef" :inline="true" :model="reactiveData.pointFormData" :v-if="reactiveData.pointFormData.length > 0">
                     <div class="edit-form-item">
                         <el-form-item label="位号名称" prop="pointName">

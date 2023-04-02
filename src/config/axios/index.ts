@@ -63,8 +63,9 @@ request.interceptors.response.use(
     (response) => {
         const ok = response.data.ok || false
         const status = response.status || 401
+        const responseType = response.config.responseType
 
-        if (ok) return response
+        if (ok || responseType === 'blob') return response
 
         if (status === 401) {
             logout()

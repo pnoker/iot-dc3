@@ -76,20 +76,20 @@ export default defineComponent({
             rwFlag: [
                 {
                     required: true,
-                    message: '请选择位号读写类型',
+                    message: '请选择位号读写标识',
                     trigger: 'change',
                 },
             ],
             baseValue: [
                 {
                     pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-                    message: '请输入 正确格式的基值',
+                    message: '请输入 正确格式的基础值',
                 },
             ],
             multiple: [
                 {
                     pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-                    message: '请输入 正确格式的倍数',
+                    message: '请输入 正确格式的比例系数',
                 },
             ],
             valueDecimal: [

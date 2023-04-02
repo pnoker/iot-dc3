@@ -31,7 +31,7 @@
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.pointId, '位号值ID')">
                         {{ point.pointName }}
                     </div>
-                    <div title="读写类型" class="things-card-header-status">
+                    <div title="读写标识" class="things-card-header-status">
                         <el-tag v-if="data.rwFlag === 'R'" type="warning" effect="plain">只读</el-tag>
                         <el-tag v-else-if="data.rwFlagrw === 'W'" type="info" effect="plain">只写</el-tag>
                         <el-tag v-else-if="data.rwFlag === 'RW'" type="success" effect="plain">读写</el-tag>

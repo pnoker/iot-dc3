@@ -152,3 +152,32 @@ export const getDeviceStatusByProfileId = (profileId: string) =>
         url: `api/v3/data/device/status/device/profile_id/${profileId}`,
         method: 'get',
     })
+
+/**
+ * 通过驱动ID和模板ID获取设备导入模板
+ *
+ * @param device Device
+ * @returns MyAxiosPromise
+ */
+export const importDeviceTemplate = (device: any) =>
+    request<R>({
+        url: `api/v3/manager/device/import/template`,
+        responseType: 'blob',
+        method: 'post',
+        data: device,
+    })
+
+/**
+ * 通过驱动ID和模板ID获取设备导入模板
+ *
+ * @param device Device
+ * @returns MyAxiosPromise
+ */
+export const importDevice = (device: any) =>
+    request<R>({
+        url: `api/v3/manager/device/import`,
+        method: 'post',
+        timeout: 0,
+        headers: { 'Content-Type': 'multipart/form-data' },
+        data: device,
+    })

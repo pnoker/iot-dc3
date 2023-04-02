@@ -65,6 +65,7 @@
             <div class="tool-card-footer">
                 <div class="tool-card-footer-button">
                     <el-button v-if="embedded == ''" type="success" :icon="Plus" @click="showAdd">新增</el-button>
+                    <el-button v-if="embedded == ''" type="primary" :icon="Upload" @click="showImport">导入</el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination

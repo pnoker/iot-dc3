@@ -22,6 +22,7 @@
             @search="search"
             @reset="reset"
             @show-add="showAdd"
+            @show-import="showImport"
             @refresh="refresh"
             @sort="sort"
             @size-change="sizeChange"
@@ -51,6 +52,7 @@
         </blank-card>
 
         <device-add-form ref="deviceAddFormRef" @add-thing="addThing" />
+        <device-import-form ref="deviceImportFormRef" @import-template="importTemplate" @import-thing="importThing" />
     </div>
 </template>
 

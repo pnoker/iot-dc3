@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, computed } from 'vue'
+import { computed, defineComponent, reactive, ref } from 'vue'
 
+import { addDevice, deleteDevice, getDeviceList, getDeviceStatus, importDevice, importDeviceTemplate, updateDevice } from '@/api/device'
 import { getDriverByIds } from '@/api/driver'
-import { addDevice, deleteDevice, getDeviceList, getDeviceStatus, updateDevice } from '@/api/device'
 
 import { Order } from '@/config/types'
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
-import deviceTool from './tool/DeviceTool.vue'
+import { failMessage } from '@/utils/NotificationUtils'
+import { isNull } from '@/utils/utils'
 import deviceAddForm from './add/DeviceAddForm.vue'
 import deviceCard from './card/DeviceCard.vue'
-import { isNull } from '@/utils/utils'
-import { failMessage } from '@/utils/NotificationUtils'
+import deviceImportForm from './import/DeviceImportForm.vue'
+import deviceTool from './tool/DeviceTool.vue'
 
 export default defineComponent({
     name: 'Device',
@@ -36,6 +37,7 @@ export default defineComponent({
         skeletonCard,
         deviceTool,
         deviceAddForm,
+        deviceImportForm,
         deviceCard,
     },
     props: {
@@ -60,6 +62,7 @@ export default defineComponent({
     },
     setup(props) {
         const deviceAddFormRef: any = ref<InstanceType<typeof deviceAddForm>>()
+        const deviceImportFormRef: any = ref<InstanceType<typeof deviceImportForm>>()
 
         // 定义响应式数据
         const reactiveData = reactive({
@@ -180,6 +183,39 @@ export default defineComponent({
                 })
         }
 
+        const showImport = () => {
+            deviceImportFormRef.value.show()
+        }
+
+        const importTemplate = (form, done) => {
+            importDeviceTemplate(form)
+                .then((response) => {
+                    const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]))
+                    const name = response.headers['content-disposition'].split(';')[1].split('filename=')[1]
+                    const link = document.createElement('a')
+                    link.href = url
+                    link.setAttribute('download', name)
+                    document.body.appendChild(link)
+                    link.click()
+
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
+        const importThing = (form, done) => {
+            importDevice(form)
+                .then(() => {
+                    list()
+                    done()
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        }
+
         const disableThing = (id, driverId, done) => {
             console.log(props)
             updateDevice({ id: id, driverId: driverId, enableFlag: 'DISABLE' })
@@ -246,12 +282,16 @@ export default defineComponent({
 
         return {
             deviceAddFormRef,
+            deviceImportFormRef,
             reactiveData,
             hasData,
             search,
             reset,
             showAdd,
             addThing,
+            showImport,
+            importTemplate,
+            importThing,
             disableThing,
             enableThing,
             deleteThing,
