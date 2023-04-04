@@ -12,6 +12,7 @@ import io.github.pnoker.center.auth.mapper.RoleResourceBindMapper;
 import io.github.pnoker.center.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.RoleResourceBind;
@@ -37,11 +38,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private ResourceMapper resourceMapper;
 
     @Override
-    public void add(RoleResourceBind roleResourceBind) {
-        if (bindMapper.insert(roleResourceBind) > 0) {
-            return;
+    public void add(RoleResourceBind entityDo) {
+        //todo check if exists
+        if (bindMapper.insert(entityDo) < 1) {
+            throw new AddException("The tenant bind add failed");
         }
-        throw new ServiceException("The tenant bind add failed");
     }
 
     @Override
@@ -51,13 +52,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public void update(RoleResourceBind bind) {
-        selectById(bind.getId());
-        bind.setOperateTime(null);
-        if (bindMapper.updateById(bind) > 0) {
-            return;
+    public void update(RoleResourceBind entityDo) {
+        selectById(entityDo.getId());
+        if (bindMapper.updateById(entityDo) < 1) {
+            throw new ServiceException("The role resource bind update failed");
         }
-        throw new ServiceException("The role resource bind update failed");
     }
 
     @Override
@@ -74,16 +73,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         if (ObjectUtil.isNull(pageQuery.getPage())) {
             pageQuery.setPage(new Pages());
         }
-        return bindMapper.selectPage(pageQuery.getPage().convert(), fuzzyQuery(pageQuery));
-    }
-
-    public LambdaQueryWrapper<RoleResourceBind> fuzzyQuery(RoleResourceBindPageQuery pageQuery) {
-        LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
-        if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBind::getResourceId, pageQuery.getRoleId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBind::getResourceId, pageQuery.getResourceId());
-        }
-        return queryWrapper;
+        return bindMapper.selectPage(pageQuery.getPage().convert(), buildQueryWrapper(pageQuery));
     }
 
     @Override
@@ -99,5 +89,14 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         }
 
         return null;
+    }
+
+    private LambdaQueryWrapper<RoleResourceBind> buildQueryWrapper(RoleResourceBindPageQuery pageQuery) {
+        LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
+        if (ObjectUtil.isNotNull(pageQuery)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBind::getResourceId, pageQuery.getRoleId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBind::getResourceId, pageQuery.getResourceId());
+        }
+        return queryWrapper;
     }
 }

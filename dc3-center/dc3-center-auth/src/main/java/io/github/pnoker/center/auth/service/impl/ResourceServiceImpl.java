@@ -9,6 +9,7 @@ import io.github.pnoker.center.auth.entity.query.ResourcePageQuery;
 import io.github.pnoker.center.auth.mapper.ResourceMapper;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Resource;
@@ -28,27 +29,25 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
-    public Resource add(Resource resource) {
-        if (resourceMapper.insert(resource) > 0){
-            return resourceMapper.selectById(resource.getId());
+    public void add(Resource entityDo) {
+        //todo check if exists
+        if (resourceMapper.insert(entityDo) < 1){
+            throw new AddException("The resource add failed");
         }
-        throw new ServiceException("The resource add failed");
     }
 
     @Override
-    public Boolean delete(String id) {
+    public void delete(String id) {
         selectById(id);
-        return resourceMapper.deleteById(id) > 0;
+        resourceMapper.deleteById(id);
     }
 
     @Override
-    public Resource update(Resource resource) {
-        selectById(resource.getId());
-        resource.setOperateTime(null);
-        if (resourceMapper.updateById(resource) > 0) {
-            return resourceMapper.selectById(resource.getId());
+    public void update(Resource entityDo) {
+        selectById(entityDo.getId());
+        if (resourceMapper.updateById(entityDo) < 1) {
+            throw new ServiceException("The resource update failed");
         }
-        throw new ServiceException("The resource update failed");
     }
 
     @Override
@@ -65,11 +64,10 @@ public class ResourceServiceImpl implements ResourceService {
         if (ObjectUtil.isNull(pageQuery.getPage())) {
             pageQuery.setPage(new Pages());
         }
-        return resourceMapper.selectPage(pageQuery.getPage().convert(), fuzzyQuery(pageQuery));
+        return resourceMapper.selectPage(pageQuery.getPage().convert(), buildQueryWrapper(pageQuery));
     }
 
-    @Override
-    public LambdaQueryWrapper<Resource> fuzzyQuery(ResourcePageQuery pageQuery) {
+    private LambdaQueryWrapper<Resource> buildQueryWrapper(ResourcePageQuery pageQuery) {
         LambdaQueryWrapper<Resource> queryWrapper = Wrappers.<Resource>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getTenantId()), Resource::getTenantId, pageQuery.getTenantId());

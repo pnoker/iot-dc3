@@ -26,6 +26,7 @@ import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -55,7 +56,7 @@ public class TenantServiceImpl implements TenantService {
             throw new DuplicateException("The tenant already exists");
         }
         tenantMapper.insert(entityDO);
-        throw new ServiceException("The tenant add failed");
+        throw new AddException("The tenant add failed");
     }
 
     @Override
@@ -74,7 +75,7 @@ public class TenantServiceImpl implements TenantService {
         if (tenantMapper.updateById(entityDO) > 0) {
             Tenant select = tenantMapper.selectById(entityDO.getId());
             entityDO.setTenantName(select.getTenantName());
-            return select;
+            return;
         }
         throw new ServiceException("The tenant update failed");
     }

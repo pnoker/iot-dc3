@@ -57,9 +57,9 @@ public class UserLoginServiceImpl implements UserLoginService {
         }
 
         // 插入 user 数据，并返回插入后的 user
-        userLoginMapper.insert(entityDO);
-
-        throw new AddException("The user add failed: {}", entityDO.toString());
+        if (userLoginMapper.insert(entityDO) < 1){
+            throw new AddException("The user add failed: {}", entityDO.toString());
+        }
     }
 
     @Override
@@ -69,7 +69,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException();
         }
-        return userLoginMapper.deleteById(id) > 0;
+        userLoginMapper.deleteById(id);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         if (userLoginMapper.updateById(entityDO) > 0) {
             UserLogin select = userLoginMapper.selectById(entityDO.getId());
             entityDO.setLoginName(select.getLoginName());
-            return select;
+            return;
         }
         throw new ServiceException("The user update failed");
     }

@@ -12,6 +12,7 @@ import io.github.pnoker.center.auth.mapper.RoleUserBindMapper;
 import io.github.pnoker.center.auth.service.RoleUserBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Role;
@@ -52,17 +53,29 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         if (ObjectUtil.isNull(pageQuery.getPage())){
             pageQuery.setPage(new Pages());
         }
-        return roleUserBindMapper.selectPage(pageQuery.getPage().convert(), fuzzyQuery(pageQuery));
+        return roleUserBindMapper.selectPage(pageQuery.getPage().convert(), buildQueryWrapper(pageQuery));
     }
 
     @Override
-    public LambdaQueryWrapper<RoleUserBind> fuzzyQuery(RoleUserBindPageQuery pageQuery) {
-        LambdaQueryWrapper<RoleUserBind> queryWrapper = Wrappers.<RoleUserBind>query().lambda();
-        if (ObjectUtil.isNotNull(pageQuery)){
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getUserId()), RoleUserBind::getUserId, pageQuery.getUserId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleUserBind::getRoleId, pageQuery.getRoleId());
+    public void add(RoleUserBind entityDo) {
+        //todo check if exists
+        if (roleUserBindMapper.insert(entityDo) < 1){
+            throw new AddException("The role user bind add failed");
         }
-        return queryWrapper;
+    }
+
+    @Override
+    public void update(RoleUserBind entityDo) {
+        selectById(entityDo.getId());
+        if (roleUserBindMapper.updateById(entityDo) < 1){
+            throw new ServiceException("The role user bind update failed");
+        }
+    }
+
+    @Override
+    public void delete(String id) {
+        selectById(id);
+        roleUserBindMapper.deleteById(id);
     }
 
     @Override
@@ -80,27 +93,12 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         return null;
     }
 
-    @Override
-    public RoleUserBind add(RoleUserBind roleUserBind) {
-        if (roleUserBindMapper.insert(roleUserBind) > 0){
-            return roleUserBindMapper.selectById(roleUserBind.getId());
+    public LambdaQueryWrapper<RoleUserBind> buildQueryWrapper(RoleUserBindPageQuery pageQuery) {
+        LambdaQueryWrapper<RoleUserBind> queryWrapper = Wrappers.<RoleUserBind>query().lambda();
+        if (ObjectUtil.isNotNull(pageQuery)){
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getUserId()), RoleUserBind::getUserId, pageQuery.getUserId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleUserBind::getRoleId, pageQuery.getRoleId());
         }
-        throw new ServiceException("The role user bind add failed");
-    }
-
-    @Override
-    public RoleUserBind update(RoleUserBind roleUserBind) {
-        selectById(roleUserBind.getId());
-        roleUserBind.setOperateTime(null);
-        if (roleUserBindMapper.updateById(roleUserBind) > 0){
-            return roleUserBindMapper.selectById(roleUserBind.getId());
-        }
-        throw new ServiceException("The role user bind update failed");
-    }
-
-    @Override
-    public Boolean delete(String id) {
-        selectById(id);
-        return roleUserBindMapper.deleteById(id) > 0;
+        return queryWrapper;
     }
 }
