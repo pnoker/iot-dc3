@@ -26,6 +26,8 @@ import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.BlackIp;
@@ -51,10 +53,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     public void add(BlackIp entityDO) {
         BlackIp select = selectByIp(entityDO.getIp(), false);
         if (ObjectUtil.isNotNull(select)) {
-            throw new ServiceException("The ip already exists in the blacklist");
+            throw new DuplicateException("The ip already exists in the blacklist");
         }
-        blackIpMapper.insert(entityDO);
-        throw new ServiceException("The ip add to the blacklist failed");
+        if (blackIpMapper.insert(entityDO) < 1){
+            throw new AddException("The ip add to the blacklist failed");
+        }
     }
 
     @Override
@@ -73,8 +76,9 @@ public class BlackIpServiceImpl implements BlackIpService {
         if (blackIpMapper.updateById(entityDO) > 0) {
             BlackIp select = blackIpMapper.selectById(entityDO.getId());
             entityDO.setIp(select.getIp());
+        }else {
+            throw new ServiceException("The ip update failed in the blacklist");
         }
-        throw new ServiceException("The ip update failed in the blacklist");
     }
 
     @Override

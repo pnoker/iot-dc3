@@ -25,6 +25,7 @@ import io.github.pnoker.center.auth.entity.query.TenantBindPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantBindMapper;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.TenantBind;
@@ -48,8 +49,9 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public void add(TenantBind entityDO) {
-        tenantBindMapper.insert(entityDO);
-        throw new ServiceException("The tenant bind add failed");
+        if (tenantBindMapper.insert(entityDO) < 1){
+            throw new AddException("The tenant bind add failed");
+        }
     }
 
     @Override
@@ -62,8 +64,9 @@ public class TenantBindServiceImpl implements TenantBindService {
     public void update(TenantBind entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        tenantBindMapper.updateById(entityDO);
-        throw new ServiceException("The tenant bind update failed");
+        if (tenantBindMapper.updateById(entityDO) < 1){
+            throw new ServiceException("The tenant bind update failed");
+        }
     }
 
     @Override

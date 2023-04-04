@@ -74,9 +74,9 @@ public class UserServiceImpl implements UserService {
         }
 
         // 插入 user 数据，并返回插入后的 user
-        userMapper.insert(entityDO);
-
-        throw new AddException("The user add failed: {}", entityDO.toString());
+        if (userMapper.insert(entityDO) < 1){
+            throw new AddException("The user add failed: {}", entityDO.toString());
+        }
     }
 
     @Override
