@@ -25,6 +25,7 @@ import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
 import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -57,8 +58,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             selectByNameAndDriverId(entityDO.getAttributeName(), entityDO.getDriverId());
             throw new DuplicateException("The point attribute already exists");
         } catch (NotFoundException notFoundException) {
-            pointAttributeMapper.insert(entityDO);
-            throw new ServiceException("The point attribute add failed");
+            if (pointAttributeMapper.insert(entityDO) < 1) {
+                throw new AddException("The point attribute {} add failed", entityDO.getAttributeName());
+            }
         }
     }
 

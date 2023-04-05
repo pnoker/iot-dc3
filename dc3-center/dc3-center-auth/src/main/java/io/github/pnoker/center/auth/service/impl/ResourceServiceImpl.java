@@ -31,7 +31,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void add(Resource entityDo) {
         //todo check if exists
-        if (resourceMapper.insert(entityDo) < 1){
+        if (resourceMapper.insert(entityDo) < 1) {
             throw new AddException("The resource add failed");
         }
     }

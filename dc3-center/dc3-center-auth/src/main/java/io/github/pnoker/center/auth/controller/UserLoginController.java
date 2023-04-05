@@ -188,7 +188,7 @@ public class UserLoginController {
     @GetMapping("/check/{name}")
     public R<Boolean> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {
         try {
-            return userLoginService.checkLoginNameValid(name) ? R.ok() : R.fail();
+            return Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? R.ok() : R.fail();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

@@ -43,5 +43,5 @@ public interface UserLoginService extends Service<UserLogin, UserLoginPageQuery>
      * @param loginName 登录名称
      * @return Boolean
      */
-    Boolean checkLoginNameValid(String loginName);
+    boolean checkLoginNameValid(String loginName);
 }

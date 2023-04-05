@@ -109,7 +109,7 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverDriverInfo(MetadataCommandTypeEnum command, DriverAttributeConfig driverAttributeConfig) {
+    public void notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfig driverAttributeConfig) {
         try {
             Driver driver = driverService.selectByDeviceId(driverAttributeConfig.getDeviceId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(

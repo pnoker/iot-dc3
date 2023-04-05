@@ -23,15 +23,18 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.mapper.PointAttributeConfigMapper;
+import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.model.PointAttributeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,6 +55,8 @@ import java.util.stream.Collectors;
 public class PointAttributeConfigServiceImpl implements PointAttributeConfigService {
 
     @Resource
+    private PointAttributeMapper pointAttributeMapper;
+    @Resource
     private PointAttributeConfigMapper pointAttributeConfigMapper;
 
     @Resource
@@ -68,11 +73,14 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             selectByAttributeIdAndDeviceIdAndPointId(entityDO.getPointAttributeId(), entityDO.getDeviceId(), entityDO.getPointId());
             throw new DuplicateException("The point attribute config already exists");
         } catch (NotFoundException notFoundException) {
-            if (pointAttributeConfigMapper.insert(entityDO) > 0) {
-                PointAttributeConfig add = pointAttributeConfigMapper.selectById(entityDO.getId());
-                notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, add);
+            if (pointAttributeConfigMapper.insert(entityDO) < 1) {
+                PointAttribute pointAttribute = pointAttributeMapper.selectById(entityDO.getPointAttributeId());
+                throw new AddException("The point attribute config {} add failed", pointAttribute.getAttributeName());
             }
-            throw new ServiceException("The point attribute config add failed");
+
+            // 通知驱动新增
+            PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectById(entityDO.getId());
+            notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, pointAttributeConfig);
         }
     }
 

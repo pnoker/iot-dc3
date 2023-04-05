@@ -30,6 +30,7 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -71,11 +72,13 @@ public class PointServiceImpl implements PointService {
             selectByNameAndProfileId(entityDO.getPointName(), entityDO.getProfileId());
             throw new DuplicateException("The point already exists in the profile");
         } catch (NotFoundException notFoundException) {
-            if (pointMapper.insert(entityDO) > 0) {
-                Point add = pointMapper.selectById(entityDO.getId());
-                notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, add);
+            if (pointMapper.insert(entityDO) < 1) {
+                throw new AddException("The point {} add failed", entityDO.getPointName());
             }
-            throw new ServiceException("The point add failed");
+
+            // 通知驱动新增
+            Point point = pointMapper.selectById(entityDO.getId());
+            notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point);
         }
     }
 

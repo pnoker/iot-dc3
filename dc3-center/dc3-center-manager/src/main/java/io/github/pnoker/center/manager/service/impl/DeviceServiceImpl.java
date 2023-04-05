@@ -28,6 +28,7 @@ import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.ImportException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -54,6 +55,7 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DeviceService Impl
@@ -90,14 +92,18 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public void add(Device entityDO) {
-        if (deviceMapper.insert(entityDO) > 0) {
-            addProfileBind(entityDO.getId(), entityDO.getProfileIds());
-            Device select = deviceMapper.selectById(entityDO.getId());
-            select.setProfileIds(entityDO.getProfileIds());
-            // 通知驱动新增设备
-            notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, select);
+        if (deviceMapper.insert(entityDO) < 1) {
+            throw new AddException("The device {} add failed", entityDO.getDeviceName());
         }
-        throw new ServiceException("The device add failed");
+
+        addProfileBind(entityDO.getId(), entityDO.getProfileIds());
+
+        // 通知驱动新增
+        Device device = deviceMapper.selectById(entityDO.getId());
+        List<Profile> profiles = profileService.selectByDeviceId(entityDO.getId());
+        // ?/pnoker 同步给驱动的设备需要profile id set吗
+        device.setProfileIds(profiles.stream().map(Profile::getId).collect(Collectors.toSet()));
+        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, device);
     }
 
     /**
@@ -512,20 +518,23 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     private void addProfileBind(String deviceId, Set<String> profileIds) {
-        if (ObjectUtil.isNotNull(profileIds)) {
-            profileIds.forEach(profileId -> {
-                try {
-                    profileService.selectById(profileId);
-                    profileBindService.add(new ProfileBind(profileId, deviceId));
-
-                    List<Point> points = pointService.selectByProfileId(profileId);
-                    // 通知驱动新增位号
-                    points.forEach(point -> notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point));
-                } catch (Exception ignored) {
-                    // nothing to do
-                }
-            });
+        if (CollUtil.isEmpty(profileIds)) {
+            return;
         }
+
+        profileIds.forEach(profileId -> {
+            try {
+                profileService.selectById(profileId);
+                profileBindService.add(new ProfileBind(profileId, deviceId));
+
+                List<Point> points = pointService.selectByProfileId(profileId);
+                // 通知驱动新增位号
+                points.forEach(point -> notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point));
+            } catch (Exception ignored) {
+                // nothing to do
+            }
+        });
+
     }
 
 }

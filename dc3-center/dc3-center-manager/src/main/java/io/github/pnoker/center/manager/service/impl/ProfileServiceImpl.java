@@ -32,6 +32,7 @@ import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -70,8 +71,9 @@ public class ProfileServiceImpl implements ProfileService {
             selectByNameAndType(entityDO.getProfileName(), entityDO.getProfileTypeFlag(), entityDO.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException1) {
-            profileMapper.insert(entityDO);
-            throw new ServiceException("The profile add failed");
+            if (profileMapper.insert(entityDO) < 1) {
+                throw new AddException("The profile {} add failed", entityDO.getProfileName());
+            }
         }
     }
 

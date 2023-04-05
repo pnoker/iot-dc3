@@ -55,8 +55,9 @@ public class BlackIpServiceImpl implements BlackIpService {
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The ip already exists in the blacklist");
         }
-        if (blackIpMapper.insert(entityDO) < 1){
-            throw new AddException("The ip add to the blacklist failed");
+
+        if (blackIpMapper.insert(entityDO) < 1) {
+            throw new AddException("The ip {} add to the blacklist failed", entityDO.getIp());
         }
     }
 
@@ -76,7 +77,7 @@ public class BlackIpServiceImpl implements BlackIpService {
         if (blackIpMapper.updateById(entityDO) > 0) {
             BlackIp select = blackIpMapper.selectById(entityDO.getId());
             entityDO.setIp(select.getIp());
-        }else {
+        } else {
             throw new ServiceException("The ip update failed in the blacklist");
         }
     }

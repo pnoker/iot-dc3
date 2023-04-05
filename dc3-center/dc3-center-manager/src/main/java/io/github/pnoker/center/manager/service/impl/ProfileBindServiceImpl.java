@@ -25,6 +25,7 @@ import io.github.pnoker.center.manager.entity.query.ProfileBindPageQuery;
 import io.github.pnoker.center.manager.mapper.ProfileBindMapper;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -59,8 +60,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
             selectByDeviceIdAndProfileId(entityDO.getDeviceId(), entityDO.getProfileId());
             throw new DuplicateException("The profile bind already exists");
         } catch (NotFoundException notFoundException) {
-            profileBindMapper.insert(entityDO);
-            throw new ServiceException("The profile bind add failed");
+            if (profileBindMapper.insert(entityDO) < 1) {
+                throw new AddException("The profile bind add failed");
+            }
         }
     }
 

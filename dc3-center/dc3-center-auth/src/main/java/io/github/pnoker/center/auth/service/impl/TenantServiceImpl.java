@@ -55,8 +55,10 @@ public class TenantServiceImpl implements TenantService {
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
-        tenantMapper.insert(entityDO);
-        throw new AddException("The tenant add failed");
+
+        if (tenantMapper.insert(entityDO) < 1) {
+            throw new AddException("The tenant {} add failed", entityDO.getTenantName());
+        }
     }
 
     @Override

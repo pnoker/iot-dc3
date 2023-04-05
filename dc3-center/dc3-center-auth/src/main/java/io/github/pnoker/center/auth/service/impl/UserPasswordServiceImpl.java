@@ -54,7 +54,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     public void add(UserPassword entityDO) {
         entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         // 插入 userPassword 数据，并返回插入后的 userPassword
-        if (userPasswordMapper.insert(entityDO) < 1){
+        if (userPasswordMapper.insert(entityDO) < 1) {
             throw new AddException("The user password add failed: {}", entityDO.toString());
         }
     }
@@ -77,7 +77,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         }
         entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         entityDO.setOperateTime(null);
-        if (userPasswordMapper.updateById(entityDO) < 1){
+        if (userPasswordMapper.updateById(entityDO) < 1) {
             throw new ServiceException("The user password update failed");
         }
     }
