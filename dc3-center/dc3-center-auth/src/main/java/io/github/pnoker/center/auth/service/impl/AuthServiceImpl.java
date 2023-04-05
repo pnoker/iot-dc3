@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class UserManageServiceImpl implements UserManageService {
+public class AuthServiceImpl implements AuthService {
 
     @Resource
     private TenantService tenantService;
@@ -91,7 +91,7 @@ public class UserManageServiceImpl implements UserManageService {
     }
 
     @Override
-    public void login(Login login) {
+    public String login(Login login) {
         //1. authenticate user
         UserLogin userLogin = authenticateUser(login);
         if (ObjectUtil.isNull(userLogin)){
@@ -120,5 +120,7 @@ public class UserManageServiceImpl implements UserManageService {
         Set<String> resourceCodeSet = resourceSet.stream().map(io.github.pnoker.common.model.Resource::getResourceCode).collect(Collectors.toSet());
         String redisResourceKey = userRedisUtil.getKey(SuffixConstant.RESOURCE, login.getName(), tenant.getId());
         userRedisUtil.setSetValue(redisResourceKey, resourceCodeSet, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+
+        return login.getToken();
     }
 }

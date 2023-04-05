@@ -9,7 +9,7 @@ import io.github.pnoker.common.model.UserLogin;
  * @author: linys
  * @since: 2023.04.02
  */
-public interface UserManageService {
+public interface AuthService {
 
     /**
      * 鉴定用户, 并返回token
@@ -21,6 +21,7 @@ public interface UserManageService {
     /**
      * 用户登录
      * @param login 登录参数
+     * @return token
      */
-    void login(Login login);
+    String login(Login login);
 }
