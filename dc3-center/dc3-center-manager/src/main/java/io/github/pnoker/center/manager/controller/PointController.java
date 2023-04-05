@@ -71,7 +71,6 @@ public class PointController {
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

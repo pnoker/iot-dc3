@@ -13,6 +13,7 @@ public interface AuthService {
 
     /**
      * 鉴定用户, 并返回token
+     *
      * @param login login info
      * @return UserLogin userLogin
      */
@@ -20,6 +21,7 @@ public interface AuthService {
 
     /**
      * 用户登录
+     *
      * @param login 登录参数
      * @return token
      */

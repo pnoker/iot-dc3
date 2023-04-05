@@ -17,6 +17,7 @@ public interface RoleResourceBindService extends Service<RoleResourceBind, RoleR
 
     /**
      * 根据TenantId与UserId查询资源
+     *
      * @param roleId 角色id
      * @return 资源列表
      */

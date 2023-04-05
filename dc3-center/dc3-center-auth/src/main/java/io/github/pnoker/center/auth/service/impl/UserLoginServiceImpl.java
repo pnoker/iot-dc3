@@ -57,7 +57,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userLoginMapper.insert(entityDO) < 1){
+        if (userLoginMapper.insert(entityDO) < 1) {
             throw new AddException("The user add failed: {}", entityDO.toString());
         }
     }
@@ -122,7 +122,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Boolean checkLoginNameValid(String loginName) {
+    public boolean checkLoginNameValid(String loginName) {
         UserLogin userLogin = selectByLoginName(loginName, false);
         if (ObjectUtil.isNotNull(userLogin)) {
             return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());

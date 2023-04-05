@@ -25,6 +25,7 @@ import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.center.manager.mapper.GroupMapper;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -57,8 +58,9 @@ public class GroupServiceImpl implements GroupService {
             selectByName(entityDO.getGroupName(), entityDO.getTenantId());
             throw new DuplicateException("The device group already exists");
         } catch (NotFoundException notFoundException) {
-            groupMapper.insert(entityDO);
-            throw new ServiceException("The group add failed");
+            if (groupMapper.insert(entityDO) < 1) {
+                throw new AddException("The group {} add failed", entityDO.getGroupName());
+            }
         }
     }
 

@@ -15,6 +15,7 @@ import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
         String redisSaltValue = userRedisUtil.getValue(redisSaltKey);
         String decodePassword = DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue);
         if (CharSequenceUtil.isNotEmpty(redisSaltValue) && redisSaltValue.equals(login.getSalt())
-                && decodePassword.equals(login.getPassword())){
+                && decodePassword.equals(login.getPassword())) {
             //generate token
             String token = KeyUtil.generateToken(login.getName(), redisSaltValue, tenant.getId());
             String redisTokenKey = userRedisUtil.getKey(SuffixConstant.TOKEN, login.getName(), tenant.getId());
@@ -94,14 +95,14 @@ public class AuthServiceImpl implements AuthService {
     public String login(Login login) {
         //1. authenticate user
         UserLogin userLogin = authenticateUser(login);
-        if (ObjectUtil.isNull(userLogin)){
+        if (ObjectUtil.isNull(userLogin)) {
             throw new ServiceException("认证失败！请重试");
         }
 
         //2. save roles
         Tenant tenant = tenantService.selectByCode(login.getTenant());
         List<Role> roles = roleUserBindService.listRoleByTenantIdAndUserId(tenant.getId(), userLogin.getUserId());
-        if (CollUtil.isEmpty(roles)){
+        if (CollUtil.isEmpty(roles)) {
             throw new ServiceException("请先为用户{}分配角色", login.getName());
         }
         Set<String> roleCodeSet = roles.stream().map(Role::getRoleCode).collect(Collectors.toSet());
@@ -110,11 +111,11 @@ public class AuthServiceImpl implements AuthService {
 
         //3. save resources
         Set<io.github.pnoker.common.model.Resource> resourceSet = new HashSet<>();
-        for (Role role : roles){
+        for (Role role : roles) {
             List<io.github.pnoker.common.model.Resource> resources = roleResourceBindService.listResourceByRoleId(role.getId());
             resourceSet.addAll(resources);
         }
-        if (CollUtil.isEmpty(resourceSet)){
+        if (CollUtil.isEmpty(resourceSet)) {
             throw new ServiceException("请先为用户{}分配权限", login.getName());
         }
         Set<String> resourceCodeSet = resourceSet.stream().map(io.github.pnoker.common.model.Resource::getResourceCode).collect(Collectors.toSet());

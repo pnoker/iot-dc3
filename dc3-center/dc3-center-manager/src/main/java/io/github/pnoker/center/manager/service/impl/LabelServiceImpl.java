@@ -27,6 +27,7 @@ import io.github.pnoker.center.manager.mapper.LabelMapper;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Label;
@@ -58,8 +59,9 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public void add(Label entityDO) {
         selectByName(entityDO.getLabelName(), entityDO.getTenantId());
-        labelMapper.insert(entityDO);
-        throw new ServiceException("The label add failed");
+        if (labelMapper.insert(entityDO) < 1) {
+            throw new AddException("The label {} add failed", entityDO.getLabelName());
+        }
     }
 
     /**

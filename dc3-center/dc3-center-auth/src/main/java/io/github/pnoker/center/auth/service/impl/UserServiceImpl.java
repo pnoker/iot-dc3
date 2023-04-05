@@ -50,7 +50,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void add(User entityDO) {
-        // todo 不通过，会返回密码数据
         // 判断用户是否存在
         User selectByUserName = selectByUserName(entityDO.getUserName(), false);
         if (ObjectUtil.isNotNull(selectByUserName)) {
@@ -74,7 +73,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(entityDO) < 1){
+        if (userMapper.insert(entityDO) < 1) {
             throw new AddException("The user add failed: {}", entityDO.toString());
         }
     }

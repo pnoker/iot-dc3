@@ -24,13 +24,16 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.mapper.DriverAttributeConfigMapper;
+import io.github.pnoker.center.manager.mapper.DriverAttributeMapper;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.DriverAttributeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,6 +53,8 @@ import java.util.List;
 public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigService {
 
     @Resource
+    private DriverAttributeMapper driverAttributeMapper;
+    @Resource
     private DriverAttributeConfigMapper driverAttributeConfigMapper;
 
     @Resource
@@ -61,11 +66,14 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             selectByDeviceIdAndAttributeId(entityDO.getDeviceId(), entityDO.getDriverAttributeId());
             throw new ServiceException("The driver attribute config already exists in the device");
         } catch (NotFoundException notFoundException) {
-            if (driverAttributeConfigMapper.insert(entityDO) > 0) {
-                DriverAttributeConfig add = driverAttributeConfigMapper.selectById(entityDO.getId());
-                notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.ADD, add);
+            if (driverAttributeConfigMapper.insert(entityDO) < 1) {
+                DriverAttribute driverAttribute = driverAttributeMapper.selectById(entityDO.getDriverAttributeId());
+                throw new AddException("The driver attribute config {} add failed", driverAttribute.getDisplayName());
             }
-            throw new ServiceException("The driver attribute config add failed");
+
+            // 通知驱动新增
+            DriverAttributeConfig driverAttributeConfig = driverAttributeConfigMapper.selectById(entityDO.getId());
+            notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.ADD, driverAttributeConfig);
         }
     }
 
@@ -77,7 +85,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         DriverAttributeConfig driverAttributeConfig = selectById(id);
         boolean delete = driverAttributeConfigMapper.deleteById(id) > 0;
         if (delete) {
-            notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);
+            notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);
         }
     }
 
@@ -100,7 +108,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             DriverAttributeConfig select = driverAttributeConfigMapper.selectById(entityDO.getId());
             entityDO.setDriverAttributeId(select.getDriverAttributeId());
             entityDO.setDeviceId(select.getDeviceId());
-            notifyService.notifyDriverDriverInfo(MetadataCommandTypeEnum.UPDATE, select);
+            notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, select);
         }
         throw new ServiceException("The driver attribute config update failed");
     }

@@ -57,7 +57,7 @@ public interface NotifyService {
      * @param command               Operation Type
      * @param driverAttributeConfig Driver Attribute Config
      */
-    void notifyDriverDriverInfo(MetadataCommandTypeEnum command, DriverAttributeConfig driverAttributeConfig);
+    void notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfig driverAttributeConfig);
 
     /**
      * 通知驱动 新增位号配置(ADD) / 删除位号配置(DELETE) / 更新位号配置(UPDATE)

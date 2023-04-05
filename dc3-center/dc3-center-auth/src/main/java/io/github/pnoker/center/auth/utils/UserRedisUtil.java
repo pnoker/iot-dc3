@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author linys
  * @since 2023.04.02
- *
+ * <p>
  * todo 缓存需要所有微服务模块都能访问
  */
 @Slf4j
@@ -29,22 +30,24 @@ public class UserRedisUtil {
 
     /**
      * 获取redis key
-     * @param suffix 类型，SuffixConstant
+     *
+     * @param suffix   类型，SuffixConstant
      * @param userName 用户名称
      * @param tenantId 租户id
      * @return redis key
      */
-    public String getKey(String suffix, String userName, String tenantId){
+    public String getKey(String suffix, String userName, String tenantId) {
         return PrefixConstant.USER + suffix + SymbolConstant.DOUBLE_COLON + userName +
                 SymbolConstant.HASHTAG + tenantId;
     }
 
     /**
      * 查询redis value
+     *
      * @param key key
      * @return value
      */
-    public <T> T getValue(String key){
+    public <T> T getValue(String key) {
         ValueOperations<String, T> operations = redisTemplate.opsForValue();
         return operations.get(key);
     }
@@ -64,39 +67,42 @@ public class UserRedisUtil {
 
     /**
      * 查询Key对应的Set值
+     *
      * @param key Key
-     * @return Set<T>
      * @param <T> value
+     * @return Set<T>
      */
-    public <T> Set<T> getSetValue(String key){
+    public <T> Set<T> getSetValue(String key) {
         SetOperations operations = redisTemplate.opsForSet();
         return operations.members(key);
     }
 
     /**
      * 追加Set
-     * @param key Key
+     *
+     * @param key      Key
      * @param valueSet Value
-     * @param time Expire Time
-     * @param unit Time Unit
-     * @param <T> Type
+     * @param time     Expire Time
+     * @param unit     Time Unit
+     * @param <T>      Type
      */
-    public <T> void appendSetValue(String key, final Set<T> valueSet, long time, TimeUnit unit){
+    public <T> void appendSetValue(String key, final Set<T> valueSet, long time, TimeUnit unit) {
         redisTemplate.opsForSet().add(key, valueSet.toArray());
         redisTemplate.expire(key, time, unit);
     }
 
     /**
      * 设置Set
-     * @param key Key
+     *
+     * @param key      Key
      * @param valueSet Value
-     * @param time Expire Time
-     * @param unit Time Unit
-     * @param <T> Type
+     * @param time     Expire Time
+     * @param unit     Time Unit
+     * @param <T>      Type
      */
-    public <T> void setSetValue(String key, final Set<T> valueSet, long time, TimeUnit unit){
+    public <T> void setSetValue(String key, final Set<T> valueSet, long time, TimeUnit unit) {
         Set<Object> oldValueSet = getSetValue(key);
-        if (CollUtil.isNotEmpty(oldValueSet)){
+        if (CollUtil.isNotEmpty(oldValueSet)) {
             redisTemplate.opsForSet().remove(key, oldValueSet.toArray());
         }
         appendSetValue(key, valueSet, time, unit);

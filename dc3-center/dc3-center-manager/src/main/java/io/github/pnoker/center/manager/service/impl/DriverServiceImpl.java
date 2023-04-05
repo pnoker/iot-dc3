@@ -28,6 +28,7 @@ import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -69,8 +70,9 @@ public class DriverServiceImpl implements DriverService {
             selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId());
             throw new DuplicateException("The driver already exists");
         } catch (NotFoundException notFoundException) {
-            driverMapper.insert(entityDO);
-            throw new ServiceException("The driver add failed");
+            if (driverMapper.insert(entityDO) < 1) {
+                throw new AddException("The driver {} add failed", entityDO.getDriverName());
+            }
         }
     }
 

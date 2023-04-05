@@ -49,7 +49,7 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public void add(TenantBind entityDO) {
-        if (tenantBindMapper.insert(entityDO) < 1){
+        if (tenantBindMapper.insert(entityDO) < 1) {
             throw new AddException("The tenant bind add failed");
         }
     }
@@ -64,7 +64,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     public void update(TenantBind entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        if (tenantBindMapper.updateById(entityDO) < 1){
+        if (tenantBindMapper.updateById(entityDO) < 1) {
             throw new ServiceException("The tenant bind update failed");
         }
     }
