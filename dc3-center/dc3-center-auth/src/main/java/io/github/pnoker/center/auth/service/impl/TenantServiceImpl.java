@@ -65,8 +65,9 @@ public class TenantServiceImpl implements TenantService {
     public void delete(String id) {
         Tenant tenant = selectById(id);
         if (ObjectUtil.isNull(tenant)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The tenant does not exist");
         }
+
         tenantMapper.deleteById(id);
     }
 

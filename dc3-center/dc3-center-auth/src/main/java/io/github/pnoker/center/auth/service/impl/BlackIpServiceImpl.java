@@ -65,8 +65,9 @@ public class BlackIpServiceImpl implements BlackIpService {
     public void delete(String id) {
         BlackIp blackIp = selectById(id);
         if (ObjectUtil.isNull(blackIp)) {
-            throw new ServiceException("The ip does not exist in the blacklist");
+            throw new NotFoundException("The ip does not exist in the blacklist");
         }
+
         blackIpMapper.deleteById(id);
     }
 

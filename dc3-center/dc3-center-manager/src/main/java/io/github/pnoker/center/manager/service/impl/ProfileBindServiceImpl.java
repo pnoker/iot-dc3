@@ -71,7 +71,11 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public void delete(String id) {
-        selectById(id);
+        ProfileBind profileBind = selectById(id);
+        if (ObjectUtil.isNull(profileBind)) {
+            throw new NotFoundException("The profile bind does not exist");
+        }
+
         profileBindMapper.deleteById(id);
     }
 
