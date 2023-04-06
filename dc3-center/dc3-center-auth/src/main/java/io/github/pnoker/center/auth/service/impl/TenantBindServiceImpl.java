@@ -56,7 +56,11 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public void delete(String id) {
-        selectById(id);
+        TenantBind tenantBind = selectById(id);
+        if (ObjectUtil.isNull(tenantBind)) {
+            throw new NotFoundException("The tenant bind does not exist");
+        }
+
         tenantBindMapper.deleteById(id);
     }
 
