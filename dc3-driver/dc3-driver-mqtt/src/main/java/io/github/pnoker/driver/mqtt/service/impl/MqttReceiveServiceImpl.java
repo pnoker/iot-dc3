@@ -16,12 +16,17 @@
 
 package io.github.pnoker.driver.mqtt.service.impl;
 
+import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
+import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.driver.sdk.service.DriverSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -31,13 +36,23 @@ import java.util.List;
 @Service
 public class MqttReceiveServiceImpl implements MqttReceiveService {
 
+    @Resource
+    private DriverSenderService driverSenderService;
+
     @Override
     public void receiveValue(MqttMessage mqttMessage) {
         // do something to process your mqtt messages
+        log.info(JsonUtil.toPrettyJsonString(mqttMessage));
+        PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
+        driverSenderService.pointValueSender(pointValue);
     }
 
     @Override
     public void receiveValues(List<MqttMessage> mqttMessageList) {
         // do something to process your mqtt messages
+        log.info(JsonUtil.toPrettyJsonString(mqttMessageList));
+        List<PointValue> pointValues = mqttMessageList.stream()
+                .map(mqttMessage -> JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class)).collect(Collectors.toList());
+        driverSenderService.pointValueSender(pointValues);
     }
 }
