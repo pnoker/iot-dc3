@@ -28,6 +28,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.UserPassword;
 import io.github.pnoker.common.utils.DecodeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +80,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         entityDO.setOperateTime(null);
         if (userPasswordMapper.updateById(entityDO) < 1) {
-            throw new ServiceException("The user password update failed");
+            throw new UpdateException("The user password update failed");
         }
     }
 

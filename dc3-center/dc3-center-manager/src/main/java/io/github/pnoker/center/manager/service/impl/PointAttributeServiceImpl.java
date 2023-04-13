@@ -28,7 +28,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,12 +84,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     public void update(PointAttribute entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        if (pointAttributeMapper.updateById(entityDO) > 0) {
-            PointAttribute select = pointAttributeMapper.selectById(entityDO.getId());
-            entityDO.setAttributeName(select.getAttributeName());
-            entityDO.setDriverId(select.getDriverId());
+        if (pointAttributeMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The point attribute update failed");
         }
-        throw new ServiceException("The point attribute update failed");
     }
 
     /**

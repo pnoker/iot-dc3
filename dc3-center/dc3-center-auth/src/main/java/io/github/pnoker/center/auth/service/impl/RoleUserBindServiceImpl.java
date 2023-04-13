@@ -15,6 +15,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Role;
 import io.github.pnoker.common.model.RoleUserBind;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     public void update(RoleUserBind entityDo) {
         selectById(entityDo.getId());
         if (roleUserBindMapper.updateById(entityDo) < 1) {
-            throw new ServiceException("The role user bind update failed");
+            throw new UpdateException("The role user bind update failed");
         }
     }
 

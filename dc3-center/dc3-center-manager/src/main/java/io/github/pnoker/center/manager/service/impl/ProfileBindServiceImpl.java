@@ -28,7 +28,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -107,8 +107,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     public void update(ProfileBind entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        profileBindMapper.updateById(entityDO);
-        throw new ServiceException("The profile bind update failed");
+        if (profileBindMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The profile bind update failed");
+        }
     }
 
     /**

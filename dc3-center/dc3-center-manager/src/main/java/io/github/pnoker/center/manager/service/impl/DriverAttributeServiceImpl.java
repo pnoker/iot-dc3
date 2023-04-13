@@ -25,10 +25,7 @@ import io.github.pnoker.center.manager.entity.query.DriverAttributePageQuery;
 import io.github.pnoker.center.manager.mapper.DriverAttributeMapper;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.DriverAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,12 +81,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public void update(DriverAttribute entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        if (driverAttributeMapper.updateById(entityDO) > 0) {
-            DriverAttribute select = driverAttributeMapper.selectById(entityDO.getId());
-            entityDO.setAttributeName(select.getAttributeName());
-            entityDO.setDriverId(select.getDriverId());
+        if (driverAttributeMapper.updateById(entityDO) < 1) {
+        throw new UpdateException("The driver attribute update failed");
         }
-        throw new ServiceException("The driver attribute update failed");
     }
 
     /**

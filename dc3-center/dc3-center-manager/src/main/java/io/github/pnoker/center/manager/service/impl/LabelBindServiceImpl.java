@@ -27,7 +27,7 @@ import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,8 +77,9 @@ public class LabelBindServiceImpl implements LabelBindService {
     public void update(LabelBind entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        labelBindMapper.updateById(entityDO);
-        throw new ServiceException("The label bind update failed");
+        if (labelBindMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The label bind update failed");
+        }
     }
 
     /**

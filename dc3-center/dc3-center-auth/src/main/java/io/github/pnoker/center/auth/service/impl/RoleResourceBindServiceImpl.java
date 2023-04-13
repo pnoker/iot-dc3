@@ -15,6 +15,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.RoleResourceBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     public void update(RoleResourceBind entityDo) {
         selectById(entityDo.getId());
         if (bindMapper.updateById(entityDo) < 1) {
-            throw new ServiceException("The role resource bind update failed");
+            throw new UpdateException("The role resource bind update failed");
         }
     }
 

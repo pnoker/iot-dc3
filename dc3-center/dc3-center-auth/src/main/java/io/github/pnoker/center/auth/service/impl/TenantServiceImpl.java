@@ -29,7 +29,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Tenant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,12 +75,9 @@ public class TenantServiceImpl implements TenantService {
     public void update(Tenant entityDO) {
         entityDO.setTenantName(null);
         entityDO.setOperateTime(null);
-        if (tenantMapper.updateById(entityDO) > 0) {
-            Tenant select = tenantMapper.selectById(entityDO.getId());
-            entityDO.setTenantName(select.getTenantName());
-            return;
+        if (tenantMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The tenant update failed");
         }
-        throw new ServiceException("The tenant update failed");
     }
 
     @Override

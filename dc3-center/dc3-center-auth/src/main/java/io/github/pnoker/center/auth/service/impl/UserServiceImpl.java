@@ -118,11 +118,9 @@ public class UserServiceImpl implements UserService {
 
         entityDO.setUserName(null);
         entityDO.setOperateTime(null);
-        if (userMapper.updateById(entityDO) > 0) {
-            User select = userMapper.selectById(entityDO.getId());
-            entityDO.setUserName(select.getUserName());
+        if (userMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The user update failed");
         }
-        throw new ServiceException("The user update failed");
     }
 
     @Override

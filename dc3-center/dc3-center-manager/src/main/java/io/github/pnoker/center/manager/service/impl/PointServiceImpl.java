@@ -33,7 +33,7 @@ import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -113,13 +113,15 @@ public class PointServiceImpl implements PointService {
                 // nothing to do
             }
         }
-        if (pointMapper.updateById(entityDO) > 0) {
-            Point select = pointMapper.selectById(entityDO.getId());
-            entityDO.setPointName(select.getPointName());
-            entityDO.setProfileId(select.getProfileId());
-            notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, select);
+
+        if (pointMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The point update failed");
         }
-        throw new ServiceException("The point update failed");
+
+        Point select = pointMapper.selectById(entityDO.getId());
+        entityDO.setPointName(select.getPointName());
+        entityDO.setProfileId(select.getProfileId());
+        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, select);
     }
 
     /**
