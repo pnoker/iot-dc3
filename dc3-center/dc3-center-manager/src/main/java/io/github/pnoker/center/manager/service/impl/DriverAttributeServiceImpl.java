@@ -69,7 +69,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     @Override
     public void delete(String id) {
-        selectById(id);
+        DriverAttribute driverAttribute = selectById(id);
+        if (ObjectUtil.isNull(driverAttribute)) {
+            throw new NotFoundException("The driver attribute does not exist");
+        }
+
         driverAttributeMapper.deleteById(id);
     }
 

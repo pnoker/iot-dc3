@@ -83,6 +83,10 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     @Override
     public void delete(String id) {
         DriverAttributeConfig driverAttributeConfig = selectById(id);
+        if (ObjectUtil.isNull(driverAttributeConfig)) {
+            throw new NotFoundException("The driver attribute config does not exist");
+        }
+
         boolean delete = driverAttributeConfigMapper.deleteById(id) > 0;
         if (delete) {
             notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);

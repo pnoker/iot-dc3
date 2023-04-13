@@ -81,7 +81,11 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public void delete(String id) {
-        selectById(id);
+        Driver driver = selectById(id);
+        if (ObjectUtil.isNull(driver)) {
+            throw new NotFoundException("The driver does not exist");
+        }
+
         driverMapper.deleteById(id);
     }
 

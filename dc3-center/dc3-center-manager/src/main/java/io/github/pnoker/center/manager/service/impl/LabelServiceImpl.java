@@ -77,8 +77,9 @@ public class LabelServiceImpl implements LabelService {
         }
         Label label = selectById(id);
         if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The label does not exist");
         }
+
         labelMapper.deleteById(id);
     }
 

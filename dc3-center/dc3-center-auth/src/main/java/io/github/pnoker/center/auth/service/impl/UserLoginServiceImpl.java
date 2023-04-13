@@ -67,8 +67,9 @@ public class UserLoginServiceImpl implements UserLoginService {
     public void delete(String id) {
         UserLogin userLogin = selectById(id);
         if (ObjectUtil.isNull(userLogin)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The user login does not exist");
         }
+
         userLoginMapper.deleteById(id);
     }
 

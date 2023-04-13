@@ -85,6 +85,10 @@ public class ProfileServiceImpl implements ProfileService {
             throw new ServiceException("The profile already bound by the point");
         } catch (NotFoundException notFoundException2) {
             Profile profile = selectById(id);
+            if (ObjectUtil.isNull(profile)) {
+                throw new NotFoundException("The profile does not exist");
+            }
+
             boolean delete = profileMapper.deleteById(id) > 0;
             if (delete) {
                 notifyService.notifyDriverProfile(MetadataCommandTypeEnum.DELETE, profile);
