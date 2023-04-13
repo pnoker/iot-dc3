@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        />
+        <title>RabbitMQ 集群部署 | IoT DC3</title>
+        <meta name="description" content="" />
+        <meta name="generator" content="VuePress 1.9.9" />
+        <link rel="icon" href="/assets/images/favicon.ico">
+    <script type="text/javascript" src="/assets/js/push.js"></script> <meta name="description" content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
+    <meta name="referrer" content="never">
+    <meta name="keywords" content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台"> <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style"><link rel="preload" href="/assets/js/app.7dfefe51.js" as="script"><link rel="preload" href="/assets/js/2.a8b8915e.js" as="script"><link rel="preload" href="/assets/js/11.287152fd.js" as="script"><link rel="prefetch" href="/assets/js/10.db658154.js"><link rel="prefetch" href="/assets/js/12.08136beb.js"><link rel="prefetch" href="/assets/js/13.83b3d580.js"><link rel="prefetch" href="/assets/js/14.d5387cec.js"><link rel="prefetch" href="/assets/js/15.aafb2a89.js"><link rel="prefetch" href="/assets/js/16.01fcc650.js"><link rel="prefetch" href="/assets/js/17.a097fd52.js"><link rel="prefetch" href="/assets/js/18.acd93e71.js"><link rel="prefetch" href="/assets/js/19.6f12b224.js"><link rel="prefetch" href="/assets/js/20.bac69ff1.js"><link rel="prefetch" href="/assets/js/21.9105165e.js"><link rel="prefetch" href="/assets/js/22.de1f017c.js"><link rel="prefetch" href="/assets/js/23.fb20a8f5.js"><link rel="prefetch" href="/assets/js/24.6459dc88.js"><link rel="prefetch" href="/assets/js/25.0587cb23.js"><link rel="prefetch" href="/assets/js/26.b6254386.js"><link rel="prefetch" href="/assets/js/27.479148c7.js"><link rel="prefetch" href="/assets/js/28.da247a59.js"><link rel="prefetch" href="/assets/js/29.f175dd67.js"><link rel="prefetch" href="/assets/js/3.8e04da2b.js"><link rel="prefetch" href="/assets/js/30.5ba7a495.js"><link rel="prefetch" href="/assets/js/31.01c3d218.js"><link rel="prefetch" href="/assets/js/32.de0e0ff7.js"><link rel="prefetch" href="/assets/js/33.0e117d4a.js"><link rel="prefetch" href="/assets/js/34.010094c5.js"><link rel="prefetch" href="/assets/js/35.8a377a71.js"><link rel="prefetch" href="/assets/js/36.fbb64a47.js"><link rel="prefetch" href="/assets/js/37.c2b9d4da.js"><link rel="prefetch" href="/assets/js/38.a66be625.js"><link rel="prefetch" href="/assets/js/39.76e387bc.js"><link rel="prefetch" href="/assets/js/4.470d098a.js"><link rel="prefetch" href="/assets/js/40.0e9ee726.js"><link rel="prefetch" href="/assets/js/41.e68f3c2e.js"><link rel="prefetch" href="/assets/js/42.ba03ba76.js"><link rel="prefetch" href="/assets/js/43.e6a91a35.js"><link rel="prefetch" href="/assets/js/44.9304b041.js"><link rel="prefetch" href="/assets/js/45.586518cf.js"><link rel="prefetch" href="/assets/js/46.ab599c67.js"><link rel="prefetch" href="/assets/js/47.dc2d8aff.js"><link rel="prefetch" href="/assets/js/48.06e9c64e.js"><link rel="prefetch" href="/assets/js/49.627cc127.js"><link rel="prefetch" href="/assets/js/5.0f4aedb8.js"><link rel="prefetch" href="/assets/js/50.bf665f72.js"><link rel="prefetch" href="/assets/js/51.08e5dea0.js"><link rel="prefetch" href="/assets/js/52.8e37a9c4.js"><link rel="prefetch" href="/assets/js/53.8c472224.js"><link rel="prefetch" href="/assets/js/54.bb582a52.js"><link rel="prefetch" href="/assets/js/55.640d9ecb.js"><link rel="prefetch" href="/assets/js/56.e2e2a21e.js"><link rel="prefetch" href="/assets/js/57.9b9b26a7.js"><link rel="prefetch" href="/assets/js/58.0d4a46c3.js"><link rel="prefetch" href="/assets/js/59.d1f11d32.js"><link rel="prefetch" href="/assets/js/6.547754b6.js"><link rel="prefetch" href="/assets/js/7.aea1a047.js"><link rel="prefetch" href="/assets/js/8.f35f3888.js"><link rel="prefetch" href="/assets/js/9.3f13bdbf.js"> <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
+    </head>
+    <body>
+        <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="ant-row"><div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars"><svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path></svg></i> <span></span></div> <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3" class="logo"> <span class="site-name">IoT DC3</span></a> <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div></div> <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light"><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
+                    首页
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
+                    指南
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/config/">
+                    配置
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/faq/">
+                    FAQ
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>
+                    代码仓库
+                </span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="visibility:hidden;position:absolute;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li></ul> <ul class="extra-group"><!----> <!----></ul></nav></div></div> <!----></header> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/code/0-environment.html" title="注意事项" class="sidebar-link">注意事项</a></li><li><a href="/docs/code/1-idea-start.html" title="必要软件环境" class="sidebar-link">必要软件环境</a></li><li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建 IoT DC3 Web UI</a></li><li><a href="/docs/code/3-quick-start.html" title="快速启动" class="sidebar-link">快速启动</a></li><li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/cluster/emqx.html" title="EMQ X 集群部署" class="sidebar-link">EMQ X 集群部署</a></li><li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo 集群部署</a></li><li><a href="/docs/cluster/rabbitmq.html" aria-current="page" title="RabbitMQ 集群部署" class="active sidebar-link">RabbitMQ 集群部署</a></li><li><a href="/docs/cluster/redis.html" title="Redis 集群部署" class="sidebar-link">Redis 集群部署</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a></li><li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li></ul> </aside> <main class="page has-page-anchor"> <div class="theme-dc3-content content__default"><h2 id="rabbitmq-集群部署"><code>RabbitMQ</code> 集群部署 <a href="#rabbitmq-集群部署" class="header-anchor">#</a></h2> <blockquote><p><code>RabbiMQ</code> 是用 <code>Erlang</code> 开发的，集群非常方便，因为 <code>Erlang</code> 天生就是一门分布式语言，但其本身并不支持负载均衡。</p> <p><code>RabbitMQ</code> 的集群节点包括内存节点、磁盘节点。<code>RabbitMQ</code> 支持消息的持久化，也就是数据写在磁盘上，最合适的方案就是既有内存节点，又有磁盘节点。</p> <p><code>RabbitMQ</code> 模式大概分为以下三种:</p> <ul><li>单一模式；</li> <li>普通模式（默认的集群模式）；</li> <li>镜像模式（把需要的队列做成镜像队列，存在于多个节点，属于 <code>RabbiMQ</code> 的 <code>HA</code> 方案，在对业务可靠性要求较高的场合中比较适用）。
+要实现镜像模式，需要先搭建一个普通集群模式，在这个模式的基础上再配置镜像模式以实现高可用。</li></ul></blockquote> <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3> <p><img src="/assets/images/dc3/cluster/rabbitmq/rabbitmq-1.png" alt=""></p> <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3> <table><thead><tr><th style="text-align:center;"><code>item</code></th> <th style="text-align:center;"><code>node 1</code></th> <th style="text-align:center;"><code>node 2</code></th> <th style="text-align:center;"><code>node 3</code></th></tr></thead> <tbody><tr><td style="text-align:center;"><code>listeners.tcp.default</code></td> <td style="text-align:center;">5000</td> <td style="text-align:center;">5100</td> <td style="text-align:center;">5200</td></tr> <tr><td style="text-align:center;"><code>management.tcp.port</code></td> <td style="text-align:center;">5020</td> <td style="text-align:center;">5120</td> <td style="text-align:center;">5220</td></tr> <tr><td style="text-align:center;"><code>mqtt.listeners.tcp.default</code></td> <td style="text-align:center;">5040</td> <td style="text-align:center;">5140</td> <td style="text-align:center;">5240</td></tr></tbody></table> <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3> <blockquote><p><strong>下载文件</strong></p> <p>请下载 <code>unix generic</code> 版本</p></blockquote> <ul><li><p>以 <code>3.9.11</code> 版本为例： https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.11/rabbitmq-server-generic-unix-3.9.11.tar.xz</p></li> <li><p>其他版本下载：https://github.com/rabbitmq/rabbitmq-server/releases</p></li></ul> <blockquote><p><strong>解压文件</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>xz <span class="token parameter variable">-d</span> rabbitmq-server-generic-unix-3.9.11.tar.xz
+
+<span class="token function">tar</span> xvf rabbitmq-server-generic-unix-3.9.11.tar
+</code></pre></div><h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4 id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a></h4> <blockquote><p>分别创建三个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> /data
+
+<span class="token function">mkdir</span> <span class="token parameter variable">-p</span> rabbitmq/dc3/node-01 rabbitmq/dc3/node-02 rabbitmq/dc3/node-03
+</code></pre></div><blockquote><p>将解压的 <code>rabbitmq</code> 文件放入到每个节点中，其他节点操作一致</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">cp</span> <span class="token parameter variable">-r</span> rabbitmq-server/* rabbitmq/dc3/node-01/
+
+<span class="token comment"># pwd</span>
+<span class="token comment"># /data/rabbitmq/dc3/node-01</span>
+
+<span class="token comment"># ls</span>
+<span class="token comment"># escript  etc  plugins  sbin  share</span>
+</code></pre></div><blockquote><p>为每个节点创建配置和 <code>keys</code> 目录，其他节点操作一致</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> node-N
+
+<span class="token function">mkdir</span> <span class="token parameter variable">-p</span> etc/rabbitmq keys
+</code></pre></div><h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4> <blockquote><p>在每个节点的 <code>etc/rabbitmq</code> 下添加配置文件 <code>advanced.config</code>、<code>rabbitmq.conf</code>、<code>rabbitmq-env.conf</code>、<code>enabled_plugins</code></p></blockquote> <h5 id="_4-2-1-advanced-config">4.2.1 <code>advanced.config</code> <a href="#_4-2-1-advanced-config" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token punctuation">[</span>
+
+
+ <span class="token directive important">%% ----------------------------------------------------------------------------</span>
+ <span class="token directive important">%% Advanced Erlang Networking/Clustering Options.</span>
+ <span class="token directive important">%%</span>
+ <span class="token directive important">%% See https://www.rabbitmq.com/clustering.html for details</span>
+ <span class="token directive important">%% ----------------------------------------------------------------------------</span>
+ <span class="token directive important">%% Sets the net_kernel tick time.</span>
+ <span class="token directive important">%% Please see http://erlang.org/doc/man/kernel_app.html and</span>
+ <span class="token directive important">%% https://www.rabbitmq.com/nettick.html for further details.</span>
+ <span class="token directive important">%%</span>
+ <span class="token directive important">%% {kernel, [{net_ticktime, 60}]},</span>
+ <span class="token directive important">%% ----------------------------------------------------------------------------</span>
+ <span class="token directive important">%% RabbitMQ Shovel Plugin</span>
+ <span class="token directive important">%%</span>
+ <span class="token directive important">%% See https://www.rabbitmq.com/shovel.html for details</span>
+ <span class="token directive important">%% ----------------------------------------------------------------------------</span>
+
+ <span class="token punctuation">{</span>rabbitmq_shovel<span class="token punctuation">,</span>
+  <span class="token punctuation">[</span><span class="token punctuation">{</span>shovels<span class="token punctuation">,</span>
+    <span class="token punctuation">[</span>%% A named shovel worker.
+     <span class="token directive important">%% {my_first_shovel,</span>
+     <span class="token directive important">%%  [</span>
+
+     <span class="token directive important">%% List the source broker(s) from which to consume.</span>
+     <span class="token directive important">%%</span>
+     <span class="token directive important">%%   {sources,</span>
+     <span class="token directive important">%%    [%% URI(s) and pre-declarations for all source broker(s).</span>
+     <span class="token directive important">%%     {brokers, [&quot;amqp://user:password@host.domain/my_vhost&quot;]},</span>
+     <span class="token directive important">%%     {declarations, []}</span>
+     <span class="token directive important">%%    ]},</span>
+
+     <span class="token directive important">%% List the destination broker(s) to publish to.</span>
+     <span class="token directive important">%%   {destinations,</span>
+     <span class="token directive important">%%    [%% A singular version of the 'brokers' element.</span>
+     <span class="token directive important">%%     {broker, &quot;amqp://&quot;},</span>
+     <span class="token directive important">%%     {declarations, []}</span>
+     <span class="token directive important">%%    ]},</span>
+
+     <span class="token directive important">%% Name of the queue to shovel messages from.</span>
+     <span class="token directive important">%%</span>
+     <span class="token directive important">%% {queue, &lt;&lt;&quot;your-queue-name-goes-here&quot;&gt;&gt;},</span>
+
+     <span class="token directive important">%% Optional prefetch count.</span>
+     <span class="token directive important">%%</span>
+     <span class="token directive important">%% {prefetch_count, 10},</span>
+
+     <span class="token directive important">%% when to acknowledge messages:</span>
+     <span class="token directive important">%% - </span><span class="token key atrule">no_ack</span><span class="token punctuation">:</span> never (auto)
+     <span class="token directive important">%% - </span><span class="token key atrule">on_publish</span><span class="token punctuation">:</span> after each message is republished
+     <span class="token directive important">%% - </span><span class="token key atrule">on_confirm</span><span class="token punctuation">:</span> when the destination broker confirms receipt
+     <span class="token directive important">%%</span>
+     <span class="token directive important">%% {ack_mode, on_confirm},</span>
+
+     <span class="token directive important">%% Overwrite fields of the outbound basic.publish.</span>
+     <span class="token directive important">%%</span>
+     <span class="token directive important">%% {publish_fields, [{exchange,    &lt;&lt;&quot;my_exchange&quot;&gt;&gt;},</span>
+     <span class="token directive important">%%                   {routing_key, &lt;&lt;&quot;from_shovel&quot;&gt;&gt;}]},</span>
+
+     <span class="token directive important">%% Static list of basic.properties to set on re-publication.</span>
+     <span class="token directive important">%%</span>
+     <span class="token directive important">%% {publish_properties, [{delivery_mode, 2}]},</span>
+
+     <span class="token directive important">%% The number of seconds to wait before attempting to</span>
+     <span class="token directive important">%% reconnect in the event of a connection failure.</span>
+     <span class="token directive important">%%</span>
+     <span class="token directive important">%% {reconnect_delay, 2.5}</span>
+
+     <span class="token directive important">%% ]} %% End of my_first_shovel</span>
+    <span class="token punctuation">]</span><span class="token punctuation">}</span>
+   <span class="token directive important">%% Rather than specifying some values per-shovel, you can specify</span>
+   <span class="token directive important">%% them for all shovels here.</span>
+   <span class="token directive important">%%</span>
+   <span class="token directive important">%% {defaults, [{prefetch_count,     0},</span>
+   <span class="token directive important">%%             {ack_mode,           on_confirm},</span>
+   <span class="token directive important">%%             {publish_fields,     []},</span>
+   <span class="token directive important">%%             {publish_properties, [{delivery_mode, 2}]},</span>
+   <span class="token directive important">%%             {reconnect_delay,    2.5}]}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+  <span class="token punctuation">{</span>rabbitmq_auth_backend_ldap<span class="token punctuation">,</span> <span class="token punctuation">[</span>
+    <span class="token directive important">%%</span>
+    <span class="token directive important">%% Authorisation</span>
+    <span class="token directive important">%% =============</span>
+    <span class="token directive important">%%</span>
+
+    <span class="token directive important">%% The LDAP plugin can perform a variety of queries against your</span>
+    <span class="token directive important">%% LDAP server to determine questions of authorisation. See</span>
+    <span class="token directive important">%% https://www.rabbitmq.com/ldap.html</span><span class="token comment">#authorisation for more</span>
+    <span class="token directive important">%% information.</span>
+
+    <span class="token directive important">%% Set the query to use when determining vhost access</span>
+    <span class="token directive important">%%</span>
+    <span class="token directive important">%% {vhost_access_query, {in_group,</span>
+    <span class="token directive important">%%                       &quot;ou=${vhost}-users,ou=vhosts,dc=example,dc=com&quot;}},</span>
+
+    <span class="token directive important">%% Set the query to use when determining resource (e.g., queue) access</span>
+    <span class="token directive important">%%</span>
+    <span class="token directive important">%% {resource_access_query, {constant, true}},</span>
+
+    <span class="token directive important">%% Set queries to determine which tags a user has</span>
+    <span class="token directive important">%%</span>
+    <span class="token directive important">%% {tag_queries, []}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">}</span>
+<span class="token punctuation">]</span>.
+</code></pre></div><h5 id="_4-2-2-rabbitmq-conf">4.2.2 <code>rabbitmq.conf</code> <a href="#_4-2-2-rabbitmq-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">## This example configuration file demonstrates various settings</span>
+<span class="token comment">## available via rabbitmq.conf. It primarily focuses core broker settings</span>
+<span class="token comment">## but some tier 1 plugin settings are also covered.</span>
+<span class="token comment">##</span>
+<span class="token comment">## This file is AN EXAMPLE. It is NOT MEANT TO BE USED IN PRODUCTION. Instead of</span>
+<span class="token comment">## copying the entire (large!) file, create or generate a new rabbitmq.conf for the target system</span>
+<span class="token comment">## and populate it with the necessary settings.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See https://rabbitmq.com/configure.html to learn about how to configure RabbitMQ,</span>
+<span class="token comment">## the ini-style format used by rabbitmq.conf, how it is different from `advanced.config`,</span>
+<span class="token comment">## how to verify effective configuration, and so on.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See https://rabbitmq.com/documentation.html for the rest of RabbitMQ documentation.</span>
+<span class="token comment">##</span>
+<span class="token comment">## In case you have questions, please use RabbitMQ community Slack and the rabbitmq-users Google group</span>
+<span class="token comment">## instead of GitHub issues.</span>
+
+<span class="token comment"># ======================================</span>
+<span class="token comment"># Core broker section</span>
+<span class="token comment"># ======================================</span>
+
+
+<span class="token comment">## Networking</span>
+<span class="token comment">## ====================</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/networking.html.</span>
+<span class="token comment">##</span>
+<span class="token comment">## By default, RabbitMQ will listen on all interfaces, using</span>
+<span class="token comment">## the standard (reserved) AMQP 0-9-1 and 1.0 port.</span>
+<span class="token comment">##</span>
+listeners.tcp.default = 5000
+
+
+<span class="token comment">## To listen on a specific interface, provide an IP address with port.</span>
+<span class="token comment">## For example, to listen only on localhost for both IPv4 and IPv6:</span>
+<span class="token comment">##</span>
+<span class="token comment"># IPv4</span>
+<span class="token comment"># listeners.tcp.local    = 127.0.0.1:5672</span>
+<span class="token comment"># IPv6</span>
+<span class="token comment"># listeners.tcp.local_v6 = ::1:5672</span>
+
+<span class="token comment">## You can define multiple listeners using listener names</span>
+<span class="token comment"># listeners.tcp.other_port = 5673</span>
+<span class="token comment"># listeners.tcp.other_ip   = 10.10.10.10:5672</span>
+
+
+<span class="token comment">## TLS listeners are configured in the same fashion as TCP listeners,</span>
+<span class="token comment">## including the option to control the choice of interface.</span>
+<span class="token comment">##</span>
+<span class="token comment"># listeners.ssl.default = 5030</span>
+
+<span class="token comment">## It is possible to disable regular TCP (non-TLS) listeners. Clients</span>
+<span class="token comment">## not configured to use TLS and the correct TLS-enabled port won't be able</span>
+<span class="token comment">## to connect to this node.</span>
+<span class="token comment"># listeners.tcp = none</span>
+
+<span class="token comment">## Number of Erlang processes that will accept connections for the TCP</span>
+<span class="token comment">## and TLS listeners.k</span>
+<span class="token comment">##</span>
+<span class="token comment"># num_acceptors.tcp = 10</span>
+<span class="token comment"># num_acceptors.ssl = 10</span>
+
+<span class="token comment">## Socket writer will force GC every so many bytes transferred.</span>
+<span class="token comment">## Default is 1 GiB (`1000000000`). Set to 'off' to disable.</span>
+<span class="token comment">##</span>
+<span class="token comment"># socket_writer.gc_threshold = 1000000000</span>
+<span class="token comment">#</span>
+<span class="token comment">## To disable:</span>
+<span class="token comment"># socket_writer.gc_threshold = off</span>
+
+<span class="token comment">## Maximum amount of time allowed for the AMQP 0-9-1 and AMQP 1.0 handshake</span>
+<span class="token comment">## (performed after socket connection and TLS handshake) to complete, in milliseconds.</span>
+<span class="token comment">##</span>
+<span class="token comment"># handshake_timeout = 10000</span>
+
+<span class="token comment">## Set to 'true' to perform reverse DNS lookups when accepting a</span>
+<span class="token comment">## connection. rabbitmqctl and management UI will then display hostnames</span>
+<span class="token comment">## instead of IP addresses. Default value is `false`.</span>
+<span class="token comment">##</span>
+<span class="token comment"># reverse_dns_lookups = false</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Security, Access Control</span>
+<span class="token comment">## ==============</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## Related doc guide: https://rabbitmq.com/access-control.html.</span>
+
+<span class="token comment">## The default &quot;guest&quot; user is only permitted to access the server</span>
+<span class="token comment">## via a loopback interface (e.g. localhost).</span>
+<span class="token comment">## {loopback_users, [&lt;&lt;&quot;guest&quot;&gt;&gt;]},</span>
+<span class="token comment">##</span>
+<span class="token comment"># loopback_users.guest = true</span>
+
+<span class="token comment">## Uncomment the following line if you want to allow access to the</span>
+<span class="token comment">## guest user from anywhere on the network.</span>
+<span class="token comment"># loopback_users.guest = false</span>
+
+<span class="token comment">## TLS configuration.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/ssl.html.</span>
+<span class="token comment">##</span>
+<span class="token comment"># listeners.ssl.1                  = 5671</span>
+<span class="token comment"># </span>
+<span class="token comment"># ssl_options.verify               = verify_peer</span>
+<span class="token comment"># ssl_options.fail_if_no_peer_cert = false</span>
+<span class="token comment"># ssl_options.cacertfile           = /path/to/cacert.pem</span>
+<span class="token comment"># ssl_options.certfile             = /path/to/cert.pem</span>
+<span class="token comment"># ssl_options.keyfile              = /path/to/key.pem</span>
+<span class="token comment">#</span>
+<span class="token comment"># ssl_options.honor_cipher_order   = true</span>
+<span class="token comment"># ssl_options.honor_ecc_order      = true</span>
+<span class="token comment">#</span>
+<span class="token comment">## These are highly recommended for TLSv1.2 but cannot be used</span>
+<span class="token comment">## with TLSv1.3. If TLSv1.3 is enabled, these lines MUST be removed.</span>
+<span class="token comment"># ssl_options.client_renegotiation = false</span>
+<span class="token comment"># ssl_options.secure_renegotiate   = true</span>
+<span class="token comment">#</span>
+<span class="token comment">## Limits what TLS versions the server enables for client TLS</span>
+<span class="token comment">## connections. See https://www.rabbitmq.com/ssl.html#tls-versions for details.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Cutting edge TLS version which requires recent client runtime</span>
+<span class="token comment">## versions and has no cipher suite in common with earlier TLS versions.</span>
+<span class="token comment"># ssl_options.versions.1 = tlsv1.3</span>
+<span class="token comment">## Enables TLSv1.2 for best compatibility</span>
+<span class="token comment"># ssl_options.versions.2 = tlsv1.2</span>
+<span class="token comment">## Older TLS versions have known vulnerabilities and are being phased out</span>
+<span class="token comment">## from wide use.</span>
+
+<span class="token comment">## Limits what cipher suites the server will use for client TLS</span>
+<span class="token comment">## connections. Narrowing this down can prevent some clients</span>
+<span class="token comment">## from connecting.</span>
+<span class="token comment">## If TLSv1.3 is enabled and cipher suites are overridden, TLSv1.3-specific</span>
+<span class="token comment">## cipher suites must also be explicitly enabled.</span>
+<span class="token comment">## See https://www.rabbitmq.com/ssl.html#cipher-suites and https://wiki.openssl.org/index.php/TLS1.3#Ciphersuites</span>
+<span class="token comment">## for details.</span>
+<span class="token comment">#</span>
+<span class="token comment">## The example below uses TLSv1.3 cipher suites only</span>
+<span class="token comment">#</span>
+<span class="token comment"># ssl_options.ciphers.1  = TLS_AES_256_GCM_SHA384</span>
+<span class="token comment"># ssl_options.ciphers.2  = TLS_AES_128_GCM_SHA256</span>
+<span class="token comment"># ssl_options.ciphers.3  = TLS_CHACHA20_POLY1305_SHA256</span>
+<span class="token comment"># ssl_options.ciphers.4  = TLS_AES_128_CCM_SHA256</span>
+<span class="token comment"># ssl_options.ciphers.5  = TLS_AES_128_CCM_8_SHA256</span>
+<span class="token comment">#</span>
+<span class="token comment">## The example below uses TLSv1.2 cipher suites only</span>
+<span class="token comment">#</span>
+<span class="token comment"># ssl_options.ciphers.1  = ECDHE-ECDSA-AES256-GCM-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.2  = ECDHE-RSA-AES256-GCM-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.3  = ECDHE-ECDSA-AES256-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.4  = ECDHE-RSA-AES256-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.5  = ECDH-ECDSA-AES256-GCM-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.6  = ECDH-RSA-AES256-GCM-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.7  = ECDH-ECDSA-AES256-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.8  = ECDH-RSA-AES256-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.9  = DHE-RSA-AES256-GCM-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.10 = DHE-DSS-AES256-GCM-SHA384</span>
+<span class="token comment"># ssl_options.ciphers.11 = DHE-RSA-AES256-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.12 = DHE-DSS-AES256-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.13 = ECDHE-ECDSA-AES128-GCM-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.14 = ECDHE-RSA-AES128-GCM-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.15 = ECDHE-ECDSA-AES128-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.16 = ECDHE-RSA-AES128-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.17 = ECDH-ECDSA-AES128-GCM-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.18 = ECDH-RSA-AES128-GCM-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.19 = ECDH-ECDSA-AES128-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.20 = ECDH-RSA-AES128-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.21 = DHE-RSA-AES128-GCM-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.22 = DHE-DSS-AES128-GCM-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.23 = DHE-RSA-AES128-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.24 = DHE-DSS-AES128-SHA256</span>
+<span class="token comment"># ssl_options.ciphers.25 = ECDHE-ECDSA-AES256-SHA</span>
+<span class="token comment"># ssl_options.ciphers.26 = ECDHE-RSA-AES256-SHA</span>
+<span class="token comment"># ssl_options.ciphers.27 = DHE-RSA-AES256-SHA</span>
+<span class="token comment"># ssl_options.ciphers.28 = DHE-DSS-AES256-SHA</span>
+<span class="token comment"># ssl_options.ciphers.29 = ECDH-ECDSA-AES256-SHA</span>
+<span class="token comment"># ssl_options.ciphers.30 = ECDH-RSA-AES256-SHA</span>
+<span class="token comment"># ssl_options.ciphers.31 = ECDHE-ECDSA-AES128-SHA</span>
+<span class="token comment"># ssl_options.ciphers.32 = ECDHE-RSA-AES128-SHA</span>
+<span class="token comment"># ssl_options.ciphers.33 = DHE-RSA-AES128-SHA</span>
+<span class="token comment"># ssl_options.ciphers.34 = DHE-DSS-AES128-SHA</span>
+<span class="token comment"># ssl_options.ciphers.35 = ECDH-ECDSA-AES128-SHA</span>
+<span class="token comment"># ssl_options.ciphers.36 = ECDH-RSA-AES128-SHA</span>
+
+<span class="token comment"># ssl_options.bypass_pem_cache = true</span>
+
+<span class="token comment">## Select an authentication/authorisation backend to use.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Alternative backends are provided by plugins, such as rabbitmq-auth-backend-ldap.</span>
+<span class="token comment">##</span>
+<span class="token comment">## NB: These settings require certain plugins to be enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guides:</span>
+<span class="token comment">##</span>
+<span class="token comment">##  * https://rabbitmq.com/plugins.html</span>
+<span class="token comment">##  * https://rabbitmq.com/access-control.html</span>
+<span class="token comment">##</span>
+
+<span class="token comment"># auth_backends.1   = rabbit_auth_backend_internal</span>
+
+<span class="token comment">## uses separate backends for authentication and authorisation,</span>
+<span class="token comment">## see below.</span>
+<span class="token comment"># auth_backends.1.authn = rabbit_auth_backend_ldap</span>
+<span class="token comment"># auth_backends.1.authz = rabbit_auth_backend_internal</span>
+
+<span class="token comment">## The rabbitmq_auth_backend_ldap plugin allows the broker to</span>
+<span class="token comment">## perform authentication and authorisation by deferring to an</span>
+<span class="token comment">## external LDAP server.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Relevant doc guides:</span>
+<span class="token comment">##</span>
+<span class="token comment">## * https://rabbitmq.com/ldap.html</span>
+<span class="token comment">## * https://rabbitmq.com/access-control.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## uses LDAP for both authentication and authorisation</span>
+<span class="token comment"># auth_backends.1 = rabbit_auth_backend_ldap</span>
+
+<span class="token comment">## uses HTTP service for both authentication and</span>
+<span class="token comment">## authorisation</span>
+<span class="token comment"># auth_backends.1 = rabbit_auth_backend_http</span>
+
+<span class="token comment">## uses two backends in a chain: HTTP first, then internal</span>
+<span class="token comment"># auth_backends.1   = rabbit_auth_backend_http</span>
+<span class="token comment"># auth_backends.2   = rabbit_auth_backend_internal</span>
+
+<span class="token comment">## Authentication</span>
+<span class="token comment">## The built-in mechanisms are 'PLAIN',</span>
+<span class="token comment">## 'AMQPLAIN', and 'EXTERNAL' Additional mechanisms can be added via</span>
+<span class="token comment">## plugins.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/authentication.html.</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_mechanisms.1 = PLAIN</span>
+<span class="token comment"># auth_mechanisms.2 = AMQPLAIN</span>
+
+<span class="token comment">## The rabbitmq-auth-mechanism-ssl plugin makes it possible to</span>
+<span class="token comment">## authenticate a user based on the client's x509 (TLS) certificate.</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/authentication.html.</span>
+<span class="token comment">##</span>
+<span class="token comment">## To use auth-mechanism-ssl, the EXTERNAL mechanism should</span>
+<span class="token comment">## be enabled:</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_mechanisms.1 = PLAIN</span>
+<span class="token comment"># auth_mechanisms.2 = AMQPLAIN</span>
+<span class="token comment"># auth_mechanisms.3 = EXTERNAL</span>
+
+<span class="token comment">## To force x509 certificate-based authentication on all clients,</span>
+<span class="token comment">## exclude all other mechanisms (note: this will disable password-based</span>
+<span class="token comment">## authentication even for the management UI!):</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_mechanisms.1 = EXTERNAL</span>
+
+<span class="token comment">## This pertains to both the rabbitmq-auth-mechanism-ssl plugin and</span>
+<span class="token comment">## STOMP ssl_cert_login configurations. See the RabbitMQ STOMP plugin</span>
+<span class="token comment">## configuration section later in this file and the README in</span>
+<span class="token comment">## https://github.com/rabbitmq/rabbitmq-auth-mechanism-ssl for further</span>
+<span class="token comment">## details.</span>
+<span class="token comment">##</span>
+<span class="token comment">## To use the TLS cert's CN instead of its DN as the username</span>
+<span class="token comment">##</span>
+<span class="token comment"># ssl_cert_login_from   = common_name</span>
+
+<span class="token comment">## TLS handshake timeout, in milliseconds.</span>
+<span class="token comment">##</span>
+<span class="token comment"># ssl_handshake_timeout = 5000</span>
+
+
+<span class="token comment">## Cluster name</span>
+<span class="token comment">##</span>
+<span class="token comment"># cluster_name = dev3.eng.megacorp.local</span>
+
+<span class="token comment">## Password hashing implementation. Will only affect newly</span>
+<span class="token comment">## created users. To recalculate hash for an existing user</span>
+<span class="token comment">## it's necessary to update her password.</span>
+<span class="token comment">##</span>
+<span class="token comment">## To use SHA-512, set to rabbit_password_hashing_sha512.</span>
+<span class="token comment">##</span>
+<span class="token comment"># password_hashing_module = rabbit_password_hashing_sha256</span>
+
+<span class="token comment">## When importing definitions exported from versions earlier</span>
+<span class="token comment">## than 3.6.0, it is possible to go back to MD5 (only do this</span>
+<span class="token comment">## as a temporary measure!) by setting this to rabbit_password_hashing_md5.</span>
+<span class="token comment">##</span>
+<span class="token comment"># password_hashing_module = rabbit_password_hashing_md5</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Default User / VHost</span>
+<span class="token comment">## ====================</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## On first start RabbitMQ will create a vhost and a user. These</span>
+<span class="token comment">## config items control what gets created.</span>
+<span class="token comment">## Relevant doc guide: https://rabbitmq.com/access-control.html</span>
+<span class="token comment">##</span>
+default_vhost = /dc3
+default_user = dc3
+default_pass = dc3
+
+<span class="token comment"># default_permissions.configure = .*</span>
+<span class="token comment"># default_permissions.read = .*</span>
+<span class="token comment"># default_permissions.write = .*</span>
+
+<span class="token comment">## Tags for default user</span>
+<span class="token comment">##</span>
+<span class="token comment">## For more details about tags, see the documentation for the</span>
+<span class="token comment">## Management Plugin at https://rabbitmq.com/management.html.</span>
+<span class="token comment">##</span>
+<span class="token comment"># default_user_tags.administrator = true</span>
+
+<span class="token comment">## Define other tags like this:</span>
+<span class="token comment"># default_user_tags.management = true</span>
+<span class="token comment"># default_user_tags.custom_tag = true</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Additional network and protocol related configuration</span>
+<span class="token comment">## =====================================================</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## Set the server AMQP 0-9-1 heartbeat timeout in seconds.</span>
+<span class="token comment">## RabbitMQ nodes will send heartbeat frames at roughly</span>
+<span class="token comment">## the (timeout / 2) interval. Two missed heartbeats from</span>
+<span class="token comment">## a client will close its connection.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Values lower than 6 seconds are very likely to produce</span>
+<span class="token comment">## false positives and are not recommended.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guides:</span>
+<span class="token comment">##</span>
+<span class="token comment">## * https://rabbitmq.com/heartbeats.html</span>
+<span class="token comment">## * https://rabbitmq.com/networking.html</span>
+<span class="token comment">##</span>
+<span class="token comment"># heartbeat = 60</span>
+
+<span class="token comment">## Set the max permissible size of an AMQP frame (in bytes).</span>
+<span class="token comment">##</span>
+<span class="token comment"># frame_max = 131072</span>
+
+<span class="token comment">## Set the max frame size the server will accept before connection</span>
+<span class="token comment">## tuning occurs</span>
+<span class="token comment">##</span>
+<span class="token comment"># initial_frame_max = 4096</span>
+
+<span class="token comment">## Set the max permissible number of channels per connection.</span>
+<span class="token comment">## 0 means &quot;no limit&quot;.</span>
+<span class="token comment">##</span>
+<span class="token comment"># channel_max = 128</span>
+
+<span class="token comment">## Customising TCP Listener (Socket) Configuration.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guides:</span>
+<span class="token comment">##</span>
+<span class="token comment">## * https://rabbitmq.com/networking.html</span>
+<span class="token comment">## * https://www.erlang.org/doc/man/inet.html#setopts-2</span>
+<span class="token comment">##</span>
+
+<span class="token comment"># tcp_listen_options.backlog = 128</span>
+<span class="token comment"># tcp_listen_options.nodelay = true</span>
+<span class="token comment"># tcp_listen_options.exit_on_close = false</span>
+<span class="token comment">#</span>
+<span class="token comment"># tcp_listen_options.keepalive = true</span>
+<span class="token comment"># tcp_listen_options.send_timeout = 15000</span>
+<span class="token comment">#</span>
+<span class="token comment"># tcp_listen_options.buffer = 196608</span>
+<span class="token comment"># tcp_listen_options.sndbuf = 196608</span>
+<span class="token comment"># tcp_listen_options.recbuf = 196608</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Resource Limits &amp; Flow Control</span>
+<span class="token comment">## ==============================</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/memory.html.</span>
+
+<span class="token comment">## Memory-based Flow Control threshold.</span>
+<span class="token comment">##</span>
+<span class="token comment"># vm_memory_high_watermark.relative = 0.4</span>
+
+<span class="token comment">## Alternatively, we can set a limit (in bytes) of RAM used by the node.</span>
+<span class="token comment">##</span>
+<span class="token comment"># vm_memory_high_watermark.absolute = 1073741824</span>
+
+<span class="token comment">## Or you can set absolute value using memory units (with RabbitMQ 3.6.0+).</span>
+<span class="token comment">## Absolute watermark will be ignored if relative is defined!</span>
+<span class="token comment">##</span>
+<span class="token comment"># vm_memory_high_watermark.absolute = 2GB</span>
+<span class="token comment">##</span>
+<span class="token comment">## Supported unit symbols:</span>
+<span class="token comment">##</span>
+<span class="token comment">## k, kiB: kibibytes (2^10 - 1,024 bytes)</span>
+<span class="token comment">## M, MiB: mebibytes (2^20 - 1,048,576 bytes)</span>
+<span class="token comment">## G, GiB: gibibytes (2^30 - 1,073,741,824 bytes)</span>
+<span class="token comment">## kB: kilobytes (10^3 - 1,000 bytes)</span>
+<span class="token comment">## MB: megabytes (10^6 - 1,000,000 bytes)</span>
+<span class="token comment">## GB: gigabytes (10^9 - 1,000,000,000 bytes)</span>
+
+
+
+<span class="token comment">## Fraction of the high watermark limit at which queues start to</span>
+<span class="token comment">## page message out to disc in order to free up memory.</span>
+<span class="token comment">## For example, when vm_memory_high_watermark is set to 0.4 and this value is set to 0.5,</span>
+<span class="token comment">## paging can begin as early as when 20% of total available RAM is used by the node.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Values greater than 1.0 can be dangerous and should be used carefully.</span>
+<span class="token comment">##</span>
+<span class="token comment">## One alternative to this is to use durable queues and publish messages</span>
+<span class="token comment">## as persistent (delivery mode = 2). With this combination queues will</span>
+<span class="token comment">## move messages to disk much more rapidly.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Another alternative is to configure queues to page all messages (both</span>
+<span class="token comment">## persistent and transient) to disk as quickly</span>
+<span class="token comment">## as possible, see https://rabbitmq.com/lazy-queues.html.</span>
+<span class="token comment">##</span>
+<span class="token comment"># vm_memory_high_watermark_paging_ratio = 0.5</span>
+
+<span class="token comment">## Selects Erlang VM memory consumption calculation strategy. Can be `allocated`, `rss` or `legacy` (aliased as `erlang`),</span>
+<span class="token comment">## Introduced in 3.6.11. `rss` is the default as of 3.6.12.</span>
+<span class="token comment">## See https://github.com/rabbitmq/rabbitmq-server/issues/1223 and rabbitmq/rabbitmq-common#224 for background.</span>
+<span class="token comment"># vm_memory_calculation_strategy = rss</span>
+
+<span class="token comment">## Interval (in milliseconds) at which we perform the check of the memory</span>
+<span class="token comment">## levels against the watermarks.</span>
+<span class="token comment">##</span>
+<span class="token comment"># memory_monitor_interval = 2500</span>
+
+<span class="token comment">## The total memory available can be calculated from the OS resources</span>
+<span class="token comment">## - default option - or provided as a configuration parameter.</span>
+<span class="token comment"># total_memory_available_override_value = 2GB</span>
+
+<span class="token comment">## Set disk free limit (in bytes). Once free disk space reaches this</span>
+<span class="token comment">## lower bound, a disk alarm will be set - see the documentation</span>
+<span class="token comment">## listed above for more details.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Absolute watermark will be ignored if relative is defined!</span>
+<span class="token comment"># disk_free_limit.absolute = 50000</span>
+
+<span class="token comment">## Or you can set it using memory units (same as in vm_memory_high_watermark)</span>
+<span class="token comment">## with RabbitMQ 3.6.0+.</span>
+<span class="token comment"># disk_free_limit.absolute = 500KB</span>
+<span class="token comment"># disk_free_limit.absolute = 50mb</span>
+<span class="token comment"># disk_free_limit.absolute = 5GB</span>
+
+<span class="token comment">## Alternatively, we can set a limit relative to total available RAM.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Values lower than 1.0 can be dangerous and should be used carefully.</span>
+<span class="token comment"># disk_free_limit.relative = 2.0</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Clustering</span>
+<span class="token comment">## =====================</span>
+<span class="token comment">##</span>
+<span class="token comment"># cluster_partition_handling = ignore</span>
+
+<span class="token comment">## Pauses all nodes on the minority side of a partition. The cluster</span>
+<span class="token comment">## MUST have an odd number of nodes (3, 5, etc)</span>
+<span class="token comment"># cluster_partition_handling = pause_minority</span>
+
+<span class="token comment">## pause_if_all_down strategy require additional configuration</span>
+<span class="token comment"># cluster_partition_handling = pause_if_all_down</span>
+
+<span class="token comment">## Recover strategy. Can be either 'autoheal' or 'ignore'</span>
+<span class="token comment"># cluster_partition_handling.pause_if_all_down.recover = ignore</span>
+
+<span class="token comment">## Node names to check</span>
+<span class="token comment"># cluster_partition_handling.pause_if_all_down.nodes.1 = rabbit@localhost</span>
+<span class="token comment"># cluster_partition_handling.pause_if_all_down.nodes.2 = hare@localhost</span>
+
+<span class="token comment">## Mirror sync batch size, in messages. Increasing this will speed</span>
+<span class="token comment">## up syncing but total batch size in bytes must not exceed 2 GiB.</span>
+<span class="token comment">## Available in RabbitMQ 3.6.0 or later.</span>
+<span class="token comment">##</span>
+<span class="token comment"># mirroring_sync_batch_size = 4096</span>
+
+<span class="token comment">## Make clustering happen *automatically* at startup. Only applied</span>
+<span class="token comment">## to nodes that have just been reset or started for the first time.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Relevant doc guide: https://rabbitmq.com//cluster-formation.html</span>
+<span class="token comment">##</span>
+
+<span class="token comment"># cluster_formation.peer_discovery_backend     = rabbit_peer_discovery_classic_config</span>
+<span class="token comment">#</span>
+<span class="token comment"># cluster_formation.classic_config.nodes.1 = rabbit1@hostname</span>
+<span class="token comment"># cluster_formation.classic_config.nodes.2 = rabbit2@hostname</span>
+<span class="token comment"># cluster_formation.classic_config.nodes.3 = rabbit3@hostname</span>
+<span class="token comment"># cluster_formation.classic_config.nodes.4 = rabbit4@hostname</span>
+
+<span class="token comment">## DNS-based peer discovery. This backend will list A records</span>
+<span class="token comment">## of the configured hostname and perform reverse lookups for</span>
+<span class="token comment">## the addresses returned.</span>
+
+<span class="token comment"># cluster_formation.peer_discovery_backend = rabbit_peer_discovery_dns</span>
+<span class="token comment"># cluster_formation.dns.hostname = discovery.eng.example.local</span>
+
+<span class="token comment">## This node's type can be configured. If you are not sure</span>
+<span class="token comment">## what node type to use, always use 'disc'.</span>
+<span class="token comment"># cluster_formation.node_type = disc</span>
+
+<span class="token comment">## Interval (in milliseconds) at which we send keepalive messages</span>
+<span class="token comment">## to other cluster members. Note that this is not the same thing</span>
+<span class="token comment">## as net_ticktime; missed keepalive messages will not cause nodes</span>
+<span class="token comment">## to be considered down.</span>
+<span class="token comment">##</span>
+<span class="token comment"># cluster_keepalive_interval = 10000</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Statistics Collection</span>
+<span class="token comment">## =====================</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## Statistics collection interval (in milliseconds). Increasing</span>
+<span class="token comment">## this will reduce the load on management database.</span>
+<span class="token comment">##</span>
+<span class="token comment"># collect_statistics_interval = 5000</span>
+
+<span class="token comment">## Fine vs. coarse statistics</span>
+<span class="token comment">#</span>
+<span class="token comment"># This value is no longer meant to be configured directly.</span>
+<span class="token comment">#</span>
+<span class="token comment"># See https://www.rabbitmq.com/management.html#fine-stats.</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Ra Settings</span>
+<span class="token comment">## =====================</span>
+<span class="token comment">##</span>
+<span class="token comment"># raft.segment_max_entries = 65536</span>
+<span class="token comment"># raft.wal_max_size_bytes = 1048576</span>
+<span class="token comment"># raft.wal_max_batch_size = 4096</span>
+<span class="token comment"># raft.snapshot_chunk_size = 1000000</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Misc/Advanced Options</span>
+<span class="token comment">## =====================</span>
+<span class="token comment">##</span>
+<span class="token comment">## NB: Change these only if you understand what you are doing!</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## Timeout used when waiting for Mnesia tables in a cluster to</span>
+<span class="token comment">## become available.</span>
+<span class="token comment">##</span>
+<span class="token comment"># mnesia_table_loading_retry_timeout = 30000</span>
+
+<span class="token comment">## Retries when waiting for Mnesia tables in the cluster startup. Note that</span>
+<span class="token comment">## this setting is not applied to Mnesia upgrades or node deletions.</span>
+<span class="token comment">##</span>
+<span class="token comment"># mnesia_table_loading_retry_limit = 10</span>
+
+<span class="token comment">## Size in bytes below which to embed messages in the queue index.</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/persistence-conf.html</span>
+<span class="token comment">##</span>
+<span class="token comment"># queue_index_embed_msgs_below = 4096</span>
+
+<span class="token comment">## You can also set this size in memory units</span>
+<span class="token comment">##</span>
+<span class="token comment"># queue_index_embed_msgs_below = 4kb</span>
+
+<span class="token comment">## Whether or not to enable background periodic forced GC runs for all</span>
+<span class="token comment">## Erlang processes on the node in &quot;waiting&quot; state.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Disabling background GC may reduce latency for client operations,</span>
+<span class="token comment">## keeping it enabled may reduce median RAM usage by the binary heap</span>
+<span class="token comment">## (see https://www.erlang-solutions.com/blog/erlang-garbage-collector.html).</span>
+<span class="token comment">##</span>
+<span class="token comment">## Before trying this option, please take a look at the memory</span>
+<span class="token comment">## breakdown (https://www.rabbitmq.com/memory-use.html).</span>
+<span class="token comment">##</span>
+<span class="token comment"># background_gc_enabled = false</span>
+
+<span class="token comment">## Target (desired) interval (in milliseconds) at which we run background GC.</span>
+<span class="token comment">## The actual interval will vary depending on how long it takes to execute</span>
+<span class="token comment">## the operation (can be higher than this interval). Values less than</span>
+<span class="token comment">## 30000 milliseconds are not recommended.</span>
+<span class="token comment">##</span>
+<span class="token comment"># background_gc_target_interval = 60000</span>
+
+<span class="token comment">## Whether or not to enable proxy protocol support.</span>
+<span class="token comment">## Once enabled, clients cannot directly connect to the broker</span>
+<span class="token comment">## anymore. They must connect through a load balancer that sends the</span>
+<span class="token comment">## proxy protocol header to the broker at connection time.</span>
+<span class="token comment">## This setting applies only to AMQP clients, other protocols</span>
+<span class="token comment">## like MQTT or STOMP have their own setting to enable proxy protocol.</span>
+<span class="token comment">## See the plugins documentation for more information.</span>
+<span class="token comment">##</span>
+<span class="token comment"># proxy_protocol = false</span>
+
+<span class="token comment">## Overriden product name and version.</span>
+<span class="token comment">## They are set to &quot;RabbitMQ&quot; and the release version by default.</span>
+<span class="token comment"># product.name = RabbitMQ</span>
+<span class="token comment"># product.version = 1.2.3</span>
+
+<span class="token comment">## &quot;Message of the day&quot; file.</span>
+<span class="token comment">## Its content is used to expand the logged and printed banners.</span>
+<span class="token comment">## Default to /etc/rabbitmq/motd on Unix, %APPDATA%\RabbitMQ\motd.txt</span>
+<span class="token comment">## on Windows.</span>
+<span class="token comment"># motd_file = /etc/rabbitmq/motd</span>
+
+<span class="token comment">## Consumer timeout</span>
+<span class="token comment">## If a message delivered to a consumer has not been acknowledge before this timer</span>
+<span class="token comment">## triggers the channel will be force closed by the broker. This ensure that</span>
+<span class="token comment">## faultly consumers that never ack will not hold on to messages indefinitely.</span>
+<span class="token comment">##</span>
+<span class="token comment"># consumer_timeout = 900000</span>
+
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+<span class="token comment">## Advanced Erlang Networking/Clustering Options.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/clustering.html</span>
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+
+<span class="token comment"># ======================================</span>
+<span class="token comment"># Kernel section</span>
+<span class="token comment"># ======================================</span>
+
+<span class="token comment">## Timeout used to detect peer unavailability, including CLI tools.</span>
+<span class="token comment">## Related doc guide: https://www.rabbitmq.com/nettick.html.</span>
+<span class="token comment">##</span>
+<span class="token comment"># net_ticktime = 60</span>
+
+<span class="token comment">## Inter-node communication port range.</span>
+<span class="token comment">## The parameters inet_dist_listen_min and inet_dist_listen_max</span>
+<span class="token comment">## can be configured in the classic config format only.</span>
+<span class="token comment">## Related doc guide: https://www.rabbitmq.com/networking.html#epmd-inet-dist-port-range.</span>
+
+
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+<span class="token comment">## RabbitMQ Management Plugin</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/management.html.</span>
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+
+<span class="token comment"># =======================================</span>
+<span class="token comment"># Management section</span>
+<span class="token comment"># =======================================</span>
+
+<span class="token comment">## Preload schema definitions from the following JSON file.</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/management.html#load-definitions.</span>
+<span class="token comment">##</span>
+<span class="token comment"># management.load_definitions = /path/to/exported/definitions.json</span>
+
+<span class="token comment">## Log all requests to the management HTTP API to a file.</span>
+<span class="token comment">##</span>
+<span class="token comment"># management.http_log_dir = /path/to/access.log</span>
+
+<span class="token comment">## HTTP listener and embedded Web server settings.</span>
+<span class="token comment"># ## See https://rabbitmq.com/management.html for details.</span>
+<span class="token comment">#</span>
+management.tcp.port = 5020
+<span class="token comment"># management.tcp.ip   = 0.0.0.0</span>
+<span class="token comment">#</span>
+<span class="token comment"># management.tcp.shutdown_timeout   = 7000</span>
+<span class="token comment"># management.tcp.max_keepalive      = 120</span>
+<span class="token comment"># management.tcp.idle_timeout       = 120</span>
+<span class="token comment"># management.tcp.inactivity_timeout = 120</span>
+<span class="token comment"># management.tcp.request_timeout    = 120</span>
+<span class="token comment"># management.tcp.compress           = true</span>
+
+<span class="token comment">## HTTPS listener settings.</span>
+<span class="token comment">## See https://rabbitmq.com/management.html and https://rabbitmq.com/ssl.html for details.</span>
+<span class="token comment">##</span>
+<span class="token comment"># management.ssl.port       = 15671</span>
+<span class="token comment"># management.ssl.cacertfile = /path/to/ca_certificate.pem</span>
+<span class="token comment"># management.ssl.certfile   = /path/to/server_certificate.pem</span>
+<span class="token comment"># management.ssl.keyfile    = /path/to/server_key.pem</span>
+
+<span class="token comment">## More TLS options</span>
+<span class="token comment"># management.ssl.honor_cipher_order   = true</span>
+<span class="token comment"># management.ssl.honor_ecc_order      = true</span>
+
+<span class="token comment">## These are highly recommended for TLSv1.2 but cannot be used</span>
+<span class="token comment">## with TLSv1.3. If TLSv1.3 is enabled, these lines MUST be removed.</span>
+<span class="token comment"># management.ssl.client_renegotiation = false</span>
+<span class="token comment"># management.ssl.secure_renegotiate   = true</span>
+
+<span class="token comment">## Supported TLS versions</span>
+<span class="token comment"># management.ssl.versions.1 = tlsv1.2</span>
+
+<span class="token comment">## Cipher suites the server is allowed to use</span>
+<span class="token comment"># management.ssl.ciphers.1 = ECDHE-ECDSA-AES256-GCM-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.2 = ECDHE-RSA-AES256-GCM-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.3 = ECDHE-ECDSA-AES256-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.4 = ECDHE-RSA-AES256-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.5 = ECDH-ECDSA-AES256-GCM-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.6 = ECDH-RSA-AES256-GCM-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.7 = ECDH-ECDSA-AES256-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.8 = ECDH-RSA-AES256-SHA384</span>
+<span class="token comment"># management.ssl.ciphers.9 = DHE-RSA-AES256-GCM-SHA384</span>
+
+<span class="token comment">## URL path prefix for HTTP API and management UI</span>
+<span class="token comment"># management.path_prefix = /a-prefix</span>
+
+<span class="token comment">## One of 'basic', 'detailed' or 'none'. See</span>
+<span class="token comment">## https://rabbitmq.com/management.html#fine-stats for more details.</span>
+<span class="token comment"># management.rates_mode = basic</span>
+
+<span class="token comment">## Configure how long aggregated data (such as message rates and queue</span>
+<span class="token comment">## lengths) is retained. Please read the plugin's documentation in</span>
+<span class="token comment">## https://rabbitmq.com/management.html#configuration for more</span>
+<span class="token comment">## details.</span>
+<span class="token comment">## Your can use 'minute', 'hour' and 'day' keys or integer key (in seconds)</span>
+<span class="token comment"># management.sample_retention_policies.global.minute    = 5</span>
+<span class="token comment"># management.sample_retention_policies.global.hour  = 60</span>
+<span class="token comment"># management.sample_retention_policies.global.day = 1200</span>
+
+<span class="token comment"># management.sample_retention_policies.basic.minute   = 5</span>
+<span class="token comment"># management.sample_retention_policies.basic.hour = 60</span>
+
+<span class="token comment"># management.sample_retention_policies.detailed.10 = 5</span>
+
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+<span class="token comment">## RabbitMQ Shovel Plugin</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/shovel.html</span>
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+
+<span class="token comment">## See advanced.config.example for a Shovel plugin example</span>
+
+
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+<span class="token comment">## RabbitMQ STOMP Plugin</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/stomp.html</span>
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+
+<span class="token comment"># =======================================</span>
+<span class="token comment"># STOMP section</span>
+<span class="token comment"># =======================================</span>
+
+<span class="token comment">## See https://rabbitmq.com/stomp.html for details.</span>
+
+<span class="token comment">## TCP listeners.</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.listeners.tcp.1 = 127.0.0.1:61613</span>
+<span class="token comment"># stomp.listeners.tcp.2 = ::1:61613</span>
+
+<span class="token comment">## TCP listener settings</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.tcp_listen_options.backlog   = 2048</span>
+<span class="token comment"># stomp.tcp_listen_options.recbuf    = 131072</span>
+<span class="token comment"># stomp.tcp_listen_options.sndbuf    = 131072</span>
+<span class="token comment">#</span>
+<span class="token comment"># stomp.tcp_listen_options.keepalive = true</span>
+<span class="token comment"># stomp.tcp_listen_options.nodelay   = true</span>
+<span class="token comment">#</span>
+<span class="token comment"># stomp.tcp_listen_options.exit_on_close = true</span>
+<span class="token comment"># stomp.tcp_listen_options.send_timeout  = 120</span>
+
+<span class="token comment">## Proxy protocol support</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.proxy_protocol = false</span>
+
+<span class="token comment">## TLS listeners</span>
+<span class="token comment">## See https://rabbitmq.com/stomp.html and https://rabbitmq.com/ssl.html for details.</span>
+<span class="token comment"># stomp.listeners.ssl.default = 61614</span>
+<span class="token comment">#</span>
+<span class="token comment"># ssl_options.cacertfile = path/to/cacert.pem</span>
+<span class="token comment"># ssl_options.certfile   = path/to/cert.pem</span>
+<span class="token comment"># ssl_options.keyfile    = path/to/key.pem</span>
+<span class="token comment"># ssl_options.verify     =  verify_peer</span>
+<span class="token comment"># ssl_options.fail_if_no_peer_cert = true</span>
+
+
+<span class="token comment">## Number of Erlang processes that will accept connections for the TCP</span>
+<span class="token comment">## and TLS listeners.</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.num_acceptors.tcp = 10</span>
+<span class="token comment"># stomp.num_acceptors.ssl = 1</span>
+
+<span class="token comment">## Additional TLS options</span>
+
+<span class="token comment">## Extract a name from the client's certificate when using TLS.</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.ssl_cert_login = true</span>
+
+<span class="token comment">## Set a default user name and password. This is used as the default login</span>
+<span class="token comment">## whenever a CONNECT frame omits the login and passcode headers.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Please note that setting this will allow clients to connect without</span>
+<span class="token comment">## authenticating!</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.default_user = guest</span>
+<span class="token comment"># stomp.default_pass = guest</span>
+
+<span class="token comment">## If a default user is configured, or you have configured use TLS client</span>
+<span class="token comment">## certificate based authentication, you can choose to allow clients to</span>
+<span class="token comment">## omit the CONNECT frame entirely. If set to true, the client is</span>
+<span class="token comment">## automatically connected as the default user or user supplied in the</span>
+<span class="token comment">## TLS certificate whenever the first frame sent on a session is not a</span>
+<span class="token comment">## CONNECT frame.</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.implicit_connect = true</span>
+
+<span class="token comment">## Whether or not to enable proxy protocol support.</span>
+<span class="token comment">## Once enabled, clients cannot directly connect to the broker</span>
+<span class="token comment">## anymore. They must connect through a load balancer that sends the</span>
+<span class="token comment">## proxy protocol header to the broker at connection time.</span>
+<span class="token comment">## This setting applies only to STOMP clients, other protocols</span>
+<span class="token comment">## like MQTT or AMQP have their own setting to enable proxy protocol.</span>
+<span class="token comment">## See the plugins or broker documentation for more information.</span>
+<span class="token comment">##</span>
+<span class="token comment"># stomp.proxy_protocol = false</span>
+
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+<span class="token comment">## RabbitMQ MQTT Adapter</span>
+<span class="token comment">##</span>
+<span class="token comment">## See https://github.com/rabbitmq/rabbitmq-mqtt/blob/stable/README.md</span>
+<span class="token comment">## for details</span>
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+
+<span class="token comment"># =======================================</span>
+<span class="token comment"># MQTT section</span>
+<span class="token comment"># =======================================</span>
+
+<span class="token comment">## TCP listener settings.</span>
+<span class="token comment">##</span>
+<span class="token comment"># mqtt.listeners.tcp.1 = 127.0.0.1:61613</span>
+<span class="token comment"># mqtt.listeners.tcp.2 = ::1:61613</span>
+mqtt.listeners.tcp.default = <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">5040</span>
+
+<span class="token comment">## TCP listener options (as per the broker configuration).</span>
+<span class="token comment">##</span>
+<span class="token comment"># mqtt.tcp_listen_options.backlog = 4096</span>
+<span class="token comment"># mqtt.tcp_listen_options.recbuf  = 131072</span>
+<span class="token comment"># mqtt.tcp_listen_options.sndbuf  = 131072</span>
+<span class="token comment">#</span>
+<span class="token comment"># mqtt.tcp_listen_options.keepalive = true</span>
+<span class="token comment"># mqtt.tcp_listen_options.nodelay   = true</span>
+<span class="token comment">#</span>
+<span class="token comment"># mqtt.tcp_listen_options.exit_on_close = true</span>
+<span class="token comment"># mqtt.tcp_listen_options.send_timeout  = 120</span>
+
+<span class="token comment">## TLS listener settings</span>
+<span class="token comment">## ## See https://rabbitmq.com/mqtt.html and https://rabbitmq.com/ssl.html for details.</span>
+mqtt.listeners.ssl.default = 5060
+
+ssl_options.password   = dc3<span class="token punctuation">-</span>server
+ssl_options.cacertfile = /data/rabbitmq/dc3/node<span class="token punctuation">-</span>01/keys/ca.crt
+ssl_options.certfile   = /data/rabbitmq/dc3/node<span class="token punctuation">-</span>01/keys/server.crt
+ssl_options.keyfile    = /data/rabbitmq/dc3/node<span class="token punctuation">-</span>01/keys/server.key
+
+<span class="token comment">## Number of Erlang processes that will accept connections for the TCP</span>
+<span class="token comment">## and TLS listeners.</span>
+<span class="token comment">##</span>
+<span class="token comment"># mqtt.num_acceptors.tcp = 10</span>
+<span class="token comment"># mqtt.num_acceptors.ssl = 10</span>
+
+<span class="token comment">## Whether or not to enable proxy protocol support.</span>
+<span class="token comment">## Once enabled, clients cannot directly connect to the broker</span>
+<span class="token comment">## anymore. They must connect through a load balancer that sends the</span>
+<span class="token comment">## proxy protocol header to the broker at connection time.</span>
+<span class="token comment">## This setting applies only to STOMP clients, other protocols</span>
+<span class="token comment">## like STOMP or AMQP have their own setting to enable proxy protocol.</span>
+<span class="token comment">## See the plugins or broker documentation for more information.</span>
+<span class="token comment">##</span>
+<span class="token comment"># mqtt.proxy_protocol = false</span>
+
+<span class="token comment">## Set the default user name and password used for anonymous connections (when client</span>
+<span class="token comment">## provides no credentials). Anonymous connections are highly discouraged!</span>
+<span class="token comment">##</span>
+mqtt.default_user = dc3
+mqtt.default_pass = dc3
+
+<span class="token comment">## Enable anonymous connections. If this is set to false, clients MUST provide</span>
+<span class="token comment">## credentials in order to connect. See also the mqtt.default_user/mqtt.default_pass</span>
+<span class="token comment">## keys. Anonymous connections are highly discouraged!</span>
+<span class="token comment">##</span>
+mqtt.allow_anonymous = false
+
+<span class="token comment">## If you have multiple vhosts, specify the one to which the</span>
+<span class="token comment">## adapter connects.</span>
+<span class="token comment">##</span>
+mqtt.vhost = /dc3
+
+<span class="token comment">## Specify the exchange to which messages from MQTT clients are published.</span>
+<span class="token comment">##</span>
+mqtt.exchange = dc3.exchange.mqtt
+
+<span class="token comment">## Specify TTL (time to live) to control the lifetime of non-clean sessions.</span>
+<span class="token comment">##</span>
+<span class="token comment"># mqtt.subscription_ttl = 1800000</span>
+
+<span class="token comment">## Set the prefetch count (governing the maximum number of unacknowledged</span>
+<span class="token comment">## messages that will be delivered).</span>
+<span class="token comment">##</span>
+<span class="token comment"># mqtt.prefetch = 10</span>
+
+
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+<span class="token comment">## RabbitMQ AMQP 1.0 Support</span>
+<span class="token comment">##</span>
+<span class="token comment">## See https://github.com/rabbitmq/rabbitmq-amqp1.0/blob/stable/README.md.</span>
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+
+<span class="token comment"># =======================================</span>
+<span class="token comment"># AMQP 1.0 section</span>
+<span class="token comment"># =======================================</span>
+
+
+<span class="token comment">## Connections that are not authenticated with SASL will connect as this</span>
+<span class="token comment">## account. See the README for more information.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Please note that setting this will allow clients to connect without</span>
+<span class="token comment">## authenticating!</span>
+<span class="token comment">##</span>
+<span class="token comment"># amqp1_0.default_user = guest</span>
+
+<span class="token comment">## Enable protocol strict mode. See the README for more information.</span>
+<span class="token comment">##</span>
+<span class="token comment"># amqp1_0.protocol_strict_mode = false</span>
+
+<span class="token comment">## Logging settings.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See https://rabbitmq.com/logging.html for details.</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## Log directory, taken from the RABBITMQ_LOG_BASE env variable by default.</span>
+<span class="token comment">##</span>
+<span class="token comment"># log.dir = /var/log/rabbitmq</span>
+
+<span class="token comment">## Logging to file. Can be false or a filename.</span>
+<span class="token comment">## Default:</span>
+<span class="token comment"># log.file = rabbit.log</span>
+
+<span class="token comment">## To disable logging to a file</span>
+<span class="token comment"># log.file = false</span>
+
+<span class="token comment">## Log level for file logging</span>
+<span class="token comment">##</span>
+<span class="token comment"># log.file.level = info</span>
+
+<span class="token comment">## File rotation config. No rotation by default.</span>
+<span class="token comment">## DO NOT SET rotation date to ''. Leave the value unset if &quot;&quot; is the desired value</span>
+<span class="token comment"># log.file.rotation.date = $D0</span>
+<span class="token comment"># log.file.rotation.size = 0</span>
+
+<span class="token comment">## Logging to console (can be true or false)</span>
+<span class="token comment">##</span>
+<span class="token comment"># log.console = false</span>
+
+<span class="token comment">## Log level for console logging</span>
+<span class="token comment">##</span>
+<span class="token comment"># log.console.level = info</span>
+
+<span class="token comment">## Logging to the amq.rabbitmq.log exchange (can be true or false)</span>
+<span class="token comment">##</span>
+<span class="token comment"># log.exchange = false</span>
+
+<span class="token comment">## Log level to use when logging to the amq.rabbitmq.log exchange</span>
+<span class="token comment">##</span>
+<span class="token comment"># log.exchange.level = info</span>
+
+
+
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+<span class="token comment">## RabbitMQ LDAP Plugin</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/ldap.html.</span>
+<span class="token comment">##</span>
+<span class="token comment">## ----------------------------------------------------------------------------</span>
+
+<span class="token comment"># =======================================</span>
+<span class="token comment"># LDAP section</span>
+<span class="token comment"># =======================================</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Connecting to the LDAP server(s)</span>
+<span class="token comment">## ================================</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## Specify servers to bind to. You *must* set this in order for the plugin</span>
+<span class="token comment">## to work properly.</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.servers.1 = your-server-name-goes-here</span>
+
+<span class="token comment">## You can define multiple servers</span>
+<span class="token comment"># auth_ldap.servers.2 = your-other-server</span>
+
+<span class="token comment">## Connect to the LDAP server using TLS</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.use_ssl = false</span>
+
+<span class="token comment">## Specify the LDAP port to connect to</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.port = 389</span>
+
+<span class="token comment">## LDAP connection timeout, in milliseconds or 'infinity'</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.timeout = infinity</span>
+
+<span class="token comment">## Or number</span>
+<span class="token comment"># auth_ldap.timeout = 500</span>
+
+<span class="token comment">## Enable logging of LDAP queries.</span>
+<span class="token comment">## One of</span>
+<span class="token comment">##   - false (no logging is performed)</span>
+<span class="token comment">##   - true (verbose logging of the logic used by the plugin)</span>
+<span class="token comment">##   - network (as true, but additionally logs LDAP network traffic)</span>
+<span class="token comment">##</span>
+<span class="token comment">## Defaults to false.</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.log = false</span>
+
+<span class="token comment">## Also can be true or network</span>
+<span class="token comment"># auth_ldap.log = true</span>
+<span class="token comment"># auth_ldap.log = network</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Authentication</span>
+<span class="token comment">## ==============</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## Pattern to convert the username given through AMQP to a DN before</span>
+<span class="token comment">## binding</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.user_dn_pattern = cn=${username},ou=People,dc=example,dc=com</span>
+
+<span class="token comment">## Alternatively, you can convert a username to a Distinguished</span>
+<span class="token comment">## Name via an LDAP lookup after binding. See the documentation for</span>
+<span class="token comment">## full details.</span>
+
+<span class="token comment">## When converting a username to a dn via a lookup, set these to</span>
+<span class="token comment">## the name of the attribute that represents the user name, and the</span>
+<span class="token comment">## base DN for the lookup query.</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.dn_lookup_attribute = userPrincipalName</span>
+<span class="token comment"># auth_ldap.dn_lookup_base      = DC=gopivotal,DC=com</span>
+
+<span class="token comment">## Controls how to bind for authorisation queries and also to</span>
+<span class="token comment">## retrieve the details of users logging in without presenting a</span>
+<span class="token comment">## password (e.g., SASL EXTERNAL).</span>
+<span class="token comment">## One of</span>
+<span class="token comment">##  - as_user (to bind as the authenticated user - requires a password)</span>
+<span class="token comment">##  - anon    (to bind anonymously)</span>
+<span class="token comment">##  - {UserDN, Password} (to bind with a specified user name and password)</span>
+<span class="token comment">##</span>
+<span class="token comment">## Defaults to 'as_user'.</span>
+<span class="token comment">##</span>
+<span class="token comment"># auth_ldap.other_bind = as_user</span>
+
+<span class="token comment">## Or can be more complex:</span>
+<span class="token comment"># auth_ldap.other_bind.user_dn  = User</span>
+<span class="token comment"># auth_ldap.other_bind.password = Password</span>
+
+<span class="token comment">## If user_dn and password defined - other options is ignored.</span>
+
+<span class="token comment"># -----------------------------</span>
+<span class="token comment"># Too complex section of LDAP</span>
+<span class="token comment"># -----------------------------</span>
+
+<span class="token comment">##</span>
+<span class="token comment">## Authorisation</span>
+<span class="token comment">## =============</span>
+<span class="token comment">##</span>
+
+<span class="token comment">## The LDAP plugin can perform a variety of queries against your</span>
+<span class="token comment">## LDAP server to determine questions of authorisation.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Related doc guide: https://rabbitmq.com/ldap.html#authorisation.</span>
+
+<span class="token comment">## Following configuration should be defined in advanced.config file</span>
+<span class="token comment">## DO NOT UNCOMMENT THESE LINES!</span>
+
+<span class="token comment">## Set the query to use when determining vhost access</span>
+<span class="token comment">##</span>
+<span class="token comment">## {vhost_access_query, {in_group,</span>
+<span class="token comment">##                       &quot;ou=${vhost}-users,ou=vhosts,dc=example,dc=com&quot;}},</span>
+
+<span class="token comment">## Set the query to use when determining resource (e.g., queue) access</span>
+<span class="token comment">##</span>
+<span class="token comment">## {resource_access_query, {constant, true}},</span>
+
+<span class="token comment">## Set queries to determine which tags a user has</span>
+<span class="token comment">##</span>
+<span class="token comment">## {tag_queries, []}</span>
+<span class="token comment">#   ]},</span>
+<span class="token comment"># -----------------------------</span>
+</code></pre></div><h5 id="_4-2-3-rabbitmq-env-conf">4.2.3 <code>rabbitmq-env.conf</code> <a href="#_4-2-3-rabbitmq-env-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment"># Example rabbitmq-env.conf file entries. Note that the variables</span>
+<span class="token comment"># do not have the RABBITMQ_ prefix.</span>
+<span class="token comment">#</span>
+<span class="token comment"># Overrides node name</span>
+<span class="token comment">#NODENAME=rabbit@$HOSTNAME</span>
+NODENAME=node<span class="token punctuation">-</span>01@localhost
+
+<span class="token comment"># overrides primary config file location</span>
+CONFIG_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq.conf
+
+<span class="token comment"># overrides advanced config file location</span>
+ADVANCED_CONFIG_FILE=$RABBITMQ_HOME/etc/rabbitmq/advanced.config
+
+<span class="token comment"># overrides environment variable file location</span>
+CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq<span class="token punctuation">-</span>env.conf
+</code></pre></div><h5 id="_4-2-4-enabled-plugins">4.2.4 <code>enabled_plugins</code> <a href="#_4-2-4-enabled-plugins" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token punctuation">[</span>rabbitmq_management<span class="token punctuation">,</span>rabbitmq_mqtt<span class="token punctuation">]</span>.
+</code></pre></div><h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmq-server <span class="token parameter variable">-detached</span>
+
+/data/rabbitmq/dc3/node-02/sbin/rabbitmq-server <span class="token parameter variable">-detached</span>
+
+/data/rabbitmq/dc3/node-03/sbin/rabbitmq-server <span class="token parameter variable">-detached</span>
+</code></pre></div><h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4> <blockquote><p><strong>配置 <code>节点2</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost stop_app
+
+/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost reset
+
+/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost join_cluster node-01@localhost
+
+/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost start_app
+</code></pre></div><blockquote><p><strong>配置 <code>节点3</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost stop_app
+
+/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost reset
+
+/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost join_cluster node-01@localhost
+
+/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost start_app
+</code></pre></div><blockquote><p><strong>节点状态</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmq-diagnostics status
+
+/data/rabbitmq/dc3/node-02/sbin/rabbitmq-diagnostics status
+
+/data/rabbitmq/dc3/node-03/sbin/rabbitmq-diagnostics status
+</code></pre></div></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/4/12 下午5:00:18</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev"><a href="/docs/cluster/mongo.html" class="prev"><i aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
+                Mongo 集群部署
+            </a></span> <span class="next"><a href="/docs/cluster/redis.html">
+                Redis 集群部署
+                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span></p></div> <div class="page-anchor"><div class="ant-space ant-space-vertical" style="width:100%;"><div class="ant-space-item"><div class="page-anchor-offset"><div><div class="ant-anchor-wrapper" style="max-height:100vh;"><div class="ant-anchor"><div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div><div class="ant-anchor-link"><a href="#rabbitmq-集群部署" title="RabbitMQ 集群部署" class="ant-anchor-link-title">RabbitMQ 集群部署</a><div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构" class="ant-anchor-link-title">1. 集群架构</a></div><div class="ant-anchor-link"><a href="#_2-集群部署规划" title="2. 集群部署规划" class="ant-anchor-link-title">2. 集群部署规划</a></div><div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件" class="ant-anchor-link-title">3. 安装文件</a></div><div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署" class="ant-anchor-link-title">4. 集群部署</a></div></div></div></div></div></div></div></div></div> </main> <!----></div><div class="global-ui"></div></div>
+        <script src="/assets/js/app.7dfefe51.js" defer></script><script src="/assets/js/2.a8b8915e.js" defer></script><script src="/assets/js/11.287152fd.js" defer></script>
+    </body>
+</html>

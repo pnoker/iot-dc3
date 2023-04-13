@@ -1,0 +1,2699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        />
+        <title>EMQ X 集群部署 | IoT DC3</title>
+        <meta name="description" content="" />
+        <meta name="generator" content="VuePress 1.9.9" />
+        <link rel="icon" href="/assets/images/favicon.ico">
+    <script type="text/javascript" src="/assets/js/push.js"></script> <meta name="description" content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
+    <meta name="referrer" content="never">
+    <meta name="keywords" content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台"> <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style"><link rel="preload" href="/assets/js/app.7dfefe51.js" as="script"><link rel="preload" href="/assets/js/2.a8b8915e.js" as="script"><link rel="preload" href="/assets/js/9.3f13bdbf.js" as="script"><link rel="prefetch" href="/assets/js/10.db658154.js"><link rel="prefetch" href="/assets/js/11.287152fd.js"><link rel="prefetch" href="/assets/js/12.08136beb.js"><link rel="prefetch" href="/assets/js/13.83b3d580.js"><link rel="prefetch" href="/assets/js/14.d5387cec.js"><link rel="prefetch" href="/assets/js/15.aafb2a89.js"><link rel="prefetch" href="/assets/js/16.01fcc650.js"><link rel="prefetch" href="/assets/js/17.a097fd52.js"><link rel="prefetch" href="/assets/js/18.acd93e71.js"><link rel="prefetch" href="/assets/js/19.6f12b224.js"><link rel="prefetch" href="/assets/js/20.bac69ff1.js"><link rel="prefetch" href="/assets/js/21.9105165e.js"><link rel="prefetch" href="/assets/js/22.de1f017c.js"><link rel="prefetch" href="/assets/js/23.fb20a8f5.js"><link rel="prefetch" href="/assets/js/24.6459dc88.js"><link rel="prefetch" href="/assets/js/25.0587cb23.js"><link rel="prefetch" href="/assets/js/26.b6254386.js"><link rel="prefetch" href="/assets/js/27.479148c7.js"><link rel="prefetch" href="/assets/js/28.da247a59.js"><link rel="prefetch" href="/assets/js/29.f175dd67.js"><link rel="prefetch" href="/assets/js/3.8e04da2b.js"><link rel="prefetch" href="/assets/js/30.5ba7a495.js"><link rel="prefetch" href="/assets/js/31.01c3d218.js"><link rel="prefetch" href="/assets/js/32.de0e0ff7.js"><link rel="prefetch" href="/assets/js/33.0e117d4a.js"><link rel="prefetch" href="/assets/js/34.010094c5.js"><link rel="prefetch" href="/assets/js/35.8a377a71.js"><link rel="prefetch" href="/assets/js/36.fbb64a47.js"><link rel="prefetch" href="/assets/js/37.c2b9d4da.js"><link rel="prefetch" href="/assets/js/38.a66be625.js"><link rel="prefetch" href="/assets/js/39.76e387bc.js"><link rel="prefetch" href="/assets/js/4.470d098a.js"><link rel="prefetch" href="/assets/js/40.0e9ee726.js"><link rel="prefetch" href="/assets/js/41.e68f3c2e.js"><link rel="prefetch" href="/assets/js/42.ba03ba76.js"><link rel="prefetch" href="/assets/js/43.e6a91a35.js"><link rel="prefetch" href="/assets/js/44.9304b041.js"><link rel="prefetch" href="/assets/js/45.586518cf.js"><link rel="prefetch" href="/assets/js/46.ab599c67.js"><link rel="prefetch" href="/assets/js/47.dc2d8aff.js"><link rel="prefetch" href="/assets/js/48.06e9c64e.js"><link rel="prefetch" href="/assets/js/49.627cc127.js"><link rel="prefetch" href="/assets/js/5.0f4aedb8.js"><link rel="prefetch" href="/assets/js/50.bf665f72.js"><link rel="prefetch" href="/assets/js/51.08e5dea0.js"><link rel="prefetch" href="/assets/js/52.8e37a9c4.js"><link rel="prefetch" href="/assets/js/53.8c472224.js"><link rel="prefetch" href="/assets/js/54.bb582a52.js"><link rel="prefetch" href="/assets/js/55.640d9ecb.js"><link rel="prefetch" href="/assets/js/56.e2e2a21e.js"><link rel="prefetch" href="/assets/js/57.9b9b26a7.js"><link rel="prefetch" href="/assets/js/58.0d4a46c3.js"><link rel="prefetch" href="/assets/js/59.d1f11d32.js"><link rel="prefetch" href="/assets/js/6.547754b6.js"><link rel="prefetch" href="/assets/js/7.aea1a047.js"><link rel="prefetch" href="/assets/js/8.f35f3888.js"> <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
+    </head>
+    <body>
+        <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="ant-row"><div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars"><svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path></svg></i> <span></span></div> <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3" class="logo"> <span class="site-name">IoT DC3</span></a> <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div></div> <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light"><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
+                    首页
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
+                    指南
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/config/">
+                    配置
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/faq/">
+                    FAQ
+                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>
+                    代码仓库
+                </span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="visibility:hidden;position:absolute;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li></ul> <ul class="extra-group"><!----> <!----></ul></nav></div></div> <!----></header> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/code/0-environment.html" title="注意事项" class="sidebar-link">注意事项</a></li><li><a href="/docs/code/1-idea-start.html" title="必要软件环境" class="sidebar-link">必要软件环境</a></li><li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建 IoT DC3 Web UI</a></li><li><a href="/docs/code/3-quick-start.html" title="快速启动" class="sidebar-link">快速启动</a></li><li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/cluster/emqx.html" aria-current="page" title="EMQ X 集群部署" class="active sidebar-link">EMQ X 集群部署</a></li><li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo 集群部署</a></li><li><a href="/docs/cluster/rabbitmq.html" title="RabbitMQ 集群部署" class="sidebar-link">RabbitMQ 集群部署</a></li><li><a href="/docs/cluster/redis.html" title="Redis 集群部署" class="sidebar-link">Redis 集群部署</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a></li><li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li></ul> </aside> <main class="page has-page-anchor"> <div class="theme-dc3-content content__default"><h2 id="emq-x-集群部署"><code>EMQ X</code> 集群部署 <a href="#emq-x-集群部署" class="header-anchor">#</a></h2> <blockquote><p><code>EMQ X</code> 消息服务器集群基于 <code>Erlang/OTP</code> 分布式设计，集群原理可简述为下述两条规则:</p> <p><code>MQTT</code> 客户端订阅主题时，所在节点订阅成功后广播通知其他节点：某个主题(<code>Topic</code>)被本节点订阅。</p> <p><code>MQTT</code> 客户端发布消息时，所在节点会根据消息主题(<code>Topic</code>)，检索订阅并路由消息到相关节点。</p></blockquote> <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3> <p><img src="/assets/images/dc3/cluster/emqx/emqx-1.png" alt=""></p> <blockquote><p><code>EMQ X</code> 消息服务器同一集群的所有节点，都会复制一份主题(Topic) -&gt; 节点(Node)映射的路由表，例如:</p> <div class="language-bash extra-class"><pre class="language-bash"><code>topic1 -<span class="token operator">&gt;</span> node-01, node-02
+topic2 -<span class="token operator">&gt;</span> node-03
+topic3 -<span class="token operator">&gt;</span> node-02, node-04
+</code></pre></div></blockquote> <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3> <table><thead><tr><th style="text-align:center;"><code>item</code></th> <th style="text-align:center;"><code>node 1</code></th> <th style="text-align:center;"><code>node 2</code></th> <th style="text-align:center;"><code>node 3</code></th></tr></thead> <tbody><tr><td style="text-align:center;"><code>node.name</code></td> <td style="text-align:center;">node-01@127.0.0.1</td> <td style="text-align:center;">node-02@127.0.0.1</td> <td style="text-align:center;">node-03@127.0.0.1</td></tr> <tr><td style="text-align:center;"><code>mqtt:tcp:external</code></td> <td style="text-align:center;">3000</td> <td style="text-align:center;">3100</td> <td style="text-align:center;">3200</td></tr> <tr><td style="text-align:center;"><code>mqtt:ssl:external</code></td> <td style="text-align:center;">3010</td> <td style="text-align:center;">3110</td> <td style="text-align:center;">3210</td></tr> <tr><td style="text-align:center;"><code>mqtt:ws:external</code></td> <td style="text-align:center;">3020</td> <td style="text-align:center;">3120</td> <td style="text-align:center;">3220</td></tr> <tr><td style="text-align:center;"><code>mqtt:wss:external</code></td> <td style="text-align:center;">3030</td> <td style="text-align:center;">3130</td> <td style="text-align:center;">3230</td></tr> <tr><td style="text-align:center;"><code>http:management</code></td> <td style="text-align:center;">3040</td> <td style="text-align:center;">3140</td> <td style="text-align:center;">3240</td></tr> <tr><td style="text-align:center;"><code>http:dashboard</code></td> <td style="text-align:center;">3050</td> <td style="text-align:center;">3150</td> <td style="text-align:center;">3250</td></tr> <tr><td style="text-align:center;"><code>mqtt:tcp:internal</code></td> <td style="text-align:center;">13000</td> <td style="text-align:center;">13100</td> <td style="text-align:center;">13200</td></tr></tbody></table> <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3> <blockquote><p><strong>下载文件</strong></p> <p>请下载 <code>ubuntu zip</code> 版本</p></blockquote> <ul><li><p>以 <code>4.3.10</code> 版本为例：https://www.emqx.com/zh/downloads/broker/4.3.10/emqx-ubuntu20.04-4.3.10-amd64.zip</p></li> <li><p>其他版本下载：https://www.emqx.com/zh/try?product=broker</p></li></ul> <blockquote><p><strong>解压文件</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">unzip</span> emqx-ubuntu20.04-4.3.10-amd64.zip
+</code></pre></div><h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4 id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a></h4> <blockquote><p>分别创建三个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> /data
+
+<span class="token function">mkdir</span> <span class="token parameter variable">-p</span> emqx/dc3/node-01 emqx/dc3/node-02 emqx/dc3/node-03
+</code></pre></div><blockquote><p>将解压的 <code>emqx</code> 文件放入到每个节点中，其他节点操作一致</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">cp</span> <span class="token parameter variable">-r</span> emqx* emqx/dc3/node-01/
+
+<span class="token comment"># pwd</span>
+<span class="token comment"># /data/emqx/dc3/node-01</span>
+
+<span class="token comment"># ls</span>
+<span class="token comment"># bin data dynlibs erts-11.1.8 etc lib log releases</span>
+</code></pre></div><h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4> <blockquote><p>在每个节点的 <code>etc</code> 下配置文件 <code>emqx.conf</code>、<code>plugins/emqx_dashboard.conf</code>、<code>plugins/emqx_management.conf</code></p></blockquote> <h5 id="_4-2-1-emqx-conf">4.2.1 <code>emqx.conf</code> <a href="#_4-2-1-emqx-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">## EMQ X Configuration 4.3</span>
+
+<span class="token comment">## NOTE: Do not change format of CONFIG_SECTION_{BGN,END} comments!</span>
+
+<span class="token comment">## CONFIG_SECTION_BGN=cluster ==================================================</span>
+
+<span class="token comment">## Cluster name.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+cluster.name = dc3<span class="token punctuation">-</span>emqx<span class="token punctuation">-</span>cluster
+
+<span class="token comment">## Specify the erlang distributed protocol.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">##  - inet_tcp: the default; handles TCP streams with IPv4 addressing.</span>
+<span class="token comment">##  - inet6_tcp: handles TCP with IPv6 addressing.</span>
+<span class="token comment">##  - inet_tls: using TLS for Erlang Distribution.</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: -proto_dist inet_tcp</span>
+cluster.proto_dist = inet_tcp
+
+<span class="token comment">## Cluster auto-discovery strategy.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">## - manual: Manual join command</span>
+<span class="token comment">## - static: Static node list</span>
+<span class="token comment">## - mcast:  IP Multicast</span>
+<span class="token comment">## - dns:    DNS A Record</span>
+<span class="token comment">## - etcd:   etcd</span>
+<span class="token comment">## - k8s:    Kubernetes</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: manual</span>
+cluster.discovery = manual
+
+<span class="token comment">## Enable cluster autoheal from network partition.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: on</span>
+cluster.autoheal = on
+
+<span class="token comment">## Autoclean down node. A down node will be removed from the cluster</span>
+<span class="token comment">## if this value &gt; 0.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## -h: hour, e.g. '2h' for 2 hours</span>
+<span class="token comment">## -m: minute, e.g. '5m' for 5 minutes</span>
+<span class="token comment">## -s: second, e.g. '30s' for 30 seconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 5m</span>
+cluster.autoclean = 5m
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Cluster using static node list</span>
+
+<span class="token comment">## Node list of the cluster.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.static.seeds = emqx1@127.0.0.1,emqx2@127.0.0.1</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Cluster using IP Multicast.</span>
+
+<span class="token comment">## IP Multicast Address.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: IP Address</span>
+<span class="token comment">## cluster.mcast.addr = 239.192.0.1</span>
+
+<span class="token comment">## Multicast Ports.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Port List</span>
+<span class="token comment">## cluster.mcast.ports = 4369,4370</span>
+
+<span class="token comment">## Multicast Iface.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Iface Address</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 0.0.0.0</span>
+<span class="token comment">## cluster.mcast.iface = 0.0.0.0</span>
+
+<span class="token comment">## Multicast Ttl.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0-255</span>
+<span class="token comment">## cluster.mcast.ttl = 255</span>
+
+<span class="token comment">## Multicast loop.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## cluster.mcast.loop = on</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Cluster using DNS A records.</span>
+
+<span class="token comment">## DNS name.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.dns.name = localhost</span>
+
+<span class="token comment">## The App name is used to build 'node.name' with IP address.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.dns.app = emqx</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Cluster using etcd</span>
+
+<span class="token comment">## Etcd server list, seperated by ','.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.etcd.server = http://127.0.0.1:2379</span>
+
+<span class="token comment">## The prefix helps build nodes path in etcd. Each node in the cluster</span>
+<span class="token comment">## will create a path in etcd: v2/keys/&lt;prefix&gt;/&lt;cluster.name&gt;/&lt;node.name&gt;</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.etcd.prefix = dc3-emqx-cluster</span>
+
+<span class="token comment">## The TTL for node's path in etcd.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 1m, 1 minute</span>
+<span class="token comment">## cluster.etcd.node_ttl = 1m</span>
+
+<span class="token comment">## Path to a file containing the client's private PEM-encoded key.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## cluster.etcd.ssl.keyfile = etc/certs/client-key.pem</span>
+
+<span class="token comment">## The path to a file containing the client's certificate.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## cluster.etcd.ssl.certfile = etc/certs/client.pem</span>
+
+<span class="token comment">## Path to the file containing PEM-encoded CA certificates. The CA certificates</span>
+<span class="token comment">## are used during server authentication and when building the client certificate chain.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## cluster.etcd.ssl.cacertfile = etc/certs/ca.pem</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Cluster using Kubernetes</span>
+
+<span class="token comment">## Kubernetes API server list, seperated by ','.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.k8s.apiserver = http://10.110.111.204:8080</span>
+
+<span class="token comment">## The service name helps lookup EMQ nodes in the cluster.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.k8s.service_name = emqx</span>
+
+<span class="token comment">## The address type is used to extract host from k8s service.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ip | dns | hostname</span>
+<span class="token comment">## cluster.k8s.address_type = ip</span>
+
+<span class="token comment">## The app name helps build 'node.name'.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.k8s.app_name = emqx</span>
+
+<span class="token comment">## The suffix added to dns and hostname get from k8s service</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.k8s.suffix = pod.cluster.local</span>
+
+<span class="token comment">## Kubernetes Namespace</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## cluster.k8s.namespace = default</span>
+
+<span class="token comment">## CONFIG_SECTION_END=cluster ==================================================</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Node</span>
+<span class="token comment">##--------------------------------------------------------------------</span>
+
+<span class="token comment">## Node name.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/reference_manual/distributed.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: &lt;name&gt;@&lt;host&gt;</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: node-01@127.0.0.1</span>
+node.name = node<span class="token punctuation">-</span>01@127.0.0.1
+
+<span class="token comment">## Cookie for distributed node communication.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+node.cookie = emqxsecretcookie
+
+<span class="token comment">## Data dir for the node</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Folder</span>
+node.data_dir = data
+
+<span class="token comment">## Heartbeat monitoring of an Erlang runtime system. Comment the line to disable</span>
+<span class="token comment">## heartbeat, or set the value as 'on'</span>
+<span class="token comment">##</span>
+<span class="token comment">## Turning this on may cause the node to restart if it becomes unresponsive to</span>
+<span class="token comment">## the heartbeat pings.</span>
+<span class="token comment">##</span>
+<span class="token comment">## NOTE: When managed by systemd (or other supervision tools like systemd),</span>
+<span class="token comment">##       heart will probably only cause EMQ X to stop, but restart or not will</span>
+<span class="token comment">##       depend on systemd's restart strategy.</span>
+<span class="token comment">## NOTE: When running in docker, the container will die as soon as the the</span>
+<span class="token comment">##       heart process kills EMQ X, but restart or not will depend on container</span>
+<span class="token comment">##       supervision strategy, such as k8s restartPolicy.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: -heart</span>
+<span class="token comment">## node.heartbeat = on</span>
+
+<span class="token comment">## Sets the number of threads in async thread pool. Valid range is 0-1024.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0-1024</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: +A Number</span>
+<span class="token comment">## node.async_threads = 4</span>
+
+<span class="token comment">## Sets the maximum number of simultaneously existing processes for this</span>
+<span class="token comment">## system if a Number is passed as value.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number [1024-134217727]</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: +P Number</span>
+<span class="token comment">## node.process_limit = 2097152</span>
+
+<span class="token comment">## Sets the maximum number of simultaneously existing ports for this system.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number [1024-134217727]</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: +Q Number</span>
+<span class="token comment">## node.max_ports = 1048576</span>
+
+<span class="token comment">## Sets the distribution buffer busy limit (dist_buf_busy_limit).</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number [1KB-2GB]</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: +zdbbl size</span>
+<span class="token comment">## node.dist_buffer_size = 8MB</span>
+
+<span class="token comment">## Sets the maximum number of ETS tables. Note that mnesia and SSL will</span>
+<span class="token comment">## create temporary ETS tables.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: +e Number</span>
+<span class="token comment">## node.max_ets_tables = 262144</span>
+
+<span class="token comment">## Global GC Interval.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples:</span>
+<span class="token comment">##  - 2h:  2 hours</span>
+<span class="token comment">##  - 30m: 30 minutes</span>
+<span class="token comment">##  - 20s: 20 seconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Defaut: 15 minutes</span>
+node.global_gc_interval = 15m
+
+<span class="token comment">## Tweak GC to run more often.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number [0-65535]</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: -env ERL_FULLSWEEP_AFTER Number</span>
+<span class="token comment">## node.fullsweep_after = 1000</span>
+
+<span class="token comment">## Crash dump log file.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Log file</span>
+node.crash_dump = log/crash.dump
+
+<span class="token comment">## Specify SSL Options in the file if using SSL for Erlang Distribution.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: -ssl_dist_optfile &lt;File&gt;</span>
+<span class="token comment">## node.ssl_dist_optfile = etc/ssl_dist.conf</span>
+
+<span class="token comment">## Sets the net_kernel tick time. TickTime is specified in seconds.</span>
+<span class="token comment">## Notice that all communicating nodes are to have the same TickTime</span>
+<span class="token comment">## value specified.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://www.erlang.org/doc/man/kernel_app.html#net_ticktime</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">##</span>
+<span class="token comment">## vm.args: -kernel net_ticktime Number</span>
+<span class="token comment">## node.dist_net_ticktime = 120</span>
+
+<span class="token comment">## Sets the port range for the listener socket of a distributed Erlang node.</span>
+<span class="token comment">## Note that if there are firewalls between clustered nodes, this port segment</span>
+<span class="token comment">## for nodes’ communication should be allowed.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://www.erlang.org/doc/man/kernel_app.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Port [1024-65535]</span>
+node.dist_listen_min = 6369
+node.dist_listen_max = 6369
+
+node.backtrace_depth = 16
+
+<span class="token comment">## CONFIG_SECTION_BGN=rpc ======================================================</span>
+
+<span class="token comment">## RPC Mode.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: sync | async</span>
+rpc.mode = async
+
+<span class="token comment">## Max batch size of async RPC requests.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer</span>
+<span class="token comment">## Zero or negative value disables rpc batching.</span>
+<span class="token comment">##</span>
+<span class="token comment">## NOTE: RPC batch won't work when rpc.mode = sync</span>
+rpc.async_batch_size = 256
+
+<span class="token comment">## RPC port discovery</span>
+<span class="token comment">##</span>
+<span class="token comment">## The strategy for discovering the RPC listening port of other nodes.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">## - manual: discover ports by `tcp_server_port` and `tcp_client_port`.</span>
+<span class="token comment">## - stateless: discover ports in a stateless manner.</span>
+<span class="token comment">##   If node name is `emqx&lt;N&gt;@127.0.0.1`, where the `&lt;N&gt;` is an integer,</span>
+<span class="token comment">##   then the listening port will be `5370 + &lt;N&gt;`</span>
+<span class="token comment">##</span>
+<span class="token comment">## Defaults to `stateless`.</span>
+rpc.port_discovery = stateless
+
+<span class="token comment">## TCP port number for RPC server to listen on.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Only takes effect when `rpc.port_discovery` = `manual`.</span>
+<span class="token comment">##</span>
+<span class="token comment">## NOTE: All nodes in the cluster should agree to this same config.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Port [1024-65535]</span>
+<span class="token comment">#rpc.tcp_server_port = 5369</span>
+
+<span class="token comment">## Number of outgoing RPC connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Interger [0-256]</span>
+<span class="token comment">## Default = 1</span>
+<span class="token comment">#rpc.tcp_client_num = 1</span>
+
+<span class="token comment">## RCP Client connect timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.connect_timeout = 5s
+
+<span class="token comment">## TCP send timeout of RPC client and server.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.send_timeout = 5s
+
+<span class="token comment">## Authentication timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.authentication_timeout = 5s
+
+<span class="token comment">## Default receive timeout for call() functions</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.call_receive_timeout = 15s
+
+<span class="token comment">## Socket idle keepalive.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.socket_keepalive_idle = 900s
+
+<span class="token comment">## TCP Keepalive probes interval.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.socket_keepalive_interval = 75s
+
+<span class="token comment">## Probes lost to close the connection</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer</span>
+rpc.socket_keepalive_count = 9
+
+<span class="token comment">## Size of TCP send buffer.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+rpc.socket_sndbuf = 1MB
+
+<span class="token comment">## Size of TCP receive buffer.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.socket_recbuf = 1MB
+
+<span class="token comment">## Size of user-level software socket buffer.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Seconds</span>
+rpc.socket_buffer = 1MB
+
+<span class="token comment">## CONFIG_SECTION_END=rpc ======================================================</span>
+
+<span class="token comment">## CONFIG_SECTION_BGN=logger ===================================================</span>
+
+<span class="token comment">## Where to emit the logs.</span>
+<span class="token comment">## Enable the console (standard output) logs.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: file | console | both</span>
+<span class="token comment">## - file: write logs only to file</span>
+<span class="token comment">## - console: write logs only to standard I/O</span>
+<span class="token comment">## - both: write logs both to file and standard I/O</span>
+log.to = file
+
+<span class="token comment">## The log severity level.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: debug | info | notice | warning | error | critical | alert | emergency</span>
+<span class="token comment">##</span>
+<span class="token comment">## Note: Only the messages with severity level higher than or equal to</span>
+<span class="token comment">##       this level will be logged.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: warning</span>
+log.level = warning
+
+<span class="token comment">## The dir for log files.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Folder</span>
+log.dir = log
+
+<span class="token comment">## The log filename for logs of level specified in &quot;log.level&quot;.</span>
+<span class="token comment">##</span>
+<span class="token comment">## If `log.rotation` is enabled, this is the base name of the</span>
+<span class="token comment">## files. Each file in a rotated log is named &lt;base_name&gt;.N, where N is an integer.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## Default: emqx.log</span>
+log.file = emqx.log
+
+<span class="token comment">## Limits the total number of characters printed for each log event.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer</span>
+<span class="token comment">## Default: No Limit</span>
+<span class="token comment">#log.chars_limit = 8192</span>
+
+<span class="token comment">## Maximum depth for Erlang term log formatting</span>
+<span class="token comment">## and Erlang process message queue inspection.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer or 'unlimited' (without quotes)</span>
+<span class="token comment">## Default: 100</span>
+<span class="token comment">#log.max_depth = 100</span>
+
+<span class="token comment">## Log formatter</span>
+<span class="token comment">## Value: text | json</span>
+<span class="token comment">#log.formatter = text</span>
+
+<span class="token comment">## Log to single line</span>
+<span class="token comment">## Value: Boolean</span>
+<span class="token comment">#log.single_line = true</span>
+
+<span class="token comment">## Enables the log rotation.</span>
+<span class="token comment">## With this enabled, new log files will be created when the current</span>
+<span class="token comment">## log file is full, max to `log.rotation.size` files will be created.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## Default: on</span>
+log.rotation = on
+
+<span class="token comment">## Maximum size of each log file.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## Default: 10M</span>
+<span class="token comment">## Supported Unit: KB | MB | GB</span>
+log.rotation.size = 10MB
+
+<span class="token comment">## Maximum rotation count of log files.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## Default: 5</span>
+log.rotation.count = 5
+
+<span class="token comment">## To create additional log files for specific log levels.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File Name</span>
+<span class="token comment">## Format: log.$level.file = $filename,</span>
+<span class="token comment">##         where &quot;$level&quot; can be one of: debug, info, notice, warning,</span>
+<span class="token comment">##                                       error, critical, alert, emergency</span>
+<span class="token comment">## Note: Log files for a specific log level will only contain all the logs</span>
+<span class="token comment">##       that higher than or equal to that level</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.info.file  = info.log</span>
+<span class="token comment">#log.error.file = error.log</span>
+
+<span class="token comment">## The max allowed queue length before switching to sync mode.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. If the message queue grows</span>
+<span class="token comment">## larger than this value the handler switches from anync to sync mode.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 100</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.sync_mode_qlen = 100</span>
+
+<span class="token comment">## The max allowed queue length before switching to drop mode.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. When the message queue grows</span>
+<span class="token comment">## larger than this threshold, the handler switches to a mode in which</span>
+<span class="token comment">## it drops all new events that senders want to log.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 3000</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.drop_mode_qlen = 3000</span>
+
+<span class="token comment">## The max allowed queue length before switching to flush mode.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. If the length of the message queue</span>
+<span class="token comment">## grows larger than this threshold, a flush (delete) operation takes place.</span>
+<span class="token comment">## To flush events, the handler discards the messages in the message queue</span>
+<span class="token comment">## by receiving them in a loop without logging.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 8000</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.flush_qlen = 8000</span>
+
+<span class="token comment">## Kill the log handler when it gets overloaded.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. It is possible that a handler,</span>
+<span class="token comment">## even if it can successfully manage peaks of high load without crashing,</span>
+<span class="token comment">## can build up a large message queue, or use a large amount of memory.</span>
+<span class="token comment">## We could kill the log handler in these cases and restart it after a</span>
+<span class="token comment">## few seconds.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: on</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.overload_kill = on</span>
+
+<span class="token comment">## The max allowed queue length before killing the log hanlder.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. This is the maximum allowed queue</span>
+<span class="token comment">## length. If the message queue grows larger than this, the handler</span>
+<span class="token comment">## process is terminated.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 20000</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.overload_kill_qlen = 20000</span>
+
+<span class="token comment">## The max allowed memory size before killing the log hanlder.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. This is the maximum memory size</span>
+<span class="token comment">## that the handler process is allowed to use. If the handler grows</span>
+<span class="token comment">## larger than this, the process is terminated.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 30MB</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.overload_kill_mem_size = 30MB</span>
+
+<span class="token comment">## Restart the log hanlder after some seconds.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. If the handler is terminated,</span>
+<span class="token comment">## it restarts automatically after a delay specified in seconds.</span>
+<span class="token comment">## The value &quot;infinity&quot; prevents restarts.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 5s</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.overload_kill_restart_after = 5s</span>
+
+<span class="token comment">## Max burst count and time window for burst control.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Log overload protection parameter. Large bursts of log events - many</span>
+<span class="token comment">## events received by the handler under a short period of time - can</span>
+<span class="token comment">## potentially cause problems. By specifying the maximum number of events</span>
+<span class="token comment">## to be handled within a certain time frame, the handler can avoid</span>
+<span class="token comment">## choking the log with massive amounts of printouts.</span>
+<span class="token comment">##</span>
+<span class="token comment">## This config controls the maximum number of events to handle within</span>
+<span class="token comment">## a time frame. After the limit is reached, successive events are</span>
+<span class="token comment">## dropped until the end of the time frame.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Note that there would be no warning if any messages were</span>
+<span class="token comment">## dropped because of burst control.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Comment this config out to disable the burst control feature.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: MaxBurstCount,TimeWindow</span>
+<span class="token comment">## Default: disabled</span>
+<span class="token comment">##</span>
+<span class="token comment">#log.burst_limit = 20000, 1s</span>
+
+<span class="token comment">## CONFIG_SECTION_END=logger ===================================================</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Authentication/Access Control</span>
+<span class="token comment">##--------------------------------------------------------------------</span>
+
+<span class="token comment">## Allow anonymous authentication by default if no auth plugins loaded.</span>
+<span class="token comment">## Notice: Disable the option in production deployment!</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+allow_anonymous = true
+
+<span class="token comment">## Allow or deny if no ACL rules matched.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: allow | deny</span>
+acl_nomatch = allow
+
+<span class="token comment">## Default ACL File.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File Name</span>
+acl_file = etc/acl.conf
+
+<span class="token comment">## Whether to enable ACL cache.</span>
+<span class="token comment">##</span>
+<span class="token comment">## If enabled, ACLs roles for each client will be cached in the memory</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+enable_acl_cache = on
+
+<span class="token comment">## The maximum count of ACL entries can be cached for a client.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer greater than 0</span>
+<span class="token comment">## Default: 32</span>
+acl_cache_max_size = 32
+
+<span class="token comment">## The time after which an ACL cache entry will be deleted</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## Default: 1 minute</span>
+acl_cache_ttl = 1m
+
+<span class="token comment">## The action when acl check reject current operation</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ignore | disconnect</span>
+<span class="token comment">## Default: ignore</span>
+acl_deny_action = ignore
+
+<span class="token comment">## Specify the global flapping detect policy.</span>
+<span class="token comment">## The value is a string composed of flapping threshold, duration and banned interval.</span>
+<span class="token comment">## 1. threshold: an integer to specfify the disconnected times of a MQTT Client;</span>
+<span class="token comment">## 2. duration: the time window for flapping detect;</span>
+<span class="token comment">## 3. banned interval: the banned interval if a flapping is detected.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer,Duration,Duration</span>
+flapping_detect_policy = 30<span class="token punctuation">,</span> 1m<span class="token punctuation">,</span> 5m
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## MQTT Protocol</span>
+<span class="token comment">##--------------------------------------------------------------------</span>
+
+<span class="token comment">## Maximum MQTT packet size allowed.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## Default: 1MB</span>
+mqtt.max_packet_size = 1MB
+
+<span class="token comment">## Maximum length of MQTT clientId allowed.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number [23-65535]</span>
+mqtt.max_clientid_len = 65535
+
+<span class="token comment">## Maximum topic levels allowed. 0 means no limit.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+mqtt.max_topic_levels = 0
+
+<span class="token comment">## Maximum QoS allowed.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0 | 1 | 2</span>
+mqtt.max_qos_allowed = 2
+
+<span class="token comment">## Maximum Topic Alias, 0 means no topic alias supported.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0-65535</span>
+mqtt.max_topic_alias = 65535
+
+<span class="token comment">## Whether the Server supports MQTT retained messages.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+mqtt.retain_available = true
+
+<span class="token comment">## Whether the Server supports MQTT Wildcard Subscriptions</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+mqtt.wildcard_subscription = true
+
+<span class="token comment">## Whether the Server supports MQTT Shared Subscriptions.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+mqtt.shared_subscription = true
+
+<span class="token comment">## Whether to ignore loop delivery of messages.(for mqtt v3.1.1)</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+mqtt.ignore_loop_deliver = false
+
+<span class="token comment">## Whether to parse the MQTT frame in strict mode</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+mqtt.strict_mode = false
+
+<span class="token comment">## Specify the response information returned to the client</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## mqtt.response_information = example</span>
+
+<span class="token comment">## CONFIG_SECTION_BGN=zones  ===================================================</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## External Zone</span>
+
+<span class="token comment">## Idle timeout of the external MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: duration</span>
+zone.external.idle_timeout = 15s
+
+<span class="token comment">## Enable ACL check.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Flag</span>
+zone.external.enable_acl = on
+
+<span class="token comment">## Enable ban check.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Flag</span>
+zone.external.enable_ban = on
+
+<span class="token comment">## Enable per connection statistics.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+zone.external.enable_stats = on
+
+<span class="token comment">## The action when acl check reject current operation</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ignore | disconnect</span>
+<span class="token comment">## Default: ignore</span>
+zone.external.acl_deny_action = ignore
+
+<span class="token comment">## Force the MQTT connection process GC after this number of</span>
+<span class="token comment">## messages | bytes passed through.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Numbers delimited by `|'. Zero or negative is to disable.</span>
+zone.external.force_gc_policy = 16000<span class="token punctuation">|</span>16MB
+
+<span class="token comment">## Max message queue length and total heap size to force shutdown</span>
+<span class="token comment">## connection/session process.</span>
+<span class="token comment">## Message queue here is the Erlang process mailbox, but not the number</span>
+<span class="token comment">## of queued MQTT messages of QoS 1 and 2.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Numbers delimited by `|'. Zero or negative is to disable.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default:</span>
+<span class="token comment">##   - 10000|64MB on ARCH_64 system</span>
+<span class="token comment">##   - 1000|32MB  on ARCH_32 sytem</span>
+<span class="token comment">#zone.external.force_shutdown_policy = 10000|64MB</span>
+
+<span class="token comment">## Maximum MQTT packet size allowed.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## Default: 1MB</span>
+<span class="token comment">## zone.external.max_packet_size = 64KB</span>
+
+<span class="token comment">## Maximum length of MQTT clientId allowed.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number [23-65535]</span>
+<span class="token comment">## zone.external.max_clientid_len = 1024</span>
+
+<span class="token comment">## Maximum topic levels allowed. 0 means no limit.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## zone.external.max_topic_levels = 7</span>
+
+<span class="token comment">## Maximum QoS allowed.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0 | 1 | 2</span>
+<span class="token comment">## zone.external.max_qos_allowed = 2</span>
+
+<span class="token comment">## Maximum Topic Alias, 0 means no limit.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0-65535</span>
+<span class="token comment">## zone.external.max_topic_alias = 65535</span>
+
+<span class="token comment">## Whether the Server supports retained messages.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+<span class="token comment">## zone.external.retain_available = true</span>
+
+<span class="token comment">## Whether the Server supports Wildcard Subscriptions</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+<span class="token comment">## zone.external.wildcard_subscription = false</span>
+
+<span class="token comment">## Whether the Server supports Shared Subscriptions</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+<span class="token comment">## zone.external.shared_subscription = false</span>
+
+<span class="token comment">## Server Keep Alive</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## zone.external.server_keepalive = 0</span>
+
+<span class="token comment">## The backoff for MQTT keepalive timeout. The broker will kick a connection out</span>
+<span class="token comment">## until 'Keepalive * backoff * 2' timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Float &gt; 0.5</span>
+zone.external.keepalive_backoff = 0.75
+
+<span class="token comment">## Maximum number of subscriptions allowed, 0 means no limit.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+zone.external.max_subscriptions = 0
+
+<span class="token comment">## Force to upgrade QoS according to subscription.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+zone.external.upgrade_qos = off
+
+<span class="token comment">## Maximum size of the Inflight Window storing QoS1/2 messages delivered but unacked.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+zone.external.max_inflight = 32
+
+<span class="token comment">## Retry interval for QoS1/2 message delivering.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+zone.external.retry_interval = 30s
+
+<span class="token comment">## Maximum QoS2 packets (Client -&gt; Broker) awaiting PUBREL, 0 means no limit.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+zone.external.max_awaiting_rel = 100
+
+<span class="token comment">## The QoS2 messages (Client -&gt; Broker) will be dropped if awaiting PUBREL timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+zone.external.await_rel_timeout = 300s
+
+<span class="token comment">## Default session expiry interval for MQTT V3.1.1 connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## -d: day</span>
+<span class="token comment">## -h: hour</span>
+<span class="token comment">## -m: minute</span>
+<span class="token comment">## -s: second</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 2h, 2 hours</span>
+zone.external.session_expiry_interval = 2h
+
+<span class="token comment">## Maximum queue length. Enqueued messages when persistent client disconnected,</span>
+<span class="token comment">## or inflight window is full. 0 means no limit.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number &gt;= 0</span>
+zone.external.max_mqueue_len = 1000
+
+<span class="token comment">## Topic priorities.</span>
+<span class="token comment">## 'none' to indicate no priority table (by default), hence all messages</span>
+<span class="token comment">## are treated equal</span>
+<span class="token comment">##</span>
+<span class="token comment">## Priority number [1-255]</span>
+<span class="token comment">## Example: topic/1=10,topic/2=8</span>
+<span class="token comment">## NOTE: comma and equal signs are not allowed for priority topic names</span>
+<span class="token comment">## NOTE: messages for topics not in the priority table are treated as</span>
+<span class="token comment">##       either highest or lowest priority depending on the configured</span>
+<span class="token comment">##       value for mqueue_default_priority</span>
+<span class="token comment">##</span>
+zone.external.mqueue_priorities = none
+
+<span class="token comment">## Default to highest priority for topics not matching priority table</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: highest | lowest</span>
+zone.external.mqueue_default_priority = highest
+
+<span class="token comment">## Whether to enqueue QoS0 messages.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+zone.external.mqueue_store_qos0 = true
+
+<span class="token comment">## Whether to turn on flapping detect</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+zone.external.enable_flapping_detect = off
+
+<span class="token comment">## Message limit for the a external MQTT connection.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number,Duration</span>
+<span class="token comment">## Example: 100 messages per 10 seconds.</span>
+<span class="token comment">#zone.external.rate_limit.conn_messages_in = 100,10s</span>
+
+<span class="token comment">## Bytes limit for a external MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number,Duration</span>
+<span class="token comment">## Example: 100KB incoming per 10 seconds.</span>
+<span class="token comment">#zone.external.rate_limit.conn_bytes_in = 100KB,10s</span>
+
+<span class="token comment">## Whether to alarm the congested connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Sometimes the mqtt connection (usually an MQTT subscriber) may get &quot;congested&quot; because</span>
+<span class="token comment">## there're too many packets to sent. The socket trys to buffer the packets until the buffer is</span>
+<span class="token comment">## full. If more packets comes after that, the packets will be &quot;pending&quot; in a queue</span>
+<span class="token comment">## and we consider the connection is &quot;congested&quot;.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Enable this to send an alarm when there's any bytes pending in the queue. You could set</span>
+<span class="token comment">## the `listener.tcp.&lt;ZoneName&gt;.sndbuf` to a larger value if the alarm is triggered too often.</span>
+<span class="token comment">##</span>
+<span class="token comment">## The name of the alarm is of format &quot;conn_congestion/&lt;ClientID&gt;/&lt;Username&gt;&quot;.</span>
+<span class="token comment">## Where the &lt;ClientID&gt; is the client-id of the congested MQTT connection.</span>
+<span class="token comment">## And the &lt;Username&gt; is the username or &quot;unknown_user&quot; of not provided by the client.</span>
+<span class="token comment">## Default: off</span>
+<span class="token comment">#zone.external.conn_congestion.alarm = off</span>
+
+<span class="token comment">## Won't clear the congested alarm in how long time.</span>
+<span class="token comment">## The alarm is cleared only when there're no pending bytes in the queue, and also it has been</span>
+<span class="token comment">## `min_alarm_sustain_duration` time since the last time we considered the connection is &quot;congested&quot;.</span>
+<span class="token comment">##</span>
+<span class="token comment">## This is to avoid clearing and sending the alarm again too often.</span>
+<span class="token comment">## Default: 1m</span>
+<span class="token comment">#zone.external.conn_congestion.min_alarm_sustain_duration = 1m</span>
+
+<span class="token comment">## Messages quota for the each of external MQTT connection.</span>
+<span class="token comment">## This value consumed by the number of recipient on a message.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number, Duration</span>
+<span class="token comment">##</span>
+<span class="token comment">## Example: 100 messaegs per 1s</span>
+<span class="token comment">#zone.external.quota.conn_messages_routing = 100,1s</span>
+
+<span class="token comment">## Messages quota for the all of external MQTT connections.</span>
+<span class="token comment">## This value consumed by the number of recipient on a message.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number, Duration</span>
+<span class="token comment">##</span>
+<span class="token comment">## Example: 200000 messaegs per 1s</span>
+<span class="token comment">#zone.external.quota.overall_messages_routing = 200000,1s</span>
+
+<span class="token comment">## All the topics will be prefixed with the mountpoint path if this option is enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Variables in mountpoint path:</span>
+<span class="token comment">##  - %c: clientid</span>
+<span class="token comment">##  - %u: username</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## zone.external.mountpoint = devicebound/</span>
+
+<span class="token comment">## Whether use username replace client id</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+<span class="token comment">## Default: false</span>
+zone.external.use_username_as_clientid = false
+
+<span class="token comment">## Whether to ignore loop delivery of messages.(for mqtt v3.1.1)</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+zone.external.ignore_loop_deliver = false
+
+<span class="token comment">## Whether to parse the MQTT frame in strict mode</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+zone.external.strict_mode = false
+
+<span class="token comment">## Specify the response information returned to the client</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## zone.external.response_information = example</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Internal Zone</span>
+
+zone.internal.allow_anonymous = true
+
+<span class="token comment">## Enable per connection stats.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Flag</span>
+zone.internal.enable_stats = on
+
+<span class="token comment">## Enable ACL check.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Flag</span>
+zone.internal.enable_acl = off
+
+<span class="token comment">## The action when acl check reject current operation</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ignore | disconnect</span>
+<span class="token comment">## Default: ignore</span>
+zone.internal.acl_deny_action = ignore
+
+<span class="token comment">## See zone.$name.force_gc_policy</span>
+<span class="token comment">## zone.internal.force_gc_policy = 128000|128MB</span>
+
+<span class="token comment">## See zone.$name.wildcard_subscription.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+<span class="token comment">## zone.internal.wildcard_subscription = true</span>
+
+<span class="token comment">## See zone.$name.shared_subscription.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: boolean</span>
+<span class="token comment">## zone.internal.shared_subscription = true</span>
+
+<span class="token comment">## See zone.$name.max_subscriptions.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer</span>
+zone.internal.max_subscriptions = 0
+
+<span class="token comment">## See zone.$name.max_inflight</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+zone.internal.max_inflight = 128
+
+<span class="token comment">## See zone.$name.max_awaiting_rel</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+zone.internal.max_awaiting_rel = 1000
+
+<span class="token comment">## See zone.$name.max_mqueue_len</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number &gt;= 0</span>
+zone.internal.max_mqueue_len = 10000
+
+<span class="token comment">## Whether to enqueue Qos0 messages.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+zone.internal.mqueue_store_qos0 = true
+
+<span class="token comment">## Whether to turn on flapping detect</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+zone.internal.enable_flapping_detect = off
+
+<span class="token comment">## See zone.$name.force_shutdown_policy</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default:</span>
+<span class="token comment">##   - 10000|64MB on ARCH_64 system</span>
+<span class="token comment">##   - 1000|32MB  on ARCH_32 sytem</span>
+<span class="token comment">#zone.internal.force_shutdown_policy = 10000|64MB</span>
+
+<span class="token comment">## All the topics will be prefixed with the mountpoint path if this option is enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Variables in mountpoint path:</span>
+<span class="token comment">##  - %c: clientid</span>
+<span class="token comment">##  - %u: username</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## zone.internal.mountpoint = cloudbound/</span>
+
+<span class="token comment">## Whether to ignore loop delivery of messages.(for mqtt v3.1.1)</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+zone.internal.ignore_loop_deliver = false
+
+<span class="token comment">## Whether to parse the MQTT frame in strict mode</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+zone.internal.strict_mode = false
+
+<span class="token comment">## Specify the response information returned to the client</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## zone.internal.response_information = example</span>
+
+<span class="token comment">## Allow the zone's clients to bypass authentication step</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+zone.internal.bypass_auth_plugins = true
+
+<span class="token comment">## CONFIG_SECTION_END=zones ====================================================</span>
+
+<span class="token comment">## CONFIG_SECTION_BGN=listeners ================================================</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## MQTT/TCP - External TCP Listener for MQTT Protocol</span>
+
+<span class="token comment">## listener.tcp.$name is the IP address and port that the MQTT/TCP</span>
+<span class="token comment">## listener will bind.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: IP:Port | Port</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples: 3000, 127.0.0.1:3000, ::1:3000</span>
+listener.tcp.external = 3000
+
+<span class="token comment">## The acceptor pool for external MQTT/TCP listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.external.acceptors = 8
+
+<span class="token comment">## Maximum number of concurrent MQTT/TCP connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.external.max_connections = 1024000
+
+<span class="token comment">## Maximum external connections per second.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.external.max_conn_rate = 1000
+
+<span class="token comment">## Specify the {active, N} option for the external MQTT/TCP Socket.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.external.active_n = 100
+
+<span class="token comment">## Zone of the external MQTT/TCP listener belonged to.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: zone.$name.*</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+listener.tcp.external.zone = external
+
+<span class="token comment">## The access control rules for the MQTT/TCP listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: https://github.com/emqtt/esockd#allowdeny</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ACL Rule</span>
+<span class="token comment">##</span>
+<span class="token comment">## Example: allow 192.168.0.0/24</span>
+listener.tcp.external.access.1 = allow all
+
+<span class="token comment">## Enable the Proxy Protocol V1/2 if the EMQ X cluster is deployed</span>
+<span class="token comment">## behind HAProxy or Nginx.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: https://www.haproxy.com/blog/haproxy/proxy-protocol/</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.tcp.external.proxy_protocol = on</span>
+
+<span class="token comment">## Sets the timeout for proxy protocol. EMQ X will close the TCP connection</span>
+<span class="token comment">## if no proxy protocol packet recevied within the timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## listener.tcp.external.proxy_protocol_timeout = 3s</span>
+
+<span class="token comment">## Enable the option for X.509 certificate based authentication.</span>
+<span class="token comment">## EMQX will use the common name of certificate as MQTT username.</span>
+<span class="token comment">## Only support Proxy Protocol V2, the CN is available in Proxy Protocol V2 additional info</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn</span>
+<span class="token comment">## listener.tcp.external.peer_cert_as_username = cn</span>
+
+<span class="token comment">## Enable the option for X.509 certificate based authentication.</span>
+<span class="token comment">## EMQX will use the common name of certificate as MQTT clientid.</span>
+<span class="token comment">## Only support Proxy Protocol V2, the CN is available in Proxy Protocol V2 additional info</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn</span>
+<span class="token comment">## listener.tcp.external.peer_cert_as_clientid = cn</span>
+
+<span class="token comment">## The TCP backlog defines the maximum length that the queue of pending</span>
+<span class="token comment">## connections can grow to.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number &gt;= 0</span>
+listener.tcp.external.backlog = 1024
+
+<span class="token comment">## The TCP send timeout for external MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+listener.tcp.external.send_timeout = 15s
+
+<span class="token comment">## Close the TCP connection if send timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+listener.tcp.external.send_timeout_close = on
+
+<span class="token comment">## The TCP receive buffer(os kernel) for MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/inet.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.tcp.external.recbuf = 2KB</span>
+
+<span class="token comment">## The TCP send buffer(os kernel) for MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/inet.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.tcp.external.sndbuf = 2KB</span>
+
+<span class="token comment">## The size of the user-level software buffer used by the driver.</span>
+<span class="token comment">## Not to be confused with options sndbuf and recbuf, which correspond</span>
+<span class="token comment">## to the Kernel socket buffers. It is recommended to have val(buffer)</span>
+<span class="token comment">## &gt;= max(val(sndbuf),val(recbuf)) to avoid performance issues because</span>
+<span class="token comment">## of unnecessary copying. val(buffer) is automatically set to the above</span>
+<span class="token comment">## maximum when values sndbuf or recbuf are set.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/inet.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.tcp.external.buffer = 2KB</span>
+
+<span class="token comment">## Sets the 'buffer = max(sndbuf, recbuf)' if this option is enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.tcp.external.tune_buffer = off</span>
+
+<span class="token comment">## The socket is set to a busy state when the amount of data queued internally</span>
+<span class="token comment">## by the ERTS socket implementation reaches this limit.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## Defaults to 1MB</span>
+<span class="token comment">## listener.tcp.external.high_watermark = 1MB</span>
+
+<span class="token comment">## The TCP_NODELAY flag for MQTT connections. Small amounts of data are</span>
+<span class="token comment">## sent immediately if the option is enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+listener.tcp.external.nodelay = true
+
+<span class="token comment">## The SO_REUSEADDR flag for TCP listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+listener.tcp.external.reuseaddr = true
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Internal TCP Listener for MQTT Protocol</span>
+
+<span class="token comment">## The IP address and port that the internal MQTT/TCP protocol listener</span>
+<span class="token comment">## will bind.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: IP:Port, Port</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples: 13000, 127.0.0.1:13000, ::1:13000</span>
+listener.tcp.internal = 13000
+
+<span class="token comment">## The acceptor pool for internal MQTT/TCP listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.internal.acceptors = 4
+
+<span class="token comment">## Maximum number of concurrent MQTT/TCP connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.internal.max_connections = 1024000
+
+<span class="token comment">## Maximum internal connections per second.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.internal.max_conn_rate = 1000
+
+<span class="token comment">## Specify the {active, N} option for the internal MQTT/TCP Socket.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.tcp.internal.active_n = 1000
+
+<span class="token comment">## Zone of the internal MQTT/TCP listener belonged to.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+listener.tcp.internal.zone = internal
+
+<span class="token comment">## The TCP backlog of internal MQTT/TCP Listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.backlog</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number &gt;= 0</span>
+listener.tcp.internal.backlog = 512
+
+<span class="token comment">## The TCP send timeout for internal MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.send_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+listener.tcp.internal.send_timeout = 5s
+
+<span class="token comment">## Close the MQTT/TCP connection if send timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.send_timeout_close</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+listener.tcp.internal.send_timeout_close = on
+
+<span class="token comment">## The TCP receive buffer(os kernel) for internal MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.recbuf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+listener.tcp.internal.recbuf = 64KB
+
+<span class="token comment">## The TCP send buffer(os kernel) for internal MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/inet.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+listener.tcp.internal.sndbuf = 64KB
+
+<span class="token comment">## The size of the user-level software buffer used by the driver.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.buffer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.tcp.internal.buffer = 16KB</span>
+
+<span class="token comment">## Sets the 'buffer = max(sndbuf, recbuf)' if this option is enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.tune_buffer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.tcp.internal.tune_buffer = off</span>
+
+<span class="token comment">## The TCP_NODELAY flag for internal MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.nodelay</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+listener.tcp.internal.nodelay = false
+
+<span class="token comment">## The SO_REUSEADDR flag for MQTT/TCP Listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+listener.tcp.internal.reuseaddr = true
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## MQTT/SSL - External SSL Listener for MQTT Protocol</span>
+
+<span class="token comment">## listener.ssl.$name is the IP address and port that the MQTT/SSL</span>
+<span class="token comment">## listener will bind.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: IP:Port | Port</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples: 3010, 127.0.0.1:3010, ::1:3010</span>
+listener.ssl.external = 3010
+
+<span class="token comment">## The acceptor pool for external MQTT/SSL listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ssl.external.acceptors = 16
+
+<span class="token comment">## Maximum number of concurrent MQTT/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ssl.external.max_connections = 102400
+
+<span class="token comment">## Maximum MQTT/SSL connections per second.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ssl.external.max_conn_rate = 500
+
+<span class="token comment">## Specify the {active, N} option for the internal MQTT/SSL Socket.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ssl.external.active_n = 100
+
+<span class="token comment">## Zone of the external MQTT/SSL listener belonged to.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+listener.ssl.external.zone = external
+
+<span class="token comment">## The access control rules for the MQTT/SSL listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.access</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ACL Rule</span>
+listener.ssl.external.access.1 = allow all
+
+<span class="token comment">## Enable the Proxy Protocol V1/2 if the EMQ cluster is deployed behind</span>
+<span class="token comment">## HAProxy or Nginx.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.proxy_protocol</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ssl.external.proxy_protocol = on</span>
+
+<span class="token comment">## Sets the timeout for proxy protocol.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.proxy_protocol_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## listener.ssl.external.proxy_protocol_timeout = 3s</span>
+
+<span class="token comment">## TLS versions only to protect from POODLE attack.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/ssl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String, seperated by ','</span>
+<span class="token comment">## NOTE: Do not use tlsv1.3 if emqx is running on OTP-22 or earlier</span>
+<span class="token comment">## listener.ssl.external.tls_versions = tlsv1.3,tlsv1.2,tlsv1.1,tlsv1</span>
+
+<span class="token comment">## TLS Handshake timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+listener.ssl.external.handshake_timeout = 15s
+
+<span class="token comment">## Maximum number of non-self-issued intermediate certificates that</span>
+<span class="token comment">## can follow the peer certificate in a valid certification path.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## listener.ssl.external.depth = 10</span>
+
+<span class="token comment">## String containing the user's password. Only used if the private keyfile</span>
+<span class="token comment">## is password-protected.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## listener.ssl.external.key_password = yourpass</span>
+
+<span class="token comment">## Path to the file containing the user's private PEM-encoded key.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/ssl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+listener.ssl.external.keyfile = etc/certs/key.pem
+
+<span class="token comment">## Path to a file containing the user certificate.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/ssl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+listener.ssl.external.certfile = etc/certs/cert.pem
+
+<span class="token comment">## Path to the file containing PEM-encoded CA certificates. The CA certificates</span>
+<span class="token comment">## are used during server authentication and when building the client certificate chain.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## listener.ssl.external.cacertfile = etc/certs/cacert.pem</span>
+
+<span class="token comment">## The Ephemeral Diffie-Helman key exchange is a very effective way of</span>
+<span class="token comment">## ensuring Forward Secrecy by exchanging a set of keys that never hit</span>
+<span class="token comment">## the wire. Since the DH key is effectively signed by the private key,</span>
+<span class="token comment">## it needs to be at least as strong as the private key. In addition,</span>
+<span class="token comment">## the default DH groups that most of the OpenSSL installations have</span>
+<span class="token comment">## are only a handful (since they are distributed with the OpenSSL</span>
+<span class="token comment">## package that has been built for the operating system it’s running on)</span>
+<span class="token comment">## and hence predictable (not to mention, 1024 bits only).</span>
+<span class="token comment">## In order to escape this situation, first we need to generate a fresh,</span>
+<span class="token comment">## strong DH group, store it in a file and then use the option above,</span>
+<span class="token comment">## to force our SSL application to use the new DH group. Fortunately,</span>
+<span class="token comment">## OpenSSL provides us with a tool to do that. Simply run:</span>
+<span class="token comment">## openssl dhparam -out dh-params.pem 2048</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## listener.ssl.external.dhfile = etc/certs/dh-params.pem</span>
+
+<span class="token comment">## A server only does x509-path validation in mode verify_peer,</span>
+<span class="token comment">## as it then sends a certificate request to the client (this</span>
+<span class="token comment">## message is not sent if the verify option is verify_none).</span>
+<span class="token comment">## You can then also want to specify option fail_if_no_peer_cert.</span>
+<span class="token comment">## More information at: http://erlang.org/doc/man/ssl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: verify_peer | verify_none</span>
+<span class="token comment">## listener.ssl.external.verify = verify_peer</span>
+
+<span class="token comment">## Used together with {verify, verify_peer} by an SSL server. If set to true,</span>
+<span class="token comment">## the server fails if the client does not have a certificate to send, that is,</span>
+<span class="token comment">## sends an empty certificate.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+<span class="token comment">## listener.ssl.external.fail_if_no_peer_cert = true</span>
+
+<span class="token comment">## This is the single most important configuration option of an Erlang SSL</span>
+<span class="token comment">## application. Ciphers (and their ordering) define the way the client and</span>
+<span class="token comment">## server encrypt information over the wire, from the initial Diffie-Helman</span>
+<span class="token comment">## key exchange, the session key encryption ## algorithm and the message</span>
+<span class="token comment">## digest algorithm. Selecting a good cipher suite is critical for the</span>
+<span class="token comment">## application’s data security, confidentiality and performance.</span>
+<span class="token comment">##</span>
+<span class="token comment">## The cipher list above offers:</span>
+<span class="token comment">##</span>
+<span class="token comment">## A good balance between compatibility with older browsers.</span>
+<span class="token comment">## It can get stricter for Machine-To-Machine scenarios.</span>
+<span class="token comment">## Perfect Forward Secrecy.</span>
+<span class="token comment">## No old/insecure encryption and HMAC algorithms</span>
+<span class="token comment">##</span>
+<span class="token comment">## Most of it was copied from Mozilla’s Server Side TLS article</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Ciphers</span>
+listener.ssl.external.ciphers = TLS_AES_256_GCM_SHA384<span class="token punctuation">,</span>TLS_AES_128_GCM_SHA256<span class="token punctuation">,</span>TLS_CHACHA20_POLY1305_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_8_SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>DES<span class="token punctuation">-</span>CBC3<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA
+
+
+<span class="token comment">## Ciphers for TLS PSK.</span>
+<span class="token comment">## Note that 'listener.ssl.external.ciphers' and 'listener.ssl.external.psk_ciphers' cannot</span>
+<span class="token comment">## be configured at the same time.</span>
+<span class="token comment">## See 'https://tools.ietf.org/html/rfc4279#section-2'.</span>
+<span class="token comment">#listener.ssl.external.psk_ciphers = PSK-AES128-CBC-SHA,PSK-AES256-CBC-SHA,PSK-3DES-EDE-CBC-SHA,PSK-RC4-SHA</span>
+
+<span class="token comment">## SSL parameter renegotiation is a feature that allows a client and a server</span>
+<span class="token comment">## to renegotiate the parameters of the SSL connection on the fly.</span>
+<span class="token comment">## RFC 5746 defines a more secure way of doing this. By enabling secure renegotiation,</span>
+<span class="token comment">## you drop support for the insecure renegotiation, prone to MitM attacks.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ssl.external.secure_renegotiate = off</span>
+
+<span class="token comment">## A performance optimization setting, it allows clients to reuse</span>
+<span class="token comment">## pre-existing sessions, instead of initializing new ones.</span>
+<span class="token comment">## Read more about it here.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/ssl.html</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ssl.external.reuse_sessions = on</span>
+
+<span class="token comment">## An important security setting, it forces the cipher to be set based</span>
+<span class="token comment">## on the server-specified order instead of the client-specified order,</span>
+<span class="token comment">## hence enforcing the (usually more properly configured) security</span>
+<span class="token comment">## ordering of the server administrator.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ssl.external.honor_cipher_order = on</span>
+
+<span class="token comment">## Use the CN, DN or CRT field from the client certificate as a username.</span>
+<span class="token comment">## Notice that 'verify' should be set as 'verify_peer'.</span>
+<span class="token comment">## 'pem' encodes CRT in base64, and md5 is the md5 hash of CRT.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn | dn | crt | pem | md5</span>
+<span class="token comment">## listener.ssl.external.peer_cert_as_username = cn</span>
+
+<span class="token comment">## Use the CN, DN or CRT field from the client certificate as a username.</span>
+<span class="token comment">## Notice that 'verify' should be set as 'verify_peer'.</span>
+<span class="token comment">## 'pem' encodes CRT in base64, and md5 is the md5 hash of CRT.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn | dn | crt | pem | md5</span>
+<span class="token comment">## listener.ssl.external.peer_cert_as_clientid = cn</span>
+
+<span class="token comment">## TCP backlog for the SSL connection.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See listener.tcp.$name.backlog</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number &gt;= 0</span>
+<span class="token comment">## listener.ssl.external.backlog = 1024</span>
+
+<span class="token comment">## The TCP send timeout for the SSL connection.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See listener.tcp.$name.send_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## listener.ssl.external.send_timeout = 15s</span>
+
+<span class="token comment">## Close the SSL connection if send timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.send_timeout_close</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ssl.external.send_timeout_close = on</span>
+
+<span class="token comment">## The TCP receive buffer(os kernel) for the SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.recbuf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.ssl.external.recbuf = 4KB</span>
+
+<span class="token comment">## The TCP send buffer(os kernel) for internal MQTT connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.sndbuf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.ssl.external.sndbuf = 4KB</span>
+
+<span class="token comment">## The size of the user-level software buffer used by the driver.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.buffer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.ssl.external.buffer = 4KB</span>
+
+<span class="token comment">## Sets the 'buffer = max(sndbuf, recbuf)' if this option is enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.tune_buffer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ssl.external.tune_buffer = off</span>
+
+<span class="token comment">## The TCP_NODELAY flag for SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.nodelay</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+<span class="token comment">## listener.ssl.external.nodelay = true</span>
+
+<span class="token comment">## The SO_REUSEADDR flag for MQTT/SSL Listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+listener.ssl.external.reuseaddr = true
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## External WebSocket listener for MQTT protocol</span>
+
+<span class="token comment">## listener.ws.$name is the IP address and port that the MQTT/WebSocket</span>
+<span class="token comment">## listener will bind.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: IP:Port | Port</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples: 3020, 127.0.0.1:3020, ::1:3020</span>
+listener.ws.external = 3020
+
+<span class="token comment">## The path of WebSocket MQTT endpoint</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: URL Path</span>
+listener.ws.external.mqtt_path = /mqtt
+
+<span class="token comment">## The acceptor pool for external MQTT/WebSocket listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ws.external.acceptors = 4
+
+<span class="token comment">## Maximum number of concurrent MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ws.external.max_connections = 102400
+
+<span class="token comment">## Maximum MQTT/WebSocket connections per second.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ws.external.max_conn_rate = 1000
+
+<span class="token comment">## Simulate the {active, N} option for the MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.ws.external.active_n = 100
+
+<span class="token comment">## Zone of the external MQTT/WebSocket listener belonged to.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+listener.ws.external.zone = external
+
+<span class="token comment">## The access control for the MQTT/WebSocket listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.access</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ACL Rule</span>
+listener.ws.external.access.1 = allow all
+
+<span class="token comment">## If set to true, the server fails if the client does not have a Sec-WebSocket-Protocol to send.</span>
+<span class="token comment">## Set to false for WeChat MiniApp.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+<span class="token comment">## listener.ws.external.fail_if_no_subprotocol = true</span>
+
+<span class="token comment">## Supported subprotocols</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: mqtt, mqtt-v3, mqtt-v3.1.1, mqtt-v5</span>
+<span class="token comment">## listener.ws.external.supported_subprotocols = mqtt, mqtt-v3, mqtt-v3.1.1, mqtt-v5</span>
+
+<span class="token comment">## Specify which HTTP header for real source IP if the EMQ X cluster is</span>
+<span class="token comment">## deployed behind NGINX or HAProxy.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: X-Forwarded-For</span>
+<span class="token comment">## listener.ws.external.proxy_address_header = X-Forwarded-For</span>
+
+<span class="token comment">## Specify which HTTP header for real source port if the EMQ X cluster is</span>
+<span class="token comment">## deployed behind NGINX or HAProxy.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: X-Forwarded-Port</span>
+<span class="token comment">## listener.ws.external.proxy_port_header = X-Forwarded-Port</span>
+
+<span class="token comment">## Enable the Proxy Protocol V1/2 if the EMQ cluster is deployed behind</span>
+<span class="token comment">## HAProxy or Nginx.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.proxy_protocol</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ws.external.proxy_protocol = on</span>
+
+<span class="token comment">## Sets the timeout for proxy protocol.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.proxy_protocol_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## listener.ws.external.proxy_protocol_timeout = 3s</span>
+
+<span class="token comment">## Enable the option for X.509 certificate based authentication.</span>
+<span class="token comment">## EMQX will use the common name of certificate as MQTT username.</span>
+<span class="token comment">## Only support Proxy Protocol V2, the CN is available in Proxy Protocol V2 additional info</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn</span>
+<span class="token comment">## listener.ws.external.peer_cert_as_username = cn</span>
+
+<span class="token comment">## Enable the option for X.509 certificate based authentication.</span>
+<span class="token comment">## EMQX will use the common name of certificate as MQTT clientid.</span>
+<span class="token comment">## Only support Proxy Protocol V2, the CN is available in Proxy Protocol V2 additional info</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn</span>
+<span class="token comment">## listener.ws.external.peer_cert_as_clientid = cn</span>
+
+<span class="token comment">## The TCP backlog of external MQTT/WebSocket Listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.backlog</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number &gt;= 0</span>
+listener.ws.external.backlog = 1024
+
+<span class="token comment">## The TCP send timeout for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.send_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+listener.ws.external.send_timeout = 15s
+
+<span class="token comment">## Close the MQTT/WebSocket connection if send timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.send_timeout_close</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+listener.ws.external.send_timeout_close = on
+
+<span class="token comment">## The TCP receive buffer(os kernel) for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.recbuf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.ws.external.recbuf = 2KB</span>
+
+<span class="token comment">## The TCP send buffer(os kernel) for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.sndbuf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.ws.external.sndbuf = 2KB</span>
+
+<span class="token comment">## The size of the user-level software buffer used by the driver.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.buffer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.ws.external.buffer = 2KB</span>
+
+<span class="token comment">## Sets the 'buffer = max(sndbuf, recbuf)' if this option is enabled.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.tune_buffer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.ws.external.tune_buffer = off</span>
+
+<span class="token comment">## The TCP_NODELAY flag for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.nodelay</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+listener.ws.external.nodelay = true
+
+<span class="token comment">## The compress flag for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## If this Value is set true,the websocket message would be compressed</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+<span class="token comment">## listener.ws.external.compress = true</span>
+
+<span class="token comment">## The level of deflate options for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.deflate_opts.level</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: none | default | best_compression | best_speed</span>
+<span class="token comment">## listener.ws.external.deflate_opts.level = default</span>
+
+<span class="token comment">## The mem_level of deflate options for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.deflate_opts.mem_level</span>
+<span class="token comment">##</span>
+<span class="token comment">## Valid range is 1-9</span>
+<span class="token comment">## listener.ws.external.deflate_opts.mem_level = 8</span>
+
+<span class="token comment">## The strategy of deflate options for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.deflate_opts.strategy</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: default | filtered | huffman_only | rle</span>
+<span class="token comment">## listener.ws.external.deflate_opts.strategy = default</span>
+
+<span class="token comment">## The deflate option for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.deflate_opts.server_context_takeover</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: takeover | no_takeover</span>
+<span class="token comment">## listener.ws.external.deflate_opts.server_context_takeover = takeover</span>
+
+<span class="token comment">## The deflate option for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.deflate_opts.client_context_takeover</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: takeover | no_takeover</span>
+<span class="token comment">## listener.ws.external.deflate_opts.client_context_takeover = takeover</span>
+
+<span class="token comment">## The deflate options for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.deflate_opts.server_max_window_bits</span>
+<span class="token comment">##</span>
+<span class="token comment">## Valid range is 8-15</span>
+<span class="token comment">## listener.ws.external.deflate_opts.server_max_window_bits = 15</span>
+
+<span class="token comment">## The deflate options for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.deflate_opts.client_max_window_bits</span>
+<span class="token comment">##</span>
+<span class="token comment">## Valid range is 8-15</span>
+<span class="token comment">## listener.ws.external.deflate_opts.client_max_window_bits = 15</span>
+
+<span class="token comment">## The idle timeout for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ws.$name.idle_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## listener.ws.external.idle_timeout = 60s</span>
+
+<span class="token comment">## The max frame size for external MQTT/WebSocket connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## listener.ws.external.max_frame_size = 0</span>
+
+<span class="token comment">## Whether a WebSocket message is allowed to contain multiple MQTT packets</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: single | multiple</span>
+listener.ws.external.mqtt_piggyback = multiple
+
+<span class="token comment">## By default, EMQX web socket connection does not restrict connections to specific origins.</span>
+<span class="token comment">## It also, by default, does not enforce the presence of origin in request headers for WebSocket connections.</span>
+<span class="token comment">## Because of this, a malicious user could potentially hijack an existing web-socket connection to EMQX.</span>
+
+<span class="token comment">## To prevent this, users can set allowed origin headers in their ws connection to EMQX.</span>
+<span class="token comment">## WS configs are set in listener.ws.external.*</span>
+<span class="token comment">## WSS configs are set in listener.wss.external.*</span>
+
+<span class="token comment">## Example for WS connection</span>
+<span class="token comment">## To enables origin check in header for websocket connnection,</span>
+<span class="token comment">## set `listener.ws.external.check_origin_enable = true`. By default it is false,</span>
+<span class="token comment">## When it is set to true and no origin is present in the header of a ws connection request, the request fails.</span>
+
+<span class="token comment">## To allow origins to be absent in header in the websocket connection when check_origin_enable is true,</span>
+<span class="token comment">## set `listener.ws.external.allow_origin_absence = true`</span>
+
+<span class="token comment">## Enabling origin check implies there are specific valid origins allowed for ws connection.</span>
+<span class="token comment">## To set the list of allowed origins in header for websocket connection</span>
+<span class="token comment">## listener.ws.external.check_origins = http://localhost:13020(localhost dashboard url), http://yourapp.com`</span>
+<span class="token comment">## check_origins config allows a comma separated list of origins so you can specify as many origins are you want.</span>
+<span class="token comment">## With these configs, you can allow only connections from only authorized origins to your broker</span>
+
+<span class="token comment">## Enable origin check in header for websocket connection</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false (default false)</span>
+listener.ws.external.check_origin_enable = false
+
+<span class="token comment">## Allow origin to be absent in header in websocket connection when check_origin_enable is true</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false (default true)</span>
+listener.ws.external.allow_origin_absence = true
+
+<span class="token comment">## Comma separated list of allowed origin in header for websocket connection</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: http://url eg. local http dashboard url - http://localhost:13020, http://127.0.0.1:13020</span>
+listener.ws.external.check_origins = http<span class="token punctuation">:</span>//localhost<span class="token punctuation">:</span><span class="token number">13020</span><span class="token punctuation">,</span> http<span class="token punctuation">:</span>//127.0.0.1<span class="token punctuation">:</span><span class="token number">13020</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## External WebSocket/SSL listener for MQTT Protocol</span>
+
+<span class="token comment">## listener.wss.$name is the IP address and port that the MQTT/WebSocket/SSL</span>
+<span class="token comment">## listener will bind.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: IP:Port | Port</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples: 3030, 127.0.0.1:3030, ::1:3030</span>
+listener.wss.external = 3030
+
+<span class="token comment">## The path of WebSocket MQTT endpoint</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: URL Path</span>
+listener.wss.external.mqtt_path = /mqtt
+
+<span class="token comment">## The acceptor pool for external MQTT/WebSocket/SSL listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.wss.external.acceptors = 4
+
+<span class="token comment">## Maximum number of concurrent MQTT/Webwocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.wss.external.max_connections = 102400
+
+<span class="token comment">## Maximum MQTT/WebSocket/SSL connections per second.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.max_conn_rate</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.wss.external.max_conn_rate = 1000
+
+<span class="token comment">## Simulate the {active, N} option for the MQTT/WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+listener.wss.external.active_n = 100
+
+<span class="token comment">## Zone of the external MQTT/WebSocket/SSL listener belonged to.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+listener.wss.external.zone = external
+
+<span class="token comment">## The access control rules for the MQTT/WebSocket/SSL listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.access.&lt;no&gt;</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: ACL Rule</span>
+listener.wss.external.access.1 = allow all
+
+<span class="token comment">## If set to true, the server fails if the client does not have a Sec-WebSocket-Protocol to send.</span>
+<span class="token comment">## Set to false for WeChat MiniApp.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+<span class="token comment">## listener.wss.external.fail_if_no_subprotocol = true</span>
+
+<span class="token comment">## Supported subprotocols</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: mqtt, mqtt-v3, mqtt-v3.1.1, mqtt-v5</span>
+<span class="token comment">## listener.wss.external.supported_subprotocols = mqtt, mqtt-v3, mqtt-v3.1.1, mqtt-v5</span>
+
+<span class="token comment">## Specify which HTTP header for real source IP if the EMQ X cluster is</span>
+<span class="token comment">## deployed behind NGINX or HAProxy.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: X-Forwarded-For</span>
+<span class="token comment">## listener.wss.external.proxy_address_header = X-Forwarded-For</span>
+
+<span class="token comment">## Specify which HTTP header for real source port if the EMQ X cluster is</span>
+<span class="token comment">## deployed behind NGINX or HAProxy.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: X-Forwarded-Port</span>
+<span class="token comment">## listener.wss.external.proxy_port_header = X-Forwarded-Port</span>
+
+<span class="token comment">## Enable the Proxy Protocol V1/2 support.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.proxy_protocol</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.wss.external.proxy_protocol = on</span>
+
+<span class="token comment">## Sets the timeout for proxy protocol.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.proxy_protocol_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## listener.wss.external.proxy_protocol_timeout = 3s</span>
+
+<span class="token comment">## TLS versions only to protect from POODLE attack.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ssl.$name.tls_versions</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String, seperated by ','</span>
+<span class="token comment">## NOTE: Do not use tlsv1.3 if emqx is running on OTP-22 or earlier</span>
+<span class="token comment">## listener.wss.external.tls_versions = tlsv1.3,tlsv1.2,tlsv1.1,tlsv1</span>
+
+<span class="token comment">## Path to the file containing the user's private PEM-encoded key.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ssl.$name.keyfile</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+listener.wss.external.keyfile = etc/certs/key.pem
+
+<span class="token comment">## Path to a file containing the user certificate.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ssl.$name.certfile</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+listener.wss.external.certfile = etc/certs/cert.pem
+
+<span class="token comment">## Path to the file containing PEM-encoded CA certificates.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ssl.$name.cacert</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## listener.wss.external.cacertfile = etc/certs/cacert.pem</span>
+
+<span class="token comment">## Maximum number of non-self-issued intermediate certificates that</span>
+<span class="token comment">## can follow the peer certificate in a valid certification path.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ssl.external.depth</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## listener.wss.external.depth = 10</span>
+
+<span class="token comment">## String containing the user's password. Only used if the private keyfile</span>
+<span class="token comment">## is password-protected.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.ssl.$name.key_password</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## listener.wss.external.key_password = yourpass</span>
+
+<span class="token comment">## See: listener.ssl.$name.dhfile</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## listener.ssl.external.dhfile = etc/certs/dh-params.pem</span>
+
+<span class="token comment">## See: listener.ssl.$name.verify</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: verify_peer | verify_none</span>
+<span class="token comment">## listener.wss.external.verify = verify_peer</span>
+
+<span class="token comment">## See: listener.ssl.$name.fail_if_no_peer_cert</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+<span class="token comment">## listener.wss.external.fail_if_no_peer_cert = true</span>
+
+<span class="token comment">## See: listener.ssl.$name.ciphers</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Ciphers</span>
+listener.wss.external.ciphers = TLS_AES_256_GCM_SHA384<span class="token punctuation">,</span>TLS_AES_128_GCM_SHA256<span class="token punctuation">,</span>TLS_CHACHA20_POLY1305_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_8_SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>DES<span class="token punctuation">-</span>CBC3<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA
+
+<span class="token comment">## Ciphers for TLS PSK.</span>
+<span class="token comment">## Note that 'listener.wss.external.ciphers' and 'listener.wss.external.psk_ciphers' cannot</span>
+<span class="token comment">## be configured at the same time.</span>
+<span class="token comment">## See 'https://tools.ietf.org/html/rfc4279#section-2'.</span>
+<span class="token comment">## listener.wss.external.psk_ciphers = PSK-AES128-CBC-SHA,PSK-AES256-CBC-SHA,PSK-3DES-EDE-CBC-SHA,PSK-RC4-SHA</span>
+
+<span class="token comment">## See: listener.ssl.$name.secure_renegotiate</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.wss.external.secure_renegotiate = off</span>
+
+<span class="token comment">## See: listener.ssl.$name.reuse_sessions</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.wss.external.reuse_sessions = on</span>
+
+<span class="token comment">## See: listener.ssl.$name.honor_cipher_order</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## listener.wss.external.honor_cipher_order = on</span>
+
+<span class="token comment">## See: listener.ssl.$name.peer_cert_as_username</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn | dn | crt | pem | md5</span>
+<span class="token comment">## listener.wss.external.peer_cert_as_username = cn</span>
+
+<span class="token comment">## See: listener.ssl.$name.peer_cert_as_clientid</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: cn | dn | crt | pem | md5</span>
+<span class="token comment">## listener.wss.external.peer_cert_as_clientid = cn</span>
+
+<span class="token comment">## TCP backlog for the WebSocket/SSL connection.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.backlog</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number &gt;= 0</span>
+listener.wss.external.backlog = 1024
+
+<span class="token comment">## The TCP send timeout for the WebSocket/SSL connection.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.send_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+listener.wss.external.send_timeout = 15s
+
+<span class="token comment">## Close the WebSocket/SSL connection if send timeout.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.send_timeout_close</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+listener.wss.external.send_timeout_close = on
+
+<span class="token comment">## The TCP receive buffer(os kernel) for the WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.recbuf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.wss.external.recbuf = 4KB</span>
+
+<span class="token comment">## The TCP send buffer(os kernel) for the WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.sndbuf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.wss.external.sndbuf = 4KB</span>
+
+<span class="token comment">## The size of the user-level software buffer used by the driver.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.buffer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Bytes</span>
+<span class="token comment">## listener.wss.external.buffer = 4KB</span>
+
+<span class="token comment">## The TCP_NODELAY flag for WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.tcp.$name.nodelay</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+<span class="token comment">## listener.wss.external.nodelay = true</span>
+
+<span class="token comment">## The compress flag for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## If this Value is set true,the websocket message would be compressed</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+<span class="token comment">## listener.wss.external.compress = true</span>
+
+<span class="token comment">## The level of deflate options for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.deflate_opts.level</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: none | default | best_compression | best_speed</span>
+<span class="token comment">## listener.wss.external.deflate_opts.level = default</span>
+
+<span class="token comment">## The mem_level of deflate options for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.deflate_opts.mem_level</span>
+<span class="token comment">##</span>
+<span class="token comment">## Valid range is 1-9</span>
+<span class="token comment">## listener.wss.external.deflate_opts.mem_level = 8</span>
+
+<span class="token comment">## The strategy of deflate options for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.deflate_opts.strategy</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: default | filtered | huffman_only | rle</span>
+<span class="token comment">## listener.wss.external.deflate_opts.strategy = default</span>
+
+<span class="token comment">## The deflate option for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.deflate_opts.server_context_takeover</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: takeover | no_takeover</span>
+<span class="token comment">## listener.wss.external.deflate_opts.server_context_takeover = takeover</span>
+
+<span class="token comment">## The deflate option for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.deflate_opts.client_context_takeover</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: takeover | no_takeover</span>
+<span class="token comment">## listener.wss.external.deflate_opts.client_context_takeover = takeover</span>
+
+<span class="token comment">## The deflate options for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.deflate_opts.server_max_window_bits</span>
+<span class="token comment">##</span>
+<span class="token comment">## Valid range is 8-15</span>
+<span class="token comment">## listener.wss.external.deflate_opts.server_max_window_bits = 15</span>
+
+<span class="token comment">## The deflate options for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.deflate_opts.client_max_window_bits</span>
+<span class="token comment">##</span>
+<span class="token comment">## Valid range is 8-15</span>
+<span class="token comment">## listener.wss.external.deflate_opts.client_max_window_bits = 15</span>
+
+<span class="token comment">## The idle timeout for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: listener.wss.$name.idle_timeout</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## listener.wss.external.idle_timeout = 60s</span>
+
+<span class="token comment">## The max frame size for external WebSocket/SSL connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## listener.wss.external.max_frame_size = 0</span>
+
+<span class="token comment">## Whether a WebSocket message is allowed to contain multiple MQTT packets</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: single | multiple</span>
+listener.wss.external.mqtt_piggyback = multiple
+<span class="token comment">## Enable origin check in header for secure websocket connection</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false (default false)</span>
+listener.wss.external.check_origin_enable = false
+<span class="token comment">## Allow origin to be absent in header in secure websocket connection  when check_origin_enable is true</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false (default true)</span>
+listener.wss.external.allow_origin_absence = true
+<span class="token comment">## Comma separated list of allowed origin in header for secure websocket connection</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: http://url eg. https://localhost:3030, https://127.0.0.1:3030</span>
+listener.wss.external.check_origins = https<span class="token punctuation">:</span>//localhost<span class="token punctuation">:</span><span class="token number">3030</span><span class="token punctuation">,</span> https<span class="token punctuation">:</span>//127.0.0.1<span class="token punctuation">:</span><span class="token number">3030</span>
+
+<span class="token comment">## CONFIG_SECTION_END=listeners ================================================</span>
+
+<span class="token comment">## CONFIG_SECTION_BGN=modules ==================================================</span>
+
+<span class="token comment">## The file to store loaded module names.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+modules.loaded_file = data/loaded_modules
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Presence Module</span>
+
+<span class="token comment">## Sets the QoS for presence MQTT message.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0 | 1 | 2</span>
+module.presence.qos = 1
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Subscription Module</span>
+
+<span class="token comment">## Subscribe the Topics automatically when client connected.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## module.subscription.1.topic = connected/%c/%u</span>
+
+<span class="token comment">## Qos of the proxy subscription.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0 | 1 | 2</span>
+<span class="token comment">## Default: 0</span>
+<span class="token comment">## module.subscription.1.qos = 0</span>
+
+<span class="token comment">## No Local of the proxy subscription options.</span>
+<span class="token comment">## This configuration only takes effect in the MQTT V5 protocol.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0 | 1</span>
+<span class="token comment">## Default: 0</span>
+<span class="token comment">## module.subscription.1.nl = 0</span>
+
+<span class="token comment">## Retain As Published of the proxy subscription options.</span>
+<span class="token comment">## This configuration only takes effect in the MQTT V5 protocol.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0 | 1</span>
+<span class="token comment">## Default: 0</span>
+<span class="token comment">## module.subscription.1.rap = 0</span>
+
+<span class="token comment">## Retain Handling of the proxy subscription options.</span>
+<span class="token comment">## This configuration only takes effect in the MQTT V5 protocol.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: 0 | 1 | 2</span>
+<span class="token comment">## Default: 0</span>
+<span class="token comment">## module.subscription.1.rh = 0</span>
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Rewrite Module</span>
+
+<span class="token comment">## {rewrite, Topic, Re, Dest}</span>
+<span class="token comment">## module.rewrite.pub.rule.1 = x/# ^x/y/(.+)$ z/y/$1</span>
+<span class="token comment">## module.rewrite.sub.rule.1 = y/+/z/# ^y/(.+)/z/(.+)$ y/z/$2</span>
+
+<span class="token comment">## CONFIG_SECTION_END=modules ==================================================</span>
+
+<span class="token comment">##-------------------------------------------------------------------</span>
+<span class="token comment">## Plugins</span>
+<span class="token comment">##-------------------------------------------------------------------</span>
+
+<span class="token comment">## The etc dir for plugins' config.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Folder</span>
+plugins.etc_dir = etc/plugins/
+
+<span class="token comment">## The file to store loaded plugin names.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+plugins.loaded_file = data/loaded_plugins
+
+<span class="token comment">## The directory of extension plugins.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+plugins.expand_plugins_dir = etc/plugins/
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## Broker</span>
+<span class="token comment">##--------------------------------------------------------------------</span>
+
+<span class="token comment">## System interval of publishing $SYS messages.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## Default: 1m, 1 minute</span>
+broker.sys_interval = 1m
+
+<span class="token comment">## System heartbeat interval of publishing following heart beat message:</span>
+<span class="token comment">##  - &quot;$SYS/brokers/&lt;node&gt;/uptime&quot;</span>
+<span class="token comment">##  - &quot;$SYS/brokers/&lt;node&gt;/datetime&quot;</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## Default: 30s</span>
+broker.sys_heartbeat = 30s
+
+<span class="token comment">## Session locking strategy in a cluster.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">## - local</span>
+<span class="token comment">## - leader</span>
+<span class="token comment">## - quorum</span>
+<span class="token comment">## - all</span>
+broker.session_locking_strategy = quorum
+
+<span class="token comment">## Dispatch strategy for shared subscription</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">## - random</span>
+<span class="token comment">## - round_robin</span>
+<span class="token comment">## - sticky</span>
+<span class="token comment">## - hash # same as hash_clientid</span>
+<span class="token comment">## - hash_clientid</span>
+<span class="token comment">## - hash_topic</span>
+broker.shared_subscription_strategy = random
+
+<span class="token comment">## Enable/disable shared dispatch acknowledgement for QoS1 and QoS2 messages</span>
+<span class="token comment">## This should allow messages to be dispatched to a different subscriber in</span>
+<span class="token comment">## the group in case the picked (based on shared_subscription_strategy) one # is offline</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">## - true</span>
+<span class="token comment">## - false</span>
+broker.shared_dispatch_ack_enabled = false
+
+<span class="token comment">## Enable batch clean for deleted routes.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Flag</span>
+broker.route_batch_clean = off
+
+<span class="token comment">## Performance toggle for subscribe/unsubscribe wildcard topic.</span>
+<span class="token comment">## Change this toggle only when there are many wildcard topics.</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">##  - key:   mnesia translational updates with per-key locks. recommended for single node setup.</span>
+<span class="token comment">##  - tab:   mnesia translational updates with table lock. recommended for multi-nodes setup.</span>
+<span class="token comment">##  - global: global lock protected updates. recommended for larger cluster.</span>
+<span class="token comment">## NOTE: when changing from/to 'global' lock, it requires all nodes in the cluster</span>
+<span class="token comment">## to be stopped before the change.</span>
+<span class="token comment"># broker.perf.route_lock_type = key</span>
+
+<span class="token comment">## Enable trie path compaction.</span>
+<span class="token comment">## Enabling it significantly improves wildcard topic subscribe rate,</span>
+<span class="token comment">## if wildcard topics have unique prefixes like: 'sensor//+/',</span>
+<span class="token comment">## where ID is unique per subscriber.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Topic match performance (when publishing) may degrade if messages</span>
+<span class="token comment">## are mostly published to topics with large number of levels.</span>
+<span class="token comment">##</span>
+<span class="token comment">## NOTE: This is a cluster-wide configuration.</span>
+<span class="token comment">## It rquires all nodes to be stopped before changing it.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Enum</span>
+<span class="token comment">##  - true: enable trie path compaction</span>
+<span class="token comment">##  - false: disable trie path compaction</span>
+<span class="token comment"># broker.perf.trie_compaction = true</span>
+
+<span class="token comment">## CONFIG_SECTION_BGN=sys_mon ==================================================</span>
+
+<span class="token comment">## Enable Long GC monitoring. Disable if the value is 0.</span>
+<span class="token comment">## Notice: don't enable the monitor in production for:</span>
+<span class="token comment">## https://github.com/erlang/otp/blob/feb45017da36be78d4c5784d758ede619fa7bfd3/erts/emulator/beam/erl_gc.c#L421</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">##  - h: hour</span>
+<span class="token comment">##  - m: minute</span>
+<span class="token comment">##  - s: second</span>
+<span class="token comment">##  - ms: milliseconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples:</span>
+<span class="token comment">##  - 2h:  2 hours</span>
+<span class="token comment">##  - 30m: 30 minutes</span>
+<span class="token comment">##  - 0.1s: 0.1 seconds</span>
+<span class="token comment">##  - 100ms : 100 milliseconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 0ms</span>
+sysmon.long_gc = 0
+
+<span class="token comment">## Enable Long Schedule(ms) monitoring.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erlang.html#system_monitor-2</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">##  - h: hour</span>
+<span class="token comment">##  - m: minute</span>
+<span class="token comment">##  - s: second</span>
+<span class="token comment">##  - ms: milliseconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples:</span>
+<span class="token comment">##  - 2h:  2 hours</span>
+<span class="token comment">##  - 30m: 30 minutes</span>
+<span class="token comment">##  - 0.1s: 0.1 seconds</span>
+<span class="token comment">##  - 100ms: 100 milliseconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 0ms</span>
+sysmon.long_schedule = 240ms
+
+<span class="token comment">## Enable Large Heap monitoring.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erlang.html#system_monitor-2</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: bytes</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 8M words. 32MB on 32-bit VM, 64MB on 64-bit VM.</span>
+sysmon.large_heap = 8MB
+
+<span class="token comment">## Enable Busy Port monitoring.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erlang.html#system_monitor-2</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+sysmon.busy_port = false
+
+<span class="token comment">## Enable Busy Dist Port monitoring.</span>
+<span class="token comment">##</span>
+<span class="token comment">## See: http://erlang.org/doc/man/erlang.html#system_monitor-2</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: true | false</span>
+sysmon.busy_dist_port = true
+
+<span class="token comment">## The time interval for the periodic cpu check</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## -h: hour, e.g. '2h' for 2 hours</span>
+<span class="token comment">## -m: minute, e.g. '5m' for 5 minutes</span>
+<span class="token comment">## -s: second, e.g. '30s' for 30 seconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 60s</span>
+os_mon.cpu_check_interval = 60s
+
+<span class="token comment">## The threshold, as percentage of system cpu, for how much system cpu can be used before the corresponding alarm is set.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 80%</span>
+os_mon.cpu_high_watermark = 80%
+
+<span class="token comment">## The threshold, as percentage of system cpu, for how much system cpu can be used before the corresponding alarm is clear.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 60%</span>
+os_mon.cpu_low_watermark = 60%
+
+<span class="token comment">## The time interval for the periodic memory check</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">## -h: hour, e.g. '2h' for 2 hours</span>
+<span class="token comment">## -m: minute, e.g. '5m' for 5 minutes</span>
+<span class="token comment">## -s: second, e.g. '30s' for 30 seconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 60s</span>
+os_mon.mem_check_interval = 60s
+
+<span class="token comment">## The threshold, as percentage of system memory, for how much system memory can be allocated before the corresponding alarm is set.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 70%</span>
+os_mon.sysmem_high_watermark = 70%
+
+<span class="token comment">## The threshold, as percentage of system memory, for how much system memory can be allocated by one Erlang process before the corresponding alarm is set.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 5%</span>
+os_mon.procmem_high_watermark = 5%
+
+<span class="token comment">## The time interval for the periodic process limit check</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 30s</span>
+vm_mon.check_interval = 30s
+
+<span class="token comment">## The threshold, as percentage of processes, for how many processes can simultaneously exist at the local node before the corresponding alarm is set.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 80%</span>
+vm_mon.process_high_watermark = 80%
+
+<span class="token comment">## The threshold, as percentage of processes, for how many processes can simultaneously exist at the local node before the corresponding alarm is clear.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 60%</span>
+vm_mon.process_low_watermark = 60%
+
+<span class="token comment">## Specifies the actions to take when an alarm is activated</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">##  - log</span>
+<span class="token comment">##  - publish</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: log,publish</span>
+alarm.actions = log<span class="token punctuation">,</span>publish
+
+<span class="token comment">## The maximum number of deactivated alarms</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Integer</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 1000</span>
+alarm.size_limit = 1000
+
+<span class="token comment">## Validity Period of deactivated alarms</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Duration</span>
+<span class="token comment">##  - h: hour</span>
+<span class="token comment">##  - m: minute</span>
+<span class="token comment">##  - s: second</span>
+<span class="token comment">##  - ms: milliseconds</span>
+<span class="token comment">##</span>
+<span class="token comment">## Default: 24h</span>
+alarm.validity_period = 24h
+
+<span class="token comment">## CONFIG_SECTION_END=sys_mon ==================================================</span>
+</code></pre></div><h5 id="_4-2-2-plugins-emqx-dashboard-conf">4.2.2 <code>plugins/emqx_dashboard.conf</code> <a href="#_4-2-2-plugins-emqx-dashboard-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## EMQ X Dashboard</span>
+<span class="token comment">##--------------------------------------------------------------------</span>
+
+<span class="token comment">## Default user's login name.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+dashboard.default_user.login = admin
+
+<span class="token comment">## Default user's password.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+dashboard.default_user.password = public
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## HTTP Listener</span>
+
+<span class="token comment">## The port that the Dashboard HTTP listener will bind.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Port</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples: 18083</span>
+dashboard.listener.http = 3050
+
+<span class="token comment">## The acceptor pool for external Dashboard HTTP listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+dashboard.listener.http.acceptors = 4
+
+<span class="token comment">## Maximum number of concurrent Dashboard HTTP connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+dashboard.listener.http.max_clients = 512
+
+<span class="token comment">## Set up the socket for IPv6.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+dashboard.listener.http.inet6 = false
+
+<span class="token comment">## Listen on IPv4 and IPv6 (false) or only on IPv6 (true). Use with inet6.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+dashboard.listener.http.ipv6_v6only = false
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## HTTPS Listener</span>
+
+<span class="token comment">## The port that the Dashboard HTTPS listener will bind.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Port</span>
+<span class="token comment">##</span>
+<span class="token comment">## Examples: 18084</span>
+<span class="token comment">## dashboard.listener.https = 18084</span>
+
+<span class="token comment">## The acceptor pool for external Dashboard HTTPS listener.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## dashboard.listener.https.acceptors = 2</span>
+
+<span class="token comment">## Maximum number of concurrent Dashboard HTTPS connections.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Number</span>
+<span class="token comment">## dashboard.listener.https.max_clients = 512</span>
+
+<span class="token comment">## Set up the socket for IPv6.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+<span class="token comment">## dashboard.listener.https.inet6 = false</span>
+
+<span class="token comment">## Listen on IPv4 and IPv6 (false) or only on IPv6 (true). Use with inet6.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+<span class="token comment">## dashboard.listener.https.ipv6_v6only = false</span>
+
+<span class="token comment">## Path to the file containing the user's private PEM-encoded key.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## dashboard.listener.https.keyfile = etc/certs/key.pem</span>
+
+<span class="token comment">## Path to a file containing the user certificate.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## dashboard.listener.https.certfile = etc/certs/cert.pem</span>
+
+<span class="token comment">## Path to the file containing PEM-encoded CA certificates.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## dashboard.listener.https.cacertfile = etc/certs/cacert.pem</span>
+
+<span class="token comment">## See: 'listener.ssl.&lt;name&gt;.dhfile' in emq.conf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: File</span>
+<span class="token comment">## dashboard.listener.https.dhfile = etc/certs/dh-params.pem</span>
+
+<span class="token comment">## See: 'listener.ssl.&lt;name&gt;.verify' in emq.conf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: verify_peer | verify_none</span>
+<span class="token comment">## dashboard.listener.https.verify = verify_peer</span>
+
+<span class="token comment">## See: 'listener.ssl.&lt;name&gt;.fail_if_no_peer_cert' in emq.conf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: false | true</span>
+<span class="token comment">## dashboard.listener.https.fail_if_no_peer_cert = true</span>
+
+<span class="token comment">## TLS versions only to protect from POODLE attack.</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String, seperated by ','</span>
+<span class="token comment">## NOTE: Do not use tlsv1.3 if emqx is running on OTP-22 or earlier</span>
+<span class="token comment">## dashboard.listener.https.tls_versions = tlsv1.3,tlsv1.2,tlsv1.1,tlsv1</span>
+
+<span class="token comment">## See: 'listener.ssl.&lt;name&gt;.ciphers' in emq.conf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: Ciphers</span>
+<span class="token comment">## dashboard.listener.https.ciphers = TLS_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_CCM_SHA256,TLS_AES_128_CCM_8_SHA256,ECDHE-ECDSA-AES256-GCM-SHA384,ECDHE-RSA-AES256-GCM-SHA384,ECDHE-ECDSA-AES256-SHA384,ECDHE-RSA-AES256-SHA384,ECDHE-ECDSA-DES-CBC3-SHA,ECDH-ECDSA-AES256-GCM-SHA384,ECDH-RSA-AES256-GCM-SHA384,ECDH-ECDSA-AES256-SHA384,ECDH-RSA-AES256-SHA384,DHE-DSS-AES256-GCM-SHA384,DHE-DSS-AES256-SHA256,AES256-GCM-SHA384,AES256-SHA256,ECDHE-ECDSA-AES128-GCM-SHA256,ECDHE-RSA-AES128-GCM-SHA256,ECDHE-ECDSA-AES128-SHA256,ECDHE-RSA-AES128-SHA256,ECDH-ECDSA-AES128-GCM-SHA256,ECDH-RSA-AES128-GCM-SHA256,ECDH-ECDSA-AES128-SHA256,ECDH-RSA-AES128-SHA256,DHE-DSS-AES128-GCM-SHA256,DHE-DSS-AES128-SHA256,AES128-GCM-SHA256,AES128-SHA256,ECDHE-ECDSA-AES256-SHA,ECDHE-RSA-AES256-SHA,DHE-DSS-AES256-SHA,ECDH-ECDSA-AES256-SHA,ECDH-RSA-AES256-SHA,AES256-SHA,ECDHE-ECDSA-AES128-SHA,ECDHE-RSA-AES128-SHA,DHE-DSS-AES128-SHA,ECDH-ECDSA-AES128-SHA,ECDH-RSA-AES128-SHA,AES128-SHA</span>
+
+<span class="token comment">## See: 'listener.ssl.&lt;name&gt;.secure_renegotiate' in emq.conf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## dashboard.listener.https.secure_renegotiate = off</span>
+
+<span class="token comment">## See: 'listener.ssl.&lt;name&gt;.reuse_sessions' in emq.conf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## dashboard.listener.https.reuse_sessions = on</span>
+
+<span class="token comment">## See: 'listener.ssl.&lt;name&gt;.honor_cipher_order' in emq.conf</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: on | off</span>
+<span class="token comment">## dashboard.listener.https.honor_cipher_order = on</span>
+</code></pre></div><h5 id="_4-2-3-plugins-emqx-management-conf">4.2.3 <code>plugins/emqx_management.conf</code> <a href="#_4-2-3-plugins-emqx-management-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## EMQ X Management Plugin</span>
+<span class="token comment">##--------------------------------------------------------------------</span>
+
+<span class="token comment">## Max Row Limit</span>
+management.max_row_limit = 10000
+
+<span class="token comment">## Application default secret</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+<span class="token comment">## management.application.default_secret = public</span>
+
+<span class="token comment">## Default Application ID</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+management.default_application.id = admin
+
+<span class="token comment">## Default Application Secret</span>
+<span class="token comment">##</span>
+<span class="token comment">## Value: String</span>
+management.default_application.secret = public
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## HTTP Listener</span>
+
+management.listener.http = 3040
+management.listener.http.acceptors = 2
+management.listener.http.max_clients = 512
+management.listener.http.backlog = 512
+management.listener.http.send_timeout = 15s
+management.listener.http.send_timeout_close = on
+management.listener.http.inet6 = false
+management.listener.http.ipv6_v6only = false
+
+<span class="token comment">##--------------------------------------------------------------------</span>
+<span class="token comment">## HTTPS Listener</span>
+
+<span class="token comment">## management.listener.https = 8081</span>
+<span class="token comment">## management.listener.https.acceptors = 2</span>
+<span class="token comment">## management.listener.https.max_clients = 512</span>
+<span class="token comment">## management.listener.https.backlog = 512</span>
+<span class="token comment">## management.listener.https.send_timeout = 15s</span>
+<span class="token comment">## management.listener.https.send_timeout_close = on</span>
+<span class="token comment">## management.listener.https.certfile = etc/certs/cert.pem</span>
+<span class="token comment">## management.listener.https.keyfile = etc/certs/key.pem</span>
+<span class="token comment">## management.listener.https.cacertfile = etc/certs/cacert.pem</span>
+<span class="token comment">## management.listener.https.verify = verify_peer</span>
+<span class="token comment">## NOTE: Do not use tlsv1.3 if emqx is running on OTP-22 or earlier</span>
+<span class="token comment">## management.listener.https.tls_versions = tlsv1.3,tlsv1.2,tlsv1.1,tlsv1</span>
+<span class="token comment">## management.listener.https.ciphers = TLS_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_CCM_SHA256,TLS_AES_128_CCM_8_SHA256,ECDHE-ECDSA-AES256-GCM-SHA384,ECDHE-RSA-AES256-GCM-SHA384,ECDHE-ECDSA-AES256-SHA384,ECDHE-RSA-AES256-SHA384,ECDHE-ECDSA-DES-CBC3-SHA,ECDH-ECDSA-AES256-GCM-SHA384,ECDH-RSA-AES256-GCM-SHA384,ECDH-ECDSA-AES256-SHA384,ECDH-RSA-AES256-SHA384,DHE-DSS-AES256-GCM-SHA384,DHE-DSS-AES256-SHA256,AES256-GCM-SHA384,AES256-SHA256,ECDHE-ECDSA-AES128-GCM-SHA256,ECDHE-RSA-AES128-GCM-SHA256,ECDHE-ECDSA-AES128-SHA256,ECDHE-RSA-AES128-SHA256,ECDH-ECDSA-AES128-GCM-SHA256,ECDH-RSA-AES128-GCM-SHA256,ECDH-ECDSA-AES128-SHA256,ECDH-RSA-AES128-SHA256,DHE-DSS-AES128-GCM-SHA256,DHE-DSS-AES128-SHA256,AES128-GCM-SHA256,AES128-SHA256,ECDHE-ECDSA-AES256-SHA,ECDHE-RSA-AES256-SHA,DHE-DSS-AES256-SHA,ECDH-ECDSA-AES256-SHA,ECDH-RSA-AES256-SHA,AES256-SHA,ECDHE-ECDSA-AES128-SHA,ECDHE-RSA-AES128-SHA,DHE-DSS-AES128-SHA,ECDH-ECDSA-AES128-SHA,ECDH-RSA-AES128-SHA,AES128-SHA</span>
+<span class="token comment">## management.listener.https.fail_if_no_peer_cert = true</span>
+<span class="token comment">## management.listener.https.inet6 = false</span>
+<span class="token comment">## management.listener.https.ipv6_v6only = false</span>
+</code></pre></div><h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-01/bin/emqx start
+
+/data/emqx/dc3/node-02/bin/emqx start
+
+/data/emqx/dc3/node-03/bin/emqx start
+</code></pre></div><h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4> <blockquote><p><strong>配置 <code>节点2</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-02/bin/emqx_ctl cluster <span class="token function">join</span> node-01@127.0.0.1
+</code></pre></div><blockquote><p><strong>配置 <code>节点3</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-03/bin/emqx_ctl cluster <span class="token function">join</span> node-01@127.0.0.1
+</code></pre></div><blockquote><p><strong>节点状态</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-03/bin/emqx_ctl cluster status
+</code></pre></div></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/4/12 下午5:00:18</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev"><a href="/docs/tip/string-format.html" class="prev"><i aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
+                String.format()字符串常规类型格式化的两种重载方式
+            </a></span> <span class="next"><a href="/docs/cluster/mongo.html">
+                Mongo 集群部署
+                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span></p></div> <div class="page-anchor"><div class="ant-space ant-space-vertical" style="width:100%;"><div class="ant-space-item"><div class="page-anchor-offset"><div><div class="ant-anchor-wrapper" style="max-height:100vh;"><div class="ant-anchor"><div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div><div class="ant-anchor-link"><a href="#emq-x-集群部署" title="EMQ X 集群部署" class="ant-anchor-link-title">EMQ X 集群部署</a><div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构" class="ant-anchor-link-title">1. 集群架构</a></div><div class="ant-anchor-link"><a href="#_2-集群部署规划" title="2. 集群部署规划" class="ant-anchor-link-title">2. 集群部署规划</a></div><div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件" class="ant-anchor-link-title">3. 安装文件</a></div><div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署" class="ant-anchor-link-title">4. 集群部署</a></div></div></div></div></div></div></div></div></div> </main> <!----></div><div class="global-ui"></div></div>
+        <script src="/assets/js/app.7dfefe51.js" defer></script><script src="/assets/js/2.a8b8915e.js" defer></script><script src="/assets/js/9.3f13bdbf.js" defer></script>
+    </body>
+</html>
