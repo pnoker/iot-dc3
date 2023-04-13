@@ -143,7 +143,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         return pointAttributeMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery query) {
+    private LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery query) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getAttributeName()), PointAttribute::getAttributeName, query.getAttributeName());

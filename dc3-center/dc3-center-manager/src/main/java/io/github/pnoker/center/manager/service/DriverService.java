@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.service;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.model.DriverDO;
 
 import java.util.List;
 import java.util.Set;
@@ -30,7 +30,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverService extends Service<Driver, DriverPageQuery> {
+public interface DriverService extends Service<DriverDO, DriverPageQuery> {
 
     /**
      * 根据 驱动ServiceName 查询 驱动
@@ -39,7 +39,7 @@ public interface DriverService extends Service<Driver, DriverPageQuery> {
      * @param tenantId    租户ID
      * @return Driver
      */
-    Driver selectByServiceName(String serviceName, String tenantId);
+    DriverDO selectByServiceName(String serviceName, String tenantId);
 
     /**
      * 根据 驱动 Host 、 Port 查询 驱动
@@ -50,7 +50,7 @@ public interface DriverService extends Service<Driver, DriverPageQuery> {
      * @param tenantId 租户ID
      * @return Driver
      */
-    Driver selectByHostPort(DriverTypeFlagEnum type, String host, Integer port, String tenantId);
+    DriverDO selectByHostPort(DriverTypeFlagEnum type, String host, Integer port, String tenantId);
 
     /**
      * 根据 驱动Id 查询 驱动
@@ -58,7 +58,7 @@ public interface DriverService extends Service<Driver, DriverPageQuery> {
      * @param deviceId 设备ID
      * @return Driver
      */
-    Driver selectByDeviceId(String deviceId);
+    DriverDO selectByDeviceId(String deviceId);
 
     /**
      * 根据 驱动Id集 查询 驱动集
@@ -66,7 +66,7 @@ public interface DriverService extends Service<Driver, DriverPageQuery> {
      * @param ids Driver ID Array
      * @return Driver Array
      */
-    List<Driver> selectByIds(Set<String> ids);
+    List<DriverDO> selectByIds(Set<String> ids);
 
     /**
      * 根据 模版Id 查询 驱动集
@@ -74,6 +74,6 @@ public interface DriverService extends Service<Driver, DriverPageQuery> {
      * @param profileId Profile ID
      * @return Driver Array
      */
-    List<Driver> selectByProfileId(String profileId);
+    List<DriverDO> selectByProfileId(String profileId);
 
 }

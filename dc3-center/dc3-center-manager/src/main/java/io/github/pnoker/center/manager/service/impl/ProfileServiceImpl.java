@@ -155,7 +155,7 @@ public class ProfileServiceImpl implements ProfileService {
         return profileMapper.selectPageWithDevice(queryDTO.getPage().convert(), customFuzzyQuery(queryDTO), queryDTO.getDeviceId());
     }
 
-    public LambdaQueryWrapper<Profile> fuzzyQuery(ProfilePageQuery query) {
+    private LambdaQueryWrapper<Profile> fuzzyQuery(ProfilePageQuery query) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         if (ObjectUtil.isNotEmpty(query)) {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getProfileName()), Profile::getProfileName, query.getProfileName());
@@ -166,7 +166,7 @@ public class ProfileServiceImpl implements ProfileService {
         return queryWrapper;
     }
 
-    public LambdaQueryWrapper<Profile> customFuzzyQuery(ProfilePageQuery profilePageQuery) {
+    private LambdaQueryWrapper<Profile> customFuzzyQuery(ProfilePageQuery profilePageQuery) {
         QueryWrapper<Profile> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(profilePageQuery)) {

@@ -31,7 +31,7 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Dictionary;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -65,10 +65,10 @@ public class DictionaryServiceImpl implements DictionaryService {
         if (ObjectUtil.isNull(dictionaryPageQuery.getPage())) {
             dictionaryPageQuery.setPage(new Pages());
         }
-        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), Driver::getDriverName, dictionaryPageQuery.getLabel());
-        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), Driver::getTenantId, dictionaryPageQuery.getTenantId());
-        Page<Driver> driverPage = driverMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
+        LambdaQueryWrapper<DriverDO> queryWrapper = Wrappers.<DriverDO>query().lambda();
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), DriverDO::getDriverName, dictionaryPageQuery.getLabel());
+        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), DriverDO::getTenantId, dictionaryPageQuery.getTenantId());
+        Page<DriverDO> driverPage = driverMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
         List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> {
             Dictionary dictionary = new Dictionary();
             dictionary.setLabel(driver.getDriverName());

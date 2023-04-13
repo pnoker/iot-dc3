@@ -211,7 +211,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    public LambdaQueryWrapper<PointAttributeConfig> fuzzyQuery(PointAttributeConfigPageQuery query) {
+    private LambdaQueryWrapper<PointAttributeConfig> fuzzyQuery(PointAttributeConfigPageQuery query) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getPointAttributeId()), PointAttributeConfig::getPointAttributeId, query.getPointAttributeId());

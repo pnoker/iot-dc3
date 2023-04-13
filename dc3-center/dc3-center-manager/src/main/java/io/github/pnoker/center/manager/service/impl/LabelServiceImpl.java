@@ -134,7 +134,7 @@ public class LabelServiceImpl implements LabelService {
         return labelMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    public LambdaQueryWrapper<Label> fuzzyQuery(LabelPageQuery query) {
+    private LambdaQueryWrapper<Label> fuzzyQuery(LabelPageQuery query) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), Label::getLabelName, query.getLabelName());

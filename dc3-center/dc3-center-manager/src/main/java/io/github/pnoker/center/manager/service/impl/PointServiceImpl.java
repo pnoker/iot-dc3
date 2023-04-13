@@ -227,7 +227,7 @@ public class PointServiceImpl implements PointService {
         return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
     }
 
-    public LambdaQueryWrapper<Point> fuzzyQuery(PointPageQuery query) {
+    private LambdaQueryWrapper<Point> fuzzyQuery(PointPageQuery query) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getPointName()), Point::getPointName, query.getPointName());
@@ -241,7 +241,7 @@ public class PointServiceImpl implements PointService {
         return queryWrapper;
     }
 
-    public LambdaQueryWrapper<Point> customFuzzyQuery(PointPageQuery pointPageQuery) {
+    private LambdaQueryWrapper<Point> customFuzzyQuery(PointPageQuery pointPageQuery) {
         QueryWrapper<Point> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(pointPageQuery)) {

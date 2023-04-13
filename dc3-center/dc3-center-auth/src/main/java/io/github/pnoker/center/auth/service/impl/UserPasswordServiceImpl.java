@@ -108,7 +108,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         }
     }
 
-    public LambdaQueryWrapper<UserPassword> fuzzyQuery(UserPasswordPageQuery query) {
+    private LambdaQueryWrapper<UserPassword> fuzzyQuery(UserPasswordPageQuery query) {
         return Wrappers.<UserPassword>query().lambda();
     }
 
