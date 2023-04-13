@@ -65,18 +65,18 @@ public class BatchServiceImpl implements BatchService {
     @Override
     public DriverMetadata batchDriverMetadata(String serviceName, String tenantId) {
         DriverMetadata driverMetadata = new DriverMetadata();
-        Driver driver = driverService.selectByServiceName(serviceName, tenantId);
-        driverMetadata.setDriverId(driver.getId());
-        driverMetadata.setTenantId(driver.getTenantId());
+        DriverDO entityDO = driverService.selectByServiceName(serviceName, tenantId);
+        driverMetadata.setDriverId(entityDO.getId());
+        driverMetadata.setTenantId(entityDO.getTenantId());
 
         try {
-            Map<String, DriverAttribute> driverAttributeMap = getDriverAttributeMap(driver.getId());
+            Map<String, DriverAttribute> driverAttributeMap = getDriverAttributeMap(entityDO.getId());
             driverMetadata.setDriverAttributeMap(driverAttributeMap);
 
-            Map<String, PointAttribute> pointAttributeMap = getPointAttributeMap(driver.getId());
+            Map<String, PointAttribute> pointAttributeMap = getPointAttributeMap(entityDO.getId());
             driverMetadata.setPointAttributeMap(pointAttributeMap);
 
-            List<Device> devices = deviceService.selectByDriverId(driver.getId());
+            List<Device> devices = deviceService.selectByDriverId(entityDO.getId());
             Set<String> deviceIds = devices.stream().map(Base::getId).collect(Collectors.toSet());
 
             Map<String, Map<String, AttributeInfo>> driverInfoMap = getDriverInfoMap(deviceIds, driverAttributeMap);

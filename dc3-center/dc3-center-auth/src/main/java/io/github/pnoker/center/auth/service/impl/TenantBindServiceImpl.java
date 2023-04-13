@@ -102,7 +102,7 @@ public class TenantBindServiceImpl implements TenantBindService {
         return tenantBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery query) {
+    private LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery query) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), TenantBind::getTenantId, query.getTenantId());

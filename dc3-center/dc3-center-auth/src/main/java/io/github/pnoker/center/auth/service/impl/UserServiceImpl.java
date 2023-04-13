@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    public LambdaQueryWrapper<User> fuzzyQuery(UserDto query) {
+    private LambdaQueryWrapper<User> fuzzyQuery(UserDto query) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), User::getNickName, query.getNickName());

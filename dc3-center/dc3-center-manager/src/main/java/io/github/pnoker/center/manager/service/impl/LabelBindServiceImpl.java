@@ -108,7 +108,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         return labelBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindPageQuery query) {
+    private LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindPageQuery query) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBind::getLabelId, query.getLabelId());

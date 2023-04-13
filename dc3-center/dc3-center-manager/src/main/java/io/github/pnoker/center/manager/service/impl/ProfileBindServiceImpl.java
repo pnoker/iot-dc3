@@ -173,7 +173,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    public LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindPageQuery query) {
+    private LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindPageQuery query) {
         LambdaQueryWrapper<ProfileBind> queryWrapper = Wrappers.<ProfileBind>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getProfileId()), ProfileBind::getProfileId, query.getProfileId());

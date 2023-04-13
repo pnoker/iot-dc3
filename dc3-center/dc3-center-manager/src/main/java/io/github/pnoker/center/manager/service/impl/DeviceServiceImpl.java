@@ -237,7 +237,7 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceMapper.selectPageWithProfile(queryDTO.getPage().convert(), customFuzzyQuery(queryDTO), queryDTO.getProfileId());
     }
 
-    public LambdaQueryWrapper<Device> fuzzyQuery(DevicePageQuery query) {
+    private LambdaQueryWrapper<Device> fuzzyQuery(DevicePageQuery query) {
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
         if (ObjectUtil.isNotEmpty(query)) {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDeviceName()), Device::getDeviceName, query.getDeviceName());
