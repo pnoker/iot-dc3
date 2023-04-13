@@ -26,6 +26,7 @@ import io.github.pnoker.center.manager.mapper.LabelBindMapper;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.LabelBind;
@@ -67,7 +68,9 @@ public class LabelBindServiceImpl implements LabelBindService {
             throw new NotFoundException("The label bind does not exist");
         }
 
-        labelBindMapper.deleteById(id);
+        if (labelBindMapper.deleteById(id) < 1) {
+            throw new DeleteException("The label bind delete failed");
+        }
     }
 
     /**

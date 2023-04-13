@@ -38,19 +38,25 @@ public class ReportSlaveIdRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) {
         // no op
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         // no op
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         // no op
@@ -66,7 +72,9 @@ public class ReportSlaveIdRequest extends ModbusRequest {
         return new ReportSlaveIdResponse(slaveId, processImage.getReportSlaveIdData());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.REPORT_SLAVE_ID;

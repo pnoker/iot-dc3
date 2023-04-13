@@ -30,7 +30,9 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 5.0.0
  */
 abstract public class ModbusResponse extends ModbusMessage {
-    /** Constant <code>MAX_FUNCTION_CODE=(byte) 0x80</code> */
+    /**
+     * Constant <code>MAX_FUNCTION_CODE=(byte) 0x80</code>
+     */
     protected static final byte MAX_FUNCTION_CODE = (byte) 0x80;
 
     /**
@@ -118,14 +120,15 @@ abstract public class ModbusResponse extends ModbusMessage {
         return exceptionCode;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     final protected void writeImpl(ByteQueue queue) {
         if (isException()) {
             queue.push((byte) (getFunctionCode() + MAX_FUNCTION_CODE));
             queue.push(exceptionCode);
-        }
-        else {
+        } else {
             queue.push(getFunctionCode());
             writeResponse(queue);
         }
@@ -160,14 +163,15 @@ abstract public class ModbusResponse extends ModbusMessage {
 
     /**
      * Ensure that the Response slave id is equal to the requested slave id
+     *
      * @param request
      * @throws ModbusTransportException
      */
-    public void  validateResponse(ModbusRequest request) throws ModbusTransportException {
-        if(getSlaveId() != request.slaveId)
-        	throw new SlaveIdNotEqual(request.slaveId, getSlaveId());         	
+    public void validateResponse(ModbusRequest request) throws ModbusTransportException {
+        if (getSlaveId() != request.slaveId)
+            throw new SlaveIdNotEqual(request.slaveId, getSlaveId());
     }
-    
+
     /**
      * <p>main.</p>
      *
@@ -175,7 +179,7 @@ abstract public class ModbusResponse extends ModbusMessage {
      * @throws Exception if any.
      */
     public static void main(String[] args) throws Exception {
-        ByteQueue queue = new ByteQueue(new byte[] { 3, 2 });
+        ByteQueue queue = new ByteQueue(new byte[]{3, 2});
         ModbusResponse r = createModbusResponse(queue);
         System.out.println(r);
     }

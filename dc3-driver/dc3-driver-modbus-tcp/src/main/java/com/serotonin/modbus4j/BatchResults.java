@@ -30,7 +30,7 @@ public class BatchResults<K> {
     /**
      * <p>addResult.</p>
      *
-     * @param key a K object.
+     * @param key   a K object.
      * @param value a {@link Object} object.
      */
     public void addResult(K key, Object value) {
@@ -87,7 +87,9 @@ public class BatchResults<K> {
         return (Float) getValue(key);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return data.toString();

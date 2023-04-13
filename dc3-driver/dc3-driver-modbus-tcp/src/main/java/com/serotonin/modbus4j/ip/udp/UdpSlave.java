@@ -15,13 +15,6 @@
  */
 package com.serotonin.modbus4j.ip.udp;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import com.serotonin.modbus4j.ModbusSlaveSet;
 import com.serotonin.modbus4j.base.BaseMessageParser;
 import com.serotonin.modbus4j.base.BaseRequestHandler;
@@ -35,6 +28,13 @@ import com.serotonin.modbus4j.sero.messaging.IncomingMessage;
 import com.serotonin.modbus4j.sero.messaging.IncomingRequestMessage;
 import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>UdpSlave class.</p>
@@ -64,7 +64,7 @@ public class UdpSlave extends ModbusSlaveSet {
     /**
      * <p>Constructor for UdpSlave.</p>
      *
-     * @param port a int.
+     * @param port         a int.
      * @param encapsulated a boolean.
      */
     public UdpSlave(int port, boolean encapsulated) {
@@ -73,8 +73,7 @@ public class UdpSlave extends ModbusSlaveSet {
         if (encapsulated) {
             messageParser = new EncapMessageParser(false);
             requestHandler = new EncapRequestHandler(this);
-        }
-        else {
+        } else {
             messageParser = new XaMessageParser(false);
             requestHandler = new XaRequestHandler(this);
         }
@@ -82,7 +81,9 @@ public class UdpSlave extends ModbusSlaveSet {
         executorService = Executors.newCachedThreadPool();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start() throws ModbusInitException {
         try {
@@ -96,13 +97,14 @@ public class UdpSlave extends ModbusSlaveSet {
                 UdpConnectionHandler handler = new UdpConnectionHandler(datagramPacket);
                 executorService.execute(handler);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ModbusInitException(e);
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stop() {
         // Close the socket first to prevent new messages.
@@ -112,8 +114,7 @@ public class UdpSlave extends ModbusSlaveSet {
         executorService.shutdown();
         try {
             executorService.awaitTermination(3, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             getExceptionHandler().receivedException(e);
         }
     }
@@ -151,8 +152,7 @@ public class UdpSlave extends ModbusSlaveSet {
 
                 // Send the response back.
                 datagramSocket.send(responsePacket);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 getExceptionHandler().receivedException(e);
             }
         }

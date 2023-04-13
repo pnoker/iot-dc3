@@ -20,8 +20,8 @@ public class SlaveIdNotEqual extends ModbusTransportException {
 
     /**
      * Exception to show that the requested slave id is not what was received
-     * 
-     * @param requestSlaveId - slave id requested
+     *
+     * @param requestSlaveId  - slave id requested
      * @param responseSlaveId - slave id of response
      */
     public SlaveIdNotEqual(int requestSlaveId, int responseSlaveId) {

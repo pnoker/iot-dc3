@@ -26,10 +26,7 @@ import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.BlackIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,7 +65,9 @@ public class BlackIpServiceImpl implements BlackIpService {
             throw new NotFoundException("The ip does not exist in the blacklist");
         }
 
-        blackIpMapper.deleteById(id);
+        if (blackIpMapper.deleteById(id) < 1) {
+            throw new DeleteException("The ip delete failed");
+        }
     }
 
     @Override

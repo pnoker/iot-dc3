@@ -52,7 +52,9 @@ public class XaMessageRequest extends XaMessage implements OutgoingRequestMessag
         super(modbusRequest, transactionId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean expectsResponse() {
         return modbusMessage.getSlaveId() != 0;

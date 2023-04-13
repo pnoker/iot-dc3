@@ -35,9 +35,9 @@ public class WriteRegistersRequest extends ModbusRequest {
     /**
      * <p>Constructor for WriteRegistersRequest.</p>
      *
-     * @param slaveId a int.
+     * @param slaveId     a int.
      * @param startOffset a int.
-     * @param sdata an array of {@link short} objects.
+     * @param sdata       an array of {@link short} objects.
      * @throws ModbusTransportException if any.
      */
     public WriteRegistersRequest(int slaveId, int startOffset, short[] sdata) throws ModbusTransportException {
@@ -46,21 +46,25 @@ public class WriteRegistersRequest extends ModbusRequest {
         data = convertToBytes(sdata);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
         int registerCount = data.length / 2;
         if (registerCount < 1 || registerCount > modbus.getMaxWriteRegisterCount())
             throw new ModbusTransportException("Invalid number of registers: " + registerCount, slaveId);
-        ModbusUtils.validateEndOffset(startOffset + registerCount -1);
+        ModbusUtils.validateEndOffset(startOffset + registerCount - 1);
     }
 
     WriteRegistersRequest(int slaveId) throws ModbusTransportException {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, startOffset);
@@ -77,7 +81,9 @@ public class WriteRegistersRequest extends ModbusRequest {
         return new WriteRegistersResponse(slaveId, startOffset, sdata.length);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_REGISTERS;
@@ -88,7 +94,9 @@ public class WriteRegistersRequest extends ModbusRequest {
         return new WriteRegistersResponse(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         startOffset = ModbusUtils.popUnsignedShort(queue);

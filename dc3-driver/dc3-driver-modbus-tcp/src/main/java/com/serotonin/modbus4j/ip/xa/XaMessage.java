@@ -71,13 +71,17 @@ public class XaMessage extends IpMessage {
         return transactionId;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ModbusMessage getModbusMessage() {
         return modbusMessage;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "XaMessage [transactionId=" + transactionId + ", message=" + modbusMessage + "]";

@@ -30,7 +30,7 @@ public class RangeAndOffset {
     /**
      * <p>Constructor for RangeAndOffset.</p>
      *
-     * @param range a int.
+     * @param range  a int.
      * @param offset a int.
      */
     public RangeAndOffset(int range, int offset) {
@@ -48,16 +48,13 @@ public class RangeAndOffset {
         if (registerId < 10000) {
             this.range = RegisterRange.COIL_STATUS;
             this.offset = registerId - 1;
-        }
-        else if (registerId < 20000) {
+        } else if (registerId < 20000) {
             this.range = RegisterRange.INPUT_STATUS;
             this.offset = registerId - 10001;
-        }
-        else if (registerId < 40000) {
+        } else if (registerId < 40000) {
             this.range = RegisterRange.INPUT_REGISTER;
             this.offset = registerId - 30001;
-        }
-        else {
+        } else {
             this.range = RegisterRange.HOLDING_REGISTER;
             this.offset = registerId - 40001;
         }

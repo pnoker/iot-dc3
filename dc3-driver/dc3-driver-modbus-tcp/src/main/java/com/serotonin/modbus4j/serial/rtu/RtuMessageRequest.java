@@ -49,7 +49,9 @@ public class RtuMessageRequest extends RtuMessage implements OutgoingRequestMess
         super(modbusRequest);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean expectsResponse() {
         return modbusMessage.getSlaveId() != 0;

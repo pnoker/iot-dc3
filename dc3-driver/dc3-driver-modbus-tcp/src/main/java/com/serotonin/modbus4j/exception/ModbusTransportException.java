@@ -46,7 +46,7 @@ public class ModbusTransportException extends Exception {
      * <p>Constructor for ModbusTransportException.</p>
      *
      * @param message a {@link String} object.
-     * @param cause a {@link Throwable} object.
+     * @param cause   a {@link Throwable} object.
      * @param slaveId a int.
      */
     public ModbusTransportException(String message, Throwable cause, int slaveId) {
@@ -88,7 +88,7 @@ public class ModbusTransportException extends Exception {
     /**
      * <p>Constructor for ModbusTransportException.</p>
      *
-     * @param cause a {@link Throwable} object.
+     * @param cause   a {@link Throwable} object.
      * @param slaveId a int.
      */
     public ModbusTransportException(Throwable cause, int slaveId) {

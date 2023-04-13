@@ -15,12 +15,12 @@
  */
 package com.serotonin.modbus4j.serial.ascii;
 
-import java.io.IOException;
-
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.serial.SerialPortWrapper;
 import com.serotonin.modbus4j.serial.SerialSlave;
 import com.serotonin.modbus4j.sero.messaging.MessageControl;
+
+import java.io.IOException;
 
 /**
  * <p>AsciiSlave class.</p>
@@ -40,7 +40,9 @@ public class AsciiSlave extends SerialSlave {
         super(wrapper);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start() throws ModbusInitException {
         super.start();
@@ -54,13 +56,14 @@ public class AsciiSlave extends SerialSlave {
         try {
             conn.start(transport, asciiMessageParser, asciiRequestHandler, null);
             transport.start("Modbus ASCII slave");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ModbusInitException(e);
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stop() {
         conn.close();

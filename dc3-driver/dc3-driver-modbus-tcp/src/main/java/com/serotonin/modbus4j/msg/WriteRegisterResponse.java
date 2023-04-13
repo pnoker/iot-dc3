@@ -30,7 +30,9 @@ public class WriteRegisterResponse extends ModbusResponse {
     private int writeOffset;
     private int writeValue;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_REGISTER;
@@ -46,14 +48,18 @@ public class WriteRegisterResponse extends ModbusResponse {
         this.writeValue = writeValue;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeResponse(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
         ModbusUtils.pushShort(queue, writeValue);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readResponse(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

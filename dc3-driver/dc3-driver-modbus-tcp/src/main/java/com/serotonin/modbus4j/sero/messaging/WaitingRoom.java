@@ -16,15 +16,15 @@
 
 package com.serotonin.modbus4j.sero.messaging;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The waiting room is a place for request messages to hang out while awaiting their responses.
- * 
+ *
  * @author Matthew Lohbihler
  */
 class WaitingRoom {
@@ -41,7 +41,7 @@ class WaitingRoom {
     /**
      * The request message should be sent AFTER entering the waiting room so that the (vanishingly small) chance of a
      * response being returned before the thread is waiting for it is eliminated.
-     * 
+     *
      * @return
      */
     void enter(WaitingRoomKey key) {
@@ -52,8 +52,7 @@ class WaitingRoom {
                     LOG.debug("Duplicate waiting room key found. Waiting for member to leave.");
                 try {
                     wait();
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     // no op
                 }
             }
@@ -93,9 +92,8 @@ class WaitingRoom {
 
     /**
      * This method is used by the data listening thread to post responses as they are received from the transport.
-     * 
-     * @param response
-     *            the response message
+     *
+     * @param response the response message
      * @throws WaitingRoomException
      */
     void response(IncomingResponseMessage response) throws WaitingRoomException {
@@ -121,7 +119,7 @@ class WaitingRoom {
      * The instance itself serves as a monitor upon which the sending thread can wait (with a timeout). When a response
      * is received, the message controller can set it in here, automatically notifying the sending thread that the
      * response is available.
-     * 
+     *
      * @author Matthew Lohbihler
      */
     class Member {
@@ -145,8 +143,7 @@ class WaitingRoom {
         private void waitNoThrow(long timeout) {
             try {
                 wait(timeout);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 // Ignore
             }
         }

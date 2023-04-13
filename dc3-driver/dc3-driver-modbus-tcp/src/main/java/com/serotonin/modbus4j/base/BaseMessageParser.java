@@ -37,13 +37,14 @@ abstract public class BaseMessageParser implements MessageParser {
         this.master = master;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IncomingMessage parseMessage(ByteQueue queue) throws Exception {
         try {
             return parseMessageImpl(queue);
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             // Means that we ran out of data trying to read the message. Just return null.
             return null;
         }

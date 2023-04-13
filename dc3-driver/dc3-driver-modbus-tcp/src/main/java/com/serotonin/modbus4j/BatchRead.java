@@ -15,25 +15,19 @@
  */
 package com.serotonin.modbus4j;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.serotonin.modbus4j.base.KeyedModbusLocator;
 import com.serotonin.modbus4j.base.ReadFunctionGroup;
 import com.serotonin.modbus4j.base.SlaveAndRange;
 import com.serotonin.modbus4j.locator.BaseLocator;
 
+import java.util.*;
+
 /**
  * A class for defining the information required to obtain in a batch.
- *
+ * <p>
  * The generic parameterization represents the class of the key that will be used to find the results in the BatchRead
  * object. Typically String would be used, but any Object is valid.
- *
+ * <p>
  * Some modbus devices have non-contiguous sets of values within a single register range. These gaps between values may
  * cause the device to return error responses if a request attempts to read them. In spite of this, because it is
  * generally more efficient to read a set of values with a single request, the batch read by default will assume that no
@@ -41,8 +35,8 @@ import com.serotonin.modbus4j.locator.BaseLocator;
  * separate the offending request to a separate batch read object, or you can use the "contiguous requests" setting
  * which causes requests to be partitioned into only contiguous sets.
  *
- * @author mlohbihler
  * @param <K> - Type of read
+ * @author mlohbihler
  * @version 5.0.0
  */
 public class BatchRead<K> {
@@ -148,7 +142,7 @@ public class BatchRead<K> {
     /**
      * <p>addLocator.</p>
      *
-     * @param id a K object.
+     * @param id      a K object.
      * @param locator a {@link BaseLocator} object.
      */
     public void addLocator(K id, BaseLocator<?> locator) {
@@ -222,11 +216,11 @@ public class BatchRead<K> {
      * We aren't trying to do anything fancy here, like some kind of artificial optimal group for performance or
      * anything. We pretty much just try to fit as many locators as possible into a single valid request, and then move
      * on.
-     * 
+     * <p>
      * This method assumes the locators have already been sorted by start offset.
      */
     private void createRequestGroups(List<ReadFunctionGroup<K>> functionGroups, List<KeyedModbusLocator<K>> locators,
-            int maxCount) {
+                                     int maxCount) {
         ReadFunctionGroup<K> functionGroup;
         KeyedModbusLocator<K> locator;
         int index;
@@ -250,8 +244,7 @@ public class BatchRead<K> {
                             functionGroup.add(locators.remove(index));
                             added = true;
                         }
-                    }
-                    else {
+                    } else {
                         functionGroup.add(locators.remove(index));
                         added = true;
                     }

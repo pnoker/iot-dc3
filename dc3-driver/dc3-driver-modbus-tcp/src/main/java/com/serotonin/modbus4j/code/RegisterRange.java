@@ -22,13 +22,21 @@ package com.serotonin.modbus4j.code;
  * @version 5.0.0
  */
 public class RegisterRange {
-    /** Constant <code>COIL_STATUS=1</code> */
+    /**
+     * Constant <code>COIL_STATUS=1</code>
+     */
     public static final int COIL_STATUS = 1;
-    /** Constant <code>INPUT_STATUS=2</code> */
+    /**
+     * Constant <code>INPUT_STATUS=2</code>
+     */
     public static final int INPUT_STATUS = 2;
-    /** Constant <code>HOLDING_REGISTER=3</code> */
+    /**
+     * Constant <code>HOLDING_REGISTER=3</code>
+     */
     public static final int HOLDING_REGISTER = 3;
-    /** Constant <code>INPUT_REGISTER=4</code> */
+    /**
+     * Constant <code>INPUT_REGISTER=4</code>
+     */
     public static final int INPUT_REGISTER = 4;
 
     /**
@@ -39,14 +47,14 @@ public class RegisterRange {
      */
     public static int getFrom(int id) {
         switch (id) {
-        case COIL_STATUS:
-            return 0;
-        case INPUT_STATUS:
-            return 0x10000;
-        case HOLDING_REGISTER:
-            return 0x40000;
-        case INPUT_REGISTER:
-            return 0x30000;
+            case COIL_STATUS:
+                return 0;
+            case INPUT_STATUS:
+                return 0x10000;
+            case HOLDING_REGISTER:
+                return 0x40000;
+            case INPUT_REGISTER:
+                return 0x30000;
         }
         return -1;
     }
@@ -59,14 +67,14 @@ public class RegisterRange {
      */
     public static int getTo(int id) {
         switch (id) {
-        case COIL_STATUS:
-            return 0xffff;
-        case INPUT_STATUS:
-            return 0x1ffff;
-        case HOLDING_REGISTER:
-            return 0x4ffff;
-        case INPUT_REGISTER:
-            return 0x3ffff;
+            case COIL_STATUS:
+                return 0xffff;
+            case INPUT_STATUS:
+                return 0x1ffff;
+            case HOLDING_REGISTER:
+                return 0x4ffff;
+            case INPUT_REGISTER:
+                return 0x3ffff;
         }
         return -1;
     }
@@ -79,14 +87,14 @@ public class RegisterRange {
      */
     public static int getReadFunctionCode(int id) {
         switch (id) {
-        case COIL_STATUS:
-            return FunctionCode.READ_COILS;
-        case INPUT_STATUS:
-            return FunctionCode.READ_DISCRETE_INPUTS;
-        case HOLDING_REGISTER:
-            return FunctionCode.READ_HOLDING_REGISTERS;
-        case INPUT_REGISTER:
-            return FunctionCode.READ_INPUT_REGISTERS;
+            case COIL_STATUS:
+                return FunctionCode.READ_COILS;
+            case INPUT_STATUS:
+                return FunctionCode.READ_DISCRETE_INPUTS;
+            case HOLDING_REGISTER:
+                return FunctionCode.READ_HOLDING_REGISTERS;
+            case INPUT_REGISTER:
+                return FunctionCode.READ_INPUT_REGISTERS;
         }
         return -1;
     }

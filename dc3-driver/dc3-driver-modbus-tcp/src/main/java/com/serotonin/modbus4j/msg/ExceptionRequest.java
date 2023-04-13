@@ -34,8 +34,8 @@ public class ExceptionRequest extends ModbusRequest {
     /**
      * <p>Constructor for ExceptionRequest.</p>
      *
-     * @param slaveId a int.
-     * @param functionCode a byte.
+     * @param slaveId       a int.
+     * @param functionCode  a byte.
      * @param exceptionCode a byte.
      * @throws ModbusTransportException if any.
      */
@@ -45,19 +45,25 @@ public class ExceptionRequest extends ModbusRequest {
         this.exceptionCode = exceptionCode;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) {
         // no op
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         throw new ShouldNeverHappenException("wha");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         queue.clear();
@@ -73,7 +79,9 @@ public class ExceptionRequest extends ModbusRequest {
         return getResponseInstance(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return functionCode;

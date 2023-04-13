@@ -29,8 +29,8 @@ public class ReadDiscreteInputsRequest extends ReadBinaryRequest {
     /**
      * <p>Constructor for ReadDiscreteInputsRequest.</p>
      *
-     * @param slaveId a int.
-     * @param startOffset a int.
+     * @param slaveId      a int.
+     * @param startOffset  a int.
      * @param numberOfBits a int.
      * @throws ModbusTransportException if any.
      */
@@ -42,7 +42,9 @@ public class ReadDiscreteInputsRequest extends ReadBinaryRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_DISCRETE_INPUTS;
@@ -53,7 +55,9 @@ public class ReadDiscreteInputsRequest extends ReadBinaryRequest {
         return new ReadDiscreteInputsResponse(slaveId, getData(processImage));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean getBinary(ProcessImage processImage, int index) throws ModbusTransportException {
         return processImage.getInput(index);

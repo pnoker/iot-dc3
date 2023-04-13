@@ -26,19 +26,25 @@ import java.io.Writer;
  * @version 5.0.0
  */
 public class NullWriter extends Writer {
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
         // no op
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void flush() throws IOException {
         // no op
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws IOException {
         // no op

@@ -49,7 +49,9 @@ public class EncapMessageRequest extends EncapMessage implements OutgoingRequest
         super(modbusRequest);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean expectsResponse() {
         return modbusMessage.getSlaveId() != 0;

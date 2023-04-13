@@ -30,8 +30,8 @@ public class ExceptionResponse extends ModbusResponse {
     /**
      * <p>Constructor for ExceptionResponse.</p>
      *
-     * @param slaveId a int.
-     * @param functionCode a byte.
+     * @param slaveId       a int.
+     * @param functionCode  a byte.
      * @param exceptionCode a byte.
      * @throws ModbusTransportException if any.
      */
@@ -41,19 +41,25 @@ public class ExceptionResponse extends ModbusResponse {
         setException(exceptionCode);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return functionCode;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readResponse(ByteQueue queue) {
         // no op
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeResponse(ByteQueue queue) {
         // no op

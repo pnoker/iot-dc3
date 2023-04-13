@@ -38,7 +38,9 @@ public class EncapRequestHandler extends BaseRequestHandler {
         super(slave);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
         EncapMessageRequest tcpRequest = (EncapMessageRequest) req;
         ModbusRequest request = tcpRequest.getModbusRequest();

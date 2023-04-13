@@ -15,10 +15,10 @@
  */
 package com.serotonin.modbus4j.value;
 
-import java.math.BigInteger;
-
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.exception.InvalidDataConversionException;
+
+import java.math.BigInteger;
 
 /**
  * <p>Abstract ModbusValue class.</p>
@@ -33,7 +33,7 @@ abstract public class ModbusValue {
     /**
      * <p>Constructor for ModbusValue.</p>
      *
-     * @param type a {@link DataType} object.
+     * @param type  a {@link DataType} object.
      * @param value a {@link Object} object.
      */
     public ModbusValue(DataType type, Object value) {

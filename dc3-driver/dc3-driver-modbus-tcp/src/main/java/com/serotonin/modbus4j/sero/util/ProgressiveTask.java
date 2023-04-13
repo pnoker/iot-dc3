@@ -114,10 +114,10 @@ abstract public class ProgressiveTask implements Runnable {
      * Implementers of this method MUST return from it occasionally so that the cancelled status can be checked. Each
      * return must leave the class and thread state with the expectation that runImpl will not be called again, while
      * acknowledging the possibility that it will.
-     *
+     * <p>
      * Implementations SHOULD call the declareProgress method with each runImpl execution such that the listener can be
      * notified.
-     *
+     * <p>
      * Implementations MUST set the completed field to true when the task is finished.
      */
     abstract protected void runImpl();

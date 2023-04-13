@@ -1,44 +1,382 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8" />
-        <meta
+<head>
+    <meta charset="utf-8"/>
+    <meta
             name="viewport"
             content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-        />
-        <title>Redis 集群部署 | IoT DC3</title>
-        <meta name="description" content="" />
-        <meta name="generator" content="VuePress 1.9.9" />
-        <link rel="icon" href="/assets/images/favicon.ico">
-    <script type="text/javascript" src="/assets/js/push.js"></script> <meta name="description" content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
+    />
+    <title>Redis 集群部署 | IoT DC3</title>
+    <meta name="description" content=""/>
+    <meta name="generator" content="VuePress 1.9.9"/>
+    <link rel="icon" href="/assets/images/favicon.ico">
+    <script type="text/javascript" src="/assets/js/push.js"></script>
+    <meta name="description"
+          content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
     <meta name="referrer" content="never">
-    <meta name="keywords" content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台"> <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style"><link rel="preload" href="/assets/js/app.d87ce824.js" as="script"><link rel="preload" href="/assets/js/2.a8b8915e.js" as="script"><link rel="preload" href="/assets/js/12.08136beb.js" as="script"><link rel="prefetch" href="/assets/js/10.db658154.js"><link rel="prefetch" href="/assets/js/11.653957ce.js"><link rel="prefetch" href="/assets/js/13.83b3d580.js"><link rel="prefetch" href="/assets/js/14.d5387cec.js"><link rel="prefetch" href="/assets/js/15.aafb2a89.js"><link rel="prefetch" href="/assets/js/16.01fcc650.js"><link rel="prefetch" href="/assets/js/17.a097fd52.js"><link rel="prefetch" href="/assets/js/18.acd93e71.js"><link rel="prefetch" href="/assets/js/19.6f12b224.js"><link rel="prefetch" href="/assets/js/20.bac69ff1.js"><link rel="prefetch" href="/assets/js/21.9105165e.js"><link rel="prefetch" href="/assets/js/22.de1f017c.js"><link rel="prefetch" href="/assets/js/23.fb20a8f5.js"><link rel="prefetch" href="/assets/js/24.63ca195a.js"><link rel="prefetch" href="/assets/js/25.3a76708d.js"><link rel="prefetch" href="/assets/js/26.b6254386.js"><link rel="prefetch" href="/assets/js/27.3f127a30.js"><link rel="prefetch" href="/assets/js/28.afadbe5c.js"><link rel="prefetch" href="/assets/js/29.f175dd67.js"><link rel="prefetch" href="/assets/js/3.8e04da2b.js"><link rel="prefetch" href="/assets/js/30.5ba7a495.js"><link rel="prefetch" href="/assets/js/31.01c3d218.js"><link rel="prefetch" href="/assets/js/32.de0e0ff7.js"><link rel="prefetch" href="/assets/js/33.0e117d4a.js"><link rel="prefetch" href="/assets/js/34.010094c5.js"><link rel="prefetch" href="/assets/js/35.8a377a71.js"><link rel="prefetch" href="/assets/js/36.fbb64a47.js"><link rel="prefetch" href="/assets/js/37.c2b9d4da.js"><link rel="prefetch" href="/assets/js/38.a66be625.js"><link rel="prefetch" href="/assets/js/39.76e387bc.js"><link rel="prefetch" href="/assets/js/4.470d098a.js"><link rel="prefetch" href="/assets/js/40.0e9ee726.js"><link rel="prefetch" href="/assets/js/41.e68f3c2e.js"><link rel="prefetch" href="/assets/js/42.ba03ba76.js"><link rel="prefetch" href="/assets/js/43.e6a91a35.js"><link rel="prefetch" href="/assets/js/44.128407ae.js"><link rel="prefetch" href="/assets/js/45.e9f1b4b0.js"><link rel="prefetch" href="/assets/js/46.ab599c67.js"><link rel="prefetch" href="/assets/js/47.dc2d8aff.js"><link rel="prefetch" href="/assets/js/48.06e9c64e.js"><link rel="prefetch" href="/assets/js/49.627cc127.js"><link rel="prefetch" href="/assets/js/5.0f4aedb8.js"><link rel="prefetch" href="/assets/js/50.bf665f72.js"><link rel="prefetch" href="/assets/js/51.08e5dea0.js"><link rel="prefetch" href="/assets/js/52.8e37a9c4.js"><link rel="prefetch" href="/assets/js/53.8c472224.js"><link rel="prefetch" href="/assets/js/54.bb582a52.js"><link rel="prefetch" href="/assets/js/55.640d9ecb.js"><link rel="prefetch" href="/assets/js/56.e2e2a21e.js"><link rel="prefetch" href="/assets/js/57.9b9b26a7.js"><link rel="prefetch" href="/assets/js/58.0d4a46c3.js"><link rel="prefetch" href="/assets/js/59.d1f11d32.js"><link rel="prefetch" href="/assets/js/6.547754b6.js"><link rel="prefetch" href="/assets/js/7.aea1a047.js"><link rel="prefetch" href="/assets/js/8.58207631.js"><link rel="prefetch" href="/assets/js/9.f09083f8.js"> <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
-    </head>
-    <body>
-        <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="ant-row"><div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars"><svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path></svg></i> <span></span></div> <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3" class="logo"> <span class="site-name">IoT DC3</span></a> <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div></div> <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light"><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
-                    首页
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
-                    指南
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/config/">
-                    配置
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/faq/">
-                    FAQ
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>
+    <meta name="keywords"
+          content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台">
+    <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style">
+    <link rel="preload" href="/assets/js/app.d87ce824.js" as="script">
+    <link rel="preload" href="/assets/js/2.a8b8915e.js" as="script">
+    <link rel="preload" href="/assets/js/12.08136beb.js" as="script">
+    <link rel="prefetch" href="/assets/js/10.db658154.js">
+    <link rel="prefetch" href="/assets/js/11.653957ce.js">
+    <link rel="prefetch" href="/assets/js/13.83b3d580.js">
+    <link rel="prefetch" href="/assets/js/14.d5387cec.js">
+    <link rel="prefetch" href="/assets/js/15.aafb2a89.js">
+    <link rel="prefetch" href="/assets/js/16.01fcc650.js">
+    <link rel="prefetch" href="/assets/js/17.a097fd52.js">
+    <link rel="prefetch" href="/assets/js/18.acd93e71.js">
+    <link rel="prefetch" href="/assets/js/19.6f12b224.js">
+    <link rel="prefetch" href="/assets/js/20.bac69ff1.js">
+    <link rel="prefetch" href="/assets/js/21.9105165e.js">
+    <link rel="prefetch" href="/assets/js/22.de1f017c.js">
+    <link rel="prefetch" href="/assets/js/23.fb20a8f5.js">
+    <link rel="prefetch" href="/assets/js/24.63ca195a.js">
+    <link rel="prefetch" href="/assets/js/25.3a76708d.js">
+    <link rel="prefetch" href="/assets/js/26.b6254386.js">
+    <link rel="prefetch" href="/assets/js/27.3f127a30.js">
+    <link rel="prefetch" href="/assets/js/28.afadbe5c.js">
+    <link rel="prefetch" href="/assets/js/29.f175dd67.js">
+    <link rel="prefetch" href="/assets/js/3.8e04da2b.js">
+    <link rel="prefetch" href="/assets/js/30.5ba7a495.js">
+    <link rel="prefetch" href="/assets/js/31.01c3d218.js">
+    <link rel="prefetch" href="/assets/js/32.de0e0ff7.js">
+    <link rel="prefetch" href="/assets/js/33.0e117d4a.js">
+    <link rel="prefetch" href="/assets/js/34.010094c5.js">
+    <link rel="prefetch" href="/assets/js/35.8a377a71.js">
+    <link rel="prefetch" href="/assets/js/36.fbb64a47.js">
+    <link rel="prefetch" href="/assets/js/37.c2b9d4da.js">
+    <link rel="prefetch" href="/assets/js/38.a66be625.js">
+    <link rel="prefetch" href="/assets/js/39.76e387bc.js">
+    <link rel="prefetch" href="/assets/js/4.470d098a.js">
+    <link rel="prefetch" href="/assets/js/40.0e9ee726.js">
+    <link rel="prefetch" href="/assets/js/41.e68f3c2e.js">
+    <link rel="prefetch" href="/assets/js/42.ba03ba76.js">
+    <link rel="prefetch" href="/assets/js/43.e6a91a35.js">
+    <link rel="prefetch" href="/assets/js/44.128407ae.js">
+    <link rel="prefetch" href="/assets/js/45.e9f1b4b0.js">
+    <link rel="prefetch" href="/assets/js/46.ab599c67.js">
+    <link rel="prefetch" href="/assets/js/47.dc2d8aff.js">
+    <link rel="prefetch" href="/assets/js/48.06e9c64e.js">
+    <link rel="prefetch" href="/assets/js/49.627cc127.js">
+    <link rel="prefetch" href="/assets/js/5.0f4aedb8.js">
+    <link rel="prefetch" href="/assets/js/50.bf665f72.js">
+    <link rel="prefetch" href="/assets/js/51.08e5dea0.js">
+    <link rel="prefetch" href="/assets/js/52.8e37a9c4.js">
+    <link rel="prefetch" href="/assets/js/53.8c472224.js">
+    <link rel="prefetch" href="/assets/js/54.bb582a52.js">
+    <link rel="prefetch" href="/assets/js/55.640d9ecb.js">
+    <link rel="prefetch" href="/assets/js/56.e2e2a21e.js">
+    <link rel="prefetch" href="/assets/js/57.9b9b26a7.js">
+    <link rel="prefetch" href="/assets/js/58.0d4a46c3.js">
+    <link rel="prefetch" href="/assets/js/59.d1f11d32.js">
+    <link rel="prefetch" href="/assets/js/6.547754b6.js">
+    <link rel="prefetch" href="/assets/js/7.aea1a047.js">
+    <link rel="prefetch" href="/assets/js/8.58207631.js">
+    <link rel="prefetch" href="/assets/js/9.f09083f8.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+    <div class="theme-container">
+        <header class="navbar">
+            <div class="ant-row">
+                <div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars">
+                    <svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em"
+                         fill="currentColor" aria-hidden="true">
+                        <path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path>
+                    </svg>
+                </i> <span></span></div>
+                <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a
+                        href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3"
+                                                                           class="logo"> <span
+                        class="site-name">IoT DC3</span></a>
+                    <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off"
+                                                                 spellcheck="false" value=""> <!----></div>
+                </div>
+                <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20">
+                    <div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value="">
+                        <!----></div>
+                    <nav class="nav-links can-hide">
+                        <ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light">
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
+                                首页
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
+                                指南
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/config/">
+                                配置
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/faq/">
+                                FAQ
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>
                     代码仓库
-                </span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="visibility:hidden;position:absolute;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li></ul> <ul class="extra-group"><!----> <!----></ul></nav></div></div> <!----></header> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/code/0-environment.html" title="注意事项" class="sidebar-link">注意事项</a></li><li><a href="/docs/code/1-idea-start.html" title="必要软件环境" class="sidebar-link">必要软件环境</a></li><li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建 IoT DC3 Web UI</a></li><li><a href="/docs/code/3-quick-start.html" title="快速启动" class="sidebar-link">快速启动</a></li><li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/cluster/emqx.html" title="EMQ X 集群部署" class="sidebar-link">EMQ X 集群部署</a></li><li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo 集群部署</a></li><li><a href="/docs/cluster/rabbitmq.html" title="RabbitMQ 集群部署" class="sidebar-link">RabbitMQ 集群部署</a></li><li><a href="/docs/cluster/redis.html" aria-current="page" title="Redis 集群部署" class="active sidebar-link">Redis 集群部署</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a></li><li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li></ul> </aside> <main class="page has-page-anchor"> <div class="theme-dc3-content content__default"><h2 id="redis-集群部署"><code>Redis</code> 集群部署 <a href="#redis-集群部署" class="header-anchor">#</a></h2> <blockquote><p><code>Redis 3.0</code> 版本后正式推出 <code>Redis</code> 集群模式，该模式是 <code>Redis</code> 的分布式的解决方案，是一个提供在多个 <code>Redis</code> 节点间共享数据的程序集，且 <code>Redis</code> 集群是去中心化的，它的每个 <code>Master</code> 节点都可以进行读写数据，每个节点都拥有平等的关系，每个节点都保持各自的数据和整个集群的状态。</p></blockquote> <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3> <p><img src="/assets/images/dc3/cluster/redis/redis-1.png" alt=""></p> <blockquote><p><code>Redis</code> 集群没有使用一致性 <code>Hash</code>, 而是引入了&quot;哈希槽&quot;的概念。<code>Redis</code> 集群有 <code>16384</code> 个哈希槽，每个 <code>key</code>通过 <code>CRC16</code> 校验后对 <code>16384</code> 取模来决定放置哪个槽，集群的每个节点负责一部分 <code>hash</code> 槽。</p> <ul><li><p><code>节点 A</code> 包含 <code>0</code> 到 <code>5460</code> 号哈希槽；</p></li> <li><p><code>节点 B</code> 包含 <code>5461</code> 到 <code>10922</code> 号哈希槽；</p></li> <li><p><code>节点 C</code> 包含 <code>10923</code> 到 <code>16383</code> 号哈希槽。</p></li></ul> <p><img src="/assets/images/dc3/cluster/redis/redis-2.png" alt=""></p> <p>这种结构很容易 &quot;<code>添加</code>&quot; 或者 &quot;<code>删除</code>&quot; 节点. 比如如果我想新添加个 <code>节点 D</code>，我需要从节点 <code>A</code>, <code>B</code>, <code>C</code> 中得部分槽转移到 <code>节点 D</code> 上， 如果我想移除 <code>节点 A</code>，则需要将 <code>A</code> 中的槽移到 <code>B</code> 和 <code>C</code> 节点上，然后将没有任何槽的 <code>A</code> 节点从集群中移除即可。由于从一个节点将哈希槽移动到另一个节点并不会停止服务，所以无论添加删除或者改变某个节点的哈希槽的数量都不会造成集群不可用的状态。</p></blockquote> <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3> <blockquote><p><strong>在部署 <code>Redis</code> 集群模式时，至少需要六个节点组成集群才能保证集群的可用性。</strong></p> <p>在 <code>Redis</code> 集群模式下，为了防止集群部分节点因宕机等情况造成不可用，故而 <code>Redis</code> 集群使用了主从复制模式。在该模式下要求 <code>Redis</code> 集群至少要存在六个节点，其中三个节点为主节点，能够对外提供读写。还有三个节点为从节点，会同步其对应的主节点的数据。当某个主节点出现问题不可用时，<code>Redis</code> 将通过选举算法从主节点对应的从节点中选择一个节点（主节点存在多个从节点的情况下），将其更改为一个新的主节点，且能够对外提供服务。</p> <p>例如，在存在 <code>A</code>，<code>B</code>，<code>C</code> 三个主节点和其对应的 （<code>A1</code>、<code>A2</code>），（<code>B1</code>、<code>B2</code>），（<code>C1</code>、<code>C2</code>） 六个从节点，共九个节点中，如果节点 <code>A</code> 节点挂掉，那么其对应的从节点 <code>A1</code>、<code>A2</code> 节点将通过选举算法，选择其中一个节点提升为主节点，以确保集群能够正常服务。不过当 <code>A1</code>、<code>A2</code> 两个从节点或者或者半数以上主节点不可用时，那么集群也是不可用的。</p></blockquote> <table><thead><tr><th style="text-align:center;"><code>name</code></th> <th style="text-align:center;"><code>ip</code></th> <th style="text-align:center;"><code>node 1</code></th> <th style="text-align:center;"><code>node 2</code></th></tr></thead> <tbody><tr><td style="text-align:center;"><code>master-01</code></td> <td style="text-align:center;">127.0.0.1</td> <td style="text-align:center;">6100</td> <td style="text-align:center;">6101</td></tr> <tr><td style="text-align:center;"><code>master-02</code></td> <td style="text-align:center;">127.0.0.1</td> <td style="text-align:center;">6200</td> <td style="text-align:center;">6201</td></tr> <tr><td style="text-align:center;"><code>master-03</code></td> <td style="text-align:center;">127.0.0.1</td> <td style="text-align:center;">6300</td> <td style="text-align:center;">6301</td></tr></tbody></table> <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3> <blockquote><p><strong>下载源码</strong></p></blockquote> <ul><li><p>以 <code>6.2.6</code> 版本为例： https://download.redis.io/releases/redis-6.2.6.tar.gz</p></li> <li><p>其他版本下载：https://redis.io/download</p></li></ul> <blockquote><p><strong>构建源码</strong></p> <p>将在 <code>src</code> 目录下生成可执行文件</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">tar</span> xzf redis-6.2.6.tar.gz
+                </span><i class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="visibility:hidden;position:absolute;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                        </ul>
+                        <ul class="extra-group"><!----> <!----></ul>
+                    </nav>
+                </div>
+            </div> <!----></header>
+        <aside class="sidebar"><!---->
+            <ul class="sidebar-links">
+                <li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li>
+                <li>
+                    <section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/code/0-environment.html" title="注意事项"
+                                   class="sidebar-link">注意事项</a></li>
+                            <li><a href="/docs/code/1-idea-start.html" title="必要软件环境"
+                                   class="sidebar-link">必要软件环境</a></li>
+                            <li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建
+                                IoT DC3 Web UI</a></li>
+                            <li><a href="/docs/code/3-quick-start.html" title="快速启动"
+                                   class="sidebar-link">快速启动</a></li>
+                            <li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a>
+                            </li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/cluster/emqx.html" title="EMQ X 集群部署" class="sidebar-link">EMQ X
+                                集群部署</a></li>
+                            <li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo
+                                集群部署</a></li>
+                            <li><a href="/docs/cluster/rabbitmq.html" title="RabbitMQ 集群部署" class="sidebar-link">RabbitMQ
+                                集群部署</a></li>
+                            <li><a href="/docs/cluster/redis.html" aria-current="page" title="Redis 集群部署"
+                                   class="active sidebar-link">Redis 集群部署</a></li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a>
+                </li>
+                <li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li>
+            </ul>
+        </aside>
+        <main class="page has-page-anchor">
+            <div class="theme-dc3-content content__default"><h2 id="redis-集群部署"><code>Redis</code> 集群部署 <a
+                    href="#redis-集群部署" class="header-anchor">#</a></h2>
+                <blockquote><p><code>Redis 3.0</code> 版本后正式推出 <code>Redis</code> 集群模式，该模式是
+                    <code>Redis</code> 的分布式的解决方案，是一个提供在多个 <code>Redis</code> 节点间共享数据的程序集，且
+                    <code>Redis</code> 集群是去中心化的，它的每个 <code>Master</code>
+                    节点都可以进行读写数据，每个节点都拥有平等的关系，每个节点都保持各自的数据和整个集群的状态。</p>
+                </blockquote>
+                <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3>
+                <p><img src="/assets/images/dc3/cluster/redis/redis-1.png" alt=""></p>
+                <blockquote><p><code>Redis</code> 集群没有使用一致性 <code>Hash</code>, 而是引入了&quot;哈希槽&quot;的概念。<code>Redis</code>
+                    集群有 <code>16384</code> 个哈希槽，每个 <code>key</code>通过 <code>CRC16</code> 校验后对
+                    <code>16384</code> 取模来决定放置哪个槽，集群的每个节点负责一部分 <code>hash</code> 槽。</p>
+                    <ul>
+                        <li><p><code>节点 A</code> 包含 <code>0</code> 到 <code>5460</code> 号哈希槽；</p></li>
+                        <li><p><code>节点 B</code> 包含 <code>5461</code> 到 <code>10922</code> 号哈希槽；</p></li>
+                        <li><p><code>节点 C</code> 包含 <code>10923</code> 到 <code>16383</code> 号哈希槽。</p></li>
+                    </ul>
+                    <p><img src="/assets/images/dc3/cluster/redis/redis-2.png" alt=""></p>
+                    <p>这种结构很容易 &quot;<code>添加</code>&quot; 或者 &quot;<code>删除</code>&quot; 节点. 比如如果我想新添加个
+                        <code>节点 D</code>，我需要从节点 <code>A</code>, <code>B</code>, <code>C</code> 中得部分槽转移到
+                        <code>节点 D</code> 上， 如果我想移除 <code>节点 A</code>，则需要将 <code>A</code> 中的槽移到
+                        <code>B</code> 和 <code>C</code> 节点上，然后将没有任何槽的 <code>A</code>
+                        节点从集群中移除即可。由于从一个节点将哈希槽移动到另一个节点并不会停止服务，所以无论添加删除或者改变某个节点的哈希槽的数量都不会造成集群不可用的状态。
+                    </p></blockquote>
+                <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3>
+                <blockquote><p><strong>在部署 <code>Redis</code> 集群模式时，至少需要六个节点组成集群才能保证集群的可用性。</strong>
+                </p>
+                    <p>在 <code>Redis</code> 集群模式下，为了防止集群部分节点因宕机等情况造成不可用，故而
+                        <code>Redis</code> 集群使用了主从复制模式。在该模式下要求 <code>Redis</code>
+                        集群至少要存在六个节点，其中三个节点为主节点，能够对外提供读写。还有三个节点为从节点，会同步其对应的主节点的数据。当某个主节点出现问题不可用时，<code>Redis</code>
+                        将通过选举算法从主节点对应的从节点中选择一个节点（主节点存在多个从节点的情况下），将其更改为一个新的主节点，且能够对外提供服务。
+                    </p>
+                    <p>例如，在存在 <code>A</code>，<code>B</code>，<code>C</code> 三个主节点和其对应的
+                        （<code>A1</code>、<code>A2</code>），（<code>B1</code>、<code>B2</code>），（<code>C1</code>、<code>C2</code>）
+                        六个从节点，共九个节点中，如果节点 <code>A</code> 节点挂掉，那么其对应的从节点
+                        <code>A1</code>、<code>A2</code> 节点将通过选举算法，选择其中一个节点提升为主节点，以确保集群能够正常服务。不过当
+                        <code>A1</code>、<code>A2</code> 两个从节点或者或者半数以上主节点不可用时，那么集群也是不可用的。
+                    </p></blockquote>
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;"><code>name</code></th>
+                        <th style="text-align:center;"><code>ip</code></th>
+                        <th style="text-align:center;"><code>node 1</code></th>
+                        <th style="text-align:center;"><code>node 2</code></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="text-align:center;"><code>master-01</code></td>
+                        <td style="text-align:center;">127.0.0.1</td>
+                        <td style="text-align:center;">6100</td>
+                        <td style="text-align:center;">6101</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>master-02</code></td>
+                        <td style="text-align:center;">127.0.0.1</td>
+                        <td style="text-align:center;">6200</td>
+                        <td style="text-align:center;">6201</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>master-03</code></td>
+                        <td style="text-align:center;">127.0.0.1</td>
+                        <td style="text-align:center;">6300</td>
+                        <td style="text-align:center;">6301</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3>
+                <blockquote><p><strong>下载源码</strong></p></blockquote>
+                <ul>
+                    <li><p>以 <code>6.2.6</code> 版本为例： https://download.redis.io/releases/redis-6.2.6.tar.gz</p>
+                    </li>
+                    <li><p>其他版本下载：https://redis.io/download</p></li>
+                </ul>
+                <blockquote><p><strong>构建源码</strong></p>
+                    <p>将在 <code>src</code> 目录下生成可执行文件</p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token function">tar</span> xzf redis-6.2.6.tar.gz
 
 <span class="token builtin class-name">cd</span> redis-6.2.6
 
 <span class="token function">make</span>
-</code></pre></div><h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4 id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a></h4> <blockquote><p>分别创建三个节点（<code>master</code>）目录，多个以此类推 <code>master-N</code></p> <p>每个 master 目录中创建 两个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> /data
+</code></pre>
+                </div>
+                <h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4
+                        id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a>
+                </h4>
+                <blockquote><p>分别创建三个节点（<code>master</code>）目录，多个以此类推 <code>master-N</code></p>
+                    <p>每个 master 目录中创建 两个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p>
+                </blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token builtin class-name">cd</span> /data
 
 <span class="token function">mkdir</span> <span class="token parameter variable">-p</span> redis/dc3/master-01 redis/dc3/master-02 redis/dc3/master-03
 
 <span class="token function">mkdir</span> <span class="token parameter variable">-p</span> redis/dc3/master-01/node-01 redis/dc3/master-01/node-02 redis/dc3/master-02/node-01 redis/dc3/master-02/node-02 redis/dc3/master-03/node-01 redis/dc3/master-03/node-02
-</code></pre></div><blockquote><p>为每个节点创建配置、数据、日志目录，其他节点操作一致</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> node-N
+</code></pre>
+                </div>
+                <blockquote><p>为每个节点创建配置、数据、日志目录，其他节点操作一致</p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token builtin class-name">cd</span> node-N
 
 <span class="token function">mkdir</span> data etc logs
-</code></pre></div><h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4> <blockquote><p>在每个节点的 <code>etc</code> 下添加配置文件 <code>redis.conf</code></p></blockquote> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">#</span>
+</code></pre>
+                </div>
+                <h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4>
+                <blockquote><p>在每个节点的 <code>etc</code> 下添加配置文件 <code>redis.conf</code></p></blockquote>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span
+                        class="token comment">#</span>
 <span class="token comment"># Copyright (c) 2022. Pnoker. All Rights Reserved.</span>
 <span class="token comment"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="token comment"># you may not use this file except in compliance with the License.</span>
@@ -408,7 +746,11 @@ set<span class="token punctuation">-</span>proc<span class="token punctuation">-
 <span class="token comment"># {unixsocket}      Unix domain socket listening on, or &quot;&quot;.</span>
 <span class="token comment"># {config-file}     Name of configuration file used.</span>
 <span class="token comment">#</span>
-proc<span class="token punctuation">-</span>title<span class="token punctuation">-</span>template &quot;<span class="token punctuation">{</span>title<span class="token punctuation">}</span> <span class="token punctuation">{</span>listen<span class="token punctuation">-</span>addr<span class="token punctuation">}</span> <span class="token punctuation">{</span>server<span class="token punctuation">-</span>mode<span class="token punctuation">}</span>&quot;
+proc<span class="token punctuation">-</span>title<span class="token punctuation">-</span>template &quot;<span
+                            class="token punctuation">{</span>title<span class="token punctuation">}</span> <span
+                            class="token punctuation">{</span>listen<span class="token punctuation">-</span>addr<span
+                            class="token punctuation">}</span> <span class="token punctuation">{</span>server<span
+                            class="token punctuation">-</span>mode<span class="token punctuation">}</span>&quot;
 
 <span class="token comment">################################ SNAPSHOTTING  ################################</span>
 
@@ -448,7 +790,8 @@ save 60   10000
 <span class="token comment"># and persistence, you may want to disable this feature so that Redis will</span>
 <span class="token comment"># continue to work as usual even if there are problems with disk,</span>
 <span class="token comment"># permissions, and so forth.</span>
-stop<span class="token punctuation">-</span>writes<span class="token punctuation">-</span>on<span class="token punctuation">-</span>bgsave<span class="token punctuation">-</span>error yes
+stop<span class="token punctuation">-</span>writes<span class="token punctuation">-</span>on<span
+                            class="token punctuation">-</span>bgsave<span class="token punctuation">-</span>error yes
 
 <span class="token comment"># Compress string objects using LZF when dump .rdb databases?</span>
 <span class="token comment"># By default compression is enabled as it's almost always a win.</span>
@@ -494,7 +837,8 @@ dbfilename dump.rdb
 <span class="token comment"># An alternative (and sometimes better) way to obtain the same effect is</span>
 <span class="token comment"># to use diskless replication on both master and replicas instances. However</span>
 <span class="token comment"># in the case of replicas, diskless is not always an option.</span>
-rdb<span class="token punctuation">-</span>del<span class="token punctuation">-</span>sync<span class="token punctuation">-</span>files no
+rdb<span class="token punctuation">-</span>del<span class="token punctuation">-</span>sync<span
+                            class="token punctuation">-</span>files no
 
 <span class="token comment"># The working directory.</span>
 <span class="token comment">#</span>
@@ -560,7 +904,8 @@ dir /data/redis/dc3/master<span class="token punctuation">-</span>01/node<span c
 <span class="token comment">#    UNSUBSCRIBE, PSUBSCRIBE, PUNSUBSCRIBE, PUBLISH, PUBSUB, COMMAND, POST,</span>
 <span class="token comment">#    HOST and LATENCY.</span>
 <span class="token comment">#</span>
-replica<span class="token punctuation">-</span>serve<span class="token punctuation">-</span>stale<span class="token punctuation">-</span>data yes
+replica<span class="token punctuation">-</span>serve<span class="token punctuation">-</span>stale<span
+                            class="token punctuation">-</span>data yes
 
 <span class="token comment"># You can configure a replica instance to accept writes or not. Writing against</span>
 <span class="token comment"># a replica instance may be useful to store some ephemeral data (because data</span>
@@ -617,7 +962,8 @@ repl<span class="token punctuation">-</span>diskless<span class="token punctuati
 <span class="token comment">#</span>
 <span class="token comment"># The delay is specified in seconds, and by default is 5 seconds. To disable</span>
 <span class="token comment"># it entirely just set it to 0 seconds and the transfer will start ASAP.</span>
-repl<span class="token punctuation">-</span>diskless<span class="token punctuation">-</span>sync<span class="token punctuation">-</span>delay 5
+repl<span class="token punctuation">-</span>diskless<span class="token punctuation">-</span>sync<span
+                            class="token punctuation">-</span>delay 5
 
 <span class="token comment"># -----------------------------------------------------------------------------</span>
 <span class="token comment"># WARNING: RDB diskless load is experimental. Since in this setup the replica</span>
@@ -677,7 +1023,8 @@ repl<span class="token punctuation">-</span>diskless<span class="token punctuati
 <span class="token comment"># By default we optimize for low latency, but in very high traffic conditions</span>
 <span class="token comment"># or when the master and replicas are many hops away, turning this to &quot;yes&quot; may</span>
 <span class="token comment"># be a good idea.</span>
-repl<span class="token punctuation">-</span>disable<span class="token punctuation">-</span>tcp<span class="token punctuation">-</span>nodelay no
+repl<span class="token punctuation">-</span>disable<span class="token punctuation">-</span>tcp<span
+                            class="token punctuation">-</span>nodelay no
 
 <span class="token comment"># Set the replication backlog size. The backlog is a buffer that accumulates</span>
 <span class="token comment"># replica data when replicas are disconnected for some time, so that when a</span>
@@ -1178,7 +1525,8 @@ maxmemory<span class="token punctuation">-</span>policy volatile<span class="tok
 
 lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>eviction no
 lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>expire no
-lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>server<span class="token punctuation">-</span>del no
+lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>server<span
+                            class="token punctuation">-</span>del no
 replica<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>flush no
 
 <span class="token comment"># It is also possible, for the case when to replace the user code DEL calls</span>
@@ -1186,14 +1534,16 @@ replica<span class="token punctuation">-</span>lazy<span class="token punctuatio
 <span class="token comment"># command to act exactly like UNLINK, using the following configuration</span>
 <span class="token comment"># directive:</span>
 
-lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>user<span class="token punctuation">-</span>del no
+lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>user<span
+                            class="token punctuation">-</span>del no
 
 <span class="token comment"># FLUSHDB, FLUSHALL, and SCRIPT FLUSH support both asynchronous and synchronous</span>
 <span class="token comment"># deletion, which can be controlled by passing the [SYNC|ASYNC] flags into the</span>
 <span class="token comment"># commands. When neither flag is passed, this directive will be used to determine</span>
 <span class="token comment"># if the data should be deleted asynchronously.</span>
 
-lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>user<span class="token punctuation">-</span>flush no
+lazyfree<span class="token punctuation">-</span>lazy<span class="token punctuation">-</span>user<span
+                            class="token punctuation">-</span>flush no
 
 <span class="token comment">################################ THREADED I/O #################################</span>
 
@@ -1228,7 +1578,8 @@ io<span class="token punctuation">-</span>threads 4
 <span class="token comment"># protocol parsing using the following configuration directive, by setting</span>
 <span class="token comment"># it to yes:</span>
 <span class="token comment">#</span>
-io<span class="token punctuation">-</span>threads<span class="token punctuation">-</span>do<span class="token punctuation">-</span>reads yes
+io<span class="token punctuation">-</span>threads<span class="token punctuation">-</span>do<span
+                            class="token punctuation">-</span>reads yes
 <span class="token comment">#</span>
 <span class="token comment"># Usually threading reads doesn't help much.</span>
 <span class="token comment">#</span>
@@ -1270,7 +1621,8 @@ oom<span class="token punctuation">-</span>score<span class="token punctuation">
 <span class="token comment"># can freely increase their value, but not decrease it below its initial</span>
 <span class="token comment"># settings. This means that setting oom-score-adj to &quot;relative&quot; and setting the</span>
 <span class="token comment"># oom-score-adj-values to positive values will always succeed.</span>
-oom<span class="token punctuation">-</span>score<span class="token punctuation">-</span>adj<span class="token punctuation">-</span>values 0 200 800
+oom<span class="token punctuation">-</span>score<span class="token punctuation">-</span>adj<span
+                            class="token punctuation">-</span>values 0 200 800
 
 
 <span class="token comment">#################### KERNEL transparent hugepage CONTROL ######################</span>
@@ -1357,7 +1709,8 @@ appendfsync everysec
 <span class="token comment"># If you have latency problems turn this to &quot;yes&quot;. Otherwise leave it as</span>
 <span class="token comment"># &quot;no&quot; that is the safest pick from the point of view of durability.</span>
 
-no<span class="token punctuation">-</span>appendfsync<span class="token punctuation">-</span>on<span class="token punctuation">-</span>rewrite no
+no<span class="token punctuation">-</span>appendfsync<span class="token punctuation">-</span>on<span
+                            class="token punctuation">-</span>rewrite no
 
 <span class="token comment"># Automatic rewrite of the append only file.</span>
 <span class="token comment"># Redis is able to automatically rewrite the log file implicitly calling</span>
@@ -1376,8 +1729,10 @@ no<span class="token punctuation">-</span>appendfsync<span class="token punctuat
 <span class="token comment"># Specify a percentage of zero in order to disable the automatic AOF</span>
 <span class="token comment"># rewrite feature.</span>
 
-auto<span class="token punctuation">-</span>aof<span class="token punctuation">-</span>rewrite<span class="token punctuation">-</span>percentage 100
-auto<span class="token punctuation">-</span>aof<span class="token punctuation">-</span>rewrite<span class="token punctuation">-</span>min<span class="token punctuation">-</span>size 64mb
+auto<span class="token punctuation">-</span>aof<span class="token punctuation">-</span>rewrite<span
+                            class="token punctuation">-</span>percentage 100
+auto<span class="token punctuation">-</span>aof<span class="token punctuation">-</span>rewrite<span
+                            class="token punctuation">-</span>min<span class="token punctuation">-</span>size 64mb
 
 <span class="token comment"># An AOF file may be found to be truncated at the end during the Redis</span>
 <span class="token comment"># startup process, when the AOF data gets loaded back into memory.</span>
@@ -1412,7 +1767,8 @@ aof<span class="token punctuation">-</span>load<span class="token punctuation">-
 <span class="token comment"># When loading, Redis recognizes that the AOF file starts with the &quot;REDIS&quot;</span>
 <span class="token comment"># string and loads the prefixed RDB file, then continues loading the AOF</span>
 <span class="token comment"># tail.</span>
-aof<span class="token punctuation">-</span>use<span class="token punctuation">-</span>rdb<span class="token punctuation">-</span>preamble yes
+aof<span class="token punctuation">-</span>use<span class="token punctuation">-</span>rdb<span
+                            class="token punctuation">-</span>preamble yes
 
 <span class="token comment">################################ LUA SCRIPTING  ###############################</span>
 
@@ -1448,7 +1804,8 @@ cluster<span class="token punctuation">-</span>enabled yes
 <span class="token comment"># overlapping cluster configuration file names.</span>
 <span class="token comment">#</span>
 <span class="token comment"># cluster-config-file nodes-6379.conf</span>
-cluster<span class="token punctuation">-</span>config<span class="token punctuation">-</span>file /data/redis/dc3/master<span class="token punctuation">-</span>01/node<span class="token punctuation">-</span>01/etc/nodes.conf
+cluster<span class="token punctuation">-</span>config<span class="token punctuation">-</span>file /data/redis/dc3/master<span
+                            class="token punctuation">-</span>01/node<span class="token punctuation">-</span>01/etc/nodes.conf
 
 <span class="token comment"># Cluster node timeout is the amount of milliseconds a node must be unreachable</span>
 <span class="token comment"># for it to be considered in failure state.</span>
@@ -1628,7 +1985,8 @@ cluster<span class="token punctuation">-</span>config<span class="token punctuat
 <span class="token comment"># The following time is expressed in microseconds, so 1000000 is equivalent</span>
 <span class="token comment"># to one second. Note that a negative number disables the slow log, while</span>
 <span class="token comment"># a value of zero forces the logging of every command.</span>
-slowlog<span class="token punctuation">-</span>log<span class="token punctuation">-</span>slower<span class="token punctuation">-</span>than 10000
+slowlog<span class="token punctuation">-</span>log<span class="token punctuation">-</span>slower<span
+                            class="token punctuation">-</span>than 10000
 
 <span class="token comment"># There is no limit to this length. Just be aware that it will consume memory.</span>
 <span class="token comment"># You can reclaim memory used by the slow log with SLOWLOG RESET.</span>
@@ -1769,8 +2127,10 @@ notify<span class="token punctuation">-</span>keyspace<span class="token punctua
 <span class="token comment"># Hashes are encoded using a memory efficient data structure when they have a</span>
 <span class="token comment"># small number of entries, and the biggest entry does not exceed a given</span>
 <span class="token comment"># threshold. These thresholds can be configured using the following directives.</span>
-hash<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span class="token punctuation">-</span>entries 512
-hash<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span class="token punctuation">-</span>value 64
+hash<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span
+                            class="token punctuation">-</span>entries 512
+hash<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span
+                            class="token punctuation">-</span>value 64
 
 <span class="token comment"># Lists are also encoded in a special way to save a lot of space.</span>
 <span class="token comment"># The number of entries allowed per internal list node can be specified</span>
@@ -1785,7 +2145,9 @@ hash<span class="token punctuation">-</span>max<span class="token punctuation">-
 <span class="token comment"># per list node.</span>
 <span class="token comment"># The highest performing option is usually -2 (8 Kb size) or -1 (4 Kb size),</span>
 <span class="token comment"># but if your use case is unique, adjust the settings as necessary.</span>
-list<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span class="token punctuation">-</span>size <span class="token punctuation">-</span><span class="token number">2</span>
+list<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span
+                            class="token punctuation">-</span>size <span class="token punctuation">-</span><span
+                            class="token number">2</span>
 
 <span class="token comment"># Lists may also be compressed.</span>
 <span class="token comment"># Compress depth is the number of quicklist ziplist nodes from *each* side of</span>
@@ -1808,13 +2170,16 @@ list<span class="token punctuation">-</span>compress<span class="token punctuati
 <span class="token comment"># of 64 bit signed integers.</span>
 <span class="token comment"># The following configuration setting sets the limit in the size of the</span>
 <span class="token comment"># set in order to use this special memory saving encoding.</span>
-set<span class="token punctuation">-</span>max<span class="token punctuation">-</span>intset<span class="token punctuation">-</span>entries 512
+set<span class="token punctuation">-</span>max<span class="token punctuation">-</span>intset<span
+                            class="token punctuation">-</span>entries 512
 
 <span class="token comment"># Similarly to hashes and lists, sorted sets are also specially encoded in</span>
 <span class="token comment"># order to save a lot of space. This encoding is only used when the length and</span>
 <span class="token comment"># elements of a sorted set are below the following limits:</span>
-zset<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span class="token punctuation">-</span>entries 128
-zset<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span class="token punctuation">-</span>value 64
+zset<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span
+                            class="token punctuation">-</span>entries 128
+zset<span class="token punctuation">-</span>max<span class="token punctuation">-</span>ziplist<span
+                            class="token punctuation">-</span>value 64
 
 <span class="token comment"># HyperLogLog sparse representation bytes limit. The limit includes the</span>
 <span class="token comment"># 16 bytes header. When an HyperLogLog using the sparse representation crosses</span>
@@ -1828,7 +2193,8 @@ zset<span class="token punctuation">-</span>max<span class="token punctuation">-
 <span class="token comment"># which is O(N) with the sparse encoding. The value can be raised to</span>
 <span class="token comment"># ~ 10000 when CPU is not a concern, but space is, and the data set is</span>
 <span class="token comment"># composed of many HyperLogLogs with cardinality in the 0 - 15000 range.</span>
-hll<span class="token punctuation">-</span>sparse<span class="token punctuation">-</span>max<span class="token punctuation">-</span>bytes 3000
+hll<span class="token punctuation">-</span>sparse<span class="token punctuation">-</span>max<span
+                            class="token punctuation">-</span>bytes 3000
 
 <span class="token comment"># Streams macro node max size / items. The stream data structure is a radix</span>
 <span class="token comment"># tree of big nodes that encode multiple items inside. Using this configuration</span>
@@ -1838,8 +2204,10 @@ hll<span class="token punctuation">-</span>sparse<span class="token punctuation"
 <span class="token comment"># zero, the limit is ignored, so for instance it is possible to set just a</span>
 <span class="token comment"># max entries limit by setting max-bytes to 0 and max-entries to the desired</span>
 <span class="token comment"># value.</span>
-stream<span class="token punctuation">-</span>node<span class="token punctuation">-</span>max<span class="token punctuation">-</span>bytes 4096
-stream<span class="token punctuation">-</span>node<span class="token punctuation">-</span>max<span class="token punctuation">-</span>entries 100
+stream<span class="token punctuation">-</span>node<span class="token punctuation">-</span>max<span
+                            class="token punctuation">-</span>bytes 4096
+stream<span class="token punctuation">-</span>node<span class="token punctuation">-</span>max<span
+                            class="token punctuation">-</span>entries 100
 
 <span class="token comment"># Active rehashing uses 1 millisecond every 100 milliseconds of CPU time in</span>
 <span class="token comment"># order to help rehashing the main Redis hash table (the one mapping top-level</span>
@@ -1894,9 +2262,12 @@ activerehashing yes
 <span class="token comment"># subscribers and replicas receive data in a push fashion.</span>
 <span class="token comment">#</span>
 <span class="token comment"># Both the hard or the soft limit can be disabled by setting them to zero.</span>
-client<span class="token punctuation">-</span>output<span class="token punctuation">-</span>buffer<span class="token punctuation">-</span>limit normal 0 0 0
-client<span class="token punctuation">-</span>output<span class="token punctuation">-</span>buffer<span class="token punctuation">-</span>limit replica 256mb 64mb 60
-client<span class="token punctuation">-</span>output<span class="token punctuation">-</span>buffer<span class="token punctuation">-</span>limit pubsub 32mb 8mb 60
+client<span class="token punctuation">-</span>output<span class="token punctuation">-</span>buffer<span
+                            class="token punctuation">-</span>limit normal 0 0 0
+client<span class="token punctuation">-</span>output<span class="token punctuation">-</span>buffer<span
+                            class="token punctuation">-</span>limit replica 256mb 64mb 60
+client<span class="token punctuation">-</span>output<span class="token punctuation">-</span>buffer<span
+                            class="token punctuation">-</span>limit pubsub 32mb 8mb 60
 
 <span class="token comment"># Client query buffers accumulate new commands. They are limited to a fixed</span>
 <span class="token comment"># amount by default in order to avoid that a protocol desynchronization (for</span>
@@ -1949,13 +2320,15 @@ dynamic<span class="token punctuation">-</span>hz yes
 <span class="token comment"># the file will be fsync-ed every 32 MB of data generated. This is useful</span>
 <span class="token comment"># in order to commit the file to the disk more incrementally and avoid</span>
 <span class="token comment"># big latency spikes.</span>
-aof<span class="token punctuation">-</span>rewrite<span class="token punctuation">-</span>incremental<span class="token punctuation">-</span>fsync yes
+aof<span class="token punctuation">-</span>rewrite<span class="token punctuation">-</span>incremental<span
+                            class="token punctuation">-</span>fsync yes
 
 <span class="token comment"># When redis saves RDB file, if the following option is enabled</span>
 <span class="token comment"># the file will be fsync-ed every 32 MB of data generated. This is useful</span>
 <span class="token comment"># in order to commit the file to the disk more incrementally and avoid</span>
 <span class="token comment"># big latency spikes.</span>
-rdb<span class="token punctuation">-</span>save<span class="token punctuation">-</span>incremental<span class="token punctuation">-</span>fsync yes
+rdb<span class="token punctuation">-</span>save<span class="token punctuation">-</span>incremental<span
+                            class="token punctuation">-</span>fsync yes
 
 <span class="token comment"># Redis LFU eviction (see maxmemory setting) can be tuned. However it is a good</span>
 <span class="token comment"># idea to start with the default settings and only change them after investigating</span>
@@ -2107,7 +2480,10 @@ jemalloc<span class="token punctuation">-</span>bg<span class="token punctuation
 <span class="token comment"># to suppress</span>
 <span class="token comment">#</span>
 <span class="token comment"># ignore-warnings ARM64-COW-BUG</span>
-</code></pre></div><h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-server /data/redis/dc3/master-01/node-01/etc/redis.conf
+</code></pre>
+                </div>
+                <h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-server /data/redis/dc3/master-01/node-01/etc/redis.conf
 
 /usr/local/redis/src/redis-server /data/redis/dc3/master-01/node-02/etc/redis.conf
 
@@ -2118,9 +2494,14 @@ jemalloc<span class="token punctuation">-</span>bg<span class="token punctuation
 /usr/local/redis/src/redis-server /data/redis/dc3/master-03/node-01/etc/redis.conf
 
 /usr/local/redis/src/redis-server /data/redis/dc3/master-03/node-02/etc/redis.conf
-</code></pre></div><h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4> <blockquote><p><strong>节点握手</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token comment"># 登录到任意节点</span>
+</code></pre>
+                </div>
+                <h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4>
+                <blockquote><p><strong>节点握手</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token comment"># 登录到任意节点</span>
 <span class="token comment"># -c 选项指定以Cluster模式运行redis-cli</span>
-/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6100</span> <span class="token parameter variable">-c</span>
+/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span
+                            class="token number">6100</span> <span class="token parameter variable">-c</span>
 
 <span class="token comment"># 握手</span>
 cluster meet <span class="token number">127.0</span>.0.1 <span class="token number">6101</span>
@@ -2128,34 +2509,96 @@ cluster meet <span class="token number">127.0</span>.0.1 <span class="token numb
 cluster meet <span class="token number">127.0</span>.0.1 <span class="token number">6201</span>
 cluster meet <span class="token number">127.0</span>.0.1 <span class="token number">6300</span>
 cluster meet <span class="token number">127.0</span>.0.1 <span class="token number">6301</span>
-</code></pre></div><blockquote><p><strong>节点状态</strong></p> <p>每个节点启动后，节点间是相互独立的，他们都处于一个只包含自己的集群当中，以端口号 <code>master-01/node-01</code> 节点的服务器为例，利用 <code>CLUSTER NODES</code> 查看当前集群包含的节点。</p> <p><code>&lt;id&gt; &lt;ip:port@cport&gt; &lt;flags&gt; &lt;master&gt; &lt;ping-sent&gt; &lt;pong-recv&gt; &lt;config-epoch&gt; &lt;link-state&gt; &lt;slot&gt; &lt;slot&gt; ... &lt;slot&gt;</code></p> <ul><li>节点<code>id</code>: 由<code>40</code>个<code>16</code>进制字符串组成，节点id只在集群初始化时创建一次，然后保存到集群配置文件（即前文提到的<code>cluster-config-file</code>）中，以后节点重新启动时会直接在集群配置文件中读取。</li> <li><code>port@cport</code>: 前者为普通端口，用于为客户端提供服务；后者为集群端口，分配方法为：普通端口<code>+10000</code>，只用于节点间的通讯。</li></ul></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token comment"># 登录到任意节点</span>
+</code></pre>
+                </div>
+                <blockquote><p><strong>节点状态</strong></p>
+                    <p>每个节点启动后，节点间是相互独立的，他们都处于一个只包含自己的集群当中，以端口号 <code>master-01/node-01</code>
+                        节点的服务器为例，利用 <code>CLUSTER NODES</code> 查看当前集群包含的节点。</p>
+                    <p><code>&lt;id&gt; &lt;ip:port@cport&gt; &lt;flags&gt; &lt;master&gt; &lt;ping-sent&gt; &lt;pong-recv&gt;
+                        &lt;config-epoch&gt; &lt;link-state&gt; &lt;slot&gt; &lt;slot&gt; ... &lt;slot&gt;</code></p>
+                    <ul>
+                        <li>节点<code>id</code>: 由<code>40</code>个<code>16</code>进制字符串组成，节点id只在集群初始化时创建一次，然后保存到集群配置文件（即前文提到的<code>cluster-config-file</code>）中，以后节点重新启动时会直接在集群配置文件中读取。
+                        </li>
+                        <li><code>port@cport</code>: 前者为普通端口，用于为客户端提供服务；后者为集群端口，分配方法为：普通端口<code>+10000</code>，只用于节点间的通讯。
+                        </li>
+                    </ul>
+                </blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token comment"># 登录到任意节点</span>
 <span class="token comment"># -c 选项指定以Cluster模式运行redis-cli</span>
-/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6100</span> <span class="token parameter variable">-c</span>
+/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span
+                            class="token number">6100</span> <span class="token parameter variable">-c</span>
 
 <span class="token comment"># 查看节点的状态</span>
 cluster nodes
 
 <span class="token comment"># 输出</span>
-c5f306ea99017b59e1621e51875f81fdbf928fe7 <span class="token number">127.0</span>.0.1:6300@16300 master - <span class="token number">0</span> <span class="token number">1638944695507</span> <span class="token number">5</span> connected
-0472e59e5dde1deb38418c5fc49b24240c87c69b <span class="token number">127.0</span>.0.1:6201@16201 master - <span class="token number">0</span> <span class="token number">1638944694000</span> <span class="token number">3</span> connected
-a22940cd650ecbf823293f08836c8375199f7d1e <span class="token number">127.0</span>.0.1:6100@16100 myself,master - <span class="token number">0</span> <span class="token number">1638944694000</span> <span class="token number">2</span> connected
-6a75b47aa9c5e3b6bebe87a3184cb5285abe3755 <span class="token number">127.0</span>.0.1:6101@16101 master - <span class="token number">0</span> <span class="token number">1638944695000</span> <span class="token number">1</span> connected
-dea417a8d19eccb12194e8aee5a4c77e861bdeb4 <span class="token number">127.0</span>.0.1:6301@16301 master - <span class="token number">0</span> <span class="token number">1638944694000</span> <span class="token number">0</span> connected
-c348f29d5aa3ac65593ed97fccabd36e7677ae41 <span class="token number">127.0</span>.0.1:6200@16200 master - <span class="token number">0</span> <span class="token number">1638944695000</span> <span class="token number">4</span> connected
-</code></pre></div><blockquote><p><strong>指派节点槽</strong></p> <p><code>Redis</code> 集群通过分片（<code>sharding</code>）的方式保存数据库的键值对，整个数据库被分为 <code>16384</code> 个槽（<code>slot</code>），数据库每个键都属于这 <code>16384</code> 个槽的一个，集群中的每个节点都可以处理 <code>0</code> 个或者最多 <code>16384</code> 个 <code>slot</code>。</p> <p>槽是数据管理和迁移的基本单位。当数据库中的 <code>16384</code> 个槽都分配了节点时，集群处于上线状态（<code>ok</code>）；如果有任意一个槽没有分配节点，则集群处于下线状态（<code>fail</code>）。</p> <p>注意，只有主节点有处理槽的能力，如果将槽指派步骤放在主从复制之后，并且将槽位分配给从节点，那么集群将无法正常工作（处于下线状态）。</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6100</span> cluster addslots <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">..</span><span class="token number">5000</span><span class="token punctuation">}</span>
-/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6200</span> cluster addslots <span class="token punctuation">{</span><span class="token number">5001</span><span class="token punctuation">..</span><span class="token number">10000</span><span class="token punctuation">}</span>
-/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6300</span> cluster addslots <span class="token punctuation">{</span><span class="token number">10001</span><span class="token punctuation">..</span><span class="token number">16383</span><span class="token punctuation">}</span>
+c5f306ea99017b59e1621e51875f81fdbf928fe7 <span class="token number">127.0</span>.0.1:6300@16300 master - <span
+                            class="token number">0</span> <span class="token number">1638944695507</span> <span
+                            class="token number">5</span> connected
+0472e59e5dde1deb38418c5fc49b24240c87c69b <span class="token number">127.0</span>.0.1:6201@16201 master - <span
+                            class="token number">0</span> <span class="token number">1638944694000</span> <span
+                            class="token number">3</span> connected
+a22940cd650ecbf823293f08836c8375199f7d1e <span class="token number">127.0</span>.0.1:6100@16100 myself,master - <span
+                            class="token number">0</span> <span class="token number">1638944694000</span> <span
+                            class="token number">2</span> connected
+6a75b47aa9c5e3b6bebe87a3184cb5285abe3755 <span class="token number">127.0</span>.0.1:6101@16101 master - <span
+                            class="token number">0</span> <span class="token number">1638944695000</span> <span
+                            class="token number">1</span> connected
+dea417a8d19eccb12194e8aee5a4c77e861bdeb4 <span class="token number">127.0</span>.0.1:6301@16301 master - <span
+                            class="token number">0</span> <span class="token number">1638944694000</span> <span
+                            class="token number">0</span> connected
+c348f29d5aa3ac65593ed97fccabd36e7677ae41 <span class="token number">127.0</span>.0.1:6200@16200 master - <span
+                            class="token number">0</span> <span class="token number">1638944695000</span> <span
+                            class="token number">4</span> connected
+</code></pre>
+                </div>
+                <blockquote><p><strong>指派节点槽</strong></p>
+                    <p><code>Redis</code> 集群通过分片（<code>sharding</code>）的方式保存数据库的键值对，整个数据库被分为
+                        <code>16384</code> 个槽（<code>slot</code>），数据库每个键都属于这 <code>16384</code>
+                        个槽的一个，集群中的每个节点都可以处理 <code>0</code> 个或者最多 <code>16384</code> 个
+                        <code>slot</code>。</p>
+                    <p>槽是数据管理和迁移的基本单位。当数据库中的 <code>16384</code> 个槽都分配了节点时，集群处于上线状态（<code>ok</code>）；如果有任意一个槽没有分配节点，则集群处于下线状态（<code>fail</code>）。
+                    </p>
+                    <p>
+                        注意，只有主节点有处理槽的能力，如果将槽指派步骤放在主从复制之后，并且将槽位分配给从节点，那么集群将无法正常工作（处于下线状态）。</p>
+                </blockquote>
+                <div class="language-bash extra-class"><pre
+                        class="language-bash"><code>/usr/local/redis/src/redis-cli <span
+                        class="token parameter variable">-p</span> <span class="token number">6100</span> cluster addslots <span
+                        class="token punctuation">{</span><span class="token number">0</span><span
+                        class="token punctuation">..</span><span class="token number">5000</span><span
+                        class="token punctuation">}</span>
+/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6200</span> cluster addslots <span
+                            class="token punctuation">{</span><span class="token number">5001</span><span
+                            class="token punctuation">..</span><span class="token number">10000</span><span
+                            class="token punctuation">}</span>
+/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6300</span> cluster addslots <span
+                            class="token punctuation">{</span><span class="token number">10001</span><span
+                            class="token punctuation">..</span><span class="token number">16383</span><span
+                            class="token punctuation">}</span>
 
 <span class="token comment"># 查看节点的状态</span>
 cluster nodes
 
 <span class="token comment"># 输出</span>
-c5f306ea99017b59e1621e51875f81fdbf928fe7 <span class="token number">127.0</span>.0.1:6300@16300 master - <span class="token number">0</span> <span class="token number">1638945113031</span> <span class="token number">5</span> connected <span class="token number">10001</span>-16383
-0472e59e5dde1deb38418c5fc49b24240c87c69b <span class="token number">127.0</span>.0.1:6201@16201 master - <span class="token number">0</span> <span class="token number">1638945112000</span> <span class="token number">3</span> connected
-a22940cd650ecbf823293f08836c8375199f7d1e <span class="token number">127.0</span>.0.1:6100@16100 myself,master - <span class="token number">0</span> <span class="token number">1638945111000</span> <span class="token number">2</span> connected <span class="token number">0</span>-5000
-6a75b47aa9c5e3b6bebe87a3184cb5285abe3755 <span class="token number">127.0</span>.0.1:6101@16101 master - <span class="token number">0</span> <span class="token number">1638945111024</span> <span class="token number">1</span> connected
-dea417a8d19eccb12194e8aee5a4c77e861bdeb4 <span class="token number">127.0</span>.0.1:6301@16301 master - <span class="token number">0</span> <span class="token number">1638945111000</span> <span class="token number">0</span> connected
-c348f29d5aa3ac65593ed97fccabd36e7677ae41 <span class="token number">127.0</span>.0.1:6200@16200 master - <span class="token number">0</span> <span class="token number">1638945112027</span> <span class="token number">4</span> connected <span class="token number">5001</span>-10000
+c5f306ea99017b59e1621e51875f81fdbf928fe7 <span class="token number">127.0</span>.0.1:6300@16300 master - <span
+                            class="token number">0</span> <span class="token number">1638945113031</span> <span
+                            class="token number">5</span> connected <span class="token number">10001</span>-16383
+0472e59e5dde1deb38418c5fc49b24240c87c69b <span class="token number">127.0</span>.0.1:6201@16201 master - <span
+                            class="token number">0</span> <span class="token number">1638945112000</span> <span
+                            class="token number">3</span> connected
+a22940cd650ecbf823293f08836c8375199f7d1e <span class="token number">127.0</span>.0.1:6100@16100 myself,master - <span
+                            class="token number">0</span> <span class="token number">1638945111000</span> <span
+                            class="token number">2</span> connected <span class="token number">0</span>-5000
+6a75b47aa9c5e3b6bebe87a3184cb5285abe3755 <span class="token number">127.0</span>.0.1:6101@16101 master - <span
+                            class="token number">0</span> <span class="token number">1638945111024</span> <span
+                            class="token number">1</span> connected
+dea417a8d19eccb12194e8aee5a4c77e861bdeb4 <span class="token number">127.0</span>.0.1:6301@16301 master - <span
+                            class="token number">0</span> <span class="token number">1638945111000</span> <span
+                            class="token number">0</span> connected
+c348f29d5aa3ac65593ed97fccabd36e7677ae41 <span class="token number">127.0</span>.0.1:6200@16200 master - <span
+                            class="token number">0</span> <span class="token number">1638945112027</span> <span
+                            class="token number">4</span> connected <span class="token number">5001</span>-10000
 
 
 <span class="token comment"># 查看集群的信息</span>
@@ -2178,101 +2621,267 @@ cluster_stats_messages_sent:938
 cluster_stats_messages_ping_received:466
 cluster_stats_messages_pong_received:472
 cluster_stats_messages_received:938
-</code></pre></div><blockquote><p><strong>高可用 - 主从复制配置</strong></p> <p><code>CLUSTER REPLICATE &lt;node_id&gt;</code> 用来让集群中接收命令的节点成为 <code>node_id</code> 所指定节点的从节点，并开始对主节点进行复制。</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6101</span> cluster replicate a22940cd650ecbf823293f08836c8375199f7d1e
+</code></pre>
+                </div>
+                <blockquote><p><strong>高可用 - 主从复制配置</strong></p>
+                    <p><code>CLUSTER REPLICATE &lt;node_id&gt;</code> 用来让集群中接收命令的节点成为
+                        <code>node_id</code> 所指定节点的从节点，并开始对主节点进行复制。</p></blockquote>
+                <div class="language-bash extra-class"><pre
+                        class="language-bash"><code>/usr/local/redis/src/redis-cli <span
+                        class="token parameter variable">-p</span> <span class="token number">6101</span> cluster replicate a22940cd650ecbf823293f08836c8375199f7d1e
 
 /usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6201</span> cluster replicate c348f29d5aa3ac65593ed97fccabd36e7677ae41
 
 /usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6301</span> cluster replicate c5f306ea99017b59e1621e51875f81fdbf928fe7
-</code></pre></div><h3 id="_5-集群伸缩">5. 集群伸缩 <a href="#_5-集群伸缩" class="header-anchor">#</a></h3> <h4 id="_5-1-添加节点">5.1 添加节点 <a href="#_5-1-添加节点" class="header-anchor">#</a></h4> <blockquote><p><strong>启动节点</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-server /data/redis/dc3/master-04/node-01/etc/redis.conf
+</code></pre>
+                </div>
+                <h3 id="_5-集群伸缩">5. 集群伸缩 <a href="#_5-集群伸缩" class="header-anchor">#</a></h3> <h4
+                        id="_5-1-添加节点">5.1 添加节点 <a href="#_5-1-添加节点" class="header-anchor">#</a></h4>
+                <blockquote><p><strong>启动节点</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-server /data/redis/dc3/master-04/node-01/etc/redis.conf
 
 /usr/local/redis/src/redis-server /data/redis/dc3/master-04/node-02/etc/redis.conf
-</code></pre></div><blockquote><p><strong>添加节点</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> add-node <span class="token number">127.0</span>.0.1:6400 <span class="token number">127.0</span>.0.1:6100
+</code></pre>
+                </div>
+                <blockquote><p><strong>添加节点</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre
+                        class="language-bash"><code>/usr/local/redis/src/redis-cli <span
+                        class="token parameter variable">--cluster</span> add-node <span
+                        class="token number">127.0</span>.0.1:6400 <span class="token number">127.0</span>.0.1:6100
 
-/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> add-node <span class="token number">127.0</span>.0.1:6401 <span class="token number">127.0</span>.0.1:6100
-</code></pre></div><blockquote><p><strong>移动节点槽</strong></p> <p>16383 / 4 = 4096</p> <ul><li>移动的槽位数：最终平均每个主节点有 <code>4096</code> 个 <code>slot</code> ，因此总共移动 <code>4096 slots</code></li> <li>接收槽位的目标节点 <code>ID</code>：节点 <code>6400</code> 的 <code>ID</code></li> <li>移出槽位的源节点 <code>ID</code>：节点 <code>6100</code>、<code>6200</code>、<code>6300</code> 的 <code>ID</code></li></ul></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> reshard <span class="token number">127.0</span>.0.1 <span class="token number">6100</span>
+/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> add-node <span
+                            class="token number">127.0</span>.0.1:6401 <span class="token number">127.0</span>.0.1:6100
+</code></pre>
+                </div>
+                <blockquote><p><strong>移动节点槽</strong></p>
+                    <p>16383 / 4 = 4096</p>
+                    <ul>
+                        <li>移动的槽位数：最终平均每个主节点有 <code>4096</code> 个 <code>slot</code> ，因此总共移动
+                            <code>4096 slots</code></li>
+                        <li>接收槽位的目标节点 <code>ID</code>：节点 <code>6400</code> 的 <code>ID</code></li>
+                        <li>移出槽位的源节点 <code>ID</code>：节点 <code>6100</code>、<code>6200</code>、<code>6300</code>
+                            的 <code>ID</code></li>
+                    </ul>
+                </blockquote>
+                <div class="language-bash extra-class"><pre
+                        class="language-bash"><code>/usr/local/redis/src/redis-cli <span
+                        class="token parameter variable">--cluster</span> reshard <span
+                        class="token number">127.0</span>.0.1 <span class="token number">6100</span>
 
 <span class="token comment"># 输出</span>
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Performing Cluster Check <span class="token punctuation">(</span>using <span class="token function">node</span> <span class="token number">127.0</span>.0.1:6100<span class="token punctuation">)</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Performing Cluster Check <span
+                            class="token punctuation">(</span>using <span class="token function">node</span> <span
+                            class="token number">127.0</span>.0.1:6100<span class="token punctuation">)</span>
 M: a22940cd650ecbf823293f08836c8375199f7d1e <span class="token number">127.0</span>.0.1:6100
-   slots:<span class="token punctuation">[</span><span class="token number">0</span>-5000<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token number">5001</span> slots<span class="token punctuation">)</span> master
-   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+   slots:<span class="token punctuation">[</span><span class="token number">0</span>-5000<span
+                            class="token punctuation">]</span> <span class="token punctuation">(</span><span
+                            class="token number">5001</span> slots<span class="token punctuation">)</span> master
+   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span
+                            class="token punctuation">)</span>
 M: c5f306ea99017b59e1621e51875f81fdbf928fe7 <span class="token number">127.0</span>.0.1:6300
-   slots:<span class="token punctuation">[</span><span class="token number">10001</span>-16383<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token number">6383</span> slots<span class="token punctuation">)</span> master
-   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+   slots:<span class="token punctuation">[</span><span class="token number">10001</span>-16383<span
+                            class="token punctuation">]</span> <span class="token punctuation">(</span><span
+                            class="token number">6383</span> slots<span class="token punctuation">)</span> master
+   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span
+                            class="token punctuation">)</span>
 S: 0472e59e5dde1deb38418c5fc49b24240c87c69b <span class="token number">127.0</span>.0.1:6201
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> slave
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> slave
    replicates c348f29d5aa3ac65593ed97fccabd36e7677ae41
 S: 6a75b47aa9c5e3b6bebe87a3184cb5285abe3755 <span class="token number">127.0</span>.0.1:6101
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> slave
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> slave
    replicates a22940cd650ecbf823293f08836c8375199f7d1e
 M: ef7b5e0771fe4a1846ee3da4afc5192c96a2af3d <span class="token number">127.0</span>.0.1:6401
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> master
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> master
 S: dea417a8d19eccb12194e8aee5a4c77e861bdeb4 <span class="token number">127.0</span>.0.1:6301
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> slave
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> slave
    replicates c5f306ea99017b59e1621e51875f81fdbf928fe7
 M: cf52da2233fc7c0dc406f2f871e59afcdc31b121 <span class="token number">127.0</span>.0.1:6400
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> master
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> master
 M: c348f29d5aa3ac65593ed97fccabd36e7677ae41 <span class="token number">127.0</span>.0.1:6200
-   slots:<span class="token punctuation">[</span><span class="token number">5001</span>-10000<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token number">5000</span> slots<span class="token punctuation">)</span> master
-   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+   slots:<span class="token punctuation">[</span><span class="token number">5001</span>-10000<span
+                            class="token punctuation">]</span> <span class="token punctuation">(</span><span
+                            class="token number">5000</span> slots<span class="token punctuation">)</span> master
+   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span
+                            class="token punctuation">)</span>
 <span class="token punctuation">[</span>OK<span class="token punctuation">]</span> All nodes agree about slots configuration.
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check <span class="token keyword">for</span> <span class="token function">open</span> slots<span class="token punctuation">..</span>.
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check slots coverage<span class="token punctuation">..</span>.
-<span class="token punctuation">[</span>OK<span class="token punctuation">]</span> All <span class="token number">16384</span> slots covered.
-How many slots <span class="token keyword">do</span> you want to move <span class="token punctuation">(</span>from <span class="token number">1</span> to <span class="token number">16384</span><span class="token punctuation">)</span>? <span class="token number">4096</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check <span class="token keyword">for</span> <span
+                            class="token function">open</span> slots<span class="token punctuation">..</span>.
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check slots coverage<span
+                            class="token punctuation">..</span>.
+<span class="token punctuation">[</span>OK<span class="token punctuation">]</span> All <span
+                            class="token number">16384</span> slots covered.
+How many slots <span class="token keyword">do</span> you want to move <span class="token punctuation">(</span>from <span
+                            class="token number">1</span> to <span class="token number">16384</span><span
+                            class="token punctuation">)</span>? <span class="token number">4096</span>
 What is the receiving <span class="token function">node</span> ID? cf52da2233fc7c0dc406f2f871e59afcdc31b121
 Please enter all the <span class="token builtin class-name">source</span> <span class="token function">node</span> IDs.
-  Type <span class="token string">'all'</span> to use all the nodes as <span class="token builtin class-name">source</span> nodes <span class="token keyword">for</span> the <span class="token builtin class-name">hash</span> slots.
-  Type <span class="token string">'done'</span> once you entered all the <span class="token builtin class-name">source</span> nodes IDs.
+  Type <span class="token string">'all'</span> to use all the nodes as <span
+                            class="token builtin class-name">source</span> nodes <span class="token keyword">for</span> the <span
+                            class="token builtin class-name">hash</span> slots.
+  Type <span class="token string">'done'</span> once you entered all the <span
+                            class="token builtin class-name">source</span> nodes IDs.
 Source <span class="token function">node</span> <span class="token comment">#1: all</span>
-</code></pre></div><blockquote><p><strong>高可用 - 主从复制配置</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-cli <span class="token parameter variable">-p</span> <span class="token number">6401</span> cluster replicate cf52da2233fc7c0dc406f2f871e59afcdc31b121
-</code></pre></div><h4 id="_5-2-删除节点">5.2 删除节点 <a href="#_5-2-删除节点" class="header-anchor">#</a></h4> <blockquote><p><strong>移动节点槽</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> reshard <span class="token number">127.0</span>.0.1 <span class="token number">6400</span>
+</code></pre>
+                </div>
+                <blockquote><p><strong>高可用 - 主从复制配置</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre
+                        class="language-bash"><code>/usr/local/redis/src/redis-cli <span
+                        class="token parameter variable">-p</span> <span class="token number">6401</span> cluster replicate cf52da2233fc7c0dc406f2f871e59afcdc31b121
+</code></pre>
+                </div>
+                <h4 id="_5-2-删除节点">5.2 删除节点 <a href="#_5-2-删除节点" class="header-anchor">#</a></h4>
+                <blockquote><p><strong>移动节点槽</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre
+                        class="language-bash"><code>/usr/local/redis/src/redis-cli <span
+                        class="token parameter variable">--cluster</span> reshard <span
+                        class="token number">127.0</span>.0.1 <span class="token number">6400</span>
 
 <span class="token comment"># 输出</span>
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Performing Cluster Check <span class="token punctuation">(</span>using <span class="token function">node</span> <span class="token number">127.0</span>.0.1:6400<span class="token punctuation">)</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Performing Cluster Check <span
+                            class="token punctuation">(</span>using <span class="token function">node</span> <span
+                            class="token number">127.0</span>.0.1:6400<span class="token punctuation">)</span>
 M: cf52da2233fc7c0dc406f2f871e59afcdc31b121 <span class="token number">127.0</span>.0.1:6400
-   slots:<span class="token punctuation">[</span><span class="token number">0</span>-1249<span class="token punctuation">]</span>,<span class="token punctuation">[</span><span class="token number">5001</span>-6250<span class="token punctuation">]</span>,<span class="token punctuation">[</span><span class="token number">10001</span>-11596<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token number">4096</span> slots<span class="token punctuation">)</span> master
-   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+   slots:<span class="token punctuation">[</span><span class="token number">0</span>-1249<span
+                            class="token punctuation">]</span>,<span class="token punctuation">[</span><span
+                            class="token number">5001</span>-6250<span class="token punctuation">]</span>,<span
+                            class="token punctuation">[</span><span class="token number">10001</span>-11596<span
+                            class="token punctuation">]</span> <span class="token punctuation">(</span><span
+                            class="token number">4096</span> slots<span class="token punctuation">)</span> master
+   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span
+                            class="token punctuation">)</span>
 S: dea417a8d19eccb12194e8aee5a4c77e861bdeb4 <span class="token number">127.0</span>.0.1:6301
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> slave
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> slave
    replicates c5f306ea99017b59e1621e51875f81fdbf928fe7
 S: ef7b5e0771fe4a1846ee3da4afc5192c96a2af3d <span class="token number">127.0</span>.0.1:6401
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> slave
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> slave
    replicates cf52da2233fc7c0dc406f2f871e59afcdc31b121
 M: a22940cd650ecbf823293f08836c8375199f7d1e <span class="token number">127.0</span>.0.1:6100
-   slots:<span class="token punctuation">[</span><span class="token number">1250</span>-5000<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token number">3751</span> slots<span class="token punctuation">)</span> master
-   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+   slots:<span class="token punctuation">[</span><span class="token number">1250</span>-5000<span
+                            class="token punctuation">]</span> <span class="token punctuation">(</span><span
+                            class="token number">3751</span> slots<span class="token punctuation">)</span> master
+   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span
+                            class="token punctuation">)</span>
 S: 6a75b47aa9c5e3b6bebe87a3184cb5285abe3755 <span class="token number">127.0</span>.0.1:6101
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> slave
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> slave
    replicates a22940cd650ecbf823293f08836c8375199f7d1e
 M: c348f29d5aa3ac65593ed97fccabd36e7677ae41 <span class="token number">127.0</span>.0.1:6200
-   slots:<span class="token punctuation">[</span><span class="token number">6251</span>-10000<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token number">3750</span> slots<span class="token punctuation">)</span> master
-   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+   slots:<span class="token punctuation">[</span><span class="token number">6251</span>-10000<span
+                            class="token punctuation">]</span> <span class="token punctuation">(</span><span
+                            class="token number">3750</span> slots<span class="token punctuation">)</span> master
+   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span
+                            class="token punctuation">)</span>
 S: 0472e59e5dde1deb38418c5fc49b24240c87c69b <span class="token number">127.0</span>.0.1:6201
-   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span class="token punctuation">)</span> slave
+   slots: <span class="token punctuation">(</span><span class="token number">0</span> slots<span
+                            class="token punctuation">)</span> slave
    replicates c348f29d5aa3ac65593ed97fccabd36e7677ae41
 M: c5f306ea99017b59e1621e51875f81fdbf928fe7 <span class="token number">127.0</span>.0.1:6300
-   slots:<span class="token punctuation">[</span><span class="token number">11597</span>-16383<span class="token punctuation">]</span> <span class="token punctuation">(</span><span class="token number">4787</span> slots<span class="token punctuation">)</span> master
-   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+   slots:<span class="token punctuation">[</span><span class="token number">11597</span>-16383<span
+                            class="token punctuation">]</span> <span class="token punctuation">(</span><span
+                            class="token number">4787</span> slots<span class="token punctuation">)</span> master
+   <span class="token number">1</span> additional replica<span class="token punctuation">(</span>s<span
+                            class="token punctuation">)</span>
 <span class="token punctuation">[</span>OK<span class="token punctuation">]</span> All nodes agree about slots configuration.
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check <span class="token keyword">for</span> <span class="token function">open</span> slots<span class="token punctuation">..</span>.
-<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check slots coverage<span class="token punctuation">..</span>.
-<span class="token punctuation">[</span>OK<span class="token punctuation">]</span> All <span class="token number">16384</span> slots covered.
-How many slots <span class="token keyword">do</span> you want to move <span class="token punctuation">(</span>from <span class="token number">1</span> to <span class="token number">16384</span><span class="token punctuation">)</span>? <span class="token number">4096</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check <span class="token keyword">for</span> <span
+                            class="token function">open</span> slots<span class="token punctuation">..</span>.
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> Check slots coverage<span
+                            class="token punctuation">..</span>.
+<span class="token punctuation">[</span>OK<span class="token punctuation">]</span> All <span
+                            class="token number">16384</span> slots covered.
+How many slots <span class="token keyword">do</span> you want to move <span class="token punctuation">(</span>from <span
+                            class="token number">1</span> to <span class="token number">16384</span><span
+                            class="token punctuation">)</span>? <span class="token number">4096</span>
 What is the receiving <span class="token function">node</span> ID? a22940cd650ecbf823293f08836c8375199f7d1e
 Please enter all the <span class="token builtin class-name">source</span> <span class="token function">node</span> IDs.
-  Type <span class="token string">'all'</span> to use all the nodes as <span class="token builtin class-name">source</span> nodes <span class="token keyword">for</span> the <span class="token builtin class-name">hash</span> slots.
-  Type <span class="token string">'done'</span> once you entered all the <span class="token builtin class-name">source</span> nodes IDs.
-Source <span class="token function">node</span> <span class="token comment">#1: cf52da2233fc7c0dc406f2f871e59afcdc31b121</span>
+  Type <span class="token string">'all'</span> to use all the nodes as <span
+                            class="token builtin class-name">source</span> nodes <span class="token keyword">for</span> the <span
+                            class="token builtin class-name">hash</span> slots.
+  Type <span class="token string">'done'</span> once you entered all the <span
+                            class="token builtin class-name">source</span> nodes IDs.
+Source <span class="token function">node</span> <span
+                            class="token comment">#1: cf52da2233fc7c0dc406f2f871e59afcdc31b121</span>
 Source <span class="token function">node</span> <span class="token comment">#2: done</span>
-</code></pre></div><blockquote><p><strong>删除节点</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> del-node <span class="token number">127.0</span>.0.1:6400 cf52da2233fc7c0dc406f2f871e59afcdc31b121
+</code></pre>
+                </div>
+                <blockquote><p><strong>删除节点</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre
+                        class="language-bash"><code>/usr/local/redis/src/redis-cli <span
+                        class="token parameter variable">--cluster</span> del-node <span
+                        class="token number">127.0</span>.0.1:6400 cf52da2233fc7c0dc406f2f871e59afcdc31b121
 
-/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> del-node <span class="token number">127.0</span>.0.1:6401 ef7b5e0771fe4a1846ee3da4afc5192c96a2af3d
-</code></pre></div></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/4/12 下午5:00:18</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev"><a href="/docs/cluster/rabbitmq.html" class="prev"><i aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
+/usr/local/redis/src/redis-cli <span class="token parameter variable">--cluster</span> del-node <span
+                            class="token number">127.0</span>.0.1:6401 ef7b5e0771fe4a1846ee3da4afc5192c96a2af3d
+</code></pre>
+                </div>
+            </div>
+            <footer class="page-edit"><!---->
+                <div class="last-updated"><span class="prefix">上次更新:</span> <span
+                        class="time">2023/4/12 下午5:00:18</span></div>
+            </footer>
+            <div class="page-nav">
+                <p class="inner"><span class="prev"><a href="/docs/cluster/rabbitmq.html" class="prev"><i
+                        aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896"
+                                                                                  focusable="false" data-icon="left"
+                                                                                  width="1em" height="1em"
+                                                                                  fill="currentColor"
+                                                                                  aria-hidden="true"><path
+                        d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
                 RabbitMQ 集群部署
             </a></span> <span class="next"><a href="/docs/error/modbus4j-error.html">
                 Modbus4j 依赖下载失败
-                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span></p></div> <div class="page-anchor"><div class="ant-space ant-space-vertical" style="width:100%;"><div class="ant-space-item"><div class="page-anchor-offset"><div><div class="ant-anchor-wrapper" style="max-height:100vh;"><div class="ant-anchor"><div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div><div class="ant-anchor-link"><a href="#redis-集群部署" title="Redis 集群部署" class="ant-anchor-link-title">Redis 集群部署</a><div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构" class="ant-anchor-link-title">1. 集群架构</a></div><div class="ant-anchor-link"><a href="#_2-集群部署规划" title="2. 集群部署规划" class="ant-anchor-link-title">2. 集群部署规划</a></div><div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件" class="ant-anchor-link-title">3. 安装文件</a></div><div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署" class="ant-anchor-link-title">4. 集群部署</a></div><div class="ant-anchor-link"><a href="#_5-集群伸缩" title="5. 集群伸缩" class="ant-anchor-link-title">5. 集群伸缩</a></div></div></div></div></div></div></div></div></div> </main> <!----></div><div class="global-ui"></div></div>
-        <script src="/assets/js/app.d87ce824.js" defer></script><script src="/assets/js/2.a8b8915e.js" defer></script><script src="/assets/js/12.08136beb.js" defer></script>
-    </body>
+                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false"
+                                                                               data-icon="right" width="1em"
+                                                                               height="1em" fill="currentColor"
+                                                                               aria-hidden="true"><path
+                        d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span>
+                </p>
+            </div>
+            <div class="page-anchor">
+                <div class="ant-space ant-space-vertical" style="width:100%;">
+                    <div class="ant-space-item">
+                        <div class="page-anchor-offset">
+                            <div>
+                                <div class="ant-anchor-wrapper" style="max-height:100vh;">
+                                    <div class="ant-anchor">
+                                        <div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div>
+                                        <div class="ant-anchor-link"><a href="#redis-集群部署" title="Redis 集群部署"
+                                                                        class="ant-anchor-link-title">Redis 集群部署</a>
+                                            <div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构"
+                                                                            class="ant-anchor-link-title">1.
+                                                集群架构</a></div>
+                                            <div class="ant-anchor-link"><a href="#_2-集群部署规划"
+                                                                            title="2. 集群部署规划"
+                                                                            class="ant-anchor-link-title">2.
+                                                集群部署规划</a></div>
+                                            <div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件"
+                                                                            class="ant-anchor-link-title">3.
+                                                安装文件</a></div>
+                                            <div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署"
+                                                                            class="ant-anchor-link-title">4.
+                                                集群部署</a></div>
+                                            <div class="ant-anchor-link"><a href="#_5-集群伸缩" title="5. 集群伸缩"
+                                                                            class="ant-anchor-link-title">5.
+                                                集群伸缩</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main> <!----></div>
+    <div class="global-ui"></div>
+</div>
+<script src="/assets/js/app.d87ce824.js" defer></script>
+<script src="/assets/js/2.a8b8915e.js" defer></script>
+<script src="/assets/js/12.08136beb.js" defer></script>
+</body>
 </html>

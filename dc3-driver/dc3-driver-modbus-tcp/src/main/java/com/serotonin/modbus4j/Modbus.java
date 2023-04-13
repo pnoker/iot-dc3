@@ -22,18 +22,24 @@ import com.serotonin.modbus4j.sero.messaging.MessagingExceptionHandler;
 
 /**
  * Base level for masters and slaves/listeners
- *
+ * <p>
  * TODO: - handle echoing in RS485
  *
  * @author mlohbihler
  * @version 5.0.0
  */
 public class Modbus {
-    /** Constant <code>DEFAULT_MAX_READ_BIT_COUNT=2000</code> */
+    /**
+     * Constant <code>DEFAULT_MAX_READ_BIT_COUNT=2000</code>
+     */
     public static final int DEFAULT_MAX_READ_BIT_COUNT = 2000;
-    /** Constant <code>DEFAULT_MAX_READ_REGISTER_COUNT=125</code> */
+    /**
+     * Constant <code>DEFAULT_MAX_READ_REGISTER_COUNT=125</code>
+     */
     public static final int DEFAULT_MAX_READ_REGISTER_COUNT = 125;
-    /** Constant <code>DEFAULT_MAX_WRITE_REGISTER_COUNT=120</code> */
+    /**
+     * Constant <code>DEFAULT_MAX_WRITE_REGISTER_COUNT=120</code>
+     */
     public static final int DEFAULT_MAX_WRITE_REGISTER_COUNT = 120;
 
     private MessagingExceptionHandler exceptionHandler = new DefaultMessagingExceptionHandler();
@@ -50,12 +56,12 @@ public class Modbus {
      */
     public int getMaxReadCount(int registerRange) {
         switch (registerRange) {
-        case RegisterRange.COIL_STATUS:
-        case RegisterRange.INPUT_STATUS:
-            return maxReadBitCount;
-        case RegisterRange.HOLDING_REGISTER:
-        case RegisterRange.INPUT_REGISTER:
-            return maxReadRegisterCount;
+            case RegisterRange.COIL_STATUS:
+            case RegisterRange.INPUT_STATUS:
+                return maxReadBitCount;
+            case RegisterRange.HOLDING_REGISTER:
+            case RegisterRange.INPUT_REGISTER:
+                return maxReadRegisterCount;
         }
         return -1;
     }

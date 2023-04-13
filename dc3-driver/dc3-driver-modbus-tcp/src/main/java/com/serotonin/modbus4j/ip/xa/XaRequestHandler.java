@@ -38,7 +38,9 @@ public class XaRequestHandler extends BaseRequestHandler {
         super(slave);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
         XaMessageRequest tcpRequest = (XaMessageRequest) req;
         ModbusRequest request = tcpRequest.getModbusRequest();

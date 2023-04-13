@@ -1,48 +1,371 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8" />
-        <meta
+<head>
+    <meta charset="utf-8"/>
+    <meta
             name="viewport"
             content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-        />
-        <title>RabbitMQ 集群部署 | IoT DC3</title>
-        <meta name="description" content="" />
-        <meta name="generator" content="VuePress 1.9.9" />
-        <link rel="icon" href="/assets/images/favicon.ico">
-    <script type="text/javascript" src="/assets/js/push.js"></script> <meta name="description" content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
+    />
+    <title>RabbitMQ 集群部署 | IoT DC3</title>
+    <meta name="description" content=""/>
+    <meta name="generator" content="VuePress 1.9.9"/>
+    <link rel="icon" href="/assets/images/favicon.ico">
+    <script type="text/javascript" src="/assets/js/push.js"></script>
+    <meta name="description"
+          content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
     <meta name="referrer" content="never">
-    <meta name="keywords" content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台"> <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style"><link rel="preload" href="/assets/js/app.d87ce824.js" as="script"><link rel="preload" href="/assets/js/2.a8b8915e.js" as="script"><link rel="preload" href="/assets/js/11.653957ce.js" as="script"><link rel="prefetch" href="/assets/js/10.db658154.js"><link rel="prefetch" href="/assets/js/12.08136beb.js"><link rel="prefetch" href="/assets/js/13.83b3d580.js"><link rel="prefetch" href="/assets/js/14.d5387cec.js"><link rel="prefetch" href="/assets/js/15.aafb2a89.js"><link rel="prefetch" href="/assets/js/16.01fcc650.js"><link rel="prefetch" href="/assets/js/17.a097fd52.js"><link rel="prefetch" href="/assets/js/18.acd93e71.js"><link rel="prefetch" href="/assets/js/19.6f12b224.js"><link rel="prefetch" href="/assets/js/20.bac69ff1.js"><link rel="prefetch" href="/assets/js/21.9105165e.js"><link rel="prefetch" href="/assets/js/22.de1f017c.js"><link rel="prefetch" href="/assets/js/23.fb20a8f5.js"><link rel="prefetch" href="/assets/js/24.63ca195a.js"><link rel="prefetch" href="/assets/js/25.3a76708d.js"><link rel="prefetch" href="/assets/js/26.b6254386.js"><link rel="prefetch" href="/assets/js/27.3f127a30.js"><link rel="prefetch" href="/assets/js/28.afadbe5c.js"><link rel="prefetch" href="/assets/js/29.f175dd67.js"><link rel="prefetch" href="/assets/js/3.8e04da2b.js"><link rel="prefetch" href="/assets/js/30.5ba7a495.js"><link rel="prefetch" href="/assets/js/31.01c3d218.js"><link rel="prefetch" href="/assets/js/32.de0e0ff7.js"><link rel="prefetch" href="/assets/js/33.0e117d4a.js"><link rel="prefetch" href="/assets/js/34.010094c5.js"><link rel="prefetch" href="/assets/js/35.8a377a71.js"><link rel="prefetch" href="/assets/js/36.fbb64a47.js"><link rel="prefetch" href="/assets/js/37.c2b9d4da.js"><link rel="prefetch" href="/assets/js/38.a66be625.js"><link rel="prefetch" href="/assets/js/39.76e387bc.js"><link rel="prefetch" href="/assets/js/4.470d098a.js"><link rel="prefetch" href="/assets/js/40.0e9ee726.js"><link rel="prefetch" href="/assets/js/41.e68f3c2e.js"><link rel="prefetch" href="/assets/js/42.ba03ba76.js"><link rel="prefetch" href="/assets/js/43.e6a91a35.js"><link rel="prefetch" href="/assets/js/44.128407ae.js"><link rel="prefetch" href="/assets/js/45.e9f1b4b0.js"><link rel="prefetch" href="/assets/js/46.ab599c67.js"><link rel="prefetch" href="/assets/js/47.dc2d8aff.js"><link rel="prefetch" href="/assets/js/48.06e9c64e.js"><link rel="prefetch" href="/assets/js/49.627cc127.js"><link rel="prefetch" href="/assets/js/5.0f4aedb8.js"><link rel="prefetch" href="/assets/js/50.bf665f72.js"><link rel="prefetch" href="/assets/js/51.08e5dea0.js"><link rel="prefetch" href="/assets/js/52.8e37a9c4.js"><link rel="prefetch" href="/assets/js/53.8c472224.js"><link rel="prefetch" href="/assets/js/54.bb582a52.js"><link rel="prefetch" href="/assets/js/55.640d9ecb.js"><link rel="prefetch" href="/assets/js/56.e2e2a21e.js"><link rel="prefetch" href="/assets/js/57.9b9b26a7.js"><link rel="prefetch" href="/assets/js/58.0d4a46c3.js"><link rel="prefetch" href="/assets/js/59.d1f11d32.js"><link rel="prefetch" href="/assets/js/6.547754b6.js"><link rel="prefetch" href="/assets/js/7.aea1a047.js"><link rel="prefetch" href="/assets/js/8.58207631.js"><link rel="prefetch" href="/assets/js/9.f09083f8.js"> <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
-    </head>
-    <body>
-        <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="ant-row"><div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars"><svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path></svg></i> <span></span></div> <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3" class="logo"> <span class="site-name">IoT DC3</span></a> <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div></div> <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light"><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
-                    首页
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
-                    指南
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/config/">
-                    配置
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/faq/">
-                    FAQ
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>
+    <meta name="keywords"
+          content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台">
+    <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style">
+    <link rel="preload" href="/assets/js/app.d87ce824.js" as="script">
+    <link rel="preload" href="/assets/js/2.a8b8915e.js" as="script">
+    <link rel="preload" href="/assets/js/11.653957ce.js" as="script">
+    <link rel="prefetch" href="/assets/js/10.db658154.js">
+    <link rel="prefetch" href="/assets/js/12.08136beb.js">
+    <link rel="prefetch" href="/assets/js/13.83b3d580.js">
+    <link rel="prefetch" href="/assets/js/14.d5387cec.js">
+    <link rel="prefetch" href="/assets/js/15.aafb2a89.js">
+    <link rel="prefetch" href="/assets/js/16.01fcc650.js">
+    <link rel="prefetch" href="/assets/js/17.a097fd52.js">
+    <link rel="prefetch" href="/assets/js/18.acd93e71.js">
+    <link rel="prefetch" href="/assets/js/19.6f12b224.js">
+    <link rel="prefetch" href="/assets/js/20.bac69ff1.js">
+    <link rel="prefetch" href="/assets/js/21.9105165e.js">
+    <link rel="prefetch" href="/assets/js/22.de1f017c.js">
+    <link rel="prefetch" href="/assets/js/23.fb20a8f5.js">
+    <link rel="prefetch" href="/assets/js/24.63ca195a.js">
+    <link rel="prefetch" href="/assets/js/25.3a76708d.js">
+    <link rel="prefetch" href="/assets/js/26.b6254386.js">
+    <link rel="prefetch" href="/assets/js/27.3f127a30.js">
+    <link rel="prefetch" href="/assets/js/28.afadbe5c.js">
+    <link rel="prefetch" href="/assets/js/29.f175dd67.js">
+    <link rel="prefetch" href="/assets/js/3.8e04da2b.js">
+    <link rel="prefetch" href="/assets/js/30.5ba7a495.js">
+    <link rel="prefetch" href="/assets/js/31.01c3d218.js">
+    <link rel="prefetch" href="/assets/js/32.de0e0ff7.js">
+    <link rel="prefetch" href="/assets/js/33.0e117d4a.js">
+    <link rel="prefetch" href="/assets/js/34.010094c5.js">
+    <link rel="prefetch" href="/assets/js/35.8a377a71.js">
+    <link rel="prefetch" href="/assets/js/36.fbb64a47.js">
+    <link rel="prefetch" href="/assets/js/37.c2b9d4da.js">
+    <link rel="prefetch" href="/assets/js/38.a66be625.js">
+    <link rel="prefetch" href="/assets/js/39.76e387bc.js">
+    <link rel="prefetch" href="/assets/js/4.470d098a.js">
+    <link rel="prefetch" href="/assets/js/40.0e9ee726.js">
+    <link rel="prefetch" href="/assets/js/41.e68f3c2e.js">
+    <link rel="prefetch" href="/assets/js/42.ba03ba76.js">
+    <link rel="prefetch" href="/assets/js/43.e6a91a35.js">
+    <link rel="prefetch" href="/assets/js/44.128407ae.js">
+    <link rel="prefetch" href="/assets/js/45.e9f1b4b0.js">
+    <link rel="prefetch" href="/assets/js/46.ab599c67.js">
+    <link rel="prefetch" href="/assets/js/47.dc2d8aff.js">
+    <link rel="prefetch" href="/assets/js/48.06e9c64e.js">
+    <link rel="prefetch" href="/assets/js/49.627cc127.js">
+    <link rel="prefetch" href="/assets/js/5.0f4aedb8.js">
+    <link rel="prefetch" href="/assets/js/50.bf665f72.js">
+    <link rel="prefetch" href="/assets/js/51.08e5dea0.js">
+    <link rel="prefetch" href="/assets/js/52.8e37a9c4.js">
+    <link rel="prefetch" href="/assets/js/53.8c472224.js">
+    <link rel="prefetch" href="/assets/js/54.bb582a52.js">
+    <link rel="prefetch" href="/assets/js/55.640d9ecb.js">
+    <link rel="prefetch" href="/assets/js/56.e2e2a21e.js">
+    <link rel="prefetch" href="/assets/js/57.9b9b26a7.js">
+    <link rel="prefetch" href="/assets/js/58.0d4a46c3.js">
+    <link rel="prefetch" href="/assets/js/59.d1f11d32.js">
+    <link rel="prefetch" href="/assets/js/6.547754b6.js">
+    <link rel="prefetch" href="/assets/js/7.aea1a047.js">
+    <link rel="prefetch" href="/assets/js/8.58207631.js">
+    <link rel="prefetch" href="/assets/js/9.f09083f8.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+    <div class="theme-container">
+        <header class="navbar">
+            <div class="ant-row">
+                <div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars">
+                    <svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em"
+                         fill="currentColor" aria-hidden="true">
+                        <path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path>
+                    </svg>
+                </i> <span></span></div>
+                <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a
+                        href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3"
+                                                                           class="logo"> <span
+                        class="site-name">IoT DC3</span></a>
+                    <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off"
+                                                                 spellcheck="false" value=""> <!----></div>
+                </div>
+                <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20">
+                    <div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value="">
+                        <!----></div>
+                    <nav class="nav-links can-hide">
+                        <ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light">
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
+                                首页
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
+                                指南
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/config/">
+                                配置
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/faq/">
+                                FAQ
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>
                     代码仓库
-                </span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="visibility:hidden;position:absolute;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li></ul> <ul class="extra-group"><!----> <!----></ul></nav></div></div> <!----></header> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/code/0-environment.html" title="注意事项" class="sidebar-link">注意事项</a></li><li><a href="/docs/code/1-idea-start.html" title="必要软件环境" class="sidebar-link">必要软件环境</a></li><li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建 IoT DC3 Web UI</a></li><li><a href="/docs/code/3-quick-start.html" title="快速启动" class="sidebar-link">快速启动</a></li><li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/cluster/emqx.html" title="EMQ X 集群部署" class="sidebar-link">EMQ X 集群部署</a></li><li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo 集群部署</a></li><li><a href="/docs/cluster/rabbitmq.html" aria-current="page" title="RabbitMQ 集群部署" class="active sidebar-link">RabbitMQ 集群部署</a></li><li><a href="/docs/cluster/redis.html" title="Redis 集群部署" class="sidebar-link">Redis 集群部署</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a></li><li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li></ul> </aside> <main class="page has-page-anchor"> <div class="theme-dc3-content content__default"><h2 id="rabbitmq-集群部署"><code>RabbitMQ</code> 集群部署 <a href="#rabbitmq-集群部署" class="header-anchor">#</a></h2> <blockquote><p><code>RabbiMQ</code> 是用 <code>Erlang</code> 开发的，集群非常方便，因为 <code>Erlang</code> 天生就是一门分布式语言，但其本身并不支持负载均衡。</p> <p><code>RabbitMQ</code> 的集群节点包括内存节点、磁盘节点。<code>RabbitMQ</code> 支持消息的持久化，也就是数据写在磁盘上，最合适的方案就是既有内存节点，又有磁盘节点。</p> <p><code>RabbitMQ</code> 模式大概分为以下三种:</p> <ul><li>单一模式；</li> <li>普通模式（默认的集群模式）；</li> <li>镜像模式（把需要的队列做成镜像队列，存在于多个节点，属于 <code>RabbiMQ</code> 的 <code>HA</code> 方案，在对业务可靠性要求较高的场合中比较适用）。
-要实现镜像模式，需要先搭建一个普通集群模式，在这个模式的基础上再配置镜像模式以实现高可用。</li></ul></blockquote> <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3> <p><img src="/assets/images/dc3/cluster/rabbitmq/rabbitmq-1.png" alt=""></p> <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3> <table><thead><tr><th style="text-align:center;"><code>item</code></th> <th style="text-align:center;"><code>node 1</code></th> <th style="text-align:center;"><code>node 2</code></th> <th style="text-align:center;"><code>node 3</code></th></tr></thead> <tbody><tr><td style="text-align:center;"><code>listeners.tcp.default</code></td> <td style="text-align:center;">5000</td> <td style="text-align:center;">5100</td> <td style="text-align:center;">5200</td></tr> <tr><td style="text-align:center;"><code>management.tcp.port</code></td> <td style="text-align:center;">5020</td> <td style="text-align:center;">5120</td> <td style="text-align:center;">5220</td></tr> <tr><td style="text-align:center;"><code>mqtt.listeners.tcp.default</code></td> <td style="text-align:center;">5040</td> <td style="text-align:center;">5140</td> <td style="text-align:center;">5240</td></tr></tbody></table> <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3> <blockquote><p><strong>下载文件</strong></p> <p>请下载 <code>unix generic</code> 版本</p></blockquote> <ul><li><p>以 <code>3.9.11</code> 版本为例： https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.11/rabbitmq-server-generic-unix-3.9.11.tar.xz</p></li> <li><p>其他版本下载：https://github.com/rabbitmq/rabbitmq-server/releases</p></li></ul> <blockquote><p><strong>解压文件</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>xz <span class="token parameter variable">-d</span> rabbitmq-server-generic-unix-3.9.11.tar.xz
+                </span><i class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="visibility:hidden;position:absolute;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                        </ul>
+                        <ul class="extra-group"><!----> <!----></ul>
+                    </nav>
+                </div>
+            </div> <!----></header>
+        <aside class="sidebar"><!---->
+            <ul class="sidebar-links">
+                <li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li>
+                <li>
+                    <section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/code/0-environment.html" title="注意事项"
+                                   class="sidebar-link">注意事项</a></li>
+                            <li><a href="/docs/code/1-idea-start.html" title="必要软件环境"
+                                   class="sidebar-link">必要软件环境</a></li>
+                            <li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建
+                                IoT DC3 Web UI</a></li>
+                            <li><a href="/docs/code/3-quick-start.html" title="快速启动"
+                                   class="sidebar-link">快速启动</a></li>
+                            <li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a>
+                            </li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/cluster/emqx.html" title="EMQ X 集群部署" class="sidebar-link">EMQ X
+                                集群部署</a></li>
+                            <li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo
+                                集群部署</a></li>
+                            <li><a href="/docs/cluster/rabbitmq.html" aria-current="page" title="RabbitMQ 集群部署"
+                                   class="active sidebar-link">RabbitMQ 集群部署</a></li>
+                            <li><a href="/docs/cluster/redis.html" title="Redis 集群部署" class="sidebar-link">Redis
+                                集群部署</a></li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a>
+                </li>
+                <li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li>
+            </ul>
+        </aside>
+        <main class="page has-page-anchor">
+            <div class="theme-dc3-content content__default"><h2 id="rabbitmq-集群部署"><code>RabbitMQ</code> 集群部署 <a
+                    href="#rabbitmq-集群部署" class="header-anchor">#</a></h2>
+                <blockquote><p><code>RabbiMQ</code> 是用 <code>Erlang</code> 开发的，集群非常方便，因为
+                    <code>Erlang</code> 天生就是一门分布式语言，但其本身并不支持负载均衡。</p>
+                    <p><code>RabbitMQ</code> 的集群节点包括内存节点、磁盘节点。<code>RabbitMQ</code>
+                        支持消息的持久化，也就是数据写在磁盘上，最合适的方案就是既有内存节点，又有磁盘节点。</p>
+                    <p><code>RabbitMQ</code> 模式大概分为以下三种:</p>
+                    <ul>
+                        <li>单一模式；</li>
+                        <li>普通模式（默认的集群模式）；</li>
+                        <li>镜像模式（把需要的队列做成镜像队列，存在于多个节点，属于 <code>RabbiMQ</code> 的
+                            <code>HA</code> 方案，在对业务可靠性要求较高的场合中比较适用）。
+                            要实现镜像模式，需要先搭建一个普通集群模式，在这个模式的基础上再配置镜像模式以实现高可用。
+                        </li>
+                    </ul>
+                </blockquote>
+                <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3>
+                <p><img src="/assets/images/dc3/cluster/rabbitmq/rabbitmq-1.png" alt=""></p>
+                <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;"><code>item</code></th>
+                        <th style="text-align:center;"><code>node 1</code></th>
+                        <th style="text-align:center;"><code>node 2</code></th>
+                        <th style="text-align:center;"><code>node 3</code></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="text-align:center;"><code>listeners.tcp.default</code></td>
+                        <td style="text-align:center;">5000</td>
+                        <td style="text-align:center;">5100</td>
+                        <td style="text-align:center;">5200</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>management.tcp.port</code></td>
+                        <td style="text-align:center;">5020</td>
+                        <td style="text-align:center;">5120</td>
+                        <td style="text-align:center;">5220</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>mqtt.listeners.tcp.default</code></td>
+                        <td style="text-align:center;">5040</td>
+                        <td style="text-align:center;">5140</td>
+                        <td style="text-align:center;">5240</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3>
+                <blockquote><p><strong>下载文件</strong></p>
+                    <p>请下载 <code>unix generic</code> 版本</p></blockquote>
+                <ul>
+                    <li><p>以 <code>3.9.11</code> 版本为例：
+                        https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.11/rabbitmq-server-generic-unix-3.9.11.tar.xz
+                    </p></li>
+                    <li><p>其他版本下载：https://github.com/rabbitmq/rabbitmq-server/releases</p></li>
+                </ul>
+                <blockquote><p><strong>解压文件</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>xz <span
+                        class="token parameter variable">-d</span> rabbitmq-server-generic-unix-3.9.11.tar.xz
 
 <span class="token function">tar</span> xvf rabbitmq-server-generic-unix-3.9.11.tar
-</code></pre></div><h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4 id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a></h4> <blockquote><p>分别创建三个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> /data
+</code></pre>
+                </div>
+                <h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4
+                        id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a>
+                </h4>
+                <blockquote><p>分别创建三个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token builtin class-name">cd</span> /data
 
 <span class="token function">mkdir</span> <span class="token parameter variable">-p</span> rabbitmq/dc3/node-01 rabbitmq/dc3/node-02 rabbitmq/dc3/node-03
-</code></pre></div><blockquote><p>将解压的 <code>rabbitmq</code> 文件放入到每个节点中，其他节点操作一致</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">cp</span> <span class="token parameter variable">-r</span> rabbitmq-server/* rabbitmq/dc3/node-01/
+</code></pre>
+                </div>
+                <blockquote><p>将解压的 <code>rabbitmq</code> 文件放入到每个节点中，其他节点操作一致</p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token function">cp</span> <span class="token parameter variable">-r</span> rabbitmq-server/* rabbitmq/dc3/node-01/
 
 <span class="token comment"># pwd</span>
 <span class="token comment"># /data/rabbitmq/dc3/node-01</span>
 
 <span class="token comment"># ls</span>
 <span class="token comment"># escript  etc  plugins  sbin  share</span>
-</code></pre></div><blockquote><p>为每个节点创建配置和 <code>keys</code> 目录，其他节点操作一致</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> node-N
+</code></pre>
+                </div>
+                <blockquote><p>为每个节点创建配置和 <code>keys</code> 目录，其他节点操作一致</p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token builtin class-name">cd</span> node-N
 
 <span class="token function">mkdir</span> <span class="token parameter variable">-p</span> etc/rabbitmq keys
-</code></pre></div><h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4> <blockquote><p>在每个节点的 <code>etc/rabbitmq</code> 下添加配置文件 <code>advanced.config</code>、<code>rabbitmq.conf</code>、<code>rabbitmq-env.conf</code>、<code>enabled_plugins</code></p></blockquote> <h5 id="_4-2-1-advanced-config">4.2.1 <code>advanced.config</code> <a href="#_4-2-1-advanced-config" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token punctuation">[</span>
+</code></pre>
+                </div>
+                <h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4>
+                <blockquote><p>在每个节点的 <code>etc/rabbitmq</code> 下添加配置文件 <code>advanced.config</code>、<code>rabbitmq.conf</code>、<code>rabbitmq-env.conf</code>、<code>enabled_plugins</code>
+                </p></blockquote>
+                <h5 id="_4-2-1-advanced-config">4.2.1 <code>advanced.config</code> <a href="#_4-2-1-advanced-config"
+                                                                                      class="header-anchor">#</a></h5>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token punctuation">[</span>
 
 
  <span class="token directive important">%% ----------------------------------------------------------------------------</span>
@@ -62,7 +385,8 @@
  <span class="token directive important">%% ----------------------------------------------------------------------------</span>
 
  <span class="token punctuation">{</span>rabbitmq_shovel<span class="token punctuation">,</span>
-  <span class="token punctuation">[</span><span class="token punctuation">{</span>shovels<span class="token punctuation">,</span>
+  <span class="token punctuation">[</span><span class="token punctuation">{</span>shovels<span
+                            class="token punctuation">,</span>
     <span class="token punctuation">[</span>%% A named shovel worker.
      <span class="token directive important">%% {my_first_shovel,</span>
      <span class="token directive important">%%  [</span>
@@ -91,9 +415,12 @@
      <span class="token directive important">%% {prefetch_count, 10},</span>
 
      <span class="token directive important">%% when to acknowledge messages:</span>
-     <span class="token directive important">%% - </span><span class="token key atrule">no_ack</span><span class="token punctuation">:</span> never (auto)
-     <span class="token directive important">%% - </span><span class="token key atrule">on_publish</span><span class="token punctuation">:</span> after each message is republished
-     <span class="token directive important">%% - </span><span class="token key atrule">on_confirm</span><span class="token punctuation">:</span> when the destination broker confirms receipt
+     <span class="token directive important">%% - </span><span class="token key atrule">no_ack</span><span
+                            class="token punctuation">:</span> never (auto)
+     <span class="token directive important">%% - </span><span class="token key atrule">on_publish</span><span
+                            class="token punctuation">:</span> after each message is republished
+     <span class="token directive important">%% - </span><span class="token key atrule">on_confirm</span><span
+                            class="token punctuation">:</span> when the destination broker confirms receipt
      <span class="token directive important">%%</span>
      <span class="token directive important">%% {ack_mode, on_confirm},</span>
 
@@ -121,9 +448,11 @@
    <span class="token directive important">%%             {publish_fields,     []},</span>
    <span class="token directive important">%%             {publish_properties, [{delivery_mode, 2}]},</span>
    <span class="token directive important">%%             {reconnect_delay,    2.5}]}</span>
-  <span class="token punctuation">]</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token punctuation">}</span><span
+                            class="token punctuation">,</span>
 
-  <span class="token punctuation">{</span>rabbitmq_auth_backend_ldap<span class="token punctuation">,</span> <span class="token punctuation">[</span>
+  <span class="token punctuation">{</span>rabbitmq_auth_backend_ldap<span class="token punctuation">,</span> <span
+                            class="token punctuation">[</span>
     <span class="token directive important">%%</span>
     <span class="token directive important">%% Authorisation</span>
     <span class="token directive important">%% =============</span>
@@ -148,7 +477,11 @@
     <span class="token directive important">%% {tag_queries, []}</span>
   <span class="token punctuation">]</span><span class="token punctuation">}</span>
 <span class="token punctuation">]</span>.
-</code></pre></div><h5 id="_4-2-2-rabbitmq-conf">4.2.2 <code>rabbitmq.conf</code> <a href="#_4-2-2-rabbitmq-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">## This example configuration file demonstrates various settings</span>
+</code></pre>
+                </div>
+                <h5 id="_4-2-2-rabbitmq-conf">4.2.2 <code>rabbitmq.conf</code> <a href="#_4-2-2-rabbitmq-conf"
+                                                                                  class="header-anchor">#</a></h5>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">## This example configuration file demonstrates various settings</span>
 <span class="token comment">## available via rabbitmq.conf. It primarily focuses core broker settings</span>
 <span class="token comment">## but some tier 1 plugin settings are also covered.</span>
 <span class="token comment">##</span>
@@ -961,7 +1294,8 @@ management.tcp.port = 5020
 <span class="token comment">##</span>
 <span class="token comment"># mqtt.listeners.tcp.1 = 127.0.0.1:61613</span>
 <span class="token comment"># mqtt.listeners.tcp.2 = ::1:61613</span>
-mqtt.listeners.tcp.default = <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">5040</span>
+mqtt.listeners.tcp.default = <span class="token punctuation">:</span><span class="token punctuation">:</span><span
+                            class="token punctuation">:</span><span class="token number">5040</span>
 
 <span class="token comment">## TCP listener options (as per the broker configuration).</span>
 <span class="token comment">##</span>
@@ -1220,7 +1554,11 @@ mqtt.exchange = dc3.exchange.mqtt
 <span class="token comment">## {tag_queries, []}</span>
 <span class="token comment">#   ]},</span>
 <span class="token comment"># -----------------------------</span>
-</code></pre></div><h5 id="_4-2-3-rabbitmq-env-conf">4.2.3 <code>rabbitmq-env.conf</code> <a href="#_4-2-3-rabbitmq-env-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment"># Example rabbitmq-env.conf file entries. Note that the variables</span>
+</code></pre>
+                </div>
+                <h5 id="_4-2-3-rabbitmq-env-conf">4.2.3 <code>rabbitmq-env.conf</code> <a
+                        href="#_4-2-3-rabbitmq-env-conf" class="header-anchor">#</a></h5>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment"># Example rabbitmq-env.conf file entries. Note that the variables</span>
 <span class="token comment"># do not have the RABBITMQ_ prefix.</span>
 <span class="token comment">#</span>
 <span class="token comment"># Overrides node name</span>
@@ -1235,36 +1573,115 @@ ADVANCED_CONFIG_FILE=$RABBITMQ_HOME/etc/rabbitmq/advanced.config
 
 <span class="token comment"># overrides environment variable file location</span>
 CONF_ENV_FILE=$RABBITMQ_HOME/etc/rabbitmq/rabbitmq<span class="token punctuation">-</span>env.conf
-</code></pre></div><h5 id="_4-2-4-enabled-plugins">4.2.4 <code>enabled_plugins</code> <a href="#_4-2-4-enabled-plugins" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token punctuation">[</span>rabbitmq_management<span class="token punctuation">,</span>rabbitmq_mqtt<span class="token punctuation">]</span>.
-</code></pre></div><h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmq-server <span class="token parameter variable">-detached</span>
+</code></pre>
+                </div>
+                <h5 id="_4-2-4-enabled-plugins">4.2.4 <code>enabled_plugins</code> <a href="#_4-2-4-enabled-plugins"
+                                                                                      class="header-anchor">#</a></h5>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token punctuation">[</span>rabbitmq_management<span
+                        class="token punctuation">,</span>rabbitmq_mqtt<span class="token punctuation">]</span>.
+</code></pre>
+                </div>
+                <h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmq-server <span
+                        class="token parameter variable">-detached</span>
 
 /data/rabbitmq/dc3/node-02/sbin/rabbitmq-server <span class="token parameter variable">-detached</span>
 
 /data/rabbitmq/dc3/node-03/sbin/rabbitmq-server <span class="token parameter variable">-detached</span>
-</code></pre></div><h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4> <blockquote><p><strong>配置 <code>节点2</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost stop_app
+</code></pre>
+                </div>
+                <h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4>
+                <blockquote><p><strong>配置 <code>节点2</code> 加入 <code>节点1</code></strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span
+                        class="token parameter variable">-n</span> node-02@localhost stop_app
 
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost reset
 
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost join_cluster node-01@localhost
 
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-02@localhost start_app
-</code></pre></div><blockquote><p><strong>配置 <code>节点3</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost stop_app
+</code></pre>
+                </div>
+                <blockquote><p><strong>配置 <code>节点3</code> 加入 <code>节点1</code></strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span
+                        class="token parameter variable">-n</span> node-03@localhost stop_app
 
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost reset
 
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost join_cluster node-01@localhost
 
 /data/rabbitmq/dc3/node-01/sbin/rabbitmqctl <span class="token parameter variable">-n</span> node-03@localhost start_app
-</code></pre></div><blockquote><p><strong>节点状态</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmq-diagnostics status
+</code></pre>
+                </div>
+                <blockquote><p><strong>节点状态</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/rabbitmq/dc3/node-01/sbin/rabbitmq-diagnostics status
 
 /data/rabbitmq/dc3/node-02/sbin/rabbitmq-diagnostics status
 
 /data/rabbitmq/dc3/node-03/sbin/rabbitmq-diagnostics status
-</code></pre></div></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/4/12 下午5:00:18</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev"><a href="/docs/cluster/mongo.html" class="prev"><i aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
+</code></pre>
+                </div>
+            </div>
+            <footer class="page-edit"><!---->
+                <div class="last-updated"><span class="prefix">上次更新:</span> <span
+                        class="time">2023/4/12 下午5:00:18</span></div>
+            </footer>
+            <div class="page-nav">
+                <p class="inner"><span class="prev"><a href="/docs/cluster/mongo.html" class="prev"><i
+                        aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896"
+                                                                                  focusable="false" data-icon="left"
+                                                                                  width="1em" height="1em"
+                                                                                  fill="currentColor"
+                                                                                  aria-hidden="true"><path
+                        d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
                 Mongo 集群部署
             </a></span> <span class="next"><a href="/docs/cluster/redis.html">
                 Redis 集群部署
-                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span></p></div> <div class="page-anchor"><div class="ant-space ant-space-vertical" style="width:100%;"><div class="ant-space-item"><div class="page-anchor-offset"><div><div class="ant-anchor-wrapper" style="max-height:100vh;"><div class="ant-anchor"><div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div><div class="ant-anchor-link"><a href="#rabbitmq-集群部署" title="RabbitMQ 集群部署" class="ant-anchor-link-title">RabbitMQ 集群部署</a><div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构" class="ant-anchor-link-title">1. 集群架构</a></div><div class="ant-anchor-link"><a href="#_2-集群部署规划" title="2. 集群部署规划" class="ant-anchor-link-title">2. 集群部署规划</a></div><div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件" class="ant-anchor-link-title">3. 安装文件</a></div><div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署" class="ant-anchor-link-title">4. 集群部署</a></div></div></div></div></div></div></div></div></div> </main> <!----></div><div class="global-ui"></div></div>
-        <script src="/assets/js/app.d87ce824.js" defer></script><script src="/assets/js/2.a8b8915e.js" defer></script><script src="/assets/js/11.653957ce.js" defer></script>
-    </body>
+                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false"
+                                                                               data-icon="right" width="1em"
+                                                                               height="1em" fill="currentColor"
+                                                                               aria-hidden="true"><path
+                        d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span>
+                </p>
+            </div>
+            <div class="page-anchor">
+                <div class="ant-space ant-space-vertical" style="width:100%;">
+                    <div class="ant-space-item">
+                        <div class="page-anchor-offset">
+                            <div>
+                                <div class="ant-anchor-wrapper" style="max-height:100vh;">
+                                    <div class="ant-anchor">
+                                        <div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div>
+                                        <div class="ant-anchor-link"><a href="#rabbitmq-集群部署"
+                                                                        title="RabbitMQ 集群部署"
+                                                                        class="ant-anchor-link-title">RabbitMQ
+                                            集群部署</a>
+                                            <div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构"
+                                                                            class="ant-anchor-link-title">1.
+                                                集群架构</a></div>
+                                            <div class="ant-anchor-link"><a href="#_2-集群部署规划"
+                                                                            title="2. 集群部署规划"
+                                                                            class="ant-anchor-link-title">2.
+                                                集群部署规划</a></div>
+                                            <div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件"
+                                                                            class="ant-anchor-link-title">3.
+                                                安装文件</a></div>
+                                            <div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署"
+                                                                            class="ant-anchor-link-title">4.
+                                                集群部署</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main> <!----></div>
+    <div class="global-ui"></div>
+</div>
+<script src="/assets/js/app.d87ce824.js" defer></script>
+<script src="/assets/js/2.a8b8915e.js" defer></script>
+<script src="/assets/js/11.653957ce.js" defer></script>
+</body>
 </html>

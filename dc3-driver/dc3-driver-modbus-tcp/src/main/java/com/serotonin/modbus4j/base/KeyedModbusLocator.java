@@ -32,7 +32,7 @@ public class KeyedModbusLocator<K> {
     /**
      * <p>Constructor for KeyedModbusLocator.</p>
      *
-     * @param key a K object.
+     * @param key     a K object.
      * @param locator a {@link BaseLocator} object.
      */
     public KeyedModbusLocator(K key, BaseLocator<?> locator) {
@@ -58,7 +58,9 @@ public class KeyedModbusLocator<K> {
         return locator;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "KeyedModbusLocator(key=" + key + ", locator=" + locator + ")";
@@ -69,6 +71,7 @@ public class KeyedModbusLocator<K> {
     /// Delegation.
     ///
     //
+
     /**
      * <p>getDataType.</p>
      *
@@ -117,15 +120,14 @@ public class KeyedModbusLocator<K> {
     /**
      * <p>bytesToValue.</p>
      *
-     * @param data an array of {@link byte} objects.
+     * @param data          an array of {@link byte} objects.
      * @param requestOffset a int.
      * @return a {@link Object} object.
      */
     public Object bytesToValue(byte[] data, int requestOffset) {
         try {
             return locator.bytesToValue(data, requestOffset);
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             // Some equipment will not return data lengths that we expect, which causes AIOOBEs. Catch them and convert
             // them into illegal data address exceptions.
             return new ExceptionResult(ExceptionCode.ILLEGAL_DATA_ADDRESS);

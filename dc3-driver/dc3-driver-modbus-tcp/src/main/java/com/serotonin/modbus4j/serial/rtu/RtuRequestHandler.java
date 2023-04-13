@@ -38,7 +38,9 @@ public class RtuRequestHandler extends BaseRequestHandler {
         super(slave);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
         RtuMessageRequest rtuRequest = (RtuMessageRequest) req;
         ModbusRequest request = rtuRequest.getModbusRequest();

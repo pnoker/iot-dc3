@@ -35,9 +35,9 @@ public class WriteRegisterRequest extends ModbusRequest {
     /**
      * <p>Constructor for WriteRegisterRequest.</p>
      *
-     * @param slaveId a int.
+     * @param slaveId     a int.
      * @param writeOffset a int.
-     * @param writeValue a int.
+     * @param writeValue  a int.
      * @throws ModbusTransportException if any.
      */
     public WriteRegisterRequest(int slaveId, int writeOffset, int writeValue) throws ModbusTransportException {
@@ -46,7 +46,9 @@ public class WriteRegisterRequest extends ModbusRequest {
         this.writeValue = writeValue;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
@@ -56,7 +58,9 @@ public class WriteRegisterRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
@@ -69,7 +73,9 @@ public class WriteRegisterRequest extends ModbusRequest {
         return new WriteRegisterResponse(slaveId, writeOffset, writeValue);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_REGISTER;
@@ -80,7 +86,9 @@ public class WriteRegisterRequest extends ModbusRequest {
         return new WriteRegisterResponse(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

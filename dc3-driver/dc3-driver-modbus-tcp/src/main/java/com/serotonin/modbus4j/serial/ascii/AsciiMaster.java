@@ -15,9 +15,6 @@
  */
 package com.serotonin.modbus4j.serial.ascii;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.msg.ModbusRequest;
@@ -27,6 +24,8 @@ import com.serotonin.modbus4j.serial.SerialPortWrapper;
 import com.serotonin.modbus4j.serial.SerialWaitingRoomKeyFactory;
 import com.serotonin.modbus4j.sero.messaging.MessageControl;
 import com.serotonin.modbus4j.sero.messaging.StreamTransport;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>AsciiMaster class.</p>
@@ -41,7 +40,7 @@ public class AsciiMaster extends SerialMaster {
 
     /**
      * <p>Constructor for AsciiMaster.</p>
-     *
+     * <p>
      * Default to validating the slave id in responses
      *
      * @param wrapper a {@link SerialPortWrapper} object.
@@ -51,21 +50,21 @@ public class AsciiMaster extends SerialMaster {
     }
 
     /**
-     *
-     * @param wrapper a {@link SerialPortWrapper} object.
+     * @param wrapper          a {@link SerialPortWrapper} object.
      * @param validateResponse - confirm that requested slave id is the same in the response
      */
     public AsciiMaster(SerialPortWrapper wrapper, boolean validateResponse) {
         super(wrapper, validateResponse);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init() throws ModbusInitException {
         try {
             openConnection(null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ModbusInitException(e);
         }
         initialized = true;
@@ -82,7 +81,9 @@ public class AsciiMaster extends SerialMaster {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         closeMessageControl(conn);
@@ -90,7 +91,9 @@ public class AsciiMaster extends SerialMaster {
         initialized = false;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         // Wrap the modbus request in an ascii request.
@@ -103,8 +106,7 @@ public class AsciiMaster extends SerialMaster {
             if (asciiResponse == null)
                 return null;
             return asciiResponse.getModbusResponse();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             try {
                 LOG.debug("Connection may have been reset. Attempting to re-open.");
                 openConnection(conn);
@@ -112,7 +114,7 @@ public class AsciiMaster extends SerialMaster {
                 if (asciiResponse == null)
                     return null;
                 return asciiResponse.getModbusResponse();
-            }catch(Exception e2) {
+            } catch (Exception e2) {
                 closeConnection(conn);
                 LOG.debug("Failed to re-connect", e);
                 throw new ModbusTransportException(e2, request.getSlaveId());

@@ -89,15 +89,18 @@ public class IpParameters {
      *
      * @return a int.
      */
-    public Integer getLingerTime() { return lingerTime; }
+    public Integer getLingerTime() {
+        return lingerTime;
+    }
 
     /**
      * <p>Setter for the field <code>linger</code>.</p>
      *
      * @param lingerTime a int.
      */
-    public void setLingerTime(Integer lingerTime) { this.lingerTime = lingerTime; }
-
+    public void setLingerTime(Integer lingerTime) {
+        this.lingerTime = lingerTime;
+    }
 
 
 }

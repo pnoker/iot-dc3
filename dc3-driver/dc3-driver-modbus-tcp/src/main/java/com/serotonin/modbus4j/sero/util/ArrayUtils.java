@@ -40,7 +40,7 @@ public class ArrayUtils {
      *
      * @param bytes an array of {@link byte} objects.
      * @param start a int.
-     * @param len a int.
+     * @param len   a int.
      * @return a {@link String} object.
      */
     public static String toHexString(byte[] bytes, int start, int len) {
@@ -72,7 +72,7 @@ public class ArrayUtils {
      *
      * @param bytes an array of {@link byte} objects.
      * @param start a int.
-     * @param len a int.
+     * @param len   a int.
      * @return a {@link String} object.
      */
     public static String toPlainHexString(byte[] bytes, int start, int len) {
@@ -101,7 +101,7 @@ public class ArrayUtils {
      *
      * @param bytes an array of {@link byte} objects.
      * @param start a int.
-     * @param len a int.
+     * @param len   a int.
      * @return a {@link String} object.
      */
     public static String toString(byte[] bytes, int start, int len) {
@@ -132,7 +132,7 @@ public class ArrayUtils {
      * <p>indexOf.</p>
      *
      * @param values an array of {@link String} objects.
-     * @param value a {@link String} object.
+     * @param value  a {@link String} object.
      * @return a int.
      */
     public static int indexOf(String[] values, String value) {
@@ -151,7 +151,7 @@ public class ArrayUtils {
      * <p>containsIgnoreCase.</p>
      *
      * @param values an array of {@link String} objects.
-     * @param value a {@link String} object.
+     * @param value  a {@link String} object.
      * @return a boolean.
      */
     public static boolean containsIgnoreCase(String[] values, String value) {
@@ -169,7 +169,7 @@ public class ArrayUtils {
     /**
      * <p>indexOf.</p>
      *
-     * @param src an array of {@link byte} objects.
+     * @param src    an array of {@link byte} objects.
      * @param target an array of {@link byte} objects.
      * @return a int.
      */
@@ -180,8 +180,8 @@ public class ArrayUtils {
     /**
      * <p>indexOf.</p>
      *
-     * @param src an array of {@link byte} objects.
-     * @param len a int.
+     * @param src    an array of {@link byte} objects.
+     * @param len    a int.
      * @param target an array of {@link byte} objects.
      * @return a int.
      */
@@ -192,9 +192,9 @@ public class ArrayUtils {
     /**
      * <p>indexOf.</p>
      *
-     * @param src an array of {@link byte} objects.
-     * @param start a int.
-     * @param len a int.
+     * @param src    an array of {@link byte} objects.
+     * @param start  a int.
+     * @param len    a int.
      * @param target an array of {@link byte} objects.
      * @return a int.
      */
@@ -229,12 +229,9 @@ public class ArrayUtils {
      * Returns the value of the bits in the given range. Ranges can extend multiple bytes. No range checking is done.
      * Invalid ranges will result in {@link ArrayIndexOutOfBoundsException}.
      *
-     * @param b
-     *            the array of bytes.
-     * @param offset
-     *            the location at which to begin
-     * @param length
-     *            the number of bits to include in the value.
+     * @param b      the array of bytes.
+     * @param offset the location at which to begin
+     * @param length the number of bits to include in the value.
      * @return the value of the bits in the range.
      */
     public static long bitRangeValueLong(byte[] b, int offset, int length) {
@@ -256,12 +253,12 @@ public class ArrayUtils {
         return result;
     }
 
-    private static int[] bitFromMask = { 0xff, 0x7f, 0x3f, 0x1f, 0xf, 0x7, 0x3, 0x1 };
+    private static int[] bitFromMask = {0xff, 0x7f, 0x3f, 0x1f, 0xf, 0x7, 0x3, 0x1};
 
     /**
      * <p>bitRangeValue.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b      an array of {@link byte} objects.
      * @param offset a int.
      * @param length a int.
      * @return a int.
@@ -273,7 +270,7 @@ public class ArrayUtils {
     /**
      * <p>byteRangeValueLong.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b      an array of {@link byte} objects.
      * @param offset a int.
      * @param length a int.
      * @return a long.
@@ -292,7 +289,7 @@ public class ArrayUtils {
     /**
      * <p>byteRangeValue.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b      an array of {@link byte} objects.
      * @param offset a int.
      * @param length a int.
      * @return a int.
@@ -343,7 +340,7 @@ public class ArrayUtils {
     /**
      * <p>concatenate.</p>
      *
-     * @param a an array of {@link Object} objects.
+     * @param a         an array of {@link Object} objects.
      * @param delimiter a {@link String} object.
      * @return a {@link String} object.
      */
@@ -363,7 +360,7 @@ public class ArrayUtils {
     /**
      * <p>shift.</p>
      *
-     * @param a an array of {@link Object} objects.
+     * @param a     an array of {@link Object} objects.
      * @param count a int.
      */
     public static void shift(Object[] a, int count) {

@@ -48,7 +48,7 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
      * Constructor that defaults the masks to have no effect on the register. Use the setBit function to modify mask
      * values.
      *
-     * @param slaveId a int.
+     * @param slaveId     a int.
      * @param writeOffset a int.
      * @throws ModbusTransportException when necessary
      */
@@ -59,10 +59,10 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
     /**
      * <p>Constructor for WriteMaskRegisterRequest.</p>
      *
-     * @param slaveId a int.
+     * @param slaveId     a int.
      * @param writeOffset a int.
-     * @param andMask a int.
-     * @param orMask a int.
+     * @param andMask     a int.
+     * @param orMask      a int.
      * @throws ModbusTransportException if any.
      */
     public WriteMaskRegisterRequest(int slaveId, int writeOffset, int andMask, int orMask)
@@ -73,7 +73,9 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         this.orMask = orMask;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
@@ -82,7 +84,7 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
     /**
      * <p>setBit.</p>
      *
-     * @param bit a int.
+     * @param bit   a int.
      * @param value a boolean.
      */
     public void setBit(int bit, boolean value) {
@@ -103,7 +105,9 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
@@ -119,7 +123,9 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         return new WriteMaskRegisterResponse(slaveId, writeOffset, andMask, orMask);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_MASK_REGISTER;
@@ -130,7 +136,9 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         return new WriteMaskRegisterResponse(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

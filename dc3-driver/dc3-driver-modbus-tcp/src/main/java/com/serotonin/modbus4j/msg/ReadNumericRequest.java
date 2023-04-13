@@ -34,8 +34,8 @@ abstract public class ReadNumericRequest extends ModbusRequest {
     /**
      * <p>Constructor for ReadNumericRequest.</p>
      *
-     * @param slaveId a int.
-     * @param startOffset a int.
+     * @param slaveId           a int.
+     * @param startOffset       a int.
      * @param numberOfRegisters a int.
      * @throws ModbusTransportException if any.
      */
@@ -45,7 +45,9 @@ abstract public class ReadNumericRequest extends ModbusRequest {
         this.numberOfRegisters = numberOfRegisters;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
@@ -57,14 +59,18 @@ abstract public class ReadNumericRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, startOffset);
         ModbusUtils.pushShort(queue, numberOfRegisters);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         startOffset = ModbusUtils.popUnsignedShort(queue);
@@ -92,13 +98,15 @@ abstract public class ReadNumericRequest extends ModbusRequest {
      * <p>getNumeric.</p>
      *
      * @param processImage a {@link ProcessImage} object.
-     * @param index a int.
+     * @param index        a int.
      * @return a short.
      * @throws ModbusTransportException if any.
      */
     abstract protected short getNumeric(ProcessImage processImage, int index) throws ModbusTransportException;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "ReadNumericRequest [startOffset=" + startOffset + ", numberOfRegisters=" + numberOfRegisters + "]";

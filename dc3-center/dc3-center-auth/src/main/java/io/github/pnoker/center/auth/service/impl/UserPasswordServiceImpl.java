@@ -26,8 +26,8 @@ import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.UserPassword;
 import io.github.pnoker.common.utils.DecodeUtil;
@@ -68,7 +68,9 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             throw new NotFoundException("The user password does not exist");
         }
 
-        userPasswordMapper.deleteById(id);
+        if (userPasswordMapper.deleteById(id) < 1) {
+            throw new DeleteException("The user password delete failed");
+        }
     }
 
     @Override

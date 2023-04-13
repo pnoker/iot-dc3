@@ -25,10 +25,7 @@ import io.github.pnoker.center.manager.entity.query.ProfileBindPageQuery;
 import io.github.pnoker.center.manager.mapper.ProfileBindMapper;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.ProfileBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,7 +73,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
             throw new NotFoundException("The profile bind does not exist");
         }
 
-        profileBindMapper.deleteById(id);
+        if (profileBindMapper.deleteById(id) < 1) {
+            throw new DeleteException("The profile bind delete failed");
+        }
     }
 
     /**

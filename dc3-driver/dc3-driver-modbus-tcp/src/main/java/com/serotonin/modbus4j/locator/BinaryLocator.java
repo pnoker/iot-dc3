@@ -35,8 +35,8 @@ public class BinaryLocator extends BaseLocator<Boolean> {
      * <p>Constructor for BinaryLocator.</p>
      *
      * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
+     * @param range   a int.
+     * @param offset  a int.
      */
     public BinaryLocator(int slaveId, int range, int offset) {
         super(slaveId, range, offset);
@@ -49,9 +49,9 @@ public class BinaryLocator extends BaseLocator<Boolean> {
      * <p>Constructor for BinaryLocator.</p>
      *
      * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
-     * @param bit a int.
+     * @param range   a int.
+     * @param offset  a int.
+     * @param bit     a int.
      */
     public BinaryLocator(int slaveId, int range, int offset, int bit) {
         super(slaveId, range, offset);
@@ -90,26 +90,34 @@ public class BinaryLocator extends BaseLocator<Boolean> {
         return bit;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDataType() {
         return DataType.BINARY;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getRegisterCount() {
         return 1;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "BinaryLocator(slaveId=" + getSlaveId() + ", range=" + range + ", offset=" + offset + ", bit=" + bit
                 + ")";
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean bytesToValueRealOffset(byte[] data, int offset) {
         // If this is a coil or input, convert to boolean.
@@ -123,7 +131,9 @@ public class BinaryLocator extends BaseLocator<Boolean> {
         return new Boolean((((data[offset + 1 - bit / 8] & 0xff) >> (bit % 8)) & 0x1) == 1);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public short[] valueToShorts(Boolean value) {
         throw new NotImplementedException();

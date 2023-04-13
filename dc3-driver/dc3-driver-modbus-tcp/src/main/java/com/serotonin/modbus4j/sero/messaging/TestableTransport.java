@@ -31,7 +31,7 @@ public class TestableTransport extends StreamTransport {
     /**
      * <p>Constructor for TestableTransport.</p>
      *
-     * @param in a {@link InputStream} object.
+     * @param in  a {@link InputStream} object.
      * @param out a {@link OutputStream} object.
      */
     public TestableTransport(InputStream in, OutputStream out) {

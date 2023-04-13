@@ -25,11 +25,7 @@ import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 import com.serotonin.modbus4j.ip.tcp.TcpSlave;
 import com.serotonin.modbus4j.ip.udp.UdpMaster;
 import com.serotonin.modbus4j.ip.udp.UdpSlave;
-import com.serotonin.modbus4j.msg.ModbusRequest;
-import com.serotonin.modbus4j.msg.ReadCoilsRequest;
-import com.serotonin.modbus4j.msg.ReadDiscreteInputsRequest;
-import com.serotonin.modbus4j.msg.ReadHoldingRegistersRequest;
-import com.serotonin.modbus4j.msg.ReadInputRegistersRequest;
+import com.serotonin.modbus4j.msg.*;
 import com.serotonin.modbus4j.serial.SerialPortWrapper;
 import com.serotonin.modbus4j.serial.ascii.AsciiMaster;
 import com.serotonin.modbus4j.serial.ascii.AsciiSlave;
@@ -46,6 +42,7 @@ public class ModbusFactory {
     //
     // Modbus masters
     //
+
     /**
      * <p>createRtuMaster.</p>
      *
@@ -55,7 +52,7 @@ public class ModbusFactory {
     public ModbusMaster createRtuMaster(SerialPortWrapper wrapper) {
         return new RtuMaster(wrapper);
     }
-    
+
     /**
      * <p>createAsciiMaster.</p>
      *
@@ -69,7 +66,7 @@ public class ModbusFactory {
     /**
      * <p>createTcpMaster.</p>
      *
-     * @param params a {@link IpParameters} object.
+     * @param params    a {@link IpParameters} object.
      * @param keepAlive a boolean.
      * @return a {@link ModbusMaster} object.
      */
@@ -80,13 +77,13 @@ public class ModbusFactory {
     /**
      * <p>createTcpMaster.</p>
      *
-     * @param params a {@link IpParameters} object.
-     * @param keepAlive a boolean.
+     * @param params     a {@link IpParameters} object.
+     * @param keepAlive  a boolean.
      * @param lingerTime an Integer.
      * @return a {@link ModbusMaster} object.
      */
     public ModbusMaster createTcpMaster(IpParameters params, boolean keepAlive, Integer lingerTime) {
-        return new TcpMaster(params, keepAlive,lingerTime);
+        return new TcpMaster(params, keepAlive, lingerTime);
     }
 
     /**
@@ -112,6 +109,7 @@ public class ModbusFactory {
     //
     // Modbus slaves
     //
+
     /**
      * <p>createRtuSlave.</p>
      *
@@ -155,16 +153,17 @@ public class ModbusFactory {
     //
     // Modbus requests
     //
+
     /**
      * <p>createReadRequest.</p>
      *
      * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
-     * @param length a int.
+     * @param range   a int.
+     * @param offset  a int.
+     * @param length  a int.
      * @return a {@link ModbusRequest} object.
      * @throws ModbusTransportException if any.
-     * @throws ModbusIdException if any.
+     * @throws ModbusIdException        if any.
      */
     public ModbusRequest createReadRequest(int slaveId, int range, int offset, int length)
             throws ModbusTransportException, ModbusIdException {

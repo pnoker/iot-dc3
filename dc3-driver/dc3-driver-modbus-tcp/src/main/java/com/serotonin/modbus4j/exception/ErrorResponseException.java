@@ -34,7 +34,7 @@ public class ErrorResponseException extends Exception {
      * <p>Constructor for ErrorResponseException.</p>
      *
      * @param originalRequest a {@link ModbusRequest} object.
-     * @param errorResponse a {@link ModbusResponse} object.
+     * @param errorResponse   a {@link ModbusResponse} object.
      */
     public ErrorResponseException(ModbusRequest originalRequest, ModbusResponse errorResponse) {
         this.originalRequest = originalRequest;
@@ -59,7 +59,9 @@ public class ErrorResponseException extends Exception {
         return originalRequest;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getMessage() {
         return errorResponse.getExceptionMessage();

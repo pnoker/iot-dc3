@@ -16,14 +16,14 @@
 
 package com.serotonin.modbus4j.locator;
 
-import java.nio.charset.Charset;
-
 import com.serotonin.modbus4j.base.ModbusUtils;
 import com.serotonin.modbus4j.base.RangeAndOffset;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
 import com.serotonin.modbus4j.exception.ModbusIdException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
+
+import java.nio.charset.Charset;
 
 /**
  * <p>Abstract BaseLocator class.</p>
@@ -36,11 +36,12 @@ abstract public class BaseLocator<T> {
     //
     // Factory methods
     //
+
     /**
      * <p>coilStatus.</p>
      *
      * @param slaveId a int.
-     * @param offset a int.
+     * @param offset  a int.
      * @return a {@link BaseLocator} object.
      */
     public static BaseLocator<Boolean> coilStatus(int slaveId, int offset) {
@@ -51,7 +52,7 @@ abstract public class BaseLocator<T> {
      * <p>inputStatus.</p>
      *
      * @param slaveId a int.
-     * @param offset a int.
+     * @param offset  a int.
      * @return a {@link BaseLocator} object.
      */
     public static BaseLocator<Boolean> inputStatus(int slaveId, int offset) {
@@ -61,8 +62,8 @@ abstract public class BaseLocator<T> {
     /**
      * <p>inputRegister.</p>
      *
-     * @param slaveId a int.
-     * @param offset a int.
+     * @param slaveId  a int.
+     * @param offset   a int.
      * @param dataType a int.
      * @return a {@link BaseLocator} object.
      */
@@ -74,8 +75,8 @@ abstract public class BaseLocator<T> {
      * <p>inputRegisterBit.</p>
      *
      * @param slaveId a int.
-     * @param offset a int.
-     * @param bit a int.
+     * @param offset  a int.
+     * @param bit     a int.
      * @return a {@link BaseLocator} object.
      */
     public static BaseLocator<Boolean> inputRegisterBit(int slaveId, int offset, int bit) {
@@ -85,8 +86,8 @@ abstract public class BaseLocator<T> {
     /**
      * <p>holdingRegister.</p>
      *
-     * @param slaveId a int.
-     * @param offset a int.
+     * @param slaveId  a int.
+     * @param offset   a int.
      * @param dataType a int.
      * @return a {@link BaseLocator} object.
      */
@@ -98,8 +99,8 @@ abstract public class BaseLocator<T> {
      * <p>holdingRegisterBit.</p>
      *
      * @param slaveId a int.
-     * @param offset a int.
-     * @param bit a int.
+     * @param offset  a int.
+     * @param bit     a int.
      * @return a {@link BaseLocator} object.
      */
     public static BaseLocator<Boolean> holdingRegisterBit(int slaveId, int offset, int bit) {
@@ -109,10 +110,10 @@ abstract public class BaseLocator<T> {
     /**
      * <p>createLocator.</p>
      *
-     * @param slaveId a int.
-     * @param registerId a int.
-     * @param dataType a int.
-     * @param bit a int.
+     * @param slaveId       a int.
+     * @param registerId    a int.
+     * @param dataType      a int.
+     * @param bit           a int.
      * @param registerCount a int.
      * @return a {@link BaseLocator} object.
      */
@@ -125,16 +126,16 @@ abstract public class BaseLocator<T> {
     /**
      * <p>createLocator.</p>
      *
-     * @param slaveId a int.
-     * @param registerId a int.
-     * @param dataType a int.
-     * @param bit a int.
+     * @param slaveId       a int.
+     * @param registerId    a int.
+     * @param dataType      a int.
+     * @param bit           a int.
      * @param registerCount a int.
-     * @param charset a {@link Charset} object.
+     * @param charset       a {@link Charset} object.
      * @return a {@link BaseLocator} object.
      */
     public static BaseLocator<?> createLocator(int slaveId, int registerId, int dataType, int bit, int registerCount,
-            Charset charset) {
+                                               Charset charset) {
         RangeAndOffset rao = new RangeAndOffset(registerId);
         return createLocator(slaveId, rao.getRange(), rao.getOffset(), dataType, bit, registerCount, charset);
     }
@@ -142,33 +143,33 @@ abstract public class BaseLocator<T> {
     /**
      * <p>createLocator.</p>
      *
-     * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
-     * @param bit a int.
+     * @param slaveId       a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
+     * @param bit           a int.
      * @param registerCount a int.
      * @return a {@link BaseLocator} object.
      */
     public static BaseLocator<?> createLocator(int slaveId, int range, int offset, int dataType, int bit,
-            int registerCount) {
+                                               int registerCount) {
         return createLocator(slaveId, range, offset, dataType, bit, registerCount, StringLocator.ASCII);
     }
 
     /**
      * <p>createLocator.</p>
      *
-     * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
-     * @param bit a int.
+     * @param slaveId       a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
+     * @param bit           a int.
      * @param registerCount a int.
-     * @param charset a {@link Charset} object.
+     * @param charset       a {@link Charset} object.
      * @return a {@link BaseLocator} object.
      */
     public static BaseLocator<?> createLocator(int slaveId, int range, int offset, int dataType, int bit,
-            int registerCount, Charset charset) {
+                                               int registerCount, Charset charset) {
         if (dataType == DataType.BINARY) {
             if (BinaryLocator.isBinaryRange(range))
                 return new BinaryLocator(slaveId, range, offset);
@@ -187,8 +188,8 @@ abstract public class BaseLocator<T> {
      * <p>Constructor for BaseLocator.</p>
      *
      * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
+     * @param range   a int.
+     * @param offset  a int.
      */
     public BaseLocator(int slaveId, int range, int offset) {
         this.slaveId = slaveId;
@@ -205,8 +206,7 @@ abstract public class BaseLocator<T> {
         try {
             ModbusUtils.validateOffset(offset);
             ModbusUtils.validateEndOffset(offset + registerCount - 1);
-        }
-        catch (ModbusTransportException e) {
+        } catch (ModbusTransportException e) {
             throw new ModbusIdException(e);
         }
     }
@@ -268,7 +268,7 @@ abstract public class BaseLocator<T> {
     /**
      * <p>bytesToValue.</p>
      *
-     * @param data an array of {@link byte} objects.
+     * @param data          an array of {@link byte} objects.
      * @param requestOffset a int.
      * @return a T object.
      */
@@ -280,7 +280,7 @@ abstract public class BaseLocator<T> {
     /**
      * <p>bytesToValueRealOffset.</p>
      *
-     * @param data an array of {@link byte} objects.
+     * @param data   an array of {@link byte} objects.
      * @param offset a int.
      * @return a T object.
      */

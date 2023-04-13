@@ -84,10 +84,11 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             throw new NotFoundException("The driver attribute config does not exist");
         }
 
-        boolean delete = driverAttributeConfigMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);
+        if (driverAttributeConfigMapper.deleteById(id) < 1) {
+            throw new DeleteException("The driver attribute config delete failed");
         }
+
+        notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);
     }
 
     /**

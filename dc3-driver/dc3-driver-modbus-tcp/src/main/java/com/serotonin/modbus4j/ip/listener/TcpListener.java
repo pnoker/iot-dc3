@@ -16,19 +16,6 @@
 
 package com.serotonin.modbus4j.ip.listener;
 
-import java.io.IOException;
-import java.net.BindException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.base.BaseMessageParser;
 import com.serotonin.modbus4j.exception.ModbusInitException;
@@ -43,12 +30,19 @@ import com.serotonin.modbus4j.ip.xa.XaMessageRequest;
 import com.serotonin.modbus4j.ip.xa.XaWaitingRoomKeyFactory;
 import com.serotonin.modbus4j.msg.ModbusRequest;
 import com.serotonin.modbus4j.msg.ModbusResponse;
-import com.serotonin.modbus4j.sero.messaging.EpollStreamTransport;
-import com.serotonin.modbus4j.sero.messaging.MessageControl;
-import com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage;
-import com.serotonin.modbus4j.sero.messaging.StreamTransport;
-import com.serotonin.modbus4j.sero.messaging.Transport;
-import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
+import com.serotonin.modbus4j.sero.messaging.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
+import java.net.BindException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>TcpListener class.</p>
@@ -71,7 +65,7 @@ public class TcpListener extends ModbusMaster {
 
     /**
      * <p>Constructor for TcpListener.</p>
-     * 
+     * <p>
      * Will validate response to ensure that slaveId == response slaveId if encapsulated is true
      *
      * @param params a {@link IpParameters} object.
@@ -81,22 +75,22 @@ public class TcpListener extends ModbusMaster {
         ipParameters = params;
         connected = false;
         validateResponse = ipParameters.isEncapsulated();
-        if(LOG.isDebugEnabled())
+        if (LOG.isDebugEnabled())
             LOG.debug("TcpListener created! Port: " + ipParameters.getPort());
     }
-    
+
     /**
      * Control to validate response to ensure that slaveId == response slaveId
-     * 
+     *
      * @param params
-     * @param validateResponse 
+     * @param validateResponse
      */
     public TcpListener(IpParameters params, boolean validateResponse) {
         LOG.debug("Creating TcpListener in port " + params.getPort());
         ipParameters = params;
         connected = false;
         this.validateResponse = validateResponse;
-        if(LOG.isDebugEnabled())
+        if (LOG.isDebugEnabled())
             LOG.debug("TcpListener created! Port: " + ipParameters.getPort());
     }
 
@@ -109,7 +103,9 @@ public class TcpListener extends ModbusMaster {
         return nextTransactionId++;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     synchronized public void init() throws ModbusInitException {
         LOG.debug("Init TcpListener Port: " + ipParameters.getPort());
@@ -127,14 +123,15 @@ public class TcpListener extends ModbusMaster {
             handler = new ListenerConnectionHandler(socket);
             LOG.debug("Init handler thread");
             executorService.execute(handler);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.warn("Error initializing TcpListener ", e);
             throw new ModbusInitException(e);
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     synchronized public void destroy() {
         LOG.debug("Destroy TCPListener Port: " + ipParameters.getPort());
@@ -142,8 +139,7 @@ public class TcpListener extends ModbusMaster {
         try {
             if (serverSocket != null)
                 serverSocket.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOG.warn("Error closing socket" + e.getLocalizedMessage());
             getExceptionHandler().receivedException(e);
         }
@@ -164,15 +160,16 @@ public class TcpListener extends ModbusMaster {
         try {
             executorService.awaitTermination(300, TimeUnit.MILLISECONDS);
             LOG.debug("Handler Thread terminated,  Port: " + ipParameters.getPort());
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             LOG.debug("Error terminating executorService - " + e.getLocalizedMessage());
             getExceptionHandler().receivedException(e);
         }
         handler = null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     synchronized public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
 
@@ -196,8 +193,7 @@ public class TcpListener extends ModbusMaster {
                 sb.append(String.format("%02X ", b));
             }
             LOG.debug("Encap Request: " + sb.toString());
-        }
-        else {
+        } else {
             ipRequest = new XaMessageRequest(request, getNextTransactionId());
             StringBuilder sb = new StringBuilder();
             for (byte b : Arrays.copyOfRange(ipRequest.getMessageData(), 0, ipRequest.getMessageData().length)) {
@@ -221,13 +217,11 @@ public class TcpListener extends ModbusMaster {
             }
             LOG.debug("Response: " + sb.toString());
             return ipResponse.getModbusResponse();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.debug(e.getLocalizedMessage() + ",  Port: " + ipParameters.getPort() + ", retries: " + retries);
             if (retries < 10 && !e.getLocalizedMessage().contains("Broken")) {
                 retries++;
-            }
-            else {
+            } else {
                 /*
                  * To recover from a Broken Pipe, the only way is to restart serverSocket
                  */
@@ -237,8 +231,7 @@ public class TcpListener extends ModbusMaster {
                 try {
                     if (serverSocket != null)
                         serverSocket.close();
-                }
-                catch (IOException e2) {
+                } catch (IOException e2) {
                     LOG.debug("Error closing socket" + e2.getLocalizedMessage(), e);
                     getExceptionHandler().receivedException(e2);
                 }
@@ -257,8 +250,7 @@ public class TcpListener extends ModbusMaster {
                 executorService = Executors.newCachedThreadPool();
                 try {
                     startListener();
-                }
-                catch (Exception e2) {
+                } catch (Exception e2) {
                     LOG.warn("Error trying to restart socket" + e2.getLocalizedMessage(), e);
                     throw new ModbusTransportException(e2, request.getSlaveId());
                 }
@@ -288,16 +280,14 @@ public class TcpListener extends ModbusMaster {
             if (ipParameters.isEncapsulated()) {
                 ipMessageParser = new EncapMessageParser(true);
                 waitingRoomKeyFactory = new EncapWaitingRoomKeyFactory();
-            }
-            else {
+            } else {
                 ipMessageParser = new XaMessageParser(true);
                 waitingRoomKeyFactory = new XaWaitingRoomKeyFactory();
             }
 
             try {
                 acceptConnection();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.debug("Error in TCP Listener! - " + e.getLocalizedMessage(), e);
                 conn.close();
                 closeConnection();
@@ -309,8 +299,7 @@ public class TcpListener extends ModbusMaster {
             while (true) {
                 try {
                     Thread.sleep(500);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
@@ -327,18 +316,15 @@ public class TcpListener extends ModbusMaster {
                         else
                             transport = new StreamTransport(socket.getInputStream(), socket.getOutputStream());
                         break;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         LOG.warn(
                                 "Open connection failed on port " + ipParameters.getPort() + ", caused by "
                                         + e.getLocalizedMessage(), e);
                         if (e instanceof SocketTimeoutException) {
                             continue;
-                        }
-                        else if (e.getLocalizedMessage().contains("closed")) {
+                        } else if (e.getLocalizedMessage().contains("closed")) {
                             return;
-                        }
-                        else if (e instanceof BindException) {
+                        } else if (e instanceof BindException) {
                             closeConnection();
                             throw (BindException) e;
                         }
@@ -365,8 +351,7 @@ public class TcpListener extends ModbusMaster {
                 if (socket != null) {
                     socket.close();
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.debug("Error closing socket on port " + ipParameters.getPort() + ". " + e.getLocalizedMessage());
                 getExceptionHandler().receivedException(new ModbusInitException(e));
             }

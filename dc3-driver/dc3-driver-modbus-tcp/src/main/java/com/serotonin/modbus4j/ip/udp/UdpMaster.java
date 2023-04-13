@@ -15,13 +15,6 @@
  */
 package com.serotonin.modbus4j.ip.udp;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.base.BaseMessageParser;
 import com.serotonin.modbus4j.exception.ModbusInitException;
@@ -36,6 +29,9 @@ import com.serotonin.modbus4j.msg.ModbusRequest;
 import com.serotonin.modbus4j.msg.ModbusResponse;
 import com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage;
 import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
+
+import java.io.IOException;
+import java.net.*;
 
 /**
  * <p>UdpMaster class.</p>
@@ -55,9 +51,9 @@ public class UdpMaster extends ModbusMaster {
 
     /**
      * <p>Constructor for UdpMaster.</p>
-     *
+     * <p>
      * Default to not validating the slave id in responses
-     * 
+     *
      * @param params a {@link IpParameters} object.
      */
     public UdpMaster(IpParameters params) {
@@ -66,7 +62,7 @@ public class UdpMaster extends ModbusMaster {
 
     /**
      * <p>Constructor for UdpMaster.</p>
-     * 
+     *
      * @param params
      * @param validateResponse - confirm that requested slave id is the same in the response
      */
@@ -74,7 +70,7 @@ public class UdpMaster extends ModbusMaster {
         ipParameters = params;
         this.validateResponse = validateResponse;
     }
-    
+
     /**
      * <p>Getter for the field <code>nextTransactionId</code>.</p>
      *
@@ -84,7 +80,9 @@ public class UdpMaster extends ModbusMaster {
         return nextTransactionId++;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init() throws ModbusInitException {
         if (ipParameters.isEncapsulated())
@@ -95,21 +93,24 @@ public class UdpMaster extends ModbusMaster {
         try {
             socket = new DatagramSocket();
             socket.setSoTimeout(getTimeout());
-        }
-        catch (SocketException e) {
+        } catch (SocketException e) {
             throw new ModbusInitException(e);
         }
         initialized = true;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         socket.close();
         initialized = false;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         // Wrap the modbus request in an ip request.
@@ -134,8 +135,7 @@ public class UdpMaster extends ModbusMaster {
                 // Receive the response.
                 try {
                     ipResponse = receiveImpl();
-                }
-                catch (SocketTimeoutException e) {
+                } catch (SocketTimeoutException e) {
                     attempts--;
                     if (attempts > 0)
                         // Try again.
@@ -149,8 +149,7 @@ public class UdpMaster extends ModbusMaster {
             }
 
             return ipResponse.getModbusResponse();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ModbusTransportException(e, request.getSlaveId());
         }
     }
@@ -173,8 +172,7 @@ public class UdpMaster extends ModbusMaster {
         IpMessageResponse response;
         try {
             response = (IpMessageResponse) messageParser.parseMessage(queue);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ModbusTransportException(e);
         }
 

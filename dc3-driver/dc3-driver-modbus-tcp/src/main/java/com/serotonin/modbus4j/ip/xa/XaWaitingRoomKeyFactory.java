@@ -29,13 +29,17 @@ import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
  * @version 5.0.0
  */
 public class XaWaitingRoomKeyFactory implements WaitingRoomKeyFactory {
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(OutgoingRequestMessage request) {
         return createWaitingRoomKey((XaMessage) request);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(IncomingResponseMessage response) {
         return createWaitingRoomKey((XaMessage) response);

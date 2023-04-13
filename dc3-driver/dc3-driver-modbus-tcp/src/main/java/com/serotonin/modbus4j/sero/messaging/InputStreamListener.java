@@ -16,10 +16,10 @@
 
 package com.serotonin.modbus4j.sero.messaging;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class provides a stoppable listener for an input stream that sends arbitrary information. A read() call to an
@@ -46,7 +46,7 @@ public class InputStreamListener implements Runnable {
     /**
      * <p>Constructor for InputStreamListener.</p>
      *
-     * @param in a {@link InputStream} object.
+     * @param in       a {@link InputStream} object.
      * @param consumer a {@link DataConsumer} object.
      */
     public InputStreamListener(InputStream in, DataConsumer consumer) {
@@ -108,8 +108,7 @@ public class InputStreamListener implements Runnable {
                         synchronized (this) {
                             try {
                                 wait(readDelay);
-                            }
-                            catch (InterruptedException e) {
+                            } catch (InterruptedException e) {
                                 // no op
                             }
                         }
@@ -118,8 +117,7 @@ public class InputStreamListener implements Runnable {
 
                     readcount = in.read(buf);
                     consumer.data(buf, readcount);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     consumer.handleIOException(e);
                     if (StringUtils.equals(e.getMessage(), "Stream closed."))
                         break;
@@ -127,8 +125,7 @@ public class InputStreamListener implements Runnable {
                         break;
                 }
             }
-        }
-        finally {
+        } finally {
             running = false;
         }
     }
