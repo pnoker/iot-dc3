@@ -35,11 +35,12 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
     /**
      * 根据 驱动ServiceName 查询 驱动
      *
-     * @param serviceName 驱动服务名称
-     * @param tenantId    租户ID
+     * @param serviceName    驱动服务名称
+     * @param tenantId       租户ID
+     * @param throwException Throw Exception
      * @return Driver
      */
-    DriverDO selectByServiceName(String serviceName, String tenantId);
+    DriverDO selectByServiceName(String serviceName, String tenantId, boolean throwException);
 
     /**
      * 根据 驱动 Host 、 Port 查询 驱动

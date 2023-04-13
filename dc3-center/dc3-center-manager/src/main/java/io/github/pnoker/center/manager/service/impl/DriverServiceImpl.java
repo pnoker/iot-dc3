@@ -63,13 +63,13 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public void add(DriverDO entityDO) {
-        try {
-            selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId());
+        boolean duplicate = checkDuplicate(entityDO);
+        if (duplicate) {
             throw new DuplicateException("The driver already exists");
-        } catch (NotFoundException notFoundException) {
-            if (driverMapper.insert(entityDO) < 1) {
-                throw new AddException("The driver {} add failed", entityDO.getDriverName());
-            }
+        }
+
+        if (driverMapper.insert(entityDO) < 1) {
+            throw new AddException("The driver {} add failed", entityDO.getDriverName());
         }
     }
 
@@ -125,14 +125,16 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public DriverDO selectByServiceName(String serviceName, String tenantId) {
+    public DriverDO selectByServiceName(String serviceName, String tenantId, boolean throwException) {
         LambdaQueryWrapper<DriverDO> queryWrapper = Wrappers.<DriverDO>query().lambda();
         queryWrapper.eq(DriverDO::getServiceName, serviceName);
         queryWrapper.eq(DriverDO::getTenantId, tenantId);
         queryWrapper.last("limit 1");
         DriverDO entityDO = driverMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException();
+        if (throwException) {
+            if (ObjectUtil.isNull(entityDO)) {
+                throw new NotFoundException();
+            }
         }
         return entityDO;
     }
@@ -190,8 +192,15 @@ public class DriverServiceImpl implements DriverService {
         return driverMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
+    /**
+     * 按服务名称，判断是否重复
+     *
+     * @param entityDO DriverDO
+     * @return 是否重复
+     */
     private boolean checkDuplicate(DriverDO entityDO) {
-
+        DriverDO driverDO = selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId(), false);
+        return ObjectUtil.isNotNull(driverDO);
     }
 
     private LambdaQueryWrapper<DriverDO> fuzzyQuery(DriverPageQuery query) {
