@@ -38,7 +38,7 @@ public class StreamTransport implements Transport, Runnable {
     /**
      * <p>Constructor for StreamTransport.</p>
      *
-     * @param in a {@link InputStream} object.
+     * @param in  a {@link InputStream} object.
      * @param out a {@link OutputStream} object.
      */
     public StreamTransport(InputStream in, OutputStream out) {
@@ -79,7 +79,9 @@ public class StreamTransport implements Transport, Runnable {
         listener.run();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void setConsumer(DataConsumer consumer) {
         listener = new InputStreamListener(in, consumer);
     }
@@ -103,7 +105,9 @@ public class StreamTransport implements Transport, Runnable {
         out.flush();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void write(byte[] data, int len) throws IOException {
         out.write(data, 0, len);
         out.flush();

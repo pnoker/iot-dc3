@@ -51,7 +51,7 @@ public interface Transport {
      * <p>write.</p>
      *
      * @param data an array of {@link byte} objects.
-     * @param len a int.
+     * @param len  a int.
      * @throws IOException if any.
      */
     abstract void write(byte[] data, int len) throws IOException;

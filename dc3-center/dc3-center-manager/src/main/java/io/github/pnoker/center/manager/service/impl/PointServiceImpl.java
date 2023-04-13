@@ -30,10 +30,7 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Point;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -92,10 +89,11 @@ public class PointServiceImpl implements PointService {
             throw new NotFoundException("The point does not exist");
         }
 
-        boolean delete = pointMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, point);
+        if (pointMapper.deleteById(id) < 1) {
+            throw new DeleteException("The point delete failed");
         }
+
+        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, point);
     }
 
     /**

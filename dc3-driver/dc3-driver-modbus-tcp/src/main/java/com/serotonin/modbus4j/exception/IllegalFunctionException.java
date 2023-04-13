@@ -30,7 +30,7 @@ public class IllegalFunctionException extends ModbusTransportException {
      * <p>Constructor for IllegalFunctionException.</p>
      *
      * @param functionCode a byte.
-     * @param slaveId a int.
+     * @param slaveId      a int.
      */
     public IllegalFunctionException(byte functionCode, int slaveId) {
         super("Function code: 0x" + Integer.toHexString(functionCode & 0xff), slaveId);

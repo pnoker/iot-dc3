@@ -29,8 +29,8 @@ public class ReadInputRegistersRequest extends ReadNumericRequest {
     /**
      * <p>Constructor for ReadInputRegistersRequest.</p>
      *
-     * @param slaveId a int.
-     * @param startOffset a int.
+     * @param slaveId           a int.
+     * @param startOffset       a int.
      * @param numberOfRegisters a int.
      * @throws ModbusTransportException if any.
      */
@@ -43,7 +43,9 @@ public class ReadInputRegistersRequest extends ReadNumericRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_INPUT_REGISTERS;
@@ -54,7 +56,9 @@ public class ReadInputRegistersRequest extends ReadNumericRequest {
         return new ReadInputRegistersResponse(slaveId, getData(processImage));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected short getNumeric(ProcessImage processImage, int index) throws ModbusTransportException {
         return processImage.getInputRegister(index);
@@ -65,7 +69,9 @@ public class ReadInputRegistersRequest extends ReadNumericRequest {
         return new ReadInputRegistersResponse(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "ReadInputRegistersRequest [slaveId=" + slaveId + ", getFunctionCode()=" + getFunctionCode()

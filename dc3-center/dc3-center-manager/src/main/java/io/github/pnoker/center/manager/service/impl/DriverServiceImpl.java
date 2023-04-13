@@ -28,10 +28,7 @@ import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Driver;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +83,9 @@ public class DriverServiceImpl implements DriverService {
             throw new NotFoundException("The driver does not exist");
         }
 
-        driverMapper.deleteById(id);
+        if (driverMapper.deleteById(id) < 1) {
+            throw new DeleteException("The driver delete failed");
+        }
     }
 
     /**

@@ -25,10 +25,7 @@ import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.center.manager.mapper.GroupMapper;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -74,7 +71,9 @@ public class GroupServiceImpl implements GroupService {
             throw new NotFoundException("The group does not exist");
         }
 
-        groupMapper.deleteById(id);
+        if (groupMapper.deleteById(id) < 1) {
+            throw new DeleteException("The group delete failed");
+        }
     }
 
     /**

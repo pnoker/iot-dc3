@@ -33,13 +33,17 @@ public class ReadCoilsResponse extends ReadResponse {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_COILS;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "ReadCoilsResponse [exceptionCode=" + exceptionCode + ", slaveId=" + slaveId + ", getFunctionCode()="

@@ -1,45 +1,392 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8" />
-        <meta
+<head>
+    <meta charset="utf-8"/>
+    <meta
             name="viewport"
             content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-        />
-        <title>EMQ X 集群部署 | IoT DC3</title>
-        <meta name="description" content="" />
-        <meta name="generator" content="VuePress 1.9.9" />
-        <link rel="icon" href="/assets/images/favicon.ico">
-    <script type="text/javascript" src="/assets/js/push.js"></script> <meta name="description" content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
+    />
+    <title>EMQ X 集群部署 | IoT DC3</title>
+    <meta name="description" content=""/>
+    <meta name="generator" content="VuePress 1.9.9"/>
+    <link rel="icon" href="/assets/images/favicon.ico">
+    <script type="text/javascript" src="/assets/js/push.js"></script>
+    <meta name="description"
+          content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
     <meta name="referrer" content="never">
-    <meta name="keywords" content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台"> <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style"><link rel="preload" href="/assets/js/app.d87ce824.js" as="script"><link rel="preload" href="/assets/js/2.a8b8915e.js" as="script"><link rel="preload" href="/assets/js/9.f09083f8.js" as="script"><link rel="prefetch" href="/assets/js/10.db658154.js"><link rel="prefetch" href="/assets/js/11.653957ce.js"><link rel="prefetch" href="/assets/js/12.08136beb.js"><link rel="prefetch" href="/assets/js/13.83b3d580.js"><link rel="prefetch" href="/assets/js/14.d5387cec.js"><link rel="prefetch" href="/assets/js/15.aafb2a89.js"><link rel="prefetch" href="/assets/js/16.01fcc650.js"><link rel="prefetch" href="/assets/js/17.a097fd52.js"><link rel="prefetch" href="/assets/js/18.acd93e71.js"><link rel="prefetch" href="/assets/js/19.6f12b224.js"><link rel="prefetch" href="/assets/js/20.bac69ff1.js"><link rel="prefetch" href="/assets/js/21.9105165e.js"><link rel="prefetch" href="/assets/js/22.de1f017c.js"><link rel="prefetch" href="/assets/js/23.fb20a8f5.js"><link rel="prefetch" href="/assets/js/24.63ca195a.js"><link rel="prefetch" href="/assets/js/25.3a76708d.js"><link rel="prefetch" href="/assets/js/26.b6254386.js"><link rel="prefetch" href="/assets/js/27.3f127a30.js"><link rel="prefetch" href="/assets/js/28.afadbe5c.js"><link rel="prefetch" href="/assets/js/29.f175dd67.js"><link rel="prefetch" href="/assets/js/3.8e04da2b.js"><link rel="prefetch" href="/assets/js/30.5ba7a495.js"><link rel="prefetch" href="/assets/js/31.01c3d218.js"><link rel="prefetch" href="/assets/js/32.de0e0ff7.js"><link rel="prefetch" href="/assets/js/33.0e117d4a.js"><link rel="prefetch" href="/assets/js/34.010094c5.js"><link rel="prefetch" href="/assets/js/35.8a377a71.js"><link rel="prefetch" href="/assets/js/36.fbb64a47.js"><link rel="prefetch" href="/assets/js/37.c2b9d4da.js"><link rel="prefetch" href="/assets/js/38.a66be625.js"><link rel="prefetch" href="/assets/js/39.76e387bc.js"><link rel="prefetch" href="/assets/js/4.470d098a.js"><link rel="prefetch" href="/assets/js/40.0e9ee726.js"><link rel="prefetch" href="/assets/js/41.e68f3c2e.js"><link rel="prefetch" href="/assets/js/42.ba03ba76.js"><link rel="prefetch" href="/assets/js/43.e6a91a35.js"><link rel="prefetch" href="/assets/js/44.128407ae.js"><link rel="prefetch" href="/assets/js/45.e9f1b4b0.js"><link rel="prefetch" href="/assets/js/46.ab599c67.js"><link rel="prefetch" href="/assets/js/47.dc2d8aff.js"><link rel="prefetch" href="/assets/js/48.06e9c64e.js"><link rel="prefetch" href="/assets/js/49.627cc127.js"><link rel="prefetch" href="/assets/js/5.0f4aedb8.js"><link rel="prefetch" href="/assets/js/50.bf665f72.js"><link rel="prefetch" href="/assets/js/51.08e5dea0.js"><link rel="prefetch" href="/assets/js/52.8e37a9c4.js"><link rel="prefetch" href="/assets/js/53.8c472224.js"><link rel="prefetch" href="/assets/js/54.bb582a52.js"><link rel="prefetch" href="/assets/js/55.640d9ecb.js"><link rel="prefetch" href="/assets/js/56.e2e2a21e.js"><link rel="prefetch" href="/assets/js/57.9b9b26a7.js"><link rel="prefetch" href="/assets/js/58.0d4a46c3.js"><link rel="prefetch" href="/assets/js/59.d1f11d32.js"><link rel="prefetch" href="/assets/js/6.547754b6.js"><link rel="prefetch" href="/assets/js/7.aea1a047.js"><link rel="prefetch" href="/assets/js/8.58207631.js"> <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
-    </head>
-    <body>
-        <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="ant-row"><div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars"><svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path></svg></i> <span></span></div> <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3" class="logo"> <span class="site-name">IoT DC3</span></a> <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div></div> <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light"><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
-                    首页
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
-                    指南
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/config/">
-                    配置
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/faq/">
-                    FAQ
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>
+    <meta name="keywords"
+          content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台">
+    <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style">
+    <link rel="preload" href="/assets/js/app.d87ce824.js" as="script">
+    <link rel="preload" href="/assets/js/2.a8b8915e.js" as="script">
+    <link rel="preload" href="/assets/js/9.f09083f8.js" as="script">
+    <link rel="prefetch" href="/assets/js/10.db658154.js">
+    <link rel="prefetch" href="/assets/js/11.653957ce.js">
+    <link rel="prefetch" href="/assets/js/12.08136beb.js">
+    <link rel="prefetch" href="/assets/js/13.83b3d580.js">
+    <link rel="prefetch" href="/assets/js/14.d5387cec.js">
+    <link rel="prefetch" href="/assets/js/15.aafb2a89.js">
+    <link rel="prefetch" href="/assets/js/16.01fcc650.js">
+    <link rel="prefetch" href="/assets/js/17.a097fd52.js">
+    <link rel="prefetch" href="/assets/js/18.acd93e71.js">
+    <link rel="prefetch" href="/assets/js/19.6f12b224.js">
+    <link rel="prefetch" href="/assets/js/20.bac69ff1.js">
+    <link rel="prefetch" href="/assets/js/21.9105165e.js">
+    <link rel="prefetch" href="/assets/js/22.de1f017c.js">
+    <link rel="prefetch" href="/assets/js/23.fb20a8f5.js">
+    <link rel="prefetch" href="/assets/js/24.63ca195a.js">
+    <link rel="prefetch" href="/assets/js/25.3a76708d.js">
+    <link rel="prefetch" href="/assets/js/26.b6254386.js">
+    <link rel="prefetch" href="/assets/js/27.3f127a30.js">
+    <link rel="prefetch" href="/assets/js/28.afadbe5c.js">
+    <link rel="prefetch" href="/assets/js/29.f175dd67.js">
+    <link rel="prefetch" href="/assets/js/3.8e04da2b.js">
+    <link rel="prefetch" href="/assets/js/30.5ba7a495.js">
+    <link rel="prefetch" href="/assets/js/31.01c3d218.js">
+    <link rel="prefetch" href="/assets/js/32.de0e0ff7.js">
+    <link rel="prefetch" href="/assets/js/33.0e117d4a.js">
+    <link rel="prefetch" href="/assets/js/34.010094c5.js">
+    <link rel="prefetch" href="/assets/js/35.8a377a71.js">
+    <link rel="prefetch" href="/assets/js/36.fbb64a47.js">
+    <link rel="prefetch" href="/assets/js/37.c2b9d4da.js">
+    <link rel="prefetch" href="/assets/js/38.a66be625.js">
+    <link rel="prefetch" href="/assets/js/39.76e387bc.js">
+    <link rel="prefetch" href="/assets/js/4.470d098a.js">
+    <link rel="prefetch" href="/assets/js/40.0e9ee726.js">
+    <link rel="prefetch" href="/assets/js/41.e68f3c2e.js">
+    <link rel="prefetch" href="/assets/js/42.ba03ba76.js">
+    <link rel="prefetch" href="/assets/js/43.e6a91a35.js">
+    <link rel="prefetch" href="/assets/js/44.128407ae.js">
+    <link rel="prefetch" href="/assets/js/45.e9f1b4b0.js">
+    <link rel="prefetch" href="/assets/js/46.ab599c67.js">
+    <link rel="prefetch" href="/assets/js/47.dc2d8aff.js">
+    <link rel="prefetch" href="/assets/js/48.06e9c64e.js">
+    <link rel="prefetch" href="/assets/js/49.627cc127.js">
+    <link rel="prefetch" href="/assets/js/5.0f4aedb8.js">
+    <link rel="prefetch" href="/assets/js/50.bf665f72.js">
+    <link rel="prefetch" href="/assets/js/51.08e5dea0.js">
+    <link rel="prefetch" href="/assets/js/52.8e37a9c4.js">
+    <link rel="prefetch" href="/assets/js/53.8c472224.js">
+    <link rel="prefetch" href="/assets/js/54.bb582a52.js">
+    <link rel="prefetch" href="/assets/js/55.640d9ecb.js">
+    <link rel="prefetch" href="/assets/js/56.e2e2a21e.js">
+    <link rel="prefetch" href="/assets/js/57.9b9b26a7.js">
+    <link rel="prefetch" href="/assets/js/58.0d4a46c3.js">
+    <link rel="prefetch" href="/assets/js/59.d1f11d32.js">
+    <link rel="prefetch" href="/assets/js/6.547754b6.js">
+    <link rel="prefetch" href="/assets/js/7.aea1a047.js">
+    <link rel="prefetch" href="/assets/js/8.58207631.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+    <div class="theme-container">
+        <header class="navbar">
+            <div class="ant-row">
+                <div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars">
+                    <svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em"
+                         fill="currentColor" aria-hidden="true">
+                        <path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path>
+                    </svg>
+                </i> <span></span></div>
+                <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a
+                        href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3"
+                                                                           class="logo"> <span
+                        class="site-name">IoT DC3</span></a>
+                    <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off"
+                                                                 spellcheck="false" value=""> <!----></div>
+                </div>
+                <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20">
+                    <div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value="">
+                        <!----></div>
+                    <nav class="nav-links can-hide">
+                        <ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light">
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
+                                首页
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
+                                指南
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/config/">
+                                配置
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/faq/">
+                                FAQ
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>
                     代码仓库
-                </span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="visibility:hidden;position:absolute;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li></ul> <ul class="extra-group"><!----> <!----></ul></nav></div></div> <!----></header> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/code/0-environment.html" title="注意事项" class="sidebar-link">注意事项</a></li><li><a href="/docs/code/1-idea-start.html" title="必要软件环境" class="sidebar-link">必要软件环境</a></li><li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建 IoT DC3 Web UI</a></li><li><a href="/docs/code/3-quick-start.html" title="快速启动" class="sidebar-link">快速启动</a></li><li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/cluster/emqx.html" aria-current="page" title="EMQ X 集群部署" class="active sidebar-link">EMQ X 集群部署</a></li><li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo 集群部署</a></li><li><a href="/docs/cluster/rabbitmq.html" title="RabbitMQ 集群部署" class="sidebar-link">RabbitMQ 集群部署</a></li><li><a href="/docs/cluster/redis.html" title="Redis 集群部署" class="sidebar-link">Redis 集群部署</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a></li><li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li></ul> </aside> <main class="page has-page-anchor"> <div class="theme-dc3-content content__default"><h2 id="emq-x-集群部署"><code>EMQ X</code> 集群部署 <a href="#emq-x-集群部署" class="header-anchor">#</a></h2> <blockquote><p><code>EMQ X</code> 消息服务器集群基于 <code>Erlang/OTP</code> 分布式设计，集群原理可简述为下述两条规则:</p> <p><code>MQTT</code> 客户端订阅主题时，所在节点订阅成功后广播通知其他节点：某个主题(<code>Topic</code>)被本节点订阅。</p> <p><code>MQTT</code> 客户端发布消息时，所在节点会根据消息主题(<code>Topic</code>)，检索订阅并路由消息到相关节点。</p></blockquote> <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3> <p><img src="/assets/images/dc3/cluster/emqx/emqx-1.png" alt=""></p> <blockquote><p><code>EMQ X</code> 消息服务器同一集群的所有节点，都会复制一份主题(Topic) -&gt; 节点(Node)映射的路由表，例如:</p> <div class="language-bash extra-class"><pre class="language-bash"><code>topic1 -<span class="token operator">&gt;</span> node-01, node-02
+                </span><i class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="visibility:hidden;position:absolute;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                        </ul>
+                        <ul class="extra-group"><!----> <!----></ul>
+                    </nav>
+                </div>
+            </div> <!----></header>
+        <aside class="sidebar"><!---->
+            <ul class="sidebar-links">
+                <li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li>
+                <li>
+                    <section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/code/0-environment.html" title="注意事项"
+                                   class="sidebar-link">注意事项</a></li>
+                            <li><a href="/docs/code/1-idea-start.html" title="必要软件环境"
+                                   class="sidebar-link">必要软件环境</a></li>
+                            <li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建
+                                IoT DC3 Web UI</a></li>
+                            <li><a href="/docs/code/3-quick-start.html" title="快速启动"
+                                   class="sidebar-link">快速启动</a></li>
+                            <li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a>
+                            </li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>驱动使用说明</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading open"><span>集群部署</span> <span class="arrow down"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/cluster/emqx.html" aria-current="page" title="EMQ X 集群部署"
+                                   class="active sidebar-link">EMQ X 集群部署</a></li>
+                            <li><a href="/docs/cluster/mongo.html" title="Mongo 集群部署" class="sidebar-link">Mongo
+                                集群部署</a></li>
+                            <li><a href="/docs/cluster/rabbitmq.html" title="RabbitMQ 集群部署" class="sidebar-link">RabbitMQ
+                                集群部署</a></li>
+                            <li><a href="/docs/cluster/redis.html" title="Redis 集群部署" class="sidebar-link">Redis
+                                集群部署</a></li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a>
+                </li>
+                <li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li>
+            </ul>
+        </aside>
+        <main class="page has-page-anchor">
+            <div class="theme-dc3-content content__default"><h2 id="emq-x-集群部署"><code>EMQ X</code> 集群部署 <a
+                    href="#emq-x-集群部署" class="header-anchor">#</a></h2>
+                <blockquote><p><code>EMQ X</code> 消息服务器集群基于 <code>Erlang/OTP</code> 分布式设计，集群原理可简述为下述两条规则:
+                </p>
+                    <p><code>MQTT</code> 客户端订阅主题时，所在节点订阅成功后广播通知其他节点：某个主题(<code>Topic</code>)被本节点订阅。
+                    </p>
+                    <p><code>MQTT</code> 客户端发布消息时，所在节点会根据消息主题(<code>Topic</code>)，检索订阅并路由消息到相关节点。
+                    </p></blockquote>
+                <h3 id="_1-集群架构">1. 集群架构 <a href="#_1-集群架构" class="header-anchor">#</a></h3>
+                <p><img src="/assets/images/dc3/cluster/emqx/emqx-1.png" alt=""></p>
+                <blockquote><p><code>EMQ X</code> 消息服务器同一集群的所有节点，都会复制一份主题(Topic) -&gt;
+                    节点(Node)映射的路由表，例如:</p>
+                    <div class="language-bash extra-class"><pre class="language-bash"><code>topic1 -<span
+                            class="token operator">&gt;</span> node-01, node-02
 topic2 -<span class="token operator">&gt;</span> node-03
 topic3 -<span class="token operator">&gt;</span> node-02, node-04
-</code></pre></div></blockquote> <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3> <table><thead><tr><th style="text-align:center;"><code>item</code></th> <th style="text-align:center;"><code>node 1</code></th> <th style="text-align:center;"><code>node 2</code></th> <th style="text-align:center;"><code>node 3</code></th></tr></thead> <tbody><tr><td style="text-align:center;"><code>node.name</code></td> <td style="text-align:center;">node-01@127.0.0.1</td> <td style="text-align:center;">node-02@127.0.0.1</td> <td style="text-align:center;">node-03@127.0.0.1</td></tr> <tr><td style="text-align:center;"><code>mqtt:tcp:external</code></td> <td style="text-align:center;">3000</td> <td style="text-align:center;">3100</td> <td style="text-align:center;">3200</td></tr> <tr><td style="text-align:center;"><code>mqtt:ssl:external</code></td> <td style="text-align:center;">3010</td> <td style="text-align:center;">3110</td> <td style="text-align:center;">3210</td></tr> <tr><td style="text-align:center;"><code>mqtt:ws:external</code></td> <td style="text-align:center;">3020</td> <td style="text-align:center;">3120</td> <td style="text-align:center;">3220</td></tr> <tr><td style="text-align:center;"><code>mqtt:wss:external</code></td> <td style="text-align:center;">3030</td> <td style="text-align:center;">3130</td> <td style="text-align:center;">3230</td></tr> <tr><td style="text-align:center;"><code>http:management</code></td> <td style="text-align:center;">3040</td> <td style="text-align:center;">3140</td> <td style="text-align:center;">3240</td></tr> <tr><td style="text-align:center;"><code>http:dashboard</code></td> <td style="text-align:center;">3050</td> <td style="text-align:center;">3150</td> <td style="text-align:center;">3250</td></tr> <tr><td style="text-align:center;"><code>mqtt:tcp:internal</code></td> <td style="text-align:center;">13000</td> <td style="text-align:center;">13100</td> <td style="text-align:center;">13200</td></tr></tbody></table> <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3> <blockquote><p><strong>下载文件</strong></p> <p>请下载 <code>ubuntu zip</code> 版本</p></blockquote> <ul><li><p>以 <code>4.3.10</code> 版本为例：https://www.emqx.com/zh/downloads/broker/4.3.10/emqx-ubuntu20.04-4.3.10-amd64.zip</p></li> <li><p>其他版本下载：https://www.emqx.com/zh/try?product=broker</p></li></ul> <blockquote><p><strong>解压文件</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">unzip</span> emqx-ubuntu20.04-4.3.10-amd64.zip
-</code></pre></div><h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4 id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a></h4> <blockquote><p>分别创建三个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token builtin class-name">cd</span> /data
+</code></pre>
+                    </div>
+                </blockquote>
+                <h3 id="_2-集群部署规划">2. 集群部署规划 <a href="#_2-集群部署规划" class="header-anchor">#</a></h3>
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;"><code>item</code></th>
+                        <th style="text-align:center;"><code>node 1</code></th>
+                        <th style="text-align:center;"><code>node 2</code></th>
+                        <th style="text-align:center;"><code>node 3</code></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="text-align:center;"><code>node.name</code></td>
+                        <td style="text-align:center;">node-01@127.0.0.1</td>
+                        <td style="text-align:center;">node-02@127.0.0.1</td>
+                        <td style="text-align:center;">node-03@127.0.0.1</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>mqtt:tcp:external</code></td>
+                        <td style="text-align:center;">3000</td>
+                        <td style="text-align:center;">3100</td>
+                        <td style="text-align:center;">3200</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>mqtt:ssl:external</code></td>
+                        <td style="text-align:center;">3010</td>
+                        <td style="text-align:center;">3110</td>
+                        <td style="text-align:center;">3210</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>mqtt:ws:external</code></td>
+                        <td style="text-align:center;">3020</td>
+                        <td style="text-align:center;">3120</td>
+                        <td style="text-align:center;">3220</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>mqtt:wss:external</code></td>
+                        <td style="text-align:center;">3030</td>
+                        <td style="text-align:center;">3130</td>
+                        <td style="text-align:center;">3230</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>http:management</code></td>
+                        <td style="text-align:center;">3040</td>
+                        <td style="text-align:center;">3140</td>
+                        <td style="text-align:center;">3240</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>http:dashboard</code></td>
+                        <td style="text-align:center;">3050</td>
+                        <td style="text-align:center;">3150</td>
+                        <td style="text-align:center;">3250</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><code>mqtt:tcp:internal</code></td>
+                        <td style="text-align:center;">13000</td>
+                        <td style="text-align:center;">13100</td>
+                        <td style="text-align:center;">13200</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <h3 id="_3-安装文件">3. 安装文件 <a href="#_3-安装文件" class="header-anchor">#</a></h3>
+                <blockquote><p><strong>下载文件</strong></p>
+                    <p>请下载 <code>ubuntu zip</code> 版本</p></blockquote>
+                <ul>
+                    <li><p>以 <code>4.3.10</code>
+                        版本为例：https://www.emqx.com/zh/downloads/broker/4.3.10/emqx-ubuntu20.04-4.3.10-amd64.zip</p>
+                    </li>
+                    <li><p>其他版本下载：https://www.emqx.com/zh/try?product=broker</p></li>
+                </ul>
+                <blockquote><p><strong>解压文件</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">unzip</span> emqx-ubuntu20.04-4.3.10-amd64.zip
+</code></pre>
+                </div>
+                <h3 id="_4-集群部署">4. 集群部署 <a href="#_4-集群部署" class="header-anchor">#</a></h3> <h4
+                        id="_4-1-创建文件目录">4.1 创建文件目录 <a href="#_4-1-创建文件目录" class="header-anchor">#</a>
+                </h4>
+                <blockquote><p>分别创建三个节点（<code>node</code>）目录，多个以此类推 <code>node-N</code></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token builtin class-name">cd</span> /data
 
 <span class="token function">mkdir</span> <span class="token parameter variable">-p</span> emqx/dc3/node-01 emqx/dc3/node-02 emqx/dc3/node-03
-</code></pre></div><blockquote><p>将解压的 <code>emqx</code> 文件放入到每个节点中，其他节点操作一致</p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">cp</span> <span class="token parameter variable">-r</span> emqx* emqx/dc3/node-01/
+</code></pre>
+                </div>
+                <blockquote><p>将解压的 <code>emqx</code> 文件放入到每个节点中，其他节点操作一致</p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code><span
+                        class="token function">cp</span> <span class="token parameter variable">-r</span> emqx* emqx/dc3/node-01/
 
 <span class="token comment"># pwd</span>
 <span class="token comment"># /data/emqx/dc3/node-01</span>
 
 <span class="token comment"># ls</span>
 <span class="token comment"># bin data dynlibs erts-11.1.8 etc lib log releases</span>
-</code></pre></div><h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4> <blockquote><p>在每个节点的 <code>etc</code> 下配置文件 <code>emqx.conf</code>、<code>plugins/emqx_dashboard.conf</code>、<code>plugins/emqx_management.conf</code></p></blockquote> <h5 id="_4-2-1-emqx-conf">4.2.1 <code>emqx.conf</code> <a href="#_4-2-1-emqx-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">## EMQ X Configuration 4.3</span>
+</code></pre>
+                </div>
+                <h4 id="_4-2-配置文件">4.2 配置文件 <a href="#_4-2-配置文件" class="header-anchor">#</a></h4>
+                <blockquote><p>在每个节点的 <code>etc</code> 下配置文件 <code>emqx.conf</code>、<code>plugins/emqx_dashboard.conf</code>、<code>plugins/emqx_management.conf</code>
+                </p></blockquote>
+                <h5 id="_4-2-1-emqx-conf">4.2.1 <code>emqx.conf</code> <a href="#_4-2-1-emqx-conf"
+                                                                          class="header-anchor">#</a></h5>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">## EMQ X Configuration 4.3</span>
 
 <span class="token comment">## NOTE: Do not change format of CONFIG_SECTION_{BGN,END} comments!</span>
 
@@ -1500,7 +1847,86 @@ listener.ssl.external.certfile = etc/certs/cert.pem
 <span class="token comment">## Most of it was copied from Mozilla’s Server Side TLS article</span>
 <span class="token comment">##</span>
 <span class="token comment">## Value: Ciphers</span>
-listener.ssl.external.ciphers = TLS_AES_256_GCM_SHA384<span class="token punctuation">,</span>TLS_AES_128_GCM_SHA256<span class="token punctuation">,</span>TLS_CHACHA20_POLY1305_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_8_SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>DES<span class="token punctuation">-</span>CBC3<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA
+listener.ssl.external.ciphers = TLS_AES_256_GCM_SHA384<span
+                            class="token punctuation">,</span>TLS_AES_128_GCM_SHA256<span
+                            class="token punctuation">,</span>TLS_CHACHA20_POLY1305_SHA256<span
+                            class="token punctuation">,</span>TLS_AES_128_CCM_SHA256<span
+                            class="token punctuation">,</span>TLS_AES_128_CCM_8_SHA256<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span
+                            class="token punctuation">-</span>DES<span class="token punctuation">-</span>CBC3<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>AES256<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>AES256<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span
+                            class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>AES128<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES128<span
+                            class="token punctuation">-</span>SHA
 
 
 <span class="token comment">## Ciphers for TLS PSK.</span>
@@ -1874,7 +2300,11 @@ listener.ws.external.allow_origin_absence = true
 <span class="token comment">## Comma separated list of allowed origin in header for websocket connection</span>
 <span class="token comment">##</span>
 <span class="token comment">## Value: http://url eg. local http dashboard url - http://localhost:13020, http://127.0.0.1:13020</span>
-listener.ws.external.check_origins = http<span class="token punctuation">:</span>//localhost<span class="token punctuation">:</span><span class="token number">13020</span><span class="token punctuation">,</span> http<span class="token punctuation">:</span>//127.0.0.1<span class="token punctuation">:</span><span class="token number">13020</span>
+listener.ws.external.check_origins = http<span class="token punctuation">:</span>//localhost<span
+                            class="token punctuation">:</span><span class="token number">13020</span><span
+                            class="token punctuation">,</span> http<span
+                            class="token punctuation">:</span>//127.0.0.1<span class="token punctuation">:</span><span
+                            class="token number">13020</span>
 
 <span class="token comment">##--------------------------------------------------------------------</span>
 <span class="token comment">## External WebSocket/SSL listener for MQTT Protocol</span>
@@ -2026,7 +2456,86 @@ listener.wss.external.certfile = etc/certs/cert.pem
 <span class="token comment">## See: listener.ssl.$name.ciphers</span>
 <span class="token comment">##</span>
 <span class="token comment">## Value: Ciphers</span>
-listener.wss.external.ciphers = TLS_AES_256_GCM_SHA384<span class="token punctuation">,</span>TLS_AES_128_GCM_SHA256<span class="token punctuation">,</span>TLS_CHACHA20_POLY1305_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_SHA256<span class="token punctuation">,</span>TLS_AES_128_CCM_8_SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>DES<span class="token punctuation">-</span>CBC3<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES256<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES128<span class="token punctuation">-</span>SHA
+listener.wss.external.ciphers = TLS_AES_256_GCM_SHA384<span
+                            class="token punctuation">,</span>TLS_AES_128_GCM_SHA256<span
+                            class="token punctuation">,</span>TLS_CHACHA20_POLY1305_SHA256<span
+                            class="token punctuation">,</span>TLS_AES_128_CCM_SHA256<span
+                            class="token punctuation">,</span>TLS_AES_128_CCM_8_SHA256<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>ECDSA<span
+                            class="token punctuation">-</span>DES<span class="token punctuation">-</span>CBC3<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA384<span
+                            class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span
+                            class="token punctuation">-</span>AES256<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>AES256<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA384<span class="token punctuation">,</span>AES256<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>ECDHE<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>ECDH<span class="token punctuation">-</span>RSA<span
+                            class="token punctuation">-</span>AES128<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>GCM<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>DHE<span class="token punctuation">-</span>DSS<span
+                            class="token punctuation">-</span>AES128<span class="token punctuation">-</span>SHA256<span
+                            class="token punctuation">,</span>AES128<span class="token punctuation">-</span>GCM<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>AES128<span
+                            class="token punctuation">-</span>SHA256<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES256<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDHE<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>DHE<span
+                            class="token punctuation">-</span>DSS<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>ECDSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>ECDH<span
+                            class="token punctuation">-</span>RSA<span class="token punctuation">-</span>AES128<span
+                            class="token punctuation">-</span>SHA<span class="token punctuation">,</span>AES128<span
+                            class="token punctuation">-</span>SHA
 
 <span class="token comment">## Ciphers for TLS PSK.</span>
 <span class="token comment">## Note that 'listener.wss.external.ciphers' and 'listener.wss.external.psk_ciphers' cannot</span>
@@ -2191,7 +2700,11 @@ listener.wss.external.allow_origin_absence = true
 <span class="token comment">## Comma separated list of allowed origin in header for secure websocket connection</span>
 <span class="token comment">##</span>
 <span class="token comment">## Value: http://url eg. https://localhost:3030, https://127.0.0.1:3030</span>
-listener.wss.external.check_origins = https<span class="token punctuation">:</span>//localhost<span class="token punctuation">:</span><span class="token number">3030</span><span class="token punctuation">,</span> https<span class="token punctuation">:</span>//127.0.0.1<span class="token punctuation">:</span><span class="token number">3030</span>
+listener.wss.external.check_origins = https<span class="token punctuation">:</span>//localhost<span
+                            class="token punctuation">:</span><span class="token number">3030</span><span
+                            class="token punctuation">,</span> https<span
+                            class="token punctuation">:</span>//127.0.0.1<span class="token punctuation">:</span><span
+                            class="token number">3030</span>
 
 <span class="token comment">## CONFIG_SECTION_END=listeners ================================================</span>
 
@@ -2499,7 +3012,11 @@ alarm.size_limit = 1000
 alarm.validity_period = 24h
 
 <span class="token comment">## CONFIG_SECTION_END=sys_mon ==================================================</span>
-</code></pre></div><h5 id="_4-2-2-plugins-emqx-dashboard-conf">4.2.2 <code>plugins/emqx_dashboard.conf</code> <a href="#_4-2-2-plugins-emqx-dashboard-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">##--------------------------------------------------------------------</span>
+</code></pre>
+                </div>
+                <h5 id="_4-2-2-plugins-emqx-dashboard-conf">4.2.2 <code>plugins/emqx_dashboard.conf</code> <a
+                        href="#_4-2-2-plugins-emqx-dashboard-conf" class="header-anchor">#</a></h5>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">##--------------------------------------------------------------------</span>
 <span class="token comment">## EMQ X Dashboard</span>
 <span class="token comment">##--------------------------------------------------------------------</span>
 
@@ -2628,7 +3145,11 @@ dashboard.listener.http.ipv6_v6only = false
 <span class="token comment">##</span>
 <span class="token comment">## Value: on | off</span>
 <span class="token comment">## dashboard.listener.https.honor_cipher_order = on</span>
-</code></pre></div><h5 id="_4-2-3-plugins-emqx-management-conf">4.2.3 <code>plugins/emqx_management.conf</code> <a href="#_4-2-3-plugins-emqx-management-conf" class="header-anchor">#</a></h5> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">##--------------------------------------------------------------------</span>
+</code></pre>
+                </div>
+                <h5 id="_4-2-3-plugins-emqx-management-conf">4.2.3 <code>plugins/emqx_management.conf</code> <a
+                        href="#_4-2-3-plugins-emqx-management-conf" class="header-anchor">#</a></h5>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token comment">##--------------------------------------------------------------------</span>
 <span class="token comment">## EMQ X Management Plugin</span>
 <span class="token comment">##--------------------------------------------------------------------</span>
 
@@ -2681,19 +3202,90 @@ management.listener.http.ipv6_v6only = false
 <span class="token comment">## management.listener.https.fail_if_no_peer_cert = true</span>
 <span class="token comment">## management.listener.https.inet6 = false</span>
 <span class="token comment">## management.listener.https.ipv6_v6only = false</span>
-</code></pre></div><h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-01/bin/emqx start
+</code></pre>
+                </div>
+                <h4 id="_4-3-启动">4.3 启动 <a href="#_4-3-启动" class="header-anchor">#</a></h4>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-01/bin/emqx start
 
 /data/emqx/dc3/node-02/bin/emqx start
 
 /data/emqx/dc3/node-03/bin/emqx start
-</code></pre></div><h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4> <blockquote><p><strong>配置 <code>节点2</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-02/bin/emqx_ctl cluster <span class="token function">join</span> node-01@127.0.0.1
-</code></pre></div><blockquote><p><strong>配置 <code>节点3</code> 加入 <code>节点1</code></strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-03/bin/emqx_ctl cluster <span class="token function">join</span> node-01@127.0.0.1
-</code></pre></div><blockquote><p><strong>节点状态</strong></p></blockquote> <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-03/bin/emqx_ctl cluster status
-</code></pre></div></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/4/12 下午5:00:18</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev"><a href="/docs/tip/string-format.html" class="prev"><i aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
+</code></pre>
+                </div>
+                <h4 id="_4-4-节点配置">4.4 节点配置 <a href="#_4-4-节点配置" class="header-anchor">#</a></h4>
+                <blockquote><p><strong>配置 <code>节点2</code> 加入 <code>节点1</code></strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-02/bin/emqx_ctl cluster <span
+                        class="token function">join</span> node-01@127.0.0.1
+</code></pre>
+                </div>
+                <blockquote><p><strong>配置 <code>节点3</code> 加入 <code>节点1</code></strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-03/bin/emqx_ctl cluster <span
+                        class="token function">join</span> node-01@127.0.0.1
+</code></pre>
+                </div>
+                <blockquote><p><strong>节点状态</strong></p></blockquote>
+                <div class="language-bash extra-class"><pre class="language-bash"><code>/data/emqx/dc3/node-03/bin/emqx_ctl cluster status
+</code></pre>
+                </div>
+            </div>
+            <footer class="page-edit"><!---->
+                <div class="last-updated"><span class="prefix">上次更新:</span> <span
+                        class="time">2023/4/12 下午5:00:18</span></div>
+            </footer>
+            <div class="page-nav">
+                <p class="inner"><span class="prev"><a href="/docs/tip/string-format.html" class="prev"><i
+                        aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896"
+                                                                                  focusable="false" data-icon="left"
+                                                                                  width="1em" height="1em"
+                                                                                  fill="currentColor"
+                                                                                  aria-hidden="true"><path
+                        d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
                 String.format()字符串常规类型格式化的两种重载方式
             </a></span> <span class="next"><a href="/docs/cluster/mongo.html">
                 Mongo 集群部署
-                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span></p></div> <div class="page-anchor"><div class="ant-space ant-space-vertical" style="width:100%;"><div class="ant-space-item"><div class="page-anchor-offset"><div><div class="ant-anchor-wrapper" style="max-height:100vh;"><div class="ant-anchor"><div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div><div class="ant-anchor-link"><a href="#emq-x-集群部署" title="EMQ X 集群部署" class="ant-anchor-link-title">EMQ X 集群部署</a><div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构" class="ant-anchor-link-title">1. 集群架构</a></div><div class="ant-anchor-link"><a href="#_2-集群部署规划" title="2. 集群部署规划" class="ant-anchor-link-title">2. 集群部署规划</a></div><div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件" class="ant-anchor-link-title">3. 安装文件</a></div><div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署" class="ant-anchor-link-title">4. 集群部署</a></div></div></div></div></div></div></div></div></div> </main> <!----></div><div class="global-ui"></div></div>
-        <script src="/assets/js/app.d87ce824.js" defer></script><script src="/assets/js/2.a8b8915e.js" defer></script><script src="/assets/js/9.f09083f8.js" defer></script>
-    </body>
+                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false"
+                                                                               data-icon="right" width="1em"
+                                                                               height="1em" fill="currentColor"
+                                                                               aria-hidden="true"><path
+                        d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span>
+                </p>
+            </div>
+            <div class="page-anchor">
+                <div class="ant-space ant-space-vertical" style="width:100%;">
+                    <div class="ant-space-item">
+                        <div class="page-anchor-offset">
+                            <div>
+                                <div class="ant-anchor-wrapper" style="max-height:100vh;">
+                                    <div class="ant-anchor">
+                                        <div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div>
+                                        <div class="ant-anchor-link"><a href="#emq-x-集群部署" title="EMQ X 集群部署"
+                                                                        class="ant-anchor-link-title">EMQ X 集群部署</a>
+                                            <div class="ant-anchor-link"><a href="#_1-集群架构" title="1. 集群架构"
+                                                                            class="ant-anchor-link-title">1.
+                                                集群架构</a></div>
+                                            <div class="ant-anchor-link"><a href="#_2-集群部署规划"
+                                                                            title="2. 集群部署规划"
+                                                                            class="ant-anchor-link-title">2.
+                                                集群部署规划</a></div>
+                                            <div class="ant-anchor-link"><a href="#_3-安装文件" title="3. 安装文件"
+                                                                            class="ant-anchor-link-title">3.
+                                                安装文件</a></div>
+                                            <div class="ant-anchor-link"><a href="#_4-集群部署" title="4. 集群部署"
+                                                                            class="ant-anchor-link-title">4.
+                                                集群部署</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main> <!----></div>
+    <div class="global-ui"></div>
+</div>
+<script src="/assets/js/app.d87ce824.js" defer></script>
+<script src="/assets/js/2.a8b8915e.js" defer></script>
+<script src="/assets/js/9.f09083f8.js" defer></script>
+</body>
 </html>

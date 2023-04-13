@@ -15,12 +15,6 @@
  */
 package com.serotonin.modbus4j;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.serotonin.modbus4j.base.ModbusUtils;
 import com.serotonin.modbus4j.base.RangeAndOffset;
 import com.serotonin.modbus4j.code.RegisterRange;
@@ -29,6 +23,12 @@ import com.serotonin.modbus4j.exception.ModbusIdException;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.locator.NumericLocator;
 import com.serotonin.modbus4j.locator.StringLocator;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>BasicProcessImage class.</p>
@@ -58,7 +58,9 @@ public class BasicProcessImage implements ProcessImage {
         this.slaveId = slaveId;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getSlaveId() {
         return slaveId;
@@ -123,6 +125,7 @@ public class BasicProcessImage implements ProcessImage {
     // / Additional convenience methods.
     // /
     //
+
     /**
      * <p>Setter for the field <code>exceptionStatus</code>.</p>
      *
@@ -134,11 +137,12 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Binaries
+
     /**
      * <p>setBinary.</p>
      *
      * @param registerId a int.
-     * @param value a boolean.
+     * @param value      a boolean.
      */
     public void setBinary(int registerId, boolean value) {
         RangeAndOffset rao = new RangeAndOffset(registerId);
@@ -148,9 +152,9 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>setBinary.</p>
      *
-     * @param range a int.
+     * @param range  a int.
      * @param offset a int.
-     * @param value a boolean.
+     * @param value  a boolean.
      */
     public void setBinary(int range, int offset, boolean value) {
         if (range == RegisterRange.COIL_STATUS)
@@ -163,12 +167,13 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Numerics
+
     /**
      * <p>setNumeric.</p>
      *
      * @param registerId a int.
-     * @param dataType a int.
-     * @param value a {@link Number} object.
+     * @param dataType   a int.
+     * @param value      a {@link Number} object.
      */
     public synchronized void setNumeric(int registerId, int dataType, Number value) {
         RangeAndOffset rao = new RangeAndOffset(registerId);
@@ -178,10 +183,10 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>setNumeric.</p>
      *
-     * @param range a int.
-     * @param offset a int.
+     * @param range    a int.
+     * @param offset   a int.
      * @param dataType a int.
-     * @param value a {@link Number} object.
+     * @param value    a {@link Number} object.
      */
     public synchronized void setNumeric(int range, int offset, int dataType, Number value) {
         short[] registers = new NumericLocator(slaveId, range, offset, dataType).valueToShorts(value);
@@ -197,14 +202,15 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Strings
+
     /**
      * <p>setString.</p>
      *
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
      * @param registerCount a int.
-     * @param s a {@link String} object.
+     * @param s             a {@link String} object.
      */
     public synchronized void setString(int range, int offset, int dataType, int registerCount, String s) {
         setString(range, offset, dataType, registerCount, StringLocator.ASCII, s);
@@ -213,12 +219,12 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>setString.</p>
      *
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
      * @param registerCount a int.
-     * @param charset a {@link Charset} object.
-     * @param s a {@link String} object.
+     * @param charset       a {@link Charset} object.
+     * @param s             a {@link String} object.
      */
     public synchronized void setString(int range, int offset, int dataType, int registerCount, Charset charset, String s) {
         short[] registers = new StringLocator(slaveId, range, offset, dataType, registerCount, charset)
@@ -236,7 +242,7 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>setHoldingRegister.</p>
      *
-     * @param offset a int.
+     * @param offset    a int.
      * @param registers an array of {@link short} objects.
      */
     public synchronized void setHoldingRegister(int offset, short[] registers) {
@@ -248,7 +254,7 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>setInputRegister.</p>
      *
-     * @param offset a int.
+     * @param offset    a int.
      * @param registers an array of {@link short} objects.
      */
     public synchronized void setInputRegister(int offset, short[] registers) {
@@ -259,13 +265,14 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Bits
+
     /**
      * <p>setBit.</p>
      *
-     * @param range a int.
+     * @param range  a int.
      * @param offset a int.
-     * @param bit a int.
-     * @param value a boolean.
+     * @param bit    a int.
+     * @param value  a boolean.
      */
     public synchronized void setBit(int range, int offset, int bit, boolean value) {
         if (range == RegisterRange.HOLDING_REGISTER)
@@ -280,16 +287,15 @@ public class BasicProcessImage implements ProcessImage {
      * <p>setHoldingRegisterBit.</p>
      *
      * @param offset a int.
-     * @param bit a int.
-     * @param value a boolean.
+     * @param bit    a int.
+     * @param value  a boolean.
      */
     public synchronized void setHoldingRegisterBit(int offset, int bit, boolean value) {
         validateBit(bit);
         short s;
         try {
             s = getHoldingRegister(offset);
-        }
-        catch (IllegalDataAddressException e) {
+        } catch (IllegalDataAddressException e) {
             s = 0;
         }
         setHoldingRegister(offset, setBit(s, bit, value));
@@ -299,16 +305,15 @@ public class BasicProcessImage implements ProcessImage {
      * <p>setInputRegisterBit.</p>
      *
      * @param offset a int.
-     * @param bit a int.
-     * @param value a boolean.
+     * @param bit    a int.
+     * @param value  a boolean.
      */
     public synchronized void setInputRegisterBit(int offset, int bit, boolean value) {
         validateBit(bit);
         short s;
         try {
             s = getInputRegister(offset);
-        }
-        catch (IllegalDataAddressException e) {
+        } catch (IllegalDataAddressException e) {
             s = 0;
         }
         setInputRegister(offset, setBit(s, bit, value));
@@ -317,9 +322,9 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>getBit.</p>
      *
-     * @param range a int.
+     * @param range  a int.
      * @param offset a int.
-     * @param bit a int.
+     * @param bit    a int.
      * @return a boolean.
      * @throws IllegalDataAddressException if any.
      */
@@ -335,7 +340,7 @@ public class BasicProcessImage implements ProcessImage {
      * <p>getHoldingRegisterBit.</p>
      *
      * @param offset a int.
-     * @param bit a int.
+     * @param bit    a int.
      * @return a boolean.
      * @throws IllegalDataAddressException if any.
      */
@@ -348,7 +353,7 @@ public class BasicProcessImage implements ProcessImage {
      * <p>getInputRegisterBit.</p>
      *
      * @param offset a int.
-     * @param bit a int.
+     * @param bit    a int.
      * @return a boolean.
      * @throws IllegalDataAddressException if any.
      */
@@ -360,8 +365,8 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>getNumeric.</p>
      *
-     * @param range a int.
-     * @param offset a int.
+     * @param range    a int.
+     * @param offset   a int.
      * @param dataType a int.
      * @return a {@link Number} object.
      * @throws IllegalDataAddressException if any.
@@ -373,9 +378,9 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>getString.</p>
      *
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
      * @param registerCount a int.
      * @return a {@link String} object.
      * @throws IllegalDataAddressException if any.
@@ -387,11 +392,11 @@ public class BasicProcessImage implements ProcessImage {
     /**
      * <p>getString.</p>
      *
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
      * @param registerCount a int.
-     * @param charset a {@link Charset} object.
+     * @param charset       a {@link Charset} object.
      * @return a {@link String} object.
      * @throws IllegalDataAddressException if any.
      */
@@ -404,7 +409,7 @@ public class BasicProcessImage implements ProcessImage {
      * <p>getRegister.</p>
      *
      * @param locator a {@link BaseLocator} object.
-     * @param <T> a T object.
+     * @param <T>     a T object.
      * @return a T object.
      * @throws IllegalDataAddressException if any.
      */
@@ -435,20 +440,27 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Coils
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean getCoil(int offset) throws IllegalDataAddressException {
         return getBoolean(offset, coils);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setCoil(int offset, boolean value) {
         validateOffset(offset);
         coils.put(offset, value);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void writeCoil(int offset, boolean value) throws IllegalDataAddressException {
         boolean old = getBoolean(offset, coils);
@@ -460,13 +472,18 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Inputs
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean getInput(int offset) throws IllegalDataAddressException {
         return getBoolean(offset, inputs);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setInput(int offset, boolean value) {
         validateOffset(offset);
@@ -475,20 +492,27 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Holding registers
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized short getHoldingRegister(int offset) throws IllegalDataAddressException {
         return getShort(offset, holdingRegisters);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setHoldingRegister(int offset, short value) {
         validateOffset(offset);
         holdingRegisters.put(offset, value);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void writeHoldingRegister(int offset, short value) throws IllegalDataAddressException {
         short old = getShort(offset, holdingRegisters);
@@ -500,13 +524,18 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Input registers
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized short getInputRegister(int offset) throws IllegalDataAddressException {
         return getShort(offset, inputRegisters);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void setInputRegister(int offset, short value) {
         validateOffset(offset);
@@ -515,7 +544,10 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Exception status
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getExceptionStatus() {
         return exceptionStatus;
@@ -523,7 +555,10 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Report slave id
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] getReportSlaveIdData() {
         return new byte[0];

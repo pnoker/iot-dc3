@@ -37,19 +37,25 @@ public class ReadExceptionStatusResponse extends ModbusResponse {
         this.exceptionStatus = exceptionStatus;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_EXCEPTION_STATUS;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readResponse(ByteQueue queue) {
         exceptionStatus = queue.pop();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeResponse(ByteQueue queue) {
         queue.push(exceptionStatus);

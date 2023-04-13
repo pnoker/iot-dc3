@@ -36,9 +36,9 @@ public class WriteCoilsRequest extends ModbusRequest {
     /**
      * <p>Constructor for WriteCoilsRequest.</p>
      *
-     * @param slaveId a int.
+     * @param slaveId     a int.
      * @param startOffset a int.
-     * @param bdata an array of {@link boolean} objects.
+     * @param bdata       an array of {@link boolean} objects.
      * @throws ModbusTransportException if any.
      */
     public WriteCoilsRequest(int slaveId, int startOffset, boolean[] bdata) throws ModbusTransportException {
@@ -48,7 +48,9 @@ public class WriteCoilsRequest extends ModbusRequest {
         data = convertToBytes(bdata);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
@@ -60,7 +62,9 @@ public class WriteCoilsRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, startOffset);
@@ -77,7 +81,9 @@ public class WriteCoilsRequest extends ModbusRequest {
         return new WriteCoilsResponse(slaveId, startOffset, numberOfBits);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_COILS;
@@ -88,7 +94,9 @@ public class WriteCoilsRequest extends ModbusRequest {
         return new WriteCoilsResponse(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         startOffset = ModbusUtils.popUnsignedShort(queue);

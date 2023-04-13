@@ -30,13 +30,17 @@ import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
  * @version 5.0.0
  */
 public class EncapWaitingRoomKeyFactory implements WaitingRoomKeyFactory {
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(OutgoingRequestMessage request) {
         return createWaitingRoomKey(((IpMessage) request).getModbusMessage());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(IncomingResponseMessage response) {
         return createWaitingRoomKey(((IpMessage) response).getModbusMessage());

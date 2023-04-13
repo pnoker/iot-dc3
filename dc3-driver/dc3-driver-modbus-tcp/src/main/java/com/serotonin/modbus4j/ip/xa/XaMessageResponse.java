@@ -45,7 +45,7 @@ public class XaMessageResponse extends XaMessage implements IpMessageResponse {
      * <p>Constructor for XaMessageResponse.</p>
      *
      * @param modbusResponse a {@link ModbusResponse} object.
-     * @param transactionId a int.
+     * @param transactionId  a int.
      */
     public XaMessageResponse(ModbusResponse modbusResponse, int transactionId) {
         super(modbusResponse, transactionId);

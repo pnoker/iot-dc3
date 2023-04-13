@@ -35,7 +35,7 @@ public class ModbusInitException extends Exception {
      * <p>Constructor for ModbusInitException.</p>
      *
      * @param message a {@link String} object.
-     * @param cause a {@link Throwable} object.
+     * @param cause   a {@link Throwable} object.
      */
     public ModbusInitException(String message, Throwable cause) {
         super(message, cause);

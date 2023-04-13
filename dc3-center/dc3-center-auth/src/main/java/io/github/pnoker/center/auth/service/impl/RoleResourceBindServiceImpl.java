@@ -13,8 +13,8 @@ import io.github.pnoker.center.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.RoleResourceBind;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     @Override
     public void delete(String id) {
         selectById(id);
-        bindMapper.deleteById(id);
+        if (bindMapper.deleteById(id) < 1) {
+            throw new DeleteException("The role resource bind delete failed");
+        }
     }
 
     @Override

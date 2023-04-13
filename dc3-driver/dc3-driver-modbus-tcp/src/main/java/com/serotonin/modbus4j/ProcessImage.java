@@ -36,6 +36,7 @@ public interface ProcessImage {
     // / Coils
     // /
     //
+
     /**
      * Returns the current value of the coil for the given offset.
      *
@@ -49,7 +50,7 @@ public interface ProcessImage {
      * Used internally for setting the value of the coil.
      *
      * @param offset a int.
-     * @param value a boolean.
+     * @param value  a boolean.
      */
     void setCoil(int offset, boolean value);
 
@@ -57,7 +58,7 @@ public interface ProcessImage {
      * Used to set the coil as a result of a write command from the master.
      *
      * @param offset a int.
-     * @param value a boolean.
+     * @param value  a boolean.
      * @throws IllegalDataAddressException if any.
      */
     void writeCoil(int offset, boolean value) throws IllegalDataAddressException;
@@ -67,6 +68,7 @@ public interface ProcessImage {
     // / Inputs
     // /
     //
+
     /**
      * Returns the current value of the input for the given offset.
      *
@@ -80,7 +82,7 @@ public interface ProcessImage {
      * Used internally for setting the value of the input.
      *
      * @param offset a int.
-     * @param value a boolean.
+     * @param value  a boolean.
      */
     void setInput(int offset, boolean value);
 
@@ -89,6 +91,7 @@ public interface ProcessImage {
     // / Holding registers
     // /
     //
+
     /**
      * Returns the current value of the holding register for the given offset.
      *
@@ -102,7 +105,7 @@ public interface ProcessImage {
      * Used internally for setting the value of the holding register.
      *
      * @param offset a int.
-     * @param value a short.
+     * @param value  a short.
      */
     void setHoldingRegister(int offset, short value);
 
@@ -110,7 +113,7 @@ public interface ProcessImage {
      * Used to set the holding register as a result of a write command from the master.
      *
      * @param offset a int.
-     * @param value a short.
+     * @param value  a short.
      * @throws IllegalDataAddressException if any.
      */
     void writeHoldingRegister(int offset, short value) throws IllegalDataAddressException;
@@ -120,6 +123,7 @@ public interface ProcessImage {
     // / Input registers
     // /
     //
+
     /**
      * Returns the current value of the input register for the given offset.
      *
@@ -133,7 +137,7 @@ public interface ProcessImage {
      * Used internally for setting the value of the input register.
      *
      * @param offset a int.
-     * @param value a short.
+     * @param value  a short.
      */
     void setInputRegister(int offset, short value);
 
@@ -142,6 +146,7 @@ public interface ProcessImage {
     // / Exception status
     // /
     //
+
     /**
      * Returns the current value of the exception status.
      *
@@ -154,6 +159,7 @@ public interface ProcessImage {
     // / Report slave id
     // /
     //
+
     /**
      * Returns the data for the report slave id command.
      *

@@ -47,7 +47,9 @@ public class AsciiMessageRequest extends AsciiMessage implements OutgoingRequest
         super(modbusMessage);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean expectsResponse() {
         return modbusMessage.getSlaveId() != 0;

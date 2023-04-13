@@ -23,7 +23,7 @@ import java.io.File;
  * @author Matthew Lohbihler
  * @version 5.0.0
  */
-public class IOLog extends BaseIOLog{
+public class IOLog extends BaseIOLog {
     //private static final Log LOG = LogFactory.getLog(IOLog.class);
     private static final int MAX_FILESIZE = 1000000;
     //    private static final int MAX_FILESIZE = 1000;
@@ -35,12 +35,14 @@ public class IOLog extends BaseIOLog{
      * @param filename a {@link String} object.
      */
     public IOLog(String filename) {
-    	super(new File(filename));
+        super(new File(filename));
         backupFile = new File(filename + ".1");
     }
 
- 
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void sizeCheck() {
         // Check if the file should be rolled.

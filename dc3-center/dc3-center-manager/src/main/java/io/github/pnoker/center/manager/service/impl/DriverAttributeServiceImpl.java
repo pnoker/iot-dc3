@@ -71,7 +71,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
             throw new NotFoundException("The driver attribute does not exist");
         }
 
-        driverAttributeMapper.deleteById(id);
+        if (driverAttributeMapper.deleteById(id) < 1) {
+            throw new DeleteException("The driver attribute delete failed");
+        }
     }
 
     /**
@@ -82,7 +84,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
         if (driverAttributeMapper.updateById(entityDO) < 1) {
-        throw new UpdateException("The driver attribute update failed");
+            throw new UpdateException("The driver attribute update failed");
         }
     }
 

@@ -66,8 +66,8 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>Constructor for ByteQueue.</p>
      *
-     * @param b an array of {@link byte} objects.
-     * @param pos a int.
+     * @param b      an array of {@link byte} objects.
+     * @param pos    a int.
      * @param length a int.
      */
     public ByteQueue(byte[] b, int pos, int length) {
@@ -245,7 +245,7 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>read.</p>
      *
-     * @param in a {@link InputStream} object.
+     * @param in     a {@link InputStream} object.
      * @param length a int.
      * @throws IOException if any.
      */
@@ -292,8 +292,8 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>push.</p>
      *
-     * @param b an array of {@link byte} objects.
-     * @param pos a int.
+     * @param b      an array of {@link byte} objects.
+     * @param pos    a int.
      * @param length a int.
      */
     public void push(byte[] b, int pos, int length) {
@@ -343,7 +343,7 @@ public class ByteQueue implements Cloneable {
      * <p>push.</p>
      *
      * @param source a {@link ByteQueue} object.
-     * @param len a int.
+     * @param len    a int.
      */
     public void push(ByteQueue source, int len) {
         // TODO There is certainly a more elegant way to do this...
@@ -408,8 +408,7 @@ public class ByteQueue implements Cloneable {
         if (size == 1) {
             head = -1;
             tail = 0;
-        }
-        else
+        } else
             head = (head + 1) % queue.length;
 
         size--;
@@ -485,8 +484,8 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>pop.</p>
      *
-     * @param buf an array of {@link byte} objects.
-     * @param pos a int.
+     * @param buf    an array of {@link byte} objects.
+     * @param pos    a int.
      * @param length a int.
      * @return a int.
      */
@@ -498,8 +497,7 @@ public class ByteQueue implements Cloneable {
         if (size == 0) {
             head = -1;
             tail = 0;
-        }
-        else
+        } else
             head = (head + length) % queue.length;
 
         return length;
@@ -525,8 +523,7 @@ public class ByteQueue implements Cloneable {
         if (size == 0) {
             head = -1;
             tail = 0;
-        }
-        else
+        } else
             head = (head + length) % queue.length;
 
         return length;
@@ -535,7 +532,7 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>popString.</p>
      *
-     * @param length a int.
+     * @param length  a int.
      * @param charset a {@link Charset} object.
      * @return a {@link String} object.
      */
@@ -569,7 +566,7 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>write.</p>
      *
-     * @param out a {@link OutputStream} object.
+     * @param out    a {@link OutputStream} object.
      * @param length a int.
      * @throws IOException if any.
      */
@@ -595,8 +592,7 @@ public class ByteQueue implements Cloneable {
         if (size == 0) {
             head = -1;
             tail = 0;
-        }
-        else
+        } else
             head = (head + length) % queue.length;
     }
 
@@ -639,7 +635,7 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>peek.</p>
      *
-     * @param index a int.
+     * @param index  a int.
      * @param length a int.
      * @return an array of {@link byte} objects.
      */
@@ -675,8 +671,8 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>peek.</p>
      *
-     * @param buf an array of {@link byte} objects.
-     * @param pos a int.
+     * @param buf    an array of {@link byte} objects.
+     * @param pos    a int.
      * @param length a int.
      * @return a int.
      */
@@ -713,7 +709,7 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>indexOf.</p>
      *
-     * @param b a byte.
+     * @param b     a byte.
      * @param start a int.
      * @return a int.
      */
@@ -743,7 +739,7 @@ public class ByteQueue implements Cloneable {
     /**
      * <p>indexOf.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b     an array of {@link byte} objects.
      * @param start a int.
      * @return a int.
      */
@@ -812,7 +808,9 @@ public class ByteQueue implements Cloneable {
         queue = newb;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object clone() {
         try {
@@ -820,13 +818,14 @@ public class ByteQueue implements Cloneable {
             // Array is mutable, so make a copy of it too.
             clone.queue = queue.clone();
             return clone;
-        }
-        catch (CloneNotSupportedException e) { /* Will never happen because we're Cloneable */
+        } catch (CloneNotSupportedException e) { /* Will never happen because we're Cloneable */
         }
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         if (size == 0)

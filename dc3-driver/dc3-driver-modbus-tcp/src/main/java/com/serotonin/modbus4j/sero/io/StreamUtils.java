@@ -19,24 +19,13 @@
  */
 package com.serotonin.modbus4j.sero.io;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>StreamUtils class.</p>
@@ -48,7 +37,7 @@ public class StreamUtils {
     /**
      * <p>transfer.</p>
      *
-     * @param in a {@link InputStream} object.
+     * @param in  a {@link InputStream} object.
      * @param out a {@link OutputStream} object.
      * @throws IOException if any.
      */
@@ -59,8 +48,8 @@ public class StreamUtils {
     /**
      * <p>transfer.</p>
      *
-     * @param in a {@link InputStream} object.
-     * @param out a {@link OutputStream} object.
+     * @param in    a {@link InputStream} object.
+     * @param out   a {@link OutputStream} object.
      * @param limit a long.
      * @throws IOException if any.
      */
@@ -87,7 +76,7 @@ public class StreamUtils {
     /**
      * <p>transfer.</p>
      *
-     * @param in a {@link InputStream} object.
+     * @param in  a {@link InputStream} object.
      * @param out a {@link SocketChannel} object.
      * @throws IOException if any.
      */
@@ -120,7 +109,7 @@ public class StreamUtils {
      *
      * @param reader a {@link Reader} object.
      * @param writer a {@link Writer} object.
-     * @param limit a long.
+     * @param limit  a long.
      * @throws IOException if any.
      */
     public static void transfer(Reader reader, Writer writer, long limit) throws IOException {
@@ -183,7 +172,7 @@ public class StreamUtils {
     /**
      * <p>readString.</p>
      *
-     * @param in a {@link InputStream} object.
+     * @param in     a {@link InputStream} object.
      * @param length a int.
      * @return a {@link String} object.
      * @throws IOException if any.
@@ -254,7 +243,7 @@ public class StreamUtils {
      * <p>writeByte.</p>
      *
      * @param out a {@link OutputStream} object.
-     * @param b a byte.
+     * @param b   a byte.
      * @throws IOException if any.
      */
     public static void writeByte(OutputStream out, byte b) throws IOException {
@@ -265,7 +254,7 @@ public class StreamUtils {
      * <p>writeChar.</p>
      *
      * @param out a {@link OutputStream} object.
-     * @param c a char.
+     * @param c   a char.
      * @throws IOException if any.
      */
     public static void writeChar(OutputStream out, char c) throws IOException {
@@ -276,7 +265,7 @@ public class StreamUtils {
      * <p>writeString.</p>
      *
      * @param out a {@link OutputStream} object.
-     * @param s a {@link String} object.
+     * @param s   a {@link String} object.
      * @throws IOException if any.
      */
     public static void writeString(OutputStream out, String s) throws IOException {
@@ -288,7 +277,7 @@ public class StreamUtils {
      * <p>write4ByteSigned.</p>
      *
      * @param out a {@link OutputStream} object.
-     * @param i a int.
+     * @param i   a int.
      * @throws IOException if any.
      */
     public static void write4ByteSigned(OutputStream out, int i) throws IOException {
@@ -302,7 +291,7 @@ public class StreamUtils {
      * <p>write4ByteUnsigned.</p>
      *
      * @param out a {@link OutputStream} object.
-     * @param l a long.
+     * @param l   a long.
      * @throws IOException if any.
      */
     public static void write4ByteUnsigned(OutputStream out, long l) throws IOException {
@@ -316,7 +305,7 @@ public class StreamUtils {
      * <p>write2ByteUnsigned.</p>
      *
      * @param out a {@link OutputStream} object.
-     * @param i a int.
+     * @param i   a int.
      * @throws IOException if any.
      */
     public static void write2ByteUnsigned(OutputStream out, int i) throws IOException {
@@ -328,7 +317,7 @@ public class StreamUtils {
      * <p>write2ByteSigned.</p>
      *
      * @param out a {@link OutputStream} object.
-     * @param s a short.
+     * @param s   a short.
      * @throws IOException if any.
      */
     public static void write2ByteSigned(OutputStream out, short s) throws IOException {
@@ -349,7 +338,7 @@ public class StreamUtils {
     /**
      * <p>dumpArray.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b   an array of {@link byte} objects.
      * @param pos a int.
      * @param len a int.
      * @return a {@link String} object.
@@ -379,7 +368,7 @@ public class StreamUtils {
     /**
      * <p>dumpMessage.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b   an array of {@link byte} objects.
      * @param pos a int.
      * @param len a int.
      * @return a {@link String} object.
@@ -389,17 +378,17 @@ public class StreamUtils {
         sb.append('[');
         for (int i = pos; i < len; i++) {
             switch (b[i]) {
-            case 2:
-                sb.append("&STX;");
-                break;
-            case 3:
-                sb.append("&ETX;");
-                break;
-            case 27:
-                sb.append("&ESC;");
-                break;
-            default:
-                sb.append((char) b[i]);
+                case 2:
+                    sb.append("&STX;");
+                    break;
+                case 3:
+                    sb.append("&ETX;");
+                    break;
+                case 27:
+                    sb.append("&ESC;");
+                    break;
+                default:
+                    sb.append((char) b[i]);
             }
         }
         sb.append(']');
@@ -419,7 +408,7 @@ public class StreamUtils {
     /**
      * <p>dumpArrayHex.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b   an array of {@link byte} objects.
      * @param pos a int.
      * @param len a int.
      * @return a {@link String} object.
@@ -449,7 +438,7 @@ public class StreamUtils {
     /**
      * <p>dumpHex.</p>
      *
-     * @param b an array of {@link byte} objects.
+     * @param b   an array of {@link byte} objects.
      * @param pos a int.
      * @param len a int.
      * @return a {@link String} object.
@@ -486,8 +475,7 @@ public class StreamUtils {
             StringWriter out = new StringWriter();
             transfer(in, out);
             return out.toString();
-        }
-        finally {
+        } finally {
             if (in != null)
                 in.close();
         }
@@ -520,8 +508,7 @@ public class StreamUtils {
             while ((line = in.readLine()) != null)
                 lines.add(line);
             return lines;
-        }
-        finally {
+        } finally {
             if (in != null)
                 in.close();
         }
@@ -531,7 +518,7 @@ public class StreamUtils {
      * <p>writeFile.</p>
      *
      * @param filename a {@link String} object.
-     * @param content a {@link String} object.
+     * @param content  a {@link String} object.
      * @throws IOException if any.
      */
     public static void writeFile(String filename, String content) throws IOException {
@@ -541,7 +528,7 @@ public class StreamUtils {
     /**
      * <p>writeFile.</p>
      *
-     * @param file a {@link File} object.
+     * @param file    a {@link File} object.
      * @param content a {@link String} object.
      * @throws IOException if any.
      */
@@ -550,8 +537,7 @@ public class StreamUtils {
         try {
             out = new FileWriter(file);
             out.write(content);
-        }
-        finally {
+        } finally {
             if (out != null)
                 out.close();
         }
@@ -560,7 +546,7 @@ public class StreamUtils {
     /**
      * <p>readLines.</p>
      *
-     * @param filename a {@link String} object.
+     * @param filename    a {@link String} object.
      * @param lineHandler a {@link LineHandler} object.
      * @throws IOException if any.
      */
@@ -572,8 +558,7 @@ public class StreamUtils {
             while ((line = in.readLine()) != null)
                 lineHandler.handleLine(line);
             lineHandler.done();
-        }
-        finally {
+        } finally {
             if (in != null)
                 in.close();
         }

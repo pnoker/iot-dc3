@@ -13,8 +13,8 @@ import io.github.pnoker.center.auth.service.RoleUserBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Role;
 import io.github.pnoker.common.model.RoleUserBind;
@@ -76,7 +76,9 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     @Override
     public void delete(String id) {
         selectById(id);
-        roleUserBindMapper.deleteById(id);
+        if (roleUserBindMapper.deleteById(id) < 1) {
+            throw new DeleteException("The role user bind delete failed");
+        }
     }
 
     @Override

@@ -16,11 +16,11 @@
 
 package com.serotonin.modbus4j.locator;
 
-import java.nio.charset.Charset;
-
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
 import com.serotonin.modbus4j.exception.IllegalDataTypeException;
+
+import java.nio.charset.Charset;
 
 /**
  * <p>StringLocator class.</p>
@@ -29,7 +29,9 @@ import com.serotonin.modbus4j.exception.IllegalDataTypeException;
  * @version 5.0.0
  */
 public class StringLocator extends BaseLocator<String> {
-    /** Constant <code>ASCII</code> */
+    /**
+     * Constant <code>ASCII</code>
+     */
     public static final Charset ASCII = Charset.forName("ASCII");
 
     private final int dataType;
@@ -39,10 +41,10 @@ public class StringLocator extends BaseLocator<String> {
     /**
      * <p>Constructor for StringLocator.</p>
      *
-     * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
+     * @param slaveId       a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
      * @param registerCount a int.
      */
     public StringLocator(int slaveId, int range, int offset, int dataType, int registerCount) {
@@ -52,12 +54,12 @@ public class StringLocator extends BaseLocator<String> {
     /**
      * <p>Constructor for StringLocator.</p>
      *
-     * @param slaveId a int.
-     * @param range a int.
-     * @param offset a int.
-     * @param dataType a int.
+     * @param slaveId       a int.
+     * @param range         a int.
+     * @param offset        a int.
+     * @param dataType      a int.
      * @param registerCount a int.
-     * @param charset a {@link Charset} object.
+     * @param charset       a {@link Charset} object.
      */
     public StringLocator(int slaveId, int range, int offset, int dataType, int registerCount, Charset charset) {
         super(slaveId, range, offset);
@@ -77,26 +79,34 @@ public class StringLocator extends BaseLocator<String> {
             throw new IllegalDataTypeException("Invalid data type");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDataType() {
         return dataType;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getRegisterCount() {
         return registerCount;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "StringLocator(slaveId=" + getSlaveId() + ", range=" + range + ", offset=" + offset + ", dataType="
                 + dataType + ", registerCount=" + registerCount + ", charset=" + charset + ")";
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String bytesToValueRealOffset(byte[] data, int offset) {
         offset *= 2;
@@ -122,7 +132,9 @@ public class StringLocator extends BaseLocator<String> {
         throw new RuntimeException("Unsupported data type: " + dataType);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public short[] valueToShorts(String value) {
         short[] result = new short[registerCount];
@@ -138,16 +150,14 @@ public class StringLocator extends BaseLocator<String> {
 
             for (int i = 0; i < length; i++)
                 setByte(result, i, bytes[i] & 0xff);
-        }
-        else
+        } else
             length = 0;
 
         if (dataType == DataType.CHAR) {
             // Pad the rest with spaces
             for (int i = length; i < resultByteLen; i++)
                 setByte(result, i, 0x20);
-        }
-        else if (dataType == DataType.VARCHAR) {
+        } else if (dataType == DataType.VARCHAR) {
             if (length >= resultByteLen)
                 // Ensure the last byte is a null terminator.
                 result[registerCount - 1] &= 0xff00;
@@ -156,8 +166,7 @@ public class StringLocator extends BaseLocator<String> {
                 for (int i = length; i < resultByteLen; i++)
                     setByte(result, i, 0);
             }
-        }
-        else
+        } else
             throw new RuntimeException("Unsupported data type: " + dataType);
 
         return result;

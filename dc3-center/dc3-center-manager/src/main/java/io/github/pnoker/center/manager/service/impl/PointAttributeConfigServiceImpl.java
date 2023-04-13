@@ -29,10 +29,7 @@ import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.model.PointAttributeConfig;
@@ -94,10 +91,11 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             throw new NotFoundException("The point attribute config does not exist");
         }
 
-        boolean delete = pointAttributeConfigMapper.deleteById(id) > 0;
-        if (delete) {
-            notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfig);
+        if (pointAttributeConfigMapper.deleteById(id) < 1) {
+            throw new DeleteException("The point attribute delete failed");
         }
+
+        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfig);
     }
 
     /**

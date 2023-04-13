@@ -25,7 +25,7 @@ public interface ProcessImageListener {
     /**
      * <p>coilWrite.</p>
      *
-     * @param offset a int.
+     * @param offset   a int.
      * @param oldValue a boolean.
      * @param newValue a boolean.
      */
@@ -34,7 +34,7 @@ public interface ProcessImageListener {
     /**
      * <p>holdingRegisterWrite.</p>
      *
-     * @param offset a int.
+     * @param offset   a int.
      * @param oldValue a short.
      * @param newValue a short.
      */

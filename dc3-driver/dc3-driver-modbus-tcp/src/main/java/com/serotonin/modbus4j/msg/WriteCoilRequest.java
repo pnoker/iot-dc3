@@ -35,9 +35,9 @@ public class WriteCoilRequest extends ModbusRequest {
     /**
      * <p>Constructor for WriteCoilRequest.</p>
      *
-     * @param slaveId a int.
+     * @param slaveId     a int.
      * @param writeOffset a int.
-     * @param writeValue a boolean.
+     * @param writeValue  a boolean.
      * @throws ModbusTransportException if any.
      */
     public WriteCoilRequest(int slaveId, int writeOffset, boolean writeValue) throws ModbusTransportException {
@@ -46,7 +46,9 @@ public class WriteCoilRequest extends ModbusRequest {
         this.writeValue = writeValue;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
@@ -56,7 +58,9 @@ public class WriteCoilRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
@@ -69,7 +73,9 @@ public class WriteCoilRequest extends ModbusRequest {
         return new WriteCoilResponse(slaveId, writeOffset, writeValue);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_COIL;
@@ -80,7 +86,9 @@ public class WriteCoilRequest extends ModbusRequest {
         return new WriteCoilResponse(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

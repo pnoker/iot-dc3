@@ -1,33 +1,262 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8" />
-        <meta
+<head>
+    <meta charset="utf-8"/>
+    <meta
             name="viewport"
             content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-        />
-        <title>配置 | IoT DC3</title>
-        <meta name="description" content="" />
-        <meta name="generator" content="VuePress 1.9.9" />
-        <link rel="icon" href="/assets/images/favicon.ico">
-    <script type="text/javascript" src="/assets/js/push.js"></script> <meta name="description" content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
+    />
+    <title>配置 | IoT DC3</title>
+    <meta name="description" content=""/>
+    <meta name="generator" content="VuePress 1.9.9"/>
+    <link rel="icon" href="/assets/images/favicon.ico">
+    <script type="text/javascript" src="/assets/js/push.js"></script>
+    <meta name="description"
+          content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
     <meta name="referrer" content="never">
-    <meta name="keywords" content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台"> <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style"><link rel="preload" href="/assets/js/app.7dfefe51.js" as="script"><link rel="preload" href="/assets/js/2.a8b8915e.js" as="script"><link rel="preload" href="/assets/js/6.547754b6.js" as="script"><link rel="prefetch" href="/assets/js/10.db658154.js"><link rel="prefetch" href="/assets/js/11.287152fd.js"><link rel="prefetch" href="/assets/js/12.08136beb.js"><link rel="prefetch" href="/assets/js/13.83b3d580.js"><link rel="prefetch" href="/assets/js/14.d5387cec.js"><link rel="prefetch" href="/assets/js/15.aafb2a89.js"><link rel="prefetch" href="/assets/js/16.01fcc650.js"><link rel="prefetch" href="/assets/js/17.a097fd52.js"><link rel="prefetch" href="/assets/js/18.acd93e71.js"><link rel="prefetch" href="/assets/js/19.6f12b224.js"><link rel="prefetch" href="/assets/js/20.bac69ff1.js"><link rel="prefetch" href="/assets/js/21.9105165e.js"><link rel="prefetch" href="/assets/js/22.de1f017c.js"><link rel="prefetch" href="/assets/js/23.fb20a8f5.js"><link rel="prefetch" href="/assets/js/24.6459dc88.js"><link rel="prefetch" href="/assets/js/25.0587cb23.js"><link rel="prefetch" href="/assets/js/26.b6254386.js"><link rel="prefetch" href="/assets/js/27.479148c7.js"><link rel="prefetch" href="/assets/js/28.da247a59.js"><link rel="prefetch" href="/assets/js/29.f175dd67.js"><link rel="prefetch" href="/assets/js/3.8e04da2b.js"><link rel="prefetch" href="/assets/js/30.5ba7a495.js"><link rel="prefetch" href="/assets/js/31.01c3d218.js"><link rel="prefetch" href="/assets/js/32.de0e0ff7.js"><link rel="prefetch" href="/assets/js/33.0e117d4a.js"><link rel="prefetch" href="/assets/js/34.010094c5.js"><link rel="prefetch" href="/assets/js/35.8a377a71.js"><link rel="prefetch" href="/assets/js/36.fbb64a47.js"><link rel="prefetch" href="/assets/js/37.c2b9d4da.js"><link rel="prefetch" href="/assets/js/38.a66be625.js"><link rel="prefetch" href="/assets/js/39.76e387bc.js"><link rel="prefetch" href="/assets/js/4.470d098a.js"><link rel="prefetch" href="/assets/js/40.0e9ee726.js"><link rel="prefetch" href="/assets/js/41.e68f3c2e.js"><link rel="prefetch" href="/assets/js/42.ba03ba76.js"><link rel="prefetch" href="/assets/js/43.e6a91a35.js"><link rel="prefetch" href="/assets/js/44.9304b041.js"><link rel="prefetch" href="/assets/js/45.586518cf.js"><link rel="prefetch" href="/assets/js/46.ab599c67.js"><link rel="prefetch" href="/assets/js/47.dc2d8aff.js"><link rel="prefetch" href="/assets/js/48.06e9c64e.js"><link rel="prefetch" href="/assets/js/49.627cc127.js"><link rel="prefetch" href="/assets/js/5.0f4aedb8.js"><link rel="prefetch" href="/assets/js/50.bf665f72.js"><link rel="prefetch" href="/assets/js/51.08e5dea0.js"><link rel="prefetch" href="/assets/js/52.8e37a9c4.js"><link rel="prefetch" href="/assets/js/53.8c472224.js"><link rel="prefetch" href="/assets/js/54.bb582a52.js"><link rel="prefetch" href="/assets/js/55.640d9ecb.js"><link rel="prefetch" href="/assets/js/56.e2e2a21e.js"><link rel="prefetch" href="/assets/js/57.9b9b26a7.js"><link rel="prefetch" href="/assets/js/58.0d4a46c3.js"><link rel="prefetch" href="/assets/js/59.d1f11d32.js"><link rel="prefetch" href="/assets/js/7.aea1a047.js"><link rel="prefetch" href="/assets/js/8.f35f3888.js"><link rel="prefetch" href="/assets/js/9.3f13bdbf.js"> <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
-    </head>
-    <body>
-        <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="ant-row"><div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars"><svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path></svg></i> <span></span></div> <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3" class="logo"> <span class="site-name">IoT DC3</span></a> <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div></div> <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light"><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
-                    首页
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/docs/">
-                    指南
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item ant-menu-item-selected"><a href="/config/" aria-current="page" class="router-link-exact-active router-link-active">
-                    配置
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/faq/">
-                    FAQ
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>
+    <meta name="keywords"
+          content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台">
+    <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style">
+    <link rel="preload" href="/assets/js/app.7dfefe51.js" as="script">
+    <link rel="preload" href="/assets/js/2.a8b8915e.js" as="script">
+    <link rel="preload" href="/assets/js/6.547754b6.js" as="script">
+    <link rel="prefetch" href="/assets/js/10.db658154.js">
+    <link rel="prefetch" href="/assets/js/11.287152fd.js">
+    <link rel="prefetch" href="/assets/js/12.08136beb.js">
+    <link rel="prefetch" href="/assets/js/13.83b3d580.js">
+    <link rel="prefetch" href="/assets/js/14.d5387cec.js">
+    <link rel="prefetch" href="/assets/js/15.aafb2a89.js">
+    <link rel="prefetch" href="/assets/js/16.01fcc650.js">
+    <link rel="prefetch" href="/assets/js/17.a097fd52.js">
+    <link rel="prefetch" href="/assets/js/18.acd93e71.js">
+    <link rel="prefetch" href="/assets/js/19.6f12b224.js">
+    <link rel="prefetch" href="/assets/js/20.bac69ff1.js">
+    <link rel="prefetch" href="/assets/js/21.9105165e.js">
+    <link rel="prefetch" href="/assets/js/22.de1f017c.js">
+    <link rel="prefetch" href="/assets/js/23.fb20a8f5.js">
+    <link rel="prefetch" href="/assets/js/24.6459dc88.js">
+    <link rel="prefetch" href="/assets/js/25.0587cb23.js">
+    <link rel="prefetch" href="/assets/js/26.b6254386.js">
+    <link rel="prefetch" href="/assets/js/27.479148c7.js">
+    <link rel="prefetch" href="/assets/js/28.da247a59.js">
+    <link rel="prefetch" href="/assets/js/29.f175dd67.js">
+    <link rel="prefetch" href="/assets/js/3.8e04da2b.js">
+    <link rel="prefetch" href="/assets/js/30.5ba7a495.js">
+    <link rel="prefetch" href="/assets/js/31.01c3d218.js">
+    <link rel="prefetch" href="/assets/js/32.de0e0ff7.js">
+    <link rel="prefetch" href="/assets/js/33.0e117d4a.js">
+    <link rel="prefetch" href="/assets/js/34.010094c5.js">
+    <link rel="prefetch" href="/assets/js/35.8a377a71.js">
+    <link rel="prefetch" href="/assets/js/36.fbb64a47.js">
+    <link rel="prefetch" href="/assets/js/37.c2b9d4da.js">
+    <link rel="prefetch" href="/assets/js/38.a66be625.js">
+    <link rel="prefetch" href="/assets/js/39.76e387bc.js">
+    <link rel="prefetch" href="/assets/js/4.470d098a.js">
+    <link rel="prefetch" href="/assets/js/40.0e9ee726.js">
+    <link rel="prefetch" href="/assets/js/41.e68f3c2e.js">
+    <link rel="prefetch" href="/assets/js/42.ba03ba76.js">
+    <link rel="prefetch" href="/assets/js/43.e6a91a35.js">
+    <link rel="prefetch" href="/assets/js/44.9304b041.js">
+    <link rel="prefetch" href="/assets/js/45.586518cf.js">
+    <link rel="prefetch" href="/assets/js/46.ab599c67.js">
+    <link rel="prefetch" href="/assets/js/47.dc2d8aff.js">
+    <link rel="prefetch" href="/assets/js/48.06e9c64e.js">
+    <link rel="prefetch" href="/assets/js/49.627cc127.js">
+    <link rel="prefetch" href="/assets/js/5.0f4aedb8.js">
+    <link rel="prefetch" href="/assets/js/50.bf665f72.js">
+    <link rel="prefetch" href="/assets/js/51.08e5dea0.js">
+    <link rel="prefetch" href="/assets/js/52.8e37a9c4.js">
+    <link rel="prefetch" href="/assets/js/53.8c472224.js">
+    <link rel="prefetch" href="/assets/js/54.bb582a52.js">
+    <link rel="prefetch" href="/assets/js/55.640d9ecb.js">
+    <link rel="prefetch" href="/assets/js/56.e2e2a21e.js">
+    <link rel="prefetch" href="/assets/js/57.9b9b26a7.js">
+    <link rel="prefetch" href="/assets/js/58.0d4a46c3.js">
+    <link rel="prefetch" href="/assets/js/59.d1f11d32.js">
+    <link rel="prefetch" href="/assets/js/7.aea1a047.js">
+    <link rel="prefetch" href="/assets/js/8.f35f3888.js">
+    <link rel="prefetch" href="/assets/js/9.3f13bdbf.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+    <div class="theme-container">
+        <header class="navbar">
+            <div class="ant-row">
+                <div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars">
+                    <svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em"
+                         fill="currentColor" aria-hidden="true">
+                        <path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path>
+                    </svg>
+                </i> <span></span></div>
+                <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a
+                        href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3"
+                                                                           class="logo"> <span
+                        class="site-name">IoT DC3</span></a>
+                    <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off"
+                                                                 spellcheck="false" value=""> <!----></div>
+                </div>
+                <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20">
+                    <div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value="">
+                        <!----></div>
+                    <nav class="nav-links can-hide">
+                        <ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light">
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
+                                首页
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/docs/">
+                                指南
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item ant-menu-item-selected"><a href="/config/"
+                                                                                                aria-current="page"
+                                                                                                class="router-link-exact-active router-link-active">
+                                配置
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/faq/">
+                                FAQ
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>
                     代码仓库
-                </span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="visibility:hidden;position:absolute;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li></ul> <ul class="extra-group"><!----> <!----></ul></nav></div></div> <!----></header> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/config/" aria-current="page" title="配置" class="active sidebar-link">配置</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/config/#基础配置" title="基础配置" class="sidebar-link">基础配置</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/config/#redis" title="redis" class="sidebar-link">redis</a></li><li class="sidebar-sub-header"><a href="/config/#mongodb" title="mongodb" class="sidebar-link">mongodb</a></li></ul></li><li class="sidebar-sub-header"><a href="/config/#驱动配置" title="驱动配置" class="sidebar-link">驱动配置</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/config/#通用配置" title="通用配置" class="sidebar-link">通用配置</a></li><li class="sidebar-sub-header"><a href="/config/#lwm2m" title="Lwm2m" class="sidebar-link">Lwm2m</a></li></ul></li></ul></li></ul> </aside> <main class="page has-page-anchor"> <div class="theme-dc3-content content__default"><h2 id="基础配置">基础配置 <a href="#基础配置" class="header-anchor">#</a></h2> <h3 id="redis">redis <a href="#redis" class="header-anchor">#</a></h3> <h3 id="mongodb">mongodb <a href="#mongodb" class="header-anchor">#</a></h3> <h2 id="驱动配置">驱动配置 <a href="#驱动配置" class="header-anchor">#</a></h2> <h3 id="通用配置">通用配置 <a href="#通用配置" class="header-anchor">#</a></h3> <h3 id="lwm2m">Lwm2m <a href="#lwm2m" class="header-anchor">#</a></h3> <p></p> <div data-show="true" class="ant-alert ant-alert-info ant-alert-no-icon"><span class="ant-alert-message"><span>
+                </span><i class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="visibility:hidden;position:absolute;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                        </ul>
+                        <ul class="extra-group"><!----> <!----></ul>
+                    </nav>
+                </div>
+            </div> <!----></header>
+        <aside class="sidebar"><!---->
+            <ul class="sidebar-links">
+                <li><a href="/config/" aria-current="page" title="配置" class="active sidebar-link">配置</a>
+                    <ul class="sidebar-sub-headers">
+                        <li class="sidebar-sub-header"><a href="/config/#基础配置" title="基础配置"
+                                                          class="sidebar-link">基础配置</a>
+                            <ul class="sidebar-sub-headers">
+                                <li class="sidebar-sub-header"><a href="/config/#redis" title="redis"
+                                                                  class="sidebar-link">redis</a></li>
+                                <li class="sidebar-sub-header"><a href="/config/#mongodb" title="mongodb"
+                                                                  class="sidebar-link">mongodb</a></li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-sub-header"><a href="/config/#驱动配置" title="驱动配置"
+                                                          class="sidebar-link">驱动配置</a>
+                            <ul class="sidebar-sub-headers">
+                                <li class="sidebar-sub-header"><a href="/config/#通用配置" title="通用配置"
+                                                                  class="sidebar-link">通用配置</a></li>
+                                <li class="sidebar-sub-header"><a href="/config/#lwm2m" title="Lwm2m"
+                                                                  class="sidebar-link">Lwm2m</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+        <main class="page has-page-anchor">
+            <div class="theme-dc3-content content__default"><h2 id="基础配置">基础配置 <a href="#基础配置"
+                                                                                          class="header-anchor">#</a>
+            </h2>
+                <h3 id="redis">redis <a href="#redis" class="header-anchor">#</a></h3>
+                <h3 id="mongodb">mongodb <a href="#mongodb" class="header-anchor">#</a></h3>
+                <h2 id="驱动配置">驱动配置 <a href="#驱动配置" class="header-anchor">#</a></h2>
+                <h3 id="通用配置">通用配置 <a href="#通用配置" class="header-anchor">#</a></h3>
+                <h3 id="lwm2m">Lwm2m <a href="#lwm2m" class="header-anchor">#</a></h3>
+                <p></p>
+                <div data-show="true" class="ant-alert ant-alert-info ant-alert-no-icon"><span
+                        class="ant-alert-message"><span>
     位置：iot-dc3\dc3-driver\dc3-driver-lwm2m\src\main\resources\application.yml
-  </span></span><span class="ant-alert-description"></span></div> <h4 id="custom-coap-port">custom.coap.port <a href="#custom-coap-port" class="header-anchor">#</a></h4> <p></p> <ul><li>类型: <code>int</code></li> <li>默认值: <code>5683</code></li></ul> <p>CoAP端口</p> <h4 id="custom-coaps-port-未启用">custom.coaps.port <span class="ant-tag ant-tag-red">未启用</span> <a href="#custom-coaps-port-未启用" class="header-anchor">#</a></h4> <p></p> <ul><li>类型: <code>int</code></li> <li>默认值: <code>5684</code></li></ul> <p>CoAPS端口,加密端口</p></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/4/12 下午10:14:54</span></div></footer> <!----> <div class="page-anchor"><div class="ant-space ant-space-vertical" style="width:100%;"><div class="ant-space-item"><div class="page-anchor-offset"><div><div class="ant-anchor-wrapper" style="max-height:100vh;"><div class="ant-anchor"><div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div><div class="ant-anchor-link"><a href="#基础配置" title="基础配置" class="ant-anchor-link-title">基础配置</a><div class="ant-anchor-link"><a href="#redis" title="redis" class="ant-anchor-link-title">redis</a></div><div class="ant-anchor-link"><a href="#mongodb" title="mongodb" class="ant-anchor-link-title">mongodb</a></div></div><div class="ant-anchor-link"><a href="#驱动配置" title="驱动配置" class="ant-anchor-link-title">驱动配置</a><div class="ant-anchor-link"><a href="#通用配置" title="通用配置" class="ant-anchor-link-title">通用配置</a></div><div class="ant-anchor-link"><a href="#lwm2m" title="Lwm2m" class="ant-anchor-link-title">Lwm2m</a></div></div></div></div></div></div></div></div></div> </main> <!----></div><div class="global-ui"></div></div>
-        <script src="/assets/js/app.7dfefe51.js" defer></script><script src="/assets/js/2.a8b8915e.js" defer></script><script src="/assets/js/6.547754b6.js" defer></script>
-    </body>
+  </span></span><span class="ant-alert-description"></span></div>
+                <h4 id="custom-coap-port">custom.coap.port <a href="#custom-coap-port" class="header-anchor">#</a></h4>
+                <p></p>
+                <ul>
+                    <li>类型: <code>int</code></li>
+                    <li>默认值: <code>5683</code></li>
+                </ul>
+                <p>CoAP端口</p> <h4 id="custom-coaps-port-未启用">custom.coaps.port <span class="ant-tag ant-tag-red">未启用</span>
+                    <a href="#custom-coaps-port-未启用" class="header-anchor">#</a></h4>
+                <p></p>
+                <ul>
+                    <li>类型: <code>int</code></li>
+                    <li>默认值: <code>5684</code></li>
+                </ul>
+                <p>CoAPS端口,加密端口</p></div>
+            <footer class="page-edit"><!---->
+                <div class="last-updated"><span class="prefix">上次更新:</span> <span
+                        class="time">2023/4/12 下午10:14:54</span></div>
+            </footer> <!---->
+            <div class="page-anchor">
+                <div class="ant-space ant-space-vertical" style="width:100%;">
+                    <div class="ant-space-item">
+                        <div class="page-anchor-offset">
+                            <div>
+                                <div class="ant-anchor-wrapper" style="max-height:100vh;">
+                                    <div class="ant-anchor">
+                                        <div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div>
+                                        <div class="ant-anchor-link"><a href="#基础配置" title="基础配置"
+                                                                        class="ant-anchor-link-title">基础配置</a>
+                                            <div class="ant-anchor-link"><a href="#redis" title="redis"
+                                                                            class="ant-anchor-link-title">redis</a>
+                                            </div>
+                                            <div class="ant-anchor-link"><a href="#mongodb" title="mongodb"
+                                                                            class="ant-anchor-link-title">mongodb</a>
+                                            </div>
+                                        </div>
+                                        <div class="ant-anchor-link"><a href="#驱动配置" title="驱动配置"
+                                                                        class="ant-anchor-link-title">驱动配置</a>
+                                            <div class="ant-anchor-link"><a href="#通用配置" title="通用配置"
+                                                                            class="ant-anchor-link-title">通用配置</a>
+                                            </div>
+                                            <div class="ant-anchor-link"><a href="#lwm2m" title="Lwm2m"
+                                                                            class="ant-anchor-link-title">Lwm2m</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main> <!----></div>
+    <div class="global-ui"></div>
+</div>
+<script src="/assets/js/app.7dfefe51.js" defer></script>
+<script src="/assets/js/2.a8b8915e.js" defer></script>
+<script src="/assets/js/6.547754b6.js" defer></script>
+</body>
 </html>

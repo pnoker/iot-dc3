@@ -33,13 +33,17 @@ public class ReadHoldingRegistersResponse extends ReadResponse {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_HOLDING_REGISTERS;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "ReadHoldingRegistersResponse [exceptionCode=" + exceptionCode + ", slaveId=" + slaveId

@@ -15,15 +15,14 @@
  */
 package com.serotonin.modbus4j.serial;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.sero.messaging.EpollStreamTransport;
 import com.serotonin.modbus4j.sero.messaging.MessageControl;
 import com.serotonin.modbus4j.sero.messaging.StreamTransport;
 import com.serotonin.modbus4j.sero.messaging.Transport;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>Abstract SerialMaster class.</p>
@@ -44,10 +43,9 @@ abstract public class SerialMaster extends ModbusMaster {
     protected Transport transport;
 
 
-
     /**
      * <p>Constructor for SerialMaster.</p>
-     *
+     * <p>
      * Default to validating the slave id in responses
      *
      * @param wrapper a {@link SerialPortWrapper} object.
@@ -58,7 +56,8 @@ abstract public class SerialMaster extends ModbusMaster {
 
     /**
      * <p>Constructor for SerialMaster.</p>
-     * @param wrapper a {@link SerialPortWrapper} object.
+     *
+     * @param wrapper          a {@link SerialPortWrapper} object.
      * @param validateResponse - confirm that requested slave id is the same in the response
      */
     public SerialMaster(SerialPortWrapper wrapper, boolean validateResponse) {
@@ -66,13 +65,14 @@ abstract public class SerialMaster extends ModbusMaster {
         this.validateResponse = validateResponse;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init() throws ModbusInitException {
         try {
             this.openConnection(null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ModbusInitException(e);
         }
     }
@@ -99,12 +99,12 @@ abstract public class SerialMaster extends ModbusMaster {
                     transport = new EpollStreamTransport(wrapper.getInputStream(),
                             wrapper.getOutputStream(),
                             getePoll());
-                }else {
+                } else {
                     transport = new StreamTransport(wrapper.getInputStream(),
                             wrapper.getOutputStream());
                 }
                 break;
-            }catch(Exception e) {
+            } catch (Exception e) {
                 //Ensure port is closed before we try to reopen or bail out
                 close();
 
@@ -116,8 +116,7 @@ abstract public class SerialMaster extends ModbusMaster {
                 // Pause for a bit.
                 try {
                     Thread.sleep(retryPause);
-                }
-                catch (InterruptedException e1) {
+                } catch (InterruptedException e1) {
                     // ignore
                 }
                 retryPause *= 2;
@@ -129,17 +128,17 @@ abstract public class SerialMaster extends ModbusMaster {
 
     /**
      * Close serial port
+     *
      * @param conn
      */
     protected void closeConnection(MessageControl conn) {
         closeMessageControl(conn);
         try {
-            if(serialPortOpen) {
+            if (serialPortOpen) {
                 wrapper.close();
                 serialPortOpen = false;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             getExceptionHandler().receivedException(e);
         }
 

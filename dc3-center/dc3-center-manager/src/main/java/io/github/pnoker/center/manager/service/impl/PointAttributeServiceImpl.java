@@ -25,10 +25,7 @@ import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
 import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -74,7 +71,9 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             throw new NotFoundException("The point attribute does not exist");
         }
 
-        pointAttributeMapper.deleteById(id);
+        if (pointAttributeMapper.deleteById(id) < 1) {
+            throw new DeleteException("The point attribute delete failed");
+        }
     }
 
     /**

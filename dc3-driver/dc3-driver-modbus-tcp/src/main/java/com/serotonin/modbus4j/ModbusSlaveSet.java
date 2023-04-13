@@ -15,13 +15,13 @@
  */
 package com.serotonin.modbus4j;
 
+import com.serotonin.modbus4j.exception.ModbusInitException;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import com.serotonin.modbus4j.exception.ModbusInitException;
 
 /**
  * <p>Abstract ModbusSlaveSet class.</p>
@@ -30,7 +30,7 @@ import com.serotonin.modbus4j.exception.ModbusInitException;
  * @version 5.0.0
  */
 abstract public class ModbusSlaveSet extends Modbus {
-	
+
     private LinkedHashMap<Integer, ProcessImage> processImages = new LinkedHashMap<>();
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -40,27 +40,27 @@ abstract public class ModbusSlaveSet extends Modbus {
      * @param processImage a {@link ProcessImage} object.
      */
     public void addProcessImage(ProcessImage processImage) {
-    	lock.writeLock().lock();
-    	try{
-    		processImages.put(processImage.getSlaveId(), processImage);
-    	}finally{
-    		lock.writeLock().unlock();
-    	}
+        lock.writeLock().lock();
+        try {
+            processImages.put(processImage.getSlaveId(), processImage);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
-    
+
     /**
      * <p>removeProcessImage.</p>
      *
      * @param slaveId a int.
      * @return a boolean.
      */
-    public boolean removeProcessImage(int slaveId){
-    	lock.writeLock().lock();
-    	try{
-    		return (processImages.remove(slaveId) != null);
-    	}finally{
-    		lock.writeLock().unlock();
-    	}
+    public boolean removeProcessImage(int slaveId) {
+        lock.writeLock().lock();
+        try {
+            return (processImages.remove(slaveId) != null);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     /**
@@ -69,13 +69,13 @@ abstract public class ModbusSlaveSet extends Modbus {
      * @param processImage a {@link ProcessImage} object.
      * @return a boolean.
      */
-    public boolean removeProcessImage(ProcessImage processImage){
-    	lock.writeLock().lock();
-    	try{
-    		return (processImages.remove(processImage.getSlaveId()) != null);
-    	}finally{
-    		lock.writeLock().unlock();
-    	}
+    public boolean removeProcessImage(ProcessImage processImage) {
+        lock.writeLock().lock();
+        try {
+            return (processImages.remove(processImage.getSlaveId()) != null);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
 
@@ -86,12 +86,12 @@ abstract public class ModbusSlaveSet extends Modbus {
      * @return a {@link ProcessImage} object.
      */
     public ProcessImage getProcessImage(int slaveId) {
-    	lock.readLock().lock();
-    	try{
-    		return processImages.get(slaveId);
-    	}finally{
-    		lock.readLock().unlock();
-    	}
+        lock.readLock().lock();
+        try {
+            return processImages.get(slaveId);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     /**
@@ -100,12 +100,12 @@ abstract public class ModbusSlaveSet extends Modbus {
      * @return a {@link Collection} object.
      */
     public Collection<ProcessImage> getProcessImages() {
-    	lock.readLock().lock();
-    	try{
-    		return new HashSet<>(processImages.values());
-    	}finally{
-    		lock.readLock().unlock();
-    	}
+        lock.readLock().lock();
+        try {
+            return new HashSet<>(processImages.values());
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     /**

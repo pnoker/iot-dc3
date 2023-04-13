@@ -91,7 +91,7 @@ public class SimpleLog {
      * <p>out.</p>
      *
      * @param message a {@link String} object.
-     * @param t a {@link Throwable} object.
+     * @param t       a {@link Throwable} object.
      */
     public synchronized void out(String message, Throwable t) {
         sb.delete(0, sb.length());
@@ -104,8 +104,7 @@ public class SimpleLog {
                 sb.append(" - ").append(t.getMessage());
             out.println(sb.toString());
             t.printStackTrace(out);
-        }
-        else
+        } else
             out.println(sb.toString());
         out.flush();
     }

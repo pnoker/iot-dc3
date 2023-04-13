@@ -15,12 +15,12 @@
  */
 package com.serotonin.modbus4j.serial.rtu;
 
-import java.io.IOException;
-
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.serial.SerialPortWrapper;
 import com.serotonin.modbus4j.serial.SerialSlave;
 import com.serotonin.modbus4j.sero.messaging.MessageControl;
+
+import java.io.IOException;
 
 /**
  * <p>RtuSlave class.</p>
@@ -41,7 +41,9 @@ public class RtuSlave extends SerialSlave {
         super(wrapper);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start() throws ModbusInitException {
         super.start();
@@ -55,13 +57,14 @@ public class RtuSlave extends SerialSlave {
         try {
             conn.start(transport, rtuMessageParser, rtuRequestHandler, null);
             transport.start("Modbus RTU slave");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ModbusInitException(e);
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stop() {
         conn.close();

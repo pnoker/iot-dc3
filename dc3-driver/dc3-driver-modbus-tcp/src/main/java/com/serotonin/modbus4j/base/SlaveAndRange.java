@@ -29,7 +29,7 @@ public class SlaveAndRange {
      * <p>Constructor for SlaveAndRange.</p>
      *
      * @param slaveId a int.
-     * @param range a int.
+     * @param range   a int.
      */
     public SlaveAndRange(int slaveId, int range) {
         ModbusUtils.validateSlaveId(slaveId, true);
@@ -56,7 +56,9 @@ public class SlaveAndRange {
         return slaveId;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -66,7 +68,9 @@ public class SlaveAndRange {
         return result;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

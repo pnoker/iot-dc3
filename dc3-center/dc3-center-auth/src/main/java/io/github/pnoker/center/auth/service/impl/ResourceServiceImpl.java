@@ -10,8 +10,8 @@ import io.github.pnoker.center.auth.mapper.ResourceMapper;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,9 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void delete(String id) {
         selectById(id);
-        resourceMapper.deleteById(id);
+        if (resourceMapper.deleteById(id) < 1) {
+            throw new DeleteException("The resource delete failed");
+        }
     }
 
     @Override

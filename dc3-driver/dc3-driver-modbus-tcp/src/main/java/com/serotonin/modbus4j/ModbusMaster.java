@@ -15,11 +15,6 @@
  */
 package com.serotonin.modbus4j;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.serotonin.modbus4j.base.KeyedModbusLocator;
 import com.serotonin.modbus4j.base.ReadFunctionGroup;
 import com.serotonin.modbus4j.base.SlaveProfile;
@@ -34,23 +29,17 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.locator.BinaryLocator;
 import com.serotonin.modbus4j.locator.NumericLocator;
-import com.serotonin.modbus4j.msg.ModbusRequest;
-import com.serotonin.modbus4j.msg.ModbusResponse;
-import com.serotonin.modbus4j.msg.ReadCoilsRequest;
-import com.serotonin.modbus4j.msg.ReadDiscreteInputsRequest;
-import com.serotonin.modbus4j.msg.ReadHoldingRegistersRequest;
-import com.serotonin.modbus4j.msg.ReadInputRegistersRequest;
-import com.serotonin.modbus4j.msg.ReadResponse;
-import com.serotonin.modbus4j.msg.WriteCoilRequest;
-import com.serotonin.modbus4j.msg.WriteCoilsRequest;
-import com.serotonin.modbus4j.msg.WriteMaskRegisterRequest;
-import com.serotonin.modbus4j.msg.WriteRegisterRequest;
-import com.serotonin.modbus4j.msg.WriteRegistersRequest;
+import com.serotonin.modbus4j.msg.*;
 import com.serotonin.modbus4j.sero.epoll.InputStreamEPollWrapper;
 import com.serotonin.modbus4j.sero.log.BaseIOLog;
 import com.serotonin.modbus4j.sero.messaging.MessageControl;
 import com.serotonin.modbus4j.sero.util.ArrayUtils;
 import com.serotonin.modbus4j.sero.util.ProgressiveTask;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Abstract ModbusMaster class.</p>
@@ -64,7 +53,7 @@ abstract public class ModbusMaster extends Modbus {
 
     /**
      * Should we validate the responses:
-     *  - ensure that the requested slave id is what is in the response
+     * - ensure that the requested slave id is what is in the response
      */
     protected boolean validateResponse;
 
@@ -139,10 +128,10 @@ abstract public class ModbusMaster extends Modbus {
      */
     public final ModbusResponse send(ModbusRequest request) throws ModbusTransportException {
         request.validate(this);
-		ModbusResponse modbusResponse = sendImpl(request);
-		if(validateResponse)
-		    modbusResponse.validateResponse(request);
-		return modbusResponse;
+        ModbusResponse modbusResponse = sendImpl(request);
+        if (validateResponse)
+            modbusResponse.validateResponse(request);
+        return modbusResponse;
     }
 
     /**
@@ -159,15 +148,12 @@ abstract public class ModbusMaster extends Modbus {
      * allowed to be requested including multi-word types. The determination of the correct request message to send is
      * handled automatically.
      *
-     * @param locator
-     *            the information required to locate the value in the modbus network.
+     * @param locator the information required to locate the value in the modbus network.
+     * @param <T>     a T object.
      * @return an object representing the value found. This will be one of Boolean, Short, Integer, Long, BigInteger,
-     *         Float, or Double. See the DataType enumeration for details on which type to expect.
-     * @throws ModbusTransportException
-     *             if there was an IO error or other technical failure while sending the message
-     * @throws ErrorResponseException
-     *             if the response returned from the slave was an exception.
-     * @param <T> a T object.
+     * Float, or Double. See the DataType enumeration for details on which type to expect.
+     * @throws ModbusTransportException if there was an IO error or other technical failure while sending the message
+     * @throws ErrorResponseException   if the response returned from the slave was an exception.
      */
     @SuppressWarnings("unchecked")
     public <T> T getValue(BaseLocator<T> locator) throws ModbusTransportException, ErrorResponseException {
@@ -182,15 +168,12 @@ abstract public class ModbusMaster extends Modbus {
      * allowed to be set including including multi-word types. The determination of the correct write message to send is
      * handled automatically.
      *
-     * @param locator
-     *            the information required to locate the value in the modbus network.
-     * @param value an object representing the value to be set. This will be one of Boolean, Short, Integer, Long, BigInteger,
-     *        Float, or Double. See the DataType enumeration for details on which type to expect.
-     * @throws ModbusTransportException
-     *             if there was an IO error or other technical failure while sending the message
-     * @throws ErrorResponseException
-     *             if the response returned from the slave was an exception.
-     * @param <T> type of locator
+     * @param locator the information required to locate the value in the modbus network.
+     * @param value   an object representing the value to be set. This will be one of Boolean, Short, Integer, Long, BigInteger,
+     *                Float, or Double. See the DataType enumeration for details on which type to expect.
+     * @param <T>     type of locator
+     * @throws ModbusTransportException if there was an IO error or other technical failure while sending the message
+     * @throws ErrorResponseException   if the response returned from the slave was an exception.
      */
     public <T> void setValue(BaseLocator<T> locator, Object value) throws ModbusTransportException,
             ErrorResponseException {
@@ -206,19 +189,17 @@ abstract public class ModbusMaster extends Modbus {
             if (!(value instanceof Boolean))
                 throw new InvalidDataConversionException("Only boolean values can be written to coils");
             if (multipleWritesOnly)
-                setValue(new WriteCoilsRequest(slaveId, writeOffset, new boolean[] { ((Boolean) value).booleanValue() }));
+                setValue(new WriteCoilsRequest(slaveId, writeOffset, new boolean[]{((Boolean) value).booleanValue()}));
             else
                 setValue(new WriteCoilRequest(slaveId, writeOffset, ((Boolean) value).booleanValue()));
-        }
-        else {
+        } else {
             // Writing to holding registers.
             if (locator.getDataType() == DataType.BINARY) {
                 if (!(value instanceof Boolean))
                     throw new InvalidDataConversionException("Only boolean values can be written to coils");
                 setHoldingRegisterBit(slaveId, writeOffset, ((BinaryLocator) locator).getBit(),
                         ((Boolean) value).booleanValue());
-            }
-            else {
+            } else {
                 // Writing some kind of value to a holding register.
                 @SuppressWarnings("unchecked")
                 short[] data = locator.valueToShorts((T) value);
@@ -234,7 +215,7 @@ abstract public class ModbusMaster extends Modbus {
     /**
      * Node scanning. Returns a list of slave nodes that respond to a read exception status request (perhaps with an
      * error, but respond nonetheless).
-     *
+     * <p>
      * Note: a similar scan could be done for registers in nodes, but, for one thing, it would take some time to run,
      * and in any case the results would not be meaningful since there would be no semantic information accompanying the
      * results.
@@ -288,8 +269,7 @@ abstract public class ModbusMaster extends Modbus {
     public boolean testSlaveNode(int node) {
         try {
             send(new ReadHoldingRegistersRequest(node, 0, 1));
-        }
-        catch (ModbusTransportException e) {
+        } catch (ModbusTransportException e) {
             // If there was a transport exception, there's no node there.
             return false;
         }
@@ -417,10 +397,10 @@ abstract public class ModbusMaster extends Modbus {
      * Useful for sending a number of polling commands at once, or at least in as optimal a batch as possible.
      *
      * @param batch a {@link BatchRead} object.
+     * @param <K>   type of result
      * @return a {@link BatchResults} object.
      * @throws ModbusTransportException if any.
-     * @throws ErrorResponseException if any.
-     * @param <K> type of result
+     * @throws ErrorResponseException   if any.
      */
     public <K> BatchResults<K> send(BatchRead<K> batch) throws ModbusTransportException, ErrorResponseException {
         if (!initialized)
@@ -443,6 +423,7 @@ abstract public class ModbusMaster extends Modbus {
     //
     // Protected methods
     //
+
     /**
      * <p>getMessageControl.</p>
      *
@@ -472,12 +453,13 @@ abstract public class ModbusMaster extends Modbus {
     //
     // Private stuff
     //
+
     /**
      * This method assumes that all locators have already been pre-sorted and grouped into valid requests, say, by the
      * createRequestGroups method.
      */
     private <K> void sendFunctionGroup(ReadFunctionGroup<K> functionGroup, BatchResults<K> results,
-            boolean errorsInResults, boolean exceptionsInResults) throws ModbusTransportException,
+                                       boolean errorsInResults, boolean exceptionsInResults) throws ModbusTransportException,
             ErrorResponseException {
         int slaveId = functionGroup.getSlaveAndRange().getSlaveId();
         int startOffset = functionGroup.getStartOffset();
@@ -499,8 +481,7 @@ abstract public class ModbusMaster extends Modbus {
         ReadResponse response;
         try {
             response = (ReadResponse) send(request);
-        }
-        catch (ModbusTransportException e) {
+        } catch (ModbusTransportException e) {
             if (!exceptionsInResults)
                 throw e;
 
@@ -522,8 +503,7 @@ abstract public class ModbusMaster extends Modbus {
             else {
                 try {
                     results.addResult(locator.getKey(), locator.bytesToValue(data, startOffset));
-                }
-                catch (RuntimeException e) {
+                } catch (RuntimeException e) {
                     throw new RuntimeException("Result conversion exception. data=" + ArrayUtils.toHexString(data)
                             + ", startOffset=" + startOffset + ", locator=" + locator + ", functionGroup.functionCode="
                             + functionGroup.getFunctionCode() + ", functionGroup.startOffset=" + startOffset

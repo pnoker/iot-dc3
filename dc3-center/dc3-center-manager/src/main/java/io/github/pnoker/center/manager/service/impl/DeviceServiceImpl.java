@@ -114,16 +114,16 @@ public class DeviceServiceImpl implements DeviceService {
             throw new NotFoundException("The device does not exist");
         }
 
-        Boolean deleteBind = profileBindService.deleteByDeviceId(id);
-        if (!deleteBind) {
-            return;
+        if (!profileBindService.deleteByDeviceId(id)) {
+            throw new DeleteException("The profile bind delete failed");
         }
 
-        boolean delete = deviceMapper.deleteById(id) > 0;
-        if (delete) {
-            // 通知驱动删除设备
-            notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, device);
+        if (deviceMapper.deleteById(id) < 1) {
+            throw new DeleteException("The device delete failed");
         }
+
+        // 通知驱动删除设备
+        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, device);
     }
 
     /**

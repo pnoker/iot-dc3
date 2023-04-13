@@ -34,8 +34,8 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
     /**
      * <p>Constructor for ReadBinaryRequest.</p>
      *
-     * @param slaveId a int.
-     * @param startOffset a int.
+     * @param slaveId      a int.
+     * @param startOffset  a int.
      * @param numberOfBits a int.
      * @throws ModbusTransportException if any.
      */
@@ -45,7 +45,9 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
         this.numberOfBits = numberOfBits;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
@@ -57,14 +59,18 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, startOffset);
         ModbusUtils.pushShort(queue, numberOfBits);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readRequest(ByteQueue queue) {
         startOffset = ModbusUtils.popUnsignedShort(queue);
@@ -93,13 +99,15 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
      * <p>getBinary.</p>
      *
      * @param processImage a {@link ProcessImage} object.
-     * @param index a int.
+     * @param index        a int.
      * @return a boolean.
      * @throws ModbusTransportException if any.
      */
     abstract protected boolean getBinary(ProcessImage processImage, int index) throws ModbusTransportException;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "ReadBinaryRequest [startOffset=" + startOffset + ", numberOfBits=" + numberOfBits + "]";

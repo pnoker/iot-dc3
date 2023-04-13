@@ -70,7 +70,9 @@ public class UserLoginServiceImpl implements UserLoginService {
             throw new NotFoundException("The user login does not exist");
         }
 
-        userLoginMapper.deleteById(id);
+        if (userLoginMapper.deleteById(id) < 1) {
+            throw new DeleteException("The user login delete failed");
+        }
     }
 
     @Override

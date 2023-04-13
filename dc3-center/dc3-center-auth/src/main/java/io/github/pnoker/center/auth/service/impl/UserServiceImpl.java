@@ -86,7 +86,9 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("The user does not exist");
         }
 
-        userMapper.deleteById(id);
+        if (userMapper.deleteById(id) < 1) {
+            throw new DeleteException("The user delete failed");
+        }
     }
 
     @Override

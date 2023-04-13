@@ -86,10 +86,11 @@ public class ProfileServiceImpl implements ProfileService {
                 throw new NotFoundException("The profile does not exist");
             }
 
-            boolean delete = profileMapper.deleteById(id) > 0;
-            if (delete) {
-                notifyService.notifyDriverProfile(MetadataCommandTypeEnum.DELETE, profile);
+            if (profileMapper.deleteById(id) < 1) {
+                throw new DeleteException("The profile delete failed");
             }
+
+            notifyService.notifyDriverProfile(MetadataCommandTypeEnum.DELETE, profile);
         }
     }
 

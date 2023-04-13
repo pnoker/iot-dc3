@@ -26,8 +26,9 @@ import io.github.pnoker.center.auth.mapper.TenantBindMapper;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.TenantBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,9 @@ public class TenantBindServiceImpl implements TenantBindService {
             throw new NotFoundException("The tenant bind does not exist");
         }
 
-        tenantBindMapper.deleteById(id);
+        if (tenantBindMapper.deleteById(id) < 1) {
+            throw new DeleteException("The tenant bind delete failed");
+        }
     }
 
     @Override
@@ -69,7 +72,7 @@ public class TenantBindServiceImpl implements TenantBindService {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
         if (tenantBindMapper.updateById(entityDO) < 1) {
-            throw new ServiceException("The tenant bind update failed");
+            throw new UpdateException("The tenant bind update failed");
         }
     }
 

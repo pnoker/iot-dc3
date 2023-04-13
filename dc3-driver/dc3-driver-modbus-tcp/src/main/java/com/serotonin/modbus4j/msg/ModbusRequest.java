@@ -63,8 +63,8 @@ abstract public class ModbusRequest extends ModbusMessage {
             request = new WriteRegistersRequest(slaveId);
         else if (functionCode == FunctionCode.REPORT_SLAVE_ID)
             request = new ReportSlaveIdRequest(slaveId);
-        // else if (functionCode == FunctionCode.WRITE_MASK_REGISTER)
-        // request = new WriteMaskRegisterRequest(slaveId);
+            // else if (functionCode == FunctionCode.WRITE_MASK_REGISTER)
+            // request = new WriteMaskRegisterRequest(slaveId);
         else
             request = new ExceptionRequest(slaveId, functionCode, ExceptionCode.ILLEGAL_FUNCTION);
 
@@ -96,12 +96,10 @@ abstract public class ModbusRequest extends ModbusMessage {
         try {
             try {
                 return handleImpl(processImage);
-            }
-            catch (IllegalDataAddressException e) {
+            } catch (IllegalDataAddressException e) {
                 return handleException(ExceptionCode.ILLEGAL_DATA_ADDRESS);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return handleException(ExceptionCode.SLAVE_DEVICE_FAILURE);
         }
     }
@@ -123,7 +121,9 @@ abstract public class ModbusRequest extends ModbusMessage {
 
     abstract ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     final protected void writeImpl(ByteQueue queue) {
         queue.push(getFunctionCode());

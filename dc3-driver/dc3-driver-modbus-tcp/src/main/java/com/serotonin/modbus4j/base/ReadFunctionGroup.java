@@ -15,10 +15,10 @@
  */
 package com.serotonin.modbus4j.base;
 
+import com.serotonin.modbus4j.code.RegisterRange;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.serotonin.modbus4j.code.RegisterRange;
 
 /**
  * <p>ReadFunctionGroup class.</p>

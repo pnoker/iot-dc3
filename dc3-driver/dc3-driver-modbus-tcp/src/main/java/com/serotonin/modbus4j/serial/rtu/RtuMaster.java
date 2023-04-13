@@ -15,9 +15,6 @@
  */
 package com.serotonin.modbus4j.serial.rtu;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.msg.ModbusRequest;
@@ -28,6 +25,8 @@ import com.serotonin.modbus4j.serial.SerialWaitingRoomKeyFactory;
 import com.serotonin.modbus4j.sero.ShouldNeverHappenException;
 import com.serotonin.modbus4j.sero.messaging.MessageControl;
 import com.serotonin.modbus4j.sero.messaging.StreamTransport;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>RtuMaster class.</p>
@@ -44,7 +43,7 @@ public class RtuMaster extends SerialMaster {
 
     /**
      * <p>Constructor for RtuMaster.</p>
-     *
+     * <p>
      * Default to validating the slave id in responses
      *
      * @param wrapper a {@link SerialPortWrapper} object.
@@ -56,26 +55,29 @@ public class RtuMaster extends SerialMaster {
     /**
      * <p>Constructor for RtuMaster.</p>
      *
-     * @param wrapper a {@link SerialPortWrapper} object.
+     * @param wrapper          a {@link SerialPortWrapper} object.
      * @param validateResponse - confirm that requested slave id is the same in the response
      */
     public RtuMaster(SerialPortWrapper wrapper, boolean validateResponse) {
         super(wrapper, validateResponse);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init() throws ModbusInitException {
         try {
             openConnection(null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ModbusInitException(e);
         }
         initialized = true;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void openConnection(MessageControl toClose) throws Exception {
         super.openConnection(toClose);
@@ -88,7 +90,9 @@ public class RtuMaster extends SerialMaster {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         closeMessageControl(conn);
@@ -96,7 +100,9 @@ public class RtuMaster extends SerialMaster {
         initialized = false;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         // Wrap the modbus request in an rtu request.
@@ -109,8 +115,7 @@ public class RtuMaster extends SerialMaster {
             if (rtuResponse == null)
                 return null;
             return rtuResponse.getModbusResponse();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             try {
                 LOG.debug("Connection may have been reset. Attempting to re-open.");
                 openConnection(conn);
@@ -118,7 +123,7 @@ public class RtuMaster extends SerialMaster {
                 if (rtuResponse == null)
                     return null;
                 return rtuResponse.getModbusResponse();
-            }catch(Exception e2) {
+            } catch (Exception e2) {
                 closeConnection(conn);
                 LOG.debug("Failed to re-connect", e);
                 throw new ModbusTransportException(e2, request.getSlaveId());
@@ -130,19 +135,18 @@ public class RtuMaster extends SerialMaster {
      * RTU Spec:
      * For baud greater than 19200
      * Message Spacing: 1.750uS
-     *
+     * <p>
      * For baud less than 19200
      * Message Spacing: 3.5 * char time
      *
      * @param wrapper a {@link SerialPortWrapper} object.
      * @return a long.
      */
-    public static long computeMessageFrameSpacing(SerialPortWrapper wrapper){
+    public static long computeMessageFrameSpacing(SerialPortWrapper wrapper) {
         //For Modbus Serial Spec, Message Framing rates at 19200 Baud are fixed
         if (wrapper.getBaudRate() > 19200) {
             return 1750000l; //Nanoseconds
-        }
-        else {
+        } else {
             float charTime = computeCharacterTime(wrapper);
             return (long) (charTime * 3.5f);
         }
@@ -152,19 +156,18 @@ public class RtuMaster extends SerialMaster {
      * RTU Spec:
      * For baud greater than 19200
      * Char Spacing: 750uS
-     *
+     * <p>
      * For baud less than 19200
      * Char Spacing: 1.5 * char time
      *
      * @param wrapper a {@link SerialPortWrapper} object.
      * @return a long.
      */
-    public static long computeCharacterSpacing(SerialPortWrapper wrapper){
+    public static long computeCharacterSpacing(SerialPortWrapper wrapper) {
         //For Modbus Serial Spec, Message Framing rates at 19200 Baud are fixed
         if (wrapper.getBaudRate() > 19200) {
             return 750000l; //Nanoseconds
-        }
-        else {
+        } else {
             float charTime = computeCharacterTime(wrapper);
             return (long) (charTime * 1.5f);
         }
@@ -174,20 +177,20 @@ public class RtuMaster extends SerialMaster {
     /**
      * Compute the time it takes to transmit 1 character with
      * the provided Serial Parameters.
-     *
+     * <p>
      * RTU Spec:
      * For baud greater than 19200
      * Char Spacing: 750uS
      * Message Spacing: 1.750uS
-     *
+     * <p>
      * For baud less than 19200
      * Char Spacing: 1.5 * char time
      * Message Spacing: 3.5 * char time
      *
-     * @return time in nanoseconds
      * @param wrapper a {@link SerialPortWrapper} object.
+     * @return time in nanoseconds
      */
-    public static float computeCharacterTime(SerialPortWrapper wrapper){
+    public static float computeCharacterTime(SerialPortWrapper wrapper) {
         //Compute the char size
         float charBits = wrapper.getDataBits();
         switch (wrapper.getStopBits()) {

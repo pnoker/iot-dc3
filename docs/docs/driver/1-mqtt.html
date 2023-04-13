@@ -1,37 +1,315 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="utf-8" />
-        <meta
+<head>
+    <meta charset="utf-8"/>
+    <meta
             name="viewport"
             content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-        />
-        <title>DC3 Mqtt 驱动模块 | IoT DC3</title>
-        <meta name="description" content="" />
-        <meta name="generator" content="VuePress 1.9.9" />
-        <link rel="icon" href="/assets/images/favicon.ico">
-    <script type="text/javascript" src="/assets/js/push.js"></script> <meta name="description" content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
+    />
+    <title>DC3 Mqtt 驱动模块 | IoT DC3</title>
+    <meta name="description" content=""/>
+    <meta name="generator" content="VuePress 1.9.9"/>
+    <link rel="icon" href="/assets/images/favicon.ico">
+    <script type="text/javascript" src="/assets/js/push.js"></script>
+    <meta name="description"
+          content="DC3是一个基于Spring Cloud的开源的、分布式的物联网(IOT)平台,用于快速开发物联网项目和管理物联设备,是一整套物联系统解决方案。">
     <meta name="referrer" content="never">
-    <meta name="keywords" content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台"> <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style"><link rel="preload" href="/assets/js/app.d87ce824.js" as="script"><link rel="preload" href="/assets/js/2.a8b8915e.js" as="script"><link rel="preload" href="/assets/js/19.6f12b224.js" as="script"><link rel="prefetch" href="/assets/js/10.db658154.js"><link rel="prefetch" href="/assets/js/11.653957ce.js"><link rel="prefetch" href="/assets/js/12.08136beb.js"><link rel="prefetch" href="/assets/js/13.83b3d580.js"><link rel="prefetch" href="/assets/js/14.d5387cec.js"><link rel="prefetch" href="/assets/js/15.aafb2a89.js"><link rel="prefetch" href="/assets/js/16.01fcc650.js"><link rel="prefetch" href="/assets/js/17.a097fd52.js"><link rel="prefetch" href="/assets/js/18.acd93e71.js"><link rel="prefetch" href="/assets/js/20.bac69ff1.js"><link rel="prefetch" href="/assets/js/21.9105165e.js"><link rel="prefetch" href="/assets/js/22.de1f017c.js"><link rel="prefetch" href="/assets/js/23.fb20a8f5.js"><link rel="prefetch" href="/assets/js/24.63ca195a.js"><link rel="prefetch" href="/assets/js/25.3a76708d.js"><link rel="prefetch" href="/assets/js/26.b6254386.js"><link rel="prefetch" href="/assets/js/27.3f127a30.js"><link rel="prefetch" href="/assets/js/28.afadbe5c.js"><link rel="prefetch" href="/assets/js/29.f175dd67.js"><link rel="prefetch" href="/assets/js/3.8e04da2b.js"><link rel="prefetch" href="/assets/js/30.5ba7a495.js"><link rel="prefetch" href="/assets/js/31.01c3d218.js"><link rel="prefetch" href="/assets/js/32.de0e0ff7.js"><link rel="prefetch" href="/assets/js/33.0e117d4a.js"><link rel="prefetch" href="/assets/js/34.010094c5.js"><link rel="prefetch" href="/assets/js/35.8a377a71.js"><link rel="prefetch" href="/assets/js/36.fbb64a47.js"><link rel="prefetch" href="/assets/js/37.c2b9d4da.js"><link rel="prefetch" href="/assets/js/38.a66be625.js"><link rel="prefetch" href="/assets/js/39.76e387bc.js"><link rel="prefetch" href="/assets/js/4.470d098a.js"><link rel="prefetch" href="/assets/js/40.0e9ee726.js"><link rel="prefetch" href="/assets/js/41.e68f3c2e.js"><link rel="prefetch" href="/assets/js/42.ba03ba76.js"><link rel="prefetch" href="/assets/js/43.e6a91a35.js"><link rel="prefetch" href="/assets/js/44.128407ae.js"><link rel="prefetch" href="/assets/js/45.e9f1b4b0.js"><link rel="prefetch" href="/assets/js/46.ab599c67.js"><link rel="prefetch" href="/assets/js/47.dc2d8aff.js"><link rel="prefetch" href="/assets/js/48.06e9c64e.js"><link rel="prefetch" href="/assets/js/49.627cc127.js"><link rel="prefetch" href="/assets/js/5.0f4aedb8.js"><link rel="prefetch" href="/assets/js/50.bf665f72.js"><link rel="prefetch" href="/assets/js/51.08e5dea0.js"><link rel="prefetch" href="/assets/js/52.8e37a9c4.js"><link rel="prefetch" href="/assets/js/53.8c472224.js"><link rel="prefetch" href="/assets/js/54.bb582a52.js"><link rel="prefetch" href="/assets/js/55.640d9ecb.js"><link rel="prefetch" href="/assets/js/56.e2e2a21e.js"><link rel="prefetch" href="/assets/js/57.9b9b26a7.js"><link rel="prefetch" href="/assets/js/58.0d4a46c3.js"><link rel="prefetch" href="/assets/js/59.d1f11d32.js"><link rel="prefetch" href="/assets/js/6.547754b6.js"><link rel="prefetch" href="/assets/js/7.aea1a047.js"><link rel="prefetch" href="/assets/js/8.58207631.js"><link rel="prefetch" href="/assets/js/9.f09083f8.js"> <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
-    </head>
-    <body>
-        <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="ant-row"><div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars"><svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path></svg></i> <span></span></div> <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3" class="logo"> <span class="site-name">IoT DC3</span></a> <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div></div> <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light"><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
-                    首页
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
-                    指南
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/config/">
-                    配置
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-item"><a href="/faq/">
-                    FAQ
-                </a></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="display:none;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>
+    <meta name="keywords"
+          content="iot,dc3,DC3,iotdc3,iot dc3,IOTDC3,IoTDC3,IOT DC3,IoT DC3,物联网,开源,分布式,物联网平台,IOT平台">
+    <link rel="preload" href="/assets/css/0.styles.116dcc83.css" as="style">
+    <link rel="preload" href="/assets/js/app.d87ce824.js" as="script">
+    <link rel="preload" href="/assets/js/2.a8b8915e.js" as="script">
+    <link rel="preload" href="/assets/js/19.6f12b224.js" as="script">
+    <link rel="prefetch" href="/assets/js/10.db658154.js">
+    <link rel="prefetch" href="/assets/js/11.653957ce.js">
+    <link rel="prefetch" href="/assets/js/12.08136beb.js">
+    <link rel="prefetch" href="/assets/js/13.83b3d580.js">
+    <link rel="prefetch" href="/assets/js/14.d5387cec.js">
+    <link rel="prefetch" href="/assets/js/15.aafb2a89.js">
+    <link rel="prefetch" href="/assets/js/16.01fcc650.js">
+    <link rel="prefetch" href="/assets/js/17.a097fd52.js">
+    <link rel="prefetch" href="/assets/js/18.acd93e71.js">
+    <link rel="prefetch" href="/assets/js/20.bac69ff1.js">
+    <link rel="prefetch" href="/assets/js/21.9105165e.js">
+    <link rel="prefetch" href="/assets/js/22.de1f017c.js">
+    <link rel="prefetch" href="/assets/js/23.fb20a8f5.js">
+    <link rel="prefetch" href="/assets/js/24.63ca195a.js">
+    <link rel="prefetch" href="/assets/js/25.3a76708d.js">
+    <link rel="prefetch" href="/assets/js/26.b6254386.js">
+    <link rel="prefetch" href="/assets/js/27.3f127a30.js">
+    <link rel="prefetch" href="/assets/js/28.afadbe5c.js">
+    <link rel="prefetch" href="/assets/js/29.f175dd67.js">
+    <link rel="prefetch" href="/assets/js/3.8e04da2b.js">
+    <link rel="prefetch" href="/assets/js/30.5ba7a495.js">
+    <link rel="prefetch" href="/assets/js/31.01c3d218.js">
+    <link rel="prefetch" href="/assets/js/32.de0e0ff7.js">
+    <link rel="prefetch" href="/assets/js/33.0e117d4a.js">
+    <link rel="prefetch" href="/assets/js/34.010094c5.js">
+    <link rel="prefetch" href="/assets/js/35.8a377a71.js">
+    <link rel="prefetch" href="/assets/js/36.fbb64a47.js">
+    <link rel="prefetch" href="/assets/js/37.c2b9d4da.js">
+    <link rel="prefetch" href="/assets/js/38.a66be625.js">
+    <link rel="prefetch" href="/assets/js/39.76e387bc.js">
+    <link rel="prefetch" href="/assets/js/4.470d098a.js">
+    <link rel="prefetch" href="/assets/js/40.0e9ee726.js">
+    <link rel="prefetch" href="/assets/js/41.e68f3c2e.js">
+    <link rel="prefetch" href="/assets/js/42.ba03ba76.js">
+    <link rel="prefetch" href="/assets/js/43.e6a91a35.js">
+    <link rel="prefetch" href="/assets/js/44.128407ae.js">
+    <link rel="prefetch" href="/assets/js/45.e9f1b4b0.js">
+    <link rel="prefetch" href="/assets/js/46.ab599c67.js">
+    <link rel="prefetch" href="/assets/js/47.dc2d8aff.js">
+    <link rel="prefetch" href="/assets/js/48.06e9c64e.js">
+    <link rel="prefetch" href="/assets/js/49.627cc127.js">
+    <link rel="prefetch" href="/assets/js/5.0f4aedb8.js">
+    <link rel="prefetch" href="/assets/js/50.bf665f72.js">
+    <link rel="prefetch" href="/assets/js/51.08e5dea0.js">
+    <link rel="prefetch" href="/assets/js/52.8e37a9c4.js">
+    <link rel="prefetch" href="/assets/js/53.8c472224.js">
+    <link rel="prefetch" href="/assets/js/54.bb582a52.js">
+    <link rel="prefetch" href="/assets/js/55.640d9ecb.js">
+    <link rel="prefetch" href="/assets/js/56.e2e2a21e.js">
+    <link rel="prefetch" href="/assets/js/57.9b9b26a7.js">
+    <link rel="prefetch" href="/assets/js/58.0d4a46c3.js">
+    <link rel="prefetch" href="/assets/js/59.d1f11d32.js">
+    <link rel="prefetch" href="/assets/js/6.547754b6.js">
+    <link rel="prefetch" href="/assets/js/7.aea1a047.js">
+    <link rel="prefetch" href="/assets/js/8.58207631.js">
+    <link rel="prefetch" href="/assets/js/9.f09083f8.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.116dcc83.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+    <div class="theme-container">
+        <header class="navbar">
+            <div class="ant-row">
+                <div class="nav-button"><i aria-label="icon: bars" class="anticon anticon-bars">
+                    <svg viewBox="0 0 1024 1024" focusable="false" data-icon="bars" width="1em" height="1em"
+                         fill="currentColor" aria-hidden="true">
+                        <path d="M912 192H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 284H328c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h584c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM104 228a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0zm0 284a56 56 0 1 0 112 0 56 56 0 1 0-112 0z"></path>
+                    </svg>
+                </i> <span></span></div>
+                <div class="ant-col ant-col-xs-24 ant-col-sm-24 ant-col-md-6 ant-col-lg-6 ant-col-xl-5 ant-col-xxl-4"><a
+                        href="/" class="router-link-active home-link"><img src="/assets/images/logo.png" alt="IoT DC3"
+                                                                           class="logo"> <span
+                        class="site-name">IoT DC3</span></a>
+                    <div class="search-box mobile-search"><input aria-label="Search" autocomplete="off"
+                                                                 spellcheck="false" value=""> <!----></div>
+                </div>
+                <div class="nav-space-between ant-col ant-col-xs-0 ant-col-sm-0 ant-col-md-18 ant-col-lg-18 ant-col-xl-19 ant-col-xxl-20">
+                    <div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value="">
+                        <!----></div>
+                    <nav class="nav-links can-hide">
+                        <ul role="menu" id="nav" class="ant-menu ant-menu-horizontal ant-menu-root ant-menu-light">
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/" class="router-link-active">
+                                首页
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/docs/" class="router-link-active">
+                                指南
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/config/">
+                                配置
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-item"><a href="/faq/">
+                                FAQ
+                            </a></li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="display:none;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>
                     代码仓库
-                </span><i class="ant-menu-submenu-arrow"></i></div></li><li role="menuitem" class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu" style="visibility:hidden;position:absolute;"><div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i class="ant-menu-submenu-arrow"></i></div></li></ul> <ul class="extra-group"><!----> <!----></ul></nav></div></div> <!----></header> <aside class="sidebar"><!---->  <ul class="sidebar-links"><li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/code/0-environment.html" title="注意事项" class="sidebar-link">注意事项</a></li><li><a href="/docs/code/1-idea-start.html" title="必要软件环境" class="sidebar-link">必要软件环境</a></li><li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建 IoT DC3 Web UI</a></li><li><a href="/docs/code/3-quick-start.html" title="快速启动" class="sidebar-link">快速启动</a></li><li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading open"><span>驱动使用说明</span> <span class="arrow down"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/docs/driver/0-driver.html" title="❗️❗️❗️前置概念❗️❗️❗️" class="sidebar-link">❗️❗️❗️前置概念❗️❗️❗️</a></li><li><a href="/docs/driver/1-mqtt.html" aria-current="page" title="DC3 Mqtt 驱动模块" class="active sidebar-link">DC3 Mqtt 驱动模块</a></li><li><a href="/docs/driver/2-modbus-tcp.html" title="DC3 Modbus Tcp 驱动模块" class="sidebar-link">DC3 Modbus Tcp 驱动模块</a></li><li><a href="/docs/driver/3-opc-da.html" title="DC3 Opc Da 驱动模块" class="sidebar-link">DC3 Opc Da 驱动模块</a></li><li><a href="/docs/driver/4-opc-ua.html" title="DC3 Opc Ua 驱动模块" class="sidebar-link">DC3 Opc Ua 驱动模块</a></li><li><a href="/docs/driver/5-Lwm2m.html" title="Lwm2m &amp; Coap 驱动" class="sidebar-link">Lwm2m &amp; Coap 驱动</a></li><li><a href="/docs/driver/6-dtu-yeecom.html" title="/docs/driver/6-dtu-yeecom.html" class="sidebar-link">/docs/driver/6-dtu-yeecom.html</a></li><li><a href="/docs/driver/7-weather-amap.html" title="/docs/driver/7-weather-amap.html" class="sidebar-link">/docs/driver/7-weather-amap.html</a></li><li><a href="/docs/driver/8-edge-gateway.html" title="/docs/driver/8-edge-gateway.html" class="sidebar-link">/docs/driver/8-edge-gateway.html</a></li><li><a href="/docs/driver/9-listening-virtual.html" title="/docs/driver/9-listening-virtual.html" class="sidebar-link">/docs/driver/9-listening-virtual.html</a></li><li><a href="/docs/driver/10-plcs7.html" title="/docs/driver/10-plcs7.html" class="sidebar-link">/docs/driver/10-plcs7.html</a></li><li><a href="/docs/driver/11-virtual.html" title="/docs/driver/11-virtual.html" class="sidebar-link">/docs/driver/11-virtual.html</a></li></ul></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>集群部署</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><section class="sidebar-group collapsable depth-0"><p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896" focusable="false" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span></p> <!----></section></li><li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a></li><li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li></ul> </aside> <main class="page has-page-anchor"> <div class="theme-dc3-content content__default"><h3 id="dc3-mqtt-驱动模块">DC3 Mqtt 驱动模块 <a href="#dc3-mqtt-驱动模块" class="header-anchor">#</a></h3> <blockquote><p><strong>位置</strong>：iot-dc3\dc3-driver\dc3-driver-mqtt</p> <p><strong>依赖服务</strong>（参考 Idea 开发环境启动即可）：dc3-mysql、dc3-mongo、dc3-redis、dc3-rabbitmq、dc3-center-register、dc3-center-manager、dc3-center-data、dc3-center-auth、dc3-center-gateway、dc3-web</p> <p><strong>开源工具</strong>：Spring Cloud</p> <p><strong>Mqtt</strong>：基于客户端-服务器的消息发布/订阅传输协议。MQTT 协议是轻量、简单、开放和易于实现的，这些特点使它适用范围非常广泛。在很多情况下，包括受限的环境中，如：机器与机器（M2M）通信和物联网（IoT）。其在，通过卫星链路通信传感器、偶尔拨号的医疗设备、智能家居、及一些小型化设备中已广泛使用。</p></blockquote> <h3 id="配置文件">配置文件 <a href="#配置文件" class="header-anchor">#</a></h3> <blockquote><p><strong>位置</strong>：iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\resources\application.yml</p></blockquote> <h4 id="_1-mqtt-服务器连接配置">1. mqtt 服务器连接配置 <a href="#_1-mqtt-服务器连接配置" class="header-anchor">#</a></h4> <blockquote><p><em>mqtt 用于配置连接一个 Mqtt 服务所需要的基本参数</em></p></blockquote> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token key atrule">mqtt</span><span class="token punctuation">:</span>
+                </span><i class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                            <li role="menuitem"
+                                class="ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu"
+                                style="visibility:hidden;position:absolute;">
+                                <div aria-haspopup="true" class="ant-menu-submenu-title"><span>···</span><i
+                                        class="ant-menu-submenu-arrow"></i></div>
+                            </li>
+                        </ul>
+                        <ul class="extra-group"><!----> <!----></ul>
+                    </nav>
+                </div>
+            </div> <!----></header>
+        <aside class="sidebar"><!---->
+            <ul class="sidebar-links">
+                <li><a href="/docs/" aria-current="page" title="简介" class="sidebar-link">简介</a></li>
+                <li>
+                    <section class="sidebar-group depth-0"><p class="sidebar-heading"><span>开发指南</span> <!----></p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/code/0-environment.html" title="注意事项"
+                                   class="sidebar-link">注意事项</a></li>
+                            <li><a href="/docs/code/1-idea-start.html" title="必要软件环境"
+                                   class="sidebar-link">必要软件环境</a></li>
+                            <li><a href="/docs/code/2-web-ui.html" title="构建 IoT DC3 Web UI" class="sidebar-link">构建
+                                IoT DC3 Web UI</a></li>
+                            <li><a href="/docs/code/3-quick-start.html" title="快速启动"
+                                   class="sidebar-link">快速启动</a></li>
+                            <li><a href="/docs/code/4-start.html" title="🚀最佳实践" class="sidebar-link">🚀最佳实践</a>
+                            </li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>操作手册</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>功能说明</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading open"><span>驱动使用说明</span> <span class="arrow down"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p>
+                        <ul class="sidebar-links sidebar-group-items">
+                            <li><a href="/docs/driver/0-driver.html" title="❗️❗️❗️前置概念❗️❗️❗️" class="sidebar-link">❗️❗️❗️前置概念❗️❗️❗️</a>
+                            </li>
+                            <li><a href="/docs/driver/1-mqtt.html" aria-current="page" title="DC3 Mqtt 驱动模块"
+                                   class="active sidebar-link">DC3 Mqtt 驱动模块</a></li>
+                            <li><a href="/docs/driver/2-modbus-tcp.html" title="DC3 Modbus Tcp 驱动模块"
+                                   class="sidebar-link">DC3 Modbus Tcp 驱动模块</a></li>
+                            <li><a href="/docs/driver/3-opc-da.html" title="DC3 Opc Da 驱动模块" class="sidebar-link">DC3
+                                Opc Da 驱动模块</a></li>
+                            <li><a href="/docs/driver/4-opc-ua.html" title="DC3 Opc Ua 驱动模块" class="sidebar-link">DC3
+                                Opc Ua 驱动模块</a></li>
+                            <li><a href="/docs/driver/5-Lwm2m.html" title="Lwm2m &amp; Coap 驱动" class="sidebar-link">Lwm2m
+                                &amp; Coap 驱动</a></li>
+                            <li><a href="/docs/driver/6-dtu-yeecom.html" title="/docs/driver/6-dtu-yeecom.html"
+                                   class="sidebar-link">/docs/driver/6-dtu-yeecom.html</a></li>
+                            <li><a href="/docs/driver/7-weather-amap.html" title="/docs/driver/7-weather-amap.html"
+                                   class="sidebar-link">/docs/driver/7-weather-amap.html</a></li>
+                            <li><a href="/docs/driver/8-edge-gateway.html" title="/docs/driver/8-edge-gateway.html"
+                                   class="sidebar-link">/docs/driver/8-edge-gateway.html</a></li>
+                            <li><a href="/docs/driver/9-listening-virtual.html"
+                                   title="/docs/driver/9-listening-virtual.html" class="sidebar-link">/docs/driver/9-listening-virtual.html</a>
+                            </li>
+                            <li><a href="/docs/driver/10-plcs7.html" title="/docs/driver/10-plcs7.html"
+                                   class="sidebar-link">/docs/driver/10-plcs7.html</a></li>
+                            <li><a href="/docs/driver/11-virtual.html" title="/docs/driver/11-virtual.html"
+                                   class="sidebar-link">/docs/driver/11-virtual.html</a></li>
+                        </ul>
+                    </section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>相关文档</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>集群部署</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li>
+                    <section class="sidebar-group collapsable depth-0">
+                        <p class="sidebar-heading"><span>错误</span> <span class="arrow right"><i
+                                aria-label="icon: down" class="anticon anticon-down"><svg viewBox="64 64 896 896"
+                                                                                          focusable="false"
+                                                                                          data-icon="down" width="1em"
+                                                                                          height="1em"
+                                                                                          fill="currentColor"
+                                                                                          aria-hidden="true"><path
+                                d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></i></span>
+                        </p> <!----></section>
+                </li>
+                <li><a href="/docs/update-log.html" title="更新日志&amp;&amp;开发计划" class="sidebar-link">更新日志&amp;&amp;开发计划</a>
+                </li>
+                <li><a href="/docs/about.html" title="关于项目" class="sidebar-link">关于项目</a></li>
+            </ul>
+        </aside>
+        <main class="page has-page-anchor">
+            <div class="theme-dc3-content content__default"><h3 id="dc3-mqtt-驱动模块">DC3 Mqtt 驱动模块 <a
+                    href="#dc3-mqtt-驱动模块" class="header-anchor">#</a></h3>
+                <blockquote><p><strong>位置</strong>：iot-dc3\dc3-driver\dc3-driver-mqtt</p>
+                    <p><strong>依赖服务</strong>（参考 Idea
+                        开发环境启动即可）：dc3-mysql、dc3-mongo、dc3-redis、dc3-rabbitmq、dc3-center-register、dc3-center-manager、dc3-center-data、dc3-center-auth、dc3-center-gateway、dc3-web
+                    </p>
+                    <p><strong>开源工具</strong>：Spring Cloud</p>
+                    <p><strong>Mqtt</strong>：基于客户端-服务器的消息发布/订阅传输协议。MQTT
+                        协议是轻量、简单、开放和易于实现的，这些特点使它适用范围非常广泛。在很多情况下，包括受限的环境中，如：机器与机器（M2M）通信和物联网（IoT）。其在，通过卫星链路通信传感器、偶尔拨号的医疗设备、智能家居、及一些小型化设备中已广泛使用。
+                    </p></blockquote>
+                <h3 id="配置文件">配置文件 <a href="#配置文件" class="header-anchor">#</a></h3>
+                <blockquote><p><strong>位置</strong>：iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\resources\application.yml
+                </p></blockquote>
+                <h4 id="_1-mqtt-服务器连接配置">1. mqtt 服务器连接配置 <a href="#_1-mqtt-服务器连接配置"
+                                                                          class="header-anchor">#</a></h4>
+                <blockquote><p><em>mqtt 用于配置连接一个 Mqtt 服务所需要的基本参数</em></p></blockquote>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token key atrule">mqtt</span><span
+                        class="token punctuation">:</span>
     <span class="token comment"># 用户名</span>
     <span class="token key atrule">username</span><span class="token punctuation">:</span> dc3
     <span class="token comment"># 密码</span>
     <span class="token key atrule">password</span><span class="token punctuation">:</span> dc3
     <span class="token comment"># Mqtt 服务URL</span>
-    <span class="token key atrule">url</span><span class="token punctuation">:</span> tcp<span class="token punctuation">:</span>//dc3<span class="token punctuation">-</span>rabbitmq<span class="token punctuation">:</span><span class="token number">1883</span>
+    <span class="token key atrule">url</span><span class="token punctuation">:</span> tcp<span
+                            class="token punctuation">:</span>//dc3<span class="token punctuation">-</span>rabbitmq<span
+                            class="token punctuation">:</span><span class="token number">1883</span>
     <span class="token comment"># qos（0,1,2），与下面的 topics 一一对应</span>
     <span class="token key atrule">qos</span><span class="token punctuation">:</span>
         <span class="token punctuation">-</span> <span class="token number">0</span>
@@ -40,44 +318,209 @@
         <span class="token punctuation">-</span> mqtt/group/device/<span class="token comment">#</span>
     <span class="token comment"># 客户端连接标识</span>
     <span class="token key atrule">client</span><span class="token punctuation">:</span>
-        <span class="token key atrule">id</span><span class="token punctuation">:</span> dc3<span class="token punctuation">-</span>mqtt<span class="token punctuation">-</span>client
+        <span class="token key atrule">id</span><span class="token punctuation">:</span> dc3<span
+                            class="token punctuation">-</span>mqtt<span class="token punctuation">-</span>client
     <span class="token comment"># 默认配置，用于调试使用，创建一个 dc3-mqtt-topic 主题</span>
     <span class="token key atrule">default</span><span class="token punctuation">:</span>
-        <span class="token key atrule">topic</span><span class="token punctuation">:</span> dc3<span class="token punctuation">-</span>mqtt<span class="token punctuation">-</span>topic
-        <span class="token key atrule">qos</span><span class="token punctuation">:</span> <span class="token number">1</span>
+        <span class="token key atrule">topic</span><span class="token punctuation">:</span> dc3<span
+                            class="token punctuation">-</span>mqtt<span class="token punctuation">-</span>topic
+        <span class="token key atrule">qos</span><span class="token punctuation">:</span> <span
+                            class="token number">1</span>
         <span class="token comment"># 设置是否接收默认主题发送的数据</span>
         <span class="token key atrule">receive</span><span class="token punctuation">:</span>
-            <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+            <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span
+                            class="token boolean important">true</span>
     <span class="token comment"># 心跳和超时设置</span>
     <span class="token key atrule">keep-alive</span><span class="token punctuation">:</span> <span class="token number">5</span>
-    <span class="token key atrule">completion-timeout</span><span class="token punctuation">:</span> <span class="token number">3000</span>
-</code></pre></div><h4 id="_2-driver-point-attribute">2. driver.point-attribute <a href="#_2-driver-point-attribute" class="header-anchor">#</a></h4> <blockquote><p><em>point-attribute 用于配置读取一个 Mqtt 点位值所需要的基本参数</em></p> <p><strong>读取一个 Mqtt 服务的点位值需要：指令 Topic、指令 Qos，那么 <code>dc3-mqtt</code> 驱动模块此处的 <code>point-attribute</code> 就应该如下:</strong></p></blockquote> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token key atrule">point-attribute</span><span class="token punctuation">:</span>
-    <span class="token punctuation">-</span> <span class="token key atrule">displayName</span><span class="token punctuation">:</span> 指令Topic
+    <span class="token key atrule">completion-timeout</span><span class="token punctuation">:</span> <span
+                            class="token number">3000</span>
+</code></pre>
+                </div>
+                <h4 id="_2-driver-point-attribute">2. driver.point-attribute <a href="#_2-driver-point-attribute"
+                                                                                class="header-anchor">#</a></h4>
+                <blockquote><p><em>point-attribute 用于配置读取一个 Mqtt 点位值所需要的基本参数</em></p>
+                    <p><strong>读取一个 Mqtt 服务的点位值需要：指令 Topic、指令 Qos，那么 <code>dc3-mqtt</code> 驱动模块此处的
+                        <code>point-attribute</code> 就应该如下:</strong></p></blockquote>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token key atrule">point-attribute</span><span
+                        class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">displayName</span><span
+                            class="token punctuation">:</span> 指令Topic
       <span class="token key atrule">name</span><span class="token punctuation">:</span> commandTopic
       <span class="token key atrule">type</span><span class="token punctuation">:</span> string
       <span class="token key atrule">value</span><span class="token punctuation">:</span> commandTopic
       <span class="token key atrule">description</span><span class="token punctuation">:</span> 测点/设备接收下行指令的Mqtt主题
-    <span class="token punctuation">-</span> <span class="token key atrule">displayName</span><span class="token punctuation">:</span> 指令Qos
+    <span class="token punctuation">-</span> <span class="token key atrule">displayName</span><span
+                            class="token punctuation">:</span> 指令Qos
       <span class="token key atrule">name</span><span class="token punctuation">:</span> commandQos
       <span class="token key atrule">type</span><span class="token punctuation">:</span> int
-      <span class="token key atrule">value</span><span class="token punctuation">:</span> <span class="token number">2</span>
+      <span class="token key atrule">value</span><span class="token punctuation">:</span> <span
+                            class="token number">2</span>
       <span class="token key atrule">description</span><span class="token punctuation">:</span> 测点/设备接收下行指令的Mqtt主题的Qos
-</code></pre></div><h4 id="_3-driver-schedule">3. driver.schedule <a href="#_3-driver-schedule" class="header-anchor">#</a></h4> <blockquote><p><em>schedule 用于设置 读 和 自定义方法的调度</em></p> <p><strong>read</strong>：用于配置周期性调用 iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\java\com\dc3\driver\service\impl\CustomDriverServiceImpl.java （read 方法）</p> <p><strong>custom</strong>：用于配置周期性调用 iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\java\com\dc3\driver\service\impl\CustomDriverServiceImpl.java（schedule 方法）</p> <p><strong>enable</strong>：是否启动</p> <p><strong>corn</strong>：corn 表达式，用于设置调度规则</p></blockquote> <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token key atrule">schedule</span><span class="token punctuation">:</span>
+</code></pre>
+                </div>
+                <h4 id="_3-driver-schedule">3. driver.schedule <a href="#_3-driver-schedule" class="header-anchor">#</a>
+                </h4>
+                <blockquote><p><em>schedule 用于设置 读 和 自定义方法的调度</em></p>
+                    <p><strong>read</strong>：用于配置周期性调用
+                        iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\java\com\dc3\driver\service\impl\CustomDriverServiceImpl.java
+                        （read 方法）</p>
+                    <p><strong>custom</strong>：用于配置周期性调用
+                        iot-dc3\dc3-driver\dc3-driver-mqtt\src\main\java\com\dc3\driver\service\impl\CustomDriverServiceImpl.java（schedule
+                        方法）</p>
+                    <p><strong>enable</strong>：是否启动</p>
+                    <p><strong>corn</strong>：corn 表达式，用于设置调度规则</p></blockquote>
+                <div class="language-yaml extra-class"><pre class="language-yaml"><code><span class="token key atrule">schedule</span><span
+                        class="token punctuation">:</span>
     <span class="token key atrule">read</span><span class="token punctuation">:</span>
-        <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+        <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span
+                            class="token boolean important">true</span>
         <span class="token key atrule">corn</span><span class="token punctuation">:</span> <span class="token string">'0/30 * * * * ?'</span>
     <span class="token key atrule">custom</span><span class="token punctuation">:</span>
-        <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span>
+        <span class="token key atrule">enable</span><span class="token punctuation">:</span> <span
+                            class="token boolean important">true</span>
         <span class="token key atrule">corn</span><span class="token punctuation">:</span> <span class="token string">'0/5 * * * * ?'</span>
-</code></pre></div><h3 id="小试牛刀">小试牛刀 <a href="#小试牛刀" class="header-anchor">#</a></h3> <h4 id="_1-启动依赖服务">1. 启动依赖服务 <a href="#_1-启动依赖服务" class="header-anchor">#</a></h4> <ul><li>参考 Idea 开发环境启动 dc3-mysql、dc3-mongo、dc3-redis、dc3-rabbitmq、dc3-center-register、dc3-center-manager、dc3-center-data、dc3-center-auth、dc3-web</li> <li>启动 dc3-driver-mqtt</li></ul> <h4 id="_2-启动-mqtt-调试工具">2. 启动 Mqtt 调试工具 <a href="#_2-启动-mqtt-调试工具" class="header-anchor">#</a></h4> <p>安装并启动 Mqtt.fx 软件</p> <p>下载链接：<a href="https://pan.baidu.com/s/1zcdKpBiYLOdwanqxn-GZWA" target="_blank" rel="noopener noreferrer">百度云盘 Mqtt.fx<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p> <p>验证码：<code>wona</code></p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-2.png" alt=""></p> <h4 id="_3-驱动">3. 驱动 <a href="#_3-驱动" class="header-anchor">#</a></h4> <p>切换到 ''<strong>驱动</strong>&quot; 菜单，当前 <code>Mqtt</code> 启动启动成功，并处于 <strong>在线</strong> 状态</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-3.png" alt=""></p> <h4 id="_4-驱动属性">4. 驱动属性 <a href="#_4-驱动属性" class="header-anchor">#</a></h4> <p>切换到 ''<strong>驱动属性</strong>&quot; 菜单，当前 驱动属性 , Mqtt 模块是没有驱动配置，如图列表为空</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-4.png" alt=""></p> <h4 id="_5-位号属性">5. 位号属性 <a href="#_5-位号属性" class="header-anchor">#</a></h4> <p>切换到 “<strong>位号属性</strong>” 菜单，当前 位号属性 列表如下</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-5.png" alt=""></p> <h4 id="_6-模板">6. 模板 <a href="#_6-模板" class="header-anchor">#</a></h4> <p>切换到 “<strong>模板</strong>” 菜单，新建一个 <code>私有</code> 的 <code>MqttProfile</code> 模板，如下</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-6.png" alt=""></p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-7.png" alt=""></p> <h4 id="_7-位号">7. 位号 <a href="#_7-位号" class="header-anchor">#</a></h4> <p>切换到 “<strong>位号</strong>” 菜单，为刚刚新建的 <code>模板</code> 配置待读取的 位号，这里以一个 <code>Integer</code> 类型的为例，如下</p> <blockquote><p>同时也需要在 Mqtt.fx 软件中设置一下</p></blockquote> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-8.png" alt=""></p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-9.png" alt=""></p> <h4 id="_8-分组">8. 分组 <a href="#_8-分组" class="header-anchor">#</a></h4> <p>切换到 “<strong>分组</strong>” 菜单，新建一个设备分组，如下</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-10.png" alt=""></p> <h4 id="_9-设备">9. 设备 <a href="#_9-设备" class="header-anchor">#</a></h4> <p>切换到 “<strong>设备</strong>” 菜单，在刚刚新建的分组下，新建一个设备，如下</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-11.png" alt=""></p> <h4 id="_10-位号配置">10. 位号配置 <a href="#_10-位号配置" class="header-anchor">#</a></h4> <blockquote><p>提示：如果不需要控制设备，该位号配置可以不用配置</p></blockquote> <p>切换到 “<strong>位号配置</strong>” 菜单，为新建的 <code>设备</code> ，配置 <code>位号</code> 的的 <strong>属性值</strong>，从而是 <code>dc3-mqtt</code> 模块能下发控制指令到 <code>Mqtt.fx</code> 软件，如下</p> <ul><li><strong>指令 Topic</strong>：用于向设备发送控制指令的 topic，例如： <code>dc3/mqtt/commad/device_1</code></li></ul> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-12.png" alt=""></p> <ul><li><strong>指令 Qos</strong>：用于向设备发送控制指令的 topic 的 qos，例如：0</li></ul> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-13.png" alt=""></p> <ul><li>以上的 命名空间和位号均配置完之后，列表如下</li></ul> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-14.png" alt=""></p> <h4 id="_11-mqtt-fx-设置">11. Mqtt.fx 设置 <a href="#_11-mqtt-fx-设置" class="header-anchor">#</a></h4> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-15.png" alt=""> <img src="/assets/images/dc3/driver/mqtt/mqtt-16.png" alt=""> <img src="/assets/images/dc3/driver/mqtt/mqtt-17.png" alt=""> <img src="/assets/images/dc3/driver/mqtt/mqtt-18.png" alt=""></p> <h4 id="_12-数据">12. 数据 <a href="#_12-数据" class="header-anchor">#</a></h4> <p>切换到 “数据” 菜单，在 <code>Mqtt.fx</code> 中 publish 就会采集到一条数据</p> <p><strong>发送数据：</strong></p> <blockquote><p><strong>Public Topic</strong> 填写 <code>driver/dc3-driver-mqtt_default/device/设备ID</code></p> <p>请务必替换设备 ID 和位号 ID，点击设备标题和位号标题能获取到对应的ID。</p></blockquote> <div class="language-json extra-class"><pre class="language-json"><code><span class="token punctuation">{</span>
-    <span class="token property">&quot;payload&quot;</span><span class="token operator">:</span> <span class="token string">&quot;{ \&quot;deviceId\&quot;: 1633872950490894337, \&quot;pointId\&quot;: 1633872856706256897, \&quot;value\&quot;: 1212 }&quot;</span>
+</code></pre>
+                </div>
+                <h3 id="小试牛刀">小试牛刀 <a href="#小试牛刀" class="header-anchor">#</a></h3> <h4
+                        id="_1-启动依赖服务">1. 启动依赖服务 <a href="#_1-启动依赖服务" class="header-anchor">#</a></h4>
+                <ul>
+                    <li>参考 Idea 开发环境启动
+                        dc3-mysql、dc3-mongo、dc3-redis、dc3-rabbitmq、dc3-center-register、dc3-center-manager、dc3-center-data、dc3-center-auth、dc3-web
+                    </li>
+                    <li>启动 dc3-driver-mqtt</li>
+                </ul>
+                <h4 id="_2-启动-mqtt-调试工具">2. 启动 Mqtt 调试工具 <a href="#_2-启动-mqtt-调试工具"
+                                                                        class="header-anchor">#</a></h4>
+                <p>安装并启动 Mqtt.fx 软件</p>
+                <p>下载链接：<a href="https://pan.baidu.com/s/1zcdKpBiYLOdwanqxn-GZWA" target="_blank"
+                               rel="noopener noreferrer">百度云盘 Mqtt.fx<span><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    aria-hidden="true" focusable="false"
+                                                                                    x="0px" y="0px"
+                                                                                    viewBox="0 0 100 100" width="15"
+                                                                                    height="15" class="icon outbound"><path
+                        fill="currentColor"
+                        d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon
+                        fill="currentColor"
+                        points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span
+                        class="sr-only">(opens new window)</span></span></a></p>
+                <p>验证码：<code>wona</code></p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-2.png" alt=""></p> <h4 id="_3-驱动">3. 驱动 <a
+                        href="#_3-驱动" class="header-anchor">#</a></h4>
+                <p>切换到 ''<strong>驱动</strong>&quot; 菜单，当前 <code>Mqtt</code> 启动启动成功，并处于
+                    <strong>在线</strong> 状态</p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-3.png" alt=""></p> <h4 id="_4-驱动属性">4. 驱动属性 <a
+                        href="#_4-驱动属性" class="header-anchor">#</a></h4>
+                <p>切换到 ''<strong>驱动属性</strong>&quot; 菜单，当前 驱动属性 , Mqtt 模块是没有驱动配置，如图列表为空
+                </p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-4.png" alt=""></p> <h4 id="_5-位号属性">5. 位号属性 <a
+                        href="#_5-位号属性" class="header-anchor">#</a></h4>
+                <p>切换到 “<strong>位号属性</strong>” 菜单，当前 位号属性 列表如下</p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-5.png" alt=""></p> <h4 id="_6-模板">6. 模板 <a
+                        href="#_6-模板" class="header-anchor">#</a></h4>
+                <p>切换到 “<strong>模板</strong>” 菜单，新建一个 <code>私有</code> 的 <code>MqttProfile</code> 模板，如下
+                </p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-6.png" alt=""></p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-7.png" alt=""></p> <h4 id="_7-位号">7. 位号 <a
+                        href="#_7-位号" class="header-anchor">#</a></h4>
+                <p>切换到 “<strong>位号</strong>” 菜单，为刚刚新建的 <code>模板</code> 配置待读取的 位号，这里以一个
+                    <code>Integer</code> 类型的为例，如下</p>
+                <blockquote><p>同时也需要在 Mqtt.fx 软件中设置一下</p></blockquote>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-8.png" alt=""></p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-9.png" alt=""></p> <h4 id="_8-分组">8. 分组 <a
+                        href="#_8-分组" class="header-anchor">#</a></h4>
+                <p>切换到 “<strong>分组</strong>” 菜单，新建一个设备分组，如下</p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-10.png" alt=""></p> <h4 id="_9-设备">9. 设备 <a
+                        href="#_9-设备" class="header-anchor">#</a></h4>
+                <p>切换到 “<strong>设备</strong>” 菜单，在刚刚新建的分组下，新建一个设备，如下</p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-11.png" alt=""></p> <h4 id="_10-位号配置">10. 位号配置
+                    <a href="#_10-位号配置" class="header-anchor">#</a></h4>
+                <blockquote><p>提示：如果不需要控制设备，该位号配置可以不用配置</p></blockquote>
+                <p>切换到 “<strong>位号配置</strong>” 菜单，为新建的 <code>设备</code> ，配置 <code>位号</code> 的的
+                    <strong>属性值</strong>，从而是 <code>dc3-mqtt</code> 模块能下发控制指令到 <code>Mqtt.fx</code> 软件，如下
+                </p>
+                <ul>
+                    <li><strong>指令 Topic</strong>：用于向设备发送控制指令的 topic，例如：
+                        <code>dc3/mqtt/commad/device_1</code></li>
+                </ul>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-12.png" alt=""></p>
+                <ul>
+                    <li><strong>指令 Qos</strong>：用于向设备发送控制指令的 topic 的 qos，例如：0</li>
+                </ul>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-13.png" alt=""></p>
+                <ul>
+                    <li>以上的 命名空间和位号均配置完之后，列表如下</li>
+                </ul>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-14.png" alt=""></p> <h4 id="_11-mqtt-fx-设置">11.
+                    Mqtt.fx 设置 <a href="#_11-mqtt-fx-设置" class="header-anchor">#</a></h4>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-15.png" alt=""> <img
+                        src="/assets/images/dc3/driver/mqtt/mqtt-16.png" alt=""> <img
+                        src="/assets/images/dc3/driver/mqtt/mqtt-17.png" alt=""> <img
+                        src="/assets/images/dc3/driver/mqtt/mqtt-18.png" alt=""></p> <h4 id="_12-数据">12. 数据 <a
+                        href="#_12-数据" class="header-anchor">#</a></h4>
+                <p>切换到 “数据” 菜单，在 <code>Mqtt.fx</code> 中 publish 就会采集到一条数据</p>
+                <p><strong>发送数据：</strong></p>
+                <blockquote><p><strong>Public Topic</strong> 填写
+                    <code>driver/dc3-driver-mqtt_default/device/设备ID</code></p>
+                    <p>请务必替换设备 ID 和位号 ID，点击设备标题和位号标题能获取到对应的ID。</p></blockquote>
+                <div class="language-json extra-class"><pre class="language-json"><code><span class="token punctuation">{</span>
+    <span class="token property">&quot;payload&quot;</span><span class="token operator">:</span> <span
+                            class="token string">&quot;{ \&quot;deviceId\&quot;: 1633872950490894337, \&quot;pointId\&quot;: 1633872856706256897, \&quot;value\&quot;: 1212 }&quot;</span>
 <span class="token punctuation">}</span>
-</code></pre></div><p><img src="/assets/images/dc3/driver/mqtt/mqtt-19.png" alt=""> <img src="/assets/images/dc3/driver/mqtt/mqtt-20.png" alt=""></p> <h4 id="_13-下发控制指令到设备">13. 下发控制指令到设备 <a href="#_13-下发控制指令到设备" class="header-anchor">#</a></h4> <p><code>Mqtt.fx</code> 配置如下：</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-21.png" alt=""></p> <p>使用 接口调用指令下发，向设备端写入数据</p> <p>请注意，设备 ID（deviceId）和位号 ID（pointId），如实际数据库中的数据为准，以下为例子：</p> <p><img src="/assets/images/dc3/driver/mqtt/mqtt-22.png" alt=""> <img src="/assets/images/dc3/driver/mqtt/mqtt-23.png" alt=""></p> <p>在 <code>Mqtt.fx</code> 中收到发送过来的控制指令，如图：
-<img src="/assets/images/dc3/driver/mqtt/mqtt-24.png" alt=""></p></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新:</span> <span class="time">2023/4/12 下午5:00:18</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev"><a href="/docs/driver/0-driver.html" class="prev"><i aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
+</code></pre>
+                </div>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-19.png" alt=""> <img
+                        src="/assets/images/dc3/driver/mqtt/mqtt-20.png" alt=""></p> <h4 id="_13-下发控制指令到设备">13.
+                    下发控制指令到设备 <a href="#_13-下发控制指令到设备" class="header-anchor">#</a></h4>
+                <p><code>Mqtt.fx</code> 配置如下：</p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-21.png" alt=""></p>
+                <p>使用 接口调用指令下发，向设备端写入数据</p>
+                <p>请注意，设备 ID（deviceId）和位号 ID（pointId），如实际数据库中的数据为准，以下为例子：</p>
+                <p><img src="/assets/images/dc3/driver/mqtt/mqtt-22.png" alt=""> <img
+                        src="/assets/images/dc3/driver/mqtt/mqtt-23.png" alt=""></p>
+                <p>在 <code>Mqtt.fx</code> 中收到发送过来的控制指令，如图：
+                    <img src="/assets/images/dc3/driver/mqtt/mqtt-24.png" alt=""></p></div>
+            <footer class="page-edit"><!---->
+                <div class="last-updated"><span class="prefix">上次更新:</span> <span
+                        class="time">2023/4/12 下午5:00:18</span></div>
+            </footer>
+            <div class="page-nav">
+                <p class="inner"><span class="prev"><a href="/docs/driver/0-driver.html" class="prev"><i
+                        aria-label="icon: left" class="anticon anticon-left"><svg viewBox="64 64 896 896"
+                                                                                  focusable="false" data-icon="left"
+                                                                                  width="1em" height="1em"
+                                                                                  fill="currentColor"
+                                                                                  aria-hidden="true"><path
+                        d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></i>
                 ❗️❗️❗️前置概念❗️❗️❗️
             </a></span> <span class="next"><a href="/docs/driver/2-modbus-tcp.html">
                 DC3 Modbus Tcp 驱动模块
-                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span></p></div> <div class="page-anchor"><div class="ant-space ant-space-vertical" style="width:100%;"><div class="ant-space-item"><div class="page-anchor-offset"><div><div class="ant-anchor-wrapper" style="max-height:100vh;"><div class="ant-anchor"><div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div></div></div></div></div></div></div></div> </main> <!----></div><div class="global-ui"></div></div>
-        <script src="/assets/js/app.d87ce824.js" defer></script><script src="/assets/js/2.a8b8915e.js" defer></script><script src="/assets/js/19.6f12b224.js" defer></script>
-    </body>
+                <i aria-label="icon: right" class="anticon anticon-right"><svg viewBox="64 64 896 896" focusable="false"
+                                                                               data-icon="right" width="1em"
+                                                                               height="1em" fill="currentColor"
+                                                                               aria-hidden="true"><path
+                        d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i></a></span>
+                </p>
+            </div>
+            <div class="page-anchor">
+                <div class="ant-space ant-space-vertical" style="width:100%;">
+                    <div class="ant-space-item">
+                        <div class="page-anchor-offset">
+                            <div>
+                                <div class="ant-anchor-wrapper" style="max-height:100vh;">
+                                    <div class="ant-anchor">
+                                        <div class="ant-anchor-ink"><span class="ant-anchor-ink-ball"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main> <!----></div>
+    <div class="global-ui"></div>
+</div>
+<script src="/assets/js/app.d87ce824.js" defer></script>
+<script src="/assets/js/2.a8b8915e.js" defer></script>
+<script src="/assets/js/19.6f12b224.js" defer></script>
+</body>
 </html>
