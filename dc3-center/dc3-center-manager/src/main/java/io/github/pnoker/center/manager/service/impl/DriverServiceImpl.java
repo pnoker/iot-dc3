@@ -31,7 +31,7 @@ import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Driver;
 import lombok.extern.slf4j.Slf4j;
@@ -96,12 +96,9 @@ public class DriverServiceImpl implements DriverService {
     public void update(Driver entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        if (driverMapper.updateById(entityDO) > 0) {
-            Driver select = driverMapper.selectById(entityDO.getId());
-            entityDO.setServiceName(select.getServiceName());
-            entityDO.setServiceHost(select.getServiceHost());
+        if (driverMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The driver update failed");
         }
-        throw new ServiceException("The driver update failed");
     }
 
     /**

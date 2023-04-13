@@ -32,7 +32,7 @@ import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.model.PointAttributeConfig;
@@ -115,14 +115,16 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
                 // nothing to do
             }
         }
-        if (pointAttributeConfigMapper.updateById(entityDO) > 0) {
-            PointAttributeConfig select = pointAttributeConfigMapper.selectById(entityDO.getId());
-            entityDO.setPointAttributeId(select.getPointAttributeId());
-            entityDO.setDeviceId(select.getDeviceId());
-            entityDO.setPointId(select.getPointId());
-            notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, select);
+
+        if (pointAttributeConfigMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The point attribute config update failed");
         }
-        throw new ServiceException("The point attribute config update failed");
+
+        PointAttributeConfig select = pointAttributeConfigMapper.selectById(entityDO.getId());
+        entityDO.setPointAttributeId(select.getPointAttributeId());
+        entityDO.setDeviceId(select.getDeviceId());
+        entityDO.setPointId(select.getPointId());
+        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, select);
     }
 
     /**

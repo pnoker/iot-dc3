@@ -32,10 +32,7 @@ import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -100,11 +97,12 @@ public class ProfileServiceImpl implements ProfileService {
     public void update(Profile entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        if (profileMapper.updateById(entityDO) > 0) {
-            Profile update = profileMapper.selectById(entityDO.getId());
-            notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, update);
+        if (profileMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The profile update failed");
         }
-        throw new ServiceException("The profile update failed");
+
+        Profile update = profileMapper.selectById(entityDO.getId());
+        notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, update);
     }
 
     @Override

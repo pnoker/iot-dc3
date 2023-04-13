@@ -29,10 +29,7 @@ import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.DriverAttributeConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -108,13 +105,15 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
                 // nothing to do
             }
         }
-        if (driverAttributeConfigMapper.updateById(entityDO) > 0) {
-            DriverAttributeConfig select = driverAttributeConfigMapper.selectById(entityDO.getId());
-            entityDO.setDriverAttributeId(select.getDriverAttributeId());
-            entityDO.setDeviceId(select.getDeviceId());
-            notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, select);
+
+        if (driverAttributeConfigMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The driver attribute config update failed");
         }
-        throw new ServiceException("The driver attribute config update failed");
+
+        DriverAttributeConfig select = driverAttributeConfigMapper.selectById(entityDO.getId());
+        entityDO.setDriverAttributeId(select.getDriverAttributeId());
+        entityDO.setDeviceId(select.getDeviceId());
+        notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, select);
     }
 
     /**

@@ -29,7 +29,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.BlackIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,11 +75,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     public void update(BlackIp entityDO) {
         entityDO.setIp(null);
         entityDO.setOperateTime(null);
-        if (blackIpMapper.updateById(entityDO) > 0) {
-            BlackIp select = blackIpMapper.selectById(entityDO.getId());
-            entityDO.setIp(select.getIp());
-        } else {
-            throw new ServiceException("The ip update failed in the blacklist");
+        if (blackIpMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The ip update failed in the blacklist");
         }
     }
 

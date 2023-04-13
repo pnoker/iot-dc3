@@ -28,10 +28,7 @@ import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.ImportException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.*;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PoiUtil;
@@ -151,14 +148,16 @@ public class DeviceServiceImpl implements DeviceService {
         delete.forEach(profileId -> profileBindService.deleteByDeviceIdAndProfileId(entityDO.getId(), profileId));
 
         entityDO.setOperateTime(null);
-        if (deviceMapper.updateById(entityDO) > 0) {
-            Device select = deviceMapper.selectById(entityDO.getId());
-            select.setProfileIds(newProfileIds);
-            entityDO.setDeviceName(select.getDeviceName());
-            // 通知驱动更新设备
-            notifyService.notifyDriverDevice(MetadataCommandTypeEnum.UPDATE, select);
+
+        if (deviceMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The device update failed");
         }
-        throw new ServiceException("The device update failed");
+
+        Device select = deviceMapper.selectById(entityDO.getId());
+        select.setProfileIds(newProfileIds);
+        entityDO.setDeviceName(select.getDeviceName());
+        // 通知驱动更新设备
+        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.UPDATE, select);
     }
 
     /**

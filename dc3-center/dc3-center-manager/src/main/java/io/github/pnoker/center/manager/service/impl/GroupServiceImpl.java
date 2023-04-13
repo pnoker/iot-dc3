@@ -28,7 +28,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,11 +84,9 @@ public class GroupServiceImpl implements GroupService {
     public void update(Group entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        if (groupMapper.updateById(entityDO) > 0) {
-            Group select = groupMapper.selectById(entityDO.getId());
-            entityDO.setGroupName(select.getGroupName());
+        if (groupMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The group update failed");
         }
-        throw new ServiceException("The group update failed");
     }
 
     /**

@@ -77,16 +77,13 @@ public class UserLoginServiceImpl implements UserLoginService {
     public void update(UserLogin entityDO) {
         UserLogin selectById = selectById(entityDO.getId());
         if (ObjectUtil.isNull(selectById)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The user login does not exist");
         }
         entityDO.setLoginName(null);
         entityDO.setOperateTime(null);
-        if (userLoginMapper.updateById(entityDO) > 0) {
-            UserLogin select = userLoginMapper.selectById(entityDO.getId());
-            entityDO.setLoginName(select.getLoginName());
-            return;
+        if (userLoginMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The user login update failed");
         }
-        throw new ServiceException("The user update failed");
     }
 
     @Override

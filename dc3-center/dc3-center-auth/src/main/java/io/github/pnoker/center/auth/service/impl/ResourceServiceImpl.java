@@ -12,6 +12,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class ResourceServiceImpl implements ResourceService {
     public void update(Resource entityDo) {
         selectById(entityDo.getId());
         if (resourceMapper.updateById(entityDo) < 1) {
-            throw new ServiceException("The resource update failed");
+            throw new UpdateException("The resource update failed");
         }
     }
 
