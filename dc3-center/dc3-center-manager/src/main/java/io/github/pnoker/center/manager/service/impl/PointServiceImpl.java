@@ -88,6 +88,10 @@ public class PointServiceImpl implements PointService {
     @Override
     public void delete(String id) {
         Point point = selectById(id);
+        if (ObjectUtil.isNull(point)) {
+            throw new NotFoundException("The point does not exist");
+        }
+
         boolean delete = pointMapper.deleteById(id) > 0;
         if (delete) {
             notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, point);

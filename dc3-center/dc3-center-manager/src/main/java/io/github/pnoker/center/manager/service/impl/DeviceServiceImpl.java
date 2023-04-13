@@ -110,9 +110,18 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void delete(String id) {
         Device device = selectById(id);
-        profileBindService.deleteByDeviceId(id);
+        if (ObjectUtil.isNull(device)) {
+            throw new NotFoundException("The device does not exist");
+        }
+
+        Boolean deleteBind = profileBindService.deleteByDeviceId(id);
+        if (!deleteBind) {
+            return;
+        }
+
         boolean delete = deviceMapper.deleteById(id) > 0;
         if (delete) {
             // 通知驱动删除设备

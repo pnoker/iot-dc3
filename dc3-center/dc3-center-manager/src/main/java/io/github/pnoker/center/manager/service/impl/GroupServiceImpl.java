@@ -69,7 +69,11 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public void delete(String id) {
-        selectById(id);
+        Group group = selectById(id);
+        if (ObjectUtil.isNull(group)) {
+            throw new NotFoundException("The group does not exist");
+        }
+
         groupMapper.deleteById(id);
     }
 

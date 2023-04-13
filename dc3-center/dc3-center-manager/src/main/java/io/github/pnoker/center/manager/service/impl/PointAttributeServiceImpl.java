@@ -69,7 +69,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     @Override
     public void delete(String id) {
-        selectById(id);
+        PointAttribute pointAttribute = selectById(id);
+        if (ObjectUtil.isNull(pointAttribute)) {
+            throw new NotFoundException("The point attribute does not exist");
+        }
+
         pointAttributeMapper.deleteById(id);
     }
 

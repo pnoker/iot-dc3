@@ -62,7 +62,11 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     @Override
     public void delete(String id) {
-        selectById(id);
+        LabelBind labelBind = selectById(id);
+        if (ObjectUtil.isNull(labelBind)) {
+            throw new NotFoundException("The label bind does not exist");
+        }
+
         labelBindMapper.deleteById(id);
     }
 

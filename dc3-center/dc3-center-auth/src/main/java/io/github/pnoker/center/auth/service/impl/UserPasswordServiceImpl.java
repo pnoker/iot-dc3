@@ -64,8 +64,9 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     public void delete(String id) {
         UserPassword userPassword = selectById(id);
         if (ObjectUtil.isNull(userPassword)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The user password does not exist");
         }
+
         userPasswordMapper.deleteById(id);
     }
 

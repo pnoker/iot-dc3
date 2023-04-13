@@ -83,8 +83,9 @@ public class UserServiceImpl implements UserService {
     public void delete(String id) {
         User user = selectById(id);
         if (ObjectUtil.isNull(user)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The user does not exist");
         }
+
         userMapper.deleteById(id);
     }
 

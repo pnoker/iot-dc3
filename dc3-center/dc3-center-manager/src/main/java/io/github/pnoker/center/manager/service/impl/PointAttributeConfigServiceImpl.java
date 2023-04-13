@@ -90,6 +90,10 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     @Override
     public void delete(String id) {
         PointAttributeConfig pointAttributeConfig = selectById(id);
+        if (ObjectUtil.isNull(pointAttributeConfig)) {
+            throw new NotFoundException("The point attribute config does not exist");
+        }
+
         boolean delete = pointAttributeConfigMapper.deleteById(id) > 0;
         if (delete) {
             notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfig);
