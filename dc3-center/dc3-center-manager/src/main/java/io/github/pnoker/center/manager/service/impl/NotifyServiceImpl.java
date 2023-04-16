@@ -144,7 +144,7 @@ public class NotifyServiceImpl implements NotifyService {
     /**
      * notify driver
      *
-     * @param entityDO    Driver
+     * @param entityDO  Driver
      * @param entityDTO DriverMetadataDTO
      */
     private void notifyDriver(DriverDO entityDO, DriverMetadataDTO entityDTO) {

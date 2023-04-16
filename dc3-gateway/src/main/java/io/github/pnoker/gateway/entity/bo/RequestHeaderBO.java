@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.gateway.entity.bean;
+package io.github.pnoker.gateway.entity.bo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Request Token Header
+ * Request Header BO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenRequestHeader {
+public class RequestHeaderBO {
     private String salt;
     private String token;
 }

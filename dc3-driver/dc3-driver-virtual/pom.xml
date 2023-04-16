@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2023.2.3</version>
+        <version>2023.4.0</version>
     </parent>
 
     <artifactId>dc3-driver-virtual</artifactId>
