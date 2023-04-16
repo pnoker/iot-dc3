@@ -18,10 +18,11 @@ version: '3'
 
 services:
   web:
-    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:2023.2.3.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:demo
+    restart: always
     ports:
-      - '8080:80'
+      - 80:80
+      - 443:443
     container_name: dc3-web
     hostname: dc3-web
     volumes:
@@ -32,8 +33,13 @@ services:
           - dc3-web
 
   gateway:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2023.2.3.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:demo
+    restart: always
+    environment:
+      - EUREKA_HOST=dc3-center-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -49,8 +55,14 @@ services:
           - dc3-gateway
 
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.9.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:demo
+    restart: always
+    environment:
+      - EUREKA_DASHBOARD_PATH=/
+      - EUREKA_HOST=dc3-center-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-center-register
     hostname: dc3-center-register
     volumes:
@@ -66,8 +78,21 @@ services:
           - dc3-center-register
 
   auth:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2023.2.3.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:demo
+    restart: always
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=dc3
+      - REDIS_HOST=dc3-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=dc3
+      - CACHE_REDIS_TIME_TO_LIVE=6H
+      - EUREKA_HOST=dc3-center-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -83,8 +108,32 @@ services:
           - dc3-center-auth
 
   manager:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2023.2.3.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:demo
+    restart: always
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=dc3
+      - REDIS_HOST=dc3-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=dc3
+      - MONGO_HOST=dc3-mongo
+      - MONGO_PORT=27017
+      - MONGO_DATABASE=dc3
+      - MONGO_AUTH_TYPE=password
+      - MONGO_USERNAME=dc3
+      - MONGO_PASSWORD=dc3
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - CACHE_REDIS_TIME_TO_LIVE=6H
+      - EUREKA_HOST=dc3-center-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -100,8 +149,32 @@ services:
           - dc3-center-manager
 
   data:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2023.2.3.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:demo
+    restart: always
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=dc3
+      - REDIS_HOST=dc3-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=dc3
+      - MONGO_HOST=dc3-mongo
+      - MONGO_PORT=27017
+      - MONGO_DATABASE=dc3
+      - MONGO_AUTH_TYPE=password
+      - MONGO_USERNAME=dc3
+      - MONGO_PASSWORD=dc3
+      - RABBITMQ_VIRTUAL_HOST=dc3
+      - RABBITMQ_HOST=dc3-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=dc3
+      - RABBITMQ_PASSWORD=dc3
+      - CACHE_REDIS_TIME_TO_LIVE=6H
+      - EUREKA_HOST=dc3-center-register
+      - EUREKA_PORT=8100
+      - SECURITY_USER_NAME=dc3
+      - SECURITY_USER_PASSWORD=dc3
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -117,8 +190,8 @@ services:
           - dc3-center-data
 
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.2.2.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:demo
+    restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=dc3
     container_name: dc3-mysql
@@ -136,8 +209,8 @@ services:
           - dc3-mysql
 
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.2.2.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:demo
+    restart: always
     container_name: dc3-mongo
     hostname: dc3-mongo
     volumes:
@@ -154,8 +227,8 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.2.2.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:demo
+    restart: always
     container_name: dc3-redis
     hostname: dc3-redis
     volumes:
@@ -171,8 +244,8 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.2.2.demo
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:demo
+    restart: always
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
     volumes:
@@ -198,5 +271,5 @@ volumes:
 
 networks:
   dc3demonet:
-    driver: bridge
+    driver: 'bridge'
 ...
