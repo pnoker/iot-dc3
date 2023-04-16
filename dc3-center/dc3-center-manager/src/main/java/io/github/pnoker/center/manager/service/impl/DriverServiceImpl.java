@@ -27,7 +27,6 @@ import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.DriverDO;
@@ -116,9 +115,22 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public DriverDO selectByDeviceId(String deviceId) {
-        Device device = deviceService.selectById(deviceId);
-        return selectById(device.getDriverId());
+    public Page<DriverDO> list(DriverPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
+        }
+        return driverMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DriverDO> selectByIds(Set<String> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return driverMapper.selectBatchIds(ids);
     }
 
     /**
@@ -131,40 +143,10 @@ public class DriverServiceImpl implements DriverService {
         queryWrapper.eq(DriverDO::getTenantId, tenantId);
         queryWrapper.last("limit 1");
         DriverDO entityDO = driverMapper.selectOne(queryWrapper);
-        if (throwException) {
-            if (ObjectUtil.isNull(entityDO)) {
-                throw new NotFoundException();
-            }
+        if (throwException && (ObjectUtil.isNull(entityDO))) {
+            throw new NotFoundException("The driver does not exist of service name: {} for tenant: {}", serviceName, tenantId);
         }
         return entityDO;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DriverDO selectByHostPort(DriverTypeFlagEnum type, String host, Integer port, String tenantId) {
-        LambdaQueryWrapper<DriverDO> queryWrapper = Wrappers.<DriverDO>query().lambda();
-        queryWrapper.eq(DriverDO::getDriverTypeFlag, type);
-        queryWrapper.eq(DriverDO::getServiceHost, host);
-        queryWrapper.eq(DriverDO::getTenantId, tenantId);
-        queryWrapper.last("limit 1");
-        DriverDO entityDO = driverMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException();
-        }
-        return entityDO;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<DriverDO> selectByIds(Set<String> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return driverMapper.selectBatchIds(ids);
     }
 
     /**
@@ -185,11 +167,9 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverDO> list(DriverPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
-        }
-        return driverMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+    public DriverDO selectByDeviceId(String deviceId) {
+        Device device = deviceService.selectById(deviceId);
+        return selectById(device.getDriverId());
     }
 
     /**

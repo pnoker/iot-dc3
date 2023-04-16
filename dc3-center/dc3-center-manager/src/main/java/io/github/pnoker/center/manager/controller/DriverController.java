@@ -24,7 +24,6 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -57,7 +56,7 @@ public class DriverController {
     /**
      * 新增 Driver
      *
-     * @param entityDO   Driver
+     * @param entityDO Driver
      * @param tenantId 租户ID
      * @return Driver
      */
@@ -91,7 +90,7 @@ public class DriverController {
     /**
      * 修改 Driver
      *
-     * @param entityDO   Driver
+     * @param entityDO Driver
      * @param tenantId 租户ID
      * @return Driver
      */
@@ -150,30 +149,7 @@ public class DriverController {
     public R<DriverDO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName,
                                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
-            DriverDO select = driverService.selectByServiceName(serviceName, tenantId);
-            return R.ok(select);
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-    }
-
-    /**
-     * 根据 TYPE 、 HOST 、 PORT 查询 Driver
-     *
-     * @param type     Driver type
-     * @param host     Driver Host
-     * @param port     Driver Port
-     * @param tenantId 租户ID
-     * @return Driver
-     */
-    @GetMapping("/type/{type}/host/{host}/port/{port}")
-    public R<DriverDO> selectByHostPort(@NotNull @PathVariable(value = "type") String type,
-                                        @NotNull @PathVariable(value = "host") String host,
-                                        @NotNull @PathVariable(value = "port") Integer port,
-                                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
-        try {
-            DriverTypeFlagEnum typeEnum = DriverTypeFlagEnum.ofCode(type);
-            DriverDO select = driverService.selectByHostPort(typeEnum, host, port, tenantId);
+            DriverDO select = driverService.selectByServiceName(serviceName, tenantId, true);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
