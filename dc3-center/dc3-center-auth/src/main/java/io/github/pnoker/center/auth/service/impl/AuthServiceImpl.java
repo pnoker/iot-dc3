@@ -4,23 +4,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.service.*;
-import io.github.pnoker.center.auth.utils.UserRedisUtil;
-import io.github.pnoker.common.constant.cache.TimeoutConstant;
-import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.entity.auth.Login;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.utils.AuthUtil;
 import io.github.pnoker.common.utils.DecodeUtil;
-import io.github.pnoker.common.utils.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -51,9 +46,6 @@ public class AuthServiceImpl implements AuthService {
     @Resource
     private RoleResourceBindService roleResourceBindService;
 
-    @Resource
-    private UserRedisUtil userRedisUtil;
-
     @Override
     public UserLogin authenticateUser(Login login) {
         Tenant tenant = tenantService.selectByCode(login.getTenant());
@@ -74,15 +66,19 @@ public class AuthServiceImpl implements AuthService {
         }
 
         UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
-        String redisSaltKey = userRedisUtil.getKey(SuffixConstant.SALT, login.getName(), tenant.getId());
-        String redisSaltValue = userRedisUtil.getValue(redisSaltKey);
-        String decodePassword = DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue);
-        if (CharSequenceUtil.isNotEmpty(redisSaltValue) && redisSaltValue.equals(login.getSalt())
-                && decodePassword.equals(login.getPassword())) {
-            //generate token
-            String token = KeyUtil.generateToken(login.getName(), redisSaltValue, tenant.getId());
-            String redisTokenKey = userRedisUtil.getKey(SuffixConstant.TOKEN, login.getName(), tenant.getId());
-            userRedisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+        if (ObjectUtil.isNull(userPassword)){
+            throw new NotFoundException("密码不存在，请先设置密码");
+        }
+
+        String saltValue = AuthUtil.getPasswordSalt(tenant.getId(), login.getName());
+        if (CharSequenceUtil.isEmpty(saltValue)){
+            throw new NotFoundException("密码盐不存在，请重新登录");
+        }
+
+        String decodedPassword = DecodeUtil.md5(userPassword.getLoginPassword() + saltValue);
+        if (saltValue.equals(login.getSalt()) && decodedPassword.equals(login.getPassword())) {
+            //create and save token
+            String token = AuthUtil.createToken(tenant.getId(), login.getName(), saltValue);
             login.setToken(token);
             return userLogin;
         }
@@ -92,24 +88,29 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(Login login) {
+    public AuthUser login(Login login) {
         //1. authenticate user
         UserLogin userLogin = authenticateUser(login);
         if (ObjectUtil.isNull(userLogin)) {
             throw new ServiceException("认证失败！请重试");
         }
 
-        //2. save roles
+        //2. save AuthUser
+        AuthUser authUser = new AuthUser();
+        authUser.setUserId(userLogin.getUserId());
+        authUser.setUserName(userLogin.getLoginName());
         Tenant tenant = tenantService.selectByCode(login.getTenant());
+        authUser.setTenantId(tenant.getId());
+
+        //2.1 roles
         List<Role> roles = roleUserBindService.listRoleByTenantIdAndUserId(tenant.getId(), userLogin.getUserId());
         if (CollUtil.isEmpty(roles)) {
             throw new ServiceException("请先为用户{}分配角色", login.getName());
         }
         Set<String> roleCodeSet = roles.stream().map(Role::getRoleCode).collect(Collectors.toSet());
-        String redisRoleKey = userRedisUtil.getKey(SuffixConstant.ROLE, login.getName(), tenant.getId());
-        userRedisUtil.setSetValue(redisRoleKey, roleCodeSet, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+        authUser.setRoleCodeSet(roleCodeSet);
 
-        //3. save resources
+        //2.2 resources
         Set<io.github.pnoker.common.model.Resource> resourceSet = new HashSet<>();
         for (Role role : roles) {
             List<io.github.pnoker.common.model.Resource> resources = roleResourceBindService.listResourceByRoleId(role.getId());
@@ -119,9 +120,14 @@ public class AuthServiceImpl implements AuthService {
             throw new ServiceException("请先为用户{}分配权限", login.getName());
         }
         Set<String> resourceCodeSet = resourceSet.stream().map(io.github.pnoker.common.model.Resource::getResourceCode).collect(Collectors.toSet());
-        String redisResourceKey = userRedisUtil.getKey(SuffixConstant.RESOURCE, login.getName(), tenant.getId());
-        userRedisUtil.setSetValue(redisResourceKey, resourceCodeSet, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+        authUser.setResourceCodeSet(resourceCodeSet);
 
-        return login.getToken();
+        AuthUtil.saveTokenToAuthUserMap(login.getToken(), authUser);
+        return authUser;
+    }
+
+    @Override
+    public void logout() {
+        AuthUtil.logout();
     }
 }
