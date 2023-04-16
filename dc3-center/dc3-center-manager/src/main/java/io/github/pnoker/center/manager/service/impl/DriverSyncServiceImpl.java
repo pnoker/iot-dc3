@@ -28,8 +28,8 @@ import io.github.pnoker.common.dto.DriverSyncUpDTO;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.model.DriverAttribute;
+import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
 
     @Override
     public void up(DriverSyncUpDTO entityDTO) {
-        if (ObjectUtil.isNull(entityDTO) || ObjectUtil.isNull(entityDTO.getDriverDO())) {
+        if (ObjectUtil.isNull(entityDTO) || ObjectUtil.isNull(entityDTO.getDriver())) {
             return;
         }
 
@@ -109,11 +109,11 @@ public class DriverSyncServiceImpl implements DriverSyncService {
         }
 
         // register driver
-        DriverDO entityDO = entityDTO.getDriverDO();
+        DriverDO entityDO = entityDTO.getDriver();
         entityDO.setTenantId(rTenantDTO.getData().getBase().getId());
         log.info("Register driver {}", entityDO);
         try {
-            DriverDO byServiceName = driverService.selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId());
+            DriverDO byServiceName = driverService.selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId(), true);
             log.debug("Driver already registered, updating {} ", entityDO);
             entityDO.setId(byServiceName.getId());
             driverService.update(entityDO);
@@ -128,7 +128,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * 注册驱动属性
      *
      * @param driverSyncUpDTO DriverSyncUpDTO
-     * @param entityDO          Driver
+     * @param entityDO        Driver
      */
     private void registerDriverAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverDO entityDO) {
         Map<String, DriverAttribute> newDriverAttributeMap = new HashMap<>(8);
@@ -176,7 +176,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * 注册位号属性
      *
      * @param driverSyncUpDTO DriverSyncUpDTO
-     * @param entityDO          Driver
+     * @param entityDO        Driver
      */
     private void registerPointAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverDO entityDO) {
         Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);

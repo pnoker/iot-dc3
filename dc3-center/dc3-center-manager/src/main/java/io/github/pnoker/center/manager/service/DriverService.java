@@ -18,7 +18,6 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.model.DriverDO;
 
 import java.util.List;
@@ -33,6 +32,14 @@ import java.util.Set;
 public interface DriverService extends Service<DriverDO, DriverPageQuery> {
 
     /**
+     * 根据 驱动Id集 查询 驱动集
+     *
+     * @param ids Driver ID Array
+     * @return Driver Array
+     */
+    List<DriverDO> selectByIds(Set<String> ids);
+
+    /**
      * 根据 驱动ServiceName 查询 驱动
      *
      * @param serviceName    驱动服务名称
@@ -43,15 +50,12 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
     DriverDO selectByServiceName(String serviceName, String tenantId, boolean throwException);
 
     /**
-     * 根据 驱动 Host 、 Port 查询 驱动
+     * 根据 模版Id 查询 驱动集
      *
-     * @param type     Driver Type
-     * @param host     Driver Service Host
-     * @param port     Driver Service Port
-     * @param tenantId 租户ID
-     * @return Driver
+     * @param profileId Profile ID
+     * @return Driver Array
      */
-    DriverDO selectByHostPort(DriverTypeFlagEnum type, String host, Integer port, String tenantId);
+    List<DriverDO> selectByProfileId(String profileId);
 
     /**
      * 根据 驱动Id 查询 驱动
@@ -60,21 +64,5 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
      * @return Driver
      */
     DriverDO selectByDeviceId(String deviceId);
-
-    /**
-     * 根据 驱动Id集 查询 驱动集
-     *
-     * @param ids Driver ID Array
-     * @return Driver Array
-     */
-    List<DriverDO> selectByIds(Set<String> ids);
-
-    /**
-     * 根据 模版Id 查询 驱动集
-     *
-     * @param profileId Profile ID
-     * @return Driver Array
-     */
-    List<DriverDO> selectByProfileId(String profileId);
 
 }
