@@ -1,6 +1,7 @@
 package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.common.entity.auth.Login;
+import io.github.pnoker.common.model.AuthUser;
 import io.github.pnoker.common.model.UserLogin;
 
 /**
@@ -23,7 +24,12 @@ public interface AuthService {
      * 用户登录
      *
      * @param login 登录参数
-     * @return token
+     * @return AuthUser
      */
-    String login(Login login);
+    AuthUser login(Login login);
+
+    /**
+     * 当前用户退出登录
+     */
+    void logout();
 }
