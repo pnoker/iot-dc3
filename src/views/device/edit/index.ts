@@ -369,20 +369,20 @@ export default defineComponent({
 
                         driverInfo.id
                             ? updateDriverInfo(driverInfo)
-                                  .then((res) => loadFormData(res))
+                                  .then((res) => loadFormData(driverInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
                             : addDriverInfo(driverInfo)
-                                  .then((res) => loadFormData(res))
+                                  .then((res) => loadFormData(driverInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
 
                         function loadFormData(res) {
                             driverFormData[attribute.attributeName] = {
-                                id: res.data.data.id,
-                                configValue: res.data.data.configValue,
+                                id: res.id,
+                                configValue: res.configValue,
                             }
                             reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData))
                         }
@@ -406,12 +406,12 @@ export default defineComponent({
 
                         pointInfo.id
                             ? updatePointInfo(pointInfo)
-                                  .then((res) => loadFormData(res))
+                                  .then((res) => loadFormData(pointInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
                             : addPointInfo(pointInfo)
-                                  .then((res) => loadFormData(res))
+                                  .then((res) => loadFormData(pointInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
@@ -420,8 +420,8 @@ export default defineComponent({
                             reactiveData.pointInfoData.forEach((pointInfo) => {
                                 if (pointInfo.id === reactiveData.pointFormData.id) {
                                     pointInfo[attribute.attributeName] = {
-                                        id: res.data.data.id,
-                                        configValue: res.data.data.configValue,
+                                        id: res.id,
+                                        configValue: res.configValue,
                                     }
                                     reactiveData.oldPointFormData = JSON.parse(JSON.stringify(pointInfo))
                                 }
