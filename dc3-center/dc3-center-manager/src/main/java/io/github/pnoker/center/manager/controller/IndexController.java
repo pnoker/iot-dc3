@@ -35,7 +35,7 @@ import java.util.Date;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = ManagerServiceConstant.INDEX_URL_PREFIX)
+//@RequestMapping(value = ManagerServiceConstant.INDEX_URL_PREFIX)
 public class IndexController {
 
     /**
@@ -43,9 +43,9 @@ public class IndexController {
      *
      * @return DataTime
      */
-    @GetMapping("/ping")
+    /*@GetMapping("/ping")
     public R<String> ping() {
         return R.ok(TimeUtil.defaultFormat(new Date()));
-    }
+    }*/
 
 }
