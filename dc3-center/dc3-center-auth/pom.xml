@@ -52,7 +52,6 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-auth</artifactId>
-            <version>2023.4.0</version>
         </dependency>
 
     </dependencies>
