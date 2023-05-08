@@ -42,7 +42,7 @@ cd iot-dc3-web
 yarn
 
 # run
-yarn run serve:dev
+yarn run serve
 ```
 
 ---
