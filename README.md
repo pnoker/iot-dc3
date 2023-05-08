@@ -8,7 +8,7 @@
 
 ## 一、准备
 
-- `nodejs` >= 12
+- `nodejs` >= 12，推荐使用 14、16
 - `git`
 - `Web Storm` 或者 `Visual Studio Code`
 
@@ -42,7 +42,7 @@ cd iot-dc3-web
 yarn
 
 # run
-yarn run serve
+yarn serve
 ```
 
 ---
