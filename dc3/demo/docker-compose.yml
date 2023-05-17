@@ -60,34 +60,6 @@ services:
         aliases:
           - dc3-gateway
 
-  register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.4.0.demo
-    restart: always
-    environment:
-      - PREFER_HOST_MODE=hostname
-      - MODE=standalone
-      - SPRING_DATASOURCE_PLATFORM=mysql
-      - JVM_XMS=512m
-      - JVM_XMX=512m
-      - JVM_XMN=256m
-      - JVM_MS=128m
-      - JVM_MMS=256m
-    container_name: dc3-demo-center-register
-    hostname: dc3-center-register
-    depends_on:
-      - mysql
-    volumes:
-      - demo_logs:/dc3-center/dc3-center-register/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3demonet:
-        aliases:
-          - dc3-center-register
-
   auth:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2023.4.0.demo
     restart: always
@@ -186,6 +158,34 @@ services:
       dc3demonet:
         aliases:
           - dc3-driver-virtual
+
+  register:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.4.0.demo
+    restart: always
+    environment:
+      - PREFER_HOST_MODE=hostname
+      - MODE=standalone
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - JVM_XMN=256m
+      - JVM_MS=128m
+      - JVM_MMS=256m
+    container_name: dc3-demo-center-register
+    hostname: dc3-center-register
+    depends_on:
+      - mysql
+    volumes:
+      - demo_logs:/dc3-center/dc3-center-register/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3demonet:
+        aliases:
+          - dc3-center-register
 
   mysql:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.4.0.demo
