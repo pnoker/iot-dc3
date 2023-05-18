@@ -12,6 +12,7 @@ import io.github.pnoker.common.utils.AuthUtil;
 import io.github.pnoker.common.utils.DecodeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
@@ -66,12 +67,12 @@ public class AuthServiceImpl implements AuthService {
         }
 
         UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
-        if (ObjectUtil.isNull(userPassword)){
+        if (ObjectUtil.isNull(userPassword)) {
             throw new NotFoundException("密码不存在，请先设置密码");
         }
 
         String saltValue = AuthUtil.getPasswordSalt(tenant.getId(), login.getName());
-        if (CharSequenceUtil.isEmpty(saltValue)){
+        if (CharSequenceUtil.isEmpty(saltValue)) {
             throw new NotFoundException("密码盐不存在，请重新登录");
         }
 

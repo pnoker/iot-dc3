@@ -24,6 +24,7 @@ import io.github.pnoker.common.model.Point;
 import io.github.pnoker.driver.sdk.DriverContext;
 import io.github.pnoker.driver.sdk.service.DriverCustomService;
 import io.github.pnoker.driver.sdk.service.DriverSenderService;
+import io.github.pnoker.driver.service.MqttSendService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +46,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverSenderService driverSenderService;
 
-    /*@Resource
-    private MqttSendService mqttSendService;*/
+    @Resource
+    private MqttSendService mqttSendService;
 
     @Override
     public void initial() {
@@ -96,9 +97,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         String value = values.getValue();
         try {
             int commandQos = attribute(pointInfo, "commandQos");
-            //mqttSendService.sendToMqtt(commandTopic, commandQos, value);
+            mqttSendService.sendToMqtt(commandTopic, commandQos, value);
         } catch (Exception e) {
-            //mqttSendService.sendToMqtt(commandTopic, value);
+            mqttSendService.sendToMqtt(commandTopic, value);
         }
         return true;
     }
