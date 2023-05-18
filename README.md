@@ -11,6 +11,10 @@
 <strong>DC3 是基于 Spring Cloud 的开源可分布式物联网 (IOT) 平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。</strong>
 </p>
 
+🎉 亲爱的用户，感谢您使用我们的项目，点个 Star (opens new window)，为我们的项目加油助力吧！
+
+我们一直在努力开发和维护这个项目，以确保它能够为您提供更好的体验和价值。 您的点赞助力将是对我们的最大鼓励和支持。 这也将使我们更有动力，不断完善和改进我们的项目，以更好地服务于您和更广大的用户群体。 再次感谢您的支持和信任，我们期待着您的反馈和建议！
+
 ---
 
 # 1 DC3 架构设计
@@ -76,11 +80,11 @@
 
 # 7 开源贡献
 
-- 从 `main` 分支 `checkout` 一个新分支（**注**：请务必保证 `main` 代码是最新的）
-- 新分支命名格式：`feature/username/description`，例如：`feature/pnoker/mqtt_driver`
-- 在新分支上编辑文档、代码，并提交代码
-- 提交 `PR` 合并到 `develop` 分支，等待作者合并即可
-- 合并通过后我们会添加你的 UserID 到 [鸣谢](https://doc.dc3.site/contributor)
+-   从 `main` 分支 `checkout` 一个新分支（**注**：请务必保证 `main` 代码是最新的）
+-   新分支命名格式：`feature/username/description`，例如：`feature/pnoker/mqtt_driver`
+-   在新分支上编辑文档、代码，并提交代码
+-   提交 `PR` 合并到 `develop` 分支，等待作者合并即可
+-   合并通过后我们会添加你的 UserID 到 [鸣谢](https://doc.dc3.site/contributor)
 
 # 8 开源协议
 
