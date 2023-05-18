@@ -56,7 +56,7 @@
 > 我们由衷的感谢所有正在使用、即将使用、研究学习和支持 DC3 的用户！我们将开足马力，继续迭代动能，为广大用户提供更好的开源产品。
 >
 >
-我们愿意倾听您的声音，在这里（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6I15G) | [Github](https://github.com/pnoker/iot-dc3/issues/60)
+我们愿意倾听您的声音，在这里（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6I15G)
 > ），您可以登记相关信息, 不限于：使用场景、建议、公司等更多信息。
 > 仅展示已授权名称，排名不分先后。
 
@@ -64,14 +64,14 @@
 
 # 5 讨论区
 
-我们正在使用讨论作为与我们社区其他成员联系的地方。您可以在（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6IKAL) | [Github](https://github.com/pnoker/iot-dc3/discussions)
-）下方发表你的评论，告诉大家你要讨论的问题、关于 DC3 好的发展建议、一些奇思妙想 🚀🛸🚤！
+我们正在使用讨论作为与我们社区其他成员联系的地方。您可以在（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6IKAL)
+下方发表你的评论，告诉大家你要讨论的问题、关于 DC3 好的发展建议、一些奇思妙想 🚀🛸🚤！
 
 # 6 协助计划
 
 如果你在使用或者部署过程遇到任何问题，请在 QQ 群讨论或者联系作者微信。
 
-🌟 请记住我们不收费，如果你觉得很不错，请点个 [Start](https://gitee.com/pnoker/iot-dc3/star) 吧！🌟
+🌟 请记住我们不收费，代码完全开源，如果你觉得很不错，请点个 Start 鼓励我们吧！🌟
 
 ![Our users](dc3/images/social.png)
 
