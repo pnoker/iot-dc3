@@ -16,15 +16,8 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.utils.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
 
 /**
  * Index Controller

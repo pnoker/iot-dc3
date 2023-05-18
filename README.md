@@ -55,7 +55,8 @@
 
 > 我们由衷的感谢所有正在使用、即将使用、研究学习和支持 DC3 的用户！我们将开足马力，继续迭代动能，为广大用户提供更好的开源产品。
 >
-> 我们愿意倾听您的声音，在这里（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6I15G) | [Github](https://github.com/pnoker/iot-dc3/issues/60)
+>
+我们愿意倾听您的声音，在这里（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6I15G) | [Github](https://github.com/pnoker/iot-dc3/issues/60)
 > ），您可以登记相关信息, 不限于：使用场景、建议、公司等更多信息。
 > 仅展示已授权名称，排名不分先后。
 
@@ -76,12 +77,13 @@
 
 # 7 开源贡献
 
--   从 `main` 分支 `checkout` 一个新分支（**注**：请务必保证 `main` 代码是最新的）
--   新分支命名格式：`feature/username/description`，例如：`feature/pnoker/mqtt_driver`
--   在新分支上编辑文档、代码，并提交代码
--   提交 `PR` 合并到 `develop` 分支，等待作者合并即可
--   合并通过后我们会添加你的 UserID 到 [鸣谢](https://doc.dc3.site/contributor)
+- 从 `main` 分支 `checkout` 一个新分支（**注**：请务必保证 `main` 代码是最新的）
+- 新分支命名格式：`feature/username/description`，例如：`feature/pnoker/mqtt_driver`
+- 在新分支上编辑文档、代码，并提交代码
+- 提交 `PR` 合并到 `develop` 分支，等待作者合并即可
+- 合并通过后我们会添加你的 UserID 到 [鸣谢](https://doc.dc3.site/contributor)
 
 # 8 开源协议
 
-`IOT DC3` 开源平台遵循 [Apache 2.0 协议](https://www.apache.org/licenses/LICENSE-2.0.html)。 允许商业使用，但务必保留类作者、Copyright 信息。
+`IOT DC3` 开源平台遵循 [Apache 2.0 协议](https://www.apache.org/licenses/LICENSE-2.0.html)。 允许商业使用，但务必保留类作者、Copyright
+信息。
