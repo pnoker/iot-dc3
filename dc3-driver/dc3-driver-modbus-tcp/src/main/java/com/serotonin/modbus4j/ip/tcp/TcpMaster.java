@@ -63,9 +63,9 @@ public class TcpMaster extends ModbusMaster {
     /**
      * <p>Constructor for TcpMaster.</p>
      *
-     * @param params
-     * @param keepAlive
-     * @param autoIncrementTransactionId
+     * @param params                     a {@link IpParameters} object.
+     * @param keepAlive                  a boolean.
+     * @param autoIncrementTransactionId a boolean.
      * @param validateResponse           - confirm that requested slave id is the same in the response
      * @param lingerTime                 The setting only affects socket close.
      */
@@ -81,9 +81,9 @@ public class TcpMaster extends ModbusMaster {
      * <p>
      * Default to lingerTime disabled
      *
-     * @param params
-     * @param keepAlive
-     * @param autoIncrementTransactionId
+     * @param params                     a {@link IpParameters} object.
+     * @param keepAlive                  a boolean.
+     * @param autoIncrementTransactionId a boolean.
      * @param validateResponse           - confirm that requested slave id is the same in the response
      */
     public TcpMaster(IpParameters params, boolean keepAlive, boolean autoIncrementTransactionId, boolean validateResponse) {
