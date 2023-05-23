@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -79,7 +78,7 @@ public class PointValueReceiver {
                 PointValueScheduleJob.addPointValues(pointValue);
                 PointValueScheduleJob.valueLock.writeLock().unlock();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
