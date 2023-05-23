@@ -85,25 +85,25 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
         group.forEach((deviceId, values) -> {
             // 保存批量数据到 Redis & Mongo
-            savePointValuesToRepository(deviceId, pointValues, redisRepositoryService, mongoRepositoryService);
+            savePointValuesToRepository(deviceId, values, redisRepositoryService, mongoRepositoryService);
 
             // 保存批量数据到 Influxdb
             if (Boolean.TRUE.equals(enableInfluxdb)) {
                 // nothing to do
                 RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
-                savePointValuesToRepository(deviceId, pointValues, repositoryService);
+                savePointValuesToRepository(deviceId, values, repositoryService);
             }
 
             // 保存批量数据到 Opentsdb
             if (Boolean.TRUE.equals(enableOpentsdb)) {
                 RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_OPENTSDB);
-                savePointValuesToRepository(deviceId, pointValues, repositoryService);
+                savePointValuesToRepository(deviceId, values, repositoryService);
             }
 
             // 保存批量数据到 Elasticsearch
             if (Boolean.TRUE.equals(enableElasticsearch)) {
                 RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH);
-                savePointValuesToRepository(deviceId, pointValues, repositoryService);
+                savePointValuesToRepository(deviceId, values, repositoryService);
             }
         });
     }
