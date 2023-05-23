@@ -82,8 +82,8 @@ public class TcpListener extends ModbusMaster {
     /**
      * Control to validate response to ensure that slaveId == response slaveId
      *
-     * @param params
-     * @param validateResponse
+     * @param params           a {@link IpParameters} object.
+     * @param validateResponse a boolean.
      */
     public TcpListener(IpParameters params, boolean validateResponse) {
         LOG.debug("Creating TcpListener in port " + params.getPort());
