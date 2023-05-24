@@ -123,7 +123,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         OpcUaClient opcUaClient = connectMap.get(deviceId);
         if (ObjectUtil.isNull(opcUaClient)) {
             String host = attribute(driverInfo, "host");
-            String port = attribute(driverInfo, "port");
+            int port = attribute(driverInfo, "port");
             String path = attribute(driverInfo, "path");
             String url = String.format("opc.tcp://%s:%s%s", host, port, path);
             try {
