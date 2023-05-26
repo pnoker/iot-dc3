@@ -20,6 +20,8 @@ driver:
   code: WeatherAMapDriver
   type: DRIVER
   remark: @project.description@
+  custom:
+    key: 04ddc2146bc32a4847b7ca6b6dfb1324
   schedule:
     # 定时读数据
     read:
