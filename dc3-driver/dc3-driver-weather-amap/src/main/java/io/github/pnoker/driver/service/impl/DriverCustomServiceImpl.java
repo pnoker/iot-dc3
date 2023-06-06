@@ -31,6 +31,7 @@ import io.github.pnoker.driver.sdk.DriverContext;
 import io.github.pnoker.driver.sdk.service.DriverCustomService;
 import io.github.pnoker.driver.sdk.service.DriverSenderService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -56,6 +57,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private DriverContext driverContext;
     @Resource
     private DriverSenderService driverSenderService;
+    @Value("${driver.custom.key}")
+    private String key;
 
     @Override
     public void initial() {
@@ -107,7 +110,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequest(String city) {
         try {
-            URL url = new URL(CharSequenceUtil.format("https://restapi.amap.com/v3/weather/weatherInfo?key=04ddc2146bc32a4847b7ca6b6dfb1324&city={}", city));
+            URL url = new URL(CharSequenceUtil.format("https://restapi.amap.com/v3/weather/weatherInfo?key={}&city={}", key, city));
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
