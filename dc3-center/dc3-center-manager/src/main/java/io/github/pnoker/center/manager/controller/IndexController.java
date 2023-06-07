@@ -16,8 +16,16 @@
 
 package io.github.pnoker.center.manager.controller;
 
+import io.github.pnoker.center.manager.service.IndexService;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.dto.DataStatisticsDTO;
+import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * Index Controller
@@ -27,8 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-//@RequestMapping(value = ManagerServiceConstant.INDEX_URL_PREFIX)
+@RequestMapping(value = ManagerServiceConstant.INDEX_URL_PREFIX)
 public class IndexController {
+
+    @Resource
+    IndexService indexService;
 
     /**
      * ping
@@ -39,5 +50,13 @@ public class IndexController {
     public R<String> ping() {
         return R.ok(TimeUtil.defaultFormat(new Date()));
     }*/
+
+    /**
+     * 数据统计
+     */
+    @GetMapping("statistics")
+    public R<DataStatisticsDTO> statistics() {
+        return R.ok(indexService.dataStatistics());
+    }
 
 }

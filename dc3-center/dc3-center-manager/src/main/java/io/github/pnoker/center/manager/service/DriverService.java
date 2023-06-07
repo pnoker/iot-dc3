@@ -65,4 +65,5 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
      */
     DriverDO selectByDeviceId(String deviceId);
 
+    Long count();
 }

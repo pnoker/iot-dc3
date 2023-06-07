@@ -58,4 +58,5 @@ public interface ProfileService extends Service<Profile, ProfilePageQuery> {
      */
     List<Profile> selectByDeviceId(String deviceId);
 
+    Long count();
 }

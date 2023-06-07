@@ -26,6 +26,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
+import io.github.pnoker.common.constant.driver.StorageConstant;
+import io.github.pnoker.common.entity.base.Base;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
@@ -40,6 +42,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,6 +86,8 @@ public class DeviceServiceImpl implements DeviceService {
     private ProfileBindService profileBindService;
     @Resource
     private NotifyService notifyService;
+    @Resource
+    private MongoTemplate mongoTemplate;
 
     /**
      * {@inheritDoc}
@@ -314,6 +319,19 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 生成设备导入模板
         return generateTemplate(workbook);
+    }
+
+    @Override
+    public Long count() {
+        return deviceMapper.selectCount(new QueryWrapper<>());
+    }
+
+    @Override
+    public Long dataCount() {
+        return deviceMapper.selectList(new LambdaQueryWrapper<>()).stream()
+                .map(Base::getId)
+                .mapToLong(deviceId -> mongoTemplate.getCollection(StorageConstant.POINT_VALUE_PREFIX + deviceId).countDocuments())
+                .sum();
     }
 
     /**

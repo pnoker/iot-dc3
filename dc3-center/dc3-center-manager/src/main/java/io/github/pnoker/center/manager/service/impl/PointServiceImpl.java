@@ -227,6 +227,11 @@ public class PointServiceImpl implements PointService {
         return points.stream().collect(Collectors.toMap(Point::getId, Point::getUnit));
     }
 
+    @Override
+    public Long count() {
+        return pointMapper.selectCount(new QueryWrapper<>());
+    }
+
     private LambdaQueryWrapper<Point> fuzzyQuery(PointPageQuery query) {
         LambdaQueryWrapper<Point> queryWrapper = Wrappers.<Point>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
