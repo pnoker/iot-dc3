@@ -81,4 +81,8 @@ public interface DeviceService extends Service<Device, DevicePageQuery> {
      * @return File Path
      */
     Path generateImportTemplate(Device device);
+
+    Long count();
+
+    Long dataCount();
 }

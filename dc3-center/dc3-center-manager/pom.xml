@@ -60,6 +60,12 @@
             <artifactId>dc3-common-redis</artifactId>
         </dependency>
 
+        <!-- DC3 Common Mongo -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mongo</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

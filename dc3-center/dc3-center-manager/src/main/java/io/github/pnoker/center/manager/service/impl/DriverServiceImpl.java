@@ -20,6 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
@@ -170,6 +171,11 @@ public class DriverServiceImpl implements DriverService {
     public DriverDO selectByDeviceId(String deviceId) {
         Device device = deviceService.selectById(deviceId);
         return selectById(device.getDriverId());
+    }
+
+    @Override
+    public Long count() {
+        return driverMapper.selectCount(new QueryWrapper<>());
     }
 
     /**

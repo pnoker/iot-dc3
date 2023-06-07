@@ -81,4 +81,6 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @return Map Long:Unit String
      */
     Map<String, String> unit(Set<String> pointIds);
+
+    Long count();
 }

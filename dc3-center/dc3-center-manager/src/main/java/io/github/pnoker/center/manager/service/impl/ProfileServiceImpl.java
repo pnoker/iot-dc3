@@ -148,6 +148,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    public Long count() {
+        return profileMapper.selectCount(new QueryWrapper<>());
+    }
+
+    @Override
     public Page<Profile> list(ProfilePageQuery queryDTO) {
         if (ObjectUtil.isNull(queryDTO.getPage())) {
             queryDTO.setPage(new Pages());
