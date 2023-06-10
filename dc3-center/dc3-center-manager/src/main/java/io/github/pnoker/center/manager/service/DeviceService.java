@@ -85,4 +85,6 @@ public interface DeviceService extends Service<Device, DevicePageQuery> {
     Long count();
 
     Long dataCount();
+
+    List<Device> selectAllByDriverId(String id, String tenantId);
 }

@@ -30,6 +30,12 @@ driver:
     custom:
       enable: true
       corn: '0/5 * * * * ?'
+  driver-attribute:
+    - display-name: 坐标
+      attribute-name: location
+      attribute-type-flag: STRING
+      default-value: 116.40,39.91
+      remark: location
   point-attribute:
     - display-name: 城市编号
       attribute-name: city

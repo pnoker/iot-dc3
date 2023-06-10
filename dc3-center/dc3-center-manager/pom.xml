@@ -42,6 +42,13 @@
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
+        <!-- DC3 Api Data -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-data</artifactId>
+        </dependency>
+
+
         <!-- DC3 Common RabbitMQ -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

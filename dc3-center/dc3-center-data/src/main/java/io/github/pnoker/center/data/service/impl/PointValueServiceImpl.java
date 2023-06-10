@@ -20,6 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.data.PointValueQuery;
 import io.github.pnoker.api.center.manager.PagePointQueryDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.center.manager.PointDTO;
@@ -160,6 +161,12 @@ public class PointValueServiceImpl implements PointValueService {
         List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class, collection);
         pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);
         return pointValuePage;
+    }
+
+    @Override
+    public PointValue latest(PointValueQuery request) {
+        final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + request.getDeviceId() + SymbolConstant.DOT;
+        return redisUtil.getKey(prefix + request.getPointId());
     }
 
     /**
