@@ -19,9 +19,17 @@ import { RouteRecordRaw } from 'vue-router'
 const Layout = () => import('@/components/layout/Layout.vue')
 const routes: RouteRecordRaw = {
     path: '/',
-    redirect: '/driver',
+    redirect: '/home',
     component: Layout,
     children: [
+        {
+            name: 'home',
+            path: '/home',
+            meta: {
+                title: '首页',
+            },
+            component: () => import('@/views/home/Home.vue'),
+        },
         {
             name: 'driver',
             path: '/driver',

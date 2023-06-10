@@ -21,12 +21,25 @@ import * as echarts from 'echarts'
 import TitleCard from '@/components/card/title/TitleCard.vue'
 import ApplicationCard from '@/views/application/card/ApplicationCard.vue'
 import DashboardCard from '@/views/dashboard/card/DashboardCard.vue'
+import {
+    ArrowRight,
+    CaretBottom,
+    CaretTop,
+    Warning,
+} from '@element-plus/icons-vue'
+import { getStatisticsData,getWeatherDeviceList } from '@/api/index'
+import AMapLoader from '@amap/amap-jsapi-loader';
+import { shallowRef } from '@vue/reactivity'
 
 export default defineComponent({
     components: {
         TitleCard,
         ApplicationCard,
         DashboardCard,
+        ArrowRight,
+        CaretBottom,
+        CaretTop,
+        Warning,
     },
     setup() {
         const countDataChartRef = ref<HTMLElement>()
@@ -285,11 +298,69 @@ export default defineComponent({
                 ],
             }
             chart.setOption(option)
+            initMap()
         })
+
+        const statisticData = reactive({
+            driverCount: 0,
+            profileCount: 0,
+            pointCount: 0,
+            deviceCount: 0,
+            dataCount: 0
+        })
+
+        getStatisticsData().then((res)=>{
+            const data = res.data.data
+            statisticData.dataCount = data.dataCount;
+            statisticData.driverCount = data.driverCount;
+            statisticData.profileCount = data.profileCount;
+            statisticData.deviceCount = data.deviceCount;
+            statisticData.pointCount = data.pointCount;
+        })
+        
+        const map = shallowRef(null);
+        const initMap = () =>{
+            AMapLoader.load({
+                key:"549d63580619bd27f70ebcebb85461d8",             // 申请好的Web端开发者Key，首次调用 load 时必填
+                version:"2.0",      // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+                plugins:[''],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+              }).then((AMap)=>{
+                map.value = new AMap.Map("container",{  //设置地图容器id
+                  viewMode:"3D",    //是否为3D地图模式
+                  zoom:5,           //初始化地图级别
+                  center:[105.602725,37.076636], //初始化地图中心点位置
+                });
+                getWeatherDeviceList().then(res=>{
+                    const data = res.data.data;
+                    data.forEach(element => {
+                        console.log(element)
+                        var marker = new AMap.Marker({
+                            position: new AMap.LngLat(
+                                element.location.split(",")[0],
+                                element.location.split(",")[1]
+                            ), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+                            anchor:'bottom-center',
+                            offset: new AMap.Pixel(0, 0)
+                        });
+                        marker.setMap(map.value);
+                        marker.setLabel({
+                            direction:'top',
+                            offset: new AMap.Pixel(0,-5 ),  //设置文本标注偏移量
+                            content: `<div class='info'>实时温度:${element.lastValue}℃</div>`, //设置文本标注内容
+                        });
+                    });
+                })
+                
+              }).catch(e=>{
+                console.log(e);
+              })
+        }
 
         return {
             countDataChartRef,
             reactiveData,
+            statisticData,
+            map,
         }
     },
 })

@@ -22,6 +22,12 @@
             </el-col>
             <el-col :span="16" class="header_item">
                 <el-menu :default-active="handleMenuEnter($route.path)" mode="horizontal" :router="true" class="header_menu">
+                    <el-menu-item index="/home">
+                        <el-icon>
+                            <HomeFilled />
+                        </el-icon>
+                        首页
+                    </el-menu-item>
                     <template v-for="menu in menus">
                         <el-sub-menu v-if="menu.children" :key="menu.name" :index="menu.path">
                             <template #title>{{ menu.meta.title }}</template>
