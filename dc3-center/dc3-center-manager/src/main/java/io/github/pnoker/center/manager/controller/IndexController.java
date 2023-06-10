@@ -19,6 +19,7 @@ package io.github.pnoker.center.manager.controller;
 import io.github.pnoker.center.manager.service.IndexService;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DataStatisticsDTO;
+import io.github.pnoker.common.dto.WeatherDeviceStatisticsDTO;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Index Controller
@@ -57,6 +59,15 @@ public class IndexController {
     @GetMapping("statistics")
     public R<DataStatisticsDTO> statistics() {
         return R.ok(indexService.dataStatistics());
+    }
+
+    /**
+     * 高德天气驱动设备列表
+     * TODO 此接口包含过多固定值,后期应该优化掉
+     */
+    @GetMapping("weatherDeviceList")
+    public R<List<WeatherDeviceStatisticsDTO>> weatherDeviceList() {
+        return R.ok(indexService.weatherDeviceList());
     }
 
 }

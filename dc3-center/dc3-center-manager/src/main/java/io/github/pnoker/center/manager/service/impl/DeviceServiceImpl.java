@@ -334,6 +334,11 @@ public class DeviceServiceImpl implements DeviceService {
                 .sum();
     }
 
+    @Override
+    public List<Device> selectAllByDriverId(String driverId, String tenantId) {
+        return deviceMapper.selectList(new LambdaQueryWrapper<Device>().eq(Device::getDriverId, driverId).eq(Device::getTenantId, tenantId));
+    }
+
     /**
      * 导入设备
      *
