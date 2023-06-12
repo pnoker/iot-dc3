@@ -84,6 +84,13 @@
             <version>2023.4.3</version>
         </dependency>
 
+        <!-- DC3 Common tdengine -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-tdengine</artifactId>
+            <version>2023.4.3</version>
+        </dependency>
+
         <!-- DC3 Common Quartz -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
