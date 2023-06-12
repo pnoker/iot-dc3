@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "data.point.sava.influxdb.enable", havingValue = "true")
-public class InfluxDataServiceImpl implements RepositoryService, InitializingBean {
+public class InfluxServiceImpl implements RepositoryService, InitializingBean {
 
     @Resource
     private InfluxDBClient influxDBClient;
