@@ -46,6 +46,8 @@ data:
     sava:
       influxdb:
         enable: false
+      tdengine:
+        enable: false
       opentsdb:
         enable: false
         host: dc3-opentsdb
