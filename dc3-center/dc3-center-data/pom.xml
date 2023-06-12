@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2023.4.3</version>
+        <version>2023.4.4</version>
     </parent>
 
     <artifactId>dc3-center-data</artifactId>
@@ -77,19 +77,17 @@
             <artifactId>dc3-common-redis</artifactId>
         </dependency>
 
-        <!-- DC3 Common InfluxData -->
+        <!-- DC3 Common Influx -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-influxdata</artifactId>
-            <version>2023.4.3</version>
+            <artifactId>dc3-common-influx</artifactId>
         </dependency>
 
         <!-- DC3 Common tdengine -->
-        <dependency>
+        <!--<dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-tdengine</artifactId>
-            <version>2023.4.3</version>
-        </dependency>
+        </dependency>-->
 
         <!-- DC3 Common Quartz -->
         <dependency>
